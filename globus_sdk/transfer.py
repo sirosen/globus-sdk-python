@@ -6,32 +6,9 @@ from globus_sdk.base import BaseClient
 from globus_sdk import config
 
 
-NEXUS_TOKEN_PATH = "/goauth/token?grant_type=client_credentials"
-
-
 class TransferClient(BaseClient):
     def __init__(self, environment="default"):
         BaseClient.__init__(self, "transfer", environment, "/v0.10/")
-
-    def get_goauth_token(self, username, password):
-        """
-        Legacy method for getting a GOAuth token from nexus using
-        globusid username and password. Clients using this should
-        be prepared to migrate to Globus Auth.
-
-        Note that these tokens have a long lifetime and should be saved
-        and re-used.
-
-        TODO: should this live somewhere else? It's temporary anyway, so
-        maybe doesn't matter?
-        """
-        nexus_url = config.get_service_url(self.environment, "nexus")
-        url = "https://%s%s" % (nexus_url, NEXUS_TOKEN_PATH)
-        headers = dict(Accepts="application/json")
-        r = requests.get(url, auth=(username, password),
-                         headers=headers, verifyf=self._verify)
-        data = r.json()
-        return data["access_token"]
 
     # Convenience methods, providing more pythonic access to common REST
     # resources

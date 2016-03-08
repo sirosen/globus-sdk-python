@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(name="globus-sdk-python",
       version="0.1",
@@ -8,6 +8,10 @@ setup(name="globus-sdk-python",
       author_email="ballen@globus.org",
       url="https://github.com/globusonline/globus-sdk-python",
       packages=["globus_sdk"],
+      package_data={'': ['*.cfg']},
+      install_requires=[
+          'requests>=2.0.0,<3.0.0'
+      ],
       keywords=["globus", "file transfer"],
       classifiers=[
           "Development Status :: 4 - Beta",
