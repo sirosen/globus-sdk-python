@@ -15,5 +15,5 @@ class AuthClient(BaseClient):
     def token_introspect(self, token, **kw):
         post_data = dict(token=token)
         post_data.update(kw)
-        string_data = urllib.urlencode(post_data)
-        return self.post("/v2/oauth2/token/introspect", data=string_data)
+        return self.post("/v2/oauth2/token/introspect",
+                         text_body=urllib.urlencode(post_data))

@@ -19,7 +19,6 @@ class BaseClient(object):
         self.base_url = config.get_service_url(environment, service)
         if base_path is not None:
             self.base_url = slash_join(self.base_url, base_path)
-        print "base_url", self.base_url
         self._s = requests.Session()
         self._headers = dict(Accepts="application/json")
         # TODO: get this from config file, default True
@@ -34,37 +33,38 @@ class BaseClient(object):
     def get(self, path, params=None, headers=None):
         return self._request("GET", path, params=params, headers=headers)
 
-    def post(self, path, data=None, params=None, headers=None):
-        return self._request("POST", path, data=data, params=params,
-                             headers=headers)
+    def post(self, path, json_body=None, params=None, headers=None,
+             text_body=None):
+        return self._request("POST", path, json_body=json_body, params=params,
+                             headers=headers, text_body=text_body)
 
     def delete(self, path, params=None, headers=None):
         return self._request("DELETE", path, params=params, headers=headers)
 
-    def put(self, path, data=None):
-        return self._request("PUT", path, data=data)
+    def put(self, path, json_body=None, params=None, headers=None,
+            text_body=None):
+        return self._request("PUT", path, json_body=json_body, params=params,
+                             headers=headers, text_body=text_body)
 
-    def _request(self, method, path, data=None, params=None, headers=None):
+    def _request(self, method, path, params=None, headers=None,
+                 json_body=None, text_body=None):
         """
-        :param data: data to send in the request body. If not a string,
-                     it will be serialized with JSON.
+        :param json_body: Python data structure to send in the request body
+                          serialized as JSON
+        :param text_body: string to send in the request body
         """
-        # TODO: add a content_type param, and encode using
-        # urlencode or json depending on type? While most of our APIs
-        # use JSON, some of the auth APIs are based on existing specs
-        # and use urlenocde instead.
-        if data is not None and not isinstance(data, basestring):
-            data = json.dumps(data)
+        if json_body is not None:
+            assert text_body is None
+            text_body = json.dumps(json_body)
         rheaders = dict(self._headers)
         if headers is not None:
             rheaders.update(headers)
         url = slash_join(self.base_url, path)
-        print url
         r = self._s.request(method=method,
                             url=url,
                             headers=rheaders,
                             params=params,
-                            data=data,
+                            data=text_body,
                             verify=self._verify)
         if 200 <= r.status_code < 400:
             return GlobusResponse(r)

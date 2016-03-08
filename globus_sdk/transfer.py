@@ -11,7 +11,7 @@ NEXUS_TOKEN_PATH = "/goauth/token?grant_type=client_credentials"
 
 class TransferClient(BaseClient):
     def __init__(self, environment="default"):
-        BaseClient.__init__(self, "transfer", environment, "v0.10/")
+        BaseClient.__init__(self, "transfer", environment, "/v0.10/")
 
     def get_goauth_token(self, username, password):
         """
@@ -51,7 +51,7 @@ class TransferClient(BaseClient):
 
     def create_endpoint(self, data):
         """POST /endpoint/<endpoint_id>"""
-        return self.post("endpoint", data=data)
+        return self.post("endpoint", data)
 
 
 def _get_client_from_args():
