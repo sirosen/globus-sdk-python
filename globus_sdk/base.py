@@ -30,25 +30,26 @@ class BaseClient(object):
     def qjoin_path(self, *parts):
         return "/" + "/".join(urllib.quote(part) for part in parts)
 
-    def get(self, path, params=None, headers=None, **kw):
-        return self._request("GET", path, params=params, headers=headers, **kw)
+    def get(self, path, params=None, headers=None, auth=None):
+        return self._request("GET", path, params=params, headers=headers,
+                             auth=auth)
 
     def post(self, path, json_body=None, params=None, headers=None,
-             text_body=None, **kw):
+             text_body=None, auth=None):
         return self._request("POST", path, json_body=json_body, params=params,
-                             headers=headers, text_body=text_body, **kw)
+                             headers=headers, text_body=text_body, auth=auth)
 
-    def delete(self, path, params=None, headers=None, **kw):
+    def delete(self, path, params=None, headers=None, auth=None):
         return self._request("DELETE", path, params=params,
-                             headers=headers, **kw)
+                             headers=headers, auth=auth)
 
     def put(self, path, json_body=None, params=None, headers=None,
-            text_body=None, **kw):
+            text_body=None, auth=None):
         return self._request("PUT", path, json_body=json_body, params=params,
-                             headers=headers, text_body=text_body, **kw)
+                             headers=headers, text_body=text_body, auth=auth)
 
     def _request(self, method, path, params=None, headers=None,
-                 json_body=None, text_body=None, **kw):
+                 json_body=None, text_body=None, auth=None):
         """
         :param json_body: Python data structure to send in the request body
                           serialized as JSON
@@ -67,7 +68,7 @@ class BaseClient(object):
                             params=params,
                             data=text_body,
                             verify=self._verify,
-                            **kw)
+                            auth=auth)
         if 200 <= r.status_code < 400:
             return GlobusResponse(r)
         # TODO: an alternative to raising an error for 400+, we could
