@@ -1,9 +1,6 @@
 from __future__ import print_function
 
-import requests
-
 from globus_sdk.base import BaseClient
-from globus_sdk import config
 
 
 class TransferClient(BaseClient):
@@ -29,6 +26,9 @@ class TransferClient(BaseClient):
     def create_endpoint(self, data):
         """POST /endpoint/<endpoint_id>"""
         return self.post("endpoint", data)
+
+    def endpoint_search(self, **params):
+        return self.get("endpoint_search", params=params)
 
 
 def _get_client_from_args():

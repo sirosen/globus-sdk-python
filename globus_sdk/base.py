@@ -19,10 +19,12 @@ class BaseClient(object):
         self.base_url = config.get_service_url(environment, service)
         if base_path is not None:
             self.base_url = slash_join(self.base_url, base_path)
-        self._s = requests.Session()
+        self._session = requests.Session()
         self._headers = dict(Accepts="application/json")
         # TODO: get this from config file, default True
         self._verify = True
+        if "ec2" in self.base_url:
+            self._verify = False
 
     def set_auth_token(self, token):
         self._headers["Authorization"] = "Bearer %s" % token
@@ -62,13 +64,13 @@ class BaseClient(object):
         if headers is not None:
             rheaders.update(headers)
         url = slash_join(self.base_url, path)
-        r = self._s.request(method=method,
-                            url=url,
-                            headers=rheaders,
-                            params=params,
-                            data=text_body,
-                            verify=self._verify,
-                            auth=auth)
+        r = self._session.request(method=method,
+                                  url=url,
+                                  headers=rheaders,
+                                  params=params,
+                                  data=text_body,
+                                  verify=self._verify,
+                                  auth=auth)
         if 200 <= r.status_code < 400:
             return GlobusResponse(r)
         # TODO: an alternative to raising an error for 400+, we could
@@ -81,7 +83,7 @@ class BaseClient(object):
 
 class GlobusResponse(object):
     def __init__(self, r):
-        self._r = r
+        self._underlying_request = r
         # NB: the word 'code' is confusing because we use it in the
         # error body, and status_code is not much better. http_code, or
         # http_status_code if we wanted to be really explicit, is
@@ -91,12 +93,12 @@ class GlobusResponse(object):
         self.content_type = r.headers["Content-Type"]
 
     @property
-    def json(self):
-        return self._r.json()
+    def json_body(self):
+        return self._underlying_request.json()
 
     @property
-    def text(self):
-        return self._r.text
+    def text_body(self):
+        return self._underlying_request.text
 
 
 class GlobusError(Exception):
@@ -118,6 +120,10 @@ class GlobusError(Exception):
 
 
 def slash_join(a, b):
+    """
+    Join a and b with a single slash, regardless of whether they already
+    contain a trailing/leading slash or neither.
+    """
     if a.endswith("/"):
         if b.startswith("/"):
             return a[:-1] + b
