@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from globus_sdk.base import BaseClient
+from globus_sdk.base import BaseClient, GlobusError
 
 
 class NexusClient(BaseClient):
