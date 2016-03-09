@@ -10,7 +10,7 @@ class AuthClient(BaseClient):
         BaseClient.__init__(self, "auth", environment)
 
     def get_identities(self, **kw):
-        return self.get("/v2/identities", params=kw)
+        return self.get("/v2/api/identities", params=kw)
 
     def token_introspect(self, token, **kw):
         post_data = dict(token=token)
