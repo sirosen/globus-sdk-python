@@ -3,24 +3,49 @@ Load config files once per interpreter invocation.
 """
 
 import os.path
-from ConfigParser import SafeConfigParser
+from ConfigParser import SafeConfigParser, NoOptionError
 
 
 _parser = None
 
 
 def get_service_url(environment, service):
-    section = "environment " + environment
+    section = _env_section(environment)
     option = service + "_service"
     # TODO: validate with urlparse?
     return _get(section, option)
 
 
-def _get(section, option):
+def get_auth_token(environment):
+    """
+    Fetch any auth token from the config, if one is present
+    """
+    section = _env_section(environment)
+
+    tkn = _get(section, 'auth_token', failover_to_general=True)
+
+    return tkn
+
+
+def _env_section(envname):
+    return 'environment ' + envname
+
+
+def _get(section, option, failover_to_general=False):
+    """
+    Attempt to lookup an option in the config file. Optionally failover to the
+    [general] section if the option is not found.
+    Returns None for an unfound key, rather than raising a NoOptionError.
+    """
     global _parser
     if _parser is None:
         _parser = _load_config()
-    return _parser.get(section, option)
+    try:
+        return _parser.get(section, option)
+    except NoOptionError:
+        if failover_to_general:
+            return _get('general', option)
+        return None
 
 
 def _load_config():
