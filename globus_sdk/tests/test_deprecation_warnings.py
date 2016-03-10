@@ -35,7 +35,7 @@ class DeprecationWarningsTests(CapturedIOTestCase):
         Nexus Client Prints Deprecation Warning
         """
         warnings.simplefilter('always')
-        ncl = NexusClient()
+        NexusClient()
 
         expected = NexusClient._DEPRECATION_TEXT
         err = self.stderr.getvalue()
@@ -47,7 +47,7 @@ class DeprecationWarningsTests(CapturedIOTestCase):
         """
         warnings.simplefilter('ignore', PendingDeprecationWarning)
         warnings.simplefilter('ignore', DeprecationWarning)
-        ncl = NexusClient()
+        NexusClient()
 
         not_expected = NexusClient._DEPRECATION_TEXT
         err = self.stderr.getvalue()
@@ -60,8 +60,8 @@ class DeprecationWarningsTests(CapturedIOTestCase):
         """
         warnings.simplefilter('once', PendingDeprecationWarning)
         warnings.simplefilter('once', DeprecationWarning)
-        ncl1 = NexusClient()
-        ncl2 = NexusClient()
+        NexusClient()
+        NexusClient()
 
         expected = NexusClient._DEPRECATION_TEXT
         err = self.stderr.getvalue()
