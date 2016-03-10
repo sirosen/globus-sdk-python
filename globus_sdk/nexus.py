@@ -1,11 +1,24 @@
-from __future__ import print_function
+import warnings
 
 from globus_sdk.base import BaseClient, GlobusError
 
 
 class NexusClient(BaseClient):
+    """
+    A client for accessing the (mostly deprecated) Nexus API.
+    It is still required for a very limited set of activities -- mostly
+    fetching the older style of Globus Access Tokens (GOAuth Tokens).
+    """
+    _DEPRECATION_TEXT = (
+        'Globus Nexus provides access to features of Globus which are '
+        'being moved to new services. If you use Nexus, be ready to '
+        'transition to the new API after we announce it\'s availability.'
+    )
+
     def __init__(self, environment="default"):
         BaseClient.__init__(self, "nexus", environment)
+        # warn that this class is deprecated upon initialization
+        warnings.warn(self._DEPRECATION_TEXT, PendingDeprecationWarning)
 
     def get_goauth_token(self, username, password):
         """
