@@ -1,5 +1,6 @@
 import urllib
 import json
+import warnings
 
 import requests
 
@@ -21,6 +22,18 @@ class BaseClient(object):
             self.base_url = slash_join(self.base_url, base_path)
         self._session = requests.Session()
         self._headers = dict(Accepts="application/json")
+
+        # potentially add an Authorization header, if a token is specified
+        auth_token = config.get_auth_token(environment)
+        if auth_token:
+            warnings.warn(
+                ('Providing raw Auth Tokens is not recommended, and is slated '
+                 'for deprecation. If you use this feature, be ready to '
+                 'transition to using a new authentication mechanism after we '
+                 'announce its availability.'),
+                PendingDeprecationWarning)
+            self.set_auth_token(auth_token)
+
         # TODO: get this from config file, default True
         self._verify = True
         if "ec2" in self.base_url:
