@@ -80,9 +80,10 @@ def _get(section, option, failover_to_general=False, check_env=False):
     [general] section if the option is not found.
 
     Also optionally, check for a relevant environment variable, which is named
-    always as GLOBUS_{option.upper()}. Note that 'section' doesn't slot into
-    the naming at all. Otherwise, we'd have to contend with GLOBUS_GENERAL_...
-    for almost everything, and GLOBUS_ENVIRONMENT\ PROD_... which is awful.
+    always as GLOBUS_SDK_{option.upper()}. Note that 'section' doesn't slot
+    into the naming at all. Otherwise, we'd have to contend with
+    GLOBUS_SDK_GENERAL_... for almost everything, and
+    GLOBUS_SDK_ENVIRONMENT\ PROD_... which is awful.
 
     Returns None for an unfound key, rather than raising a NoOptionError.
     """
@@ -94,7 +95,7 @@ def _get(section, option, failover_to_general=False, check_env=False):
     # *first* for a value -- env values have higher precedence than config
     # files so that you can locally override the behavior of a command in a
     # given shell or subshell
-    env_option_name = 'GLOBUS_{}'.format(option.upper())
+    env_option_name = 'GLOBUS_SDK_{}'.format(option.upper())
     if check_env and env_option_name in os.environ:
         return os.environ[env_option_name]
 
