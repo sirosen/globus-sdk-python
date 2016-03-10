@@ -3,8 +3,51 @@ Load config files once per interpreter invocation.
 """
 
 import os.path
-from ConfigParser import SafeConfigParser, NoOptionError
+from ConfigParser import (
+    SafeConfigParser, NoOptionError, MissingSectionHeaderError)
 
+# use StringIO to wrap up reads from file-like objects in new file-like objects
+# import it in a py2/py3 safe way
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+
+class GlobusConfigParser(SafeConfigParser):
+    """
+    A very slightly modified config parser that captures
+    MissingSectionHeaderError and injects '[general]\n' at the beginning of
+    file contents IFF it is triggered on a filename during a call to read() or
+    readfp()
+    """
+    def _read(self, fp, fpname):
+        """
+        Wrap the parent class's _read() function, which is what handles
+        slurping things in from raw file-like objects.
+        This is slightly more dangerous than overriding read() and readfp()
+        directly, as a future version of Python could change the implementation
+        of _read() significantly, but it's also easier to read and understand.
+        Given that we're already going to be subclassing from a stdlib class,
+        that danger already exists a bit -- doesn't seem that bad.
+        """
+        # wrap the file-like object in a StringIO so that we can do quick and
+        # easy calls to seek(0) without touching disk or worrying about reading
+        # something that doesn't support seek() (like a socket)
+        # call me paranoid, but it might save us down the line
+        wrapped_fp = StringIO(fp.read())
+        try:
+            return SafeConfigParser._read(self, wrapped_fp, fpname)
+        except MissingSectionHeaderError:
+            # go back to the beginning so that we can do a fresh read
+            wrapped_fp.seek(0)
+            # create a new StringIO with the desired content because write()
+            # would just append
+            wrapped_fp = StringIO('[general]\n'+wrapped_fp.read())
+            # don't capture errors here -- there shouldn't be any
+            # MissingSectionHeaderErrors anymore because the section is right
+            # at the top
+            return SafeConfigParser._read(self, wrapped_fp, fpname)
 
 _parser = None
 
@@ -49,7 +92,7 @@ def _get(section, option, failover_to_general=False):
 
 
 def _load_config():
-    parser = SafeConfigParser()
+    parser = GlobusConfigParser()
     # TODO: /etc is not windows friendly, not sure about expanduser
     parser.read([_get_lib_config_path(), "/etc/globus.cfg",
                  os.path.expanduser("~/.globus.cfg")])
