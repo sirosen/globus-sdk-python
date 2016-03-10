@@ -2,7 +2,7 @@
 Load config files once per interpreter invocation.
 """
 
-import os.path
+import os
 from ConfigParser import (
     SafeConfigParser, NoOptionError, MissingSectionHeaderError)
 
@@ -65,7 +65,7 @@ def get_auth_token(environment):
     """
     section = _env_section(environment)
 
-    tkn = _get(section, 'auth_token', failover_to_general=True)
+    tkn = _get(section, 'auth_token', failover_to_general=True, check_env=True)
 
     return tkn
 
@@ -74,15 +74,30 @@ def _env_section(envname):
     return 'environment ' + envname
 
 
-def _get(section, option, failover_to_general=False):
+def _get(section, option, failover_to_general=False, check_env=False):
     """
     Attempt to lookup an option in the config file. Optionally failover to the
     [general] section if the option is not found.
+
+    Also optionally, check for a relevant environment variable, which is named
+    always as GLOBUS_{option.upper()}. Note that 'section' doesn't slot into
+    the naming at all. Otherwise, we'd have to contend with GLOBUS_GENERAL_...
+    for almost everything, and GLOBUS_ENVIRONMENT\ PROD_... which is awful.
+
     Returns None for an unfound key, rather than raising a NoOptionError.
     """
     global _parser
     if _parser is None:
         _parser = _load_config()
+
+    # if this is a config option which checks the environment, look there
+    # *first* for a value -- env values have higher precedence than config
+    # files so that you can locally override the behavior of a command in a
+    # given shell or subshell
+    env_option_name = 'GLOBUS_{}'.format(option.upper())
+    if check_env and env_option_name in os.environ:
+        return os.environ[env_option_name]
+
     try:
         return _parser.get(section, option)
     except NoOptionError:
