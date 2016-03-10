@@ -12,6 +12,14 @@ setup(name="globus-sdk-python",
       install_requires=[
           'requests>=2.0.0,<3.0.0'
       ],
+
+      # run tests with nose2, include mock (for python2)
+      tests_require=[
+          'nose2',
+          'mock'
+      ],
+      test_suite='nose2.collector.collector',
+
       keywords=["globus", "file transfer"],
       classifiers=[
           "Development Status :: 4 - Beta",
