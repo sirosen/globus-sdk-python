@@ -58,6 +58,29 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id, "ls")
         return self.get(path, params=params)
 
+    def endpoint_search_iterator(self, *args, **kwargs):
+        """
+        Wrap endpoint_search calls in an iterator that walks over the paginated
+        results, returning the search result objects themselves (rather than
+        the wrapping JSON object, which isn't relevant in this context).
+        """
+        has_next_page = True
+        offset = 0
+        limit = 100
+        while has_next_page:
+            kwargs['offset'] = offset
+            kwargs['limit'] = limit
+            res = self.endpoint_search(*args, **kwargs).json_body
+            for item in res['DATA']:
+                yield item
+
+            has_next_page = res['has_next_page']
+            offset += limit
+            # transfer caps at offset=999, so harshly end the search here if
+            # that's what we were given
+            if offset > 999:
+                has_next_page = False
+
 
 def _get_client_from_args():
     import sys
