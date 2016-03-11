@@ -3,7 +3,7 @@ Load config files once per interpreter invocation.
 """
 
 import os
-from ConfigParser import SafeConfigParser, NoOptionError
+from ConfigParser import SafeConfigParser, NoOptionError, NoSectionError
 
 # use StringIO to wrap up reads from file-like objects in new file-like objects
 # import it in a py2/py3 safe way
@@ -100,7 +100,7 @@ class GlobusConfigParser(object):
         else:
             try:
                 value = self._parser.get(section, option)
-            except NoOptionError:
+            except (NoOptionError, NoSectionError):
                 if failover_to_general:
                     value = self.get(option,
                                      section=self._GENERAL_CONF_SECTION)
