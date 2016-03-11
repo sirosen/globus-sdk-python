@@ -1,9 +1,25 @@
 from __future__ import print_function
 
-from globus_sdk.base import BaseClient
+from globus_sdk.base import BaseClient, GlobusError
+
+
+class TransferError(GlobusError):
+    def __init__(self, r):
+        self.request_id = None
+        GlobusError.__init__(self, r)
+
+    def _get_args(self):
+        return (self.http_status, self.code, self.message, self.request_id)
+
+    def _load_from_json(self, data):
+        self.code = data["code"]
+        self.message = data["message"]
+        self.request_id = data["request_id"]
 
 
 class TransferClient(BaseClient):
+    error_class = TransferError
+
     def __init__(self, environment="default"):
         BaseClient.__init__(self, "transfer", environment, "/v0.10/")
 
@@ -29,6 +45,14 @@ class TransferClient(BaseClient):
 
     def endpoint_search(self, **params):
         return self.get("endpoint_search", params=params)
+
+    def endpoint_autoactivate(self, endpoint_id, **params):
+        path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
+        return self.post(path, params=params)
+
+    def operation_ls(self, endpoint_id, **params):
+        path = self.qjoin_path("endpoint", endpoint_id, "ls")
+        return self.get(path, params=params)
 
 
 def _get_client_from_args():

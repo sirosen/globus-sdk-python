@@ -66,7 +66,8 @@ class GlobusConfigParser(object):
 
     def get(self, option,
             section=None, environment=None,
-            failover_to_general=False, check_env=False):
+            failover_to_general=False, check_env=False,
+            type_cast=str):
         """
         Attempt to lookup an option in the config file. Optionally failover to
         the general section if the option is not found.
@@ -88,20 +89,25 @@ class GlobusConfigParser(object):
         if section is None:
             section = self._GENERAL_CONF_SECTION
 
-        # if this is a config option which checks the environment, look there
+        # if this is a config option which checks the shell env, look there
         # *first* for a value -- env values have higher precedence than config
         # files so that you can locally override the behavior of a command in a
         # given shell or subshell
         env_option_name = 'GLOBUS_SDK_{}'.format(option.upper())
+        value = None
         if check_env and env_option_name in os.environ:
-            return os.environ[env_option_name]
+            value = os.environ[env_option_name]
+        else:
+            try:
+                value = self._parser.get(section, option)
+            except NoOptionError:
+                if failover_to_general:
+                    value = self.get(option,
+                                     section=self._GENERAL_CONF_SECTION)
 
-        try:
-            return self._parser.get(section, option)
-        except NoOptionError:
-            if failover_to_general:
-                return self.get(option, section=self._GENERAL_CONF_SECTION)
-            return None
+        if value is not None:
+            value = type_cast(value)
+        return value
 
 
 def _get_parser():
@@ -122,6 +128,25 @@ def get_service_url(environment, service):
     option = service + "_service"
     # TODO: validate with urlparse?
     return p.get(option, environment=environment)
+
+
+def get_ssl_verify(environment):
+    p = _get_parser()
+    value = p.get("ssl_verify", environment=environment,
+                  failover_to_general=False, check_env=True,
+                  type_cast=_bool_cast)
+    if value is None:
+        return True
+    return value
+
+
+def _bool_cast(value):
+    value = value.lower()
+    if value in ("1", "yes", "true", "on"):
+        return True
+    elif value in ("0", "no", "false", "off"):
+        return False
+    raise ValueError("Invalid config bool")
 
 
 def get_auth_token(environment):
