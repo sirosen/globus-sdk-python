@@ -1,6 +1,7 @@
 import warnings
 
-from globus_sdk.base import BaseClient, GlobusError
+from globus_sdk.base import BaseClient
+from globus_sdk import exc
 
 
 class NexusClient(BaseClient):
@@ -34,6 +35,6 @@ class NexusClient(BaseClient):
         try:
             return r.json_body['access_token']
         except KeyError:
-            raise GlobusError(r)
+            raise exc.GlobusAPIError(r)
         else:
             raise

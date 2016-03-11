@@ -5,46 +5,7 @@ import warnings
 import requests
 
 from globus_sdk import config
-
-
-class GlobusError(Exception):
-    def __init__(self, r, *args, **kw):
-        self._underlying_response = r
-        self.http_status = r.status_code
-        if "application/json" in r.headers["Content-Type"]:
-            try:
-                self._load_from_json(r.json())
-            except KeyError:
-                self._load_from_text(r.text)
-        else:
-            # fallback to using the entire body as the message for all
-            # other types
-            self._load_from_text(r.text)
-        args = self._get_args()
-        Exception.__init__(self, *args)
-
-    def _get_args(self):
-        """
-        Get arguments to pass to the Exception base class. These args are
-        displayed in stack traces.
-        """
-        return (self.http_status, self.code, self.message)
-
-    def _load_from_json(self, data):
-        """
-        Load error data from a JSON document. Must set at least
-        code and message instance variables.
-        """
-        self.code = data["code"]
-        self.message = data["message"]
-
-    def _load_from_text(self, text):
-        """
-        Load error data from a raw text body that is not JSON. Must set at
-        least code and message instance variables.
-        """
-        self.code = "Error"
-        self.message = text
+from globus_sdk import exc
 
 
 class BaseClient(object):
@@ -56,7 +17,7 @@ class BaseClient(object):
     """
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
-    error_class = GlobusError
+    error_class = exc.GlobusAPIError
 
     def __init__(self, service, environment="default", base_path=None):
         self.environment = environment

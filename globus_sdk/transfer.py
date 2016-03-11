@@ -1,24 +1,11 @@
 from __future__ import print_function
 
-from globus_sdk.base import BaseClient, GlobusError
-
-
-class TransferError(GlobusError):
-    def __init__(self, r):
-        self.request_id = None
-        GlobusError.__init__(self, r)
-
-    def _get_args(self):
-        return (self.http_status, self.code, self.message, self.request_id)
-
-    def _load_from_json(self, data):
-        self.code = data["code"]
-        self.message = data["message"]
-        self.request_id = data["request_id"]
+from globus_sdk.base import BaseClient
+from globus_sdk import exc
 
 
 class TransferClient(BaseClient):
-    error_class = TransferError
+    error_class = exc.TransferAPIError
 
     def __init__(self, environment="default"):
         BaseClient.__init__(self, "transfer", environment, "/v0.10/")
