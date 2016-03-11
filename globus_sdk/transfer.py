@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from globus_sdk.base import BaseClient
+from globus_sdk.base import BaseClient, merge_params
 from globus_sdk import exc
 
 
@@ -30,7 +30,24 @@ class TransferClient(BaseClient):
         """POST /endpoint/<endpoint_id>"""
         return self.post("endpoint", data)
 
-    def endpoint_search(self, **params):
+    def endpoint_search(self, filter_fulltext, filter_scope=None, **params):
+        """
+        GET /endpoint_search?filter_fulltext=<filter_fulltext>
+                            &filter_scope=<filter_scope>
+
+        Additional params and valid filter_scopes are documented at
+        https://docs.globus.org/api/transfer/endpoint_search
+
+
+        # Examples
+        Search for a given string as a fulltext search:
+        >>> endpoint_search('String to search for!')
+
+        Search for a given string, but only on endpoints that you own:
+        >>> endpoint_search('foo', filter_scope='my-endpoints')
+        """
+        merge_params(params, filter_scope=filter_scope,
+                     filter_fulltext=filter_fulltext)
         return self.get("endpoint_search", params=params)
 
     def endpoint_autoactivate(self, endpoint_id, **params):
