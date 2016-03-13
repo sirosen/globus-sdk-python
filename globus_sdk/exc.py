@@ -57,3 +57,10 @@ class TransferAPIError(GlobusAPIError):
         self.code = data["code"]
         self.message = data["message"]
         self.request_id = data["request_id"]
+
+
+class PaginationOverrunError(GlobusError):
+    """
+    Paginated results exceeded a limit set by our API. Too many pages of
+    results were being requested, and the API maximum would be exceeded.
+    """
