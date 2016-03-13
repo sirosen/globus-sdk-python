@@ -117,7 +117,7 @@ def paginated_resource(page_size, default_limit, max_total_results):
             while has_next_page:
                 # check the offset to see if it exceeds the maximum total
                 # number of results allowed by the API
-                if offset > max_total_results:
+                if offset >= max_total_results:
                     raise exc.PaginationOverrunError((
                         'Paginated call exceeded API limit. Try being more '
                         'restrictive with the results you request, or pass a '
