@@ -1,30 +1,17 @@
 from __future__ import print_function
 
+import functools
+
 from globus_sdk.base import BaseClient, merge_params
 from globus_sdk import exc
 
 
-def paginated_resource(page_size, default_limit, max_total_results):
+class PaginatedResource(object):
     """
     A decorator that describes paginated Transfer API resources.
     This is not a top level helper func because it depends upon the pagination
     implementation of the Transfer API, which may not be the implementation
     chosen by other, future APIs.
-
-    A more complex and generic version of this generalization, as a
-    PaginatedResource class from which various API resources inherit is
-    possible, but it requires that individually defined API resources
-    "know" how to request the next page. We chose not to do this because of the
-    complexity and limited need for it at present.
-
-    When using this decorator, it is a good idea to name the arguments, even
-    though they are positionals, for greater clarity inline.
-    As in
-
-    >>> @paginated_resource(page_size=25, default_limit=25,
-    >>>                     max_total_results=250)
-    >>> def call_that_supports_paging(...):
-    >>>     ...
 
     Expectations about Paginated Transfer API Resources:
     - They support `limit` and `offset` query params, with `limit` being a
@@ -37,96 +24,79 @@ def paginated_resource(page_size, default_limit, max_total_results):
       the returned JSON document
     """
 
-    def wrapper(func):
+    def __init__(self, page_size, max_total_results):
         """
-        Inner decorator returned by paginated_resource being called on its
-        arguments.
+        PaginatedResource takes two arguments
+        page_size is the (max) size of a page to fetch from the API.
+        max_total_results is a pagination limit for total results to return
+        from the API.
+
+        When using this decorator, it is a good idea to name the arguments,
+        even though they are positionals, for greater clarity inline, as in
+
+        >>> @PaginatedResource(page_size=25, max_total_results=250)
+        >>> def call_that_supports_paging(...):
+        >>>     ...
         """
-        def _get_paginator_kwargs(**kwargs):
-            """
-            Small helper for tidiness. Pulls some values out of kwargs, as
-            desired.
+        self.page_size = page_size
+        self.max_total_results = max_total_results
 
-            TODO: Can functools make this easier for us?
+    def _get_paging_kwargs(self, **kwargs):
+        """
+        Small helper for tidiness. Pulls some values out of kwargs, as
+        desired.
 
-            We need to pull desired values out of kwargs so that we don't
-            disrupt the flow of original positional arguments to the wrapped
-            function, `func`
-            This is messiness because a function definition can't read as
-            >>> def wrapped_func(*args, a=1, **kwargs): ...
+        We need to pull desired values out of kwargs so that we don't
+        disrupt the flow of original positional arguments to the wrapped
+        function, `func`
+        """
+        # limit for num results, with a default given by the decorator
+        # definition
+        # paginated calls should always define a `limit` kwarg, but just in
+        # case someone forgets to do so, we can fall back on the page size
+        limit = kwargs.get('limit', self.page_size)
 
-            and if we do
-            >>> def wrapped_func(a=1, *args, **kwargs): ...
+        # offset should rarely be set, but we need to handle the case in
+        # which a caller wants to start their results at a given offset
+        # manually
+        offset = kwargs.get('offset', 0)
 
-            we'll get into trouble if we try to decorate a function with
-            positional arguments (because the first one will be assigned to
-            `a`, rather than whatever positional was used in the function
-            definition)
-            """
-            # pull out the paginate=True/False with a default of false
-            paginated = kwargs.get('paginate', False)
+        return limit, offset
 
-            # limit for num results, with a default given by the decorator
-            # definition
-            limit = kwargs.get('limit', default_limit)
+    def __call__(self, func):
+        """
+        The "real" function decorator.
 
-            # offset should rarely be set, but we need to handle the case in
-            # which a caller wants to start their results at a given offset
-            # manually
-            offset = kwargs.get('offset', 0)
+        i.e. it's the result of creating a PaginatedResource(...), and applying
+        it to a function with the @<decorator> syntax.
+        """
 
-            return paginated, limit, offset
-
+        @functools.wraps(func)
         def wrapped_func(*args, **kwargs):
             """
-            Go a level deeper to produce a function which wraps the function
-            that wrapper() is being applied to! This is obvious and intuitive!
-
-            Explanation:
-            paginated_resource is used as a decorator, but takes arguments, so
-            it needs to be defined as a function on those arguments which
-            returns a decorator.
-            That decorator is wrapper().
-            wrapper() is a decorator which takes a function, and returns a
-            paginated version of that function. But wrapper(), being a
-            decorator, is a transformation that runs at function definition
-            time, so it in turn needs to create a closure over the paginated
-            function that does what we want, and return that.
-            That closure, created by the decorator wrapper(), is
-            wrapped_func().
-            Got it? Good.
-
-            Furthermore, paginated resources have their paginated behavior IFF
-            paginate=True is passed. Since that's an argument that callers of
-            the resource, not the SDK writers, control, it goes deep in here,
-            in the wrapped_func.
+            This is a closure over the wrapped function -- a paginated version
+            of that function. Lets us write paginated calls as though they were
+            single API calls, and get paginated results via an iterator
+            interface.
             """
-            # keyword args used by the paginator itself
-            paginated, limit, offset = _get_paginator_kwargs(**kwargs)
-
-            # delete paginate from kwargs so that we don't pass it to the API
-            # as a query param
-            # use pop() over del to avoid a KeyError if absent
-            kwargs.pop('paginate', None)
+            # keyword args used by the paging itself
+            limit, offset = self._get_paging_kwargs(**kwargs)
 
             # now, cap the limit per request to the page size
-            per_call_limit = min(limit, page_size)
+            per_call_limit = min(limit, self.page_size)
+
+            # check the limit to see if it exceeds the maximum total
+            # number of results allowed by the API
+            if limit > self.max_total_results:
+                raise exc.PaginationOverrunError((
+                    'Paginated call would exceed API limit. Pass a smaller '
+                    'limit parameter -- the maximum for this call is {}')
+                    .format(self.max_total_results))
 
             has_next_page = True
-
             while has_next_page:
-                # check the offset to see if it exceeds the maximum total
-                # number of results allowed by the API
-                if offset >= max_total_results:
-                    raise exc.PaginationOverrunError((
-                        'Paginated call exceeded API limit. Try being more '
-                        'restrictive with the results you request, or pass a '
-                        'smaller limit to the paginated call you are making.'))
-
                 # if we're about to request more results than the user asked
                 # for, limit ourselves on the last paginated call to the API
-                # TODO: is there a clearer way of expressing this arithmetic so
-                # that it's more obviously correct?
                 if offset + per_call_limit > limit:
                     per_call_limit = limit - offset
 
@@ -140,18 +110,13 @@ def paginated_resource(page_size, default_limit, max_total_results):
                 for item in res['DATA']:
                     yield item
 
-                offset += per_call_limit
-
+                offset += self.page_size
                 # do we have another page of results to fetch?
-                # always False if we're not paginated
-                # also false if we've reached the given limit
-                has_next_page = (res['has_next_page'] and
-                                 paginated and
-                                 offset < limit)
+                # set to False if we've reached the given limit
+                has_next_page = res['has_next_page'] and offset < limit
 
+        # we're still in __call__ here -- return the closure we just defined
         return wrapped_func
-
-    return wrapper
 
 
 class TransferClient(BaseClient):
@@ -180,9 +145,9 @@ class TransferClient(BaseClient):
         """POST /endpoint/<endpoint_id>"""
         return self.post("endpoint", data)
 
-    @paginated_resource(page_size=100, default_limit=25,
-                        max_total_results=1000)
-    def endpoint_search(self, filter_fulltext, filter_scope=None, **params):
+    @PaginatedResource(page_size=100, max_total_results=1000)
+    def endpoint_search(self, filter_fulltext, filter_scope=None, limit=25,
+                        **params):
         """
         GET /endpoint_search?filter_fulltext=<filter_fulltext>
                             &filter_scope=<filter_scope>
@@ -195,53 +160,32 @@ class TransferClient(BaseClient):
 
         # Simple Examples
         Search for a given string as a fulltext search:
-        >>> ep_list = list(endpoint_search('String to search for!'))
+        >>> for ep in endpoint_search('String to search for!'):
+        >>>     print(ep['display_name'])
 
         Search for a given string, but only on endpoints that you own:
-        >>> ep_list = list(endpoint_search('foo', filter_scope='my-endpoints'))
+        >>> for ep in endpoint_search('foo', filter_scope='my-endpoints'):
+        >>>     print('{} has ID {}'.format(ep['display_name'], ep['id']))
 
-        These forms of search are capped at 100 elements.
-        If you want to get more than 100 search results, you must use the
-        Paginated form of endpoint_search.
+        Search results are capped at a number of elements equal to the `limit`
+        parameter.
+        If you want more than the default, 25, elements, do like so:
 
-        # Paginated Search
-        endpoint_search is a paginated resource. This means that it supports
-        our global set of paginator arguments,
-          - limit: int, the number of records to return
-          - paginate: bool, turn on (or off) pagination
-
-        Paginated Resources involve multiple API calls to iterate over a result
-        set which is too large to be returned by a single call (this is why
-        endpoint_search always has an iterator interface).
-        Endpoint search returns 100 results at a time.
-        Let's consider the case in which you want to iterate over 120
-        endpoints:
-
-        >>> ep_list = list(endpoint_search('String to search for!',
-        >>>                                paginate=True, limit=120))
-
-        That means
-        - Turn on pagination (paginate=True), allowing multiple API calls to be
-          made
-        - Limit the paginated results to just 120 records
+        >>> for ep in endpoint_search('String to search for!', limit=120):
+        >>>     print(ep['display_name'])
 
         It is very important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query. If you attempt to exceed this
         limit, you will trigger a PaginationOverrunError.
 
-        >>> ep_list = list(endpoint_search('globus', # a very common string
-        >>>                                paginate=True, limit=1200))
+        >>> for ep in endpoint_search('globus', # a very common string
+        >>>                           limit=1200):
+        >>>     print(ep['display_name'])
 
         will trigger this error.
-
-        The limit can be set below the page size for endpoint search, so
-
-        >>> ep_list = list(endpoint_search('Some string', limit=50))
-
-        is perfectly valid (with or without pagination turned on).
         """
         merge_params(params, filter_scope=filter_scope,
-                     filter_fulltext=filter_fulltext)
+                     filter_fulltext=filter_fulltext, limit=limit)
         return self.get("endpoint_search", params=params)
 
     def endpoint_autoactivate(self, endpoint_id, **params):
