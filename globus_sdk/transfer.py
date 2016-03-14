@@ -24,21 +24,21 @@ class PaginatedResource(object):
       the returned JSON document
     """
 
-    def __init__(self, page_size, max_total_results):
+    def __init__(self, max_results_per_call, max_total_results):
         """
         PaginatedResource takes two arguments
-        page_size is the (max) size of a page to fetch from the API.
+        max_results_per_call is the max size of a page to fetch from the API.
         max_total_results is a pagination limit for total results to return
         from the API.
 
         When using this decorator, it is a good idea to name the arguments,
         even though they are positionals, for greater clarity inline, as in
 
-        >>> @PaginatedResource(page_size=25, max_total_results=250)
+        >>> @PaginatedResource(max_results_per_call=25, max_total_results=250)
         >>> def call_that_supports_paging(...):
         >>>     ...
         """
-        self.page_size = page_size
+        self.max_results_per_call = max_results_per_call
         self.max_total_results = max_total_results
 
     def _get_paging_kwargs(self, **kwargs):
@@ -50,18 +50,16 @@ class PaginatedResource(object):
         disrupt the flow of original positional arguments to the wrapped
         function, `func`
         """
-        # limit for num results, with a default given by the decorator
-        # definition
-        # paginated calls should always define a `limit` kwarg, but just in
-        # case someone forgets to do so, we can fall back on the page size
-        limit = kwargs.get('limit', self.page_size)
+        # paginated calls should always define a `num_results` kwarg, but just
+        # in case someone forgets to do so, we can fall back on the max allowed
+        num_results = kwargs.get('num_results', self.max_results_per_call)
 
         # offset should rarely be set, but we need to handle the case in
         # which a caller wants to start their results at a given offset
         # manually
         offset = kwargs.get('offset', 0)
 
-        return limit, offset
+        return num_results, offset
 
     def __call__(self, func):
         """
@@ -80,28 +78,28 @@ class PaginatedResource(object):
             interface.
             """
             # keyword args used by the paging itself
-            limit, offset = self._get_paging_kwargs(**kwargs)
+            num_results, offset = self._get_paging_kwargs(**kwargs)
 
-            # now, cap the limit per request to the page size
-            per_call_limit = min(limit, self.page_size)
+            # now, cap the limit per request to the max per request size
+            limit = min(num_results, self.max_results_per_call)
 
-            # check the limit to see if it exceeds the maximum total
-            # number of results allowed by the API
-            if limit > self.max_total_results:
+            # check the requested num results to see if it exceeds the maximum
+            # total number of results allowed by the API
+            if num_results > self.max_total_results:
                 raise exc.PaginationOverrunError((
                     'Paginated call would exceed API limit. Pass a smaller '
-                    'limit parameter -- the maximum for this call is {}')
+                    'num_results parameter -- the maximum for this call is {}')
                     .format(self.max_total_results))
 
             has_next_page = True
             while has_next_page:
                 # if we're about to request more results than the user asked
                 # for, limit ourselves on the last paginated call to the API
-                if offset + per_call_limit > limit:
-                    per_call_limit = limit - offset
+                if offset + limit > num_results:
+                    limit = num_results - offset
 
                 kwargs['offset'] = offset
-                kwargs['limit'] = per_call_limit
+                kwargs['limit'] = limit
 
                 res = func(*args, **kwargs).json_body
 
@@ -110,10 +108,11 @@ class PaginatedResource(object):
                 for item in res['DATA']:
                     yield item
 
-                offset += self.page_size
+                offset += self.max_results_per_call
+
                 # do we have another page of results to fetch?
                 # set to False if we've reached the given limit
-                has_next_page = res['has_next_page'] and offset < limit
+                has_next_page = res['has_next_page'] and offset < num_results
 
         # we're still in __call__ here -- return the closure we just defined
         return wrapped_func
@@ -145,9 +144,9 @@ class TransferClient(BaseClient):
         """POST /endpoint/<endpoint_id>"""
         return self.post("endpoint", data)
 
-    @PaginatedResource(page_size=100, max_total_results=1000)
-    def endpoint_search(self, filter_fulltext, filter_scope=None, limit=25,
-                        **params):
+    @PaginatedResource(max_results_per_call=100, max_total_results=1000)
+    def endpoint_search(self, filter_fulltext, filter_scope=None,
+                        num_results=25, **params):
         """
         GET /endpoint_search?filter_fulltext=<filter_fulltext>
                             &filter_scope=<filter_scope>
@@ -167,11 +166,12 @@ class TransferClient(BaseClient):
         >>> for ep in endpoint_search('foo', filter_scope='my-endpoints'):
         >>>     print('{} has ID {}'.format(ep['display_name'], ep['id']))
 
-        Search results are capped at a number of elements equal to the `limit`
-        parameter.
+        Search results are capped at a number of elements equal to the
+        `num_results` parameter.
         If you want more than the default, 25, elements, do like so:
 
-        >>> for ep in endpoint_search('String to search for!', limit=120):
+        >>> for ep in endpoint_search('String to search for!',
+        >>>                           num_results=120):
         >>>     print(ep['display_name'])
 
         It is very important to be aware that the Endpoint Search API limits
@@ -179,13 +179,13 @@ class TransferClient(BaseClient):
         limit, you will trigger a PaginationOverrunError.
 
         >>> for ep in endpoint_search('globus', # a very common string
-        >>>                           limit=1200):
+        >>>                           num_results=1200):
         >>>     print(ep['display_name'])
 
         will trigger this error.
         """
         merge_params(params, filter_scope=filter_scope,
-                     filter_fulltext=filter_fulltext, limit=limit)
+                     filter_fulltext=filter_fulltext, num_results=num_results)
         return self.get("endpoint_search", params=params)
 
     def endpoint_autoactivate(self, endpoint_id, **params):
