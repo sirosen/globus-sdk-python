@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name="globus-sdk-python",
+setup(name="globus-sdk",
       version="0.1",
       description="Globus SDK for Python",
       long_description=open("README.md").read(),
