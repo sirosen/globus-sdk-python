@@ -33,8 +33,14 @@ class GlobusAPIError(GlobusError):
         Load error data from a JSON document. Must set at least
         code and message instance variables.
         """
+        if "errors" in data:
+            # TODO: handle responses with more than one error
+            data = data["errors"][0]
         self.code = data["code"]
-        self.message = data["message"]
+        if "message" in data:
+            self.message = data["message"]
+        else:
+            self.message = data["detail"]
 
     def _load_from_text(self, text):
         """

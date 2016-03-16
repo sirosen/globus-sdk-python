@@ -1,6 +1,7 @@
 import urllib
 import json
 import warnings
+import base64
 
 import requests
 
@@ -19,13 +20,17 @@ class BaseClient(object):
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class = exc.GlobusAPIError
 
+    AUTH_TOKEN = "token"
+    AUTH_BASIC = "basic"
+
     def __init__(self, service, environment="default", base_path=None):
         self.environment = environment
         self.base_url = config.get_service_url(environment, service)
         if base_path is not None:
             self.base_url = slash_join(self.base_url, base_path)
         self._session = requests.Session()
-        self._headers = dict(Accepts="application/json")
+        self._headers = dict(Accept="application/json")
+        self._auth = None
 
         # potentially add an Authorization header, if a token is specified
         auth_token = config.get_auth_token(environment)
@@ -41,7 +46,13 @@ class BaseClient(object):
         self._verify = config.get_ssl_verify(environment)
 
     def set_auth_token(self, token):
+        self.auth_type = self.AUTH_TOKEN
         self._headers["Authorization"] = "Bearer %s" % token
+
+    def set_auth_basic(self, username, password):
+        self.auth_type = self.AUTH_BASIC
+        encoded = base64.b64encode("%s:%s" % (username, password))
+        self._headers["Authorization"] = "Basic %s" % encoded
 
     def qjoin_path(self, *parts):
         return "/" + "/".join(urllib.quote(part) for part in parts)
