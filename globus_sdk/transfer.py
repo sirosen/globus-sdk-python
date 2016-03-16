@@ -233,6 +233,22 @@ class TransferClient(BaseClient):
         for server in self.get(path, params=params).json_body['DATA']:
             yield server
 
+    def endpoint_my_shared_endpoint_list(self, endpoint_id, **params):
+        path = self.qjoin_path('endpoint', endpoint_id,
+                               'my_shared_endpoint_list')
+        for ep in self.get(path, params=params).json_body['DATA']:
+            yield ep
+
+    def endpoint_role_list(self, endpoint_id, **params):
+        path = self.qjoin_path('endpoint', endpoint_id, 'role_list')
+        for role in self.get(path, params=params).json_body['DATA']:
+            yield role
+
+    def bookmark_list(self, **params):
+        for bookmark in self.get('bookmark_list',
+                                 params=params).json_body['DATA']:
+            yield bookmark
+
     @PaginatedResource(max_results_per_call=1000, max_total_results=None,
                        paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
     def task_list(self, num_results=10, **params):
