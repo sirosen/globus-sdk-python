@@ -228,6 +228,11 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
         return self.post(path, params=params)
 
+    def endpoint_server_list(self, endpoint_id, **params):
+        path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
+        for server in self.get(path, params=params).json_body['DATA']:
+            yield server
+
     @PaginatedResource(max_results_per_call=1000, max_total_results=None,
                        paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
     def task_list(self, num_results=10, **params):
