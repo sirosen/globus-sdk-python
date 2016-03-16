@@ -233,6 +233,12 @@ class TransferClient(BaseClient):
     def task_list(self, num_results=10, **params):
         return self.get('task_list', params=params)
 
+    @PaginatedResource(max_results_per_call=1000, max_total_results=None,
+                       paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
+    def task_event_list(self, task_id, num_results=10, **params):
+        path = self.qjoin_path('task', task_id, 'event_list')
+        return self.get(path, params=params)
+
     def operation_ls(self, endpoint_id, **params):
         path = self.qjoin_path("endpoint", endpoint_id, "ls")
         return self.get(path, params=params)
