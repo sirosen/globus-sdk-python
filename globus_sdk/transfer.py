@@ -181,7 +181,7 @@ class TransferClient(BaseClient):
         return self.post("endpoint", data)
 
     @PaginatedResource(max_results_per_call=100, max_total_results=1000)
-    def endpoint_search(self, filter_fulltext, filter_scope=None,
+    def endpoint_search(self, filter_fulltext=None, filter_scope=None,
                         num_results=25, **params):
         """
         GET /endpoint_search?filter_fulltext=<filter_fulltext>
