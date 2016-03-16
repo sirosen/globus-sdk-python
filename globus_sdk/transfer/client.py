@@ -76,31 +76,49 @@ class TransferClient(BaseClient):
         return self.get("endpoint_search", params=params)
 
     def endpoint_autoactivate(self, endpoint_id, **params):
+        """
+        POST /endpoint/<endpoint_id>/autoactivate
+        """
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
         return self.post(path, params=params)
 
     def endpoint_server_list(self, endpoint_id, **params):
+        """
+        GET /endpoint/<endpoint_id>/server_list
+        """
         path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
         for server in self.get(path, params=params).json_body['DATA']:
             yield server
 
     def my_shared_endpoint_list(self, endpoint_id, **params):
+        """
+        GET /endpoint/<endpoint_id>/my_shared_endpoint_list
+        """
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_shared_endpoint_list')
         for ep in self.get(path, params=params).json_body['DATA']:
             yield ep
 
     def endpoint_role_list(self, endpoint_id, **params):
+        """
+        GET /endpoint/<endpoint_id>/role_list
+        """
         path = self.qjoin_path('endpoint', endpoint_id, 'role_list')
         for role in self.get(path, params=params).json_body['DATA']:
             yield role
 
     def endpoint_acl_list(self, endpoint_id, **params):
+        """
+        GET /endpoint/<endpoint_id>/access_list
+        """
         path = self.qjoin_path('endpoint', endpoint_id, 'access_list')
         for rule in self.get(path, params=params).json_body['DATA']:
             yield rule
 
     def bookmark_list(self, **params):
+        """
+        GET /bookmark_list
+        """
         for bookmark in self.get('bookmark_list',
                                  params=params).json_body['DATA']:
             yield bookmark
@@ -108,17 +126,38 @@ class TransferClient(BaseClient):
     @PaginatedResource(max_results_per_call=1000, max_total_results=None,
                        paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
     def task_list(self, num_results=10, **params):
+        """
+        GET /task_list
+        """
         return self.get('task_list', params=params)
 
     @PaginatedResource(max_results_per_call=1000, max_total_results=None,
                        paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
     def task_event_list(self, task_id, num_results=10, **params):
+        """
+        GET /task/<task_id>/event_list
+        """
         path = self.qjoin_path('task', task_id, 'event_list')
         return self.get(path, params=params)
 
     def operation_ls(self, endpoint_id, **params):
-        path = self.qjoin_path("endpoint", endpoint_id, "ls")
+        """
+        GET /operation/endpoint/<endpoint_id>/ls
+        """
+        path = self.qjoin_path("operation/endpoint", endpoint_id, "ls")
         return self.get(path, params=params)
+
+    def operation_mkdir(self, endpoint_id, path, **params):
+        """
+        POST /operation/endpoint/<endpoint_id>/mkdir
+        """
+        resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
+                                        "mkdir")
+        json_body = {
+            'DATA_TYPE': 'mkdir',
+            'path': path
+        }
+        return self.post(resource_path, json_body=json_body, params=params)
 
 
 def _get_client_from_args():
