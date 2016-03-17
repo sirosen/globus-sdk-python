@@ -159,6 +159,19 @@ class TransferClient(BaseClient):
         }
         return self.post(resource_path, json_body=json_body, params=params)
 
+    def operation_rename(self, endpoint_id, oldpath, newpath, **params):
+        """
+        POST /operation/endpoint/<endpoint_id>/rename
+        """
+        resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
+                                        "rename")
+        json_body = {
+            'DATA_TYPE': 'mkdir',
+            'old_path': oldpath,
+            'new_path': newpath
+        }
+        return self.post(resource_path, json_body=json_body, params=params)
+
 
 def _get_client_from_args():
     import sys
