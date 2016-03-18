@@ -5,8 +5,7 @@ import base64
 
 import requests
 
-from globus_sdk import config
-from globus_sdk import exc
+from globus_sdk import config, exc
 
 
 class BaseClient(object):
@@ -23,7 +22,8 @@ class BaseClient(object):
     AUTH_TOKEN = "token"
     AUTH_BASIC = "basic"
 
-    def __init__(self, service, environment="default", base_path=None):
+    def __init__(self, service, environment=config.get_default_environ(),
+                 base_path=None):
         self.environment = environment
         self.base_url = config.get_service_url(environment, service)
         if base_path is not None:

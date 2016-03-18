@@ -2,11 +2,12 @@ from __future__ import print_function
 
 import urllib
 
+from globus_sdk import config
 from globus_sdk.base import BaseClient, merge_params
 
 
 class AuthClient(BaseClient):
-    def __init__(self, environment="default"):
+    def __init__(self, environment=config.get_default_environ()):
         BaseClient.__init__(self, "auth", environment)
 
     def get_identities(self, **kw):

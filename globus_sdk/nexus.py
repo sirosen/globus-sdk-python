@@ -1,7 +1,7 @@
 import warnings
 
+from globus_sdk import config, exc
 from globus_sdk.base import BaseClient
-from globus_sdk import exc
 
 
 class NexusClient(BaseClient):
@@ -16,7 +16,7 @@ class NexusClient(BaseClient):
         'transition to the new API after we announce it\'s availability.'
     )
 
-    def __init__(self, environment="default"):
+    def __init__(self, environment=config.get_default_environ()):
         BaseClient.__init__(self, "nexus", environment)
         # warn that this class is deprecated upon initialization
         warnings.warn(self._DEPRECATION_TEXT, PendingDeprecationWarning)

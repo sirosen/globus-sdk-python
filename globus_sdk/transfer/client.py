@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from globus_sdk import exc
+from globus_sdk import exc, config
 from globus_sdk.base import BaseClient, merge_params
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -8,7 +8,7 @@ from globus_sdk.transfer.paging import PaginatedResource
 class TransferClient(BaseClient):
     error_class = exc.TransferAPIError
 
-    def __init__(self, environment="default"):
+    def __init__(self, environment=config.get_default_environ()):
         BaseClient.__init__(self, "transfer", environment, "/v0.10/")
 
     # Convenience methods, providing more pythonic access to common REST

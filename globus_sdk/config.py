@@ -159,3 +159,13 @@ def get_auth_token(environment):
                 failover_to_general=True, check_env=True)
 
     return tkn
+
+
+def get_default_environ():
+    """
+    Get the default environment to look for in the config, as a string.
+    Typically just "default", but it can be overridden with
+    `GLOBUS_SDK_ENVIRONMENT` in the shell environment. In that case, any client
+    which does not explicitly specify its environment will use this value.
+    """
+    return os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
