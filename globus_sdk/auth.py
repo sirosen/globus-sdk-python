@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import urllib
+from six.moves.urllib.parse import urlencode
 
 from globus_sdk import config
 from globus_sdk.base import BaseClient, merge_params
@@ -21,4 +21,4 @@ class AuthClient(BaseClient):
         """
         merge_params(kw, token=token)
         return self.post("/v2/oauth2/token/introspect",
-                         text_body=urllib.urlencode(kw)).json_body
+                         text_body=urlencode(kw)).json_body

@@ -10,7 +10,8 @@ setup(name="globus-sdk",
       packages=['globus_sdk', 'globus_sdk.transfer'],
       package_data={'': ['*.cfg']},
       install_requires=[
-          'requests>=2.0.0,<3.0.0'
+          'requests>=2.0.0,<3.0.0',
+          'six==1.10.0'
       ],
 
       # run tests with nose2, include mock (for python2)

@@ -3,7 +3,8 @@ Load config files once per interpreter invocation.
 """
 
 import os
-from ConfigParser import SafeConfigParser, NoOptionError, NoSectionError
+from six.moves.configparser import SafeConfigParser, DuplicateSectionError, \
+    NoOptionError, NoSectionError
 
 # use StringIO to wrap up reads from file-like objects in new file-like objects
 # import it in a py2/py3 safe way
@@ -60,7 +61,10 @@ class GlobusConfigParser(object):
                     # pass it to the SafeConfigParser as a file like object
                     wrapped_file = StringIO(
                         '[{}]\n'.format(self._GENERAL_CONF_SECTION) + f.read())
-                    self._parser.readfp(wrapped_file, fname)
+                    try:
+                        self._parser.readfp(wrapped_file, fname)
+                    except DuplicateSectionError:
+                        self._parser.readfp(f, fname)
             except IOError:
                 continue
 
