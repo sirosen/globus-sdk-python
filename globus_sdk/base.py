@@ -1,9 +1,10 @@
-import urllib
 import json
 import warnings
 import base64
 
 import requests
+
+from six.moves.urllib.parse import quote
 
 from globus_sdk import config, exc
 from globus_sdk.response import GlobusHTTPResponse
@@ -24,7 +25,7 @@ class BaseClient(object):
     AUTH_BASIC = "basic"
 
     def __init__(self, service, environment=config.get_default_environ(),
-                 base_path=None):
+                 base_path=None, auth_token=None):
         self.environment = environment
         self.base_url = config.get_service_url(environment, service)
         if base_path is not None:
@@ -33,15 +34,17 @@ class BaseClient(object):
         self._headers = dict(Accept="application/json")
         self._auth = None
 
-        # potentially add an Authorization header, if a token is specified
-        auth_token = config.get_auth_token(environment)
-        if auth_token:
+
+        if not auth_token:
+            # potentially add an Authorization header, if a token is specified
+            auth_token = config.get_auth_token(environment)
             warnings.warn(
                 ('Providing raw Auth Tokens is not recommended, and is slated '
                  'for deprecation. If you use this feature, be ready to '
                  'transition to using a new authentication mechanism after we '
                  'announce its availability.'),
                 PendingDeprecationWarning)
+        if auth_token:
             self.set_auth_token(auth_token)
 
         self._verify = config.get_ssl_verify(environment)
@@ -56,7 +59,7 @@ class BaseClient(object):
         self._headers["Authorization"] = "Basic %s" % encoded
 
     def qjoin_path(self, *parts):
-        return "/" + "/".join(urllib.quote(part) for part in parts)
+        return "/" + "/".join(quote(part) for part in parts)
 
     def get(self, path, params=None, headers=None, auth=None):
         return self._request("GET", path, params=params, headers=headers,

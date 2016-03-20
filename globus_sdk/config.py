@@ -64,6 +64,7 @@ class GlobusConfigParser(object):
                     try:
                         self._parser.readfp(wrapped_file, fname)
                     except DuplicateSectionError:
+                        f.seek(0)
                         self._parser.readfp(f, fname)
             except IOError:
                 continue
