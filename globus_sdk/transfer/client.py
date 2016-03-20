@@ -8,8 +8,10 @@ from globus_sdk.transfer.paging import PaginatedResource
 class TransferClient(BaseClient):
     error_class = exc.TransferAPIError
 
-    def __init__(self, environment=config.get_default_environ()):
-        BaseClient.__init__(self, "transfer", environment, "/v0.10/")
+    def __init__(self, environment=config.get_default_environ(),
+                 auth_token=None):
+        BaseClient.__init__(self, "transfer", environment, "/v0.10/",
+                            auth_token=auth_token)
 
     # Convenience methods, providing more pythonic access to common REST
     # resources
