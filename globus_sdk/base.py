@@ -1,9 +1,10 @@
-import urllib
 import json
 import warnings
 import base64
 
 import requests
+
+from six.moves.urllib.parse import quote
 
 from globus_sdk import config, exc
 
@@ -55,7 +56,7 @@ class BaseClient(object):
         self._headers["Authorization"] = "Basic %s" % encoded
 
     def qjoin_path(self, *parts):
-        return "/" + "/".join(urllib.quote(part) for part in parts)
+        return "/" + "/".join(quote(part) for part in parts)
 
     def get(self, path, params=None, headers=None, auth=None):
         return self._request("GET", path, params=params, headers=headers,
