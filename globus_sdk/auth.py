@@ -11,7 +11,7 @@ class AuthClient(BaseClient):
         BaseClient.__init__(self, "auth", environment)
 
     def get_identities(self, **kw):
-        return self.get("/v2/api/identities", params=kw).json_body
+        return self.get("/v2/api/identities", params=kw)
 
     def token_introspect(self, token, **kw):
         """
@@ -21,4 +21,4 @@ class AuthClient(BaseClient):
         """
         merge_params(kw, token=token)
         return self.post("/v2/oauth2/token/introspect",
-                         text_body=urlencode(kw)).json_body
+                         text_body=urlencode(kw))

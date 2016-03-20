@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from globus_sdk import exc, config
+from globus_sdk.response import GlobusResponse
 from globus_sdk.base import BaseClient, merge_params
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -88,7 +89,7 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
         for server in self.get(path, params=params).json_body['DATA']:
-            yield server
+            yield GlobusResponse(server)
 
     def my_shared_endpoint_list(self, endpoint_id, **params):
         """
@@ -97,7 +98,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_shared_endpoint_list')
         for ep in self.get(path, params=params).json_body['DATA']:
-            yield ep
+            yield GlobusResponse(ep)
 
     def endpoint_role_list(self, endpoint_id, **params):
         """
@@ -105,7 +106,7 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role_list')
         for role in self.get(path, params=params).json_body['DATA']:
-            yield role
+            yield GlobusResponse(role)
 
     def endpoint_acl_list(self, endpoint_id, **params):
         """
@@ -113,7 +114,7 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access_list')
         for rule in self.get(path, params=params).json_body['DATA']:
-            yield rule
+            yield GlobusResponse(rule)
 
     def bookmark_list(self, **params):
         """
@@ -121,7 +122,7 @@ class TransferClient(BaseClient):
         """
         for bookmark in self.get('bookmark_list',
                                  params=params).json_body['DATA']:
-            yield bookmark
+            yield GlobusResponse(bookmark)
 
     @PaginatedResource(max_results_per_call=1000, max_total_results=None,
                        paging_style=PaginatedResource.PAGING_STYLE_TOTAL)

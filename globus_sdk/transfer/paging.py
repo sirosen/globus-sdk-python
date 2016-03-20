@@ -2,6 +2,7 @@ import inspect
 import functools
 
 from globus_sdk import exc
+from globus_sdk.response import GlobusResponse
 
 
 class PaginatedResource(object):
@@ -131,7 +132,7 @@ class PaginatedResource(object):
                 # walk the results from the page we fetched, returning them as
                 # the iterated elements
                 for item in res['DATA']:
-                    yield item
+                    yield GlobusResponse(item)
 
                 offset += self.max_results_per_call
 

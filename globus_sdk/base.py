@@ -6,6 +6,7 @@ import base64
 import requests
 
 from globus_sdk import config, exc
+from globus_sdk.response import GlobusHTTPResponse
 
 
 class BaseClient(object):
@@ -97,28 +98,8 @@ class BaseClient(object):
                                   verify=self._verify,
                                   auth=auth)
         if 200 <= r.status_code < 400:
-            return GlobusResponse(r)
+            return GlobusHTTPResponse(r)
         raise self.error_class(r)
-
-
-class GlobusResponse(object):
-    def __init__(self, r):
-        self._underlying_request = r
-        # NB: the word 'code' is confusing because we use it in the
-        # error body, and status_code is not much better. http_code, or
-        # http_status_code if we wanted to be really explicit, is
-        # clearer, but less consistent with requests (for better and
-        # worse).
-        self.http_status = r.status_code
-        self.content_type = r.headers["Content-Type"]
-
-    @property
-    def json_body(self):
-        return self._underlying_request.json()
-
-    @property
-    def text_body(self):
-        return self._underlying_request.text
 
 
 def slash_join(a, b):
