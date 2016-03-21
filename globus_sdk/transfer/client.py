@@ -1,13 +1,21 @@
 from __future__ import print_function
 
+import json
+
 from globus_sdk import exc, config
-from globus_sdk.response import GlobusResponse
+from globus_sdk.response import GlobusResponse, GlobusHTTPResponse
 from globus_sdk.base import BaseClient, merge_params
 from globus_sdk.transfer.paging import PaginatedResource
 
 
+class TransferResponse(GlobusHTTPResponse):
+    def __str__(self):
+        return json.dumps(self.json_body, indent=2)
+
+
 class TransferClient(BaseClient):
     error_class = exc.TransferAPIError
+    response_class = TransferResponse
 
     def __init__(self, environment=config.get_default_environ(),
                  auth_token=None):
@@ -16,10 +24,6 @@ class TransferClient(BaseClient):
 
     # Convenience methods, providing more pythonic access to common REST
     # resources
-    # TODO: Is there consensus that we want to maintain these? I feel
-    # strongly that we shouldn't provide anything more complex, e.g.
-    # hard coding param names and document types, but wouldn't be too
-    # bad to maintain these.
     def get_endpoint(self, endpoint_id, **kw):
         """GET /endpoint/<endpoint_id>"""
         path = self.qjoin_path("endpoint", endpoint_id)

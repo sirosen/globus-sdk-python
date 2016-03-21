@@ -20,6 +20,7 @@ class BaseClient(object):
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class = exc.GlobusAPIError
+    response_class = GlobusHTTPResponse
 
     AUTH_TOKEN = "token"
     AUTH_BASIC = "basic"
@@ -101,7 +102,7 @@ class BaseClient(object):
                                   verify=self._verify,
                                   auth=auth)
         if 200 <= r.status_code < 400:
-            return GlobusHTTPResponse(r)
+            return self.response_class(r)
         raise self.error_class(r)
 
 
