@@ -225,27 +225,3 @@ def _set_submission_id(submission_id, datadoc, methodname):
     # users could always explicitly remove the field, if they're determined
     # to resubmit a prior transfer
     datadoc['submission_id'] = submission_id
-
-
-def _get_client_from_args():
-    import sys
-
-    if len(sys.argv) < 2:
-        print("Usage: %s token_file [environment]" % sys.argv[0])
-        sys.exit(1)
-
-    with open(sys.argv[1]) as f:
-        token = f.read().strip()
-
-    if len(sys.argv) > 2:
-        environment = sys.argv[2]
-    else:
-        environment = "default"
-
-    api = TransferClient(environment)
-    api.set_auth_token(token)
-    return api
-
-
-if __name__ == '__main__':
-    api = _get_client_from_args()

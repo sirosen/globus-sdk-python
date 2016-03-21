@@ -3,3 +3,4 @@ MANIFEST
 dist
 *.pyc
 .tox
+globus_sdk.egg-info
