@@ -158,7 +158,7 @@ class TransferClient(BaseClient):
         return self.delete(path)
 
     #
-    # Access Management
+    # Roles
     #
 
     def endpoint_role_list(self, endpoint_id, **params):
@@ -169,6 +169,31 @@ class TransferClient(BaseClient):
         for role in self.get(path, params=params).json_body['DATA']:
             yield GlobusResponse(role)
 
+    def add_endpoint_role(self, endpoint_id, role_data):
+        """
+        POST /endpoint/<endpoint_id>/role
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'role')
+        self.post(path, role_data)
+
+    def get_endpoint_role(self, endpoint_id, role_id):
+        """
+        GET /endpoint/<endpoint_id>/role/<role_id>
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'role', role_id)
+        self.get(path)
+
+    def delete_endpoint_role(self, endpoint_id, role_id):
+        """
+        DELETE /endpoint/<endpoint_id>/role/<role_id>
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'role', role_id)
+        self.delete(path)
+
+    #
+    # ACLs
+    #
+
     def endpoint_acl_list(self, endpoint_id, **params):
         """
         GET /endpoint/<endpoint_id>/access_list
@@ -176,6 +201,38 @@ class TransferClient(BaseClient):
         path = self.qjoin_path('endpoint', endpoint_id, 'access_list')
         for rule in self.get(path, params=params).json_body['DATA']:
             yield GlobusResponse(rule)
+
+    def get_endpoint_acl_rule(self, endpoint_id, rule_id):
+        """
+        GET /endpoint/<endpoint_id>/access/<rule_id>
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'access', rule_id)
+        return self.get(path)
+
+    def add_endpoint_acl_rule(self, endpoint_id, rule_data):
+        """
+        POST /endpoint/<endpoint_id>/access
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'access')
+        return self.post(path, rule_data)
+
+    def update_endpoint_acl_rule(self, endpoint_id, rule_id, rule_data):
+        """
+        PUT /endpoint/<endpoint_id>/access/<rule_id>
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'access', rule_id)
+        return self.put(path, rule_data)
+
+    def delete_endpoint_acl_rule(self, endpoint_id, rule_id):
+        """
+        DELETE /endpoint/<endpoint_id>/access/<rule_id>
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'access')
+        return self.delete(path)
+
+    #
+    # Bookmarks
+    #
 
     def bookmark_list(self, **params):
         """
@@ -185,7 +242,36 @@ class TransferClient(BaseClient):
                                  params=params).json_body['DATA']:
             yield GlobusResponse(bookmark)
 
+    def create_bookmark(self, bookmark_data):
+        """
+        POST /bookmark
+        """
+        self.post('bookmark', bookmark_data)
+
+    def get_bookmark(self, bookmark_id):
+        """
+        GET /bookmark/<bookmark_id>
+        """
+        path = self.qjoin_path('bookmark', bookmark_id)
+        self.get(path)
+
+    def update_bookmark(self, bookmark_id, bookmark_data):
+        """
+        POST /bookmark/<bookmark_id>
+        """
+        path = self.qjoin_path('bookmark', bookmark_id)
+        self.get(path, bookmark_data)
+
+    def delete_bookmark(self, bookmark_id):
+        """
+        DELETE /bookmark/<bookmark_id>
+        """
+        path = self.qjoin_path('bookmark', bookmark_id)
+        self.delete(path)
+
+    #
     # Synchronous Filesys Operations
+    #
 
     def operation_ls(self, endpoint_id, **params):
         """
@@ -219,7 +305,9 @@ class TransferClient(BaseClient):
         }
         return self.post(resource_path, json_body=json_body, params=params)
 
+    #
     # Task Submission
+    #
 
     def get_submission_id(self, **params):
         """
@@ -239,7 +327,9 @@ class TransferClient(BaseClient):
         """
         return self.post('/delete', data)
 
+    #
     # Task inspection and management
+    #
 
     @PaginatedResource(max_results_per_call=1000, max_total_results=None,
                        paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
