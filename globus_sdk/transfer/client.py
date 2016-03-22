@@ -185,28 +185,16 @@ class TransferClient(BaseClient):
         """
         return self.get("submission_id", params=params)
 
-    def submit_transfer(self, submission_id, data):
+    def submit_transfer(self, data):
         """
         POST /transfer
-
-        If the submission_id is present in the data document, raises an
-        InvalidDocumentBodyError.
         """
-        _set_submission_id(submission_id, data,
-                           'TransferClient.submit_transfer()')
-
         return self.post('/transfer', data)
 
-    def submit_delete(self, submission_id, data):
+    def submit_delete(self, data):
         """
         POST /delete
-
-        If the submission_id is present in the data document, raises an
-        InvalidDocumentBodyError.
         """
-        _set_submission_id(submission_id, data,
-                           'TransferClient.submit_delete()')
-
         return self.post('/delete', data)
 
     def get_task(self, task_id, **params):
@@ -215,20 +203,3 @@ class TransferClient(BaseClient):
         """
         resource_path = self.qjoin_path("task", task_id)
         return self.get(resource_path, params=params)
-
-
-def _set_submission_id(submission_id, datadoc, methodname):
-    if 'submission_id' in datadoc:
-        raise exc.InvalidDocumentBodyError(
-            ('{0} does not allow for '
-             'documents with a submission_id. You must omit the '
-             'submission_id from your Transfer Document and only supply '
-             'one as an argument to {0}').format(
-             methodname))
-
-    # Note: doing this without copying the data means that the same
-    # document cannot be resubmitted later with a new submission ID,
-    # because it will trigger the InvalidDocumentBodyError
-    # users could always explicitly remove the field, if they're determined
-    # to resubmit a prior transfer
-    datadoc['submission_id'] = submission_id
