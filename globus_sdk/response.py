@@ -5,13 +5,17 @@ class GlobusResponse(object):
         caller. Most basic actions on a GlobusResponse are just ways of
         interacting with this data.
         """
-        self.data = data
+        self._data = data
 
     def __str__(self):
         return repr(self)
 
     def __repr__(self):
         return "{}({!r})".format(self.__class__.__name__, self.data)
+
+    @property
+    def data(self):
+        return self._data
 
 
 class GlobusHTTPResponse(GlobusResponse):
@@ -28,9 +32,22 @@ class GlobusHTTPResponse(GlobusResponse):
         self.content_type = http_response.headers["Content-Type"]
 
     @property
+    def data(self):
+        try:
+            return self.json_body
+        # JSON decoding may raise a ValueError due to an invalid JSON
+        # document. In the case of trying to fetch the "data" on an HTTP
+        # response, this means we didn't get a JSON response. Rather than
+        # letting the error bubble up, return None, as in "no data"
+        # if the caller *really* wants the raw body of the response, they can
+        # always use text_body
+        except ValueError:
+            return None
+
+    @property
     def json_body(self):
-        return self.data.json()
+        return self._data.json()
 
     @property
     def text_body(self):
-        return self.data.text
+        return self._data.text

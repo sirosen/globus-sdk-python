@@ -35,7 +35,6 @@ class BaseClient(object):
         self._headers = dict(Accept="application/json")
         self._auth = None
 
-
         if not auth_token:
             # potentially add an Authorization header, if a token is specified
             auth_token = config.get_auth_token(environment)
