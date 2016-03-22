@@ -209,6 +209,13 @@ class TransferClient(BaseClient):
 
         return self.post('/delete', data)
 
+    def get_task(self, task_id, **params):
+        """
+        GET /task/<task_id>
+        """
+        resource_path = self.qjoin_path("task", task_id)
+        return self.get(resource_path, params=params)
+
 
 def _set_submission_id(submission_id, datadoc, methodname):
     if 'submission_id' in datadoc:
