@@ -24,6 +24,11 @@ class TransferClient(BaseClient):
 
     # Convenience methods, providing more pythonic access to common REST
     # resources
+
+    #
+    # Endpoint Management
+    #
+
     def get_endpoint(self, endpoint_id, **kw):
         """GET /endpoint/<endpoint_id>"""
         path = self.qjoin_path("endpoint", endpoint_id)
@@ -37,6 +42,13 @@ class TransferClient(BaseClient):
     def create_endpoint(self, data):
         """POST /endpoint/<endpoint_id>"""
         return self.post("endpoint", data)
+
+    def delete_endpoint(self, endpoint_id):
+        """
+        DELETE /endpoint/<endpoint_id>
+        """
+        path = self.qjoin_path("endpoint", endpoint_id)
+        return self.delete(path)
 
     @PaginatedResource(max_results_per_call=100, max_total_results=1000)
     def endpoint_search(self, filter_fulltext=None, filter_scope=None,
@@ -89,14 +101,6 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
         return self.post(path, params=params)
 
-    def endpoint_server_list(self, endpoint_id, **params):
-        """
-        GET /endpoint/<endpoint_id>/server_list
-        """
-        path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
-        for server in self.get(path, params=params).json_body['DATA']:
-            yield GlobusResponse(server)
-
     def my_shared_endpoint_list(self, endpoint_id, **params):
         """
         GET /endpoint/<endpoint_id>/my_shared_endpoint_list
@@ -105,6 +109,57 @@ class TransferClient(BaseClient):
                                'my_shared_endpoint_list')
         for ep in self.get(path, params=params).json_body['DATA']:
             yield GlobusResponse(ep)
+
+    def my_effective_pause_rule_list(self, endpoint_id, **params):
+        """
+        GET /endpoint/<endpoint_id>/my_effective_pause_rule_list
+        """
+        path = self.qjoin_path('endpoint', endpoint_id,
+                               'my_effective_pause_rule_list')
+        for rule in self.get(path, params=params).json_body['DATA']:
+            yield GlobusResponse(rule)
+
+    # Endpoint servers
+
+    def endpoint_server_list(self, endpoint_id, **params):
+        """
+        GET /endpoint/<endpoint_id>/server_list
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
+        for server in self.get(path, params=params).json_body['DATA']:
+            yield GlobusResponse(server)
+
+    def get_endpoint_server(self, endpoint_id, server_id):
+        """
+        GET /endpoint/<endpoint_id>/server/<server_id>
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
+        return self.get(path)
+
+    def add_endpoint_server(self, endpoint_id, server_data):
+        """
+        POST /endpoint/<endpoint_id>/server
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'server')
+        return self.post(path, server_data)
+
+    def update_endpoint_server(self, endpoint_id, server_id, server_data):
+        """
+        POST /endpoint/<endpoint_id>/server/<server_id>
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
+        return self.post(path, server_data)
+
+    def delete_endpoint_server(self, endpoint_id, server_id):
+        """
+        DELETE /endpoint/<endpoint_id>/server/<server_id>
+        """
+        path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
+        return self.delete(path)
+
+    #
+    # Access Management
+    #
 
     def endpoint_role_list(self, endpoint_id, **params):
         """
@@ -130,22 +185,7 @@ class TransferClient(BaseClient):
                                  params=params).json_body['DATA']:
             yield GlobusResponse(bookmark)
 
-    @PaginatedResource(max_results_per_call=1000, max_total_results=None,
-                       paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
-    def task_list(self, num_results=10, **params):
-        """
-        GET /task_list
-        """
-        return self.get('task_list', params=params)
-
-    @PaginatedResource(max_results_per_call=1000, max_total_results=None,
-                       paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
-    def task_event_list(self, task_id, num_results=10, **params):
-        """
-        GET /task/<task_id>/event_list
-        """
-        path = self.qjoin_path('task', task_id, 'event_list')
-        return self.get(path, params=params)
+    # Synchronous Filesys Operations
 
     def operation_ls(self, endpoint_id, **params):
         """
@@ -179,6 +219,8 @@ class TransferClient(BaseClient):
         }
         return self.post(resource_path, json_body=json_body, params=params)
 
+    # Task Submission
+
     def get_submission_id(self, **params):
         """
         GET /submission_id
@@ -197,9 +239,49 @@ class TransferClient(BaseClient):
         """
         return self.post('/delete', data)
 
+    # Task inspection and management
+
+    @PaginatedResource(max_results_per_call=1000, max_total_results=None,
+                       paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
+    def task_list(self, num_results=10, **params):
+        """
+        GET /task_list
+        """
+        return self.get('task_list', params=params)
+
+    @PaginatedResource(max_results_per_call=1000, max_total_results=None,
+                       paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
+    def task_event_list(self, task_id, num_results=10, **params):
+        """
+        GET /task/<task_id>/event_list
+        """
+        path = self.qjoin_path('task', task_id, 'event_list')
+        return self.get(path, params=params)
+
     def get_task(self, task_id, **params):
         """
         GET /task/<task_id>
         """
         resource_path = self.qjoin_path("task", task_id)
         return self.get(resource_path, params=params)
+
+    def update_task(self, task_id, data, **params):
+        """
+        PUT /task/<task_id>
+        """
+        resource_path = self.qjoin_path("task", task_id)
+        return self.put(resource_path, data, params=params)
+
+    def cancel_task(self, task_id):
+        """
+        POST /task/<task_id>/cancel
+        """
+        resource_path = self.qjoin_path("task", task_id, "cancel")
+        return self.post(resource_path)
+
+    def task_pause_info(self, task_id):
+        """
+        POST /task/<task_id>/pause_info
+        """
+        resource_path = self.qjoin_path("task", task_id, "pause_info")
+        return self.get(resource_path)
