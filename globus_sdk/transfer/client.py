@@ -227,7 +227,7 @@ class TransferClient(BaseClient):
         """
         DELETE /endpoint/<endpoint_id>/access/<rule_id>
         """
-        path = self.qjoin_path('endpoint', endpoint_id, 'access')
+        path = self.qjoin_path('endpoint', endpoint_id, 'access', rule_id)
         return self.delete(path)
 
     #
