@@ -101,6 +101,13 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
         return self.post(path, params=params)
 
+    def endpoint_deactivate(self, endpoint_id, **params):
+        """
+        POST /endpoint/<endpoint_id>/deactivate
+        """
+        path = self.qjoin_path("endpoint", endpoint_id, "deactivate")
+        return self.post(path, params=params)
+
     def my_shared_endpoint_list(self, endpoint_id, **params):
         """
         GET /endpoint/<endpoint_id>/my_shared_endpoint_list
