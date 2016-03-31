@@ -253,28 +253,28 @@ class TransferClient(BaseClient):
         """
         POST /bookmark
         """
-        self.post('bookmark', bookmark_data)
+        return self.post('bookmark', bookmark_data)
 
     def get_bookmark(self, bookmark_id):
         """
         GET /bookmark/<bookmark_id>
         """
         path = self.qjoin_path('bookmark', bookmark_id)
-        self.get(path)
+        return self.get(path)
 
     def update_bookmark(self, bookmark_id, bookmark_data):
         """
         POST /bookmark/<bookmark_id>
         """
         path = self.qjoin_path('bookmark', bookmark_id)
-        self.get(path, bookmark_data)
+        return self.get(path, bookmark_data)
 
     def delete_bookmark(self, bookmark_id):
         """
         DELETE /bookmark/<bookmark_id>
         """
         path = self.qjoin_path('bookmark', bookmark_id)
-        self.delete(path)
+        return self.delete(path)
 
     #
     # Synchronous Filesys Operations
