@@ -345,9 +345,15 @@ class TransferClient(BaseClient):
         sync_level can be 1, 2, or 3, but it can also be
         "exists", "mtime", or "checksum" if you want greater clarity in
         client code.
+
+        Includes fetching the submission ID as part of document generation. The
+        submission ID can be pulled out of here to inspect, but the document can
+        be used as-is multiple times over to retry a potential submission
+        failure (so there shouldn't be any need to inspect it).
         """
         datadoc = {
             'DATA_TYPE': 'transfer',
+            'submission_id': self.get_submission_id().data['value'],
             'label': label,
             'source_endpoint': source_endpoint,
             'destination_endpoint': dest_endpoint,
