@@ -335,7 +335,7 @@ class TransferClient(BaseClient):
         return self.post('/delete', data)
 
     def make_submit_transfer_data(self, source_endpoint, dest_endpoint,
-                                  transfer_items, label, sync_level=None,
+                                  transfer_items, label=None, sync_level=None,
                                   **kwargs):
         """
         Build a full document for submitting a Transfer.
@@ -347,14 +347,13 @@ class TransferClient(BaseClient):
         client code.
 
         Includes fetching the submission ID as part of document generation. The
-        submission ID can be pulled out of here to inspect, but the document can
-        be used as-is multiple times over to retry a potential submission
+        submission ID can be pulled out of here to inspect, but the document
+        can be used as-is multiple times over to retry a potential submission
         failure (so there shouldn't be any need to inspect it).
         """
         datadoc = {
             'DATA_TYPE': 'transfer',
             'submission_id': self.get_submission_id().data['value'],
-            'label': label,
             'source_endpoint': source_endpoint,
             'destination_endpoint': dest_endpoint,
             'DATA': transfer_items
@@ -370,6 +369,9 @@ class TransferClient(BaseClient):
             sync_dict = {"exists": 1, "mtime": 2, "checksum": 3}
             sync_level = sync_dict.get(sync_level, sync_level)
             datadoc['sync_level'] = sync_level
+
+        if label is not None:
+            datadoc['label'] = label
 
         # any remaining arguments are global options for the Transfer document
         # pass them through verbatim
