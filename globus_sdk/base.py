@@ -50,10 +50,12 @@ class BaseClient(object):
         self._verify = config.get_ssl_verify(environment)
 
     def set_auth_token(self, token):
+        """Set bearer token authentication for this client."""
         self.auth_type = self.AUTH_TOKEN
         self._headers["Authorization"] = "Bearer %s" % token
 
     def set_auth_basic(self, username, password):
+        """Set basic authentication for this client."""
         self.auth_type = self.AUTH_BASIC
         encoded = base64.b64encode("%s:%s" % (username, password))
         self._headers["Authorization"] = "Basic %s" % encoded
@@ -62,20 +64,24 @@ class BaseClient(object):
         return "/" + "/".join(quote(part) for part in parts)
 
     def get(self, path, params=None, headers=None, auth=None):
+        """Make a GET request to the specified path."""
         return self._request("GET", path, params=params, headers=headers,
                              auth=auth)
 
     def post(self, path, json_body=None, params=None, headers=None,
              text_body=None, auth=None):
+        """Make a POST request to the specified path."""
         return self._request("POST", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body, auth=auth)
 
     def delete(self, path, params=None, headers=None, auth=None):
+        """Make a DELETE request to the specified path."""
         return self._request("DELETE", path, params=params,
                              headers=headers, auth=auth)
 
     def put(self, path, json_body=None, params=None, headers=None,
             text_body=None, auth=None):
+        """Make a PUT request to the specified path."""
         return self._request("PUT", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body, auth=auth)
 

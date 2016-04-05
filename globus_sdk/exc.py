@@ -6,6 +6,9 @@ class GlobusError(Exception):
 
 
 class GlobusAPIError(GlobusError):
+    """
+    Wraps errors returned by a REST API.
+    """
     def __init__(self, r, *args, **kw):
         self._underlying_response = r
         self.http_status = r.status_code
@@ -52,6 +55,9 @@ class GlobusAPIError(GlobusError):
 
 
 class TransferAPIError(GlobusAPIError):
+    """
+    Error class for the Transfer API client. Adds a request_id member.
+    """
     def __init__(self, r):
         self.request_id = None
         GlobusAPIError.__init__(self, r)
