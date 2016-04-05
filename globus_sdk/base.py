@@ -12,10 +12,9 @@ from globus_sdk.response import GlobusHTTPResponse
 
 class BaseClient(object):
     """
-    Simple client with error handling for Globus REST APIs. It's a thin
-    wrapper around a requests.Session object, with a simplified interface
-    supplying only what we need for Globus APIs. The intention is to avoid
-    directly exposing requests objects in the public API.
+    Simple client with error handling for Globus REST APIs. Implemented
+    as a wrapper around a requests.Session object, with a simplified interface
+    that does not directly expose anything from requests.
     """
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
@@ -64,33 +63,59 @@ class BaseClient(object):
         return "/" + "/".join(quote(part) for part in parts)
 
     def get(self, path, params=None, headers=None, auth=None):
-        """Make a GET request to the specified path."""
+        """
+        Make a GET request to the specified path.
+
+        :param params: dict to be encoded as a query string
+
+        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        """
         return self._request("GET", path, params=params, headers=headers,
                              auth=auth)
 
     def post(self, path, json_body=None, params=None, headers=None,
              text_body=None, auth=None):
-        """Make a POST request to the specified path."""
+        """
+        Make a POST request to the specified path, and optional body in
+        either `json_body` (python data that will be encoded as JSON) or
+        `text_body`.
+
+        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        """
         return self._request("POST", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body, auth=auth)
 
     def delete(self, path, params=None, headers=None, auth=None):
-        """Make a DELETE request to the specified path."""
+        """
+        Make a DELETE request to the specified path.
+
+        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        """
         return self._request("DELETE", path, params=params,
                              headers=headers, auth=auth)
 
     def put(self, path, json_body=None, params=None, headers=None,
             text_body=None, auth=None):
-        """Make a PUT request to the specified path."""
+        """
+        Make a PUT request to the specified path.
+
+        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        """
         return self._request("PUT", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body, auth=auth)
 
     def _request(self, method, path, params=None, headers=None,
                  json_body=None, text_body=None, auth=None):
         """
+        :param method: HTTP request method, as an all caps string
+        :param headers: dict containing additional headers for the request
+        :param params: dict to be encoded as a query string
+        :param auth: tuple of (user, password) for basic auth [DEPRECATED]
         :param json_body: Python data structure to send in the request body
                           serialized as JSON
         :param text_body: string to send in the request body
+
+        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
         """
         if json_body is not None:
             assert text_body is None

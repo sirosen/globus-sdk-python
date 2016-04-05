@@ -1,4 +1,7 @@
 class GlobusResponse(object):
+    """
+    Generic response object, with a single `data` member.
+    """
     def __init__(self, data):
         """
         GlobusResponse objects *always* wrap some kind of data to return to a
@@ -15,10 +18,20 @@ class GlobusResponse(object):
 
     @property
     def data(self):
+        """
+        Response data as a Python data structure. Usually a dict or
+        list.
+        """
         return self._data
 
 
 class GlobusHTTPResponse(GlobusResponse):
+    """
+    Response object that wraps an HTTP response from the underlying HTTP
+    library. If the response is json, the parsed data will be available in
+    `data`. The members `text_body` and `json_body` can be used to access
+    the parsed raw data, or the parsed json data explicitly.
+    """
     def __init__(self, http_response):
         # the API response as some form of HTTP response object will be the
         # underlying data of an API response
@@ -46,8 +59,15 @@ class GlobusHTTPResponse(GlobusResponse):
 
     @property
     def json_body(self):
+        """
+        Parsed JSON data in the response. Raises an error if the response
+        is not JSON.
+        """
         return self._data.json()
 
     @property
     def text_body(self):
+        """
+        The raw response data, as a string.
+        """
         return self._data.text

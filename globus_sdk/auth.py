@@ -11,11 +11,16 @@ class AuthClient(BaseClient):
                  auth_token=None):
         BaseClient.__init__(self, "auth", environment, auth_token=auth_token)
 
-    def get_identities(self, **kw):
-        return self.get("/v2/api/identities", params=kw)
+    def get_identities(self, **params):
+        """
+        GET /v2/api/identities
+        """
+        return self.get("/v2/api/identities", params=params)
 
     def token_introspect(self, token, **kw):
         """
+        POST /v2/oauth2/token/introspect
+
         Get information about a Globus Auth token. Requires basic auth
         using oauth client credentials, where username=client_id
         and password=client_secret.

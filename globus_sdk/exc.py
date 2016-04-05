@@ -8,6 +8,13 @@ class GlobusError(Exception):
 class GlobusAPIError(GlobusError):
     """
     Wraps errors returned by a REST API.
+
+    :ivar http_status: HTTP status code (int)
+    :ivar code: Error code from the API (str),
+                or "Error" for unclassified errors
+    :ivar message: Error message from the API. In general, this will be more
+                   useful to developers, but there may be cases where it's
+                   suitable for display to end users.
     """
     def __init__(self, r, *args, **kw):
         self._underlying_response = r
@@ -56,7 +63,11 @@ class GlobusAPIError(GlobusError):
 
 class TransferAPIError(GlobusAPIError):
     """
-    Error class for the Transfer API client. Adds a request_id member.
+    Error class for the Transfer API client. In addition to the
+    inherited `code` and `message` instance variables, provides:
+
+    :ivar request_id: Unique identifier for the request, which should be
+                      provided when contacting support@globus.org.
     """
     def __init__(self, r):
         self.request_id = None

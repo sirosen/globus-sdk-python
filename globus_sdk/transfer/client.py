@@ -27,12 +27,15 @@ class TransferClient(BaseClient):
     client that can be used to access any REST resource.
 
     There are two types of helper methods: list methods which return an
-    iterator of GlobusResponse objects, and simple methods that return
-    a single GlobusResponse object. Detailed documentation is available
-    in the official REST API documentation, which is linked to from the
-    method documentation. Methods that allow arbitrary keyword arguments
-    will pass the extra arguments as query parameters.
+    iterator of :class:`GlobusResponse <globus_sdk.response.GlobusResponse>`
+    objects, and simple methods that return a single
+    :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>`
+    object. Detailed documentation is available in the official REST API
+    documentation, which is linked to from the method documentation. Methods
+    that allow arbitrary keyword arguments will pass the extra arguments as
+    query parameters.
     """
+
     error_class = exc.TransferAPIError
     response_class = TransferResponse
 
@@ -52,23 +55,41 @@ class TransferClient(BaseClient):
         """
         GET /endpoint/<endpoint_id>
 
-        https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id
+        See
+        `Get Endpoint by ID <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id)
         return self.get(path, params=params)
 
     def update_endpoint(self, endpoint_id, data, **params):
-        """PUT /endpoint/<endpoint_id>"""
+        """
+        PUT /endpoint/<endpoint_id>
+
+        See
+        `Update Endpoint by ID <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_by_id>`_
+        in the REST documentation for details.
+        """
         path = self.qjoin_path("endpoint", endpoint_id)
         return self.put(path, data, params=params)
 
     def create_endpoint(self, data):
-        """POST /endpoint/<endpoint_id>"""
+        """
+        POST /endpoint/<endpoint_id>
+
+        See
+        `Create endpoint <https://docs.globus.org/api/transfer/endpoint/#create_endpoint>`_
+        in the REST documentation for details.
+        """
         return self.post("endpoint", data)
 
     def delete_endpoint(self, endpoint_id):
         """
         DELETE /endpoint/<endpoint_id>
+
+        See
+        `Delete endpoint by id <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_by_id>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id)
         return self.delete(path)
@@ -84,32 +105,33 @@ class TransferClient(BaseClient):
         https://docs.globus.org/api/transfer/endpoint_search
 
         This method acts as an iterator, returning results from the API as
-        python dictionaries built from JSON documents.
+        :class:`GlobusResponse <globus_sdk.response.GlobusResponse>`
+        objects wrapping python dictionaries built from JSON documents.
 
         # Simple Examples
         Search for a given string as a fulltext search:
-        >>> for ep in endpoint_search('String to search for!'):
-        >>>     print(ep['display_name'])
+        >>> for r in endpoint_search('String to search for!'):
+        >>>     print(r.data['display_name'])
 
         Search for a given string, but only on endpoints that you own:
-        >>> for ep in endpoint_search('foo', filter_scope='my-endpoints'):
-        >>>     print('{} has ID {}'.format(ep['display_name'], ep['id']))
+        >>> for r in endpoint_search('foo', filter_scope='my-endpoints'):
+        >>>     print('{} has ID {}'.format(r.data['display_name'], ep['id']))
 
         Search results are capped at a number of elements equal to the
         `num_results` parameter.
         If you want more than the default, 25, elements, do like so:
 
-        >>> for ep in endpoint_search('String to search for!',
-        >>>                           num_results=120):
-        >>>     print(ep['display_name'])
+        >>> for r in endpoint_search('String to search for!',
+        >>>                          num_results=120):
+        >>>     print(r.data['display_name'])
 
         It is very important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query. If you attempt to exceed this
         limit, you will trigger a PaginationOverrunError.
 
-        >>> for ep in endpoint_search('globus', # a very common string
-        >>>                           num_results=1200):
-        >>>     print(ep['display_name'])
+        >>> for r in endpoint_search('globus', # a very common string
+        >>>                          num_results=1200):
+        >>>     print(r.data['display_name'])
 
         will trigger this error.
         """
@@ -120,6 +142,10 @@ class TransferClient(BaseClient):
     def endpoint_autoactivate(self, endpoint_id, **params):
         """
         POST /endpoint/<endpoint_id>/autoactivate
+
+        See
+        `Autoactivate endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
         return self.post(path, params=params)
@@ -127,13 +153,44 @@ class TransferClient(BaseClient):
     def endpoint_deactivate(self, endpoint_id, **params):
         """
         POST /endpoint/<endpoint_id>/deactivate
+
+        See
+        `Deactive endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#deactivate_endpoint>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id, "deactivate")
         return self.post(path, params=params)
 
+    def endpoint_activate(self, endpoint_id, data, **params):
+        """
+        POST /endpoint/<endpoint_id>/activate
+
+        See
+        `Activate endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
+        in the REST documentation for details.
+        """
+        path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
+        return self.post(path, params=params)
+
+    def endpoint_get_activation_requirements(self, endpoint_id, **params):
+        """
+        GET /endpoint/<endpoint_id>/activation_requirements
+
+        See
+        `Get activation requirements <https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements>`_
+        in the REST documentation for details.
+        """
+        path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
+        return self.post(path, params=params)
+
+
     def my_shared_endpoint_list(self, endpoint_id, **params):
         """
         GET /endpoint/<endpoint_id>/my_shared_endpoint_list
+
+        See
+        `Get shared endpoint list <https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_shared_endpoint_list')
@@ -143,6 +200,10 @@ class TransferClient(BaseClient):
     def my_effective_pause_rule_list(self, endpoint_id, **params):
         """
         GET /endpoint/<endpoint_id>/my_effective_pause_rule_list
+
+        See
+        `Get my effective endpoint pause rules <https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_effective_pause_rule_list')
@@ -154,21 +215,33 @@ class TransferClient(BaseClient):
     def endpoint_server_list(self, endpoint_id, **params):
         """
         GET /endpoint/<endpoint_id>/server_list
+
+        See
+        `Get endpoint server list <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
         for server in self.get(path, params=params).json_body['DATA']:
             yield GlobusResponse(server)
 
-    def get_endpoint_server(self, endpoint_id, server_id):
+    def get_endpoint_server(self, endpoint_id, server_id, **params):
         """
         GET /endpoint/<endpoint_id>/server/<server_id>
+
+        See
+        `Get endpoint server list <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
-        return self.get(path)
+        return self.get(path, params=params)
 
     def add_endpoint_server(self, endpoint_id, server_data):
         """
         POST /endpoint/<endpoint_id>/server
+
+        See
+        `Add endpoint server <https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server')
         return self.post(path, server_data)
@@ -176,6 +249,10 @@ class TransferClient(BaseClient):
     def update_endpoint_server(self, endpoint_id, server_id, server_data):
         """
         POST /endpoint/<endpoint_id>/server/<server_id>
+
+        See
+        `Update endpoint server by id <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_server_by_id>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
         return self.post(path, server_data)
@@ -183,6 +260,10 @@ class TransferClient(BaseClient):
     def delete_endpoint_server(self, endpoint_id, server_id):
         """
         DELETE /endpoint/<endpoint_id>/server/<server_id>
+
+        See
+        `Delete endpoint server by id <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_server_by_id>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
         return self.delete(path)
@@ -194,6 +275,10 @@ class TransferClient(BaseClient):
     def endpoint_role_list(self, endpoint_id, **params):
         """
         GET /endpoint/<endpoint_id>/role_list
+
+        See
+        `Get list of endpoint roles <https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role_list')
         for role in self.get(path, params=params).json_body['DATA']:
@@ -202,20 +287,32 @@ class TransferClient(BaseClient):
     def add_endpoint_role(self, endpoint_id, role_data):
         """
         POST /endpoint/<endpoint_id>/role
+
+        See
+        `Create endpoint role <https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role')
         self.post(path, role_data)
 
-    def get_endpoint_role(self, endpoint_id, role_id):
+    def get_endpoint_role(self, endpoint_id, role_id, **params):
         """
         GET /endpoint/<endpoint_id>/role/<role_id>
+
+        See
+        `Get endpoint role by id <https://docs.globus.org/api/transfer/endpoint_roles/#get_endpoint_role_by_id>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role', role_id)
-        self.get(path)
+        self.get(path, params=params)
 
     def delete_endpoint_role(self, endpoint_id, role_id):
         """
         DELETE /endpoint/<endpoint_id>/role/<role_id>
+
+        See
+        `Delete endpoint role by id <https://docs.globus.org/api/transfer/endpoint_roles/#delete_endpoint_role_by_id>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role', role_id)
         self.delete(path)
@@ -232,12 +329,12 @@ class TransferClient(BaseClient):
         for rule in self.get(path, params=params).json_body['DATA']:
             yield GlobusResponse(rule)
 
-    def get_endpoint_acl_rule(self, endpoint_id, rule_id):
+    def get_endpoint_acl_rule(self, endpoint_id, rule_id, **params):
         """
         GET /endpoint/<endpoint_id>/access/<rule_id>
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access', rule_id)
-        return self.get(path)
+        return self.get(path, params=params)
 
     def add_endpoint_acl_rule(self, endpoint_id, rule_data):
         """
@@ -278,12 +375,12 @@ class TransferClient(BaseClient):
         """
         return self.post('bookmark', bookmark_data)
 
-    def get_bookmark(self, bookmark_id):
+    def get_bookmark(self, bookmark_id, **params):
         """
         GET /bookmark/<bookmark_id>
         """
         path = self.qjoin_path('bookmark', bookmark_id)
-        return self.get(path)
+        return self.get(path, params=params)
 
     def update_bookmark(self, bookmark_id, bookmark_data):
         """
@@ -462,9 +559,9 @@ class TransferClient(BaseClient):
         resource_path = self.qjoin_path("task", task_id, "cancel")
         return self.post(resource_path)
 
-    def task_pause_info(self, task_id):
+    def task_pause_info(self, task_id, **params):
         """
         POST /task/<task_id>/pause_info
         """
         resource_path = self.qjoin_path("task", task_id, "pause_info")
-        return self.get(resource_path)
+        return self.get(resource_path, params=params)
