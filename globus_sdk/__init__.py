@@ -5,6 +5,8 @@ from globus_sdk.auth import AuthClient
 
 from globus_sdk.exc import GlobusError, GlobusAPIError, TransferAPIError
 
+__version__ = "0.1"
+
 __all__ = ["GlobusResponse", "GlobusHTTPResponse",
            "TransferClient", "NexusClient", "AuthClient",
            "GlobusError", "GlobusAPIError", "TransferAPIError"]

@@ -9,11 +9,30 @@ from globus_sdk.transfer.paging import PaginatedResource
 
 
 class TransferResponse(GlobusHTTPResponse):
+    """
+    Custom response for TransferClient, which relies on the fact that the
+    body is always json to make printing the response more friendly.
+    """
     def __str__(self):
         return json.dumps(self.json_body, indent=2)
 
 
 class TransferClient(BaseClient):
+    """
+    Client for the
+    `Globus Transfer API <https://docs.globus.org/api/transfer/>`_.
+
+    This class provides helper methods for most common resources in the
+    REST API, and basic get, post and put methods from the base rest
+    client that can be used to access any REST resource.
+
+    There are two types of helper methods: list methods which return an
+    iterator of GlobusResponse objects, and simple methods that return
+    a single GlobusResponse object. Detailed documentation is available
+    in the official REST API documentation, which is linked to from the
+    method documentation. Methods that allow arbitrary keyword arguments
+    will pass the extra arguments as query parameters.
+    """
     error_class = exc.TransferAPIError
     response_class = TransferResponse
 
@@ -29,15 +48,19 @@ class TransferClient(BaseClient):
     # Endpoint Management
     #
 
-    def get_endpoint(self, endpoint_id, **kw):
-        """GET /endpoint/<endpoint_id>"""
-        path = self.qjoin_path("endpoint", endpoint_id)
-        return self.get(path, params=kw)
+    def get_endpoint(self, endpoint_id, **params):
+        """
+        GET /endpoint/<endpoint_id>
 
-    def update_endpoint(self, endpoint_id, data, **kw):
+        https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id
+        """
+        path = self.qjoin_path("endpoint", endpoint_id)
+        return self.get(path, params=params)
+
+    def update_endpoint(self, endpoint_id, data, **params):
         """PUT /endpoint/<endpoint_id>"""
         path = self.qjoin_path("endpoint", endpoint_id)
-        return self.put(path, data, params=kw)
+        return self.put(path, data, params=params)
 
     def create_endpoint(self, data):
         """POST /endpoint/<endpoint_id>"""
