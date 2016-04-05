@@ -20,27 +20,19 @@ Basic Usage
 ===========
 
 Most APIs require authentication using an access token, so the first step
-to using the SDK is to acquire a token. For now the simplest way to get a
-token is to use the legacy Nexus Goauth API, which requires a globusid.org
-identity::
+to using the SDK is to acquire a token. The best way to get a token is to
+use the `Globus Tokens <https://tokens.globus.org>`_ webapp.
+Globus Tokens provides you with tokens for all Globus APIs which are valid for
+two days, and are tied to a consent for ``Globus Tokens``.
 
-    >>> from globus_sdk import NexusClient
-    >>> from getpass import getpass
-    >>> username = "globusid_username"
-    >>> password = getpass()
-    >>> nc = NexusClient()
-    >>> token = nc.get_goauth_token(username, password)
-    >>> with open(os.path.expanduser("~/.globus.cfg"), "w") as f:
-    ...     f.write('auth_token = "%s"\n' % token)
-
-This saves the token to '.globus.cfg' in the user's home directory, which is
-sourced by default by all SDK clients, so it only needs to be done once.
+The webapp will provide you with instructions to save your tokens to the Globus
+SDK config file, at ``~/.globus.cfg``
 
 To use the Transfer API:
 
     >>> from future import __print_function__ # for python 2
     >>> from globus_sdk import TransferClient
-    >>> tc = TransferClient() # uses token from the config file
+    >>> tc = TransferClient() # uses transfer_token from the config file
     >>> # low level interface
     >>> r = tc.get("/endpoint_search?filter_scope=my-endpoints")
     >>> for epdict in r.data["DATA"]:
