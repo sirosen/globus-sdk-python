@@ -74,9 +74,9 @@ class BaseClient(object):
     def post(self, path, json_body=None, params=None, headers=None,
              text_body=None, auth=None):
         """
-        Make a POST request to the specified path, and optional body in
-        either `json_body` (python data that will be encoded as JSON) or
-        `text_body`.
+        Make a POST request to the specified path, with optional body in
+        either ``json_body`` (python data that will be encoded as JSON) or
+        ``text_body``.
 
         :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
         """
