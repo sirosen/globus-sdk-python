@@ -7,9 +7,8 @@ from globus_sdk.base import BaseClient, merge_params
 
 
 class AuthClient(BaseClient):
-    def __init__(self, environment=config.get_default_environ(),
-                 auth_token=None):
-        BaseClient.__init__(self, "auth", environment, auth_token=auth_token)
+    def __init__(self, environment=config.get_default_environ(), token=None):
+        BaseClient.__init__(self, "auth", environment, token=token)
 
     def get_identities(self, **params):
         """
@@ -28,3 +27,6 @@ class AuthClient(BaseClient):
         merge_params(kw, token=token)
         return self.post("/v2/oauth2/token/introspect",
                          text_body=urlencode(kw))
+
+    def config_load_token(self):
+        return config.get_auth_token(self.environment)

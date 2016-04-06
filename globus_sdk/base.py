@@ -21,11 +21,11 @@ class BaseClient(object):
     error_class = exc.GlobusAPIError
     response_class = GlobusHTTPResponse
 
-    AUTH_TOKEN = "token"
-    AUTH_BASIC = "basic"
+    AUTHTYPE_TOKEN = "token"
+    AUTHTYPE_BASIC = "basic"
 
     def __init__(self, service, environment=config.get_default_environ(),
-                 base_path=None, auth_token=None):
+                 base_path=None, token=None):
         self.environment = environment
         self.base_url = config.get_service_url(environment, service)
         if base_path is not None:
@@ -34,30 +34,28 @@ class BaseClient(object):
         self._headers = dict(Accept="application/json")
         self._auth = None
 
-        if not auth_token:
-            # potentially add an Authorization header, if a token is specified
-            auth_token = config.get_auth_token(environment)
-            warnings.warn(
-                ('Providing raw Auth Tokens is not recommended, and is slated '
-                 'for deprecation. If you use this feature, be ready to '
-                 'transition to using a new authentication mechanism after we '
-                 'announce its availability.'),
-                PendingDeprecationWarning)
-        if auth_token:
-            self.set_auth_token(auth_token)
+        if not token:
+            token = self.config_load_token()
+        self.set_token(token)
 
         self._verify = config.get_ssl_verify(environment)
 
-    def set_auth_token(self, token):
+    def set_token(self, token):
         """Set bearer token authentication for this client."""
-        self.auth_type = self.AUTH_TOKEN
+        self.auth_type = self.AUTHTYPE_TOKEN
         self._headers["Authorization"] = "Bearer %s" % token
 
     def set_auth_basic(self, username, password):
         """Set basic authentication for this client."""
-        self.auth_type = self.AUTH_BASIC
+        self.auth_type = self.AUTHTYPE_BASIC
         encoded = base64.b64encode("%s:%s" % (username, password))
         self._headers["Authorization"] = "Basic %s" % encoded
+
+    def config_load_token(self):
+        raise NotImplementedError(
+            ('The BaseClient does not have a service token type associated '
+             'with it. config_load_token() must be defined by a subclass '
+             'because tokens are associated with services.'))
 
     def qjoin_path(self, *parts):
         return "/" + "/".join(quote(part) for part in parts)

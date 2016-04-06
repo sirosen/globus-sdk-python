@@ -154,16 +154,27 @@ def _bool_cast(value):
     raise ValueError("Invalid config bool")
 
 
+def _get_token(tok_type, environment):
+    p = _get_parser()
+
+    tkn = p.get(tok_type, environment=environment,
+                failover_to_general=True, check_env=True)
+
+    return tkn
+
+
 def get_auth_token(environment):
     """
     Fetch any auth token from the config, if one is present
     """
-    p = _get_parser()
+    return _get_token('auth_token', environment)
 
-    tkn = p.get('auth_token', environment=environment,
-                failover_to_general=True, check_env=True)
 
-    return tkn
+def get_transfer_token(environment):
+    """
+    Fetch any transfer token from the config, if one is present
+    """
+    return _get_token('transfer_token', environment)
 
 
 def get_default_environ():

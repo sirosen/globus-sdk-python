@@ -36,12 +36,6 @@ Auth High Level Interface
    :show-inheritance:
    :exclude-members: error_class, response_class
 
-Nexus High Level Interface (DEPRECATED)
----------------------------------------
-
-.. autoclass:: globus_sdk.NexusClient
-   :members:
-
 Responses
 ---------
 
