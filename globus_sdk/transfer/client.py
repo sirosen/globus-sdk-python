@@ -315,7 +315,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role')
-        self.post(path, role_data)
+        return self.post(path, role_data)
 
     def get_endpoint_role(self, endpoint_id, role_id, **params):
         """
@@ -327,7 +327,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role', role_id)
-        self.get(path, params=params)
+        return self.get(path, params=params)
 
     def delete_endpoint_role(self, endpoint_id, role_id):
         """
@@ -339,7 +339,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role', role_id)
-        self.delete(path)
+        return self.delete(path)
 
     #
     # ACLs
