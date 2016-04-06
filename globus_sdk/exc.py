@@ -64,7 +64,7 @@ class GlobusAPIError(GlobusError):
 class TransferAPIError(GlobusAPIError):
     """
     Error class for the Transfer API client. In addition to the
-    inherited `code` and `message` instance variables, provides:
+    inherited ``code`` and ``message`` instance variables, provides:
 
     :ivar request_id: Unique identifier for the request, which should be
                       provided when contacting support@globus.org.

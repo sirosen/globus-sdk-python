@@ -12,7 +12,7 @@ All service clients support the low level interface, provides by the
 BaseClient.
 
 .. autoclass:: globus_sdk.base.BaseClient
-   :members: get, put, post, delete, set_auth_token, set_auth_basic
+   :members: get, put, post, delete, set_token, set_auth_basic
 
 Transfer High Level Interface
 -----------------------------

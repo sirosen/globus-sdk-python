@@ -13,8 +13,8 @@ from globus_sdk.response import GlobusHTTPResponse
 class BaseClient(object):
     """
     Simple client with error handling for Globus REST APIs. Implemented
-    as a wrapper around a requests.Session object, with a simplified interface
-    that does not directly expose anything from requests.
+    as a wrapper around a ``requests.Session`` object, with a simplified
+    interface that does not directly expose anything from requests.
     """
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError

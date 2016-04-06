@@ -23,8 +23,8 @@ class TransferClient(BaseClient):
     `Globus Transfer API <https://docs.globus.org/api/transfer/>`_.
 
     This class provides helper methods for most common resources in the
-    REST API, and basic get, post and put methods from the base rest
-    client that can be used to access any REST resource.
+    REST API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
+    from the base rest client that can be used to access any REST resource.
 
     There are two types of helper methods: list methods which return an
     iterator of :class:`GlobusResponse <globus_sdk.response.GlobusResponse>`
@@ -56,7 +56,7 @@ class TransferClient(BaseClient):
 
     def get_endpoint(self, endpoint_id, **params):
         """
-        GET /endpoint/<endpoint_id>
+        ``GET /endpoint/<endpoint_id>``
 
         See
         `Get Endpoint by ID <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id>`_
@@ -67,7 +67,7 @@ class TransferClient(BaseClient):
 
     def update_endpoint(self, endpoint_id, data, **params):
         """
-        PUT /endpoint/<endpoint_id>
+        ``PUT /endpoint/<endpoint_id>``
 
         See
         `Update Endpoint by ID <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_by_id>`_
@@ -78,7 +78,7 @@ class TransferClient(BaseClient):
 
     def create_endpoint(self, data):
         """
-        POST /endpoint/<endpoint_id>
+        ``POST /endpoint/<endpoint_id>``
 
         See
         `Create endpoint <https://docs.globus.org/api/transfer/endpoint/#create_endpoint>`_
@@ -88,7 +88,7 @@ class TransferClient(BaseClient):
 
     def delete_endpoint(self, endpoint_id):
         """
-        DELETE /endpoint/<endpoint_id>
+        ``DELETE /endpoint/<endpoint_id>``
 
         See
         `Delete endpoint by id <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_by_id>`_
@@ -101,8 +101,7 @@ class TransferClient(BaseClient):
     def endpoint_search(self, filter_fulltext=None, filter_scope=None,
                         num_results=25, **params):
         """
-        GET /endpoint_search?filter_fulltext=<filter_fulltext>
-                            &filter_scope=<filter_scope>
+        ``GET /endpoint_search?filter_fulltext=<filter_fulltext>&filter_scope=<filter_scope>``
 
         Additional params and valid filter_scopes are documented at
         https://docs.globus.org/api/transfer/endpoint_search
@@ -121,7 +120,7 @@ class TransferClient(BaseClient):
         >>>     print('{} has ID {}'.format(r.data['display_name'], ep['id']))
 
         Search results are capped at a number of elements equal to the
-        `num_results` parameter.
+        ``num_results`` parameter.
         If you want more than the default, 25, elements, do like so:
 
         >>> for r in endpoint_search('String to search for!',
@@ -144,7 +143,7 @@ class TransferClient(BaseClient):
 
     def endpoint_autoactivate(self, endpoint_id, **params):
         """
-        POST /endpoint/<endpoint_id>/autoactivate
+        ``POST /endpoint/<endpoint_id>/autoactivate``
 
         See
         `Autoactivate endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
@@ -155,7 +154,7 @@ class TransferClient(BaseClient):
 
     def endpoint_deactivate(self, endpoint_id, **params):
         """
-        POST /endpoint/<endpoint_id>/deactivate
+        ``POST /endpoint/<endpoint_id>/deactivate``
 
         See
         `Deactive endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#deactivate_endpoint>`_
@@ -166,7 +165,7 @@ class TransferClient(BaseClient):
 
     def endpoint_activate(self, endpoint_id, data, **params):
         """
-        POST /endpoint/<endpoint_id>/activate
+        ``POST /endpoint/<endpoint_id>/activate``
 
         See
         `Activate endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
@@ -177,7 +176,7 @@ class TransferClient(BaseClient):
 
     def endpoint_get_activation_requirements(self, endpoint_id, **params):
         """
-        GET /endpoint/<endpoint_id>/activation_requirements
+        ``GET /endpoint/<endpoint_id>/activation_requirements``
 
         See
         `Get activation requirements <https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements>`_
@@ -189,7 +188,7 @@ class TransferClient(BaseClient):
 
     def my_shared_endpoint_list(self, endpoint_id, **params):
         """
-        GET /endpoint/<endpoint_id>/my_shared_endpoint_list
+        ``GET /endpoint/<endpoint_id>/my_shared_endpoint_list``
 
         See
         `Get shared endpoint list <https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list>`_
@@ -202,7 +201,7 @@ class TransferClient(BaseClient):
 
     def my_effective_pause_rule_list(self, endpoint_id, **params):
         """
-        GET /endpoint/<endpoint_id>/my_effective_pause_rule_list
+        ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
 
         See
         `Get my effective endpoint pause rules <https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules>`_
@@ -217,7 +216,7 @@ class TransferClient(BaseClient):
 
     def endpoint_server_list(self, endpoint_id, **params):
         """
-        GET /endpoint/<endpoint_id>/server_list
+        ``GET /endpoint/<endpoint_id>/server_list``
 
         See
         `Get endpoint server list <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
@@ -229,7 +228,7 @@ class TransferClient(BaseClient):
 
     def get_endpoint_server(self, endpoint_id, server_id, **params):
         """
-        GET /endpoint/<endpoint_id>/server/<server_id>
+        ``GET /endpoint/<endpoint_id>/server/<server_id>``
 
         See
         `Get endpoint server list <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
@@ -240,7 +239,7 @@ class TransferClient(BaseClient):
 
     def add_endpoint_server(self, endpoint_id, server_data):
         """
-        POST /endpoint/<endpoint_id>/server
+        ``POST /endpoint/<endpoint_id>/server``
 
         See
         `Add endpoint server <https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server>`_
@@ -251,7 +250,7 @@ class TransferClient(BaseClient):
 
     def update_endpoint_server(self, endpoint_id, server_id, server_data):
         """
-        POST /endpoint/<endpoint_id>/server/<server_id>
+        ``POST /endpoint/<endpoint_id>/server/<server_id>``
 
         See
         `Update endpoint server by id <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_server_by_id>`_
@@ -262,7 +261,7 @@ class TransferClient(BaseClient):
 
     def delete_endpoint_server(self, endpoint_id, server_id):
         """
-        DELETE /endpoint/<endpoint_id>/server/<server_id>
+        ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
 
         See
         `Delete endpoint server by id <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_server_by_id>`_
@@ -277,7 +276,7 @@ class TransferClient(BaseClient):
 
     def endpoint_role_list(self, endpoint_id, **params):
         """
-        GET /endpoint/<endpoint_id>/role_list
+        ``GET /endpoint/<endpoint_id>/role_list``
 
         See
         `Get list of endpoint roles <https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles>`_
@@ -289,7 +288,7 @@ class TransferClient(BaseClient):
 
     def add_endpoint_role(self, endpoint_id, role_data):
         """
-        POST /endpoint/<endpoint_id>/role
+        ``POST /endpoint/<endpoint_id>/role``
 
         See
         `Create endpoint role <https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role>`_
@@ -300,7 +299,7 @@ class TransferClient(BaseClient):
 
     def get_endpoint_role(self, endpoint_id, role_id, **params):
         """
-        GET /endpoint/<endpoint_id>/role/<role_id>
+        ``GET /endpoint/<endpoint_id>/role/<role_id>``
 
         See
         `Get endpoint role by id <https://docs.globus.org/api/transfer/endpoint_roles/#get_endpoint_role_by_id>`_
@@ -311,7 +310,7 @@ class TransferClient(BaseClient):
 
     def delete_endpoint_role(self, endpoint_id, role_id):
         """
-        DELETE /endpoint/<endpoint_id>/role/<role_id>
+        ``DELETE /endpoint/<endpoint_id>/role/<role_id>``
 
         See
         `Delete endpoint role by id <https://docs.globus.org/api/transfer/endpoint_roles/#delete_endpoint_role_by_id>`_
@@ -326,7 +325,7 @@ class TransferClient(BaseClient):
 
     def endpoint_acl_list(self, endpoint_id, **params):
         """
-        GET /endpoint/<endpoint_id>/access_list
+        ``GET /endpoint/<endpoint_id>/access_list``
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access_list')
         for rule in self.get(path, params=params).json_body['DATA']:
@@ -334,28 +333,28 @@ class TransferClient(BaseClient):
 
     def get_endpoint_acl_rule(self, endpoint_id, rule_id, **params):
         """
-        GET /endpoint/<endpoint_id>/access/<rule_id>
+        ``GET /endpoint/<endpoint_id>/access/<rule_id>``
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access', rule_id)
         return self.get(path, params=params)
 
     def add_endpoint_acl_rule(self, endpoint_id, rule_data):
         """
-        POST /endpoint/<endpoint_id>/access
+        ``POST /endpoint/<endpoint_id>/access``
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access')
         return self.post(path, rule_data)
 
     def update_endpoint_acl_rule(self, endpoint_id, rule_id, rule_data):
         """
-        PUT /endpoint/<endpoint_id>/access/<rule_id>
+        ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access', rule_id)
         return self.put(path, rule_data)
 
     def delete_endpoint_acl_rule(self, endpoint_id, rule_id):
         """
-        DELETE /endpoint/<endpoint_id>/access/<rule_id>
+        ``DELETE /endpoint/<endpoint_id>/access/<rule_id>``
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access', rule_id)
         return self.delete(path)
@@ -366,7 +365,7 @@ class TransferClient(BaseClient):
 
     def bookmark_list(self, **params):
         """
-        GET /bookmark_list
+        ``GET /bookmark_list``
         """
         for bookmark in self.get('bookmark_list',
                                  params=params).json_body['DATA']:
@@ -374,27 +373,27 @@ class TransferClient(BaseClient):
 
     def create_bookmark(self, bookmark_data):
         """
-        POST /bookmark
+        ``POST /bookmark``
         """
         return self.post('bookmark', bookmark_data)
 
     def get_bookmark(self, bookmark_id, **params):
         """
-        GET /bookmark/<bookmark_id>
+        ``GET /bookmark/<bookmark_id>``
         """
         path = self.qjoin_path('bookmark', bookmark_id)
         return self.get(path, params=params)
 
     def update_bookmark(self, bookmark_id, bookmark_data):
         """
-        POST /bookmark/<bookmark_id>
+        ``POST /bookmark/<bookmark_id>``
         """
         path = self.qjoin_path('bookmark', bookmark_id)
         return self.get(path, bookmark_data)
 
     def delete_bookmark(self, bookmark_id):
         """
-        DELETE /bookmark/<bookmark_id>
+        ``DELETE /bookmark/<bookmark_id>``
         """
         path = self.qjoin_path('bookmark', bookmark_id)
         return self.delete(path)
@@ -405,14 +404,14 @@ class TransferClient(BaseClient):
 
     def operation_ls(self, endpoint_id, **params):
         """
-        GET /operation/endpoint/<endpoint_id>/ls
+        ``GET /operation/endpoint/<endpoint_id>/ls``
         """
         path = self.qjoin_path("operation/endpoint", endpoint_id, "ls")
         return self.get(path, params=params)
 
     def operation_mkdir(self, endpoint_id, path, **params):
         """
-        POST /operation/endpoint/<endpoint_id>/mkdir
+        ``POST /operation/endpoint/<endpoint_id>/mkdir``
         """
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
                                         "mkdir")
@@ -424,7 +423,7 @@ class TransferClient(BaseClient):
 
     def operation_rename(self, endpoint_id, oldpath, newpath, **params):
         """
-        POST /operation/endpoint/<endpoint_id>/rename
+        ``POST /operation/endpoint/<endpoint_id>/rename``
         """
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
                                         "rename")
@@ -441,19 +440,19 @@ class TransferClient(BaseClient):
 
     def get_submission_id(self, **params):
         """
-        GET /submission_id
+        ``GET /submission_id``
         """
         return self.get("submission_id", params=params)
 
     def submit_transfer(self, data):
         """
-        POST /transfer
+        ``POST /transfer``
         """
         return self.post('/transfer', data)
 
     def submit_delete(self, data):
         """
-        POST /delete
+        ``POST /delete``
         """
         return self.post('/delete', data)
 
@@ -528,7 +527,7 @@ class TransferClient(BaseClient):
                        paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
     def task_list(self, num_results=10, **params):
         """
-        GET /task_list
+        ``GET /task_list``
         """
         return self.get('task_list', params=params)
 
@@ -536,35 +535,35 @@ class TransferClient(BaseClient):
                        paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
     def task_event_list(self, task_id, num_results=10, **params):
         """
-        GET /task/<task_id>/event_list
+        ``GET /task/<task_id>/event_list``
         """
         path = self.qjoin_path('task', task_id, 'event_list')
         return self.get(path, params=params)
 
     def get_task(self, task_id, **params):
         """
-        GET /task/<task_id>
+        ``GET /task/<task_id>``
         """
         resource_path = self.qjoin_path("task", task_id)
         return self.get(resource_path, params=params)
 
     def update_task(self, task_id, data, **params):
         """
-        PUT /task/<task_id>
+        ``PUT /task/<task_id>``
         """
         resource_path = self.qjoin_path("task", task_id)
         return self.put(resource_path, data, params=params)
 
     def cancel_task(self, task_id):
         """
-        POST /task/<task_id>/cancel
+        ``POST /task/<task_id>/cancel``
         """
         resource_path = self.qjoin_path("task", task_id, "cancel")
         return self.post(resource_path)
 
     def task_pause_info(self, task_id, **params):
         """
-        POST /task/<task_id>/pause_info
+        ``POST /task/<task_id>/pause_info``
         """
         resource_path = self.qjoin_path("task", task_id, "pause_info")
         return self.get(resource_path, params=params)
