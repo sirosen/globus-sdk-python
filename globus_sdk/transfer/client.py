@@ -408,10 +408,10 @@ class TransferClient(BaseClient):
 
     def update_bookmark(self, bookmark_id, bookmark_data):
         """
-        ``POST /bookmark/<bookmark_id>``
+        ``PUT /bookmark/<bookmark_id>``
         """
         path = self.qjoin_path('bookmark', bookmark_id)
-        return self.get(path, bookmark_data)
+        return self.put(path, bookmark_data)
 
     def delete_bookmark(self, bookmark_id):
         """
