@@ -40,9 +40,12 @@ class TransferClient(BaseClient):
     response_class = TransferResponse
 
     def __init__(self, environment=config.get_default_environ(),
-                 auth_token=None):
+                 token=None):
         BaseClient.__init__(self, "transfer", environment, "/v0.10/",
-                            auth_token=auth_token)
+                            token=token)
+
+    def config_load_token(self):
+        return config.get_transfer_token(self.environment)
 
     # Convenience methods, providing more pythonic access to common REST
     # resources

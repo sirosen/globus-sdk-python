@@ -34,7 +34,7 @@ def get_transfer_client_from_args(args=None):
 
     client = TransferClient(environment)
     if token is not None:
-        client.set_auth_token(token)
+        client.set_token(token)
     return client
 
 
