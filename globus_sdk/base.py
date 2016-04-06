@@ -1,5 +1,4 @@
 import json
-import warnings
 import base64
 
 import requests
@@ -66,7 +65,8 @@ class BaseClient(object):
 
         :param params: dict to be encoded as a query string
 
-        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        :return: :class:`GlobusHTTPResponse \
+        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         return self._request("GET", path, params=params, headers=headers,
                              auth=auth)
@@ -78,7 +78,8 @@ class BaseClient(object):
         either ``json_body`` (python data that will be encoded as JSON) or
         ``text_body``.
 
-        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        :return: :class:`GlobusHTTPResponse \
+        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         return self._request("POST", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body, auth=auth)
@@ -87,7 +88,8 @@ class BaseClient(object):
         """
         Make a DELETE request to the specified path.
 
-        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        :return: :class:`GlobusHTTPResponse \
+        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         return self._request("DELETE", path, params=params,
                              headers=headers, auth=auth)
@@ -97,7 +99,8 @@ class BaseClient(object):
         """
         Make a PUT request to the specified path.
 
-        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        :return: :class:`GlobusHTTPResponse \
+        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         return self._request("PUT", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body, auth=auth)
@@ -113,7 +116,8 @@ class BaseClient(object):
                           serialized as JSON
         :param text_body: string to send in the request body
 
-        :return: :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>` object
+        :return: :class:`GlobusHTTPResponse \
+        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         if json_body is not None:
             assert text_body is None

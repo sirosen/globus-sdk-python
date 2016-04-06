@@ -59,7 +59,8 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>``
 
         See
-        `Get Endpoint by ID <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id>`_
+        `Get Endpoint by ID \
+        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id)
@@ -70,7 +71,8 @@ class TransferClient(BaseClient):
         ``PUT /endpoint/<endpoint_id>``
 
         See
-        `Update Endpoint by ID <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_by_id>`_
+        `Update Endpoint by ID \
+        <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_by_id>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id)
@@ -81,7 +83,8 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>``
 
         See
-        `Create endpoint <https://docs.globus.org/api/transfer/endpoint/#create_endpoint>`_
+        `Create endpoint \
+        <https://docs.globus.org/api/transfer/endpoint/#create_endpoint>`_
         in the REST documentation for details.
         """
         return self.post("endpoint", data)
@@ -91,7 +94,8 @@ class TransferClient(BaseClient):
         ``DELETE /endpoint/<endpoint_id>``
 
         See
-        `Delete endpoint by id <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_by_id>`_
+        `Delete endpoint by id \
+        <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_by_id>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id)
@@ -100,8 +104,11 @@ class TransferClient(BaseClient):
     @PaginatedResource(max_results_per_call=100, max_total_results=1000)
     def endpoint_search(self, filter_fulltext=None, filter_scope=None,
                         num_results=25, **params):
-        """
-        ``GET /endpoint_search?filter_fulltext=<filter_fulltext>&filter_scope=<filter_scope>``
+        r"""
+        .. parsed-literal::
+
+            GET /endpoint_search\
+            ?filter_fulltext=<filter_fulltext>&filter_scope=<filter_scope>
 
         Additional params and valid filter_scopes are documented at
         https://docs.globus.org/api/transfer/endpoint_search
@@ -110,12 +117,13 @@ class TransferClient(BaseClient):
         :class:`GlobusResponse <globus_sdk.response.GlobusResponse>`
         objects wrapping python dictionaries built from JSON documents.
 
-        # Simple Examples
         Search for a given string as a fulltext search:
+
         >>> for r in endpoint_search('String to search for!'):
         >>>     print(r.data['display_name'])
 
         Search for a given string, but only on endpoints that you own:
+
         >>> for r in endpoint_search('foo', filter_scope='my-endpoints'):
         >>>     print('{} has ID {}'.format(r.data['display_name'], ep['id']))
 
@@ -146,7 +154,8 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/autoactivate``
 
         See
-        `Autoactivate endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
+        `Autoactivate endpoint \
+        <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
@@ -157,7 +166,8 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/deactivate``
 
         See
-        `Deactive endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#deactivate_endpoint>`_
+        `Deactive endpoint \
+        <https://docs.globus.org/api/transfer/endpoint_activation/#deactivate_endpoint>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id, "deactivate")
@@ -168,7 +178,8 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/activate``
 
         See
-        `Activate endpoint <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
+        `Activate endpoint \
+        <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
@@ -179,19 +190,20 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/activation_requirements``
 
         See
-        `Get activation requirements <https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements>`_
+        `Get activation requirements \
+        <https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
         return self.post(path, params=params)
-
 
     def my_shared_endpoint_list(self, endpoint_id, **params):
         """
         ``GET /endpoint/<endpoint_id>/my_shared_endpoint_list``
 
         See
-        `Get shared endpoint list <https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list>`_
+        `Get shared endpoint list \
+        <https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id,
@@ -204,7 +216,8 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
 
         See
-        `Get my effective endpoint pause rules <https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules>`_
+        `Get my effective endpoint pause rules \
+        <https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id,
@@ -219,7 +232,8 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/server_list``
 
         See
-        `Get endpoint server list <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
+        `Get endpoint server list \
+        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
@@ -231,7 +245,8 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/server/<server_id>``
 
         See
-        `Get endpoint server list <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
+        `Get endpoint server list \
+        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
@@ -242,7 +257,8 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/server``
 
         See
-        `Add endpoint server <https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server>`_
+        `Add endpoint server \
+        <https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server')
@@ -253,7 +269,8 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/server/<server_id>``
 
         See
-        `Update endpoint server by id <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_server_by_id>`_
+        `Update endpoint server by id \
+        <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
@@ -264,7 +281,8 @@ class TransferClient(BaseClient):
         ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
 
         See
-        `Delete endpoint server by id <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_server_by_id>`_
+        `Delete endpoint server by id \
+        <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
@@ -279,7 +297,8 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/role_list``
 
         See
-        `Get list of endpoint roles <https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles>`_
+        `Get list of endpoint roles \
+        <https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role_list')
@@ -291,7 +310,8 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/role``
 
         See
-        `Create endpoint role <https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role>`_
+        `Create endpoint role \
+        <https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role')
@@ -302,7 +322,8 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/role/<role_id>``
 
         See
-        `Get endpoint role by id <https://docs.globus.org/api/transfer/endpoint_roles/#get_endpoint_role_by_id>`_
+        `Get endpoint role by id \
+        <https://docs.globus.org/api/transfer/endpoint_roles/#get_endpoint_role_by_id>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role', role_id)
@@ -313,7 +334,8 @@ class TransferClient(BaseClient):
         ``DELETE /endpoint/<endpoint_id>/role/<role_id>``
 
         See
-        `Delete endpoint role by id <https://docs.globus.org/api/transfer/endpoint_roles/#delete_endpoint_role_by_id>`_
+        `Delete endpoint role by id \
+        <https://docs.globus.org/api/transfer/endpoint_roles/#delete_endpoint_role_by_id>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role', role_id)
