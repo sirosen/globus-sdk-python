@@ -1,3 +1,4 @@
 include tox.ini
-include README.md
-
+include README.rst
+include LICENSE
+include COPYING
