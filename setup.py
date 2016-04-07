@@ -1,4 +1,5 @@
 import sys
+import os.path
 from setuptools import setup
 
 tests_require = ['nose2']
@@ -6,12 +7,17 @@ tests_require = ['nose2']
 if sys.version_info < (3,3):
     tests_require.append('mock')
 
+# single source of truth for package version
+version_ns = {}
+with open(os.path.join("globus_sdk", "version.py")) as f:
+    exec(f.read(), version_ns)
+
 setup(name="globus-sdk",
-      version="0.1",
+      version=version_ns["__version__"],
       description="Globus SDK for Python",
-      long_description=open("README.md").read(),
-      author="Bryce Allen",
-      author_email="ballen@globus.org",
+      long_description=open("README.rst").read(),
+      author="Globus Team",
+      author_email="support@globus.org",
       url="https://github.com/globusonline/globus-sdk-python",
       packages=['globus_sdk', 'globus_sdk.transfer'],
       package_data={'': ['*.cfg']},

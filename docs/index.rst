@@ -6,7 +6,8 @@
 Globus SDK for Python
 =====================
 
-This SDK provides a convenient Pythonic interface to Globus REST APIs,
+This SDK provides a convenient Pythonic interface to
+`Globus <https://www.globus.org>`_ REST APIs,
 including the Transfer API and the Globus Auth API. Documentation
 for the REST APIs is available at https://docs.globus.org.
 
@@ -14,7 +15,35 @@ Two interfaces are provided - a low level interface, supporting only
 ``GET``, ``PUT``, ``POST``, and ``DELETE`` operations, and a high level
 interface providing helper methods for common API resources.
 
-The SDK requires python 2.6+ or 3.2+.
+Source code is available at https://github.com/globusonline/globus-sdk-python.
+
+Installation
+============
+
+The Globus SDK requires `Python <https://www.python.org/>`_ 2.6+ or 3.2+.
+If a supported version of Python is not already installed on your system, see
+this `Python installation guide \
+<http://docs.python-guide.org/en/latest/starting/installation/>`_.
+
+The simplest way to install the Globus SDK is using the ``pip`` package manager
+(https://pypi.python.org/pypi/pip), which is included in most Python
+installations:
+
+::
+
+    pip install globus-sdk
+
+This will install the Globus SDK and it's dependencies.
+
+Bleeding edge versions of the Globus SDK can be installed by checking out the
+git repository and installing it manually:
+
+::
+
+    git checkout https://github.com/globusonline/globus-sdk-python.git
+    cd globus-sdk-python
+    python setup.py install
+
 
 Basic Usage
 ===========
@@ -57,3 +86,36 @@ API Documentation
    :maxdepth: 2
 
    api
+
+Deprecations
+============
+
+The Globus SDK uses python ``DeprecationWarning`` and
+``PendingDeprecationWarning`` classes to indicate deprecated and soon-to-be
+deprecated behaviors.  In order to see these warnings, run python with the
+flags:
+
+::
+
+ python -Wonce::DeprecationWarning \
+        -Wonce::PendingDeprecationWarning
+
+Note: The ``-W`` flag must precede any module you are passing to ``python``,
+or it will be fed into ``sys.argv`` inside of the module.
+
+License
+=======
+
+Copyright 2016 University of Chicago
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
