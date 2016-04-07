@@ -40,9 +40,9 @@ class TransferClient(BaseClient):
     response_class = TransferResponse
 
     def __init__(self, environment=config.get_default_environ(),
-                 token=None):
+                 token=None, app_name=None):
         BaseClient.__init__(self, "transfer", environment, "/v0.10/",
-                            token=token)
+                            token=token, app_name=None)
 
     def config_load_token(self):
         return config.get_transfer_token(self.environment)
