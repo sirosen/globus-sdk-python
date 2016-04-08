@@ -6,6 +6,7 @@ import requests
 from six.moves.urllib.parse import quote
 
 from globus_sdk import config, exc
+from globus_sdk.version import __version__
 from globus_sdk.response import GlobusHTTPResponse
 
 
@@ -23,21 +24,37 @@ class BaseClient(object):
     AUTHTYPE_TOKEN = "token"
     AUTHTYPE_BASIC = "basic"
 
+    BASE_USER_AGENT = 'globus-sdk-py-{}'.format(__version__)
+
     def __init__(self, service, environment=config.get_default_environ(),
-                 base_path=None, token=None):
+                 base_path=None, token=None, app_name=None):
         self.environment = environment
+
         self.base_url = config.get_service_url(environment, service)
         if base_path is not None:
             self.base_url = slash_join(self.base_url, base_path)
-        self._session = requests.Session()
-        self._headers = dict(Accept="application/json")
-        self._auth = None
 
+        # setup the basics for wrapping a Requests Session
+        # including basics for internal header dict
+        self._session = requests.Session()
+        self._headers = {
+            'Accept': 'application/json',
+            'User-Agent': self.BASE_USER_AGENT
+        }
+
+        # load a token for the client's service if it is not given as a param
+        # assign the result
         if not token:
             token = self.config_load_token()
         self.set_token(token)
 
+        # verify SSL? Usually true
         self._verify = config.get_ssl_verify(environment)
+
+        # set application name if given
+        self.app_name = None
+        if app_name is not None:
+            self.set_app_name(app_name)
 
     def set_token(self, token):
         """Set bearer token authentication for this client."""
@@ -49,6 +66,18 @@ class BaseClient(object):
         self.auth_type = self.AUTHTYPE_BASIC
         encoded = base64.b64encode("%s:%s" % (username, password))
         self._headers["Authorization"] = "Basic %s" % encoded
+
+    def set_app_name(self, app_name):
+        """
+        Set an application name to send to Globus services as part of the User
+        Agent.
+        Application developers are encouraged to set an app name as a courtesy
+        to the Globus Team, and to potentially speed resolution of issues when
+        interacting with Globus Support.
+        """
+        self.app_name = app_name
+        self._headers['User-Agent'] = '{}/{}'.format(self.BASE_USER_AGENT,
+                                                     app_name)
 
     def config_load_token(self):
         raise NotImplementedError(
