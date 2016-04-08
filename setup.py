@@ -4,7 +4,7 @@ from setuptools import setup
 
 tests_require = ['nose2']
 # include mock (for python2)
-if sys.version_info < (3,3):
+if sys.version_info < (3, 3):
     tests_require.append('mock')
 
 # single source of truth for package version
