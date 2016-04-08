@@ -15,6 +15,22 @@ class BaseClient(object):
     Simple client with error handling for Globus REST APIs. Implemented
     as a wrapper around a ``requests.Session`` object, with a simplified
     interface that does not directly expose anything from requests.
+
+    :param token: optional bearer token
+    :param app_name: optional "nice name" for the application
+
+    ``token`` should be scoped for the service specific to the type of client
+    being instantiated.
+    It is passed to :func:`set_token <globus_sdk.base.BaseClient.set_token>`.
+    If absent, the client will attempt to load a token from the SDK config
+    file instead.
+
+    ``app_name`` is passed to
+    :func:`set_app_name <globus_sdk.base.BaseClient.set_app_name>` if
+    provided. Only used as a courtesy to Globus -- has no bearing on the
+    semantics of client actions.
+
+    All other arguments are for internal use and should be ignored.
     """
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
