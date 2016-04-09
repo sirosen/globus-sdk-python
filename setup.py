@@ -24,6 +24,7 @@ setup(name="globus-sdk",
           'requests>=2.0.0,<3.0.0',
           'six==1.10.0'
       ],
+      include_package_data=True,
 
       # run tests with nose2
       tests_require=tests_require,
