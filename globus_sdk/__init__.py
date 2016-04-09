@@ -7,6 +7,6 @@ from globus_sdk.exc import GlobusError, GlobusAPIError, TransferAPIError
 from globus_sdk.version import __version__
 
 __all__ = ["GlobusResponse", "GlobusHTTPResponse",
-           "TransferClient", "NexusClient", "AuthClient",
+           "TransferClient", "AuthClient",
            "GlobusError", "GlobusAPIError", "TransferAPIError",
            "__version__"]
