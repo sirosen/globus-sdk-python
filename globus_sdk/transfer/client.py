@@ -119,28 +119,28 @@ class TransferClient(BaseClient):
 
         Search for a given string as a fulltext search:
 
-        >>> for r in endpoint_search('String to search for!'):
+        >>> for r in tc.endpoint_search('String to search for!'):
         >>>     print(r.data['display_name'])
 
         Search for a given string, but only on endpoints that you own:
 
-        >>> for r in endpoint_search('foo', filter_scope='my-endpoints'):
+        >>> for r in tc.endpoint_search('foo', filter_scope='my-endpoints'):
         >>>     print('{} has ID {}'.format(r.data['display_name'], ep['id']))
 
         Search results are capped at a number of elements equal to the
         ``num_results`` parameter.
         If you want more than the default, 25, elements, do like so:
 
-        >>> for r in endpoint_search('String to search for!',
-        >>>                          num_results=120):
+        >>> for r in tc.endpoint_search('String to search for!',
+        >>>                             num_results=120):
         >>>     print(r.data['display_name'])
 
         It is very important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query. If you attempt to exceed this
         limit, you will trigger a PaginationOverrunError.
 
-        >>> for r in endpoint_search('globus', # a very common string
-        >>>                          num_results=1200):
+        >>> for r in tc.endpoint_search('globus', # a very common string
+        >>>                             num_results=1200):
         >>>     print(r.data['display_name'])
 
         will trigger this error.
@@ -427,6 +427,15 @@ class TransferClient(BaseClient):
     def operation_ls(self, endpoint_id, **params):
         """
         ``GET /operation/endpoint/<endpoint_id>/ls``
+
+        >>> tc.endpoint_autoactivate(ep_id)
+        >>> for entry in tc.operation_ls(ep_id, path="/~/project1/"):
+        >>>     print(entry["name"], entry["type"])
+
+        See
+        `List Directory Contents \
+        <https://docs.globus.org/api/transfer/file_operations/#list_directory_contents>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path("operation/endpoint", endpoint_id, "ls")
         return self.get(path, params=params)
@@ -434,6 +443,14 @@ class TransferClient(BaseClient):
     def operation_mkdir(self, endpoint_id, path, **params):
         """
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
+
+        >>> tc.endpoint_autoactivate(ep_id)
+        >>> tc.operation_mkdir(ep_id, path="/~/newdir/")
+
+        See
+        `Make Directory \
+        <https://docs.globus.org/api/transfer/file_operations/#make_directory>`_
+        in the REST documentation for details.
         """
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
                                         "mkdir")
@@ -446,6 +463,15 @@ class TransferClient(BaseClient):
     def operation_rename(self, endpoint_id, oldpath, newpath, **params):
         """
         ``POST /operation/endpoint/<endpoint_id>/rename``
+
+        >>> tc.endpoint_autoactivate(ep_id)
+        >>> tc.operation_rename(ep_id, oldpath="/~/file1.txt",
+        >>>                     newpath="/~/project1data.txt")
+
+        See
+        `Rename \
+        <https://docs.globus.org/api/transfer/file_operations/#rename>`_
+        in the REST documentation for details.
         """
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
                                         "rename")
@@ -469,12 +495,39 @@ class TransferClient(BaseClient):
     def submit_transfer(self, data):
         """
         ``POST /transfer``
+
+        >>> tc.endpoint_autoactivate(source_ep_id)
+        >>> tc.endpoint_autoactivate(destination_ep_id)
+        >>> transfer_items = []
+        >>> transfer_items.append(
+        >>>     tc.make_submit_transfer_item("/source/path/dir/",
+        >>>                                  "/dest/path/dir/",
+        >>>                                  recursive=True))
+        >>> transfer_items.append(
+        >>>     tc.make_submit_transfer_item("/source/path/file.txt",
+        >>>                                  "/dest/path/file.txt"))
+        >>> transfer_data = tc.make_submit_transfer_data(
+        >>>     source_endpoint_id,
+        >>>     destination_endpoint_id,
+        >>>     transfer_items)
+        >>> transfer_result = tc.submit_transfer(transfer_data)
+        >>> print("task_id = ", transfer_result["task_id"])
+
+        See
+        `Submit a transfer task \
+        <https://docs.globus.org/api/transfer/task_submit/#submit_a_transfer_task>`_
+        in the REST documentation for details.
         """
         return self.post('/transfer', data)
 
     def submit_delete(self, data):
         """
         ``POST /delete``
+
+        See
+        `Submit a delete task \
+        <https://docs.globus.org/api/transfer/task_submit/#submit_a_delete_task>`_
+        in the REST documentation for details.
         """
         return self.post('/delete', data)
 
