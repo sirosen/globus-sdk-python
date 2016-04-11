@@ -150,8 +150,31 @@ class TransferClient(BaseClient):
         return self.get("endpoint_search", params=params)
 
     def endpoint_autoactivate(self, endpoint_id, **params):
-        """
+        r"""
         ``POST /endpoint/<endpoint_id>/autoactivate``
+
+        The following example will try to "auto" activate the endpoint
+        using a credential available from another endpoint or sign in by
+        the user with the same identity provider, but only if the
+        endpoint is not already activated or going to expire within an
+        hour (3600 seconds). If that fails, direct the user to the
+        globus website to perform activation:
+
+        >>> r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
+        >>> while (r.data["code"] == "AutoActivateFailed"):
+        >>>     print("Endpoint requires manual activation, please open "
+        >>>           "the following URL in a browser to activate the "
+        >>>           "endpoint:")
+        >>>     print("https://www.globus.org/app/endpoints/%s/activate"
+        >>>           % ep_id)
+        >>>     # For python 2.X, use raw_input() instead
+        >>>     input("Press ENTER after activating the endpoint:")
+        >>>     r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
+
+        This is the recommended flow for most thick client applications,
+        because many endpoints require activation via OAuth MyProxy,
+        which must be done in a browser anyway. Web based clients can
+        link directly to the URL.
 
         See
         `Autoactivate endpoint \
@@ -176,6 +199,10 @@ class TransferClient(BaseClient):
     def endpoint_activate(self, endpoint_id, data, **params):
         """
         ``POST /endpoint/<endpoint_id>/activate``
+
+        Consider using autoactivate and web activation instead, described
+        in the example for
+        :meth:`~globus_sdk.TransferClient.endpoint_autoactivate`.
 
         See
         `Activate endpoint \
@@ -428,7 +455,6 @@ class TransferClient(BaseClient):
         """
         ``GET /operation/endpoint/<endpoint_id>/ls``
 
-        >>> tc.endpoint_autoactivate(ep_id)
         >>> for entry in tc.operation_ls(ep_id, path="/~/project1/"):
         >>>     print(entry["name"], entry["type"])
 
@@ -444,7 +470,6 @@ class TransferClient(BaseClient):
         """
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
 
-        >>> tc.endpoint_autoactivate(ep_id)
         >>> tc.operation_mkdir(ep_id, path="/~/newdir/")
 
         See
@@ -464,7 +489,6 @@ class TransferClient(BaseClient):
         """
         ``POST /operation/endpoint/<endpoint_id>/rename``
 
-        >>> tc.endpoint_autoactivate(ep_id)
         >>> tc.operation_rename(ep_id, oldpath="/~/file1.txt",
         >>>                     newpath="/~/project1data.txt")
 
@@ -496,8 +520,6 @@ class TransferClient(BaseClient):
         """
         ``POST /transfer``
 
-        >>> tc.endpoint_autoactivate(source_ep_id)
-        >>> tc.endpoint_autoactivate(destination_ep_id)
         >>> transfer_items = []
         >>> transfer_items.append(
         >>>     tc.make_submit_transfer_item("/source/path/dir/",
@@ -511,7 +533,7 @@ class TransferClient(BaseClient):
         >>>     destination_endpoint_id,
         >>>     transfer_items)
         >>> transfer_result = tc.submit_transfer(transfer_data)
-        >>> print("task_id = ", transfer_result["task_id"])
+        >>> print("task_id = ", transfer_result.data["task_id"])
 
         See
         `Submit a transfer task \
