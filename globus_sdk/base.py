@@ -16,21 +16,21 @@ class BaseClient(object):
     as a wrapper around a ``requests.Session`` object, with a simplified
     interface that does not directly expose anything from requests.
 
-    :param token: optional bearer token
+    :param token: optional bearer token, scoped for the service matching the
+                  client's class
     :param app_name: optional "nice name" for the application
 
-    ``token`` should be scoped for the service specific to the type of client
-    being instantiated.
-    It is passed to :func:`set_token <globus_sdk.base.BaseClient.set_token>`.
-    If absent, the client will attempt to load a token from the SDK config
-    file instead.
+    If ``token`` is omitted, the client will attempt to load a token from the
+    SDK config file instead.
 
-    ``app_name`` is passed to
-    :func:`set_app_name <globus_sdk.base.BaseClient.set_app_name>` if
-    provided. Only used as a courtesy to Globus -- has no bearing on the
-    semantics of client actions.
+    ``app_name`` has no bearing on the semantics of client actions. It is just
+    passed as part of the User-Agent string, and may be useful when debugging
+    issues with the Globus Team.
 
     All other arguments are for internal use and should be ignored.
+
+
+    You should *never* try to directly instantiate a ``BaseClient``.
     """
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
@@ -73,12 +73,23 @@ class BaseClient(object):
             self.set_app_name(app_name)
 
     def set_token(self, token):
-        """Set bearer token authentication for this client."""
+        """
+        Set bearer token authentication for this client.
+        Overrides any token or basic auth header that may have been set by a
+        prior invocation or by
+        :func:`set_auth_basic <globus_sdk.base.BaseClient.set_auth_basic>`
+        """
         self.auth_type = self.AUTHTYPE_TOKEN
         self._headers["Authorization"] = "Bearer %s" % token
 
     def set_auth_basic(self, username, password):
-        """Set basic authentication for this client."""
+        """
+        Set basic authentication for this client to the base64 encoding of
+        ``<username>:<password>``.
+        Overrides any auth token or basic auth header that may have been set by
+        a prior invocation or by
+        :func:`set_token <globus_sdk.base.BaseClient.set_token>`
+        """
         self.auth_type = self.AUTHTYPE_BASIC
         encoded = base64.b64encode("%s:%s" % (username, password))
         self._headers["Authorization"] = "Basic %s" % encoded
@@ -87,6 +98,7 @@ class BaseClient(object):
         """
         Set an application name to send to Globus services as part of the User
         Agent.
+
         Application developers are encouraged to set an app name as a courtesy
         to the Globus Team, and to potentially speed resolution of issues when
         interacting with Globus Support.
@@ -108,7 +120,10 @@ class BaseClient(object):
         """
         Make a GET request to the specified path.
 
+        :param path: path for the request, with or without leading slash
         :param params: dict to be encoded as a query string
+        :param headers: dict of HTTP headers to add to the request
+        :param auth: tuple of (user, password) for basic auth [DEPRECATED]
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -119,9 +134,14 @@ class BaseClient(object):
     def post(self, path, json_body=None, params=None, headers=None,
              text_body=None, auth=None):
         """
-        Make a POST request to the specified path, with optional body in
-        either ``json_body`` (python data that will be encoded as JSON) or
-        ``text_body``.
+        Make a POST request to the specified path.
+
+        :param path: path for the request, with or without leading slash
+        :param params: dict to be encoded as a query string
+        :param headers: dict of HTTP headers to add to the request
+        :param auth: tuple of (user, password) for basic auth [DEPRECATED]
+        :param json_body: dict that will be encoded as a JSON request body
+        :param text_body: raw string that will be the request body
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -132,6 +152,11 @@ class BaseClient(object):
     def delete(self, path, params=None, headers=None, auth=None):
         """
         Make a DELETE request to the specified path.
+
+        :param path: path for the request, with or without leading slash
+        :param params: dict to be encoded as a query string
+        :param headers: dict of HTTP headers to add to the request
+        :param auth: tuple of (user, password) for basic auth [DEPRECATED]
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -144,6 +169,13 @@ class BaseClient(object):
         """
         Make a PUT request to the specified path.
 
+        :param path: path for the request, with or without leading slash
+        :param params: dict to be encoded as a query string
+        :param headers: dict of HTTP headers to add to the request
+        :param auth: tuple of (user, password) for basic auth [DEPRECATED]
+        :param json_body: dict that will be encoded as a JSON request body
+        :param text_body: raw string that will be the request body
+
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
@@ -154,12 +186,12 @@ class BaseClient(object):
                  json_body=None, text_body=None, auth=None):
         """
         :param method: HTTP request method, as an all caps string
+        :param path: path for the request, with or without leading slash
         :param headers: dict containing additional headers for the request
         :param params: dict to be encoded as a query string
         :param auth: tuple of (user, password) for basic auth [DEPRECATED]
-        :param json_body: Python data structure to send in the request body
-                          serialized as JSON
-        :param text_body: string to send in the request body
+        :param json_body: dict that will be encoded as a JSON request body
+        :param text_body: raw string that will be the request body
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object

@@ -70,11 +70,6 @@ To use the Transfer API:
 
     tc = TransferClient() # uses transfer_token from the config file
 
-    # low level interface
-    r = tc.get("/endpoint_search?filter_scope=my-endpoints")
-    for epdict in r.data["DATA"]:
-        print(epdict["display_name"], epdict["id"])
-
     # high level interface; provides iterators for list responses
     print("My Endpoints:")
     for r in tc.endpoint_search(filter_scope='my-endpoints'):
