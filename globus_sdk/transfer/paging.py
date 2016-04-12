@@ -1,13 +1,10 @@
-import inspect
-import functools
-
 from globus_sdk import exc
 from globus_sdk.response import GlobusResponse
 
 
 class PaginatedResource(object):
     """
-    A decorator that describes paginated Transfer API resources.
+    A class that describes paginated Transfer API resources.
     This is not a top level helper func because it depends upon the pagination
     implementation of the Transfer API, which may not be the implementation
     chosen by other, future APIs.
@@ -21,7 +18,15 @@ class PaginatedResource(object):
       hard limit for the API forbids requesting these results
     - Individual results are JSON objects inside of an array named `DATA` in
       the returned JSON document
+
+    This is a class and not a function because it needs to enforce distinct
+    actions between initialization and iteration. If defined as a generator
+    function with the `yield` syntax, python won't let us distinguish between
+    creating the iterable object and iterating it.
+    To eagerly trigger errors from the first call, we need to wrap it up in a
+    class.
     """
+
     # pages have 'has_next_page', 'offset', and 'limit'
     PAGING_STYLE_HAS_NEXT = 0
     # pages have 'offset', 'limit', and 'total'
@@ -30,123 +35,143 @@ class PaginatedResource(object):
     # 'limit'
     PAGING_STYLE_LAST_KEY = 2
 
-    def __init__(self, max_results_per_call, max_total_results,
+    # bind an object at class def time to act as a sentinel value for iteration
+    # Basically grabbing something that can't be duplicated by iteration
+    # results
+    _magic = object()
+
+    def __init__(self,
+                 # passthrough stuff for making a TransferClient method call
+                 client_method, path, client_kwargs,
+                 # paging parameters
+                 num_results=10, max_results_per_call=1000,
+                 max_total_results=None, offset=0,
                  paging_style=PAGING_STYLE_HAS_NEXT):
         """
-        PaginatedResource takes two arguments
-        max_results_per_call is the max size of a page to fetch from the API.
-        max_total_results is a pagination limit for total results to return
-        from the API.
+        Takes a TransferClient method, a selection of its arguments, a variety
+        of limits on result sizes, an offest into the result set, and a
+        "paging style", which defines which kind of Transfer paging behavior
+        we'll see.
 
-        When using this decorator, it is a good idea to name the arguments,
-        even though they are positionals, for greater clarity inline, as in
+        max_results_per_call and max_total_results are fairly self-descriptive.
+        They are limits imposed by the API, but which the SDK must be aware of
+        and respect.
+        This also takes a number of results to return, `num_results`. It isn't
+        immediately obvious why num_results and max_total_results aren't one in
+        the same, so to explain: num_results is the number of results the user
+        requested. max_total_results is a limit on the number of results that
+        can be requested. The caller could handle this, but it's nice and
+        uniform to put the num results >? max_total_results check in here.
 
-        >>> @PaginatedResource(max_results_per_call=25, max_total_results=250)
-        >>> def call_that_supports_paging(...):
-        >>>     ...
+        Offset is an offset into the result set, and is only applicable if
+        paging style is HAS_KEY or TOTAL.
         """
+        self.num_results = num_results
         self.max_results_per_call = max_results_per_call
         self.max_total_results = max_total_results
+        self.offset = offset
         self.paging_style = paging_style
 
-    def _get_paging_kwargs(self, func, **kwargs):
+        # check the requested num results to see if it exceeds the maximum
+        # total number of results allowed by the API
+        # only check if there is a max_total_results though
+        if (self.max_total_results is not None and
+                num_results > self.max_total_results):
+            raise exc.PaginationOverrunError((
+                'Paginated call would exceed API limit. Pass a smaller '
+                'num_results parameter -- the maximum for this call is {}')
+                .format(self.max_total_results))
+
+        # what function call does this class instance wrap up?
+        self.client_method = client_method
+        self.client_path = path
+        self.client_kwargs = client_kwargs
+
+        # convert the iterable_func method into a generator expression by
+        # calling it
+        self.generator = self.iterable_func()
+
+        # grab the first element out of the internal iteration function
+        # because this could raise a StopIteration exception, we need to be
+        # careful and make sure that such a condition is respected (and
+        # replicated as an iterable of length 0)
+        try:
+            self.first_elem = next(self.generator)
+        except StopIteration:
+            # express this internally as "generator is null" -- just need some
+            # way of making sure that it's clear
+            self.generator = None
+
+    def __iter__(self):
         """
-        Small helper for tidiness. Pulls some values out of kwargs, as
-        desired.
-
-        We need to pull desired values out of kwargs so that we don't
-        disrupt the flow of original positional arguments to the wrapped
-        function, `func`
+        Each instance is an iterable, so make it the result of `__iter__` and
+        rely on an explicit `next()` method.
         """
-        # get the default values for keyword arguments to `func`
-        argspec = inspect.getargspec(func)
-        # getargspec has a kind of weird return value -- we need to manually
-        # join together default kwarg names with their values
-        defaults = dict(zip(argspec.args[-len(argspec.defaults):],
-                            argspec.defaults))
+        return self
 
-        # get from kwargs, failover to wrapped functions kwarg defaults,
-        # failover to None
-        num_results = kwargs.get('num_results',
-                                 defaults.get('num_results',
-                                              None)
-                                 )
-
-        # paginated calls must always define a `num_results` kwarg, and this
-        # would indicate that it wasn't passed and is missing from default
-        # kwargs on the decorated function, or was passed as None explicitly
-        if num_results is None:
-            raise ValueError('Paginated Calls Must Supply `num_results`')
-
-        # offset should rarely be set, but we need to handle the case in
-        # which a caller wants to start their results at a given offset
-        # manually
-        offset = kwargs.get('offset', 0)
-
-        return num_results, offset
-
-    def __call__(self, func):
+    def next(self):
         """
-        The "real" function decorator.
-
-        i.e. it's the result of creating a PaginatedResource(...), and applying
-        it to a function with the @<decorator> syntax.
+        PaginatedResource objects are iterable collections of results from an
+        underlying function. However, they have special behavior when being
+        setup, which is where the magical `first_elem` comes into play,
+        capturing the first iteration result.
         """
+        # if the generator was empty from the start, just raise a StopIteration
+        # here and now
+        if self.generator is None:
+            raise StopIteration()
 
-        @functools.wraps(func)
-        def wrapped_func(*args, **kwargs):
-            """
-            This is a closure over the wrapped function -- a paginated version
-            of that function. Lets us write paginated calls as though they were
-            single API calls, and get paginated results via an iterator
-            interface.
-            """
-            # keyword args used by the paging itself
-            num_results, offset = self._get_paging_kwargs(func, **kwargs)
+        if self.first_elem != self._magic:
+            tmp = self.first_elem
+            self.first_elem = self._magic
+            return tmp
+        else:
+            return next(self.generator)
 
-            # now, cap the limit per request to the max per request size
-            limit = min(num_results, self.max_results_per_call)
+    def iterable_func(self):
+        """
+        An internal function which has generator semantics. Defined using the
+        `yield` syntax.
+        Used to grab the first element during class initialization, and
+        subsequently on calls to `next()` to get the remaining elements.
+        We rely on the implicit StopIteration built into this type of function
+        to propagate through the final `next()` call.
 
-            # check the requested num results to see if it exceeds the maximum
-            # total number of results allowed by the API
-            # only check if there is a max_total_results though
-            if (self.max_total_results is not None and
-                    num_results > self.max_total_results):
-                raise exc.PaginationOverrunError((
-                    'Paginated call would exceed API limit. Pass a smaller '
-                    'num_results parameter -- the maximum for this call is {}')
-                    .format(self.max_total_results))
+        This method is the real workhorse of this entire module.
+        """
+        # now, cap the limit per request to the max per request size
+        limit = min(self.num_results, self.max_results_per_call)
 
-            has_next_page = True
-            while has_next_page:
-                # if we're about to request more results than the user asked
-                # for, limit ourselves on the last paginated call to the API
-                if offset + limit > num_results:
-                    limit = num_results - offset
+        has_next_page = True
+        while has_next_page:
+            # if we're about to request more results than the user asked
+            # for, limit ourselves on the last paginated call to the API
+            if self.offset + limit > self.num_results:
+                limit = self.num_results - self.offset
 
-                kwargs['offset'] = offset
-                kwargs['limit'] = limit
+            if not self.client_kwargs['params']:
+                self.client_kwargs['params'] = {}
+            self.client_kwargs['params']['offset'] = self.offset
+            self.client_kwargs['params']['limit'] = limit
 
-                res = func(*args, **kwargs).json_body
+            res = self.client_method(self.client_path,
+                                     **self.client_kwargs).json_body
 
-                # walk the results from the page we fetched, returning them as
-                # the iterated elements
-                for item in res['DATA']:
-                    yield GlobusResponse(item)
+            # walk the results from the page we fetched, returning them as
+            # the iterated elements
+            for item in res['DATA']:
+                yield GlobusResponse(item)
 
-                offset += self.max_results_per_call
+            self.offset += self.max_results_per_call
 
-                # do we have another page of results to fetch?
-                if self.paging_style == self.PAGING_STYLE_HAS_NEXT:
-                    # set to False if we've reached the given limit
-                    has_next_page = res['has_next_page']
-                elif self.paging_style == self.PAGING_STYLE_TOTAL:
-                    has_next_page = offset < res['total']
-                else:
-                    raise ValueError(
-                        'Invalid Paging Style Given to PaginatedResource')
+            # do we have another page of results to fetch?
+            if self.paging_style == self.PAGING_STYLE_HAS_NEXT:
+                # set to False if we've reached the given limit
+                has_next_page = res['has_next_page']
+            elif self.paging_style == self.PAGING_STYLE_TOTAL:
+                has_next_page = self.offset < res['total']
+            else:
+                raise ValueError(
+                    'Invalid Paging Style Given to PaginatedResource')
 
-                has_next_page = has_next_page and offset < num_results
-
-        # we're still in __call__ here -- return the closure we just defined
-        return wrapped_func
+            has_next_page = has_next_page and self.offset < self.num_results

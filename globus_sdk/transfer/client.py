@@ -101,7 +101,6 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id)
         return self.delete(path)
 
-    @PaginatedResource(max_results_per_call=100, max_total_results=1000)
     def endpoint_search(self, filter_fulltext=None, filter_scope=None,
                         num_results=25, **params):
         r"""
@@ -147,7 +146,10 @@ class TransferClient(BaseClient):
         """
         merge_params(params, filter_scope=filter_scope,
                      filter_fulltext=filter_fulltext)
-        return self.get("endpoint_search", params=params)
+        return PaginatedResource(
+            self.get, "endpoint_search", {'params': params},
+            num_results=num_results, max_results_per_call=100,
+            max_total_results=1000)
 
     def endpoint_autoactivate(self, endpoint_id, **params):
         r"""
@@ -235,8 +237,8 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_shared_endpoint_list')
-        for ep in self.get(path, params=params).json_body['DATA']:
-            yield GlobusResponse(ep)
+        return [GlobusResponse(ep) for ep in
+                self.get(path, params=params).json_body['DATA']]
 
     def my_effective_pause_rule_list(self, endpoint_id, **params):
         """
@@ -249,8 +251,8 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_effective_pause_rule_list')
-        for rule in self.get(path, params=params).json_body['DATA']:
-            yield GlobusResponse(rule)
+        return [GlobusResponse(rule) for rule in
+                self.get(path, params=params).json_body['DATA']]
 
     # Endpoint servers
 
@@ -264,8 +266,8 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
-        for server in self.get(path, params=params).json_body['DATA']:
-            yield GlobusResponse(server)
+        return [GlobusResponse(server) for server in
+                self.get(path, params=params).json_body['DATA']]
 
     def get_endpoint_server(self, endpoint_id, server_id, **params):
         """
@@ -329,8 +331,8 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role_list')
-        for role in self.get(path, params=params).json_body['DATA']:
-            yield GlobusResponse(role)
+        return [GlobusResponse(role) for role in
+                self.get(path, params=params).json_body['DATA']]
 
     def add_endpoint_role(self, endpoint_id, role_data):
         """
@@ -377,8 +379,8 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/access_list``
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access_list')
-        for rule in self.get(path, params=params).json_body['DATA']:
-            yield GlobusResponse(rule)
+        return [GlobusResponse(rule) for rule in
+                self.get(path, params=params).json_body['DATA']]
 
     def get_endpoint_acl_rule(self, endpoint_id, rule_id, **params):
         """
@@ -416,9 +418,8 @@ class TransferClient(BaseClient):
         """
         ``GET /bookmark_list``
         """
-        for bookmark in self.get('bookmark_list',
-                                 params=params).json_body['DATA']:
-            yield GlobusResponse(bookmark)
+        return [GlobusResponse(bookmark) for bookmark in
+                self.get('bookmark_list', params=params).json_body['DATA']]
 
     def create_bookmark(self, bookmark_data):
         """
@@ -620,22 +621,24 @@ class TransferClient(BaseClient):
     # Task inspection and management
     #
 
-    @PaginatedResource(max_results_per_call=1000, max_total_results=None,
-                       paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
     def task_list(self, num_results=10, **params):
         """
         ``GET /task_list``
         """
-        return self.get('task_list', params=params)
+        return PaginatedResource(
+            self.get, 'task_list', {'params': params},
+            num_results=num_results, max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
 
-    @PaginatedResource(max_results_per_call=1000, max_total_results=None,
-                       paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
     def task_event_list(self, task_id, num_results=10, **params):
         """
         ``GET /task/<task_id>/event_list``
         """
         path = self.qjoin_path('task', task_id, 'event_list')
-        return self.get(path, params=params)
+        return PaginatedResource(
+            self.get, path, {'params': params},
+            num_results=num_results, max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
 
     def get_task(self, task_id, **params):
         """
