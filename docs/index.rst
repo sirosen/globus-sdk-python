@@ -81,6 +81,7 @@ API Documentation
    :maxdepth: 2
 
    api
+   config
 
 Deprecations
 ============
