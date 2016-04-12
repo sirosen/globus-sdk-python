@@ -263,43 +263,22 @@ class TransferClient(BaseClient):
         :param data: A python dict representation of a ``shared_endpoint``
                      document
 
+        >>> tc = globus_sdk.TransferClient()
+        >>> shared_ep_data = {
+        >>>   'DATA_TYPE': 'shared_endpoint',
+        >>>   'host_endpoint': host_endpoint_id,
+        >>>   'host_path': host_path,
+        >>>   'display_name': display_name,
+        >>> }
+        >>> create_result = tc.create_shared_endpoint(shared_ep_data).data
+
         See
         `Create shared endpoint \
         <https://docs.globus.org/api/transfer/endpoint/#create_shared_endpoint>`_
         in the REST documentation for details.
         """
-        path = self.qjoin_path('endpoint', endpoint_id,
-                               'my_shared_endpoint_list')
         return [GlobusResponse(ep) for ep in
-                self.get(path, params=params).json_body['DATA']]
-
-    def make_create_shared_endpoint_data(self, host_endpoint, host_path,
-                                         display_name, **kwargs):
-        """
-        Helper to build a ``shared_endpoint`` document (as a dict), suitable
-        for use in :func:`create_shared_endpoint
-        <globus_sdk.transfer.client.TransferClient.create_shared_endpoint>`
-
-        :param host_endpoint: ID of the host endpoint
-        :param host_path: Absolute path on the host endpoint for the share
-        :param display_name: Display name for the new Shared Endpoint
-        :param kwargs: Keyword arguments added to the document body verbatim
-
-        For full documentation, see the REST API documentation on
-        `shared_endpoint \
-        <https://docs.globus.org/api/transfer/endpoint/\
-         #shared_endpoint_document>`_
-        documents.
-        """
-        shared_ep_doc = {
-            'DATA_TYPE': 'shared_endpoint',
-            'host_endpoint': host_endpoint,
-            'host_path': host_path,
-            'display_name': display_name
-        }
-        merge_params(shared_ep_doc, kwargs)
-
-        return shared_ep_doc
+                self.get('shared_endpoint').json_body['DATA']]
 
     # Endpoint servers
 
@@ -503,6 +482,7 @@ class TransferClient(BaseClient):
         """
         ``GET /operation/endpoint/<endpoint_id>/ls``
 
+        >>> tc = globus_sdk.TransferClient()
         >>> for entry in tc.operation_ls(ep_id, path="/~/project1/"):
         >>>     print(entry["name"], entry["type"])
 
@@ -512,12 +492,14 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path("operation/endpoint", endpoint_id, "ls")
-        return self.get(path, params=params)
+        return [GlobusResponse(file_info) for file_info in
+                self.get(path, params=params).data["DATA"]]
 
     def operation_mkdir(self, endpoint_id, path, **params):
         """
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
 
+        >>> tc = globus_sdk.TransferClient()
         >>> tc.operation_mkdir(ep_id, path="/~/newdir/")
 
         See
