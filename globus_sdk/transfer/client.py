@@ -147,7 +147,7 @@ class TransferClient(BaseClient):
         merge_params(params, filter_scope=filter_scope,
                      filter_fulltext=filter_fulltext)
         return PaginatedResource(
-            self.get, ["endpoint_search"], {'params': params},
+            self.get, "endpoint_search", {'params': params},
             num_results=num_results, max_results_per_call=100,
             max_total_results=1000)
 
@@ -604,7 +604,7 @@ class TransferClient(BaseClient):
         ``GET /task_list``
         """
         return PaginatedResource(
-            self.get, ['task_list'], {'params': params},
+            self.get, 'task_list', {'params': params},
             num_results=num_results, max_results_per_call=1000,
             paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
 
@@ -614,7 +614,7 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('task', task_id, 'event_list')
         return PaginatedResource(
-            self.get, [path], {'params': params},
+            self.get, path, {'params': params},
             num_results=num_results, max_results_per_call=1000,
             paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
 

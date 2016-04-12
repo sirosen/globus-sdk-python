@@ -40,16 +40,23 @@ class PaginatedResource(object):
     # results
     _magic = object()
 
-    def __init__(self, func, func_args, func_kwargs,
-                 num_results, max_results_per_call,
+    def __init__(self,
+                 # passthrough stuff for making a TransferClient method call
+                 client_method, path, client_kwargs,
+                 # paging parameters
+                 num_results=10, max_results_per_call=1000,
                  max_total_results=None, offset=0,
                  paging_style=PAGING_STYLE_HAS_NEXT):
         """
-        Takes a function, its positional and keyword arguments, a maximum
-        number of results (per call and total), and a "paging style", which
-        defines which kind of Transfer paging behavior we'll see.
+        Takes a TransferClient method, a selection of its arguments, a variety
+        of limits on result sizes, an offest into the result set, and a
+        "paging style", which defines which kind of Transfer paging behavior
+        we'll see.
 
-        Also takes a number of results to return, `num_results`. It isn't
+        max_results_per_call and max_total_results are fairly self-descriptive.
+        They are limits imposed by the API, but which the SDK must be aware of
+        and respect.
+        This also takes a number of results to return, `num_results`. It isn't
         immediately obvious why num_results and max_total_results aren't one in
         the same, so to explain: num_results is the number of results the user
         requested. max_total_results is a limit on the number of results that
@@ -76,9 +83,9 @@ class PaginatedResource(object):
                 .format(self.max_total_results))
 
         # what function call does this class instance wrap up?
-        self.func = func
-        self.func_args = func_args
-        self.func_kwargs = func_kwargs
+        self.client_method = client_method
+        self.client_path = path
+        self.client_kwargs = client_kwargs
 
         # convert the iterable_func method into a generator expression by
         # calling it
@@ -142,12 +149,13 @@ class PaginatedResource(object):
             if self.offset + limit > self.num_results:
                 limit = self.num_results - self.offset
 
-            if not self.func_kwargs['params']:
-                self.func_kwargs['params'] = {}
-            self.func_kwargs['params']['offset'] = self.offset
-            self.func_kwargs['params']['limit'] = limit
+            if not self.client_kwargs['params']:
+                self.client_kwargs['params'] = {}
+            self.client_kwargs['params']['offset'] = self.offset
+            self.client_kwargs['params']['limit'] = limit
 
-            res = self.func(*self.func_args, **self.func_kwargs).json_body
+            res = self.client_method(self.client_path,
+                                     **self.client_kwargs).json_body
 
             # walk the results from the page we fetched, returning them as
             # the iterated elements
