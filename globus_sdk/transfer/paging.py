@@ -1,8 +1,10 @@
+import six
+
 from globus_sdk import exc
 from globus_sdk.response import GlobusResponse
 
 
-class PaginatedResource(object):
+class PaginatedResource(six.Iterator):
     """
     A class that describes paginated Transfer API resources.
     This is not a top level helper func because it depends upon the pagination
@@ -109,7 +111,7 @@ class PaginatedResource(object):
         """
         return self
 
-    def next(self):
+    def __next__(self):
         """
         PaginatedResource objects are iterable collections of results from an
         underlying function. However, they have special behavior when being
