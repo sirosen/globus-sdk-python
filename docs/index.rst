@@ -15,7 +15,7 @@ Two interfaces are provided - a low level interface, supporting only
 ``GET``, ``PUT``, ``POST``, and ``DELETE`` operations, and a high level
 interface providing helper methods for common API resources.
 
-Source code is available at https://github.com/globusonline/globus-sdk-python.
+Source code is available at https://github.com/globus/globus-sdk-python.
 
 Installation
 ============
@@ -40,7 +40,7 @@ git repository and installing it manually:
 
 ::
 
-    git checkout https://github.com/globusonline/globus-sdk-python.git
+    git checkout https://github.com/globus/globus-sdk-python.git
     cd globus-sdk-python
     python setup.py install
 
