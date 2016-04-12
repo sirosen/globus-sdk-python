@@ -226,6 +226,22 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
         return self.post(path, params=params)
 
+    def my_effective_pause_rule_list(self, endpoint_id, **params):
+        """
+        ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
+
+        See
+        `Get my effective endpoint pause rules \
+        <https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules>`_
+        in the REST documentation for details.
+        """
+        path = self.qjoin_path('endpoint', endpoint_id,
+                               'my_effective_pause_rule_list')
+        return [GlobusResponse(rule) for rule in
+                self.get(path, params=params).json_body['DATA']]
+
+    # Shared Endpoints
+
     def my_shared_endpoint_list(self, endpoint_id, **params):
         """
         ``GET /endpoint/<endpoint_id>/my_shared_endpoint_list``
@@ -240,19 +256,50 @@ class TransferClient(BaseClient):
         return [GlobusResponse(ep) for ep in
                 self.get(path, params=params).json_body['DATA']]
 
-    def my_effective_pause_rule_list(self, endpoint_id, **params):
+    def create_shared_endpoint(self, data):
         """
-        ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
+        ``POST /shared_endpoint``
+
+        :param data: A python dict representation of a ``shared_endpoint``
+                     document
 
         See
-        `Get my effective endpoint pause rules \
-        <https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules>`_
+        `Create shared endpoint \
+        <https://docs.globus.org/api/transfer/endpoint/#create_shared_endpoint>`_
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id,
-                               'my_effective_pause_rule_list')
-        return [GlobusResponse(rule) for rule in
+                               'my_shared_endpoint_list')
+        return [GlobusResponse(ep) for ep in
                 self.get(path, params=params).json_body['DATA']]
+
+    def make_create_shared_endpoint_data(self, host_endpoint, host_path,
+                                         display_name, **kwargs):
+        """
+        Helper to build a ``shared_endpoint`` document (as a dict), suitable
+        for use in :func:`create_shared_endpoint
+        <globus_sdk.transfer.client.TransferClient.create_shared_endpoint>`
+
+        :param host_endpoint: ID of the host endpoint
+        :param host_path: Absolute path on the host endpoint for the share
+        :param display_name: Display name for the new Shared Endpoint
+        :param kwargs: Keyword arguments added to the document body verbatim
+
+        For full documentation, see the REST API documentation on
+        `shared_endpoint \
+        <https://docs.globus.org/api/transfer/endpoint/\
+         #shared_endpoint_document>`_
+        documents.
+        """
+        shared_ep_doc = {
+            'DATA_TYPE': 'shared_endpoint',
+            'host_endpoint': host_endpoint,
+            'host_path': host_path,
+            'display_name': display_name
+        }
+        merge_params(shared_ep_doc, kwargs)
+
+        return shared_ep_doc
 
     # Endpoint servers
 
