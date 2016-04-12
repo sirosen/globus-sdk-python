@@ -49,38 +49,12 @@ Auth Client
    :show-inheritance:
    :exclude-members: error_class, response_class
 
-Common Low Level Interface
---------------------------
+Common Behavior
+---------------
 
-All service clients support the low level interface, provided by the
-``BaseClient``.
+.. toctree::
+    :maxdepth: 1
 
-.. autoclass:: globus_sdk.base.BaseClient
-   :members: get, put, post, delete, set_token, set_auth_basic, set_app_name
-   :member-order: bysource
-
-Responses
----------
-
-.. autoclass:: globus_sdk.response.GlobusResponse
-   :members:
-
-.. autoclass:: globus_sdk.response.GlobusHTTPResponse
-   :members:
-   :inherited-members:
-   :show-inheritance:
-
-Exceptions
-----------
-
-.. autoclass:: globus_sdk.exc.GlobusError
-   :members:
-   :show-inheritance:
-
-.. autoclass:: globus_sdk.exc.GlobusAPIError
-   :members:
-   :show-inheritance:
-
-.. autoclass:: globus_sdk.exc.PaginationOverrunError
-   :members:
-   :show-inheritance:
+    api/response
+    api/exceptions
+    api/baseclient
