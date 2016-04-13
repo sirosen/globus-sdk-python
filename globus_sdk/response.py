@@ -16,6 +16,22 @@ class GlobusResponse(object):
     def __repr__(self):
         return "{}({!r})".format(self.__class__.__name__, self.data)
 
+    def __getitem__(self, key):
+        # force evaluation of the data property outside of the upcoming
+        # try-catch so that we don't accidentally catch TypeErrors thrown
+        # during the getter function itself
+        data = self.data
+        try:
+            return data[key]
+        except TypeError:
+            # re-raise with an altered message -- the issue is that whatever
+            # type of GlobusResponse you're working with doesn't support
+            # indexing
+            # "type" is ambiguous, but we don't know if it's the fault of the
+            # class at large, or just a particular call's `data` property
+            raise TypeError(('This type of GlobusResponse object '
+                             'does not support indexing.'))
+
     @property
     def data(self):
         """
