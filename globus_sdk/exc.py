@@ -99,7 +99,7 @@ class InvalidDocumentBodyError(GlobusError):
 # Thin wrappers around requests exceptions, so the SDK is API independent.
 class NetworkError(GlobusError):
     """
-    Error communicating between the SDK client and REST API server.
+    Error communicating with the REST API server.
     """
 
 
@@ -108,4 +108,4 @@ class TimeoutError(NetworkError):
 
 
 class ConnectionError(NetworkError):
-    """A Connection error occured in the REST request."""
+    """A connection error occured while making a REST request."""

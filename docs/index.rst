@@ -72,7 +72,7 @@ To use the Transfer API:
 
     # high level interface; provides iterators for list responses
     print("My Endpoints:")
-    for r in tc.endpoint_search(filter_scope='my-endpoints'):
+    for r in tc.endpoint_search(filter_scope="my-endpoints"):
         print(r.data["display_name"], r.data["id"])
 
 API Documentation
@@ -81,6 +81,9 @@ API Documentation
    :maxdepth: 2
 
    api
+   api/response
+   api/exceptions
+   api/baseclient
    config
 
 Deprecations

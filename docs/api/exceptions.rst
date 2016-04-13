@@ -13,14 +13,21 @@ this::
     try:
         tc = TransferClient()
 
-        eps = tc.endpoint_search(filter_fulltext='myendpointsearch')
+        eps = tc.endpoint_search(filter_fulltext="myendpointsearch")
 
         for ep in eps:
-            print(ep.data['display_name'])
+            print(ep["display_name"])
 
         ...
+    except exc.GlobusAPIError as e:
+        # Error response from the REST service, check the code and message for
+        # details.
+        print("Error code", e.code)
+        print("Error message", e.message)
+    except exc.NetworkError as e:
+        print("Network failure, check your internet connection and firewall")
     except exc.GlobusError as e:
-        print('Some GlobusError happened when we tried to foo a bar with a baz!')
+        print("GlobusError happened when we tried to foo a bar with a baz!")
         logging.exception(e)
     else:
         ...
@@ -40,6 +47,18 @@ Error Classes
    :show-inheritance:
 
 .. autoclass:: globus_sdk.exc.GlobusAPIError
+   :members:
+   :show-inheritance:
+
+.. autoclass:: globus_sdk.exc.NetworkError
+   :members:
+   :show-inheritance:
+
+.. autoclass:: globus_sdk.exc.ConnectionError
+   :members:
+   :show-inheritance:
+
+.. autoclass:: globus_sdk.exc.TimeoutError
    :members:
    :show-inheritance:
 

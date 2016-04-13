@@ -1,7 +1,7 @@
 .. _api:
 
-Developer Interface
-===================
+High Level API
+==============
 
 The Globus SDK provides a client class for every public Globus API.
 Each client object can take authentication credentials from config files,
@@ -17,10 +17,10 @@ very simply::
 
     tc = TransferClient() # uses transfer_token from the config file
 
-    print('My Last 25 Tasks:')
+    print("My Last 25 Tasks:")
     # `filter` to get Delete Tasks (default is just Transfer Tasks)
-    for task in tc.task_list(num_results=25, filter='type:TRANSFER,DELETE'):
-        print(task.data['task_id'], task.data['type'], task.data['status'])
+    for task in tc.task_list(num_results=25, filter="type:TRANSFER,DELETE"):
+        print(task["task_id"], task["type"], task["status"])
 
 
 .. module:: globus_sdk
@@ -48,13 +48,3 @@ Auth Client
    :inherited-members:
    :show-inheritance:
    :exclude-members: error_class, response_class
-
-Common Behavior
----------------
-
-.. toctree::
-    :maxdepth: 1
-
-    api/response
-    api/exceptions
-    api/baseclient

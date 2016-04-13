@@ -1,12 +1,21 @@
 class GlobusResponse(object):
     """
     Generic response object, with a single ``data`` member.
+
+    The most common response data is a JSON dictionary. To make
+    handling this type of response as seemless as possible, the
+    ``GlobusResponse`` object also supports direct dictionary item
+    access, as an alias for accessing an item of the underlying
+    ``data``. If ``data`` is not a dictionary, item access will raise
+    ``TypeError``.
+
+    >>> print("Response ID": r["id"]) # alias for r.data["id"]
     """
     def __init__(self, data):
         """
-        GlobusResponse objects *always* wrap some kind of data to return to a
-        caller. Most basic actions on a GlobusResponse are just ways of
-        interacting with this data.
+        ``GlobusResponse`` objects *always* wrap some kind of data to
+        return to a caller. Most basic actions on a GlobusResponse are
+        just ways of interacting with this data.
         """
         self._data = data
 
@@ -45,7 +54,7 @@ class GlobusHTTPResponse(GlobusResponse):
     """
     Response object that wraps an HTTP response from the underlying HTTP
     library. If the response is JSON, the parsed data will be available in
-    ``data``, otherwise ``data`` will be ``None`` and ``text_body`` should
+    ``data``, otherwise ``data`` will be ``None`` and ``text`` should
     be used instead.
 
     :ivar http_status: HTTP status code returned by the server (int)

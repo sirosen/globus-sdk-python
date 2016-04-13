@@ -1,5 +1,5 @@
-Common Low Level Interface
-==========================
+Low Level API
+=============
 
 All service clients support the low level interface, provided by the
 ``BaseClient``.

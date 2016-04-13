@@ -7,9 +7,7 @@ iterable) containing ``GlobusResponse`` objects.
 
 To customize client methods with additional detail, we may use subclasses of
 ``GlobusResponse``.
-At present, the only such subclass is ``GlobusHTTPResponse``, which attaches
-HTTP response information.
-
+For example the ``GlobusHTTPResponse`` attaches HTTP response information.
 
 Response Classes
 ----------------
@@ -18,6 +16,16 @@ Response Classes
    :members:
 
 .. autoclass:: globus_sdk.response.GlobusHTTPResponse
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+.. autoclass:: globus_sdk.transfer.response.TransferResponse
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+.. autoclass:: globus_sdk.transfer.response.IterableTransferResponse
    :members:
    :inherited-members:
    :show-inheritance:
