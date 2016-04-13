@@ -94,3 +94,18 @@ class InvalidDocumentBodyError(GlobusError):
     Paginated results exceeded a limit set by our API. Too many pages of
     results were being requested, and the API maximum would be exceeded.
     """
+
+
+# Thin wrappers around requests exceptions, so the SDK is API independent.
+class NetworkError(GlobusError):
+    """
+    Error communicating between the SDK client and REST API server.
+    """
+
+
+class TimeoutError(NetworkError):
+    """The REST request timed out."""
+
+
+class ConnectionError(NetworkError):
+    """A Connection error occured in the REST request."""

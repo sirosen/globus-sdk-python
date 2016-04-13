@@ -219,13 +219,20 @@ class BaseClient(object):
         if headers is not None:
             rheaders.update(headers)
         url = slash_join(self.base_url, path)
-        r = self._session.request(method=method,
-                                  url=url,
-                                  headers=rheaders,
-                                  params=params,
-                                  data=text_body,
-                                  verify=self._verify,
-                                  auth=auth)
+        try:
+            r = self._session.request(method=method,
+                                      url=url,
+                                      headers=rheaders,
+                                      params=params,
+                                      data=text_body,
+                                      verify=self._verify,
+                                      auth=auth)
+        except requests.Timeout as e:
+            raise exc.TimeoutError(*e.args)
+        except requests.ConnectionError as e:
+            raise exc.ConnectionError(*e.args)
+        except requests.RequestException as e:
+            raise exc.NetworkError(*e.args)
         if 200 <= r.status_code < 400:
             if response_class is None:
                 return self.default_response_class(r)
