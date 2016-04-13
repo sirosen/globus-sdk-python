@@ -1,25 +1,10 @@
 from __future__ import print_function
 
-import json
-
 from globus_sdk import exc, config
-from globus_sdk.response import GlobusResponse, GlobusHTTPResponse
 from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.transfer.response import (
+    TransferResponse, IterableTransferResponse)
 from globus_sdk.transfer.paging import PaginatedResource
-
-
-class TransferResponse(GlobusHTTPResponse):
-    """
-    Custom response for TransferClient, which relies on the fact that the
-    body is always json to make printing the response more friendly.
-    """
-    def __str__(self):
-        return json.dumps(self.data, indent=2)
-
-
-class IterableTransferResponse(TransferResponse):
-    def __iter__(self):
-        return iter(self['DATA'])
 
 
 class TransferClient(BaseClient):

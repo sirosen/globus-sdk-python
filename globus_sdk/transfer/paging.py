@@ -2,9 +2,10 @@ import six
 
 from globus_sdk import exc
 from globus_sdk.response import GlobusResponse
+from globus_sdk.transfer.response import IterableTransferResponse
 
 
-class PaginatedResource(six.Iterator):
+class PaginatedResource(GlobusResponse, six.Iterator):
     """
     A class that describes paginated Transfer API resources.
     This is not a top level helper func because it depends upon the pagination
@@ -88,6 +89,7 @@ class PaginatedResource(six.Iterator):
         self.client_method = client_method
         self.client_path = path
         self.client_kwargs = client_kwargs
+        self.client_kwargs['response_class'] = IterableTransferResponse
 
         # convert the iterable_func method into a generator expression by
         # calling it
@@ -103,6 +105,14 @@ class PaginatedResource(six.Iterator):
             # express this internally as "generator is null" -- just need some
             # way of making sure that it's clear
             self.generator = None
+
+    @property
+    def data(self):
+        """
+        To get the "data" on a PaginatedResource, fetch all pages and convert
+        them into the only python data structure that makes sense: a list.
+        """
+        return list(self)
 
     def __iter__(self):
         """
@@ -156,12 +166,12 @@ class PaginatedResource(six.Iterator):
             self.client_kwargs['params']['offset'] = self.offset
             self.client_kwargs['params']['limit'] = limit
 
-            res = self.client_method(self.client_path,
-                                     **self.client_kwargs).data
-
-            # walk the results from the page we fetched, returning them as
-            # the iterated elements
-            for item in res['DATA']:
+            # fetch a page of results and walk them, yielding them as the
+            # iterated elements wrapped in GlobusResponse objects
+            # nicely, the __getitem__ for GlobusResponse will work on raw
+            # dicts, so these handle well
+            res = self.client_method(self.client_path, **self.client_kwargs)
+            for item in res:
                 yield GlobusResponse(item)
 
             self.offset += self.max_results_per_call
