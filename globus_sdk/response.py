@@ -16,6 +16,22 @@ class GlobusResponse(object):
     def __repr__(self):
         return "{}({!r})".format(self.__class__.__name__, self.data)
 
+    def __getitem__(self, key):
+        # force evaluation of the data property outside of the upcoming
+        # try-catch so that we don't accidentally catch TypeErrors thrown
+        # during the getter function itself
+        data = self.data
+        try:
+            return data[key]
+        except TypeError:
+            # re-raise with an altered message -- the issue is that whatever
+            # type of GlobusResponse you're working with doesn't support
+            # indexing
+            # "type" is ambiguous, but we don't know if it's the fault of the
+            # class at large, or just a particular call's `data` property
+            raise TypeError(('This type of GlobusResponse object '
+                             'does not support indexing.'))
+
     @property
     def data(self):
         """
@@ -50,7 +66,7 @@ class GlobusHTTPResponse(GlobusResponse):
     @property
     def data(self):
         try:
-            return self.json_body
+            return self._data.json()
         # JSON decoding may raise a ValueError due to an invalid JSON
         # document. In the case of trying to fetch the "data" on an HTTP
         # response, this means we didn't get a JSON response. Rather than
@@ -61,16 +77,8 @@ class GlobusHTTPResponse(GlobusResponse):
             return None
 
     @property
-    def json_body(self):
+    def text(self):
         """
-        Alias for ``data`` (contains the parsed JSON data), but will raise
-        an exception if the response is not JSON instead of being ``None``.
-        """
-        return self._data.json()
-
-    @property
-    def text_body(self):
-        """
-        The raw response data, as a string.
+        The raw response data as a string.
         """
         return self._data.text

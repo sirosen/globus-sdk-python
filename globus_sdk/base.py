@@ -35,7 +35,7 @@ class BaseClient(object):
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class = exc.GlobusAPIError
-    response_class = GlobusHTTPResponse
+    default_response_class = GlobusHTTPResponse
 
     AUTHTYPE_TOKEN = "token"
     AUTHTYPE_BASIC = "basic"
@@ -116,7 +116,8 @@ class BaseClient(object):
     def qjoin_path(self, *parts):
         return "/" + "/".join(quote(part) for part in parts)
 
-    def get(self, path, params=None, headers=None, auth=None):
+    def get(self, path, params=None, headers=None, auth=None,
+            response_class=None):
         """
         Make a GET request to the specified path.
 
@@ -124,15 +125,17 @@ class BaseClient(object):
         :param params: dict to be encoded as a query string
         :param headers: dict of HTTP headers to add to the request
         :param auth: tuple of (user, password) for basic auth [DEPRECATED]
+        :param response_class: class for response object, overrides the
+                               client's ``default_response_class``
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         return self._request("GET", path, params=params, headers=headers,
-                             auth=auth)
+                             auth=auth, response_class=response_class)
 
     def post(self, path, json_body=None, params=None, headers=None,
-             text_body=None, auth=None):
+             text_body=None, auth=None, response_class=None):
         """
         Make a POST request to the specified path.
 
@@ -142,14 +145,18 @@ class BaseClient(object):
         :param auth: tuple of (user, password) for basic auth [DEPRECATED]
         :param json_body: dict that will be encoded as a JSON request body
         :param text_body: raw string that will be the request body
+        :param response_class: class for response object, overrides the
+                               client's ``default_response_class``
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         return self._request("POST", path, json_body=json_body, params=params,
-                             headers=headers, text_body=text_body, auth=auth)
+                             headers=headers, text_body=text_body, auth=auth,
+                             response_class=response_class)
 
-    def delete(self, path, params=None, headers=None, auth=None):
+    def delete(self, path, params=None, headers=None, auth=None,
+               response_class=None):
         """
         Make a DELETE request to the specified path.
 
@@ -157,15 +164,18 @@ class BaseClient(object):
         :param params: dict to be encoded as a query string
         :param headers: dict of HTTP headers to add to the request
         :param auth: tuple of (user, password) for basic auth [DEPRECATED]
+        :param response_class: class for response object, overrides the
+                               client's ``default_response_class``
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         return self._request("DELETE", path, params=params,
-                             headers=headers, auth=auth)
+                             headers=headers, auth=auth,
+                             response_class=response_class)
 
     def put(self, path, json_body=None, params=None, headers=None,
-            text_body=None, auth=None):
+            text_body=None, auth=None, response_class=None):
         """
         Make a PUT request to the specified path.
 
@@ -175,15 +185,19 @@ class BaseClient(object):
         :param auth: tuple of (user, password) for basic auth [DEPRECATED]
         :param json_body: dict that will be encoded as a JSON request body
         :param text_body: raw string that will be the request body
+        :param response_class: class for response object, overrides the
+                               client's ``default_response_class``
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         return self._request("PUT", path, json_body=json_body, params=params,
-                             headers=headers, text_body=text_body, auth=auth)
+                             headers=headers, text_body=text_body, auth=auth,
+                             response_class=response_class)
 
     def _request(self, method, path, params=None, headers=None,
-                 json_body=None, text_body=None, auth=None):
+                 json_body=None, text_body=None, auth=None,
+                 response_class=None):
         """
         :param method: HTTP request method, as an all caps string
         :param path: path for the request, with or without leading slash
@@ -192,6 +206,8 @@ class BaseClient(object):
         :param auth: tuple of (user, password) for basic auth [DEPRECATED]
         :param json_body: dict that will be encoded as a JSON request body
         :param text_body: raw string that will be the request body
+        :param response_class: class for response object, overrides the
+                               client's ``default_response_class``
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -211,7 +227,10 @@ class BaseClient(object):
                                   verify=self._verify,
                                   auth=auth)
         if 200 <= r.status_code < 400:
-            return self.response_class(r)
+            if response_class is None:
+                return self.default_response_class(r)
+            else:
+                return response_class(r)
         raise self.error_class(r)
 
 
