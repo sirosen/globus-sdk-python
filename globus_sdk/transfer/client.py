@@ -16,6 +16,15 @@ class TransferResponse(GlobusHTTPResponse):
     def __str__(self):
         return json.dumps(self.data, indent=2)
 
+    def set_iterable(self):
+        self.iterable = True
+
+    def __iter__(self):
+        if hasattr(self, 'iterable') and self.iterable:
+            return iter(self['DATA'])
+        else:
+            raise TypeError('This TransferResponse does not support iteration')
+
 
 class TransferClient(BaseClient):
     """
@@ -492,8 +501,9 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path("operation/endpoint", endpoint_id, "ls")
-        return [GlobusResponse(file_info) for file_info in
-                self.get(path, params=params).data["DATA"]]
+        res = self.get(path, params=params)
+        res.set_iterable()
+        return res
 
     def operation_mkdir(self, endpoint_id, path, **params):
         """
