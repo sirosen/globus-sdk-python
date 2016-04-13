@@ -108,13 +108,14 @@ class TransferClient(BaseClient):
 
         Search for a given string as a fulltext search:
 
+        >>> tc = globus_sdk.TransferClient()
         >>> for r in tc.endpoint_search('String to search for!'):
-        >>>     print(r.data['display_name'])
+        >>>     print(r['display_name'])
 
         Search for a given string, but only on endpoints that you own:
 
         >>> for r in tc.endpoint_search('foo', filter_scope='my-endpoints'):
-        >>>     print('{} has ID {}'.format(r.data['display_name'], ep['id']))
+        >>>     print('{} has ID {}'.format(r['display_name'], ep['id']))
 
         Search results are capped at a number of elements equal to the
         ``num_results`` parameter.
@@ -122,7 +123,7 @@ class TransferClient(BaseClient):
 
         >>> for r in tc.endpoint_search('String to search for!',
         >>>                             num_results=120):
-        >>>     print(r.data['display_name'])
+        >>>     print(r['display_name'])
 
         It is very important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query. If you attempt to exceed this
@@ -130,7 +131,7 @@ class TransferClient(BaseClient):
 
         >>> for r in tc.endpoint_search('globus', # a very common string
         >>>                             num_results=1200):
-        >>>     print(r.data['display_name'])
+        >>>     print(r['display_name'])
 
         will trigger this error.
         """
@@ -152,8 +153,9 @@ class TransferClient(BaseClient):
         hour (3600 seconds). If that fails, direct the user to the
         globus website to perform activation:
 
+        >>> tc = globus_sdk.TransferClient()
         >>> r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
-        >>> while (r.data["code"] == "AutoActivateFailed"):
+        >>> while (r["code"] == "AutoActivateFailed"):
         >>>     print("Endpoint requires manual activation, please open "
         >>>           "the following URL in a browser to activate the "
         >>>           "endpoint:")
@@ -259,16 +261,18 @@ class TransferClient(BaseClient):
         >>>   'host_endpoint': host_endpoint_id,
         >>>   'host_path': host_path,
         >>>   'display_name': display_name,
+        >>>   # optionally specify additional endpoint fields
+        >>>   'description': 'my test share'
         >>> }
-        >>> create_result = tc.create_shared_endpoint(shared_ep_data).data
+        >>> create_result = tc.create_shared_endpoint(shared_ep_data)
 
         See
         `Create shared endpoint \
         <https://docs.globus.org/api/transfer/endpoint/#create_shared_endpoint>`_
         in the REST documentation for details.
         """
-        return self.get('shared_endpoint',
-                        response_class=IterableTransferResponse)
+        return self.post('shared_endpoint', json_body=data,
+                         response_class=IterableTransferResponse)
 
     # Endpoint servers
 
@@ -509,6 +513,7 @@ class TransferClient(BaseClient):
         """
         ``POST /operation/endpoint/<endpoint_id>/rename``
 
+        >>> tc = globus_sdk.TransferClient()
         >>> tc.operation_rename(ep_id, oldpath="/~/file1.txt",
         >>>                     newpath="/~/project1data.txt")
 
@@ -540,6 +545,7 @@ class TransferClient(BaseClient):
         """
         ``POST /transfer``
 
+        >>> tc = globus_sdk.TransferClient()
         >>> transfer_items = []
         >>> transfer_items.append(
         >>>     tc.make_submit_transfer_item("/source/path/dir/",
@@ -553,7 +559,7 @@ class TransferClient(BaseClient):
         >>>     destination_endpoint_id,
         >>>     transfer_items)
         >>> transfer_result = tc.submit_transfer(transfer_data)
-        >>> print("task_id = ", transfer_result.data["task_id"])
+        >>> print("task_id = ", transfer_result["task_id"])
 
         See
         `Submit a transfer task \
@@ -592,7 +598,7 @@ class TransferClient(BaseClient):
         """
         datadoc = {
             'DATA_TYPE': 'transfer',
-            'submission_id': self.get_submission_id().data['value'],
+            'submission_id': self.get_submission_id()['value'],
             'source_endpoint': source_endpoint,
             'destination_endpoint': dest_endpoint,
             'DATA': transfer_items
