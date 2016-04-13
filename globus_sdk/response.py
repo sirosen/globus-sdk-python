@@ -50,7 +50,7 @@ class GlobusHTTPResponse(GlobusResponse):
     @property
     def data(self):
         try:
-            return self.json_body
+            return self._data.json()
         # JSON decoding may raise a ValueError due to an invalid JSON
         # document. In the case of trying to fetch the "data" on an HTTP
         # response, this means we didn't get a JSON response. Rather than
@@ -61,16 +61,8 @@ class GlobusHTTPResponse(GlobusResponse):
             return None
 
     @property
-    def json_body(self):
+    def text(self):
         """
-        Alias for ``data`` (contains the parsed JSON data), but will raise
-        an exception if the response is not JSON instead of being ``None``.
-        """
-        return self._data.json()
-
-    @property
-    def text_body(self):
-        """
-        The raw response data, as a string.
+        The raw response data as a string.
         """
         return self._data.text

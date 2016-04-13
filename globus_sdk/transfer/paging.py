@@ -157,7 +157,7 @@ class PaginatedResource(six.Iterator):
             self.client_kwargs['params']['limit'] = limit
 
             res = self.client_method(self.client_path,
-                                     **self.client_kwargs).json_body
+                                     **self.client_kwargs).data
 
             # walk the results from the page we fetched, returning them as
             # the iterated elements

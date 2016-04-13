@@ -14,7 +14,7 @@ class TransferResponse(GlobusHTTPResponse):
     body is always json to make printing the response more friendly.
     """
     def __str__(self):
-        return json.dumps(self.json_body, indent=2)
+        return json.dumps(self.data, indent=2)
 
 
 class TransferClient(BaseClient):
@@ -238,7 +238,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_effective_pause_rule_list')
         return [GlobusResponse(rule) for rule in
-                self.get(path, params=params).json_body['DATA']]
+                self.get(path, params=params).data['DATA']]
 
     # Shared Endpoints
 
@@ -254,7 +254,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_shared_endpoint_list')
         return [GlobusResponse(ep) for ep in
-                self.get(path, params=params).json_body['DATA']]
+                self.get(path, params=params).data['DATA']]
 
     def create_shared_endpoint(self, data):
         """
@@ -278,7 +278,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         return [GlobusResponse(ep) for ep in
-                self.get('shared_endpoint').json_body['DATA']]
+                self.get('shared_endpoint').data['DATA']]
 
     # Endpoint servers
 
@@ -293,7 +293,7 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
         return [GlobusResponse(server) for server in
-                self.get(path, params=params).json_body['DATA']]
+                self.get(path, params=params).data['DATA']]
 
     def get_endpoint_server(self, endpoint_id, server_id, **params):
         """
@@ -358,7 +358,7 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role_list')
         return [GlobusResponse(role) for role in
-                self.get(path, params=params).json_body['DATA']]
+                self.get(path, params=params).data['DATA']]
 
     def add_endpoint_role(self, endpoint_id, role_data):
         """
@@ -406,7 +406,7 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access_list')
         return [GlobusResponse(rule) for rule in
-                self.get(path, params=params).json_body['DATA']]
+                self.get(path, params=params).data['DATA']]
 
     def get_endpoint_acl_rule(self, endpoint_id, rule_id, **params):
         """
@@ -445,7 +445,7 @@ class TransferClient(BaseClient):
         ``GET /bookmark_list``
         """
         return [GlobusResponse(bookmark) for bookmark in
-                self.get('bookmark_list', params=params).json_body['DATA']]
+                self.get('bookmark_list', params=params).data['DATA']]
 
     def create_bookmark(self, bookmark_data):
         """
