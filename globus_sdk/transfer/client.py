@@ -16,14 +16,10 @@ class TransferResponse(GlobusHTTPResponse):
     def __str__(self):
         return json.dumps(self.data, indent=2)
 
-    def set_iterable(self):
-        self.iterable = True
 
+class IterableTransferResponse(TransferResponse):
     def __iter__(self):
-        if hasattr(self, 'iterable') and self.iterable:
-            return iter(self['DATA'])
-        else:
-            raise TypeError('This TransferResponse does not support iteration')
+        return iter(self['DATA'])
 
 
 class TransferClient(BaseClient):
@@ -46,7 +42,7 @@ class TransferClient(BaseClient):
     """
 
     error_class = exc.TransferAPIError
-    response_class = TransferResponse
+    default_response_class = TransferResponse
 
     def __init__(self, environment=config.get_default_environ(),
                  token=None, app_name=None):
@@ -246,8 +242,8 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_effective_pause_rule_list')
-        return [GlobusResponse(rule) for rule in
-                self.get(path, params=params).data['DATA']]
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
 
     # Shared Endpoints
 
@@ -262,8 +258,8 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path('endpoint', endpoint_id,
                                'my_shared_endpoint_list')
-        return [GlobusResponse(ep) for ep in
-                self.get(path, params=params).data['DATA']]
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
 
     def create_shared_endpoint(self, data):
         """
@@ -286,8 +282,8 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#create_shared_endpoint>`_
         in the REST documentation for details.
         """
-        return [GlobusResponse(ep) for ep in
-                self.get('shared_endpoint').data['DATA']]
+        return self.get('shared_endpoint',
+                        response_class=IterableTransferResponse)
 
     # Endpoint servers
 
@@ -301,8 +297,8 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server_list')
-        return [GlobusResponse(server) for server in
-                self.get(path, params=params).data['DATA']]
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
 
     def get_endpoint_server(self, endpoint_id, server_id, **params):
         """
@@ -366,8 +362,8 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'role_list')
-        return [GlobusResponse(role) for role in
-                self.get(path, params=params).data['DATA']]
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
 
     def add_endpoint_role(self, endpoint_id, role_data):
         """
@@ -414,8 +410,8 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/access_list``
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access_list')
-        return [GlobusResponse(rule) for rule in
-                self.get(path, params=params).data['DATA']]
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
 
     def get_endpoint_acl_rule(self, endpoint_id, rule_id, **params):
         """
@@ -453,8 +449,8 @@ class TransferClient(BaseClient):
         """
         ``GET /bookmark_list``
         """
-        return [GlobusResponse(bookmark) for bookmark in
-                self.get('bookmark_list', params=params).data['DATA']]
+        return self.get('bookmark_list', params=params,
+                        response_class=IterableTransferResponse)
 
     def create_bookmark(self, bookmark_data):
         """
@@ -501,9 +497,8 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path("operation/endpoint", endpoint_id, "ls")
-        res = self.get(path, params=params)
-        res.set_iterable()
-        return res
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
 
     def operation_mkdir(self, endpoint_id, path, **params):
         """
