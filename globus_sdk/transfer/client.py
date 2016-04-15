@@ -546,25 +546,22 @@ class TransferClient(BaseClient):
         ``POST /transfer``
 
         >>> tc = globus_sdk.TransferClient()
-        >>> transfer_items = []
-        >>> transfer_items.append(
-        >>>     tc.make_submit_transfer_item("/source/path/dir/",
-        >>>                                  "/dest/path/dir/",
-        >>>                                  recursive=True))
-        >>> transfer_items.append(
-        >>>     tc.make_submit_transfer_item("/source/path/file.txt",
-        >>>                                  "/dest/path/file.txt"))
-        >>> transfer_data = tc.make_submit_transfer_data(
-        >>>     source_endpoint_id,
-        >>>     destination_endpoint_id,
-        >>>     transfer_items)
-        >>> transfer_result = tc.submit_transfer(transfer_data)
+        >>> tdata = globus_sdk.TransferData(tc, source_endpoint_id,
+        >>>                                 destination_endpoint_id)
+        >>> tdata.add_item("/source/path/dir/", "/dest/path/dir/",
+        >>>                recursive=True)
+        >>> tdata.add_item("/source/path/file.txt",
+        >>>                "/dest/path/file.txt")
+        >>> transfer_result = tc.submit_transfer(tdata)
         >>> print("task_id = ", transfer_result["task_id"])
+
+        The `data` parameter can be a normal Python dictionary, or
+        a :class:`TransferData <globus_sdk.TransferData>` object.
 
         See
         `Submit a transfer task \
         <https://docs.globus.org/api/transfer/task_submit/#submit_a_transfer_task>`_
-        in the REST documentation for details.
+        in the REST documentation for more details.
         """
         return self.post('/transfer', data)
 

@@ -35,6 +35,10 @@ Transfer Client
    :show-inheritance:
    :exclude-members: error_class, response_class
 
+.. autoclass:: globus_sdk.TransferData
+   :members:
+   :show-inheritance:
+
 .. autoclass:: globus_sdk.exc.TransferAPIError
    :members:
    :show-inheritance:
