@@ -64,3 +64,45 @@ class TransferData(dict):
             "recursive": recursive,
         }
         self["DATA"].append(item_data)
+
+
+class DeleteData(dict):
+    """
+    Convenience class for constructing a delete document, to use as the
+    `data` parameter to
+    :meth:`submit_delete <globus_sdk.deleteClient.submit_delete>`.
+
+    At least one item must be added using
+    :meth:`add_item <globus_sdk.DeleteData.add_item>`.
+
+    Includes fetching the submission ID as part of document generation. The
+    submission ID can be pulled out of here to inspect, but the document
+    can be used as-is multiple times over to retry a potential submission
+    failure (so there shouldn't be any need to inspect it).
+    """
+    def __init__(self, transfer_client, source_endpoint, label=None,
+                 recursive=False, **kwargs):
+        self["DATA_TYPE"] = "delete"
+        self["submission_id"] = transfer_client.get_submission_id()["value"]
+        self["source_endpoint"] = source_endpoint
+
+        if label is not None:
+            self["label"] = label
+
+        self["DATA"] = []
+        self.update(kwargs)
+
+    def add_item(self, path):
+        """
+        Add a file or directory to be deleted. If any of the paths are
+        directories, ``recursive`` must be set True on the top level
+        ``DeleteData``.
+
+        Appends a delete_item document to the DATA key of the delete
+        document.
+        """
+        item_data = {
+            "DATA_TYPE": "delete_item",
+            "path": path,
+        }
+        self["DATA"].append(item_data)

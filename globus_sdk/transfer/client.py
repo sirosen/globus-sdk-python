@@ -553,7 +553,7 @@ class TransferClient(BaseClient):
         >>> tdata.add_item("/source/path/file.txt",
         >>>                "/dest/path/file.txt")
         >>> transfer_result = tc.submit_transfer(tdata)
-        >>> print("task_id = ", transfer_result["task_id"])
+        >>> print("task_id =", transfer_result["task_id"])
 
         The `data` parameter can be a normal Python dictionary, or
         a :class:`TransferData <globus_sdk.TransferData>` object.
@@ -568,6 +568,16 @@ class TransferClient(BaseClient):
     def submit_delete(self, data):
         """
         ``POST /delete``
+
+        >>> tc = globus_sdk.TransferClient()
+        >>> ddata = globus_sdk.DeleteData(tc, endpoint_id, recursive=True)
+        >>> ddata.add_item("/dir/to/delete/")
+        >>> ddata.add_item("/file/to/delete/file.txt")
+        >>> delete_result = tc.submit_delete(ddata)
+        >>> print("task_id =", delete_result["task_id"])
+
+        The `data` parameter can be a normal Python dictionary, or
+        a :class:`DeleteData <globus_sdk.TransferData>` object.
 
         See
         `Submit a delete task \
