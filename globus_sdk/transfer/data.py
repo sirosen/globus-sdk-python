@@ -70,7 +70,7 @@ class DeleteData(dict):
     """
     Convenience class for constructing a delete document, to use as the
     `data` parameter to
-    :meth:`submit_delete <globus_sdk.deleteClient.submit_delete>`.
+    :meth:`submit_delete <globus_sdk.TransferClient.submit_delete>`.
 
     At least one item must be added using
     :meth:`add_item <globus_sdk.DeleteData.add_item>`.
@@ -80,11 +80,11 @@ class DeleteData(dict):
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
     """
-    def __init__(self, transfer_client, source_endpoint, label=None,
+    def __init__(self, transfer_client, endpoint, label=None,
                  recursive=False, **kwargs):
         self["DATA_TYPE"] = "delete"
         self["submission_id"] = transfer_client.get_submission_id()["value"]
-        self["source_endpoint"] = source_endpoint
+        self["endpoint"] = endpoint
 
         if label is not None:
             self["label"] = label
