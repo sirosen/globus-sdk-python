@@ -48,6 +48,11 @@ class TransferClient(BaseClient):
         """
         ``GET /endpoint/<endpoint_id>``
 
+        >>> tc = globus_sdk.TransferClient()
+        >>> endpoint = tc.get_endpoint(endpoint_id)
+        >>> print("Endpoint name:",
+        >>>       endpoint["display_name"] or endpoint["canonical_name"])
+
         See
         `Get Endpoint by ID \
         <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id>`_
@@ -59,6 +64,11 @@ class TransferClient(BaseClient):
     def update_endpoint(self, endpoint_id, data, **params):
         """
         ``PUT /endpoint/<endpoint_id>``
+
+        >>> tc = globus_sdk.TransferClient()
+        >>> epup = dict(display_name="My New Endpoint Name",
+        >>>             description="Better Description")
+        >>> update_result = tc.update_endpoint(endpoint_id, epup)
 
         See
         `Update Endpoint by ID \
@@ -72,6 +82,20 @@ class TransferClient(BaseClient):
         """
         ``POST /endpoint/<endpoint_id>``
 
+        >>> tc = globus_sdk.TransferClient()
+        >>> ep_data = {
+        >>>   "DATA_TYPE": "endpoint",
+        >>>   "display_name": display_name,
+        >>>   "DATA": [
+        >>>     {
+        >>>       "DATA_TYPE": "server",
+        >>>       "hostname": "gridftp.example.edu",
+        >>>     },
+        >>>   ],
+        >>> }
+        >>> create_result = tc.create_shared_endpoint(ep_data)
+        >>> endpoint_id = create_result["id"]
+
         See
         `Create endpoint \
         <https://docs.globus.org/api/transfer/endpoint/#create_endpoint>`_
@@ -82,6 +106,9 @@ class TransferClient(BaseClient):
     def delete_endpoint(self, endpoint_id):
         """
         ``DELETE /endpoint/<endpoint_id>``
+
+        >>> tc = globus_sdk.TransferClient()
+        >>> delete_result = tc.delete_endpoint(endpoint_id)
 
         See
         `Delete endpoint by id \
@@ -257,14 +284,15 @@ class TransferClient(BaseClient):
 
         >>> tc = globus_sdk.TransferClient()
         >>> shared_ep_data = {
-        >>>   'DATA_TYPE': 'shared_endpoint',
-        >>>   'host_endpoint': host_endpoint_id,
-        >>>   'host_path': host_path,
-        >>>   'display_name': display_name,
+        >>>   "DATA_TYPE": "shared_endpoint",
+        >>>   "host_endpoint": host_endpoint_id,
+        >>>   "host_path": host_path,
+        >>>   "display_name": display_name,
         >>>   # optionally specify additional endpoint fields
-        >>>   'description': 'my test share'
+        >>>   "description": "my test share"
         >>> }
         >>> create_result = tc.create_shared_endpoint(shared_ep_data)
+        >>> endpoint_id = create_result["id"]
 
         See
         `Create shared endpoint \
