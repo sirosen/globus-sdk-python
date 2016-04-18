@@ -11,7 +11,7 @@ from __future__ import print_function
 
 import argparse
 
-from globus_sdk.transfer import TransferClient
+import globus_sdk
 
 
 def get_transfer_client_from_args(args=None):
@@ -32,7 +32,7 @@ def get_transfer_client_from_args(args=None):
     if args.environment:
         environment = args.environment
 
-    client = TransferClient(environment)
+    client = globus_sdk.TransferClient(environment)
     if token is not None:
         client.set_token(token)
     return client
