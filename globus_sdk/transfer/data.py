@@ -85,6 +85,7 @@ class DeleteData(dict):
         self["DATA_TYPE"] = "delete"
         self["submission_id"] = transfer_client.get_submission_id()["value"]
         self["endpoint"] = endpoint
+        self["recursive"] = recursive
 
         if label is not None:
             self["label"] = label
