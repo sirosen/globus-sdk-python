@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Globus SDK for Python
-=====================
+Globus SDK for Python (Beta)
+============================
 
 This SDK provides a convenient Pythonic interface to
 `Globus <https://www.globus.org>`_ REST APIs,
