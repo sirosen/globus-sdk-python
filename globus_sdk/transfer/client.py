@@ -17,10 +17,13 @@ class TransferClient(BaseClient):
     from the base rest client that can be used to access any REST resource.
 
     There are two types of helper methods: list methods which return an
-    iterator of :class:`GlobusResponse <globus_sdk.response.GlobusResponse>`
+    iterator of :class:`GlobusResponse \
+    <globus_sdk.response.GlobusResponse>`
     objects, and simple methods that return a single
-    :class:`GlobusHTTPResponse <globus_sdk.response.GlobusHTTPResponse>`
-    object. Detailed documentation is available in the official REST API
+    :class:`TransferResponse <globus_sdk.transfer.response.TransferResponse>`
+    object.
+
+    Detailed documentation is available in the official REST API
     documentation, which is linked to from the method documentation. Methods
     that allow arbitrary keyword arguments will pass the extra arguments as
     query parameters.
