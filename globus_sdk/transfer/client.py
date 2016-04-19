@@ -1,4 +1,5 @@
 from __future__ import print_function
+import warnings
 
 from globus_sdk import exc, config
 from globus_sdk.base import BaseClient, merge_params
@@ -729,19 +730,11 @@ class TransferClient(BaseClient):
                                   transfer_items, label=None, sync_level=None,
                                   **kwargs):
         """
-        Build a full document for submitting a Transfer.
-        Takes an array of transfer items, a mandatory label for the Transfer,
-        and an optional sync_level.
-        For compatibility with older code and those knowledgeable about the API
-        sync_level can be 1, 2, or 3, but it can also be
-        "exists", "mtime", or "checksum" if you want greater clarity in
-        client code.
-
-        Includes fetching the submission ID as part of document generation. The
-        submission ID can be pulled out of here to inspect, but the document
-        can be used as-is multiple times over to retry a potential submission
-        failure (so there shouldn't be any need to inspect it).
+        DEPRECATED: Use :class:`TransferData <globus_sdk.TransferData>`
+        instead.
         """
+        warnings.warn(("make_submit_transfer_data() is deprecated. Use "
+                       "globus_sdk.TransferData instead."), DeprecationWarning)
         datadoc = {
             'DATA_TYPE': 'transfer',
             'submission_id': self.get_submission_id()['value'],
@@ -773,11 +766,11 @@ class TransferClient(BaseClient):
 
     def make_submit_transfer_item(self, source, dest, recursive=False):
         """
-        Helper to build a single transfer item document (as a dict)
-        Takes a source path, dest path, and recursivity, plugs them in and
-        spits out the dict. In general, clients of the SDK should be using this
-        to feed into make_transfer_data, but not inspecting the contents.
+        DEPRECATED: Use :class:`TransferData <globus_sdk.TransferData>`
+        instead.
         """
+        warnings.warn(("make_submit_transfer_item() is deprecated. Use "
+                       "globus_sdk.TransferData instead."), DeprecationWarning)
         datadoc = {
             'DATA_TYPE': 'transfer_item',
             'source_path': source,
