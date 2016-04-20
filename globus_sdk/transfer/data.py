@@ -25,39 +25,9 @@ class TransferData(dict):
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
 
-    Example usage:
-
-    >>> from globus_sdk import TransferClient, TransferData
-    >>> tc = TransferClient()
-    >>> src_ep = ... # get source somehow
-    >>> dst_ep = ... # get dest somehow
-    >>> # the initial TransferData requires Client and Endpoints
-    >>> data = TransferData(tc, src_ep, dst_ep,
-    >>>                     label='SDK Transfer Task', sync_level="checksum")
-    >>> # add some files and dirs
-    >>> data.add_item('~/sourcefile', '~/destfile')
-    >>> data.add_item('~/sourcedir/', '~/destdir/', recursive=True)
-    >>> # and submit!
-    >>> tc.submit_transfer(data)
-
-    Because submission IDs make re-submission safe, you could do something like
-    this:
-
-    >>> retries = 3
-    >>> submitted = False
-    >>> while retries and not submitted:
-    >>>     try:
-    >>>         tc.submit_transfer(data)
-    >>>     except NetworkError:
-    >>>         retries -= 1
-    >>>     except GlobusAPIError as e:
-    >>>         # you have to write this func
-    >>>         if is_duplicate_submission_err(e):
-    >>>             submitted = True
-    >>>         else:
-    >>>             raise e
-    >>>     else:
-    >>>         submitted = True
+    See the
+    :meth:`submit_transfer <globus_sdk.TransferClient.submit_transfer>`
+    documentation for example usage.
     """
     def __init__(self, transfer_client, source_endpoint, destination_endpoint,
                  label=None, sync_level=None, **kwargs):
@@ -114,7 +84,8 @@ class DeleteData(dict):
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
 
-    Usage is similar to :class:`TransferData <globus_sdk.TransferData>` above.
+    See the :meth:`submit_delete <globus_sdk.TransferClient.submit_delete>`
+    documentation for example usage.
     """
     def __init__(self, transfer_client, endpoint, label=None,
                  recursive=False, **kwargs):

@@ -682,9 +682,13 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        Example usage:
+
         >>> tc = globus_sdk.TransferClient()
         >>> tdata = globus_sdk.TransferData(tc, source_endpoint_id,
-        >>>                                 destination_endpoint_id)
+        >>>                                 destination_endpoint_id,
+        >>>                                 label="SDK example",
+        >>>                                 sync_level="checksum")
         >>> tdata.add_item("/source/path/dir/", "/dest/path/dir/",
         >>>                recursive=True)
         >>> tdata.add_item("/source/path/file.txt",
@@ -709,6 +713,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        Example usage:
+
         >>> tc = globus_sdk.TransferClient()
         >>> ddata = globus_sdk.DeleteData(tc, endpoint_id, recursive=True)
         >>> ddata.add_item("/dir/to/delete/")
@@ -717,7 +723,7 @@ class TransferClient(BaseClient):
         >>> print("task_id =", delete_result["task_id"])
 
         The `data` parameter can be a normal Python dictionary, or
-        a :class:`DeleteData <globus_sdk.TransferData>` object.
+        a :class:`DeleteData <globus_sdk.DeleteData>` object.
 
         See
         `Submit a delete task \
