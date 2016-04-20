@@ -65,15 +65,15 @@ To use the Transfer API:
 
 .. code-block:: python
 
-    from future import __print_function__ # for python 2
+    from __future__ import print_function # for python 2
     from globus_sdk import TransferClient
 
     tc = TransferClient() # uses transfer_token from the config file
 
     # high level interface; provides iterators for list responses
     print("My Endpoints:")
-    for r in tc.endpoint_search(filter_scope="my-endpoints"):
-        print(r.data["display_name"], r.data["id"])
+    for ep in tc.endpoint_search(filter_scope="my-endpoints"):
+        print(ep["display_name"], ep["id"])
 
 API Documentation
 =================
@@ -85,22 +85,7 @@ API Documentation
    api/exceptions
    api/baseclient
    config
-
-Deprecations
-============
-
-The Globus SDK uses python ``DeprecationWarning`` and
-``PendingDeprecationWarning`` classes to indicate deprecated and soon-to-be
-deprecated behaviors.  In order to see these warnings, run python with the
-flags:
-
-::
-
- python -Wonce::DeprecationWarning \
-        -Wonce::PendingDeprecationWarning
-
-Note: The ``-W`` flag must precede any module you are passing to ``python``,
-or it will be fed into ``sys.argv`` inside of the module.
+   deprecations
 
 License
 =======

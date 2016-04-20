@@ -2,10 +2,11 @@ Responses
 =========
 
 All method return values for Globus SDK Clients are ``GlobusResponse``
-objects or a simple data structure (typically a Python list or other
-iterable) containing ``GlobusResponse`` objects.
+objects.
+Some ``GlobusResponse`` objects are iterables.
+In those cases, their contents will also be ``GlobusResponse`` objects.
 
-To customize client methods with additional detail, we may use subclasses of
+To customize client methods with additional detail, the SDK uses subclasses of
 ``GlobusResponse``.
 For example the ``GlobusHTTPResponse`` attaches HTTP response information.
 

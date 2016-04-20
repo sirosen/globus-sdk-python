@@ -2,13 +2,30 @@ Exceptions
 ==========
 
 All Globus SDK errors inherit from ``GlobusError``, and all SDK error classes
-are defined in ``globus_sdk.exc``.
+are importable from ``globus_sdk``.
 
-It should always be safe to wrap your SDK-reliant code with something like
-this::
+You can therefore capture *all* errors thrown by the SDK by looking for
+``GlobusError``, as in::
 
     import logging
-    from globus_sdk import exc
+    from globus_sdk import TransferClient, GlobusError
+
+    try:
+        tc = TransferClient()
+        # search with no parameters will throw an exception
+        eps = tc.endpoint_search()
+    except exc.GlobusError:
+        logging.exception("Globus Error!")
+        raise
+
+In most cases, it's best to look for specific subclasses of ``GlobusError``.
+For example, to write code which is distinguishes between network failures and
+unexpected API conditions, you'll want to look for ``NetworkError`` and
+``GlobusAPIError``::
+
+    import logging
+    from globus_sdk import (TransferClient,
+                            GlobusError, GlobusAPIError, NetworkError)
 
     try:
         tc = TransferClient()
@@ -19,16 +36,20 @@ this::
             print(ep["display_name"])
 
         ...
-    except exc.GlobusAPIError as e:
+    except GlobusAPIError as e:
         # Error response from the REST service, check the code and message for
         # details.
-        print("Error code", e.code)
-        print("Error message", e.message)
-    except exc.NetworkError as e:
-        print("Network failure, check your internet connection and firewall")
-    except exc.GlobusError as e:
-        print("GlobusError happened when we tried to foo a bar with a baz!")
-        logging.exception(e)
+        logging.error(("Got a Globus API Error\n"
+                       "Error Code: {}\n"
+                       "Error Message: {}").format(e.code, e.message))
+        raise e
+    except NetworkError:
+        logging.error(("Network Failure. "
+                       "Possibly a firewall or connectivity issue"))
+        raise
+    except GlobusError:
+        logging.exception("Totally unexpected GlobusError!")
+        raise
     else:
         ...
 

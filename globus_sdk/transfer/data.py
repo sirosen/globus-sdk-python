@@ -16,14 +16,18 @@ class TransferData(dict):
     :meth:`add_item <globus_sdk.TransferData.add_item>`.
 
     For compatibility with older code and those knowledgeable about the API
-    sync_level can be 1, 2, or 3, but it can also be
-    "exists", "mtime", or "checksum" if you want greater clarity in
+    sync_level can be ``1``, ``2``, or ``3``, but it can also be
+    ``"exists"``, ``"mtime"``, or ``"checksum"`` if you want greater clarity in
     client code.
 
     Includes fetching the submission ID as part of document generation. The
     submission ID can be pulled out of here to inspect, but the document
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
+
+    See the
+    :meth:`submit_transfer <globus_sdk.TransferClient.submit_transfer>`
+    documentation for example usage.
     """
     def __init__(self, transfer_client, source_endpoint, destination_endpoint,
                  label=None, sync_level=None, **kwargs):
@@ -79,6 +83,9 @@ class DeleteData(dict):
     submission ID can be pulled out of here to inspect, but the document
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
+
+    See the :meth:`submit_delete <globus_sdk.TransferClient.submit_delete>`
+    documentation for example usage.
     """
     def __init__(self, transfer_client, endpoint, label=None,
                  recursive=False, **kwargs):
