@@ -389,7 +389,7 @@ class TransferClient(BaseClient):
 
     def update_endpoint_server(self, endpoint_id, server_id, server_data):
         """
-        ``POST /endpoint/<endpoint_id>/server/<server_id>``
+        ``PUT /endpoint/<endpoint_id>/server/<server_id>``
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
@@ -400,7 +400,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
-        return self.post(path, server_data)
+        return self.put(path, server_data)
 
     def delete_endpoint_server(self, endpoint_id, server_id):
         """
