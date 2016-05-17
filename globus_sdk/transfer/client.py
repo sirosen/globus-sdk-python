@@ -369,7 +369,8 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
         in the REST documentation for details.
         """
-        path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
+        path = self.qjoin_path("endpoint", endpoint_id,
+                               "server", str(server_id))
         return self.get(path, params=params)
 
     def add_endpoint_server(self, endpoint_id, server_data):
@@ -384,7 +385,7 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server>`_
         in the REST documentation for details.
         """
-        path = self.qjoin_path('endpoint', endpoint_id, 'server')
+        path = self.qjoin_path("endpoint", endpoint_id, "server")
         return self.post(path, server_data)
 
     def update_endpoint_server(self, endpoint_id, server_id, server_data):
@@ -399,7 +400,8 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
-        path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
+        path = self.qjoin_path("endpoint", endpoint_id,
+                               "server", str(server_id))
         return self.put(path, server_data)
 
     def delete_endpoint_server(self, endpoint_id, server_id):
@@ -414,7 +416,8 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
-        path = self.qjoin_path('endpoint', endpoint_id, 'server', server_id)
+        path = self.qjoin_path("endpoint", endpoint_id,
+                               "server", str(server_id))
         return self.delete(path)
 
     #
