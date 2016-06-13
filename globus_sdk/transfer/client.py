@@ -794,6 +794,19 @@ class TransferClient(BaseClient):
     # Task inspection and management
     #
 
+    def mgmt_task_list(self, num_results=10, **params):
+        """
+        ``GET endpoint_manager/task_list``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+        """
+        path = self.qjoin_path('endpoint_manager','task_list')
+        return PaginatedResource(
+            self.get, path, {'params': params},
+            num_results=num_results, max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_HAS_NEXT)
+
     def task_list(self, num_results=10, **params):
         """
         ``GET /task_list``
