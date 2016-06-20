@@ -134,7 +134,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id)
         return self.delete(path)
 
-    def mgmt_monitored_endpoints(self, **params):
+    def management_monitored_endpoints(self, **params):
         """
         ``GET endpoint_manager/monitored_endpoints``
 
