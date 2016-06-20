@@ -3,15 +3,11 @@ Load config files once per interpreter invocation.
 """
 
 import os
-from six.moves.configparser import SafeConfigParser, DuplicateSectionError, \
-    NoOptionError, NoSectionError
+from six.moves.configparser import (
+    SafeConfigParser, MissingSectionHeaderError,
+    NoOptionError, NoSectionError)
 
-# use StringIO to wrap up reads from file-like objects in new file-like objects
-# import it in a py2/py3 safe way
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from globus_sdk.exc import GlobusError
 
 
 def _get_lib_config_path():
@@ -42,32 +38,14 @@ class GlobusConfigParser(object):
 
     def _load_config(self):
         # TODO: /etc is not windows friendly, not sure about expanduser
-        self._read([_get_lib_config_path(), "/etc/globus.cfg",
-                    os.path.expanduser("~/.globus.cfg")])
-
-    def _read(self, filenames):
-        """
-        Wraps up self._parser.read() to inject '[general]\n' at the beginning
-        of file contents.
-        Originally, this was implemented by catching
-        MissingSectionHeaderErrors, but that's actually overcomplicated and
-        unnecessary. Always inserting it, uniformly, is simpler and doesn't
-        change the semantics of config parsing at all.
-        """
-        for fname in filenames:
-            try:
-                with open(fname) as f:
-                    # wrap the file-like object in a StringIO so that we can
-                    # pass it to the SafeConfigParser as a file like object
-                    wrapped_file = StringIO(
-                        '[{}]\n'.format(self._GENERAL_CONF_SECTION) + f.read())
-                    try:
-                        self._parser.readfp(wrapped_file, fname)
-                    except DuplicateSectionError:
-                        f.seek(0)
-                        self._parser.readfp(f, fname)
-            except IOError:
-                continue
+        try:
+            self._parser.read([_get_lib_config_path(), "/etc/globus.cfg",
+                               os.path.expanduser("~/.globus.cfg")])
+        except MissingSectionHeaderError:
+            raise GlobusError(
+                "Failed to parse your ~/.globus.cfg Your config file may be "
+                "in an old format. Please visit https://tokens.globus.org/ to "
+                "get the latest format of this file.")
 
     def get(self, option,
             section=None, environment=None,
