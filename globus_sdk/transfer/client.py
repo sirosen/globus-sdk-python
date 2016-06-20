@@ -134,6 +134,17 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id)
         return self.delete(path)
 
+    def endpoint_manager_monitored_endpoints(self, **params):
+        """
+        ``GET endpoint_manager/monitored_endpoints``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+        """
+        path = self.qjoin_path('endpoint_manager','monitored_endpoints')
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
+
     def endpoint_search(self, filter_fulltext=None, filter_scope=None,
                         num_results=25, **params):
         r"""
@@ -793,6 +804,19 @@ class TransferClient(BaseClient):
     #
     # Task inspection and management
     #
+
+    def endpoint_manager_task_list(self, num_results=10, **params):
+        """
+        ``GET endpoint_manager/task_list``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+        """
+        path = self.qjoin_path('endpoint_manager','task_list')
+        return PaginatedResource(
+            self.get, path, {'params': params},
+            num_results=num_results, max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_HAS_NEXT)
 
     def task_list(self, num_results=10, **params):
         """
