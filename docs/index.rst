@@ -40,7 +40,7 @@ git repository and installing it manually:
 
 ::
 
-    git checkout https://github.com/globus/globus-sdk-python.git
+    git clone https://github.com/globus/globus-sdk-python.git
     cd globus-sdk-python
     python setup.py install
 
