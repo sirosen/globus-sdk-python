@@ -165,7 +165,7 @@ class TransferClient(BaseClient):
         Search for a given string, but only on endpoints that you own:
 
         >>> for ep in tc.endpoint_search('foo', filter_scope='my-endpoints'):
-        >>>     print('{} has ID {}'.format(ep['display_name'], ep['id']))
+        >>>     print('{0} has ID {1}'.format(ep['display_name'], ep['id']))
 
         Search results are capped at a number of elements equal to the
         ``num_results`` parameter.

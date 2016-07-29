@@ -82,7 +82,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
                 num_results > self.max_total_results):
             raise exc.PaginationOverrunError((
                 'Paginated call would exceed API limit. Pass a smaller '
-                'num_results parameter -- the maximum for this call is {}')
+                'num_results parameter -- the maximum for this call is {0}')
                 .format(self.max_total_results))
 
         # what function call does this class instance wrap up?

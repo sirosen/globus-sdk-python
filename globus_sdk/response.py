@@ -23,7 +23,7 @@ class GlobusResponse(object):
         return repr(self)
 
     def __repr__(self):
-        return "{}({!r})".format(self.__class__.__name__, self.data)
+        return "{0}({1!r})".format(self.__class__.__name__, self.data)
 
     def __getitem__(self, key):
         # force evaluation of the data property outside of the upcoming

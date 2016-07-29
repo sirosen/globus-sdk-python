@@ -76,7 +76,7 @@ class GlobusConfigParser(object):
         # *first* for a value -- env values have higher precedence than config
         # files so that you can locally override the behavior of a command in a
         # given shell or subshell
-        env_option_name = 'GLOBUS_SDK_{}'.format(option.upper())
+        env_option_name = 'GLOBUS_SDK_{0}'.format(option.upper())
         value = None
         if check_env and env_option_name in os.environ:
             value = os.environ[env_option_name]
@@ -120,6 +120,8 @@ def get_ssl_verify(environment):
                   type_cast=_bool_cast)
     if value is None:
         return True
+    #return "/home/bda/dev/transfer-api-client-python/globusonline/transfer/api_client/ca/globusconnect-ca.pem"
+    #return "/home/bda/dev/ssltest/rest-hostcert.pem"
     return value
 
 

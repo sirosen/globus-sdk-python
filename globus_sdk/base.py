@@ -40,7 +40,7 @@ class BaseClient(object):
     AUTHTYPE_TOKEN = "token"
     AUTHTYPE_BASIC = "basic"
 
-    BASE_USER_AGENT = 'globus-sdk-py-{}'.format(__version__)
+    BASE_USER_AGENT = 'globus-sdk-py-{0}'.format(__version__)
 
     def __init__(self, service, environment=config.get_default_environ(),
                  base_path=None, token=None, app_name=None):
@@ -104,8 +104,8 @@ class BaseClient(object):
         interacting with Globus Support.
         """
         self.app_name = app_name
-        self._headers['User-Agent'] = '{}/{}'.format(self.BASE_USER_AGENT,
-                                                     app_name)
+        self._headers['User-Agent'] = '{0}/{1}'.format(self.BASE_USER_AGENT,
+                                                       app_name)
 
     def config_load_token(self):
         raise NotImplementedError(
