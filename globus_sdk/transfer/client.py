@@ -106,7 +106,7 @@ class TransferClient(BaseClient):
         >>>     },
         >>>   ],
         >>> }
-        >>> create_result = tc.create_shared_endpoint(ep_data)
+        >>> create_result = tc.create_endpoint(ep_data)
         >>> endpoint_id = create_result["id"]
 
         See
@@ -525,8 +525,28 @@ class TransferClient(BaseClient):
         """
         ``POST /endpoint/<endpoint_id>/access``
 
+        :param endpoint_id: id of endpoint to add the acl to
+        :param rule_data: A python dict representation of an ``access``
+                          document
+
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        >>> tc = globus_sdk.TransferClient()
+        >>> rule_data = {
+        >>>   "DATA_TYPE": "access",
+        >>>   "principal_type": "identity",
+        >>>   "principal": identity_id,
+        >>>   "path": "/dataset1/",
+        >>>   "permissions": "rw",
+        >>> }
+        >>> result = tc.add_endpoint_acl_rule(endpoint_id, rule_data)
+        >>> rule_id = result["id"]
+
+        See
+        `Create access rule \
+        <https://docs.globus.org/api/transfer/acl/#rest_access_create>`_
+        in the REST documentation for details.
         """
         path = self.qjoin_path('endpoint', endpoint_id, 'access')
         return self.post(path, rule_data)
