@@ -112,7 +112,7 @@ Some rules and tips for the python and documentation in this project.
       confused by characters like `\\`
   - For complex functionality, include sample usage in docstrings
   - Comment liberally
-  - Use dobule-quotes for strings, except when quoting a string containing
+  - Use double-quotes for strings, except when quoting a string containing
       double-quotes but not containing single quotes
   - Use examples very liberally in documentation, and show where you imported
       from within the SDK. Start at least one example with
