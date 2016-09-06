@@ -2,7 +2,7 @@ from __future__ import print_function
 import warnings
 
 from globus_sdk import exc, config
-from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.base import BaseClient, merge_params, assert_exclusive_params
 from globus_sdk.authorizers import AccessTokenAuthorizer
 from globus_sdk.transfer.response import (
     TransferResponse, IterableTransferResponse)
@@ -18,8 +18,6 @@ class TransferClient(BaseClient):
     REST API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
     from the base rest client that can be used to access any REST resource.
 
-    :param access_token: If provided, an
-
     There are two types of helper methods: list methods which return an
     iterator of :class:`GlobusResponse \
     <globus_sdk.response.GlobusResponse>`
@@ -31,6 +29,20 @@ class TransferClient(BaseClient):
     documentation, which is linked to from the method documentation. Methods
     that allow arbitrary keyword arguments will pass the extra arguments as
     query parameters.
+
+    Several of the parameters to ``TransferClient`` construction pertain to
+    authorizing the calls made to Globus Transfer. They are generally exclusive
+    with one another.
+
+    ``authorizer``
+      A :class:`GlobusAuthorizer <globus_sdk.authorizers.GlobusAuthorizer>`
+      instance used for all calls to Globus Transfer. If this is provided, no
+      other Authorization technique may be passed to ``TransferClient``.
+
+    ``access_token``
+      An access token used to make an :class:`AccessTokenAuthorizer
+      <globus_sdk.authorizers.AccessTokenAuthorizer>`. This will be used
+      directly for Bearer token authorization.
     """
 
     error_class = exc.TransferAPIError
@@ -39,16 +51,20 @@ class TransferClient(BaseClient):
     def __init__(self, environment=config.get_default_environ(),
                  access_token=None, authorizer=None, app_name=None):
 
-        config_access_token = config.get_auth_token(environment)
+        config_access_token = config.get_transfer_token(environment)
 
-        if authorizer is not None:
-            if access_token is not None:
-                raise ValueError(
-                    ("TransferClient takes either an access_token or an "
-                     "authorizer, not both."))
-        elif access_token is not None or config_access_token is not None:
-            authorizer = AccessTokenAuthorizer(
-                access_token or config_access_token)
+        assert_exclusive_params(
+            'TransferClient', 'multiple authorization techniques specified',
+            authorizer=authorizer, access_token=access_token)
+
+        # explicitly check for authorizer=None because it's possible that
+        # config_access_token!=None AND authorizer!=None, and authorizer should
+        # take precedence in that case
+        if authorizer is None and (
+                access_token is not None or config_access_token is not None):
+            if access_token is None:
+                access_token = config_access_token
+            authorizer = AccessTokenAuthorizer(access_token)
 
         BaseClient.__init__(self, "transfer", environment, "/v0.10/",
                             authorizer=authorizer, app_name=None)

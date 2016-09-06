@@ -3,7 +3,7 @@ from __future__ import print_function
 from six.moves.urllib.parse import urlencode
 
 from globus_sdk import config
-from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.base import BaseClient, merge_params, assert_exclusive_params
 from globus_sdk.authorizers import AccessTokenAuthorizer, BasicAuthorizer
 from globus_sdk.auth.oauth2_native_app import GlobusNativeAppFlowManager
 from globus_sdk.auth.token_response import (
@@ -42,24 +42,26 @@ class AuthClient(BaseClient):
                  "no client ID. It's not clear what to do with this "
                  "information."))
 
-        if authorizer is not None:
-            if access_token is not None:
-                raise ValueError(
-                    ("AuthClient takes either an access_token or an "
-                     "authorizer, not both."))
-            if client_secret is not None:
-                raise ValueError(
-                    ("AuthClient takes either a client ID + client secret or "
-                     "an authorizer, not all three."))
-        elif access_token is not None and client_secret is not None:
-            raise ValueError(
-                ("AuthClient takes either an access_token or a "
-                 "client ID + client secret, not all three."))
-        elif client_secret is not None:
+        def _local_exclude(**params):
+            assert_exclusive_params(
+                'AuthClient', 'multiple authorization techniques specified',
+                **params)
+
+        _local_exclude(authorizer=authorizer, access_token=access_token)
+        _local_exclude(authorizer=authorizer, client_secret=client_secret)
+        _local_exclude(access_token=access_token, client_secret=client_secret)
+
+        if client_secret is not None:
             authorizer = BasicAuthorizer(client_id, client_secret)
-        elif access_token is not None or config_access_token is not None:
-            authorizer = AccessTokenAuthorizer(
-                access_token or config_access_token)
+
+        # explicitly check for authorizer=None because it's possible that
+        # config_access_token!=None AND authorizer!=None, and authorizer should
+        # take precedence in that case
+        if authorizer is None and (
+                access_token is not None or config_access_token is not None):
+            if access_token is None:
+                access_token = config_access_token
+            authorizer = AccessTokenAuthorizer(access_token)
 
         BaseClient.__init__(self, "auth", environment, authorizer=authorizer,
                             app_name=app_name)

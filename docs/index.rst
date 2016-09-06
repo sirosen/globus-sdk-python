@@ -85,6 +85,7 @@ API Documentation
    api/exceptions
    api/baseclient
    oauth
+   authorization
    config
    deprecations
 
