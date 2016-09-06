@@ -3,6 +3,7 @@ import warnings
 
 from globus_sdk import exc, config
 from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.authorizers import AccessTokenAuthorizer
 from globus_sdk.transfer.response import (
     TransferResponse, IterableTransferResponse)
 from globus_sdk.transfer.paging import PaginatedResource
@@ -16,6 +17,8 @@ class TransferClient(BaseClient):
     This class provides helper methods for most common resources in the
     REST API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
     from the base rest client that can be used to access any REST resource.
+
+    :param access_token: If provided, an
 
     There are two types of helper methods: list methods which return an
     iterator of :class:`GlobusResponse \
@@ -34,12 +37,21 @@ class TransferClient(BaseClient):
     default_response_class = TransferResponse
 
     def __init__(self, environment=config.get_default_environ(),
-                 token=None, app_name=None):
-        BaseClient.__init__(self, "transfer", environment, "/v0.10/",
-                            token=token, app_name=None)
+                 access_token=None, authorizer=None, app_name=None):
 
-    def config_load_token(self):
-        return config.get_transfer_token(self.environment)
+        config_access_token = config.get_auth_token(environment)
+
+        if authorizer is not None:
+            if access_token is not None:
+                raise ValueError(
+                    ("TransferClient takes either an access_token or an "
+                     "authorizer, not both."))
+        elif access_token is not None or config_access_token is not None:
+            authorizer = AccessTokenAuthorizer(
+                access_token or config_access_token)
+
+        BaseClient.__init__(self, "transfer", environment, "/v0.10/",
+                            authorizer=authorizer, app_name=None)
 
     # Convenience methods, providing more pythonic access to common REST
     # resources

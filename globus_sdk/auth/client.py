@@ -4,6 +4,7 @@ from six.moves.urllib.parse import urlencode
 
 from globus_sdk import config
 from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.authorizers import AccessTokenAuthorizer, BasicAuthorizer
 from globus_sdk.auth.oauth2_native_app import GlobusNativeAppFlowManager
 from globus_sdk.auth.token_response import (
     GlobusOAuthTokenResponse)
@@ -28,9 +29,39 @@ class AuthClient(BaseClient):
     Secret.
     Some resources may be available with either authentication type.
     """
-    def __init__(self, environment=config.get_default_environ(), token=None,
-                 app_name=None, client_id=None):
-        BaseClient.__init__(self, "auth", environment, token=token,
+    def __init__(self, environment=config.get_default_environ(),
+                 authorizer=None, access_token=None,
+                 client_id=None, client_secret=None,
+                 app_name=None):
+
+        config_access_token = config.get_auth_token(environment)
+
+        if client_secret is not None and client_id is None:
+            raise ValueError(
+                ("AuthClient cannot be instantiated with a client secret and "
+                 "no client ID. It's not clear what to do with this "
+                 "information."))
+
+        if authorizer is not None:
+            if access_token is not None:
+                raise ValueError(
+                    ("AuthClient takes either an access_token or an "
+                     "authorizer, not both."))
+            if client_secret is not None:
+                raise ValueError(
+                    ("AuthClient takes either a client ID + client secret or "
+                     "an authorizer, not all three."))
+        elif access_token is not None and client_secret is not None:
+            raise ValueError(
+                ("AuthClient takes either an access_token or a "
+                 "client ID + client secret, not all three."))
+        elif client_secret is not None:
+            authorizer = BasicAuthorizer(client_id, client_secret)
+        elif access_token is not None or config_access_token is not None:
+            authorizer = AccessTokenAuthorizer(
+                access_token or config_access_token)
+
+        BaseClient.__init__(self, "auth", environment, authorizer=authorizer,
                             app_name=app_name)
         self.client_id = client_id
 
