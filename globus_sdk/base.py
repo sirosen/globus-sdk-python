@@ -78,7 +78,7 @@ class BaseClient(object):
         return "/" + "/".join(quote(part) for part in parts)
 
     def get(self, path, params=None, headers=None,
-            response_class=None, retry_401=True):
+            response_class=None, no_auth_header=False, retry_401=True):
         """
         Make a GET request to the specified path.
 
@@ -87,6 +87,7 @@ class BaseClient(object):
         :param headers: dict of HTTP headers to add to the request
         :param response_class: class for response object, overrides the
                                client's ``default_response_class``
+        :param no_auth_header: Suppress the Authorization header
         :param retry_401: Retry on 401 responses with fresh Authorization if
                           ``self.authorizer`` supports it
 
@@ -95,10 +96,12 @@ class BaseClient(object):
         """
         return self._request("GET", path, params=params, headers=headers,
                              response_class=response_class,
+                             no_auth_header=no_auth_header,
                              retry_401=retry_401)
 
     def post(self, path, json_body=None, params=None, headers=None,
-             text_body=None, response_class=None, retry_401=True):
+             text_body=None, response_class=None, no_auth_header=False,
+             retry_401=True):
         """
         Make a POST request to the specified path.
 
@@ -109,6 +112,7 @@ class BaseClient(object):
         :param text_body: raw string that will be the request body
         :param response_class: class for response object, overrides the
                                client's ``default_response_class``
+        :param no_auth_header: Suppress the Authorization header
         :param retry_401: Retry on 401 responses with fresh Authorization if
                           ``self.authorizer`` supports it
 
@@ -118,10 +122,11 @@ class BaseClient(object):
         return self._request("POST", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body,
                              response_class=response_class,
+                             no_auth_header=no_auth_header,
                              retry_401=retry_401)
 
     def delete(self, path, params=None, headers=None,
-               response_class=None, retry_401=True):
+               response_class=None, no_auth_header=False, retry_401=True):
         """
         Make a DELETE request to the specified path.
 
@@ -130,6 +135,7 @@ class BaseClient(object):
         :param headers: dict of HTTP headers to add to the request
         :param response_class: class for response object, overrides the
                                client's ``default_response_class``
+        :param no_auth_header: Suppress the Authorization header
         :param retry_401: Retry on 401 responses with fresh Authorization if
                           ``self.authorizer`` supports it
 
@@ -139,10 +145,12 @@ class BaseClient(object):
         return self._request("DELETE", path, params=params,
                              headers=headers,
                              response_class=response_class,
+                             no_auth_header=no_auth_header,
                              retry_401=retry_401)
 
     def put(self, path, json_body=None, params=None, headers=None,
-            text_body=None, response_class=None, retry_401=True):
+            text_body=None, response_class=None, no_auth_header=False,
+            retry_401=True):
         """
         Make a PUT request to the specified path.
 
@@ -153,6 +161,7 @@ class BaseClient(object):
         :param text_body: raw string that will be the request body
         :param response_class: class for response object, overrides the
                                client's ``default_response_class``
+        :param no_auth_header: Suppress the Authorization header
         :param retry_401: Retry on 401 responses with fresh Authorization if
                           ``self.authorizer`` supports it
 
@@ -162,11 +171,12 @@ class BaseClient(object):
         return self._request("PUT", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body,
                              response_class=response_class,
+                             no_auth_header=no_auth_header,
                              retry_401=retry_401)
 
     def _request(self, method, path, params=None, headers=None,
                  json_body=None, text_body=None,
-                 response_class=None, retry_401=True):
+                 response_class=None, no_auth_header=False, retry_401=True):
         """
         :param method: HTTP request method, as an all caps string
         :param path: path for the request, with or without leading slash
@@ -176,6 +186,7 @@ class BaseClient(object):
         :param text_body: raw string that will be the request body
         :param response_class: class for response object, overrides the
                                client's ``default_response_class``
+        :param no_auth_header: Suppress the Authorization header
         :param retry_401: Retry on 401 responses with fresh Authorization if
                           ``self.authorizer`` supports it
 
@@ -194,7 +205,7 @@ class BaseClient(object):
 
         # add Authorization header, or (if it's a NullAuthorizer) possibly
         # explicitly remove the Authorization header
-        if self.authorizer is not None:
+        if self.authorizer is not None and not no_auth_header:
             self.authorizer.set_authorization_header(rheaders)
 
         url = slash_join(self.base_url, path)
@@ -217,7 +228,8 @@ class BaseClient(object):
         r = send_request()
 
         # potential 401 retry handling
-        if r.status_code == 401 and retry_401 and self.authorizer is not None:
+        if r.status_code == 401 and retry_401 and (
+                self.authorizer is not None and not no_auth_header):
             # note that although handle_missing_authorization returns a T/F
             # value, it may actually mutate the state of the authorizer and
             # therefore change the value set by the `set_authorization_header`

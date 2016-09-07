@@ -33,6 +33,19 @@ class AuthClient(BaseClient):
                  authorizer=None, access_token=None,
                  client_id=None, client_secret=None,
                  app_name=None):
+        # starting values #
+
+        # start out assuming native app -- only change this if there is a
+        # client secret provided
+        self.native_app = True
+        self.client_id = client_id
+
+        # an AuthClient may contain a GlobusOAuth2FlowManager in order to
+        # encapsulate the functionality of various different types of flow
+        # managers
+        self.current_oauth2_flow_manager = None
+
+        # end starting values #
 
         config_access_token = config.get_auth_token(environment)
 
@@ -52,6 +65,7 @@ class AuthClient(BaseClient):
         _local_exclude(access_token=access_token, client_secret=client_secret)
 
         if client_secret is not None:
+            self.native_app = False
             authorizer = BasicAuthorizer(client_id, client_secret)
 
         # explicitly check for authorizer=None because it's possible that
@@ -65,12 +79,6 @@ class AuthClient(BaseClient):
 
         BaseClient.__init__(self, "auth", environment, authorizer=authorizer,
                             app_name=app_name)
-        self.client_id = client_id
-
-        # an AuthClient may contain a GlobusOAuth2FlowManager in order to
-        # encapsulate the functionality of various different types of flow
-        # managers
-        self.current_oauth2_flow_manager = None
 
     def config_load_token(self):
         return config.get_auth_token(self.environment)
@@ -184,16 +192,15 @@ class AuthClient(BaseClient):
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(
             auth_code)
 
-    def oauth2_refresh_token(self, refresh_token, native_app=False,
-                             **additional_params):
+    def oauth2_refresh_token(self, refresh_token, **additional_params):
         r"""
         Exchange a refresh token for a :class:`GlobusOAuthTokenResponse
         <globus_sdk.auth.token_response.GlobusOAuthTokenResponse>`, containing
         an access token.
 
-        When ``native_app`` is set, includes a client ID in the form body and
-        suppresses the authorization header. When it is false (default), the
-        body is of the typical form
+        When ``self.native_app`` is set, includes a client ID in the form body
+        and suppresses the authorization header. When it is false, the body is
+        of the typical form
           refresh_token=<refresh_token>
           grant_type=refresh_token
         """
@@ -201,7 +208,7 @@ class AuthClient(BaseClient):
                      'grant_type': 'refresh_token'}
         form_data.update(additional_params)
 
-        if native_app:
+        if self.native_app:
             form_data.update({'client_id': self.client_id})
             return self.oauth2_token(form_data, no_auth_header=True)
         else:

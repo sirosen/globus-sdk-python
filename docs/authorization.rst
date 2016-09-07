@@ -15,30 +15,33 @@ Unless you are using Refresh Tokens, you should just use the
 `High-Level API <_api>`_ and rely on that to create a ``GlobusAuthorizer`` for
 you whenever one is necessary.
 
-.. rubric:: The Authorizer Interface
+The Authorizer Interface
+------------------------
 
 We define the interface for ``GlobusAuthorizer`` objects in terms of an
 Abstract Base Class:
 
-.. autoclass:: globus_sdk.authorizers.GlobusAuthorizer
+.. autoclass:: globus_sdk.authorizers.base.GlobusAuthorizer
     :members:
     :member-order: bysource
 
-.. rubric:: Authorizer Types
+Authorizer Types
+----------------
 
 All of these types of authorizers can be imported from
 ``globus_sdk.authorizers``.
 
-.. autoclass:: globus_sdk.authorizers.BasicAuthorizer
+.. autoclass:: globus_sdk.BasicAuthorizer
     :members:
     :member-order: bysource
     :show-inheritance:
 
-.. autoclass:: globus_sdk.authorizers.AccessTokenAuthorizer
+.. autoclass:: globus_sdk.AccessTokenAuthorizer
     :members:
     :member-order: bysource
     :show-inheritance:
 
-.. rubric:: RefreshTokenAuthorizer
-
-Under Construction
+.. autoclass:: globus_sdk.RefreshTokenAuthorizer
+    :members: set_authorization_header, handle_missing_authorization
+    :member-order: bysource
+    :show-inheritance:

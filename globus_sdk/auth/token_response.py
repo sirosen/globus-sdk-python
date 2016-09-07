@@ -43,6 +43,20 @@ class GlobusOAuthTokenResponse(GlobusHTTPResponse):
 
         return self._by_resource_server
 
+    @property
+    def expires_in(self):
+        """
+        The ``expires_in`` value for the top-level token in the response.
+        """
+        return self['expires_in']
+
+    @property
+    def access_token(self):
+        """
+        The ``access_token`` value for the top-level token in the response.
+        """
+        return self['access_token']
+
     def __str__(self):
         # Make printing responses more convenient by only showing the
         # (typically important) token info
