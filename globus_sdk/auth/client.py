@@ -3,8 +3,8 @@ from __future__ import print_function
 from six.moves.urllib.parse import urlencode
 
 from globus_sdk import config
-from globus_sdk.base import BaseClient, merge_params, assert_exclusive_params
-from globus_sdk.authorizers import AccessTokenAuthorizer, BasicAuthorizer
+from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.authorizers import AccessTokenAuthorizer
 from globus_sdk.auth.oauth2_native_app import GlobusNativeAppFlowManager
 from globus_sdk.auth.token_response import (
     GlobusOAuthTokenResponse)
@@ -28,16 +28,55 @@ class AuthClient(BaseClient):
     Clients are authenticated using Basic Auth with the Client's ID and
     Secret.
     Some resources may be available with either authentication type.
-    """
-    def __init__(self, environment=config.get_default_environ(),
-                 authorizer=None, access_token=None,
-                 client_id=None, client_secret=None,
-                 app_name=None):
-        # starting values #
 
-        # start out assuming native app -- only change this if there is a
-        # client secret provided
-        self.native_app = True
+    :param client_type: one of ``AuthClient.CLIENT_TYPE_USER``,
+                        ``AuthClient.CLIENT_TYPE_NATIVE_APP``,
+                        ``AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP``
+
+    The ``client_type`` is used to determine the behavior of the ``AuthClient``
+    in a few rare circumstances. The intended meanings for its values are as
+    follows:
+
+    - USER (default): represents an end user, there are no client credentials
+    - NATIVE_APP: represents an application that cannot keep a secret. Expects
+      a Client ID to be set
+    - CONFIDENTIAL_APP: represents an application that has a secret key.
+      Expects a Client ID to be set
+
+    Initializing an ``AuthClient`` with a client ID and secret typically looks
+    like this:
+
+    >>> from globus_sdk import AuthClient, BasicAuthorizer
+    >>> ac = AuthClient(client_type=AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP,
+    >>>                 client_id='<client_id_string>',
+    >>>                 authorizer=BasicAuthorizer('<client_id_string>',
+    >>>                                            '<client_secret_string>'))
+
+    Whereas using an ``AuthClient`` to authenticate a user making calls to the
+    Globus Auth service with an access token takes the form
+
+    >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
+    >>> # client_type defaults to "USER", and by default an
+    >>> # AccessTokenAuthorizer is used, loading from the auth_token value in
+    >>> # your configuration
+    >>> ac = AuthClient()
+    """
+    CLIENT_TYPE_USER = "CLIENT_TYPE_USER"
+    CLIENT_TYPE_NATIVE_APP = "CLIENT_TYPE_NATIVE_APP"
+    CLIENT_TYPE_CONFIDENTIAL_APP = "CLIENT_TYPE_CONFIDENTIAL_APP"
+
+    def __init__(self, environment=config.get_default_environ(),
+                 client_type=CLIENT_TYPE_USER,
+                 client_id=None, authorizer=None, app_name=None):
+        if (client_type in
+                (AuthClient.CLIENT_TYPE_NATIVE_APP,
+                 AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP)) and (
+                client_id is None):
+            raise ValueError(
+                ("Cannot instantiate an AuthClient of type {0} without a "
+                 "client ID.").format(client_type))
+
+        self.client_type = client_type
         self.client_id = client_id
 
         # an AuthClient may contain a GlobusOAuth2FlowManager in order to
@@ -45,59 +84,12 @@ class AuthClient(BaseClient):
         # managers
         self.current_oauth2_flow_manager = None
 
-        # end starting values #
-
-        config_access_token = config.get_auth_token(environment)
-
-        if client_secret is not None and client_id is None:
-            raise ValueError(
-                ("AuthClient cannot be instantiated with a client secret and "
-                 "no client ID. It's not clear what to do with this "
-                 "information."))
-
-        def _local_exclude(**params):
-            assert_exclusive_params(
-                'AuthClient', 'multiple authorization techniques specified',
-                **params)
-
-        _local_exclude(authorizer=authorizer, access_token=access_token)
-        _local_exclude(authorizer=authorizer, client_secret=client_secret)
-        _local_exclude(access_token=access_token, client_secret=client_secret)
-
-        if client_secret is not None:
-            self.native_app = False
-            authorizer = BasicAuthorizer(client_id, client_secret)
-
-        # explicitly check for authorizer=None because it's possible that
-        # config_access_token!=None AND authorizer!=None, and authorizer should
-        # take precedence in that case
-        if authorizer is None and (
-                access_token is not None or config_access_token is not None):
-            if access_token is None:
-                access_token = config_access_token
+        access_token = config.get_auth_token(environment)
+        if authorizer is None and access_token is not None:
             authorizer = AccessTokenAuthorizer(access_token)
 
         BaseClient.__init__(self, "auth", environment, authorizer=authorizer,
                             app_name=app_name)
-
-    def config_load_token(self):
-        return config.get_auth_token(self.environment)
-
-    def set_client_id(self, client_id):
-        """
-        Set the Globus Auth Client ID on this ``AuthClient``.
-        This is used as a default in several methods that accept a
-        ``client_id`` parameter on the ``AuthClient``.
-        """
-        self.client_id = client_id
-
-    def set_auth_basic(self, username, password):
-        """
-        Override the ``BaseClient`` version of this call to also set the Client
-        ID.
-        """
-        self.set_client_id(username)
-        BaseClient.set_auth_basic(self, username, password)
 
     def get_identities(self, **params):
         """
@@ -198,9 +190,9 @@ class AuthClient(BaseClient):
         <globus_sdk.auth.token_response.GlobusOAuthTokenResponse>`, containing
         an access token.
 
-        When ``self.native_app`` is set, includes a client ID in the form body
-        and suppresses the authorization header. When it is false, the body is
-        of the typical form
+        When ``client_type`` is CLIENT_TYPE_NATIVE_APP, includes a client ID in
+        the form body and suppresses the authorization header. Otherwise, the
+        body is of the typical form
           refresh_token=<refresh_token>
           grant_type=refresh_token
         """
@@ -208,7 +200,7 @@ class AuthClient(BaseClient):
                      'grant_type': 'refresh_token'}
         form_data.update(additional_params)
 
-        if self.native_app:
+        if self.client_type == AuthClient.CLIENT_TYPE_NATIVE_APP:
             form_data.update({'client_id': self.client_id})
             return self.oauth2_token(form_data, no_auth_header=True)
         else:

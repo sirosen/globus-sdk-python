@@ -57,6 +57,13 @@ class GlobusOAuthTokenResponse(GlobusHTTPResponse):
         """
         return self['access_token']
 
+    @property
+    def refresh_token(self):
+        """
+        The ``refresh_token`` value for the top-level token in the response.
+        """
+        return self.get('refresh_token')
+
     def __str__(self):
         # Make printing responses more convenient by only showing the
         # (typically important) token info

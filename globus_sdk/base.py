@@ -302,32 +302,3 @@ def merge_params(base_params, **more_params):
     for param in more_params:
         if more_params[param] is not None:
             base_params[param] = more_params[param]
-
-
-def assert_exclusive_params(method_or_constructor_name, detailed_message,
-                            **params):
-    """
-    Given a method or constructor, and two parameters with their names (given
-    as keyword arguments for convenience), ensures that at least one of the two
-    is None.
-    This is a helper for writing (usually) constructors which have strict
-    requirements on what parameters are allowed.
-
-    Additionally, you are required to provide a message with some more detail
-    on what's going on or why these are exclusive, which will be formatted into
-    the exception message.
-    """
-    if not len(params) == 2:
-        raise ValueError(
-            'assert_exclusive_params() requires EXACTLY 2 keyword arguments')
-
-    # get items in order, then pull them apart so we can actually work with
-    # them
-    items = params.items()
-    k1, v1 = items[0]
-    k2, v2 = items[1]
-
-    if v1 is not None and v2 is not None:
-        raise ValueError(
-            '{0} cannot take both {1} and {2} as arguments: {3}'.format(
-                method_or_constructor_name, k1, k2, detailed_message))
