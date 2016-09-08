@@ -13,10 +13,10 @@ without needing to know Globus API endpoints or their various parameters.
 For example, you could use the ``TransferClient`` to list your task history
 very simply::
 
-    from globus_sdk import TransferClient, AccessTokenAuthorizer
+    from globus_sdk import TransferClient
 
-    # you must have an access token to pass to the authorizer as a string
-    tc = TransferClient(authorizer=AccessTokenAuthorizer('...'))
+    # you must have transfer_token in your config for this to work
+    tc = TransferClient()
 
     print("My Last 25 Tasks:")
     # `filter` to get Delete Tasks (default is just Transfer Tasks)
