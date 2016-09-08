@@ -16,8 +16,8 @@ class BaseClient(object):
     interface that does not directly expose anything from requests.
 
     :param authorizer: optional :class:`GlobusAuthorizer \
-    <globus_sdk.authorizers.GlobusAuthorizer>` which will generate
-    Authorization headers
+                       <globus_sdk.authorizers.base.GlobusAuthorizer>` which
+                       will generate Authorization headers
     :param app_name: optional "nice name" for the application
 
     ``app_name`` has no bearing on the semantics of client actions. It is just

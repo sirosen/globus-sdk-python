@@ -65,8 +65,11 @@ The shortest version of this flow looks like this:
 .. code-block:: python
 
     import globus-sdk
-    # include your client_id, of course
-    client = globus_sdk.AuthClient(client_id=...)
+
+    # you must have a client ID
+    CLIENT_ID = '...'
+
+    client = globus_sdk.AuthClient(client_id=CLIENT_ID)
     client.oauth2_start_flow_native_app()
 
     authorize_url = client.oauth2_get_authorize_url()
@@ -96,12 +99,14 @@ OAuth2 flow.
 
     import globus_sdk
     # pass in the client ID for your application, as registered in Globus Auth
-    # or, you can omit it and run `client.set_client_id(...)` later
-    client = globus_sdk.AuthClient(client_id=...)
+    CLIENT_ID = '...'
+    client = globus_sdk.AuthClient(client_id=CLIENT_ID)
 
 Your ``client`` can only be used to run a single flow at a time.
 It must include the client ID, as that will be used in several steps of the
 OAuth2 flow.
+If you have been reading about :ref:`API Authorization <authorization>`, please
+note that you should not pass in an ``authorizer``.
 
 Determine your ``requested_scopes``, ``redirect_uri``, and whether or not you
 want ``refresh_tokens`` enabled.
@@ -159,8 +164,8 @@ Now that you have the ``auth_code``, you can exchange it for set of tokens::
 
     token_response = client.oauth2_exchange_code_for_tokens(auth_code)
 
-That ``token_response`` is a :class:`GlobusOAuthTokenResponse
-<globus_sdk.auth.token_response.GlobusOAuthTokenResponse>`, so it will be
+That ``token_response`` is a :class:`OAuthTokenResponse
+<globus_sdk.auth.token_response.OAuthTokenResponse>`, so it will be
 easiest to work with the response reformatted to be organized by Resource
 Server.
 

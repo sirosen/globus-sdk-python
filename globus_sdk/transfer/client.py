@@ -10,7 +10,7 @@ from globus_sdk.transfer.paging import PaginatedResource
 
 
 class TransferClient(BaseClient):
-    """
+    r"""
     Client for the
     `Globus Transfer API <https://docs.globus.org/api/transfer/>`_.
 
@@ -31,8 +31,9 @@ class TransferClient(BaseClient):
     query parameters.
 
     ``authorizer``
-      A :class:`GlobusAuthorizer <globus_sdk.authorizers.GlobusAuthorizer>`
-      instance used for all calls to Globus Transfer.
+      A :class:`GlobusAuthorizer
+      <globus_sdk.authorizers.base.GlobusAuthorizer>` instance used for all
+      calls to Globus Transfer.
 
     For example, you could instantiate a new ``TransferClient`` using
 

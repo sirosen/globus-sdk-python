@@ -3,8 +3,8 @@ Resouce Servers and Scopes
 
 What are Resource Servers, and how do they interact with scopes?
 
-If you look at a :class:`GlobusOAuthTokenResponse
-<globus_sdk.auth.token_response.GlobusOAuthTokenResponse>`, you will notice
+If you look at a :class:`OAuthTokenResponse
+<globus_sdk.auth.token_response.OAuthTokenResponse>`, you will notice
 that it organizes information under Resource Servers, including one access
 token (and optionally one refresh token) per Resource Server.
 This can appear confusing, especially as the Resource Servers in this response

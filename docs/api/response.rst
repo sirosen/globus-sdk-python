@@ -1,8 +1,9 @@
 Responses
 =========
 
-All method return values for Globus SDK Clients are ``GlobusResponse``
-objects.
+Unless noted otherwise, all method return values for Globus SDK Clients are
+``GlobusResponse`` objects.
+
 Some ``GlobusResponse`` objects are iterables.
 In those cases, their contents will also be ``GlobusResponse`` objects.
 
@@ -28,6 +29,6 @@ Response Classes
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.auth.token_response.GlobusOAuthTokenResponse
+.. autoclass:: globus_sdk.auth.token_response.OAuthTokenResponse
    :members:
    :show-inheritance:

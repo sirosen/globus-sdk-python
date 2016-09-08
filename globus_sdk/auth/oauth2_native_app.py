@@ -139,8 +139,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         The second step of the Native App flow, exchange an authorization code
         for access tokens (and refresh tokens if specified).
 
-        :rtype: :class:`GlobusOAuthTokenResponse \
-        <globus_sdk.auth.token_response.GlobusOAuthTokenResponse>`
+        :rtype: :class:`OAuthTokenResponse \
+        <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
         return self.auth_client.oauth2_token(
             {'client_id': self.client_id,

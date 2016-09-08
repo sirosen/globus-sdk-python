@@ -6,8 +6,7 @@ from globus_sdk import config
 from globus_sdk.base import BaseClient, merge_params
 from globus_sdk.authorizers import AccessTokenAuthorizer
 from globus_sdk.auth.oauth2_native_app import GlobusNativeAppFlowManager
-from globus_sdk.auth.token_response import (
-    GlobusOAuthTokenResponse)
+from globus_sdk.auth.token_response import OAuthTokenResponse
 
 
 class AuthClient(BaseClient):
@@ -29,13 +28,11 @@ class AuthClient(BaseClient):
     Secret.
     Some resources may be available with either authentication type.
 
-    :param client_type: one of ``AuthClient.CLIENT_TYPE_USER``,
-                        ``AuthClient.CLIENT_TYPE_NATIVE_APP``,
-                        ``AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP``
-
-    The ``client_type`` is used to determine the behavior of the ``AuthClient``
-    in a few rare circumstances. The intended meanings for its values are as
-    follows:
+    ``client_type``
+      Determines the behavior of the client. It must be one of
+      ``AuthClient.CLIENT_TYPE_USER``, ``AuthClient.CLIENT_TYPE_NATIVE_APP``,
+      ``AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP``. The intended meanings for
+      these values are as follows:
 
     - USER (default): represents an end user, there are no client credentials
     - NATIVE_APP: represents an application that cannot keep a secret. Expects
@@ -52,14 +49,27 @@ class AuthClient(BaseClient):
     >>>                 authorizer=BasicAuthorizer('<client_id_string>',
     >>>                                            '<client_secret_string>'))
 
+    If you have a client ID but no secret because you are building a Native
+    Application (for example, the Globus CLI, which cannot keep a secret), you
+    should initialize an ``AuthClient`` like so:
+
+    >>> from globus_sdk import AuthClient
+    >>> ac = AuthClient(client_type=AuthClient.CLIENT_TYPE_NATIVE_APP,
+    >>>                 client_id='<client_id_string>')
+
     Whereas using an ``AuthClient`` to authenticate a user making calls to the
     Globus Auth service with an access token takes the form
 
-    >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
+    >>> from globus_sdk import AuthClient
     >>> # client_type defaults to "USER", and by default an
     >>> # AccessTokenAuthorizer is used, loading from the auth_token value in
     >>> # your configuration
     >>> ac = AuthClient()
+
+    or explicitly as
+
+    >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
+    >>> ac = AuthClient(authorizer=AccessTokenAuthorizer('<token_string>'))
     """
     CLIENT_TYPE_USER = "CLIENT_TYPE_USER"
     CLIENT_TYPE_NATIVE_APP = "CLIENT_TYPE_NATIVE_APP"
@@ -92,20 +102,43 @@ class AuthClient(BaseClient):
                             app_name=app_name)
 
     def get_identities(self, **params):
-        """
+        r"""
         GET /v2/api/identities
 
-        Given ``usernames=<U>`` or (exclusive) ``identity_ids=<I>`` as keyword
+        Given ``usernames=<U>`` or (exclusive) ``ids=<I>`` as keyword
         arguments, looks up identity information for the set of identities
         provided.
         ``<U>`` and ``<I>`` in this case are comma-delimited strings listing
         multiple Identity Usernames or Identity IDs.
 
-        Available with either authentication type.
+        Available with any authentication/client type.
+
+        >>> ac = globus_sdk.AuthClient()
+        >>> # by IDs
+        >>> r = ac.get_identities(ids="46bd0f56-e24f-11e5-a510-131bef46955c")
+        >>> r.data
+        {u'identities': [{u'email': None,
+           u'id': u'46bd0f56-e24f-11e5-a510-131bef46955c',
+           u'identity_provider': u'7daddf46-70c5-45ee-9f0f-7244fe7c8707',
+           u'name': None,
+           u'organization': None,
+           u'status': u'unused',
+           u'username': u'globus@globus.org'}]}
+        >>> ac.get_identities(
+        >>>     identities=",".join(
+        >>>         ("46bd0f56-e24f-11e5-a510-131bef46955c",
+        >>>          "168edc3d-c6ba-478c-9cf8-541ff5ebdc1c"))
+        ...
+        >>> # or by usernames
+        >>> ac.get_identities(usernames='globus@globus.org')
+        ...
+        >>> ac.get_identities(
+        >>>     usernames='globus@globus.org,auth@globus.org')
+        ...
 
         See
         `Identities Resources \
-        <https://docs.globus.org/api/auth/reference/\
+        <https://docs.globus.org/api/auth/reference/
         #v2_api_identities_resources>`_
         in the API documentation for details.
         """
@@ -117,7 +150,13 @@ class AuthClient(BaseClient):
 
         Get information about a Globus Auth token.
 
-        Requires Basic Auth using Oauth Client credentials.
+        Requires that your client is of type
+        ``CLIENT_TYPE_CONFIDENTIAL_APP``.
+
+        >>> # parameters as discussed above
+        >>> ac = globus_sdk.AuthClient(...)
+        >>> ac.token_introspect('<token_string>')
+        ...
 
         See
         `Token Introspection \
@@ -151,7 +190,7 @@ class AuthClient(BaseClient):
     def oauth2_get_authorize_url(self):
         """
         Get the authorization URL to which users should be sent.
-        This method may only be called after an ``oauth2_*_start_flow`` method
+        This method may only be called after an ``oauth2_start_flow_*`` method
         has been called on this ``AuthClient``.
 
         :rtype: ``string``
@@ -159,7 +198,7 @@ class AuthClient(BaseClient):
         if not self.current_oauth2_flow_manager:
             raise ValueError(
                 ('Cannot get authorize URL until starting an OAuth2 flow. '
-                 'Call one of the oauth2_*_start_flow() methods on this '
+                 'Call one of the oauth2_start_flow_*() methods on this '
                  'AuthClient to resolve'))
         return self.current_oauth2_flow_manager.get_authorize_url()
 
@@ -167,18 +206,19 @@ class AuthClient(BaseClient):
         """
         Exchange an authorization code for a token or tokens.
 
-        :rtype: :class:`GlobusOAuthTokenResponse \
-        <globus_sdk.auth.token_response.GlobusOAuthTokenResponse>`
+        :rtype: :class:`OAuthTokenResponse \
+        <globus_sdk.auth.token_response.OAuthTokenResponse>`
 
-        :param auth_code: An auth code typically obtained by sending the user
-                          to the authorize URL. This is a very short-lived
-                          credential which this method is exchanging for
-                          tokens, which are longer-lived.
+        ``auth_code``
+          An auth code typically obtained by sending the user to the authorize
+          URL. The code is a very short-lived credential which this method is
+          exchanging for tokens. Tokens are the credentials used to
+          authenticate against Globus APIs.
         """
         if not self.current_oauth2_flow_manager:
             raise ValueError(
                 ('Cannot exchange auth code until starting an OAuth2 flow. '
-                 'Call one of the oauth2_*_start_flow() methods on this '
+                 'Call one of the oauth2_start_flow_*() methods on this '
                  'AuthClient to resolve'))
 
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(
@@ -186,15 +226,18 @@ class AuthClient(BaseClient):
 
     def oauth2_refresh_token(self, refresh_token, **additional_params):
         r"""
-        Exchange a refresh token for a :class:`GlobusOAuthTokenResponse
-        <globus_sdk.auth.token_response.GlobusOAuthTokenResponse>`, containing
+        Exchange a refresh token for a :class:`OAuthTokenResponse
+        <globus_sdk.auth.token_response.OAuthTokenResponse>`, containing
         an access token.
 
         When ``client_type`` is CLIENT_TYPE_NATIVE_APP, includes a client ID in
         the form body and suppresses the authorization header. Otherwise, the
         body is of the typical form
-          refresh_token=<refresh_token>
-          grant_type=refresh_token
+
+        .. code-block:: none
+
+            refresh_token=<refresh_token>
+            grant_type=refresh_token
         """
         form_data = {'refresh_token': refresh_token,
                      'grant_type': 'refresh_token'}
@@ -217,12 +260,12 @@ class AuthClient(BaseClient):
         Generally, users of the SDK should not call this method unless they are
         implementing OAuth2 flows.
 
-        :rtype: :class:`GlobusOAuthTokenResponse \
-        <globus_sdk.auth.token_response.GlobusOAuthTokenResponse>`
+        :rtype: :class:`OAuthTokenResponse \
+        <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
         return self.post(
-            '/v2/oauth2/token', response_class=GlobusOAuthTokenResponse,
+            '/v2/oauth2/token', response_class=OAuthTokenResponse,
             text_body=form_data,
             no_auth_header=no_auth_header)

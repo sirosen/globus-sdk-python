@@ -33,7 +33,6 @@ Transfer Client
    :members:
    :member-order: bysource
    :show-inheritance:
-   :member-order: bysource
    :exclude-members: error_class, default_response_class
 
 Helper Objects
@@ -61,5 +60,4 @@ Auth Client
    :members:
    :member-order: bysource
    :show-inheritance:
-   :member-order: bysource
    :exclude-members: error_class, default_response_class
