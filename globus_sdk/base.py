@@ -33,11 +33,24 @@ class BaseClient(object):
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class = exc.GlobusAPIError
     default_response_class = GlobusHTTPResponse
+    # a collection of authorizer types, or None to indicate "any"
+    allowed_authorizer_types = None
 
     BASE_USER_AGENT = 'globus-sdk-py-{0}'.format(__version__)
 
     def __init__(self, service, environment=config.get_default_environ(),
                  base_path=None, authorizer=None, app_name=None):
+        # if restrictions have been placed by a child class on the allowed
+        # authorizer types, make sure we are not in violation of those
+        # constraints
+        if self.allowed_authorizer_types is not None and (
+                type(authorizer) not in self.allowed_authorizer_types):
+            raise ValueError(
+                ("{0} can only take authorizers from {1}, "
+                 "but you have provided {2}").format(
+                    type(self), self.allowed_authorizer_types,
+                    type(authorizer)))
+
         self.environment = environment
         self.authorizer = authorizer
 

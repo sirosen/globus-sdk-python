@@ -11,8 +11,8 @@ To customize client methods with additional detail, the SDK uses subclasses of
 ``GlobusResponse``.
 For example the ``GlobusHTTPResponse`` attaches HTTP response information.
 
-Response Classes
-----------------
+Generic Response Classes
+------------------------
 
 .. autoclass:: globus_sdk.response.GlobusResponse
    :members:
@@ -21,6 +21,9 @@ Response Classes
    :members:
    :show-inheritance:
 
+Transfer Response Classes
+-------------------------
+
 .. autoclass:: globus_sdk.transfer.response.TransferResponse
    :members:
    :show-inheritance:
@@ -28,6 +31,9 @@ Response Classes
 .. autoclass:: globus_sdk.transfer.response.IterableTransferResponse
    :members:
    :show-inheritance:
+
+Auth Response Classes
+---------------------
 
 .. autoclass:: globus_sdk.auth.token_response.OAuthTokenResponse
    :members:

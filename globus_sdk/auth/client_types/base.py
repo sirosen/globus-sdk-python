@@ -5,7 +5,6 @@ from six.moves.urllib.parse import urlencode
 from globus_sdk import config
 from globus_sdk.base import BaseClient, merge_params
 from globus_sdk.authorizers import AccessTokenAuthorizer
-from globus_sdk.auth.oauth2_native_app import GlobusNativeAppFlowManager
 from globus_sdk.auth.token_response import OAuthTokenResponse
 
 
@@ -28,40 +27,10 @@ class AuthClient(BaseClient):
     Secret.
     Some resources may be available with either authentication type.
 
-    ``client_type``
-      Determines the behavior of the client. It must be one of
-      ``AuthClient.CLIENT_TYPE_USER``, ``AuthClient.CLIENT_TYPE_NATIVE_APP``,
-      ``AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP``. The intended meanings for
-      these values are as follows:
-
-    - USER (default): represents an end user, there are no client credentials
-    - NATIVE_APP: represents an application that cannot keep a secret. Expects
-      a Client ID to be set
-    - CONFIDENTIAL_APP: represents an application that has a secret key.
-      Expects a Client ID to be set
-
-    Initializing an ``AuthClient`` with a client ID and secret typically looks
-    like this:
-
-    >>> from globus_sdk import AuthClient, BasicAuthorizer
-    >>> ac = AuthClient(client_type=AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP,
-    >>>                 client_id='<client_id_string>',
-    >>>                 authorizer=BasicAuthorizer('<client_id_string>',
-    >>>                                            '<client_secret_string>'))
-
-    If you have a client ID but no secret because you are building a Native
-    Application (for example, the Globus CLI, which cannot keep a secret), you
-    should initialize an ``AuthClient`` like so:
-
-    >>> from globus_sdk import AuthClient
-    >>> ac = AuthClient(client_type=AuthClient.CLIENT_TYPE_NATIVE_APP,
-    >>>                 client_id='<client_id_string>')
-
-    Whereas using an ``AuthClient`` to authenticate a user making calls to the
+    Initializing an ``AuthClient`` to authenticate a user making calls to the
     Globus Auth service with an access token takes the form
 
     >>> from globus_sdk import AuthClient
-    >>> # client_type defaults to "USER", and by default an
     >>> # AccessTokenAuthorizer is used, loading from the auth_token value in
     >>> # your configuration
     >>> ac = AuthClient()
@@ -71,22 +40,8 @@ class AuthClient(BaseClient):
     >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
     >>> ac = AuthClient(authorizer=AccessTokenAuthorizer('<token_string>'))
     """
-    CLIENT_TYPE_USER = "CLIENT_TYPE_USER"
-    CLIENT_TYPE_NATIVE_APP = "CLIENT_TYPE_NATIVE_APP"
-    CLIENT_TYPE_CONFIDENTIAL_APP = "CLIENT_TYPE_CONFIDENTIAL_APP"
-
     def __init__(self, environment=config.get_default_environ(),
-                 client_type=CLIENT_TYPE_USER,
                  client_id=None, authorizer=None, app_name=None):
-        if (client_type in
-                (AuthClient.CLIENT_TYPE_NATIVE_APP,
-                 AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP)) and (
-                client_id is None):
-            raise ValueError(
-                ("Cannot instantiate an AuthClient of type {0} without a "
-                 "client ID.").format(client_type))
-
-        self.client_type = client_type
         self.client_id = client_id
 
         # an AuthClient may contain a GlobusOAuth2FlowManager in order to
@@ -168,25 +123,6 @@ class AuthClient(BaseClient):
         return self.post("/v2/oauth2/token/introspect",
                          text_body=urlencode(kw))
 
-    def oauth2_start_flow_native_app(
-            self, client_id=None, requested_scopes=None, redirect_uri=None,
-            state='_default', verifier=None, refresh_tokens=False):
-        """
-        Starts a Native App OAuth2 flow by instantiating a
-        :class:`GlobusNativeAppFlowManager
-        <globus_sdk.auth.GlobusNativeAppFlowManager>`
-
-        All of the parameters to this method are passed to that class's
-        initializer verbatim.
-
-        #notthreadsafe
-        """
-        self.current_oauth2_flow_manager = GlobusNativeAppFlowManager(
-            self, client_id=client_id, requested_scopes=requested_scopes,
-            redirect_uri=redirect_uri, state=state, verifier=verifier,
-            refresh_tokens=refresh_tokens)
-        return self.current_oauth2_flow_manager
-
     def oauth2_get_authorize_url(self):
         """
         Get the authorization URL to which users should be sent.
@@ -230,24 +166,20 @@ class AuthClient(BaseClient):
         <globus_sdk.auth.token_response.OAuthTokenResponse>`, containing
         an access token.
 
-        When ``client_type`` is CLIENT_TYPE_NATIVE_APP, includes a client ID in
-        the form body and suppresses the authorization header. Otherwise, the
-        body is of the typical form
+        Does a token call of the form
 
         .. code-block:: none
 
             refresh_token=<refresh_token>
             grant_type=refresh_token
+
+        plus any additional parameters you may specify.
         """
         form_data = {'refresh_token': refresh_token,
                      'grant_type': 'refresh_token'}
         form_data.update(additional_params)
 
-        if self.client_type == AuthClient.CLIENT_TYPE_NATIVE_APP:
-            form_data.update({'client_id': self.client_id})
-            return self.oauth2_token(form_data, no_auth_header=True)
-        else:
-            return self.oauth2_token(form_data)
+        return self.oauth2_token(form_data)
 
     def oauth2_token(self, form_data, no_auth_header=False):
         """

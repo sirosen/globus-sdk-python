@@ -1,5 +1,5 @@
-Globus OAuth2 SDK Tutorial
---------------------------
+OAuth2 SDK Tutorial
+-------------------
 
 This is a tutorial in the use of the Globus SDK to carry out an OAuth2
 Authentication flow.
@@ -35,17 +35,18 @@ The basic flow can be described as the following procedure:
 2. The application directs the user to authenticate at the Globus Auth
    ``authorize URL``, with a hash of the secret. Usually the user is given a
    link to the ``authorize URL``
-3. The user follows the link and logs in to any Globus Auth supported system*
+3. The user follows the link and logs in to any Globus Auth supported
+   system[#f1]_
 4. Globus Auth, after a successful login, sends an ``auth_code`` back to the
    user or directly to the application (the user may copy-paste the code back
    to the application)
 5. The application sends the ``auth_code`` and the unhashed secret from (1) to
    the server in exchange for a set of tokens
 
-* Globus Auth allows users to login with a variety of institutional accounts,
-  Google accounts, and with free "Globus ID" accounts. By default, any of these
-  are allowed, but an application can also specify that a certain type of
-  account be used by the user. Full details exceed the scope of this document.
+.. [#f1] Globus Auth allows users to login with a variety of institutional accounts,
+         Google accounts, and with free "Globus ID" accounts. By default, any of these
+         are allowed, but an application can also specify that a certain type of
+         account be used by the user. Full details exceed the scope of this document.
 
 
 The key goal of this flow is to have the user perform authentication via a web
@@ -60,16 +61,20 @@ Native App Flow on AuthClient
 
 If you want to copy-paste an example, you'll need at least a ``client_id`` for
 your ``AuthClient`` object.
-The shortest version of this flow looks like this:
+You should also specifically use the :class:`NativeAppAuthClient
+<globus_sdk.NativeAppAuthClient>` type of ``AuthClient``, as it has been
+customized to handle this flow.
+
+The shortest version of the flow looks like this:
 
 .. code-block:: python
 
-    import globus-sdk
+    import globus_sdk
 
     # you must have a client ID
     CLIENT_ID = '...'
 
-    client = globus_sdk.AuthClient(client_id=CLIENT_ID)
+    client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
     client.oauth2_start_flow_native_app()
 
     authorize_url = client.oauth2_get_authorize_url()
@@ -100,7 +105,7 @@ OAuth2 flow.
     import globus_sdk
     # pass in the client ID for your application, as registered in Globus Auth
     CLIENT_ID = '...'
-    client = globus_sdk.AuthClient(client_id=CLIENT_ID)
+    client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
 
 Your ``client`` can only be used to run a single flow at a time.
 It must include the client ID, as that will be used in several steps of the

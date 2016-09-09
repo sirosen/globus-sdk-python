@@ -13,8 +13,8 @@ These are a very simple class of generic objects which define a way of getting
 an up-to-date ``Authorization`` header, and trying to handle a 401 (if that
 header is expired).
 
-You should be using :ref:`High-Level API <api>` and passing in an authorizer
-whenever you create a new client.
+Whenever using the :ref:`Service Clients <clients>`, you should be passing in an
+authorizer when you create a new client unless otherwise specified.
 The type of authorizer you will use depends very much on your application, but
 if you want examples you should look at the :ref:`examples section
 <examples-ref>`.
@@ -28,29 +28,6 @@ Examples
 
 Using an authorizer is hard to grasp without a few examples to reference.
 The basic usage should be to create these at client instantiation time.
-
-Basic Auth on an AuthClient
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you're using an :class:`AuthClient <globus_sdk.AuthClient>` to do OAuth2
-flows, you likely want to authenticate it using your client credentials (the
-client ID and client secret).
-Using the basic authorizer, it's as simple as
-
-.. code-block:: python
-
-    from globus_sdk import AuthClient, BasicAuthorizer
-
-    CLIENT_ID = '...'
-    CLIENT_SECRET = '...'
-
-    # you probably want to give the client your CLIENT_ID as well, so that it
-    # can use it for various OAuth2 operations
-    client = AuthClient(client_type=AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP,
-                        client_id=CLIENT_ID,
-                        authorizer=BasicAuthorizer(CLIENT_ID, CLIENT_SECRET))
-
-and you're off to the races!
 
 Access Token Authorization on AuthClient and TransferClient
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,7 +74,7 @@ this time.
 
 .. code-block:: python
 
-    from globus_sdk import (AuthClient, TransferClient, BasicAuthorizer,
+    from globus_sdk import (AuthClient, TransferClient, ConfidentialAppAuthClient,
                             RefreshTokenAuthorizer)
 
     # for doing the refresh
@@ -110,10 +87,7 @@ this time.
 
     # making the authorizer requires that we have an AuthClient which can talk
     # OAuth2 to Globus Auth
-    # note that this is 100% the same as doing basic auth above
-    internal_auth_client = AuthClient(
-        client_type=AuthClient.CLIENT_TYPE_CONFIDENTIAL_APP, client_id=CLIENT_ID,
-        authorizer=BasicAuthorizer(CLIENT_ID, CLIENT_SECRET))
+    internal_auth_client = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
 
     # now let's bake a couple of authorizers
     auth_authorizer = RefreshTokenAuthorizer(AUTH_REFRESH_TOKEN,
@@ -164,6 +138,36 @@ This is really just the same as doing this:
     transfer_client = TransferClient(
         authorizer=AccessTokenAuthorizer("xyz456"))
 
+Basic Auth on an AuthClient
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're using an :class:`AuthClient <globus_sdk.AuthClient>` to do OAuth2
+flows, you likely want to authenticate it using your client credentials (the
+client ID and client secret).
+Using the ``BasicAuthorizer``, although simple, is wrong because it doesn't
+tell ``AuthClient`` what type of client it is.
+
+The preferred method is to use one of the ``AuthClient`` subclasses which
+automatically specifies its authorizer.
+By way of example:
+
+.. code-block:: python
+
+    from globus_sdk import ConfidentialAppAuthClient
+
+    CLIENT_ID = '...'
+    CLIENT_SECRET = '...'
+
+    client = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
+
+and you're off to the races!
+
+Under the hood, this is implicitly running
+
+.. code-block:: python
+
+    AuthClient(authorizer=BasicAuthorizer(CLIENT_ID, CLIENT_SECRET))
+
 
 The Authorizer Interface
 ------------------------
@@ -180,6 +184,11 @@ Authorizer Types
 
 All of these types of authorizers can be imported from
 ``globus_sdk.authorizers``.
+
+.. autoclass:: globus_sdk.NullAuthorizer
+    :members:
+    :member-order: bysource
+    :show-inheritance:
 
 .. autoclass:: globus_sdk.BasicAuthorizer
     :members:

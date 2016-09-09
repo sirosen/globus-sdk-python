@@ -3,7 +3,8 @@ import warnings
 
 from globus_sdk import exc, config
 from globus_sdk.base import BaseClient, merge_params
-from globus_sdk.authorizers import AccessTokenAuthorizer
+from globus_sdk.authorizers import (
+    AccessTokenAuthorizer, RefreshTokenAuthorizer)
 from globus_sdk.transfer.response import (
     TransferResponse, IterableTransferResponse)
 from globus_sdk.transfer.paging import PaginatedResource
@@ -46,7 +47,9 @@ class TransferClient(BaseClient):
     behavior -- loading the access token from the config value named
     ``transfer_token``.
     """
-
+    # disallow basic auth
+    allowed_authorizer_types = [AccessTokenAuthorizer,
+                                RefreshTokenAuthorizer]
     error_class = exc.TransferAPIError
     default_response_class = TransferResponse
 
