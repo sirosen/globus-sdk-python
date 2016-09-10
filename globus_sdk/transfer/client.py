@@ -3,13 +3,15 @@ import warnings
 
 from globus_sdk import exc, config
 from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.authorizers import (
+    AccessTokenAuthorizer, RefreshTokenAuthorizer)
 from globus_sdk.transfer.response import (
     TransferResponse, IterableTransferResponse)
 from globus_sdk.transfer.paging import PaginatedResource
 
 
 class TransferClient(BaseClient):
-    """
+    r"""
     Client for the
     `Globus Transfer API <https://docs.globus.org/api/transfer/>`_.
 
@@ -28,18 +30,39 @@ class TransferClient(BaseClient):
     documentation, which is linked to from the method documentation. Methods
     that allow arbitrary keyword arguments will pass the extra arguments as
     query parameters.
-    """
 
+    ``authorizer``
+      A :class:`GlobusAuthorizer
+      <globus_sdk.authorizers.base.GlobusAuthorizer>` instance used for all
+      calls to Globus Transfer.
+
+    For example, you could instantiate a new ``TransferClient`` using
+
+    >>> from globus_sdk import TransferClient
+    >>> tc = TransferClient()
+
+    and all calls made on ``tc`` will be authenticated using the access token
+    implicitly passed to the :class:`AccessTokenAuthorizer
+    <globus_sdk.authorizers.AccessTokenAuthorizer>`. This is the default
+    behavior -- loading the access token from the config value named
+    ``transfer_token``.
+    """
+    # disallow basic auth
+    allowed_authorizer_types = [AccessTokenAuthorizer,
+                                RefreshTokenAuthorizer]
     error_class = exc.TransferAPIError
     default_response_class = TransferResponse
 
     def __init__(self, environment=config.get_default_environ(),
-                 token=None, app_name=None):
-        BaseClient.__init__(self, "transfer", environment, "/v0.10/",
-                            token=token, app_name=None)
+                 authorizer=None, app_name=None):
 
-    def config_load_token(self):
-        return config.get_transfer_token(self.environment)
+        access_token = config.get_transfer_token(environment)
+
+        if authorizer is None and access_token is not None:
+            authorizer = AccessTokenAuthorizer(access_token)
+
+        BaseClient.__init__(self, "transfer", environment, "/v0.10/",
+                            authorizer=authorizer, app_name=None)
 
     # Convenience methods, providing more pythonic access to common REST
     # resources
@@ -141,7 +164,7 @@ class TransferClient(BaseClient):
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
         """
-        path = self.qjoin_path('endpoint_manager','monitored_endpoints')
+        path = self.qjoin_path('endpoint_manager', 'monitored_endpoints')
         return self.get(path, params=params,
                         response_class=IterableTransferResponse)
 
@@ -832,7 +855,7 @@ class TransferClient(BaseClient):
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
         """
-        path = self.qjoin_path('endpoint_manager','task_list')
+        path = self.qjoin_path('endpoint_manager', 'task_list')
         return PaginatedResource(
             self.get, path, {'params': params},
             num_results=num_results, max_results_per_call=1000,

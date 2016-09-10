@@ -120,8 +120,6 @@ def get_ssl_verify(environment):
                   type_cast=_bool_cast)
     if value is None:
         return True
-    #return "/home/bda/dev/transfer-api-client-python/globusonline/transfer/api_client/ca/globusconnect-ca.pem"
-    #return "/home/bda/dev/ssltest/rest-hostcert.pem"
     return value
 
 
