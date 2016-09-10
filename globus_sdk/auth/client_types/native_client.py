@@ -48,7 +48,7 @@ class NativeAppAuthClient(AuthClient):
             refresh_tokens=refresh_tokens)
         return self.current_oauth2_flow_manager
 
-    def oauth2_refresh_token(self, refresh_token, **additional_params):
+    def oauth2_refresh_token(self, refresh_token):
         """
         ``NativeAppAuthClient`` specializes the refresh token grant to include
         its client ID as a parameter in the POST body.
@@ -58,6 +58,5 @@ class NativeAppAuthClient(AuthClient):
         form_data = {'refresh_token': refresh_token,
                      'grant_type': 'refresh_token',
                      'client_id': self.client_id}
-        form_data.update(additional_params)
 
         return self.oauth2_token(form_data)

@@ -160,7 +160,7 @@ class AuthClient(BaseClient):
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(
             auth_code)
 
-    def oauth2_refresh_token(self, refresh_token, **additional_params):
+    def oauth2_refresh_token(self, refresh_token):
         r"""
         Exchange a refresh token for a :class:`OAuthTokenResponse
         <globus_sdk.auth.token_response.OAuthTokenResponse>`, containing
@@ -174,14 +174,19 @@ class AuthClient(BaseClient):
             grant_type=refresh_token
 
         plus any additional parameters you may specify.
+
+        ``refresh_token``
+          A raw Refresh Token string
+
+        ``additional_params``
+          A dict of extra params to encode in the refresh call.
         """
         form_data = {'refresh_token': refresh_token,
                      'grant_type': 'refresh_token'}
-        form_data.update(additional_params)
 
         return self.oauth2_token(form_data)
 
-    def oauth2_token(self, form_data, no_auth_header=False):
+    def oauth2_token(self, form_data):
         """
         This is the generic form of calling the OAuth2 Token endpoint.
         It takes ``form_data``, a dict which will be encoded in a form POST
@@ -199,5 +204,4 @@ class AuthClient(BaseClient):
         # a form POST
         return self.post(
             '/v2/oauth2/token', response_class=OAuthTokenResponse,
-            text_body=form_data,
-            no_auth_header=no_auth_header)
+            text_body=form_data)

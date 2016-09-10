@@ -147,5 +147,4 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
              'grant_type': 'authorization_code',
              'code': auth_code.encode('utf-8'),
              'code_verifier': self.verifier,
-             'redirect_uri': self.redirect_uri},
-            no_auth_header=True)
+             'redirect_uri': self.redirect_uri})
