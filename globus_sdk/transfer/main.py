@@ -32,9 +32,10 @@ def get_transfer_client_from_args(args=None):
     if args.environment:
         environment = args.environment
 
-    client = globus_sdk.TransferClient(environment)
+    authorizer = None
     if token is not None:
-        client.set_token(token)
+        authorizer = globus_sdk.AccessTokenAuthorizer(token)
+    client = globus_sdk.TransferClient(environment, authorizer=authorizer)
     return client
 
 
