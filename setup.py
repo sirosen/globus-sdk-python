@@ -1,6 +1,6 @@
 import sys
 import os.path
-from setuptools import setup
+from setuptools import setup, find_packages
 
 tests_require = ['nose2']
 # include mock (for python2)
@@ -19,7 +19,8 @@ setup(name="globus-sdk",
       author="Globus Team",
       author_email="support@globus.org",
       url="https://github.com/globus/globus-sdk-python",
-      packages=['globus_sdk', 'globus_sdk.transfer'],
+      packages=find_packages(
+          exclude=('globus_sdk.tests', 'globus_sdk.tests.*')),
       install_requires=[
           'requests>=2.0.0,<3.0.0',
           'six==1.10.0'
