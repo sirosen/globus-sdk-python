@@ -9,7 +9,8 @@ from globus_sdk.authorizers import (
     AccessTokenAuthorizer, RefreshTokenAuthorizer)
 
 from globus_sdk.exc import GlobusError, GlobusAPIError, TransferAPIError
-from globus_sdk.exc import NetworkError, ConnectionError, TimeoutError
+from globus_sdk.exc import (
+    NetworkError, GlobusConnectionError, GlobusTimeoutError)
 
 from globus_sdk.version import __version__
 
@@ -25,6 +26,6 @@ __all__ = ["GlobusResponse", "GlobusHTTPResponse",
            "AccessTokenAuthorizer", "RefreshTokenAuthorizer",
 
            "GlobusError", "GlobusAPIError", "TransferAPIError",
-           "NetworkError", "ConnectionError", "TimeoutError",
+           "NetworkError", "GlobusConnectionError", "GlobusTimeoutError",
 
            "__version__"]

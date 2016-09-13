@@ -76,7 +76,7 @@ class GlobusConfigParser(object):
         # *first* for a value -- env values have higher precedence than config
         # files so that you can locally override the behavior of a command in a
         # given shell or subshell
-        env_option_name = 'GLOBUS_SDK_{0}'.format(option.upper())
+        env_option_name = 'GLOBUS_SDK_{}'.format(option.upper())
         value = None
         if check_env and env_option_name in os.environ:
             value = os.environ[env_option_name]

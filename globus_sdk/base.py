@@ -221,9 +221,9 @@ class BaseClient(object):
                     method=method, url=url, headers=rheaders, params=params,
                     data=text_body, verify=self._verify)
             except requests.Timeout as e:
-                raise exc.TimeoutError(*e.args)
+                raise exc.GlobusTimeoutError(*e.args)
             except requests.ConnectionError as e:
-                raise exc.ConnectionError(*e.args)
+                raise exc.GlobusConnectionError(*e.args)
             except requests.RequestException as e:
                 raise exc.NetworkError(*e.args)
 

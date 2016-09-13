@@ -103,9 +103,9 @@ class NetworkError(GlobusError):
     """
 
 
-class TimeoutError(NetworkError):
+class GlobusTimeoutError(NetworkError):
     """The REST request timed out."""
 
 
-class ConnectionError(NetworkError):
+class GlobusConnectionError(NetworkError):
     """A connection error occured while making a REST request."""
