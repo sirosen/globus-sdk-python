@@ -1,5 +1,4 @@
 from __future__ import print_function
-import warnings
 
 from globus_sdk import exc, config
 from globus_sdk.base import BaseClient, merge_params
@@ -788,61 +787,6 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         return self.post('/delete', data)
-
-    def make_submit_transfer_data(self, source_endpoint, dest_endpoint,
-                                  transfer_items, label=None, sync_level=None,
-                                  **kwargs):
-        """
-        DEPRECATED: Use :class:`TransferData <globus_sdk.TransferData>`
-        instead.
-        """
-        warnings.warn(("make_submit_transfer_data() is deprecated. Use "
-                       "globus_sdk.TransferData instead."), DeprecationWarning)
-        datadoc = {
-            'DATA_TYPE': 'transfer',
-            'submission_id': self.get_submission_id()['value'],
-            'source_endpoint': source_endpoint,
-            'destination_endpoint': dest_endpoint,
-            'DATA': transfer_items
-        }
-
-        # map the sync_level (if it's a nice string) to one of the known int
-        # values
-        # you can get away with specifying an invalid sync level -- the API
-        # will just reject you with an error. This is kind of important: if
-        # more levels are added in the future this method doesn't become
-        # garbage overnight
-        if sync_level is not None:
-            sync_dict = {"exists": 1, "mtime": 2, "checksum": 3}
-            sync_level = sync_dict.get(sync_level, sync_level)
-            datadoc['sync_level'] = sync_level
-
-        if label is not None:
-            datadoc['label'] = label
-
-        # any remaining arguments are global options for the Transfer document
-        # pass them through verbatim
-        for optional_arg in kwargs:
-            datadoc[optional_arg] = kwargs[optional_arg]
-
-        return datadoc
-
-    def make_submit_transfer_item(self, source, dest, recursive=False):
-        """
-        DEPRECATED: Use :class:`TransferData <globus_sdk.TransferData>`
-        instead.
-        """
-        warnings.warn(("make_submit_transfer_item() is deprecated. Use "
-                       "globus_sdk.TransferData instead."), DeprecationWarning)
-        datadoc = {
-            'DATA_TYPE': 'transfer_item',
-            'source_path': source,
-            'destination_path': dest
-        }
-        if recursive:
-            datadoc['recursive'] = True
-
-        return datadoc
 
     #
     # Task inspection and management
