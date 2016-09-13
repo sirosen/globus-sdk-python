@@ -1,3 +1,5 @@
+.. _tutorial:
+
 OAuth2 SDK Tutorial
 -------------------
 
@@ -188,7 +190,8 @@ For now, let's move forward with that transfer token. It's good to go:
 
 .. code-block:: python
 
-    transfer_client = globus_sdk.TransferClient(token=globus_transfer_token)
+    transfer_client = globus_sdk.TransferClient(
+        authorizer=globus_sdk.AccessTokenAuthorizer(globus_transfer_token))
     # do something with the token
     print(transfer_client.task_list())
 
