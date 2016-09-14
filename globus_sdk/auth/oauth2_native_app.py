@@ -4,6 +4,7 @@ import base64
 from six.moves.urllib.parse import urlencode
 
 from globus_sdk.base import slash_join
+from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth_flow_manager import GlobusOAuthFlowManager
 
 
@@ -89,9 +90,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
                 'Invalid value for client_id. Got "{0}"'.format(client_id))
 
         # default to the default requested scopes
-        self.requested_scopes = requested_scopes or (
-                'openid profile email '
-                'urn:globus:auth:scope:transfer.api.globus.org:all')
+        self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
 
         # default to `/v2/web/auth-code` on whatever environment we're looking
         # at -- most typically it will be `https://auth.globus.org/`
