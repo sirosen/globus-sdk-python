@@ -27,5 +27,6 @@ __all__ = ["GlobusResponse", "GlobusHTTPResponse",
 
            "GlobusError", "GlobusAPIError", "TransferAPIError",
            "NetworkError", "GlobusConnectionError", "GlobusTimeoutError",
+           "GlobusOptionalDependencyError",
 
            "__version__"]

@@ -1,3 +1,6 @@
+import textwrap
+
+
 class GlobusError(Exception):
     """
     Root of the Globus Exception hierarchy.
@@ -109,3 +112,32 @@ class GlobusTimeoutError(NetworkError):
 
 class GlobusConnectionError(NetworkError):
     """A connection error occured while making a REST request."""
+
+
+class GlobusOptionalDependencyError(GlobusError, NotImplementedError):
+    """
+    Error class for attempts to use features only enabled via optional
+    dependencies without those dependencies installed.
+
+    **Parameters**
+
+        ``dep_names`` (*string list*)
+          Package names for the required dependencies for this feature,
+          possibly also encoding the version requirements for those packages.
+
+        ``feature_name`` (*string*)
+          Name of the method, property, class, or other construct which
+          requires these dependencies
+
+        ``message`` (*string*)
+          An additional message to include
+    """
+    def __init__(self, dep_names, feature_name):
+        self.message = textwrap.dedent("""\
+        You are missing optional dependencies required in order to use {0}
+        In order to use this feature of the Globus SDK, you must install:
+          {1}
+
+        For more information, visit our optional dependency documentation:
+        http://globus.github.io/globus-sdk-python/optional_dependencies.html
+        """.format(feature_name, "\n  ".join(dep_names)))

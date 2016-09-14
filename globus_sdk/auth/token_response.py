@@ -1,5 +1,8 @@
 import json
+import requests
+
 from globus_sdk.response import GlobusHTTPResponse
+from globus_sdk.exc import GlobusOptionalDependencyError
 
 
 class OAuthTokenResponse(GlobusHTTPResponse):
@@ -82,6 +85,28 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         The array of tokens other than the top-level one.
         """
         return self['other_tokens']
+
+    def decode_id_token(self, auth_client):
+        """
+        A parsed ID Token (OIDC) as a dict.
+        """
+        try:
+            from jose import jwt
+        except ImportError:
+            raise GlobusOptionalDependencyError(
+                ["python-jose"],
+                "JWT Parsing via OAuthTokenResponse.id_token")
+
+        # FIXME: we should be storing the JWK in the repo, not pulling it down
+        # as part of this call
+        oidc_conf = auth_client.get('/.well-known/openid-configuration')
+        jwks_uri = oidc_conf['jwks_uri']
+
+        return jwt.decode(
+            self['id_token'],
+            requests.get(jwks_uri).json(),
+            access_token=self.access_token,
+            audience=auth_client.client_id)
 
     def __str__(self):
         # Make printing responses more convenient by only showing the

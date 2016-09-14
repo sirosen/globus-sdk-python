@@ -30,6 +30,7 @@ Table of Contents
    authorization
    config
    deprecations
+   optional_dependencies
 
 License
 =======
