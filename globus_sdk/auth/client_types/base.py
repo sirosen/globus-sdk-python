@@ -1,9 +1,7 @@
 from __future__ import print_function
 
-from six.moves.urllib.parse import urlencode
-
 from globus_sdk import config
-from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.base import BaseClient
 from globus_sdk.authorizers import AccessTokenAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
 
@@ -99,30 +97,6 @@ class AuthClient(BaseClient):
         """
         return self.get("/v2/api/identities", params=params)
 
-    def token_introspect(self, token, **kw):
-        """
-        POST /v2/oauth2/token/introspect
-
-        Get information about a Globus Auth token.
-
-        Requires that your client is of type
-        ``CLIENT_TYPE_CONFIDENTIAL_APP``.
-
-        >>> # parameters as discussed above
-        >>> ac = globus_sdk.AuthClient(...)
-        >>> ac.token_introspect('<token_string>')
-        ...
-
-        See
-        `Token Introspection \
-        <https://docs.globus.org/api/auth/reference/\
-        #token_introspection_post_v2_oauth2_token_introspect>`_
-        in the API documentation for details.
-        """
-        merge_params(kw, token=token)
-        return self.post("/v2/oauth2/token/introspect",
-                         text_body=urlencode(kw))
-
     def oauth2_get_authorize_url(self, additional_params=None):
         """
         Get the authorization URL to which users should be sent.
@@ -194,22 +168,31 @@ class AuthClient(BaseClient):
 
         return self.oauth2_token(form_data)
 
-    def oauth2_token(self, form_data):
+    def oauth2_token(self, form_data, response_class=OAuthTokenResponse):
         """
         This is the generic form of calling the OAuth2 Token endpoint.
         It takes ``form_data``, a dict which will be encoded in a form POST
-        body on the request, and may suppress the Authorization header to allow
-        flexibility when the governing ``AuthClient`` has credentials that
-        could impede an OAuth2 flow.
+        body on the request.
 
         Generally, users of the SDK should not call this method unless they are
         implementing OAuth2 flows.
 
-        :rtype: :class:`OAuthTokenResponse \
-        <globus_sdk.auth.token_response.OAuthTokenResponse>`
+        **Parameters**
+
+            ``response_type``
+              Defaults to :class:`OAuthTokenResponse \
+              <globus_sdk.auth.token_response.OAuthTokenResponse>`. This is
+              used by calls to the oauth2_token endpoint which need to
+              specialize their responses. For example,
+              :meth:`oauth2_get_dependent_tokens \
+              <globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens>`
+              requires a specialize response class to handle the dramatically
+              different nature of the Dependent Token Grant response
+
+        :rtype: ``response_class``
         """
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
         return self.post(
-            '/v2/oauth2/token', response_class=OAuthTokenResponse,
+            '/v2/oauth2/token', response_class=response_class,
             text_body=form_data)

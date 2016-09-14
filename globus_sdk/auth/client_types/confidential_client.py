@@ -3,6 +3,7 @@ from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.client_types.base import AuthClient
 from globus_sdk.auth.oauth2_authorization_code import (
     GlobusAuthorizationCodeFlowManager)
+from globus_sdk.auth.token_response import OAuthDependentTokenResponse
 
 
 class ConfidentialAppAuthClient(AuthClient):
@@ -83,3 +84,57 @@ class ConfidentialAppAuthClient(AuthClient):
             self, redirect_uri, requested_scopes=requested_scopes,
             state=state, refresh_tokens=refresh_tokens)
         return self.current_oauth2_flow_manager
+
+    def oauth2_get_dependent_tokens(self, token):
+        """
+        Does a `Dependent Token Grant
+        <https://docs.globus.org/api/auth/reference/#dependent_token_grant_post_v2_oauth2_token>`_
+        against Globus Auth.
+        This exchanges a token given to this client for a new set of tokens
+        which give it access to resource servers on which it depends.
+        This grant type is intended for use by Resource Servers playing out the
+        following scenario:
+
+          1. User has tokens for Service A, but Service A requires access to
+             Service B on behalf of the user
+          2. Service B should not see tokens scoped for Service A
+          3. Service A therefore requests tokens scoped only for Service B,
+             based on tokens which were originally scoped for Service A...
+
+        In order to do this exchange, the tokens for Service A must have scopes
+        which depend on scopes for Service B (the services' scopes must encode
+        their relationship). As long as that is the case, Service A can use
+        this Grant to get those "Dependent" or "Downstream" tokens for Service
+        B.
+
+        **Parameters**
+
+            ``token`` (*string*)
+              An Access Token as a raw string, being exchanged.
+
+        :rtype: :class:`OAuthTokenResponse
+                <globus_sdk.auth.token_response.OAuthTokenResponse>`
+        """
+        return self.oauth2_token({
+            'grant_type': 'urn:globus:auth:grant_type:dependent_token',
+            'token': token},
+            response_class=OAuthDependentTokenResponse)
+
+    def oauth2_token_introspect(self, token):
+        """
+        POST /v2/oauth2/token/introspect
+
+        Get information about a Globus Auth token.
+
+        >>> ac = globus_sdk.ConfidentialAppAuthClient(
+        ...     CLIENT_ID, CLIENT_SECRET)
+        >>> ac.oauth2_token_introspect('<token_string>')
+
+        See
+        `Token Introspection \
+        <https://docs.globus.org/api/auth/reference/\
+        #token_introspection_post_v2_oauth2_token_introspect>`_
+        in the API documentation for details.
+        """
+        return self.post("/v2/oauth2/token/introspect",
+                         text_body={'token': token})
