@@ -1,6 +1,8 @@
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.client_types.base import AuthClient
+from globus_sdk.auth.oauth2_authorization_code import (
+    GlobusAuthorizationCodeFlowManager)
 
 
 class ConfidentialAppAuthClient(AuthClient):
@@ -36,7 +38,7 @@ class ConfidentialAppAuthClient(AuthClient):
             **kwargs)
 
     def oauth2_client_credentials_token(self, requested_scopes=None):
-        """
+        r"""
         Perform an OAuth2 Client Credentials Grant to get access tokens which
         directly represent your client and allow it to act on its own
         (independent of any user authorization).
@@ -48,15 +50,16 @@ class ConfidentialAppAuthClient(AuthClient):
           access token(s). Defaults to a set of commonly desired scopes for
           Globus.
 
-        :rtype: :class:`OAuthTokenResponse \
-        <globus_sdk.auth.token_response.OAuthTokenResponse>`
+        :rtype: :class:`OAuthTokenResponse
+                <globus_sdk.auth.token_response.OAuthTokenResponse>`
 
         For example, with a Client ID of "CID1001" and a Client Secret of
         "RAND2002", you could use this grant type like so:
 
         >>> client = ConfidentialAppAuthClient("CID1001", "RAND2002")
         >>> tokens = client.oauth2_client_credentials_token()
-        >>> transfer_token_info = tokens.by_resource_server["transfer.api.globus.org"]
+        >>> transfer_token_info = (
+        ...     tokens.by_resource_server["transfer.api.globus.org"])
         >>> transfer_token = transfer_token_info["access_token"]
         """
         requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
@@ -64,3 +67,19 @@ class ConfidentialAppAuthClient(AuthClient):
         return self.oauth2_token({
             'grant_type': 'client_credentials',
             'scope': requested_scopes})
+
+    def oauth2_start_flow_authorization_code(
+            self, redirect_uri, requested_scopes=None,
+            state='_default', refresh_tokens=False):
+        """
+        Starts an Authorization Code OAuth2 flow by instantiating a
+        :class:`GlobusAuthorizationCodeFlowManager
+        <globus_sdk.auth.GlobusAuthorizationCodeFlowManager>`
+
+        All of the parameters to this method are passed to that class's
+        initializer verbatim.
+        """
+        self.current_oauth2_flow_manager = GlobusAuthorizationCodeFlowManager(
+            self, redirect_uri, requested_scopes=requested_scopes,
+            state=state, refresh_tokens=refresh_tokens)
+        return self.current_oauth2_flow_manager

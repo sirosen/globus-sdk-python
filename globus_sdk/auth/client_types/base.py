@@ -123,11 +123,18 @@ class AuthClient(BaseClient):
         return self.post("/v2/oauth2/token/introspect",
                          text_body=urlencode(kw))
 
-    def oauth2_get_authorize_url(self):
+    def oauth2_get_authorize_url(self, additional_params=None):
         """
         Get the authorization URL to which users should be sent.
         This method may only be called after an ``oauth2_start_flow_*`` method
         has been called on this ``AuthClient``.
+
+        **Parameters**
+
+            ``additional_params`` (*dict*)
+              A ``dict`` or ``None``, which specifies additional query
+              parameters to include in the authorize URL. Primarily for
+              internal use
 
         :rtype: ``string``
         """
@@ -136,7 +143,8 @@ class AuthClient(BaseClient):
                 ('Cannot get authorize URL until starting an OAuth2 flow. '
                  'Call one of the oauth2_start_flow_*() methods on this '
                  'AuthClient to resolve'))
-        return self.current_oauth2_flow_manager.get_authorize_url()
+        return self.current_oauth2_flow_manager.get_authorize_url(
+            additional_params=additional_params)
 
     def oauth2_exchange_code_for_tokens(self, auth_code):
         """

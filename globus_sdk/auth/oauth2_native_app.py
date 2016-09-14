@@ -37,57 +37,52 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
     Instead, a temporary secret is generated solely for this authentication
     attempt.
 
-    :param auth_client: The ``AuthClient`` object on which this flow is
-                        based
-    :param client_id: The Client ID to use for this flow
-    :param requested_scopes: The scopes on the token(s) being requested
-    :param redirect_uri: The page to which Globus Auth will direct users
-    :param state: The state parameter for 3-legged OAuth2 flows
-    :param verifier: A secret used for the Native App flow
-    :param refresh_tokens: When True, request refresh tokens in addition to
-                           access tokens
+    **Parameters**
 
-    ``auth_client`` is used to extract default values for the flow, and
-    also to make POST calls to the Auth service.
+        ``auth_client`` (*AuthClient*)
+          The ``NativeAppAuthClient`` object on which this flow is based. It is
+          used to extract default values for the flow, and also to make calls
+          to the Auth service. This SHOULD be a ``NativeAppAuthClient``
 
-    ``client_id`` defaults to the ``auth_client.client_id``, which can be set
-    by :meth:`~globus_sdk.AuthClient.set_client_id` or by
-    :meth:`~globus_sdk.AuthClient.set_auth_basic`
+        ``requested_scopes`` (*string*)
+          The scopes on the token(s) being requested. Defaults to a set of
+          commonly desired scopes for Globus. Given as a space-separated
+          string
 
-    ``requested_scopes``  defaults to a set of commonly desired scopes for
-    Globus.
+        ``redirect_uri`` (*string*)
+          The page that users should be directed to after authenticating at the
+          authorize URL. Defaults to
+          'https://auth.globus.org/v2/web/auth-code', which displays the
+          resulting ``auth_code`` for users to copy-paste back into your
+          application (and thereby be passed back to the
+          ``GlobusNativeAppFlowManager``)
 
-    ``redirect_uri`` is a page that users should be directed to after
-    authenticating at the authorize URL. Defaults to
-    'https://auth.globus.org/v2/web/auth-code', which displays the resulting
-    ``auth_code`` for users to copy-paste back into your application (and
-    thereby be passed back to the ``GlobusNativeAppFlowManager``)
+        ``state`` (*string*)
+          Typically is not meaningful in the Native App Grant flow, but you may
+          have a specialized use case for it. The ``redirect_uri`` page will
+          have this included in a query parameter, so you can use it to pass
+          information to that page. It defaults to the string '_default'
 
-    ``state`` typically is not meaningful in the Native App Grant flow, but you
-    may have a specialized use case for it. The ``redirect_uri`` page will have
-    this included in a query parameter, so you can use it to pass information
-    to that page. It defaults to the string '_default'
+        ``verifier`` (*string*)
+          A secret used for the Native App flow. It will by default be a
+          freshly generated random string, known only to this
+          ``GlobusNativeAppFlowManager`` instance
 
-    ``verifier`` will by default be a freshly generated random string, known
-    only to this ``GlobusNativeAppFlowManager`` instance
-
-
-    The returned URL string is encoded to be suitable to display to users
-    in a link or to copy into their browser. Users will be redirected
-    either to your provided ``redirect_uri`` or to the default location,
-    with the ``auth_code`` embedded in a query parameter.
+        ``refresh_tokens`` (*bool*)
+          When True, request refresh tokens in addition to access tokens
     """
 
-    def __init__(self, auth_client, client_id=None, requested_scopes=None,
+    def __init__(self, auth_client, requested_scopes=None,
                  redirect_uri=None, state='_default', verifier=None,
                  refresh_tokens=False):
         self.auth_client = auth_client
 
-        # default to auth_client.client_id, then check for validity
-        self.client_id = client_id or auth_client.client_id
+        # set client_id, then check for validity
+        self.client_id = auth_client.client_id
         if not self.client_id:
             raise ValueError(
-                'Invalid value for client_id. Got "{0}"'.format(client_id))
+                'Invalid value for client_id. Got "{0}"'
+                .format(self.client_id))
 
         # default to the default requested scopes
         self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
@@ -106,10 +101,17 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         self.refresh_tokens = refresh_tokens
         self.state = state
 
-    def get_authorize_url(self):
+    def get_authorize_url(self, additional_params=None):
         """
         Start a Native App flow by getting the authorization URL to which users
         should be sent.
+
+        **Parameters**
+
+            ``additional_params`` (*dict*)
+              A ``dict`` or ``None``, which specifies additional query
+              parameters to include in the authorize URL. Primarily for
+              internal use
 
         :rtype: ``string``
 
@@ -121,16 +123,20 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         authorize_base_url = slash_join(self.auth_client.base_url,
                                         '/v2/oauth2/authorize')
 
-        params = urlencode(
-            {'client_id': self.client_id,
-             'redirect_uri': self.redirect_uri,
-             'scope': self.requested_scopes,
-             'state': self.state,
-             'response_type': 'code',
-             'code_challenge': self.challenge,
-             'code_challenge_method': 'S256',
-             'access_type': (self.refresh_tokens and 'offline') or 'online'
-             })
+        params = {
+            'client_id': self.client_id,
+            'redirect_uri': self.redirect_uri,
+            'scope': self.requested_scopes,
+            'state': self.state,
+            'response_type': 'code',
+            'code_challenge': self.challenge,
+            'code_challenge_method': 'S256',
+            'access_type': (self.refresh_tokens and 'offline') or 'online'
+            }
+        if additional_params:
+            params.update(additional_params)
+
+        params = urlencode(params)
         return '{0}?{1}'.format(authorize_base_url, params)
 
     def exchange_code_for_tokens(self, auth_code):

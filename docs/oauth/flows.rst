@@ -26,3 +26,6 @@ authentication method you are using and methods which act upon those parameters.
    :members:
    :show-inheritance:
 
+.. autoclass:: globus_sdk.auth.GlobusAuthorizationCodeFlowManager
+   :members:
+   :show-inheritance:
