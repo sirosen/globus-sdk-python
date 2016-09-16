@@ -1,4 +1,4 @@
-from __future__ import print_function
+import time
 
 from globus_sdk import exc, config
 from globus_sdk.base import BaseClient, merge_params
@@ -945,6 +945,89 @@ class TransferClient(BaseClient):
         """
         resource_path = self.qjoin_path("task", task_id, "cancel")
         return self.post(resource_path)
+
+    def task_wait(self, task_id, timeout=10, polling_interval=10):
+        r"""
+        Wait until a Task is complete or fails, with a time limit. If the task
+        is "ACTIVE" after time runs out, returns ``False``. Otherwise returns
+        ``True``.
+
+        **Parameters**
+
+            ``task_id`` (*string*)
+              ID of the Task to wait on for completion
+
+            ``timeout`` (*int*)
+              Number of seconds to wait in total. Minimum 1
+
+            ``polling_interval`` (*int*)
+              Number of seconds between queries to Globus about the Task
+              status. Minimum 1
+
+        **Examples**
+
+        If you want to wait for a task to terminate, but want to warn every
+        minute that it doesn't terminate, you could:
+
+        >>> tc = TransferClient()
+        >>> while not tc.task_wait(task_id, timeout=60):
+        >>>     print("Another minute went by without {0} terminating"
+        >>>           .format(task_id))
+
+        Or perhaps you want to check on a task every minute for 10 minutes, and
+        give up if it doesn't complete in that time:
+
+        >>> tc = TransferClient()
+        >>> done = tc.task_wait(task_id, timeout=600, polling_interval=60):
+        >>> if not done:
+        >>>     print("{0} didn't successfully terminate!"
+        >>>           .format(task_id))
+        >>> else:
+        >>>     print("{0} completed".format(task_id))
+
+        You could print dots while you wait for a task by only waiting one
+        second at a time:
+
+        >>> tc = TransferClient()
+        >>> while not tc.task_wait(task_id, timeout=1, polling_interval=1):
+        >>>     print(".", end="")
+        >>> print("\n{0} completed!".format(task_id))
+        """
+        # check valid args
+        if timeout < 1:
+            raise ValueError(
+                "TransferClient.task_wait timeout has a minimum of 1")
+        if polling_interval < 1:
+            raise ValueError(
+                "TransferClient.task_wait polling_interval has a minimum of 1")
+
+        # ensure that we always wait at least one interval, even if the timeout
+        # is shorter than the polling interval, by reducing the interval to the
+        # timeout if it is larger
+        polling_interval = min(timeout, polling_interval)
+
+        # helper for readability
+        def timed_out(waited_time):
+            return waited_time > timeout
+
+        waited_time = 0
+        # doing this as a while-True loop actually makes it simpler than doing
+        # while not timed_out(waited_time) because of the end condition
+        while True:
+            # get task, check if status != ACTIVE
+            task = self.get_task(task_id)
+            status = task['status']
+            if status != 'ACTIVE':
+                return True
+
+            # make sure to check if we timed out before sleeping again, so we
+            # don't sleep an extra polling_interval
+            waited_time += polling_interval
+            if timed_out(waited_time):
+                return False
+
+            time.sleep(polling_interval)
+        # unreachable -- end of task_wait
 
     def task_pause_info(self, task_id, **params):
         """
