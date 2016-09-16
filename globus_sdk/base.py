@@ -44,6 +44,7 @@ class BaseClient(object):
         # authorizer types, make sure we are not in violation of those
         # constraints
         if self.allowed_authorizer_types is not None and (
+                authorizer is not None and
                 type(authorizer) not in self.allowed_authorizer_types):
             raise ValueError(
                 ("{0} can only take authorizers from {1}, "
