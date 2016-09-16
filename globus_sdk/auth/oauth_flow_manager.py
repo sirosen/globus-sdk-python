@@ -33,17 +33,21 @@ class GlobusOAuthFlowManager(object):
 
     def exchange_code_for_tokens(self, auth_code):
         """
-        This method takes an auth_code and produces a dict-like
-        object containing one or more tokens.
+        This method takes an auth_code and produces a response object
+        containing one or more tokens.
         Most typically, this is the second step of the flow, and consumes the
         auth_code that was sent to a redirect URI used in the authorize step.
 
         The exchange process may be parameterized over attributes of the
         specific flow manager instance which is generating it.
 
-        :param auth_code: The authorization code which was produced from the
-                          authorization flow. In the default flow, this is
-        :rtype: ``dict`` or ``dict``-like
+        **Parameters**
+
+            ``auth_code`` (*string*)
+              The authorization code which was produced from the authorization
+              flow
+
+        :rtype: :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         """
         raise NotImplementedError(
             '{0} does not implement exchange_code_for_tokens()'

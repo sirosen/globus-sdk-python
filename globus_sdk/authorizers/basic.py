@@ -9,8 +9,13 @@ class BasicAuthorizer(GlobusAuthorizer):
     Given a "username" and "password", they are sent base64 encoded in the
     header.
 
-    :param username: Username component for Basic Auth
-    :param password: Password component for Basic Auth
+    **Parameters**
+
+        ``username`` (*string*)
+          Username component for Basic Auth
+
+        ``password`` (*string*)
+          Password component for Basic Auth
     """
     def __init__(self, username, password):
         self.username = username

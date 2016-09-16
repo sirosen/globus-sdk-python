@@ -7,7 +7,10 @@ class AccessTokenAuthorizer(GlobusAuthorizer):
     Tokens. This is sent as a Bearer token in the header -- basically
     unadorned.
 
-    :param access_token: An access token for Globus Auth
+    **Parameters**
+
+        ``access_token`` (*string*)
+          An access token for Globus Auth
     """
     def __init__(self, access_token):
         self.access_token = access_token
