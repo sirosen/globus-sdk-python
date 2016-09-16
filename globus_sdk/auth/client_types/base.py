@@ -168,6 +168,30 @@ class AuthClient(BaseClient):
 
         return self.oauth2_token(form_data)
 
+    def oauth2_revoke_token(self, token, additional_params=None):
+        """
+        This is the generic form of calling the OAuth2 Token endpoint.
+        It takes ``form_data``, a dict which will be encoded in a form POST
+        body on the request.
+
+        Generally, users of the SDK should not call this method unless they are
+        implementing OAuth2 flows.
+
+        **Parameters**
+
+            ``token`` (*string*)
+              The token which should be revoked
+
+            ``additional_params`` (*dict*)
+              A ``dict`` or ``None``, which specifies additional
+              parameters to include in the revocation body, which can help
+              speed the revocation process. Primarily for internal use
+        """
+        body = {'token': token}
+        if additional_params:
+            body.update(additional_params)
+        return self.post('/v2/oauth2/token/revoke', text_body=body)
+
     def oauth2_token(self, form_data, response_class=OAuthTokenResponse):
         """
         This is the generic form of calling the OAuth2 Token endpoint.
