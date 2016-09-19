@@ -4,7 +4,11 @@ Test Config Loading produces expected results.
 
 import os
 import unittest
-import mock
+
+try:
+    import mock
+except ImportError:
+    from unittest import mock
 
 import globus_sdk.config
 

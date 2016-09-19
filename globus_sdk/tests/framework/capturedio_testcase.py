@@ -1,4 +1,7 @@
-import mock
+try:
+    import mock
+except ImportError:
+    from unittest import mock
 
 # using StringIO to capture IO is easy, but we need to handle Py2 vs. Py3
 # StringIO sources by capturing an ImportError
