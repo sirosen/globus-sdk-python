@@ -1,3 +1,7 @@
+.. image:: https://travis-ci.org/globus/globus-sdk-python.svg?branch=master
+    :alt: build status
+    :target: https://travis-ci.org/globus/globus-sdk-python
+
 Globus SDK for Python
 =====================
 
