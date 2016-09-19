@@ -4,7 +4,7 @@ Load config files once per interpreter invocation.
 
 import os
 from six.moves.configparser import (
-    SafeConfigParser, MissingSectionHeaderError,
+    ConfigParser, MissingSectionHeaderError,
     NoOptionError, NoSectionError)
 
 from globus_sdk.exc import GlobusError
@@ -28,12 +28,12 @@ def _get_lib_config_path():
 
 class GlobusConfigParser(object):
     """
-    Wraps a SafeConfigParser to do modified get()s and config file loading.
+    Wraps a ConfigParser to do modified get()s and config file loading.
     """
     _GENERAL_CONF_SECTION = 'general'
 
     def __init__(self):
-        self._parser = SafeConfigParser()
+        self._parser = ConfigParser()
         self._load_config()
 
     def _load_config(self):

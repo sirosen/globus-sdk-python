@@ -23,18 +23,11 @@ class ConfigLoaderTests(unittest.TestCase):
         globus_sdk.config._parser = None
 
         def loadconf(cfgparser):
-            cfgparser._read([filename])
+            cfgparser._parser.read([filename])
 
         with mock.patch(
                 'globus_sdk.config.GlobusConfigParser._load_config', loadconf):
             globus_sdk.config._get_parser()
-
-    def test_default_auth_tkn(self):
-        self._load_config_file('default_auth_tkn.cfg')
-        assert globus_sdk.config.get_auth_token('default') == 'abc123'
-        assert globus_sdk.config.get_auth_token('general') == 'abc123'
-        assert globus_sdk.config.get_auth_token(
-            'definitelynonexistintsection') == 'abc123'
 
     def test_per_env_auth_tkn(self):
         self._load_config_file('per_env_auth_tkn.cfg')
