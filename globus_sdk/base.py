@@ -19,8 +19,9 @@ class BaseClient(object):
 
     **Parameters**
 
-        ``authorizer`` (:class:`GlobusAuthorizer \
-                       <globus_sdk.authorizers.base.GlobusAuthorizer>`)
+        ``authorizer`` (:class:`GlobusAuthorizer\
+        <globus_sdk.authorizers.base.GlobusAuthorizer>`)
+
           A ``GlobusAuthorizer`` which will generate Authorization headers
 
         ``app_name`` (*string*)
