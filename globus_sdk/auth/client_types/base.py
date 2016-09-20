@@ -170,12 +170,16 @@ class AuthClient(BaseClient):
 
     def oauth2_revoke_token(self, token, additional_params=None):
         """
-        This is the generic form of calling the OAuth2 Token endpoint.
-        It takes ``form_data``, a dict which will be encoded in a form POST
-        body on the request.
+        Revoke a token. It can be an Access Token or a Refresh token.
 
-        Generally, users of the SDK should not call this method unless they are
-        implementing OAuth2 flows.
+        Regardless of whether or not your client was issued the token, or of
+        any other unusual conditions, this call should always succeed and
+        revoke the token so long as the server can understand the request.
+        That is, it is best to try to make well-formed calls to this method,
+        but it is possible for malformed calls to still result in revocation.
+
+        You can check the "active" status of the token after revocation if you
+        want to confirm that it was revoked.
 
         **Parameters**
 
@@ -186,6 +190,21 @@ class AuthClient(BaseClient):
               A ``dict`` or ``None``, which specifies additional
               parameters to include in the revocation body, which can help
               speed the revocation process. Primarily for internal use
+
+        **Examples**
+
+        Because this call can work even when you have the wrong credentials, it
+        can even be called with no credentials at all:
+
+        >>> from globus_sdk import AuthClient
+        >>> ac = AuthClient()
+        >>> ac.oauth2_revoke_token('<token_string>')
+
+        Or you could do it with a credentialed client type as well:
+
+        >>> from globus_sdk import ConfidentialAppAuthClient
+        >>> ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
+        >>> ac.oauth2_revoke_token('<token_string>')
         """
         body = {'token': token}
         if additional_params:

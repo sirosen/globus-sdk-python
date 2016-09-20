@@ -11,8 +11,9 @@ dependency, you will get a ``GlobusOptionalDependencyError``.
 OIDC ID Tokens
 --------------
 
-The :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>` may include an
-ID token conforming to the Open ID Connect specification.
+The :class:`OAuthTokenResponse
+<globus_sdk.auth.token_response.OAuthTokenResponse>` may include an ID token
+conforming to the Open ID Connect specification.
 If you wish to decode this token via :meth:`decode_id_token
-<globus_sdk.OAuthTokenResponse.decode_id_token>`, you must install
-``python-jose``, which we use to implement ID Token verification.
+<globus_sdk.auth.token_response.OAuthTokenResponse.decode_id_token>`, you must
+install ``python-jose``, which we use to implement ID Token verification.

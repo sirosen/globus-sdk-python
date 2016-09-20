@@ -25,11 +25,15 @@ with the Globus Team. This document assumes that you already have one)
 Native App Grant Explained
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Right now, the only flow that the SDK supports is the "Native App Grant", which
-is designed to handle the case of an application which cannot protect a client
-secret.
+There are several OAuth2 flows, but the only one covered in this tutorial is
+the "Native App Grant", which is designed to handle the case of an application
+which cannot protect a client secret.
+Typically, these are applications like command-lines which do not have a web
+component.
+
 These applications need to engage in an exchange of temporary credentials that
-is based on the 3-legged OAuth flow.
+is based on the 3-legged OAuth flow, more formally known as the "Authorization
+Code Grant".
 
 The basic flow can be described as the following procedure:
 
@@ -38,17 +42,17 @@ The basic flow can be described as the following procedure:
    ``authorize URL``, with a hash of the secret. Usually the user is given a
    link to the ``authorize URL``
 3. The user follows the link and logs in to any Globus Auth supported
-   system[#f1]_
+   system [*]_
 4. Globus Auth, after a successful login, sends an ``auth_code`` back to the
    user or directly to the application (the user may copy-paste the code back
    to the application)
 5. The application sends the ``auth_code`` and the unhashed secret from (1) to
    the server in exchange for a set of tokens
 
-.. [#f1] Globus Auth allows users to login with a variety of institutional accounts,
-         Google accounts, and with free "Globus ID" accounts. By default, any of these
-         are allowed, but an application can also specify that a certain type of
-         account be used by the user. Full details exceed the scope of this document.
+.. [*] Globus Auth allows users to login with a variety of institutional accounts,
+       Google accounts, and with free "Globus ID" accounts. By default, any of these
+       are allowed, but an application can also specify that a certain type of
+       account be used by the user. Full details exceed the scope of this document.
 
 
 The key goal of this flow is to have the user perform authentication via a web
