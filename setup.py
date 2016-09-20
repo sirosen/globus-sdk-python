@@ -1,11 +1,6 @@
-import sys
 import os.path
 from setuptools import setup, find_packages
 
-tests_require = ['nose2']
-# include mock (for python2)
-if sys.version_info < (3, 3):
-    tests_require.append('mock')
 
 # single source of truth for package version
 version_ns = {}
@@ -27,10 +22,6 @@ setup(name="globus-sdk",
       ],
       include_package_data=True,
 
-      # run tests with nose2
-      tests_require=tests_require,
-      test_suite='nose2.collector.collector',
-
       keywords=["globus", "file transfer"],
       classifiers=[
           "Development Status :: 4 - Beta",
@@ -40,9 +31,7 @@ setup(name="globus-sdk",
           "Operating System :: Microsoft :: Windows",
           "Operating System :: POSIX",
           "Programming Language :: Python",
-          "Programming Language :: Python :: 2.6",
           "Programming Language :: Python :: 2.7",
-          "Programming Language :: Python :: 3.2",
           "Programming Language :: Python :: 3.3",
           "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",

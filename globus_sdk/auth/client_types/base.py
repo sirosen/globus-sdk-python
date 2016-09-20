@@ -1,9 +1,7 @@
 from __future__ import print_function
 
-from six.moves.urllib.parse import urlencode
-
 from globus_sdk import config
-from globus_sdk.base import BaseClient, merge_params
+from globus_sdk.base import BaseClient
 from globus_sdk.authorizers import AccessTokenAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
 
@@ -99,35 +97,18 @@ class AuthClient(BaseClient):
         """
         return self.get("/v2/api/identities", params=params)
 
-    def token_introspect(self, token, **kw):
-        """
-        POST /v2/oauth2/token/introspect
-
-        Get information about a Globus Auth token.
-
-        Requires that your client is of type
-        ``CLIENT_TYPE_CONFIDENTIAL_APP``.
-
-        >>> # parameters as discussed above
-        >>> ac = globus_sdk.AuthClient(...)
-        >>> ac.token_introspect('<token_string>')
-        ...
-
-        See
-        `Token Introspection \
-        <https://docs.globus.org/api/auth/reference/\
-        #token_introspection_post_v2_oauth2_token_introspect>`_
-        in the API documentation for details.
-        """
-        merge_params(kw, token=token)
-        return self.post("/v2/oauth2/token/introspect",
-                         text_body=urlencode(kw))
-
-    def oauth2_get_authorize_url(self):
+    def oauth2_get_authorize_url(self, additional_params=None):
         """
         Get the authorization URL to which users should be sent.
         This method may only be called after an ``oauth2_start_flow_*`` method
         has been called on this ``AuthClient``.
+
+        **Parameters**
+
+            ``additional_params`` (*dict*)
+              A ``dict`` or ``None``, which specifies additional query
+              parameters to include in the authorize URL. Primarily for
+              internal use
 
         :rtype: ``string``
         """
@@ -136,7 +117,8 @@ class AuthClient(BaseClient):
                 ('Cannot get authorize URL until starting an OAuth2 flow. '
                  'Call one of the oauth2_start_flow_*() methods on this '
                  'AuthClient to resolve'))
-        return self.current_oauth2_flow_manager.get_authorize_url()
+        return self.current_oauth2_flow_manager.get_authorize_url(
+            additional_params=additional_params)
 
     def oauth2_exchange_code_for_tokens(self, auth_code):
         """
@@ -186,22 +168,55 @@ class AuthClient(BaseClient):
 
         return self.oauth2_token(form_data)
 
-    def oauth2_token(self, form_data):
+    def oauth2_revoke_token(self, token, additional_params=None):
         """
         This is the generic form of calling the OAuth2 Token endpoint.
         It takes ``form_data``, a dict which will be encoded in a form POST
-        body on the request, and may suppress the Authorization header to allow
-        flexibility when the governing ``AuthClient`` has credentials that
-        could impede an OAuth2 flow.
+        body on the request.
 
         Generally, users of the SDK should not call this method unless they are
         implementing OAuth2 flows.
 
-        :rtype: :class:`OAuthTokenResponse \
-        <globus_sdk.auth.token_response.OAuthTokenResponse>`
+        **Parameters**
+
+            ``token`` (*string*)
+              The token which should be revoked
+
+            ``additional_params`` (*dict*)
+              A ``dict`` or ``None``, which specifies additional
+              parameters to include in the revocation body, which can help
+              speed the revocation process. Primarily for internal use
+        """
+        body = {'token': token}
+        if additional_params:
+            body.update(additional_params)
+        return self.post('/v2/oauth2/token/revoke', text_body=body)
+
+    def oauth2_token(self, form_data, response_class=OAuthTokenResponse):
+        """
+        This is the generic form of calling the OAuth2 Token endpoint.
+        It takes ``form_data``, a dict which will be encoded in a form POST
+        body on the request.
+
+        Generally, users of the SDK should not call this method unless they are
+        implementing OAuth2 flows.
+
+        **Parameters**
+
+            ``response_type``
+              Defaults to :class:`OAuthTokenResponse \
+              <globus_sdk.auth.token_response.OAuthTokenResponse>`. This is
+              used by calls to the oauth2_token endpoint which need to
+              specialize their responses. For example,
+              :meth:`oauth2_get_dependent_tokens \
+              <globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens>`
+              requires a specialize response class to handle the dramatically
+              different nature of the Dependent Token Grant response
+
+        :rtype: ``response_class``
         """
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
         return self.post(
-            '/v2/oauth2/token', response_class=OAuthTokenResponse,
+            '/v2/oauth2/token', response_class=response_class,
             text_body=form_data)

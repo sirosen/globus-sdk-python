@@ -1,0 +1,16 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.5-dev"
+matrix:
+  allow_failures:
+    - python: "3.5-dev"
+install:
+  - pip install .
+  - pip install -r test-requirements.txt
+cache: pip
+script:
+  - flake8
+  - nose2

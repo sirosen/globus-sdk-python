@@ -23,14 +23,6 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
     will fetch one the first time that ``set_authorization_header()`` is
     called.
 
-    :param refresh_token: Refresh Token for Globus Auth
-    :param auth_client: An ``AuthClient`` capable of using the
-                        ``refresh_token``
-    :param access_token: Initial Access Token, only used if expires_in is
-                         also set
-    :param expires_in: Expiration time for the starting access_token
-                       expressed as seconds in the future (int)
-
     This Authorizer is by far the most sophisticated ``GlobusAuthorizer``.
     Example usage looks something like this:
 
@@ -45,6 +37,21 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
     anything that inherits from :class:`BaseClient <globus_sdk.BaseClient>`, so
     at least ``TransferClient`` and ``AuthClient`` will automatically handle
     usage of the ``RefreshTokenAuthorizer``.
+
+    **Parameters**
+
+        ``refresh_token`` (*string*)
+          Refresh Token for Globus Auth
+
+        ``auth_client`` (:class:`AuthClient <globus_sdk.AuthClient>`)
+          ``AuthClient`` capable of using the ``refresh_token``
+
+        ``access_token`` (*string*)
+          Initial Access Token to use, only used if ``expires_in`` is also set
+
+        ``expires_in`` (*int*)
+          Expiration time for the starting ``access_token`` expressed as
+          seconds in the future
     """
     def __init__(self, refresh_token, auth_client,
                  access_token=None, expires_in=None):

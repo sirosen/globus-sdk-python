@@ -43,7 +43,7 @@ class NativeAppAuthClient(AuthClient):
         #notthreadsafe
         """
         self.current_oauth2_flow_manager = GlobusNativeAppFlowManager(
-            self, client_id=client_id, requested_scopes=requested_scopes,
+            self, requested_scopes=requested_scopes,
             redirect_uri=redirect_uri, state=state, verifier=verifier,
             refresh_tokens=refresh_tokens)
         return self.current_oauth2_flow_manager

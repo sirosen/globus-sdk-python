@@ -1,5 +1,4 @@
-from __future__ import print_function
-import warnings
+import time
 
 from globus_sdk import exc, config
 from globus_sdk.base import BaseClient, merge_params
@@ -31,10 +30,14 @@ class TransferClient(BaseClient):
     that allow arbitrary keyword arguments will pass the extra arguments as
     query parameters.
 
-    ``authorizer``
-      A :class:`GlobusAuthorizer
-      <globus_sdk.authorizers.base.GlobusAuthorizer>` instance used for all
-      calls to Globus Transfer.
+    **Parameters**
+
+        ``authorizer`` (:class:`GlobusAuthorizer\
+        <globus_sdk.authorizers.base.GlobusAuthorizer>`)
+
+          An authorizer instance used for all calls to Globus Transfer
+
+    **Examples**
 
     For example, you could instantiate a new ``TransferClient`` using
 
@@ -78,10 +81,14 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **Examples**
+
         >>> tc = globus_sdk.TransferClient()
         >>> endpoint = tc.get_endpoint(endpoint_id)
         >>> print("Endpoint name:",
         >>>       endpoint["display_name"] or endpoint["canonical_name"])
+
+        **External Documentation**
 
         See
         `Get Endpoint by ID \
@@ -98,10 +105,14 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **Examples**
+
         >>> tc = globus_sdk.TransferClient()
         >>> epup = dict(display_name="My New Endpoint Name",
         >>>             description="Better Description")
         >>> update_result = tc.update_endpoint(endpoint_id, epup)
+
+        **External Documentation**
 
         See
         `Update Endpoint by ID \
@@ -118,6 +129,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **Examples**
+
         >>> tc = globus_sdk.TransferClient()
         >>> ep_data = {
         >>>   "DATA_TYPE": "endpoint",
@@ -131,6 +144,8 @@ class TransferClient(BaseClient):
         >>> }
         >>> create_result = tc.create_endpoint(ep_data)
         >>> endpoint_id = create_result["id"]
+
+        **External Documentation**
 
         See
         `Create endpoint \
@@ -146,8 +161,12 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **Examples**
+
         >>> tc = globus_sdk.TransferClient()
         >>> delete_result = tc.delete_endpoint(endpoint_id)
+
+        **External Documentation**
 
         See
         `Delete endpoint by id \
@@ -179,6 +198,8 @@ class TransferClient(BaseClient):
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
+        **Examples**
+
         Search for a given string as a fulltext search:
 
         >>> tc = globus_sdk.TransferClient()
@@ -209,6 +230,8 @@ class TransferClient(BaseClient):
 
         will trigger this error.
 
+        **External Documentation**
+
         For additional information, see `Endpoint Search
         <https://docs.globus.org/api/transfer/endpoint_search>`_.
         in the REST documentation for details.
@@ -234,6 +257,8 @@ class TransferClient(BaseClient):
         hour (3600 seconds). If that fails, direct the user to the
         globus website to perform activation:
 
+        **Examples**
+
         >>> tc = globus_sdk.TransferClient()
         >>> r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
         >>> while (r["code"] == "AutoActivateFailed"):
@@ -251,6 +276,8 @@ class TransferClient(BaseClient):
         which must be done in a browser anyway. Web based clients can
         link directly to the URL.
 
+        **External Documentation**
+
         See
         `Autoactivate endpoint \
         <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
@@ -265,6 +292,8 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
 
         See
         `Deactive endpoint \
@@ -285,6 +314,8 @@ class TransferClient(BaseClient):
         in the example for
         :meth:`~globus_sdk.TransferClient.endpoint_autoactivate`.
 
+        **External Documentation**
+
         See
         `Activate endpoint \
         <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
@@ -300,6 +331,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **External Documentation**
+
         See
         `Get activation requirements \
         <https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements>`_
@@ -314,6 +347,8 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
+
+        **External Documentation**
 
         See
         `Get my effective endpoint pause rules \
@@ -334,6 +369,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
 
+        **External Documentation**
+
         See
         `Get shared endpoint list \
         <https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list>`_
@@ -348,11 +385,15 @@ class TransferClient(BaseClient):
         """
         ``POST /shared_endpoint``
 
+        **Parameters**
+
+            ``data`` (*dict*)
+              A python dict representation of a ``shared_endpoint`` document
+
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
-        :param data: A python dict representation of a ``shared_endpoint``
-                     document
+        **Examples**
 
         >>> tc = globus_sdk.TransferClient()
         >>> shared_ep_data = {
@@ -365,6 +406,8 @@ class TransferClient(BaseClient):
         >>> }
         >>> create_result = tc.create_shared_endpoint(shared_ep_data)
         >>> endpoint_id = create_result["id"]
+
+        **External Documentation**
 
         See
         `Create shared endpoint \
@@ -382,6 +425,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
 
+        **External Documentation**
+
         See
         `Get endpoint server list \
         <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
@@ -397,6 +442,8 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
 
         See
         `Get endpoint server list \
@@ -414,6 +461,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **External Documentation**
+
         See
         `Add endpoint server \
         <https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server>`_
@@ -428,6 +477,8 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
 
         See
         `Update endpoint server by id \
@@ -444,6 +495,8 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
 
         See
         `Delete endpoint server by id \
@@ -465,6 +518,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
 
+        **External Documentation**
+
         See
         `Get list of endpoint roles \
         <https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles>`_
@@ -481,6 +536,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **External Documentation**
+
         See
         `Create endpoint role \
         <https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role>`_
@@ -496,6 +553,8 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **External Documentation**
+
         See
         `Get endpoint role by id \
         <https://docs.globus.org/api/transfer/endpoint_roles/#get_endpoint_role_by_id>`_
@@ -510,6 +569,8 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
 
         See
         `Delete endpoint role by id \
@@ -548,12 +609,18 @@ class TransferClient(BaseClient):
         """
         ``POST /endpoint/<endpoint_id>/access``
 
-        :param endpoint_id: id of endpoint to add the acl to
-        :param rule_data: A python dict representation of an ``access``
-                          document
+        **Parameters**
+
+            ``endpoint_id`` (*string*)
+              ID of endpoint to which to add the acl
+
+            ``rule_data`` (*dict*)
+              A python dict representation of an ``access`` document
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **Examples**
 
         >>> tc = globus_sdk.TransferClient()
         >>> rule_data = {
@@ -565,6 +632,8 @@ class TransferClient(BaseClient):
         >>> }
         >>> result = tc.add_endpoint_acl_rule(endpoint_id, rule_data)
         >>> rule_id = result["id"]
+
+        **External Documentation**
 
         See
         `Create access rule \
@@ -658,9 +727,13 @@ class TransferClient(BaseClient):
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
 
+        **Examples**
+
         >>> tc = globus_sdk.TransferClient()
         >>> for entry in tc.operation_ls(ep_id, path="/~/project1/"):
         >>>     print(entry["name"], entry["type"])
+
+        **External Documentation**
 
         See
         `List Directory Contents \
@@ -678,8 +751,12 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **Examples**
+
         >>> tc = globus_sdk.TransferClient()
         >>> tc.operation_mkdir(ep_id, path="/~/newdir/")
+
+        **External Documentation**
 
         See
         `Make Directory \
@@ -701,9 +778,13 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        **Examples**
+
         >>> tc = globus_sdk.TransferClient()
         >>> tc.operation_rename(ep_id, oldpath="/~/file1.txt",
         >>>                     newpath="/~/project1data.txt")
+
+        **External Documentation**
 
         See
         `Rename \
@@ -739,7 +820,7 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
-        Example usage:
+        **Examples**
 
         >>> tc = globus_sdk.TransferClient()
         >>> tdata = globus_sdk.TransferData(tc, source_endpoint_id,
@@ -756,6 +837,8 @@ class TransferClient(BaseClient):
         The `data` parameter can be a normal Python dictionary, or
         a :class:`TransferData <globus_sdk.TransferData>` object.
 
+        **External Documentation**
+
         See
         `Submit a transfer task \
         <https://docs.globus.org/api/transfer/task_submit/#submit_a_transfer_task>`_
@@ -770,7 +853,7 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
-        Example usage:
+        **Examples**
 
         >>> tc = globus_sdk.TransferClient()
         >>> ddata = globus_sdk.DeleteData(tc, endpoint_id, recursive=True)
@@ -782,67 +865,14 @@ class TransferClient(BaseClient):
         The `data` parameter can be a normal Python dictionary, or
         a :class:`DeleteData <globus_sdk.DeleteData>` object.
 
+        **External Documentation**
+
         See
         `Submit a delete task \
         <https://docs.globus.org/api/transfer/task_submit/#submit_a_delete_task>`_
         in the REST documentation for details.
         """
         return self.post('/delete', data)
-
-    def make_submit_transfer_data(self, source_endpoint, dest_endpoint,
-                                  transfer_items, label=None, sync_level=None,
-                                  **kwargs):
-        """
-        DEPRECATED: Use :class:`TransferData <globus_sdk.TransferData>`
-        instead.
-        """
-        warnings.warn(("make_submit_transfer_data() is deprecated. Use "
-                       "globus_sdk.TransferData instead."), DeprecationWarning)
-        datadoc = {
-            'DATA_TYPE': 'transfer',
-            'submission_id': self.get_submission_id()['value'],
-            'source_endpoint': source_endpoint,
-            'destination_endpoint': dest_endpoint,
-            'DATA': transfer_items
-        }
-
-        # map the sync_level (if it's a nice string) to one of the known int
-        # values
-        # you can get away with specifying an invalid sync level -- the API
-        # will just reject you with an error. This is kind of important: if
-        # more levels are added in the future this method doesn't become
-        # garbage overnight
-        if sync_level is not None:
-            sync_dict = {"exists": 1, "mtime": 2, "checksum": 3}
-            sync_level = sync_dict.get(sync_level, sync_level)
-            datadoc['sync_level'] = sync_level
-
-        if label is not None:
-            datadoc['label'] = label
-
-        # any remaining arguments are global options for the Transfer document
-        # pass them through verbatim
-        for optional_arg in kwargs:
-            datadoc[optional_arg] = kwargs[optional_arg]
-
-        return datadoc
-
-    def make_submit_transfer_item(self, source, dest, recursive=False):
-        """
-        DEPRECATED: Use :class:`TransferData <globus_sdk.TransferData>`
-        instead.
-        """
-        warnings.warn(("make_submit_transfer_item() is deprecated. Use "
-                       "globus_sdk.TransferData instead."), DeprecationWarning)
-        datadoc = {
-            'DATA_TYPE': 'transfer_item',
-            'source_path': source,
-            'destination_path': dest
-        }
-        if recursive:
-            datadoc['recursive'] = True
-
-        return datadoc
 
     #
     # Task inspection and management
@@ -915,6 +945,89 @@ class TransferClient(BaseClient):
         """
         resource_path = self.qjoin_path("task", task_id, "cancel")
         return self.post(resource_path)
+
+    def task_wait(self, task_id, timeout=10, polling_interval=10):
+        r"""
+        Wait until a Task is complete or fails, with a time limit. If the task
+        is "ACTIVE" after time runs out, returns ``False``. Otherwise returns
+        ``True``.
+
+        **Parameters**
+
+            ``task_id`` (*string*)
+              ID of the Task to wait on for completion
+
+            ``timeout`` (*int*)
+              Number of seconds to wait in total. Minimum 1
+
+            ``polling_interval`` (*int*)
+              Number of seconds between queries to Globus about the Task
+              status. Minimum 1
+
+        **Examples**
+
+        If you want to wait for a task to terminate, but want to warn every
+        minute that it doesn't terminate, you could:
+
+        >>> tc = TransferClient()
+        >>> while not tc.task_wait(task_id, timeout=60):
+        >>>     print("Another minute went by without {0} terminating"
+        >>>           .format(task_id))
+
+        Or perhaps you want to check on a task every minute for 10 minutes, and
+        give up if it doesn't complete in that time:
+
+        >>> tc = TransferClient()
+        >>> done = tc.task_wait(task_id, timeout=600, polling_interval=60):
+        >>> if not done:
+        >>>     print("{0} didn't successfully terminate!"
+        >>>           .format(task_id))
+        >>> else:
+        >>>     print("{0} completed".format(task_id))
+
+        You could print dots while you wait for a task by only waiting one
+        second at a time:
+
+        >>> tc = TransferClient()
+        >>> while not tc.task_wait(task_id, timeout=1, polling_interval=1):
+        >>>     print(".", end="")
+        >>> print("\n{0} completed!".format(task_id))
+        """
+        # check valid args
+        if timeout < 1:
+            raise ValueError(
+                "TransferClient.task_wait timeout has a minimum of 1")
+        if polling_interval < 1:
+            raise ValueError(
+                "TransferClient.task_wait polling_interval has a minimum of 1")
+
+        # ensure that we always wait at least one interval, even if the timeout
+        # is shorter than the polling interval, by reducing the interval to the
+        # timeout if it is larger
+        polling_interval = min(timeout, polling_interval)
+
+        # helper for readability
+        def timed_out(waited_time):
+            return waited_time > timeout
+
+        waited_time = 0
+        # doing this as a while-True loop actually makes it simpler than doing
+        # while not timed_out(waited_time) because of the end condition
+        while True:
+            # get task, check if status != ACTIVE
+            task = self.get_task(task_id)
+            status = task['status']
+            if status != 'ACTIVE':
+                return True
+
+            # make sure to check if we timed out before sleeping again, so we
+            # don't sleep an extra polling_interval
+            waited_time += polling_interval
+            if timed_out(waited_time):
+                return False
+
+            time.sleep(polling_interval)
+        # unreachable -- end of task_wait
 
     def task_pause_info(self, task_id, **params):
         """

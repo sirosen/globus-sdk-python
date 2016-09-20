@@ -75,11 +75,11 @@ Error Classes
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.exc.ConnectionError
+.. autoclass:: globus_sdk.exc.GlobusConnectionError
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.exc.TimeoutError
+.. autoclass:: globus_sdk.exc.GlobusTimeoutError
    :members:
    :show-inheritance:
 

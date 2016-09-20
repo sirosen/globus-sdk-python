@@ -4,7 +4,7 @@ Load config files once per interpreter invocation.
 
 import os
 from six.moves.configparser import (
-    SafeConfigParser, MissingSectionHeaderError,
+    ConfigParser, MissingSectionHeaderError,
     NoOptionError, NoSectionError)
 
 from globus_sdk.exc import GlobusError
@@ -28,12 +28,12 @@ def _get_lib_config_path():
 
 class GlobusConfigParser(object):
     """
-    Wraps a SafeConfigParser to do modified get()s and config file loading.
+    Wraps a ConfigParser to do modified get()s and config file loading.
     """
     _GENERAL_CONF_SECTION = 'general'
 
     def __init__(self):
-        self._parser = SafeConfigParser()
+        self._parser = ConfigParser()
         self._load_config()
 
     def _load_config(self):
@@ -76,7 +76,7 @@ class GlobusConfigParser(object):
         # *first* for a value -- env values have higher precedence than config
         # files so that you can locally override the behavior of a command in a
         # given shell or subshell
-        env_option_name = 'GLOBUS_SDK_{0}'.format(option.upper())
+        env_option_name = 'GLOBUS_SDK_{}'.format(option.upper())
         value = None
         if check_env and env_option_name in os.environ:
             value = os.environ[env_option_name]

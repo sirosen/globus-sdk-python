@@ -2,7 +2,7 @@ OAuth Flows
 -----------
 
 If you want to get started doing OAuth2 flows, you should read the
-`tutorial <oauth/tutorial.html>`_.
+:ref:`tutorial <tutorial>`.
 
 Flow Managers
 ~~~~~~~~~~~~~
@@ -26,3 +26,6 @@ authentication method you are using and methods which act upon those parameters.
    :members:
    :show-inheritance:
 
+.. autoclass:: globus_sdk.auth.GlobusAuthorizationCodeFlowManager
+   :members:
+   :show-inheritance:
