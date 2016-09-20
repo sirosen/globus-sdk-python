@@ -38,7 +38,7 @@ class ConfidentialAppAuthClient(AuthClient):
             authorizer=BasicAuthorizer(client_id, client_secret),
             **kwargs)
 
-    def oauth2_client_credentials_token(self, requested_scopes=None):
+    def oauth2_client_credentials_tokens(self, requested_scopes=None):
         r"""
         Perform an OAuth2 Client Credentials Grant to get access tokens which
         directly represent your client and allow it to act on its own
@@ -58,7 +58,7 @@ class ConfidentialAppAuthClient(AuthClient):
         "RAND2002", you could use this grant type like so:
 
         >>> client = ConfidentialAppAuthClient("CID1001", "RAND2002")
-        >>> tokens = client.oauth2_client_credentials_token()
+        >>> tokens = client.oauth2_client_credentials_tokens()
         >>> transfer_token_info = (
         ...     tokens.by_resource_server["transfer.api.globus.org"])
         >>> transfer_token = transfer_token_info["access_token"]
