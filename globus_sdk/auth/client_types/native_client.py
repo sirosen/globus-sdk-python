@@ -30,7 +30,7 @@ class NativeAppAuthClient(AuthClient):
             self, client_id=client_id, authorizer=NullAuthorizer(), **kwargs)
 
     def oauth2_start_flow_native_app(
-            self, client_id=None, requested_scopes=None, redirect_uri=None,
+            self, requested_scopes=None, redirect_uri=None,
             state='_default', verifier=None, refresh_tokens=False):
         """
         Starts a Native App OAuth2 flow by instantiating a
