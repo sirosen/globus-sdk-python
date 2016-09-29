@@ -303,7 +303,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id, "deactivate")
         return self.post(path, params=params)
 
-    def endpoint_activate(self, endpoint_id, data, **params):
+    def endpoint_activate(self, endpoint_id, requirements_data, **params):
         """
         ``POST /endpoint/<endpoint_id>/activate``
 
@@ -318,11 +318,11 @@ class TransferClient(BaseClient):
 
         See
         `Activate endpoint \
-        <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
+        <https://docs.globus.org/api/transfer/endpoint_activation/#activate_endpoint>`_
         in the REST documentation for details.
         """
-        path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
-        return self.post(path, params=params)
+        path = self.qjoin_path("endpoint", endpoint_id, "activate")
+        return self.post(path, json_body=requirements_data, params=params)
 
     def endpoint_get_activation_requirements(self, endpoint_id, **params):
         """
