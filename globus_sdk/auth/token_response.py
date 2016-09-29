@@ -1,5 +1,6 @@
 import json
 import requests
+import time
 
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.exc import GlobusOptionalDependencyError
@@ -12,12 +13,14 @@ def _convert_token_info_dict(source_dict):
         - "refresh_token"
         - "token_type"
     """
+    expires_in = source_dict.get('expires_in', 0)
+
     return {
         'scope': source_dict['scope'],
         'access_token': source_dict['access_token'],
         'refresh_token': source_dict.get('refresh_token'),
         'token_type': source_dict.get('token_type'),
-        'expires_in': source_dict['expires_in']
+        'expires_at_seconds': int(time.time() + expires_in)
     }
 
 
@@ -28,8 +31,15 @@ class OAuthTokenResponse(GlobusHTTPResponse):
     """
     def __init__(self, *args, **kwargs):
         GlobusHTTPResponse.__init__(self, *args, **kwargs)
-        # dict used to avoid re-computing self.by_resource_server
-        self._by_resource_server = None
+
+        # call the helper at the top level
+        self._by_resource_server = {
+            self.resource_server: _convert_token_info_dict(self)}
+        # call the helper on everything in 'other_tokens'
+        self._by_resource_server.update(dict(
+            (unprocessed_item['resource_server'],
+             _convert_token_info_dict(unprocessed_item))
+            for unprocessed_item in self.other_tokens))
 
     @property
     def by_resource_server(self):
@@ -41,26 +51,23 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         valid, this representation is typically more desirable for applications
         doing inspection of access tokens and refresh tokens.
         """
-        # memoize the results of this property computation in
-        # '_by_resource_server'
-        if self._by_resource_server is None:
-            # call the helper at the top level
-            self._by_resource_server = {
-                self.resource_server: _convert_token_info_dict(self)}
-            # call the helper on everything in 'other_tokens'
-            self._by_resource_server.update(dict(
-                (unprocessed_item['resource_server'],
-                 _convert_token_info_dict(unprocessed_item))
-                for unprocessed_item in self.other_tokens))
-
         return self._by_resource_server
+
+    @property
+    def expires_at_seconds(self):
+        """
+        A POSIX timestamp representation of the expiration
+        time for the top-level token in the response.
+        """
+        top_level_token = self._by_resource_server[self.resource_server]
+        return top_level_token['expires_at_seconds']
 
     @property
     def expires_in(self):
         """
         The ``expires_in`` value for the top-level token in the response.
         """
-        return self['expires_in']
+        return int(self.expires_at_seconds - time.time())
 
     @property
     def access_token(self):
@@ -101,8 +108,6 @@ class OAuthTokenResponse(GlobusHTTPResponse):
                 ["python-jose"],
                 "JWT Parsing via OAuthTokenResponse.id_token")
 
-        # FIXME: we should be storing the JWK in the repo, not pulling it down
-        # as part of this call
         oidc_conf = auth_client.get('/.well-known/openid-configuration')
         jwks_uri = oidc_conf['jwks_uri']
 
@@ -127,8 +132,12 @@ class OAuthDependentTokenResponse(GlobusHTTPResponse):
     """
     def __init__(self, *args, **kwargs):
         GlobusHTTPResponse.__init__(self, *args, **kwargs)
-        # dict used to avoid re-computing self.by_resource_server
-        self._by_resource_server = None
+
+        # call the helper on everything in the response array
+        self._by_resource_server = dict(
+            (unprocessed_item['resource_server'],
+             _convert_token_info_dict(unprocessed_item))
+            for unprocessed_item in self.data)
 
     @property
     def by_resource_server(self):
@@ -140,13 +149,4 @@ class OAuthDependentTokenResponse(GlobusHTTPResponse):
         valid, this representation is typically more desirable for applications
         trying to use the resulting tokens.
         """
-        # memoize the results of this property computation in
-        # '_by_resource_server'
-        if self._by_resource_server is None:
-            # call the helper on everything in the response array
-            self._by_resource_server = dict(
-                (unprocessed_item['resource_server'],
-                 _convert_token_info_dict(unprocessed_item))
-                for unprocessed_item in self.data)
-
         return self._by_resource_server
