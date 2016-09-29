@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>globus_sdk.auth.client_types.base &mdash; globus-sdk-python 0.4.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="globus-sdk-python 0.4.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">globus-sdk-python 0.4.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for globus_sdk.auth.client_types.base</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">globus_sdk.base</span> <span class="kn">import</span> <span class="n">BaseClient</span>
+<span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="n">AccessTokenAuthorizer</span>
+<span class="kn">from</span> <span class="nn">globus_sdk.auth.token_response</span> <span class="kn">import</span> <span class="n">OAuthTokenResponse</span>
+
+
+<div class="viewcode-block" id="AuthClient"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient">[docs]</a><span class="k">class</span> <span class="nc">AuthClient</span><span class="p">(</span><span class="n">BaseClient</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Client for the</span>
+<span class="sd">    `Globus Auth API &lt;https://docs.globus.org/api/auth/&gt;`_</span>
+
+<span class="sd">    This class provides helper methods for most common resources in the</span>
+<span class="sd">    Auth API, and the common low-level interface from</span>
+<span class="sd">    :class:`BaseClient &lt;globus_sdk.base.BaseClient&gt;` of ``get``, ``put``,</span>
+<span class="sd">    ``post``, and ``delete`` methods, which can be used to access any API</span>
+<span class="sd">    resource.</span>
+
+<span class="sd">    There are generally two types of resources, distinguished by the type</span>
+<span class="sd">    of authentication which they use. Resources available to end users of</span>
+<span class="sd">    Globus are authenticated with a Globus Auth Token</span>
+<span class="sd">    (&quot;Authentication: Bearer ...&quot;), while resources available to OAuth</span>
+<span class="sd">    Clients are authenticated using Basic Auth with the Client&#39;s ID and</span>
+<span class="sd">    Secret.</span>
+<span class="sd">    Some resources may be available with either authentication type.</span>
+
+<span class="sd">    Initializing an ``AuthClient`` to authenticate a user making calls to the</span>
+<span class="sd">    Globus Auth service with an access token takes the form</span>
+
+<span class="sd">    &gt;&gt;&gt; from globus_sdk import AuthClient</span>
+<span class="sd">    &gt;&gt;&gt; # AccessTokenAuthorizer is used, loading from the auth_token value in</span>
+<span class="sd">    &gt;&gt;&gt; # your configuration</span>
+<span class="sd">    &gt;&gt;&gt; ac = AuthClient()</span>
+
+<span class="sd">    or explicitly as</span>
+
+<span class="sd">    &gt;&gt;&gt; from globus_sdk import AuthClient, AccessTokenAuthorizer</span>
+<span class="sd">    &gt;&gt;&gt; ac = AuthClient(authorizer=AccessTokenAuthorizer(&#39;&lt;token_string&gt;&#39;))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get_default_environ</span><span class="p">(),</span>
+                 <span class="n">client_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">app_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="n">client_id</span>
+
+        <span class="c1"># an AuthClient may contain a GlobusOAuth2FlowManager in order to</span>
+        <span class="c1"># encapsulate the functionality of various different types of flow</span>
+        <span class="c1"># managers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_oauth2_flow_manager</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">access_token</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_auth_token</span><span class="p">(</span><span class="n">environment</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">authorizer</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">authorizer</span> <span class="o">=</span> <span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+
+        <span class="n">BaseClient</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="n">environment</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="n">authorizer</span><span class="p">,</span>
+                            <span class="n">app_name</span><span class="o">=</span><span class="n">app_name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AuthClient.get_identities"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.get_identities">[docs]</a>    <span class="k">def</span> <span class="nf">get_identities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        GET /v2/api/identities</span>
+
+<span class="sd">        Given ``usernames=&lt;U&gt;`` or (exclusive) ``ids=&lt;I&gt;`` as keyword</span>
+<span class="sd">        arguments, looks up identity information for the set of identities</span>
+<span class="sd">        provided.</span>
+<span class="sd">        ``&lt;U&gt;`` and ``&lt;I&gt;`` in this case are comma-delimited strings listing</span>
+<span class="sd">        multiple Identity Usernames or Identity IDs.</span>
+
+<span class="sd">        Available with any authentication/client type.</span>
+
+<span class="sd">        &gt;&gt;&gt; ac = globus_sdk.AuthClient()</span>
+<span class="sd">        &gt;&gt;&gt; # by IDs</span>
+<span class="sd">        &gt;&gt;&gt; r = ac.get_identities(ids=&quot;46bd0f56-e24f-11e5-a510-131bef46955c&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; r.data</span>
+<span class="sd">        {u&#39;identities&#39;: [{u&#39;email&#39;: None,</span>
+<span class="sd">           u&#39;id&#39;: u&#39;46bd0f56-e24f-11e5-a510-131bef46955c&#39;,</span>
+<span class="sd">           u&#39;identity_provider&#39;: u&#39;7daddf46-70c5-45ee-9f0f-7244fe7c8707&#39;,</span>
+<span class="sd">           u&#39;name&#39;: None,</span>
+<span class="sd">           u&#39;organization&#39;: None,</span>
+<span class="sd">           u&#39;status&#39;: u&#39;unused&#39;,</span>
+<span class="sd">           u&#39;username&#39;: u&#39;globus@globus.org&#39;}]}</span>
+<span class="sd">        &gt;&gt;&gt; ac.get_identities(</span>
+<span class="sd">        &gt;&gt;&gt;     identities=&quot;,&quot;.join(</span>
+<span class="sd">        &gt;&gt;&gt;         (&quot;46bd0f56-e24f-11e5-a510-131bef46955c&quot;,</span>
+<span class="sd">        &gt;&gt;&gt;          &quot;168edc3d-c6ba-478c-9cf8-541ff5ebdc1c&quot;))</span>
+<span class="sd">        ...</span>
+<span class="sd">        &gt;&gt;&gt; # or by usernames</span>
+<span class="sd">        &gt;&gt;&gt; ac.get_identities(usernames=&#39;globus@globus.org&#39;)</span>
+<span class="sd">        ...</span>
+<span class="sd">        &gt;&gt;&gt; ac.get_identities(</span>
+<span class="sd">        &gt;&gt;&gt;     usernames=&#39;globus@globus.org,auth@globus.org&#39;)</span>
+<span class="sd">        ...</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Identities Resources \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/auth/reference/</span>
+<span class="sd">        #v2_api_identities_resources&gt;`_</span>
+<span class="sd">        in the API documentation for details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/v2/api/identities&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthClient.oauth2_get_authorize_url"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.oauth2_get_authorize_url">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_get_authorize_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">additional_params</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the authorization URL to which users should be sent.</span>
+<span class="sd">        This method may only be called after an ``oauth2_start_flow_*`` method</span>
+<span class="sd">        has been called on this ``AuthClient``.</span>
+
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">            ``additional_params`` (*dict*)</span>
+<span class="sd">              A ``dict`` or ``None``, which specifies additional query</span>
+<span class="sd">              parameters to include in the authorize URL. Primarily for</span>
+<span class="sd">              internal use</span>
+
+<span class="sd">        :rtype: ``string``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_oauth2_flow_manager</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="p">(</span><span class="s1">&#39;Cannot get authorize URL until starting an OAuth2 flow. &#39;</span>
+                 <span class="s1">&#39;Call one of the oauth2_start_flow_*() methods on this &#39;</span>
+                 <span class="s1">&#39;AuthClient to resolve&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_oauth2_flow_manager</span><span class="o">.</span><span class="n">get_authorize_url</span><span class="p">(</span>
+            <span class="n">additional_params</span><span class="o">=</span><span class="n">additional_params</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthClient.oauth2_exchange_code_for_tokens"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.oauth2_exchange_code_for_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_exchange_code_for_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auth_code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Exchange an authorization code for a token or tokens.</span>
+
+<span class="sd">        :rtype: :class:`OAuthTokenResponse \</span>
+<span class="sd">        &lt;globus_sdk.auth.token_response.OAuthTokenResponse&gt;`</span>
+
+<span class="sd">        ``auth_code``</span>
+<span class="sd">          An auth code typically obtained by sending the user to the authorize</span>
+<span class="sd">          URL. The code is a very short-lived credential which this method is</span>
+<span class="sd">          exchanging for tokens. Tokens are the credentials used to</span>
+<span class="sd">          authenticate against Globus APIs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_oauth2_flow_manager</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="p">(</span><span class="s1">&#39;Cannot exchange auth code until starting an OAuth2 flow. &#39;</span>
+                 <span class="s1">&#39;Call one of the oauth2_start_flow_*() methods on this &#39;</span>
+                 <span class="s1">&#39;AuthClient to resolve&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_oauth2_flow_manager</span><span class="o">.</span><span class="n">exchange_code_for_tokens</span><span class="p">(</span>
+            <span class="n">auth_code</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthClient.oauth2_refresh_token"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.oauth2_refresh_token">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_refresh_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refresh_token</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Exchange a refresh token for a :class:`OAuthTokenResponse</span>
+<span class="sd">        &lt;globus_sdk.auth.token_response.OAuthTokenResponse&gt;`, containing</span>
+<span class="sd">        an access token.</span>
+
+<span class="sd">        Does a token call of the form</span>
+
+<span class="sd">        .. code-block:: none</span>
+
+<span class="sd">            refresh_token=&lt;refresh_token&gt;</span>
+<span class="sd">            grant_type=refresh_token</span>
+
+<span class="sd">        plus any additional parameters you may specify.</span>
+
+<span class="sd">        ``refresh_token``</span>
+<span class="sd">          A raw Refresh Token string</span>
+
+<span class="sd">        ``additional_params``</span>
+<span class="sd">          A dict of extra params to encode in the refresh call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">form_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;refresh_token&#39;</span><span class="p">:</span> <span class="n">refresh_token</span><span class="p">,</span>
+                     <span class="s1">&#39;grant_type&#39;</span><span class="p">:</span> <span class="s1">&#39;refresh_token&#39;</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">oauth2_token</span><span class="p">(</span><span class="n">form_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthClient.oauth2_revoke_token"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.oauth2_revoke_token">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_revoke_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">additional_params</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Revoke a token. It can be an Access Token or a Refresh token.</span>
+
+<span class="sd">        Regardless of whether or not your client was issued the token, or of</span>
+<span class="sd">        any other unusual conditions, this call should always succeed and</span>
+<span class="sd">        revoke the token so long as the server can understand the request.</span>
+<span class="sd">        That is, it is best to try to make well-formed calls to this method,</span>
+<span class="sd">        but it is possible for malformed calls to still result in revocation.</span>
+
+<span class="sd">        You can check the &quot;active&quot; status of the token after revocation if you</span>
+<span class="sd">        want to confirm that it was revoked.</span>
+
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">            ``token`` (*string*)</span>
+<span class="sd">              The token which should be revoked</span>
+
+<span class="sd">            ``additional_params`` (*dict*)</span>
+<span class="sd">              A ``dict`` or ``None``, which specifies additional</span>
+<span class="sd">              parameters to include in the revocation body, which can help</span>
+<span class="sd">              speed the revocation process. Primarily for internal use</span>
+
+<span class="sd">        **Examples**</span>
+
+<span class="sd">        Because this call can work even when you have the wrong credentials, it</span>
+<span class="sd">        can even be called with no credentials at all:</span>
+
+<span class="sd">        &gt;&gt;&gt; from globus_sdk import AuthClient</span>
+<span class="sd">        &gt;&gt;&gt; ac = AuthClient()</span>
+<span class="sd">        &gt;&gt;&gt; ac.oauth2_revoke_token(&#39;&lt;token_string&gt;&#39;)</span>
+
+<span class="sd">        Or you could do it with a credentialed client type as well:</span>
+
+<span class="sd">        &gt;&gt;&gt; from globus_sdk import ConfidentialAppAuthClient</span>
+<span class="sd">        &gt;&gt;&gt; ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)</span>
+<span class="sd">        &gt;&gt;&gt; ac.oauth2_revoke_token(&#39;&lt;token_string&gt;&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="n">token</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">additional_params</span><span class="p">:</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">additional_params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/v2/oauth2/token/revoke&#39;</span><span class="p">,</span> <span class="n">text_body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthClient.oauth2_token"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.oauth2_token">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form_data</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">OAuthTokenResponse</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the generic form of calling the OAuth2 Token endpoint.</span>
+<span class="sd">        It takes ``form_data``, a dict which will be encoded in a form POST</span>
+<span class="sd">        body on the request.</span>
+
+<span class="sd">        Generally, users of the SDK should not call this method unless they are</span>
+<span class="sd">        implementing OAuth2 flows.</span>
+
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">            ``response_type``</span>
+<span class="sd">              Defaults to :class:`OAuthTokenResponse \</span>
+<span class="sd">              &lt;globus_sdk.auth.token_response.OAuthTokenResponse&gt;`. This is</span>
+<span class="sd">              used by calls to the oauth2_token endpoint which need to</span>
+<span class="sd">              specialize their responses. For example,</span>
+<span class="sd">              :meth:`oauth2_get_dependent_tokens \</span>
+<span class="sd">              &lt;globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens&gt;`</span>
+<span class="sd">              requires a specialize response class to handle the dramatically</span>
+<span class="sd">              different nature of the Dependent Token Grant response</span>
+
+<span class="sd">        :rtype: ``response_class``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># use the fact that requests implicitly encodes the `data` parameter as</span>
+        <span class="c1"># a form POST</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s1">&#39;/v2/oauth2/token&#39;</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">response_class</span><span class="p">,</span>
+            <span class="n">text_body</span><span class="o">=</span><span class="n">form_data</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">globus-sdk-python 0.4.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Globus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

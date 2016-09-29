@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Globus SDK Configuration &mdash; globus-sdk-python 0.4.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="globus-sdk-python 0.4.1 documentation" href="index.html" />
+    <link rel="next" title="Deprecations" href="deprecations.html" />
+    <link rel="prev" title="API Authorization" href="authorization.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="deprecations.html" title="Deprecations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="authorization.html" title="API Authorization"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">globus-sdk-python 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="globus-sdk-configuration">
+<h1>Globus SDK Configuration<a class="headerlink" href="#globus-sdk-configuration" title="Permalink to this headline">¶</a></h1>
+<p>There are three standard, canonical locations from which the Globus SDK will
+attempt to load configuration.</p>
+<p>There are two config file locations:</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>/etc/globus.cfg <span class="c1"># system config, shared by all users</span>
+~/.globus.cfg <span class="c1"># personal config, specific to your user</span>
+</pre></div>
+</div>
+<p>additionally, the shell environment variables loaded into Python&#8217;s <cite>os.environ</cite>
+will be searched for configuration.</p>
+<div class="section" id="precedence">
+<h2>Precedence<a class="headerlink" href="#precedence" title="Permalink to this headline">¶</a></h2>
+<p>The precedence rules for config are very simple.
+Configuration is loaded with this precendence order</p>
+<ol class="arabic simple">
+<li>Environment</li>
+<li><code class="docutils literal"><span class="pre">~/.globus.cfg</span></code></li>
+<li><code class="docutils literal"><span class="pre">/etc/globus.cfg</span></code></li>
+</ol>
+<p>If a value is defined in <code class="docutils literal"><span class="pre">~/.globus.cfg</span></code> or the environment, it doesn&#8217;t
+matter what it&#8217;s set to in <code class="docutils literal"><span class="pre">/etc/globus.cfg</span></code>.
+If a value is defined in the environment, it doesn&#8217;t matter if it&#8217;s set in
+<code class="docutils literal"><span class="pre">~/.globus.cfg</span></code> or <code class="docutils literal"><span class="pre">/etc/globus.cfg</span></code></p>
+</div>
+<div class="section" id="config-format">
+<h2>Config Format<a class="headerlink" href="#config-format" title="Permalink to this headline">¶</a></h2>
+<p>The format for the configuration files is the same, but of course it will
+differ from the way that environment variables are inspected.
+Config files are INI formatted, so they take the general form</p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[SectionName1]</span>
+<span class="na">key1</span> <span class="o">=</span> <span class="s">value1</span>
+<span class="na">key2</span> <span class="o">=</span> <span class="s">value2</span>
+</pre></div>
+</div>
+<p>If you don&#8217;t specify a section name, parsing is permissive and will assume
+that you intended your values to be part of the <code class="docutils literal"><span class="pre">general</span></code> section.</p>
+<p>So, the following two config files are 100% equivalent:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="c1"># with a section header!</span>
+<span class="k">[general]</span>
+<span class="na">auth_token</span> <span class="o">=</span> <span class="s">abc123</span>
+<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">def456</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="c1"># no section header!</span>
+<span class="na">auth_token</span> <span class="o">=</span> <span class="s">abc123</span>
+<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">def456</span>
+</pre></div>
+</div>
+<p>However, the following config file would be invalid because it creates an
+ambiguity:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="c1"># no section header!</span>
+<span class="na">auth_token</span> <span class="o">=</span> <span class="s">abc123</span>
+<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">def456</span>
+
+<span class="c1"># but also a section header!</span>
+<span class="k">[general]</span>
+<span class="na">auth_token</span> <span class="o">=</span> <span class="s">xyz987</span>
+
+<span class="c1"># what value should general:auth_token have?</span>
+</pre></div>
+</div>
+<p>Environment variables can only modify a value in the <code class="docutils literal"><span class="pre">general</span></code> configuration
+section.
+They take the form <code class="docutils literal"><span class="pre">GLOBUS_SDK_&lt;uppercase_keyname&gt;</span></code>.
+For example, <code class="docutils literal"><span class="pre">GLOBUS_SDK_AUTH_TOKEN=abc123</span></code> sets the <code class="docutils literal"><span class="pre">general:auth_token</span></code>
+value to <code class="docutils literal"><span class="pre">abc123</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">GLOBUS_SDK_...</span></code> environment variables are very rarely the best way to set a
+value, but they let you override values defined in your configuration when
+necessary.</p>
+<p>There is one very important exception to these rules:
+<code class="docutils literal"><span class="pre">GLOBUS_SDK_ENVIRONMENT</span></code> is a shell variable that can be used to point the
+SDK to an alternate set of Globus Servers.
+We currently have plans to create a beta environment that you can use with
+<code class="docutils literal"><span class="pre">GLOBUS_SDK_ENVIRONMENT=beta</span></code> to get a developer preview of upcoming
+features, but this is not available yet. For now, this variable should be left
+unset.</p>
+</div>
+<div class="section" id="configuration-parameters">
+<h2>Configuration Parameters<a class="headerlink" href="#configuration-parameters" title="Permalink to this headline">¶</a></h2>
+<p>The following are the configuration parameters you can provide in the config
+files, documented in a sample INI file:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[general]</span>
+<span class="c1"># a token scoped for the Globus Auth service, used by default whenever you</span>
+<span class="c1"># instantiate an AuthClient() object</span>
+<span class="na">auth_token</span> <span class="o">=</span> <span class="s">...</span>
+<span class="c1"># a token scoped for the Transfer service, used by default whenever you</span>
+<span class="c1"># instantiate an TransferClient() object</span>
+<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Globus SDK Configuration</a><ul>
+<li><a class="reference internal" href="#precedence">Precedence</a></li>
+<li><a class="reference internal" href="#config-format">Config Format</a></li>
+<li><a class="reference internal" href="#configuration-parameters">Configuration Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="authorization.html"
+                        title="previous chapter">API Authorization</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="deprecations.html"
+                        title="next chapter">Deprecations</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/config.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="deprecations.html" title="Deprecations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="authorization.html" title="API Authorization"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">globus-sdk-python 0.4.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Globus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>
