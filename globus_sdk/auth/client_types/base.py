@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from globus_sdk import config
 from globus_sdk.base import BaseClient
-from globus_sdk.authorizers import AccessTokenAuthorizer
+from globus_sdk.authorizers import AccessTokenAuthorizer, NullAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
 
 
@@ -207,6 +207,14 @@ class AuthClient(BaseClient):
         >>> ac.oauth2_revoke_token('<token_string>')
         """
         body = {'token': token}
+
+        # if this client has no way of authenticating itself but
+        # it does have a client_id, we'll send that in the request
+        no_authentication = (self.authorizer is None or
+                             isinstance(self.authorizer, NullAuthorizer))
+        if no_authentication and self.client_id:
+            body.update({'client_id': self.client_id})
+
         if additional_params:
             body.update(additional_params)
         return self.post('/v2/oauth2/token/revoke', text_body=body)
