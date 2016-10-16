@@ -1,4 +1,5 @@
 import json
+import logging
 
 import requests
 
@@ -7,6 +8,14 @@ from six.moves.urllib.parse import quote
 from globus_sdk import config, exc
 from globus_sdk.version import __version__
 from globus_sdk.response import GlobusHTTPResponse
+
+
+class ClientLogAdapter(logging.LoggerAdapter):
+    """
+    Stuff in the memory location of the client to make log records unambiguous.
+    """
+    def process(self, msg, kwargs):
+        return '[client:{}] {}'.format(id(self.extra['client']), msg), kwargs
 
 
 class BaseClient(object):
@@ -43,6 +52,13 @@ class BaseClient(object):
 
     def __init__(self, service, environment=config.get_default_environ(),
                  base_path=None, authorizer=None, app_name=None):
+        # get the fully qualified name of the client class, so that it's a
+        # child of globus_sdk
+        self.logger = ClientLogAdapter(
+            logging.getLogger(self.__module__ + '.' + self.__class__.__name__),
+            {'client': self})
+        self.logger.info('Creating client of type {} for service "{}"'
+                         .format(type(self), service))
         # if restrictions have been placed by a child class on the allowed
         # authorizer types, make sure we are not in violation of those
         # constraints
@@ -121,6 +137,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
+        self.logger.debug('GET to {} with params {}'.format(path, params))
         return self._request("GET", path, params=params, headers=headers,
                              response_class=response_class,
                              retry_401=retry_401)
@@ -159,6 +176,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
+        self.logger.debug('POST to {} with params {}'.format(path, params))
         return self._request("POST", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body,
                              response_class=response_class,
@@ -191,6 +209,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
+        self.logger.debug('DELETE to {} with params {}'.format(path, params))
         return self._request("DELETE", path, params=params,
                              headers=headers,
                              response_class=response_class,
@@ -230,6 +249,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
+        self.logger.debug('PUT to {} with params {}'.format(path, params))
         return self._request("PUT", path, json_body=json_body, params=params,
                              headers=headers, text_body=text_body,
                              response_class=response_class,
@@ -285,9 +305,12 @@ class BaseClient(object):
         # add Authorization header, or (if it's a NullAuthorizer) possibly
         # explicitly remove the Authorization header
         if self.authorizer is not None:
+            self.logger.debug('request will have authorization of type {}'
+                              .format(type(self.authorizer)))
             self.authorizer.set_authorization_header(rheaders)
 
         url = slash_join(self.base_url, path)
+        self.logger.debug('request will hit URL:{}'.format(url))
 
         # because a 401 can trigger retry, we need to wrap the retry-able thing
         # in a method
@@ -308,20 +331,26 @@ class BaseClient(object):
 
         # potential 401 retry handling
         if r.status_code == 401 and retry_401 and self.authorizer is not None:
+            self.logger.debug('request got 401, checking retry-capability')
             # note that although handle_missing_authorization returns a T/F
             # value, it may actually mutate the state of the authorizer and
             # therefore change the value set by the `set_authorization_header`
             # method
             if self.authorizer.handle_missing_authorization():
+                self.logger.debug('request can be retried')
                 self.authorizer.set_authorization_header(rheaders)
                 r = send_request()
 
         if 200 <= r.status_code < 400:
+            self.logger.debug('request completed with response code: {}'
+                              .format(r.status_code))
             if response_class is None:
                 return self.default_response_class(r)
             else:
                 return response_class(r)
 
+        self.logger.debug('request completed with (error) response code: {}'
+                          .format(r.status_code))
         raise self.error_class(r)
 
 
