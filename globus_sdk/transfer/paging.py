@@ -1,8 +1,11 @@
+import logging
 import six
 
 from globus_sdk import exc
 from globus_sdk.response import GlobusResponse
 from globus_sdk.transfer.response import IterableTransferResponse
+
+logger = logging.getLogger(__name__)
 
 
 class PaginatedResource(GlobusResponse, six.Iterator):
@@ -69,6 +72,11 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         Offset is an offset into the result set, and is only applicable if
         paging style is HAS_KEY or TOTAL.
         """
+        logger.info("Creating PaginatedResource({}) on {}(instance:{}):{}:{}"
+                    .format(paging_style,
+                            client_method.__self__.__class__.__name__,
+                            id(client_method.__self__),
+                            client_method.__name__, path))
         self.num_results = num_results
         self.max_results_per_call = max_results_per_call
         self.max_total_results = max_total_results
@@ -80,6 +88,8 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         # only check if there is a max_total_results though
         if (self.max_total_results is not None and
                 num_results > self.max_total_results):
+            logger.error(("PaginatedResource would overrun limits set by API. "
+                          "Please request a lower num_results"))
             raise exc.PaginationOverrunError((
                 'Paginated call would exceed API limit. Pass a smaller '
                 'num_results parameter -- the maximum for this call is {0}')
@@ -131,6 +141,8 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         # if the generator was empty from the start, just raise a StopIteration
         # here and now
         if self.generator is None:
+            logger.debug(("PaginatedResource never got results, "
+                          "iteration empty (not an error!)"))
             raise StopIteration()
 
         if self.first_elem != self._magic:
@@ -156,6 +168,8 @@ class PaginatedResource(GlobusResponse, six.Iterator):
 
         has_next_page = True
         while has_next_page:
+            logger.debug(("PaginatedResource should have more results, "
+                          "requesting them now"))
             # if we're about to request more results than the user asked
             # for, limit ourselves on the last paginated call to the API
             if self.offset + limit > self.num_results:
@@ -183,6 +197,8 @@ class PaginatedResource(GlobusResponse, six.Iterator):
             elif self.paging_style == self.PAGING_STYLE_TOTAL:
                 has_next_page = self.offset < res['total']
             else:
+                logger.error("PaginatedResource.paging_style={} is invalid"
+                             .format(self.paging_style))
                 raise ValueError(
                     'Invalid Paging Style Given to PaginatedResource')
 
