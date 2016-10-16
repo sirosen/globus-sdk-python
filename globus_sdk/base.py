@@ -15,7 +15,7 @@ class ClientLogAdapter(logging.LoggerAdapter):
     Stuff in the memory location of the client to make log records unambiguous.
     """
     def process(self, msg, kwargs):
-        return '[client:{}] {}'.format(id(self.extra['client']), msg), kwargs
+        return '[instance:{}] {}'.format(id(self.extra['client']), msg), kwargs
 
 
 class BaseClient(object):
@@ -50,7 +50,7 @@ class BaseClient(object):
 
     BASE_USER_AGENT = 'globus-sdk-py-{0}'.format(__version__)
 
-    def __init__(self, service, environment=config.get_default_environ(),
+    def __init__(self, service, environment=None,
                  base_path=None, authorizer=None, app_name=None):
         # get the fully qualified name of the client class, so that it's a
         # child of globus_sdk
@@ -72,6 +72,11 @@ class BaseClient(object):
                  "but you have provided {2}").format(
                     type(self), self.allowed_authorizer_types,
                     type(authorizer)))
+
+        # defer this default until instantiation time so that logging can
+        # capture the execution of the config load
+        if environment is None:
+            environment = config.get_default_environ()
 
         self.environment = environment
         self.authorizer = authorizer

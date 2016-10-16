@@ -1,3 +1,4 @@
+import logging
 import time
 
 from globus_sdk import exc, config
@@ -7,6 +8,8 @@ from globus_sdk.authorizers import (
 from globus_sdk.transfer.response import (
     TransferResponse, IterableTransferResponse)
 from globus_sdk.transfer.paging import PaginatedResource
+
+logger = logging.getLogger(__name__)
 
 
 class TransferClient(BaseClient):
@@ -56,16 +59,17 @@ class TransferClient(BaseClient):
     error_class = exc.TransferAPIError
     default_response_class = TransferResponse
 
-    def __init__(self, environment=config.get_default_environ(),
-                 authorizer=None, app_name=None):
-
-        access_token = config.get_transfer_token(environment)
-
+    def __init__(self, authorizer=None, **kwargs):
+        # deprecated behavior; this is a temporary backwards compatibility hack
+        access_token = config.get_transfer_token(
+            kwargs.get('environment', config.get_default_environ()))
         if authorizer is None and access_token is not None:
+            logger.warn(('Using deprecated config token. '
+                         'Switch to explicit use of AccessTokenAuthorizer'))
             authorizer = AccessTokenAuthorizer(access_token)
 
-        BaseClient.__init__(self, "transfer", environment, "/v0.10/",
-                            authorizer=authorizer, app_name=None)
+        BaseClient.__init__(self, "transfer", base_path="/v0.10/",
+                            authorizer=authorizer, **kwargs)
 
     # Convenience methods, providing more pythonic access to common REST
     # resources

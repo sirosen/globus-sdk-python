@@ -168,6 +168,6 @@ def get_default_environ():
     """
     env = os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
     if env != 'default':
-        logger.info(('On lookup, non-default Environment: '
+        logger.info(('On lookup, non-default environment: '
                      'GLOBUS_SDK_ENVIRONMENT={}'.format(env)))
     return env

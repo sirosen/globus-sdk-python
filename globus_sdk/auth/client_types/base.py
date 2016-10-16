@@ -42,8 +42,7 @@ class AuthClient(BaseClient):
     >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
     >>> ac = AuthClient(authorizer=AccessTokenAuthorizer('<token_string>'))
     """
-    def __init__(self, environment=config.get_default_environ(),
-                 client_id=None, authorizer=None, app_name=None):
+    def __init__(self, client_id=None, authorizer=None, **kwargs):
         self.client_id = client_id
 
         # an AuthClient may contain a GlobusOAuth2FlowManager in order to
@@ -51,14 +50,15 @@ class AuthClient(BaseClient):
         # managers
         self.current_oauth2_flow_manager = None
 
-        access_token = config.get_auth_token(environment)
+        # deprecated behavior; this is a temporary backwards compatibility hack
+        access_token = config.get_auth_token(
+            kwargs.get('environment', config.get_default_environ()))
         if authorizer is None and access_token is not None:
             logger.warn(('Using deprecated config token. '
                          'Switch to explicit use of AccessTokenAuthorizer'))
             authorizer = AccessTokenAuthorizer(access_token)
 
-        BaseClient.__init__(self, "auth", environment, authorizer=authorizer,
-                            app_name=app_name)
+        BaseClient.__init__(self, "auth", authorizer=authorizer, **kwargs)
 
     def get_identities(self, **params):
         r"""
