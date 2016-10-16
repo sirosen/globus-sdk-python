@@ -1,13 +1,15 @@
 """
 Load config files once per interpreter invocation.
 """
-
+import logging
 import os
 from six.moves.configparser import (
     ConfigParser, MissingSectionHeaderError,
     NoOptionError, NoSectionError)
 
 from globus_sdk.exc import GlobusError
+
+logger = logging.getLogger(__name__)
 
 
 def _get_lib_config_path():
@@ -120,6 +122,7 @@ def get_ssl_verify(environment):
                   type_cast=_bool_cast)
     if value is None:
         return True
+    logger.debug('ssl_verify set to {}'.format(value))
     return value
 
 
@@ -129,6 +132,7 @@ def _bool_cast(value):
         return True
     elif value in ("0", "no", "false", "off"):
         return False
+    logger.error('Value "{}" can\'t cast to bool'.format(value))
     raise ValueError("Invalid config bool")
 
 
@@ -162,4 +166,8 @@ def get_default_environ():
     `GLOBUS_SDK_ENVIRONMENT` in the shell environment. In that case, any client
     which does not explicitly specify its environment will use this value.
     """
-    return os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
+    env = os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
+    if env != 'default':
+        logger.info(('On lookup, non-default Environment: '
+                     'GLOBUS_SDK_ENVIRONMENT={}'.format(env)))
+    return env

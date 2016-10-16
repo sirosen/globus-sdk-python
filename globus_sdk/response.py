@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 class GlobusResponse(object):
     """
     Generic response object, with a single ``data`` member.
@@ -33,6 +38,8 @@ class GlobusResponse(object):
         try:
             return data[key]
         except TypeError:
+            logger.error("Can't index into responses of type {}"
+                         .format(type(self)))
             # re-raise with an altered message -- the issue is that whatever
             # type of GlobusResponse you're working with doesn't support
             # indexing
@@ -89,6 +96,8 @@ class GlobusHTTPResponse(GlobusResponse):
         # if the caller *really* wants the raw body of the response, they can
         # always use text_body
         except ValueError:
+            logger.warn(('GlobusHTTPResponse.data is null when body is not '
+                         'valid JSON'))
             return None
 
     @property
