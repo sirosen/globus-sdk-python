@@ -50,13 +50,14 @@ class AuthClient(BaseClient):
         # managers
         self.current_oauth2_flow_manager = None
 
-        # deprecated behavior; this is a temporary backwards compatibility hack
-        access_token = config.get_auth_token(
-            kwargs.get('environment', config.get_default_environ()))
-        if authorizer is None and access_token is not None:
-            logger.warn(('Using deprecated config token. '
-                         'Switch to explicit use of AccessTokenAuthorizer'))
-            authorizer = AccessTokenAuthorizer(access_token)
+        if authorizer is None:
+            # TODO: remove; this is a temporary backwards compatibility hack
+            access_token = config.get_auth_token(
+                kwargs.get('environment', config.get_default_environ()))
+            if access_token is not None:
+                logger.warn(('Using deprecated config token. '
+                             'Switch to use of AccessTokenAuthorizer'))
+                authorizer = AccessTokenAuthorizer(access_token)
 
         BaseClient.__init__(self, "auth", authorizer=authorizer, **kwargs)
 
@@ -102,6 +103,7 @@ class AuthClient(BaseClient):
         in the API documentation for details.
         """
         self.logger.info('Looking up Globus Auth Identities')
+        self.logger.debug('params={}'.format(params))
         if 'usernames' in params and 'identities' in params:
             self.logger.warn(('get_identities call with both usernames and '
                               'identities set! Expected to result in errors'))

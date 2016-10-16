@@ -60,13 +60,14 @@ class TransferClient(BaseClient):
     default_response_class = TransferResponse
 
     def __init__(self, authorizer=None, **kwargs):
-        # deprecated behavior; this is a temporary backwards compatibility hack
-        access_token = config.get_transfer_token(
-            kwargs.get('environment', config.get_default_environ()))
-        if authorizer is None and access_token is not None:
-            logger.warn(('Using deprecated config token. '
-                         'Switch to explicit use of AccessTokenAuthorizer'))
-            authorizer = AccessTokenAuthorizer(access_token)
+        if authorizer is None:
+            # TODO: remove; this is a temporary backwards compatibility hack
+            access_token = config.get_transfer_token(
+                kwargs.get('environment', config.get_default_environ()))
+            if access_token is not None:
+                logger.warn(('Using deprecated config token. '
+                             'Switch to use of AccessTokenAuthorizer'))
+                authorizer = AccessTokenAuthorizer(access_token)
 
         BaseClient.__init__(self, "transfer", base_path="/v0.10/",
                             authorizer=authorizer, **kwargs)

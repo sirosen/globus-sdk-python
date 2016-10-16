@@ -141,6 +141,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
                                         '/v2/oauth2/authorize')
         logger.debug('Building authorization URI. Base URL: {}'
                      .format(authorize_base_url))
+        logger.debug('additional_params={}'.format(additional_params))
 
         params = {
             'client_id': self.client_id,
