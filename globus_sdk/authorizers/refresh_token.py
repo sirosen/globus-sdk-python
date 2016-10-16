@@ -1,7 +1,9 @@
-import warnings
+import logging
 import time
 
 from globus_sdk.authorizers.base import GlobusAuthorizer
+
+logger = logging.getLogger(__name__)
 
 
 # Provides a buffer for token expiration time to account for
@@ -48,8 +50,12 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
     """
     def __init__(self, refresh_token, auth_client,
                  access_token=None, expires_at=None):
+        logger.info(("Setting up a RefreshTokenAuthorizer. It will use an "
+                     "auth type of Bearer and can handle 401s."))
+        logger.info("RefreshTokenAuthorizer.auth_client = instance:{}"
+                    .format(id(auth_client)))
         if access_token is not None and expires_at is None:
-            warnings.warn(
+            logger.warn(
                 ("Initializing a RefreshTokenAuthorizer with an "
                  "access_token and no expires_at time means that this "
                  "access_token will be discarded. You should either pass "
@@ -68,10 +74,17 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         # check access_token too -- it's not clear what it would mean to set
         # expiration without an access token
         if expires_at is not None and self.access_token is not None:
+            logger.info(("Got both expires_at and access_token. "
+                         "Will start by using "
+                         "RefreshTokenAuthorizer.access_token = ...{} "
+                         "(last 5 chars)")
+                        .format(self.access_token[-5:]))
             self._set_expiration_time(expires_at)
 
         # if these were unspecified, fetch a new access token
         if self.access_token is None and self.expires_at is None:
+            logger.info("Creating RefreshTokenAuthorizer without Access "
+                        "Token. Fetching initial token now.")
             self._get_new_access_token()
 
     def _set_expiration_time(self, expires_at):
@@ -79,6 +92,9 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         Set the expiration time.
         """
         self.expires_at = expires_at - EXPIRES_ADJUST_SECONDS
+        logger.debug(("Adjusted expiration time down to {} to account for "
+                      "potential delays.")
+                     .format(self.expires_at))
 
     def _get_new_access_token(self):
         """
@@ -91,14 +107,23 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
             self.refresh_token)
         self._set_expiration_time(token_response.expires_at_seconds)
         self.access_token = token_response.access_token
+        logger.info(("RefreshTokenAuthorizer.access_token updated to "
+                     '"...{}" (last 5 chars)')
+                    .format(self.access_token[-5:]))
 
     def _check_expiration_time(self):
         """
         Check if the expiration timer is done, and trigger a refresh if it is.
         """
+        logger.debug("RefreshTokenAuthorizer checking expiration time")
         if self.access_token is None or (
                 self.expires_at is None or time.time() > self.expires_at):
+            logger.debug(("RefreshTokenAuthorizer determined time has "
+                          "expired. Feching new Access Token"))
             self._get_new_access_token()
+        else:
+            logger.debug(("RefreshTokenAuthorizer determined time has "
+                          "not yet expired"))
 
     def set_authorization_header(self, header_dict):
         """
@@ -107,6 +132,9 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         "Bearer <access_token>"
         """
         self._check_expiration_time()
+        logger.debug(("Setting RefreshToken Authorization Header:"
+                      '"Bearer ...{}" (last 5 chars)')
+                     .format(self.access_token[-5:]))
         header_dict['Authorization'] = "Bearer %s" % self.access_token
 
     def handle_missing_authorization(self, *args, **kwargs):
@@ -116,6 +144,8 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         to ``set_authorization_header()`` will result in a new Access Token
         being fetched.
         """
+        logger.debug(("RefreshTokenAuthorizer seeing 401. Invalidating "
+                      "token and preparing for refresh."))
         # None for expires_at invalidates any current token
         self.expires_at = None
         # respond True, as in "we took some action, the 401 *may* be resolved"
