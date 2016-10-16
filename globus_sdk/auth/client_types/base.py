@@ -1,9 +1,13 @@
 from __future__ import print_function
 
+import logging
+
 from globus_sdk import config
 from globus_sdk.base import BaseClient
 from globus_sdk.authorizers import AccessTokenAuthorizer, NullAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
+
+logger = logging.getLogger(__name__)
 
 
 class AuthClient(BaseClient):
@@ -49,6 +53,8 @@ class AuthClient(BaseClient):
 
         access_token = config.get_auth_token(environment)
         if authorizer is None and access_token is not None:
+            logger.warn(('Using deprecated config token. '
+                         'Switch to explicit use of AccessTokenAuthorizer'))
             authorizer = AccessTokenAuthorizer(access_token)
 
         BaseClient.__init__(self, "auth", environment, authorizer=authorizer,
@@ -95,6 +101,10 @@ class AuthClient(BaseClient):
         #v2_api_identities_resources>`_
         in the API documentation for details.
         """
+        self.logger.info('Looking up Globus Auth Identities')
+        if 'usernames' in params and 'identities' in params:
+            self.logger.warn(('get_identities call with both usernames and '
+                              'identities set! Expected to result in errors'))
         return self.get("/v2/api/identities", params=params)
 
     def oauth2_get_authorize_url(self, additional_params=None):
@@ -113,12 +123,16 @@ class AuthClient(BaseClient):
         :rtype: ``string``
         """
         if not self.current_oauth2_flow_manager:
+            self.logger.error(('OutOfOrderOperations('
+                               'get_authorize_url before start_flow)'))
             raise ValueError(
                 ('Cannot get authorize URL until starting an OAuth2 flow. '
                  'Call one of the oauth2_start_flow_*() methods on this '
                  'AuthClient to resolve'))
-        return self.current_oauth2_flow_manager.get_authorize_url(
+        auth_url = self.current_oauth2_flow_manager.get_authorize_url(
             additional_params=additional_params)
+        self.logger.info('Got authorization URL: {}'.format(auth_url))
+        return auth_url
 
     def oauth2_exchange_code_for_tokens(self, auth_code):
         """
@@ -133,7 +147,11 @@ class AuthClient(BaseClient):
           exchanging for tokens. Tokens are the credentials used to
           authenticate against Globus APIs.
         """
+        self.logger.info(('Final Step of 3-legged OAuth2 Flows: '
+                          'Exchanging authorization code for token(s)'))
         if not self.current_oauth2_flow_manager:
+            self.logger.error(('OutOfOrderOperations('
+                               'exchange_code before start_flow)'))
             raise ValueError(
                 ('Cannot exchange auth code until starting an OAuth2 flow. '
                  'Call one of the oauth2_start_flow_*() methods on this '
@@ -163,6 +181,8 @@ class AuthClient(BaseClient):
         ``additional_params``
           A dict of extra params to encode in the refresh call.
         """
+        self.logger.info(('Executing token refresh; '
+                          'typically requires client credentials'))
         form_data = {'refresh_token': refresh_token,
                      'grant_type': 'refresh_token'}
 
@@ -206,6 +226,7 @@ class AuthClient(BaseClient):
         >>> ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
         >>> ac.oauth2_revoke_token('<token_string>')
         """
+        self.logger.info('Revoking token')
         body = {'token': token}
 
         # if this client has no way of authenticating itself but
@@ -213,6 +234,7 @@ class AuthClient(BaseClient):
         no_authentication = (self.authorizer is None or
                              isinstance(self.authorizer, NullAuthorizer))
         if no_authentication and self.client_id:
+            self.logger.debug('Revoking token with unauthenticated client')
             body.update({'client_id': self.client_id})
 
         if additional_params:
@@ -242,6 +264,7 @@ class AuthClient(BaseClient):
 
         :rtype: ``response_class``
         """
+        self.logger.info('Fetching new token from Globus Auth')
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
         return self.post(

@@ -1,8 +1,11 @@
+import logging
 from six.moves.urllib.parse import urlencode
 
 from globus_sdk.base import slash_join
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth_flow_manager import GlobusOAuthFlowManager
+
+logger = logging.getLogger(__name__)
 
 
 class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
@@ -60,6 +63,13 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         self.refresh_tokens = refresh_tokens
         self.state = state
 
+        logger.debug('Starting Authorization Code Flow with params:')
+        logger.debug('auth_client.client_id={}'.format(auth_client.client_id))
+        logger.debug('redirect_uri={}'.format(redirect_uri))
+        logger.debug('refresh_tokens={}'.format(refresh_tokens))
+        logger.debug('state={}'.format(state))
+        logger.debug('requested_scopes={}'.format(self.requested_scopes))
+
     def get_authorize_url(self, additional_params=None):
         """
         Start a Authorization Code flow by getting the authorization URL to
@@ -81,6 +91,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         """
         authorize_base_url = slash_join(self.auth_client.base_url,
                                         '/v2/oauth2/authorize')
+        logger.debug('Building authorization URI. Base URL: {}'
+                     .format(authorize_base_url))
 
         params = {
             'client_id': self.client_id,
@@ -104,6 +116,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         :rtype: :class:`OAuthTokenResponse \
         <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
+        logger.debug(('Performing Native App auth_code exchange. '
+                      'Sending client_id and client_secret'))
         return self.auth_client.oauth2_token(
             {'grant_type': 'authorization_code',
              'code': auth_code.encode('utf-8'),

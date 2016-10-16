@@ -65,6 +65,8 @@ class BaseClient(object):
         if self.allowed_authorizer_types is not None and (
                 authorizer is not None and
                 type(authorizer) not in self.allowed_authorizer_types):
+            self.logger.error("{} doesn't support authorizer={}"
+                              .format(type(self), type(authorizer)))
             raise ValueError(
                 ("{0} can only take authorizers from {1}, "
                  "but you have provided {2}").format(
@@ -320,10 +322,13 @@ class BaseClient(object):
                     method=method, url=url, headers=rheaders, params=params,
                     data=text_body, verify=self._verify)
             except requests.Timeout as e:
+                self.logger.error("TimeoutError on request")
                 raise exc.GlobusTimeoutError(*e.args)
             except requests.ConnectionError as e:
+                self.logger.error("ConnectionError on request")
                 raise exc.GlobusConnectionError(*e.args)
             except requests.RequestException as e:
+                self.logger.error("NetworkError on request")
                 raise exc.NetworkError(*e.args)
 
         # initial request
