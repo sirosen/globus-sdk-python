@@ -363,8 +363,8 @@ class TransferClient(BaseClient):
         """
         path = self.qjoin_path("endpoint", endpoint_id,
                                "activation_requirements")
-        return self.post(path, params=params,
-                         response_class=ActivationRequirementsResponse)
+        return self.get(path, params=params,
+                        response_class=ActivationRequirementsResponse)
 
     def my_effective_pause_rule_list(self, endpoint_id, **params):
         """
