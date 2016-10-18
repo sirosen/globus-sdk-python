@@ -4,6 +4,9 @@ extend ``dict``, so they can be passed seemlesly to
 :class:`TransferClient <globus_sdk.TransferClient>` methods without
 conversion.
 """
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class TransferData(dict):
@@ -31,13 +34,21 @@ class TransferData(dict):
     """
     def __init__(self, transfer_client, source_endpoint, destination_endpoint,
                  label=None, sync_level=None, **kwargs):
+        logger.info("Creating a new TransferData object")
         self["DATA_TYPE"] = "transfer"
         self["submission_id"] = transfer_client.get_submission_id()["value"]
+        logger.info("TransferData.submission_id = {}"
+                    .format(self["submission_id"]))
         self["source_endpoint"] = source_endpoint
+        logger.info("TransferData.source_endpoint = {}"
+                    .format(source_endpoint))
         self["destination_endpoint"] = destination_endpoint
+        logger.info("TransferData.destination_endpoint = {}"
+                    .format(destination_endpoint))
 
         if label is not None:
             self["label"] = label
+            logger.debug("TransferData.label = {}".format(label))
 
         # map the sync_level (if it's a nice string) to one of the known int
         # values
@@ -49,6 +60,11 @@ class TransferData(dict):
             sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
             sync_level = sync_dict.get(sync_level, sync_level)
             self['sync_level'] = sync_level
+            logger.info("TransferData.sync_level = {} ({})"
+                        .format(sync_level,
+                                (x for x in sync_dict
+                                 if sync_dict[x] == sync_level).next()
+                                ))
 
         self["DATA"] = []
 
@@ -67,6 +83,10 @@ class TransferData(dict):
             "destination_path": destination_path,
             "recursive": recursive,
         }
+        logger.debug('TransferData[{}, {}].add_item: "{}"->"{}"'
+                     .format(self["source_endpoint"],
+                             self["destination_endpoint"],
+                             source_path, destination_path))
         self["DATA"].append(item_data)
 
 
@@ -89,13 +109,21 @@ class DeleteData(dict):
     """
     def __init__(self, transfer_client, endpoint, label=None,
                  recursive=False, **kwargs):
+        logger.info("Creating a new DeleteData object")
         self["DATA_TYPE"] = "delete"
         self["submission_id"] = transfer_client.get_submission_id()["value"]
+        logger.info("DeleteData.submission_id = {}"
+                    .format(self["submission_id"]))
         self["endpoint"] = endpoint
+        logger.info("DeleteData.endpoint = {}"
+                    .format(endpoint))
         self["recursive"] = recursive
+        logger.info("DeleteData.recursive = {}"
+                    .format(recursive))
 
         if label is not None:
             self["label"] = label
+            logger.debug("DeleteData.label = {}".format(label))
 
         self["DATA"] = []
         self.update(kwargs)
@@ -113,4 +141,6 @@ class DeleteData(dict):
             "DATA_TYPE": "delete_item",
             "path": path,
         }
+        logger.debug('DeleteData[{}].add_item: "{}"'
+                     .format(self["endpoint"], path))
         self["DATA"].append(item_data)
