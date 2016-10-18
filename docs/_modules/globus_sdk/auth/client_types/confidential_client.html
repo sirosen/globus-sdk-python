@@ -47,12 +47,15 @@
           <div class="body" role="main">
             
   <h1>Source code for globus_sdk.auth.client_types.confidential_client</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="n">BasicAuthorizer</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="n">BasicAuthorizer</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.oauth2_constants</span> <span class="kn">import</span> <span class="n">DEFAULT_REQUESTED_SCOPES</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.client_types.base</span> <span class="kn">import</span> <span class="n">AuthClient</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.oauth2_authorization_code</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">GlobusAuthorizationCodeFlowManager</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.token_response</span> <span class="kn">import</span> <span class="n">OAuthDependentTokenResponse</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ConfidentialAppAuthClient"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.ConfidentialAppAuthClient">[docs]</a><span class="k">class</span> <span class="nc">ConfidentialAppAuthClient</span><span class="p">(</span><span class="n">AuthClient</span><span class="p">):</span>
@@ -79,6 +82,7 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;authorizer&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;ArgumentError(ConfidentialAppClient.authorizer)&#39;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Cannot give a ConfidentialAppAuthClient an authorizer&quot;</span><span class="p">)</span>
 
@@ -86,6 +90,8 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span>
             <span class="n">authorizer</span><span class="o">=</span><span class="n">BasicAuthorizer</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">),</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Finished initializing client, client_id={}&#39;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">client_id</span><span class="p">))</span>
 
 <div class="viewcode-block" id="ConfidentialAppAuthClient.oauth2_client_credentials_tokens"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.ConfidentialAppAuthClient.oauth2_client_credentials_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_client_credentials_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requested_scopes</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;</span>
@@ -112,6 +118,7 @@
 <span class="sd">        ...     tokens.by_resource_server[&quot;transfer.api.globus.org&quot;])</span>
 <span class="sd">        &gt;&gt;&gt; transfer_token = transfer_token_info[&quot;access_token&quot;]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Fetching token(s) using client credentials&#39;</span><span class="p">)</span>
         <span class="n">requested_scopes</span> <span class="o">=</span> <span class="n">requested_scopes</span> <span class="ow">or</span> <span class="n">DEFAULT_REQUESTED_SCOPES</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">oauth2_token</span><span class="p">({</span>
@@ -129,6 +136,7 @@
 <span class="sd">        All of the parameters to this method are passed to that class&#39;s</span>
 <span class="sd">        initializer verbatim.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting OAuth2 Authorization Code Grant Flow&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_oauth2_flow_manager</span> <span class="o">=</span> <span class="n">GlobusAuthorizationCodeFlowManager</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">redirect_uri</span><span class="p">,</span> <span class="n">requested_scopes</span><span class="o">=</span><span class="n">requested_scopes</span><span class="p">,</span>
             <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">refresh_tokens</span><span class="o">=</span><span class="n">refresh_tokens</span><span class="p">)</span>
@@ -164,6 +172,7 @@
 <span class="sd">        :rtype: :class:`OAuthTokenResponse</span>
 <span class="sd">                &lt;globus_sdk.auth.token_response.OAuthTokenResponse&gt;`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Getting dependent tokens from access token&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">oauth2_token</span><span class="p">({</span>
             <span class="s1">&#39;grant_type&#39;</span><span class="p">:</span> <span class="s1">&#39;urn:globus:auth:grant_type:dependent_token&#39;</span><span class="p">,</span>
             <span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="n">token</span><span class="p">},</span>
@@ -185,6 +194,7 @@
 <span class="sd">        #token_introspection_post_v2_oauth2_token_introspect&gt;`_</span>
 <span class="sd">        in the API documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Checking token validity (introspect)&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/v2/oauth2/token/introspect&quot;</span><span class="p">,</span>
                          <span class="n">text_body</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="n">token</span><span class="p">})</span></div></div>
 </pre></div>

@@ -6,7 +6,7 @@ from globus_sdk.base import BaseClient, merge_params
 from globus_sdk.authorizers import (
     AccessTokenAuthorizer, RefreshTokenAuthorizer)
 from globus_sdk.transfer.response import (
-    TransferResponse, IterableTransferResponse)
+    TransferResponse, IterableTransferResponse, ActivationRequirementsResponse)
 from globus_sdk.transfer.paging import PaginatedResource
 
 logger = logging.getLogger(__name__)
@@ -351,8 +351,8 @@ class TransferClient(BaseClient):
         """
         ``GET /endpoint/<endpoint_id>/activation_requirements``
 
-        :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+        :rtype: :class:`ActivationRequirementsResponse
+                <globus_sdk.transfer.response.ActivationRequirementsResponse>`
 
         **External Documentation**
 
@@ -361,8 +361,10 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements>`_
         in the REST documentation for details.
         """
-        path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
-        return self.post(path, params=params)
+        path = self.qjoin_path("endpoint", endpoint_id,
+                               "activation_requirements")
+        return self.get(path, params=params,
+                        response_class=ActivationRequirementsResponse)
 
     def my_effective_pause_rule_list(self, endpoint_id, **params):
         """

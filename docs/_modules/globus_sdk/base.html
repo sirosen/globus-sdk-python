@@ -48,6 +48,7 @@
             
   <h1>Source code for globus_sdk.base</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
 
@@ -56,6 +57,14 @@
 <span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">exc</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.version</span> <span class="kn">import</span> <span class="n">__version__</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.response</span> <span class="kn">import</span> <span class="n">GlobusHTTPResponse</span>
+
+
+<span class="k">class</span> <span class="nc">ClientLogAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stuff in the memory location of the client to make log records unambiguous.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;[instance:{}] {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extra</span><span class="p">[</span><span class="s1">&#39;client&#39;</span><span class="p">]),</span> <span class="n">msg</span><span class="p">),</span> <span class="n">kwargs</span>
 
 
 <div class="viewcode-block" id="BaseClient"><a class="viewcode-back" href="../../clients/base.html#globus_sdk.base.BaseClient">[docs]</a><span class="k">class</span> <span class="nc">BaseClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -90,19 +99,33 @@
 
     <span class="n">BASE_USER_AGENT</span> <span class="o">=</span> <span class="s1">&#39;globus-sdk-py-{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">__version__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">get_default_environ</span><span class="p">(),</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">base_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">app_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c1"># get the fully qualified name of the client class, so that it&#39;s a</span>
+        <span class="c1"># child of globus_sdk</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">ClientLogAdapter</span><span class="p">(</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__module__</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">),</span>
+            <span class="p">{</span><span class="s1">&#39;client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating client of type {} for service &quot;{}&quot;&#39;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">service</span><span class="p">))</span>
         <span class="c1"># if restrictions have been placed by a child class on the allowed</span>
         <span class="c1"># authorizer types, make sure we are not in violation of those</span>
         <span class="c1"># constraints</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_authorizer_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="p">(</span>
                 <span class="n">authorizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span>
                 <span class="nb">type</span><span class="p">(</span><span class="n">authorizer</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_authorizer_types</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;{} doesn&#39;t support authorizer={}&quot;</span>
+                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">authorizer</span><span class="p">)))</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="p">(</span><span class="s2">&quot;{0} can only take authorizers from {1}, &quot;</span>
                  <span class="s2">&quot;but you have provided {2}&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_authorizer_types</span><span class="p">,</span>
                     <span class="nb">type</span><span class="p">(</span><span class="n">authorizer</span><span class="p">)))</span>
+
+        <span class="c1"># defer this default until instantiation time so that logging can</span>
+        <span class="c1"># capture the execution of the config load</span>
+        <span class="k">if</span> <span class="n">environment</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">environment</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_default_environ</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">environment</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">authorizer</span> <span class="o">=</span> <span class="n">authorizer</span>
@@ -170,6 +193,7 @@
 <span class="sd">        :return: :class:`GlobusHTTPResponse \</span>
 <span class="sd">        &lt;globus_sdk.response.GlobusHTTPResponse&gt;` object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;GET to {} with params {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
                              <span class="n">response_class</span><span class="o">=</span><span class="n">response_class</span><span class="p">,</span>
                              <span class="n">retry_401</span><span class="o">=</span><span class="n">retry_401</span><span class="p">)</span></div>
@@ -208,6 +232,7 @@
 <span class="sd">        :return: :class:`GlobusHTTPResponse \</span>
 <span class="sd">        &lt;globus_sdk.response.GlobusHTTPResponse&gt;` object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;POST to {} with params {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">json_body</span><span class="o">=</span><span class="n">json_body</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
                              <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">text_body</span><span class="o">=</span><span class="n">text_body</span><span class="p">,</span>
                              <span class="n">response_class</span><span class="o">=</span><span class="n">response_class</span><span class="p">,</span>
@@ -240,6 +265,7 @@
 <span class="sd">        :return: :class:`GlobusHTTPResponse \</span>
 <span class="sd">        &lt;globus_sdk.response.GlobusHTTPResponse&gt;` object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;DELETE to {} with params {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
                              <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
                              <span class="n">response_class</span><span class="o">=</span><span class="n">response_class</span><span class="p">,</span>
@@ -279,6 +305,7 @@
 <span class="sd">        :return: :class:`GlobusHTTPResponse \</span>
 <span class="sd">        &lt;globus_sdk.response.GlobusHTTPResponse&gt;` object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;PUT to {} with params {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">json_body</span><span class="o">=</span><span class="n">json_body</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
                              <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">text_body</span><span class="o">=</span><span class="n">text_body</span><span class="p">,</span>
                              <span class="n">response_class</span><span class="o">=</span><span class="n">response_class</span><span class="p">,</span>
@@ -334,9 +361,12 @@
         <span class="c1"># add Authorization header, or (if it&#39;s a NullAuthorizer) possibly</span>
         <span class="c1"># explicitly remove the Authorization header</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;request will have authorization of type {}&#39;</span>
+                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">authorizer</span><span class="p">)))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">authorizer</span><span class="o">.</span><span class="n">set_authorization_header</span><span class="p">(</span><span class="n">rheaders</span><span class="p">)</span>
 
         <span class="n">url</span> <span class="o">=</span> <span class="n">slash_join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;request will hit URL:{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
 
         <span class="c1"># because a 401 can trigger retry, we need to wrap the retry-able thing</span>
         <span class="c1"># in a method</span>
@@ -346,10 +376,13 @@
                     <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">rheaders</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">text_body</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verify</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">Timeout</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;TimeoutError on request&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="n">exc</span><span class="o">.</span><span class="n">GlobusTimeoutError</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ConnectionError on request&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="n">exc</span><span class="o">.</span><span class="n">GlobusConnectionError</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;NetworkError on request&quot;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="n">exc</span><span class="o">.</span><span class="n">NetworkError</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
 
         <span class="c1"># initial request</span>
@@ -357,20 +390,26 @@
 
         <span class="c1"># potential 401 retry handling</span>
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span> <span class="ow">and</span> <span class="n">retry_401</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;request got 401, checking retry-capability&#39;</span><span class="p">)</span>
             <span class="c1"># note that although handle_missing_authorization returns a T/F</span>
             <span class="c1"># value, it may actually mutate the state of the authorizer and</span>
             <span class="c1"># therefore change the value set by the `set_authorization_header`</span>
             <span class="c1"># method</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorizer</span><span class="o">.</span><span class="n">handle_missing_authorization</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;request can be retried&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">authorizer</span><span class="o">.</span><span class="n">set_authorization_header</span><span class="p">(</span><span class="n">rheaders</span><span class="p">)</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="n">send_request</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="mi">200</span> <span class="o">&lt;=</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">400</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;request completed with response code: {}&#39;</span>
+                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">response_class</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_response_class</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">response_class</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;request completed with (error) response code: {}&#39;</span>
+                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>
         <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_class</span><span class="p">(</span><span class="n">r</span><span class="p">)</span></div>
 
 

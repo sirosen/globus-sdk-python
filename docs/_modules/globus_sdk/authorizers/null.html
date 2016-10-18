@@ -47,7 +47,11 @@
           <div class="body" role="main">
             
   <h1>Source code for globus_sdk.authorizers.null</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">globus_sdk.authorizers.base</span> <span class="kn">import</span> <span class="n">GlobusAuthorizer</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">globus_sdk.authorizers.base</span> <span class="kn">import</span> <span class="n">GlobusAuthorizer</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="NullAuthorizer"><a class="viewcode-back" href="../../../authorization.html#globus_sdk.NullAuthorizer">[docs]</a><span class="k">class</span> <span class="nc">NullAuthorizer</span><span class="p">(</span><span class="n">GlobusAuthorizer</span><span class="p">):</span>
@@ -60,6 +64,7 @@
 <span class="sd">        Removes the Authorization header from the given header dict if one was</span>
 <span class="sd">        present.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;NullAuthorizer: ensuring there is no Authorization&quot;</span><span class="p">)</span>
         <span class="n">header_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;Authorization&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span></div></div>
 </pre></div>
 

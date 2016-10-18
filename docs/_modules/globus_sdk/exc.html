@@ -47,7 +47,10 @@
           <div class="body" role="main">
             
   <h1>Source code for globus_sdk.exc</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">textwrap</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="GlobusError"><a class="viewcode-back" href="../../exceptions.html#globus_sdk.exc.GlobusError">[docs]</a><span class="k">class</span> <span class="nc">GlobusError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -72,11 +75,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_underlying_response</span> <span class="o">=</span> <span class="n">r</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">http_status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
         <span class="k">if</span> <span class="s2">&quot;application/json&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">]:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s1">&#39;Content-Type on error is application/json. &#39;</span>
+                          <span class="s1">&#39;Doing error load from JSON&#39;</span><span class="p">))</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_json</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">((</span><span class="s1">&#39;Error body could not be JSON decoded! &#39;</span>
+                              <span class="s1">&#39;This means the Content-Type is wrong, or the &#39;</span>
+                              <span class="s1">&#39;body is malformed!&#39;</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_text</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s1">&#39;Content-Type on error is unknown. &#39;</span>
+                          <span class="s1">&#39;Failing over to error load as text (default)&#39;</span><span class="p">))</span>
             <span class="c1"># fallback to using the entire body as the message for all</span>
             <span class="c1"># other types</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_text</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
@@ -96,10 +106,18 @@
 <span class="sd">        code and message instance variables.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;errors&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;Doing JSON load of error response with multiple &quot;</span>
+                             <span class="s2">&quot;errors. Exception data will only include the &quot;</span>
+                             <span class="s2">&quot;first error, but there are really {} errors&quot;</span><span class="p">)</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">])))</span>
             <span class="c1"># TODO: handle responses with more than one error</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="s2">&quot;message&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;Doing JSON load of error response with &#39;message&#39; &quot;</span>
+                          <span class="s2">&quot;field. There may also be a useful &#39;detail&#39; field &quot;</span>
+                          <span class="s2">&quot;to inspect&quot;</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;detail&quot;</span><span class="p">]</span>

@@ -120,11 +120,11 @@ be used instead.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="transfer-response-classes">
-<h2>Transfer Response Classes<a class="headerlink" href="#transfer-response-classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-globus_sdk.transfer.response">
+<span id="transfer-response-classes"></span><h2>Transfer Response Classes<a class="headerlink" href="#module-globus_sdk.transfer.response" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="globus_sdk.transfer.response.TransferResponse">
-<em class="property">class </em><code class="descclassname">globus_sdk.transfer.response.</code><code class="descname">TransferResponse</code><span class="sig-paren">(</span><em>http_response</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/globus_sdk/transfer/response.html#TransferResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.transfer.response.TransferResponse" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">globus_sdk.transfer.response.</code><code class="descname">TransferResponse</code><span class="sig-paren">(</span><em>http_response</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/globus_sdk/transfer/response/base.html#TransferResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.transfer.response.TransferResponse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#globus_sdk.response.GlobusHTTPResponse" title="globus_sdk.response.GlobusHTTPResponse"><code class="xref py py-class docutils literal"><span class="pre">globus_sdk.response.GlobusHTTPResponse</span></code></a></p>
 <p>Base class for <a class="reference internal" href="clients/transfer.html#globus_sdk.TransferClient" title="globus_sdk.TransferClient"><code class="xref py py-class docutils literal"><span class="pre">TransferClient</span></code></a>
 responses.</p>
@@ -132,8 +132,8 @@ responses.</p>
 
 <dl class="class">
 <dt id="globus_sdk.transfer.response.IterableTransferResponse">
-<em class="property">class </em><code class="descclassname">globus_sdk.transfer.response.</code><code class="descname">IterableTransferResponse</code><span class="sig-paren">(</span><em>http_response</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/globus_sdk/transfer/response.html#IterableTransferResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.transfer.response.IterableTransferResponse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#globus_sdk.transfer.response.TransferResponse" title="globus_sdk.transfer.response.TransferResponse"><code class="xref py py-class docutils literal"><span class="pre">globus_sdk.transfer.response.TransferResponse</span></code></a></p>
+<em class="property">class </em><code class="descclassname">globus_sdk.transfer.response.</code><code class="descname">IterableTransferResponse</code><span class="sig-paren">(</span><em>http_response</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/globus_sdk/transfer/response/iterable.html#IterableTransferResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.transfer.response.IterableTransferResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">globus_sdk.transfer.response.base.TransferResponse</span></code></p>
 <p>Response class for non-paged list oriented resources. Allows top level
 fields to be accessed normally via standard item access, and also
 provides a convenient way to iterate over the sub-item list in the
@@ -144,6 +144,135 @@ provides a convenient way to iterate over the sub-item list in the
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="class">
+<dt id="globus_sdk.transfer.response.ActivationRequirementsResponse">
+<em class="property">class </em><code class="descclassname">globus_sdk.transfer.response.</code><code class="descname">ActivationRequirementsResponse</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/globus_sdk/transfer/response/activation.html#ActivationRequirementsResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.transfer.response.ActivationRequirementsResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">globus_sdk.transfer.response.base.TransferResponse</span></code></p>
+<p>Response class for Activation Requirements responses.</p>
+<p>All Activation Requirements documents refer to a specific Endpoint, from
+whence they were acquired. References to &#8220;the Endpoint&#8221; implicitly refer to
+that originating Endpoint, and not to some other Endpoint.</p>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_activation/#activation_requirements_document">Activation Requirements Document</a>
+in the API documentation for details.</p>
+<dl class="method">
+<dt id="globus_sdk.transfer.response.ActivationRequirementsResponse.active_until">
+<code class="descname">active_until</code><span class="sig-paren">(</span><em>time_seconds</em>, <em>relative_time=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/globus_sdk/transfer/response/activation.html#ActivationRequirementsResponse.active_until"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.transfer.response.ActivationRequirementsResponse.active_until" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the Endpoint will be active until some time in the future,
+given as an integer number of seconds.
+When <code class="docutils literal"><span class="pre">relative_time=False</span></code>, the <code class="docutils literal"><span class="pre">time_seconds</span></code> is interpreted as a
+POSIX timestamp.</p>
+<p>This supports queries using both relative and absolute timestamps to
+better support a wide range of use cases. For example, if I have a task
+that I know will typically take N seconds, and I want an M second
+safety margin:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_secs_allowed</span> <span class="o">=</span> <span class="n">N</span> <span class="o">+</span> <span class="n">M</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reqs_doc</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_get_activation_requirements</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">reqs_doc</span><span class="o">.</span><span class="n">active_until</span><span class="p">(</span><span class="n">num_secs_allowed</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Endpoint won&#39;t be active long enough&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+</pre></div>
+</div>
+<p>or, alternatively, if I know that the endpoint must be active until
+October 18th, 2016 for my tasks to complete:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">oct18_2016</span> <span class="o">=</span> <span class="mi">1476803436</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reqs_doc</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_get_activation_requirements</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">reqs_doc</span><span class="o">.</span><span class="n">active_until</span><span class="p">(</span><span class="n">oct18_2016</span><span class="p">,</span> <span class="n">relative_time</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Endpoint won&#39;t be active long enough&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">time_seconds</span></code></dt>
+<dd>Integer number of seconds into the future.</dd>
+<dt><code class="docutils literal"><span class="pre">relative_time</span></code></dt>
+<dd>Defaults to True. When False, <code class="docutils literal"><span class="pre">time_seconds</span></code> is treated as a
+POSIX timestamp (i.e. seconds since epoch as an integer) instead of
+its ordinary behavior.</dd>
+</dl>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="globus_sdk.transfer.response.ActivationRequirementsResponse.supports_auto_activation">
+<code class="descname">supports_auto_activation</code><a class="headerlink" href="#globus_sdk.transfer.response.ActivationRequirementsResponse.supports_auto_activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the document lists Auto-Activation as an available type of
+activation.
+Typically good to use when you need to catch endpoints that require web
+activation before proceeding.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">endpoint_id</span> <span class="o">=</span> <span class="s2">&quot;...&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reqs_doc</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_get_activation_requirements</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">reqs_doc</span><span class="o">.</span><span class="n">supports_auto_activation</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># use `from __future__ import print_function` in py2</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;This endpoint requires web activation. &quot;</span>
+<span class="gp">&gt;&gt;&gt; </span>           <span class="s2">&quot;Please login and activate the endpoint here:</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span>           <span class="s2">&quot;https://www.globus.org/app/endpoints/</span><span class="si">{}</span><span class="s2">/activate&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># py3 calls it `input()` in py2, use `raw_input()`</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Please Hit Enter When You Are Done&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="globus_sdk.transfer.response.ActivationRequirementsResponse.supports_web_activation">
+<code class="descname">supports_web_activation</code><a class="headerlink" href="#globus_sdk.transfer.response.ActivationRequirementsResponse.supports_web_activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the document lists known types of activation that can be done
+through the web. If this returns <code class="docutils literal"><span class="pre">False</span></code>, it means that the endpoint
+is of a highly unusual type, and you should directly inspect the
+response&#8217;s <code class="docutils literal"><span class="pre">data</span></code> attribute to see what is required. Sending users to
+the web page for activation is also a fairly safe action to take.
+Note that <code class="docutils literal"><span class="pre">ActivationRequirementsResponse.supports_auto_activation</span></code>
+directly implies
+<code class="docutils literal"><span class="pre">ActivationRequirementsResponse.supports_web_activation</span></code>, so these
+are <em>not</em> exclusive.</p>
+<p>For example,</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reqs_doc</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_get_activation_requirements</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">reqs_doc</span><span class="o">.</span><span class="n">supports_web_activation</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># use `from __future__ import print_function` in py2</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Highly unusual endpoint. &quot;</span> <span class="o">+</span>
+<span class="gp">&gt;&gt;&gt; </span>          <span class="s2">&quot;Cannot webactivate. Raw doc: &quot;</span> <span class="o">+</span>
+<span class="gp">&gt;&gt;&gt; </span>          <span class="nb">str</span><span class="p">(</span><span class="n">reqs_doc</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sending user to web anyway, just in case.&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>          <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">...</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -242,7 +371,7 @@ trying to use the resulting tokens.</p>
   <ul>
 <li><a class="reference internal" href="#">Responses</a><ul>
 <li><a class="reference internal" href="#generic-response-classes">Generic Response Classes</a></li>
-<li><a class="reference internal" href="#transfer-response-classes">Transfer Response Classes</a></li>
+<li><a class="reference internal" href="#module-globus_sdk.transfer.response">Transfer Response Classes</a></li>
 <li><a class="reference internal" href="#auth-response-classes">Auth Response Classes</a></li>
 </ul>
 </li>

@@ -47,7 +47,12 @@
           <div class="body" role="main">
             
   <h1>Source code for globus_sdk.response</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="GlobusResponse"><a class="viewcode-back" href="../../responses.html#globus_sdk.response.GlobusResponse">[docs]</a><span></span><span class="k">class</span> <span class="nc">GlobusResponse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GlobusResponse"><a class="viewcode-back" href="../../responses.html#globus_sdk.response.GlobusResponse">[docs]</a><span class="k">class</span> <span class="nc">GlobusResponse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generic response object, with a single ``data`` member.</span>
 
@@ -82,6 +87,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Can&#39;t index into responses of type {}&quot;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
             <span class="c1"># re-raise with an altered message -- the issue is that whatever</span>
             <span class="c1"># type of GlobusResponse you&#39;re working with doesn&#39;t support</span>
             <span class="c1"># indexing</span>
@@ -138,6 +145,8 @@
         <span class="c1"># if the caller *really* wants the raw body of the response, they can</span>
         <span class="c1"># always use text_body</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s1">&#39;GlobusHTTPResponse.data is null when body is not &#39;</span>
+                         <span class="s1">&#39;valid JSON&#39;</span><span class="p">))</span>
             <span class="k">return</span> <span class="bp">None</span>
 
     <span class="nd">@property</span>
