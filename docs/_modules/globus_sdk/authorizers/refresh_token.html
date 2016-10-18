@@ -47,10 +47,12 @@
           <div class="body" role="main">
             
   <h1>Source code for globus_sdk.authorizers.refresh_token</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">globus_sdk.authorizers.base</span> <span class="kn">import</span> <span class="n">GlobusAuthorizer</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
 
 <span class="c1"># Provides a buffer for token expiration time to account for</span>
@@ -97,8 +99,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refresh_token</span><span class="p">,</span> <span class="n">auth_client</span><span class="p">,</span>
                  <span class="n">access_token</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">expires_at</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s2">&quot;Setting up a RefreshTokenAuthorizer. It will use an &quot;</span>
+                     <span class="s2">&quot;auth type of Bearer and can handle 401s.&quot;</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;RefreshTokenAuthorizer.auth_client = instance:{}&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">auth_client</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">expires_at</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="p">(</span><span class="s2">&quot;Initializing a RefreshTokenAuthorizer with an &quot;</span>
                  <span class="s2">&quot;access_token and no expires_at time means that this &quot;</span>
                  <span class="s2">&quot;access_token will be discarded. You should either pass &quot;</span>
@@ -117,10 +123,17 @@
         <span class="c1"># check access_token too -- it&#39;s not clear what it would mean to set</span>
         <span class="c1"># expiration without an access token</span>
         <span class="k">if</span> <span class="n">expires_at</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s2">&quot;Got both expires_at and access_token. &quot;</span>
+                         <span class="s2">&quot;Will start by using &quot;</span>
+                         <span class="s2">&quot;RefreshTokenAuthorizer.access_token = ...{} &quot;</span>
+                         <span class="s2">&quot;(last 5 chars)&quot;</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_expiration_time</span><span class="p">(</span><span class="n">expires_at</span><span class="p">)</span>
 
         <span class="c1"># if these were unspecified, fetch a new access token</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating RefreshTokenAuthorizer without Access &quot;</span>
+                        <span class="s2">&quot;Token. Fetching initial token now.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_access_token</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_set_expiration_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expires_at</span><span class="p">):</span>
@@ -128,6 +141,9 @@
 <span class="sd">        Set the expiration time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="o">=</span> <span class="n">expires_at</span> <span class="o">-</span> <span class="n">EXPIRES_ADJUST_SECONDS</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;Adjusted expiration time down to {} to account for &quot;</span>
+                      <span class="s2">&quot;potential delays.&quot;</span><span class="p">)</span>
+                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_get_new_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -140,14 +156,23 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">refresh_token</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_expiration_time</span><span class="p">(</span><span class="n">token_response</span><span class="o">.</span><span class="n">expires_at_seconds</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="n">token_response</span><span class="o">.</span><span class="n">access_token</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s2">&quot;RefreshTokenAuthorizer.access_token updated to &quot;</span>
+                     <span class="s1">&#39;&quot;...{}&quot; (last 5 chars)&#39;</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]))</span>
 
     <span class="k">def</span> <span class="nf">_check_expiration_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the expiration timer is done, and trigger a refresh if it is.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;RefreshTokenAuthorizer checking expiration time&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;RefreshTokenAuthorizer determined time has &quot;</span>
+                          <span class="s2">&quot;expired. Feching new Access Token&quot;</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_access_token</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;RefreshTokenAuthorizer determined time has &quot;</span>
+                          <span class="s2">&quot;not yet expired&quot;</span><span class="p">))</span>
 
 <div class="viewcode-block" id="RefreshTokenAuthorizer.set_authorization_header"><a class="viewcode-back" href="../../../authorization.html#globus_sdk.RefreshTokenAuthorizer.set_authorization_header">[docs]</a>    <span class="k">def</span> <span class="nf">set_authorization_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -156,6 +181,9 @@
 <span class="sd">        &quot;Bearer &lt;access_token&gt;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_expiration_time</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;Setting RefreshToken Authorization Header:&quot;</span>
+                      <span class="s1">&#39;&quot;Bearer ...{}&quot; (last 5 chars)&#39;</span><span class="p">)</span>
+                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]))</span>
         <span class="n">header_dict</span><span class="p">[</span><span class="s1">&#39;Authorization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Bearer </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span></div>
 
 <div class="viewcode-block" id="RefreshTokenAuthorizer.handle_missing_authorization"><a class="viewcode-back" href="../../../authorization.html#globus_sdk.RefreshTokenAuthorizer.handle_missing_authorization">[docs]</a>    <span class="k">def</span> <span class="nf">handle_missing_authorization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -165,6 +193,8 @@
 <span class="sd">        to ``set_authorization_header()`` will result in a new Access Token</span>
 <span class="sd">        being fetched.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;RefreshTokenAuthorizer seeing 401. Invalidating &quot;</span>
+                      <span class="s2">&quot;token and preparing for refresh.&quot;</span><span class="p">))</span>
         <span class="c1"># None for expires_at invalidates any current token</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="c1"># respond True, as in &quot;we took some action, the 401 *may* be resolved&quot;</span>

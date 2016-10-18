@@ -47,12 +47,15 @@
           <div class="body" role="main">
             
   <h1>Source code for globus_sdk.auth.token_response</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">globus_sdk.response</span> <span class="kn">import</span> <span class="n">GlobusHTTPResponse</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.exc</span> <span class="kn">import</span> <span class="n">GlobusOptionalDependencyError</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_convert_token_info_dict</span><span class="p">(</span><span class="n">source_dict</span><span class="p">):</span>
@@ -150,19 +153,23 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A parsed ID Token (OIDC) as a dict.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Decoding ID Token &quot;{}&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;id_token&#39;</span><span class="p">]))</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">jose</span> <span class="kn">import</span> <span class="n">jwt</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;OptionalDependencyError(python-jose)&#39;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">GlobusOptionalDependencyError</span><span class="p">(</span>
                 <span class="p">[</span><span class="s2">&quot;python-jose&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;JWT Parsing via OAuthTokenResponse.id_token&quot;</span><span class="p">)</span>
 
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Fetch JWK Data: Start&#39;</span><span class="p">)</span>
         <span class="n">oidc_conf</span> <span class="o">=</span> <span class="n">auth_client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/.well-known/openid-configuration&#39;</span><span class="p">)</span>
         <span class="n">jwks_uri</span> <span class="o">=</span> <span class="n">oidc_conf</span><span class="p">[</span><span class="s1">&#39;jwks_uri&#39;</span><span class="p">]</span>
+        <span class="n">jwk_data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">jwks_uri</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Fetch JWK Data: Complete&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;id_token&#39;</span><span class="p">],</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">jwks_uri</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;id_token&#39;</span><span class="p">],</span> <span class="n">jwk_data</span><span class="p">,</span>
             <span class="n">access_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">,</span>
             <span class="n">audience</span><span class="o">=</span><span class="n">auth_client</span><span class="o">.</span><span class="n">client_id</span><span class="p">)</span></div>
 

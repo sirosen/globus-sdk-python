@@ -24,11 +24,7 @@ Generic Response Classes
 Transfer Response Classes
 -------------------------
 
-.. autoclass:: globus_sdk.transfer.response.TransferResponse
-   :members:
-   :show-inheritance:
-
-.. autoclass:: globus_sdk.transfer.response.IterableTransferResponse
+.. automodule:: globus_sdk.transfer.response
    :members:
    :show-inheritance:
 

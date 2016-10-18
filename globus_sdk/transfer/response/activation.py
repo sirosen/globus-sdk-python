@@ -32,7 +32,7 @@ class ActivationRequirementsResponse(TransferResponse):
 
     @property
     def supports_auto_activation(self):
-        """
+        r"""
         Check if the document lists Auto-Activation as an available type of
         activation.
         Typically good to use when you need to catch endpoints that require web
@@ -99,7 +99,7 @@ class ActivationRequirementsResponse(TransferResponse):
         that I know will typically take N seconds, and I want an M second
         safety margin:
 
-        >>> num_secs_allows = N + M
+        >>> num_secs_allowed = N + M
         >>> tc = TransferClient(...)
         >>> reqs_doc = tc.endpoint_get_activation_requirements(...)
         >>> if not reqs_doc.active_until(num_secs_allowed):
