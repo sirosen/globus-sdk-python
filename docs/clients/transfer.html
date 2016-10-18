@@ -1070,9 +1070,9 @@ second at a time:</p>
 <p>At least one item must be added using
 <a class="reference internal" href="#globus_sdk.TransferData.add_item" title="globus_sdk.TransferData.add_item"><code class="xref py py-meth docutils literal"><span class="pre">add_item</span></code></a>.</p>
 <p>For compatibility with older code and those knowledgeable about the API
-sync_level can be <code class="docutils literal"><span class="pre">1</span></code>, <code class="docutils literal"><span class="pre">2</span></code>, or <code class="docutils literal"><span class="pre">3</span></code>, but it can also be
-<code class="docutils literal"><span class="pre">&quot;exists&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;mtime&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;checksum&quot;</span></code> if you want greater clarity in
-client code.</p>
+sync_level can be <code class="docutils literal"><span class="pre">0</span></code>, <code class="docutils literal"><span class="pre">1</span></code>, <code class="docutils literal"><span class="pre">2</span></code>, or <code class="docutils literal"><span class="pre">3</span></code>, but it can also be
+<code class="docutils literal"><span class="pre">&quot;exists&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;size&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;mtime&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;checksum&quot;</span></code> if you want
+greater clarity in client code.</p>
 <p>Includes fetching the submission ID as part of document generation. The
 submission ID can be pulled out of here to inspect, but the document
 can be used as-is multiple times over to retry a potential submission

@@ -16,9 +16,9 @@ class TransferData(dict):
     :meth:`add_item <globus_sdk.TransferData.add_item>`.
 
     For compatibility with older code and those knowledgeable about the API
-    sync_level can be ``1``, ``2``, or ``3``, but it can also be
-    ``"exists"``, ``"mtime"``, or ``"checksum"`` if you want greater clarity in
-    client code.
+    sync_level can be ``0``, ``1``, ``2``, or ``3``, but it can also be
+    ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"`` if you want
+    greater clarity in client code.
 
     Includes fetching the submission ID as part of document generation. The
     submission ID can be pulled out of here to inspect, but the document
@@ -46,7 +46,7 @@ class TransferData(dict):
         # more levels are added in the future this method doesn't become
         # garbage overnight
         if sync_level is not None:
-            sync_dict = {"exists": 1, "mtime": 2, "checksum": 3}
+            sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
             sync_level = sync_dict.get(sync_level, sync_level)
             self['sync_level'] = sync_level
 
