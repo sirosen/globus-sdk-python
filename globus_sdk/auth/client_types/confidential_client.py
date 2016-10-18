@@ -1,9 +1,12 @@
+import logging
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.client_types.base import AuthClient
 from globus_sdk.auth.oauth2_authorization_code import (
     GlobusAuthorizationCodeFlowManager)
 from globus_sdk.auth.token_response import OAuthDependentTokenResponse
+
+logger = logging.getLogger(__name__)
 
 
 class ConfidentialAppAuthClient(AuthClient):
@@ -30,6 +33,7 @@ class ConfidentialAppAuthClient(AuthClient):
 
     def __init__(self, client_id, client_secret, **kwargs):
         if "authorizer" in kwargs:
+            logger.error('ArgumentError(ConfidentialAppClient.authorizer)')
             raise ValueError(
                 "Cannot give a ConfidentialAppAuthClient an authorizer")
 
@@ -37,6 +41,8 @@ class ConfidentialAppAuthClient(AuthClient):
             self, client_id=client_id,
             authorizer=BasicAuthorizer(client_id, client_secret),
             **kwargs)
+        self.logger.info('Finished initializing client, client_id={}'
+                         .format(client_id))
 
     def oauth2_client_credentials_tokens(self, requested_scopes=None):
         r"""
@@ -63,6 +69,7 @@ class ConfidentialAppAuthClient(AuthClient):
         ...     tokens.by_resource_server["transfer.api.globus.org"])
         >>> transfer_token = transfer_token_info["access_token"]
         """
+        self.logger.info('Fetching token(s) using client credentials')
         requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
 
         return self.oauth2_token({
@@ -80,6 +87,7 @@ class ConfidentialAppAuthClient(AuthClient):
         All of the parameters to this method are passed to that class's
         initializer verbatim.
         """
+        self.logger.info('Starting OAuth2 Authorization Code Grant Flow')
         self.current_oauth2_flow_manager = GlobusAuthorizationCodeFlowManager(
             self, redirect_uri, requested_scopes=requested_scopes,
             state=state, refresh_tokens=refresh_tokens)
@@ -115,6 +123,7 @@ class ConfidentialAppAuthClient(AuthClient):
         :rtype: :class:`OAuthTokenResponse
                 <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
+        self.logger.info('Getting dependent tokens from access token')
         return self.oauth2_token({
             'grant_type': 'urn:globus:auth:grant_type:dependent_token',
             'token': token},
@@ -136,5 +145,6 @@ class ConfidentialAppAuthClient(AuthClient):
         #token_introspection_post_v2_oauth2_token_introspect>`_
         in the API documentation for details.
         """
+        self.logger.info('Checking token validity (introspect)')
         return self.post("/v2/oauth2/token/introspect",
                          text_body={'token': token})

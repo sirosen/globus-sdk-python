@@ -1,3 +1,4 @@
+import logging
 import uuid
 import hashlib
 import base64
@@ -6,6 +7,8 @@ from six.moves.urllib.parse import urlencode
 from globus_sdk.base import slash_join
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth_flow_manager import GlobusOAuthFlowManager
+
+logger = logging.getLogger(__name__)
 
 
 def make_native_app_challenge(verifier=None):
@@ -17,6 +20,10 @@ def make_native_app_challenge(verifier=None):
     continuing it.
     Hashing is always done with simple SHA256
     """
+    if not verifier:
+        logger.info(('Autogenerating verifier secret. On low-entropy systems '
+                     'this may be insecure'))
+
     # unless provided, the "secret" is just a UUID4
     code_verifier = verifier or str(uuid.uuid4())
     # hash it, pull out a digest
@@ -80,6 +87,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         # set client_id, then check for validity
         self.client_id = auth_client.client_id
         if not self.client_id:
+            logger.error('Invalid auth_client ID to start Native App Flow: {}'
+                         .format(self.client_id))
             raise ValueError(
                 'Invalid value for client_id. Got "{0}"'
                 .format(self.client_id))
@@ -100,6 +109,14 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         # store the remaining parameters directly, with no transformation
         self.refresh_tokens = refresh_tokens
         self.state = state
+
+        logger.debug('Starting Native App Flow with params:')
+        logger.debug('auth_client.client_id={}'.format(auth_client.client_id))
+        logger.debug('redirect_uri={}'.format(self.redirect_uri))
+        logger.debug('refresh_tokens={}'.format(refresh_tokens))
+        logger.debug('state={}'.format(state))
+        logger.debug('requested_scopes={}'.format(self.requested_scopes))
+        logger.debug('verifier=<REDACTED>,challenge={}'.format(self.challenge))
 
     def get_authorize_url(self, additional_params=None):
         """
@@ -122,6 +139,9 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         """
         authorize_base_url = slash_join(self.auth_client.base_url,
                                         '/v2/oauth2/authorize')
+        logger.debug('Building authorization URI. Base URL: {}'
+                     .format(authorize_base_url))
+        logger.debug('additional_params={}'.format(additional_params))
 
         params = {
             'client_id': self.client_id,
@@ -147,6 +167,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         :rtype: :class:`OAuthTokenResponse \
         <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
+        logger.debug(('Performing Native App auth_code exchange. '
+                      'Sending verifier and client_id'))
         return self.auth_client.oauth2_token(
             {'client_id': self.client_id,
              'grant_type': 'authorization_code',

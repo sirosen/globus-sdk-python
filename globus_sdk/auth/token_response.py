@@ -1,9 +1,12 @@
+import logging
 import json
 import requests
 import time
 
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.exc import GlobusOptionalDependencyError
+
+logger = logging.getLogger(__name__)
 
 
 def _convert_token_info_dict(source_dict):
@@ -101,19 +104,23 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         """
         A parsed ID Token (OIDC) as a dict.
         """
+        logger.info('Decoding ID Token "{}"'.format(self['id_token']))
         try:
             from jose import jwt
         except ImportError:
+            logger.error('OptionalDependencyError(python-jose)')
             raise GlobusOptionalDependencyError(
                 ["python-jose"],
                 "JWT Parsing via OAuthTokenResponse.id_token")
 
+        logger.debug('Fetch JWK Data: Start')
         oidc_conf = auth_client.get('/.well-known/openid-configuration')
         jwks_uri = oidc_conf['jwks_uri']
+        jwk_data = requests.get(jwks_uri).json()
+        logger.debug('Fetch JWK Data: Complete')
 
         return jwt.decode(
-            self['id_token'],
-            requests.get(jwks_uri).json(),
+            self['id_token'], jwk_data,
             access_token=self.access_token,
             audience=auth_client.client_id)
 

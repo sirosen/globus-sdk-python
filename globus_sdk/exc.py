@@ -1,4 +1,7 @@
+import logging
 import textwrap
+
+logger = logging.getLogger(__name__)
 
 
 class GlobusError(Exception):
@@ -23,11 +26,18 @@ class GlobusAPIError(GlobusError):
         self._underlying_response = r
         self.http_status = r.status_code
         if "application/json" in r.headers["Content-Type"]:
+            logger.debug(('Content-Type on error is application/json. '
+                          'Doing error load from JSON'))
             try:
                 self._load_from_json(r.json())
             except KeyError:
+                logger.error(('Error body could not be JSON decoded! '
+                              'This means the Content-Type is wrong, or the '
+                              'body is malformed!'))
                 self._load_from_text(r.text)
         else:
+            logger.debug(('Content-Type on error is unknown. '
+                          'Failing over to error load as text (default)'))
             # fallback to using the entire body as the message for all
             # other types
             self._load_from_text(r.text)
@@ -47,10 +57,18 @@ class GlobusAPIError(GlobusError):
         code and message instance variables.
         """
         if "errors" in data:
+            if len(data["errors"]) != 1:
+                logger.warn(("Doing JSON load of error response with multiple "
+                             "errors. Exception data will only include the "
+                             "first error, but there are really {} errors")
+                            .format(len(data["errors"])))
             # TODO: handle responses with more than one error
             data = data["errors"][0]
         self.code = data["code"]
         if "message" in data:
+            logger.debug(("Doing JSON load of error response with 'message' "
+                          "field. There may also be a useful 'detail' field "
+                          "to inspect"))
             self.message = data["message"]
         else:
             self.message = data["detail"]

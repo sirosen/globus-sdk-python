@@ -1,13 +1,15 @@
 """
 Load config files once per interpreter invocation.
 """
-
+import logging
 import os
 from six.moves.configparser import (
     ConfigParser, MissingSectionHeaderError,
     NoOptionError, NoSectionError)
 
 from globus_sdk.exc import GlobusError
+
+logger = logging.getLogger(__name__)
 
 
 def _get_lib_config_path():
@@ -18,9 +20,14 @@ def _get_lib_config_path():
     """
     fname = "globus.cfg"
     try:
+        logger.debug("Attempting pkg_resources load of lib config")
         import pkg_resources
         path = pkg_resources.resource_filename("globus_sdk", fname)
+        logger.debug("pkg_resources load of lib config success")
+        import pkg_resources
     except ImportError:
+        logger.debug(("pkg_resources load of lib config failed, failing over "
+                      "to path joining"))
         pkg_path = os.path.dirname(__file__)
         path = os.path.join(pkg_path, fname)
     return path
@@ -33,8 +40,10 @@ class GlobusConfigParser(object):
     _GENERAL_CONF_SECTION = 'general'
 
     def __init__(self):
+        logger.debug("Loading SDK Config parser")
         self._parser = ConfigParser()
         self._load_config()
+        logger.debug("Config load succeeded")
 
     def _load_config(self):
         # TODO: /etc is not windows friendly, not sure about expanduser
@@ -42,10 +51,13 @@ class GlobusConfigParser(object):
             self._parser.read([_get_lib_config_path(), "/etc/globus.cfg",
                                os.path.expanduser("~/.globus.cfg")])
         except MissingSectionHeaderError:
+            logger.error(("MissingSectionHeader means invalid config "
+                          "somewhere, and is often an indicator of a stale "
+                          "early form of the Globus SDK config"))
             raise GlobusError(
                 "Failed to parse your ~/.globus.cfg Your config file may be "
-                "in an old format. Please visit https://tokens.globus.org/ to "
-                "get the latest format of this file.")
+                "in an old format. Please ensure that the file's first line "
+                "is \"[general]\"")
 
     def get(self, option,
             section=None, environment=None,
@@ -79,12 +91,17 @@ class GlobusConfigParser(object):
         env_option_name = 'GLOBUS_SDK_{}'.format(option.upper())
         value = None
         if check_env and env_option_name in os.environ:
+            logger.debug("Getting config value from environment: {}={}"
+                         .format(env_option_name, value))
             value = os.environ[env_option_name]
         else:
             try:
                 value = self._parser.get(section, option)
             except (NoOptionError, NoSectionError):
                 if failover_to_general:
+                    logger.debug("Config lookup of [{}]:{} failed, checking "
+                                 "[general] for a value as well"
+                                 .format(section, option))
                     value = self.get(option,
                                      section=self._GENERAL_CONF_SECTION)
 
@@ -110,7 +127,10 @@ def get_service_url(environment, service):
     p = _get_parser()
     option = service + "_service"
     # TODO: validate with urlparse?
-    return p.get(option, environment=environment)
+    url = p.get(option, environment=environment)
+    logger.debug("Service URL Lookup Result: \"{}\" is at \"{}\""
+                 .format(service, url))
+    return url
 
 
 def get_ssl_verify(environment):
@@ -120,6 +140,7 @@ def get_ssl_verify(environment):
                   type_cast=_bool_cast)
     if value is None:
         return True
+    logger.debug('ssl_verify set to {}'.format(value))
     return value
 
 
@@ -129,6 +150,7 @@ def _bool_cast(value):
         return True
     elif value in ("0", "no", "false", "off"):
         return False
+    logger.error('Value "{}" can\'t cast to bool'.format(value))
     raise ValueError("Invalid config bool")
 
 
@@ -145,6 +167,8 @@ def get_auth_token(environment):
     """
     Fetch any auth token from the config, if one is present
     """
+    logger.warn(("Fetching auth_token from config -- this behavior will "
+                 "be removed in a future version of the SDK"))
     return _get_token('auth_token', environment)
 
 
@@ -152,6 +176,8 @@ def get_transfer_token(environment):
     """
     Fetch any transfer token from the config, if one is present
     """
+    logger.warn(("Fetching transfer_token from config -- this behavior will "
+                 "be removed in a future version of the SDK"))
     return _get_token('transfer_token', environment)
 
 
@@ -162,4 +188,8 @@ def get_default_environ():
     `GLOBUS_SDK_ENVIRONMENT` in the shell environment. In that case, any client
     which does not explicitly specify its environment will use this value.
     """
-    return os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
+    env = os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
+    if env != 'default':
+        logger.info(('On lookup, non-default environment: '
+                     'GLOBUS_SDK_ENVIRONMENT={}'.format(env)))
+    return env
