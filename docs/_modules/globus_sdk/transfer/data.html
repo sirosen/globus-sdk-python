@@ -65,9 +65,9 @@
 <span class="sd">    :meth:`add_item &lt;globus_sdk.TransferData.add_item&gt;`.</span>
 
 <span class="sd">    For compatibility with older code and those knowledgeable about the API</span>
-<span class="sd">    sync_level can be ``1``, ``2``, or ``3``, but it can also be</span>
-<span class="sd">    ``&quot;exists&quot;``, ``&quot;mtime&quot;``, or ``&quot;checksum&quot;`` if you want greater clarity in</span>
-<span class="sd">    client code.</span>
+<span class="sd">    sync_level can be ``0``, ``1``, ``2``, or ``3``, but it can also be</span>
+<span class="sd">    ``&quot;exists&quot;``, ``&quot;size&quot;``, ``&quot;mtime&quot;``, or ``&quot;checksum&quot;`` if you want</span>
+<span class="sd">    greater clarity in client code.</span>
 
 <span class="sd">    Includes fetching the submission ID as part of document generation. The</span>
 <span class="sd">    submission ID can be pulled out of here to inspect, but the document</span>
@@ -94,8 +94,8 @@
         <span class="c1"># will just reject you with an error. This is kind of important: if</span>
         <span class="c1"># more levels are added in the future this method doesn&#39;t become</span>
         <span class="c1"># garbage overnight</span>
-        <span class="k">if</span> <span class="n">sync_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">sync_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;exists&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;checksum&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">sync_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sync_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;exists&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;checksum&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
             <span class="n">sync_level</span> <span class="o">=</span> <span class="n">sync_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sync_level</span><span class="p">,</span> <span class="n">sync_level</span><span class="p">)</span>
             <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;sync_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sync_level</span>
 
