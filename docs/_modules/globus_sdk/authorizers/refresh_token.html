@@ -168,7 +168,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;RefreshTokenAuthorizer determined time has &quot;</span>
-                          <span class="s2">&quot;expired. Feching new Access Token&quot;</span><span class="p">))</span>
+                          <span class="s2">&quot;expired. Fetching new Access Token&quot;</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_access_token</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;RefreshTokenAuthorizer determined time has &quot;</span>
