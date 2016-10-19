@@ -6,6 +6,8 @@ conversion.
 """
 import logging
 
+from globus_sdk.base import safe_stringify
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,6 +36,8 @@ class TransferData(dict):
     """
     def __init__(self, transfer_client, source_endpoint, destination_endpoint,
                  label=None, sync_level=None, **kwargs):
+        source_endpoint = safe_stringify(source_endpoint)
+        destination_endpoint = safe_stringify(destination_endpoint)
         logger.info("Creating a new TransferData object")
         self["DATA_TYPE"] = "transfer"
         self["submission_id"] = transfer_client.get_submission_id()["value"]
@@ -109,6 +113,7 @@ class DeleteData(dict):
     """
     def __init__(self, transfer_client, endpoint, label=None,
                  recursive=False, **kwargs):
+        endpoint = safe_stringify(endpoint)
         logger.info("Creating a new DeleteData object")
         self["DATA_TYPE"] = "delete"
         self["submission_id"] = transfer_client.get_submission_id()["value"]

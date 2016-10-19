@@ -2,7 +2,7 @@ import json
 import logging
 
 import requests
-
+import six
 from six.moves.urllib.parse import quote
 
 from globus_sdk import config, exc
@@ -419,3 +419,16 @@ def merge_params(base_params, **more_params):
     for param in more_params:
         if more_params[param] is not None:
             base_params[param] = more_params[param]
+
+
+def safe_stringify(value):
+    """
+    Convert bytes by decoding, strings verbatim, and __str__ on anything
+    else
+    """
+    if isinstance(value, bytes):
+        return value.decode('utf-8')
+    elif isinstance(value, six.string_types):
+        return value
+    else:
+        return str(value)
