@@ -1,4 +1,5 @@
 import logging
+from globus_sdk.base import merge_params
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.client_types.base import AuthClient
@@ -117,8 +118,8 @@ class ConfidentialAppAuthClient(AuthClient):
 
         **Parameters**
 
-            ``token`` (*string*)
-              An Access Token as a raw string, being exchanged.
+          ``token`` (*string*)
+            An Access Token as a raw string, being exchanged.
 
         :rtype: :class:`OAuthTokenResponse
                 <globus_sdk.auth.token_response.OAuthTokenResponse>`
@@ -129,7 +130,7 @@ class ConfidentialAppAuthClient(AuthClient):
             'token': token},
             response_class=OAuthDependentTokenResponse)
 
-    def oauth2_token_introspect(self, token):
+    def oauth2_token_introspect(self, token, include=None):
         """
         POST /v2/oauth2/token/introspect
 
@@ -139,6 +140,17 @@ class ConfidentialAppAuthClient(AuthClient):
         ...     CLIENT_ID, CLIENT_SECRET)
         >>> ac.oauth2_token_introspect('<token_string>')
 
+        **Parameters**
+
+          ``token`` (*string*)
+            An Access Token as a raw string, being evaluated
+
+          ``include`` (*string*)
+            A value for the ``include`` parameter in the request body. Default
+            is to omit the parameter, also supports ``"identities_set"``.
+
+        **External Documentation**
+
         See
         `Token Introspection \
         <https://docs.globus.org/api/auth/reference/\
@@ -146,5 +158,5 @@ class ConfidentialAppAuthClient(AuthClient):
         in the API documentation for details.
         """
         self.logger.info('Checking token validity (introspect)')
-        return self.post("/v2/oauth2/token/introspect",
-                         text_body={'token': token})
+        body = merge_params({'token': token}, include=include)
+        return self.post("/v2/oauth2/token/introspect", text_body=body)

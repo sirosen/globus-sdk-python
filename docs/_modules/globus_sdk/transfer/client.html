@@ -412,8 +412,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
                                <span class="s2">&quot;activation_requirements&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                         <span class="n">response_class</span><span class="o">=</span><span class="n">ActivationRequirementsResponse</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                        <span class="n">response_class</span><span class="o">=</span><span class="n">ActivationRequirementsResponse</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TransferClient.my_effective_pause_rule_list"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.my_effective_pause_rule_list">[docs]</a>    <span class="k">def</span> <span class="nf">my_effective_pause_rule_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
