@@ -47,9 +47,13 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         ``expires_at`` (*int*)
           Expiration time for the starting ``access_token`` expressed as a
           POSIX timestamp (i.e. seconds since the epoch)
+
+        ``on_refresh`` (*callable*)
+        Will be called as fn(TokenResponse) any time this authorizer
+        fetches a new access_token
     """
     def __init__(self, refresh_token, auth_client,
-                 access_token=None, expires_at=None):
+                 access_token=None, expires_at=None, on_refresh=None):
         logger.info(("Setting up a RefreshTokenAuthorizer. It will use an "
                      "auth type of Bearer and can handle 401s."))
         logger.info("RefreshTokenAuthorizer.auth_client = instance:{}"
@@ -70,6 +74,7 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         # not required
         self.access_token = access_token
         self.expires_at = None
+        self.on_refresh = on_refresh
 
         # check access_token too -- it's not clear what it would mean to set
         # expiration without an access token
@@ -110,6 +115,10 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         logger.info(("RefreshTokenAuthorizer.access_token updated to "
                      '"...{}" (last 5 chars)')
                     .format(self.access_token[-5:]))
+
+        if callable(self.on_refresh):
+            self.on_refresh(token_response)
+            logger.debug("Invoked on_refresh callback")
 
     def _check_expiration_time(self):
         """
