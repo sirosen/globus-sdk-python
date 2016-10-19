@@ -48,6 +48,7 @@
             
   <h1>Source code for globus_sdk.auth.client_types.confidential_client</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">globus_sdk.base</span> <span class="kn">import</span> <span class="n">merge_params</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="n">BasicAuthorizer</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.oauth2_constants</span> <span class="kn">import</span> <span class="n">DEFAULT_REQUESTED_SCOPES</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.client_types.base</span> <span class="kn">import</span> <span class="n">AuthClient</span>
@@ -166,8 +167,8 @@
 
 <span class="sd">        **Parameters**</span>
 
-<span class="sd">            ``token`` (*string*)</span>
-<span class="sd">              An Access Token as a raw string, being exchanged.</span>
+<span class="sd">          ``token`` (*string*)</span>
+<span class="sd">            An Access Token as a raw string, being exchanged.</span>
 
 <span class="sd">        :rtype: :class:`OAuthTokenResponse</span>
 <span class="sd">                &lt;globus_sdk.auth.token_response.OAuthTokenResponse&gt;`</span>
@@ -178,7 +179,7 @@
             <span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="n">token</span><span class="p">},</span>
             <span class="n">response_class</span><span class="o">=</span><span class="n">OAuthDependentTokenResponse</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConfidentialAppAuthClient.oauth2_token_introspect"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.ConfidentialAppAuthClient.oauth2_token_introspect">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_token_introspect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+<div class="viewcode-block" id="ConfidentialAppAuthClient.oauth2_token_introspect"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.ConfidentialAppAuthClient.oauth2_token_introspect">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_token_introspect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        POST /v2/oauth2/token/introspect</span>
 
@@ -188,6 +189,17 @@
 <span class="sd">        ...     CLIENT_ID, CLIENT_SECRET)</span>
 <span class="sd">        &gt;&gt;&gt; ac.oauth2_token_introspect(&#39;&lt;token_string&gt;&#39;)</span>
 
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">          ``token`` (*string*)</span>
+<span class="sd">            An Access Token as a raw string, being evaluated</span>
+
+<span class="sd">          ``include`` (*string*)</span>
+<span class="sd">            A value for the ``include`` parameter in the request body. Default</span>
+<span class="sd">            is to omit the parameter, also supports ``&quot;identities_set&quot;``.</span>
+
+<span class="sd">        **External Documentation**</span>
+
 <span class="sd">        See</span>
 <span class="sd">        `Token Introspection \</span>
 <span class="sd">        &lt;https://docs.globus.org/api/auth/reference/\</span>
@@ -195,8 +207,8 @@
 <span class="sd">        in the API documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Checking token validity (introspect)&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/v2/oauth2/token/introspect&quot;</span><span class="p">,</span>
-                         <span class="n">text_body</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="n">token</span><span class="p">})</span></div></div>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">merge_params</span><span class="p">({</span><span class="s1">&#39;token&#39;</span><span class="p">:</span> <span class="n">token</span><span class="p">},</span> <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/v2/oauth2/token/introspect&quot;</span><span class="p">,</span> <span class="n">text_body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

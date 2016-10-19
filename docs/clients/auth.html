@@ -394,7 +394,7 @@ B.</p>
 
 <dl class="method">
 <dt id="globus_sdk.ConfidentialAppAuthClient.oauth2_token_introspect">
-<code class="descname">oauth2_token_introspect</code><span class="sig-paren">(</span><em>token</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/auth/client_types/confidential_client.html#ConfidentialAppAuthClient.oauth2_token_introspect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.ConfidentialAppAuthClient.oauth2_token_introspect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">oauth2_token_introspect</code><span class="sig-paren">(</span><em>token</em>, <em>include=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/auth/client_types/confidential_client.html#ConfidentialAppAuthClient.oauth2_token_introspect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.ConfidentialAppAuthClient.oauth2_token_introspect" title="Permalink to this definition">¶</a></dt>
 <dd><p>POST /v2/oauth2/token/introspect</p>
 <p>Get information about a Globus Auth token.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">ConfidentialAppAuthClient</span><span class="p">(</span>
@@ -402,6 +402,17 @@ B.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span><span class="o">.</span><span class="n">oauth2_token_introspect</span><span class="p">(</span><span class="s1">&#39;&lt;token_string&gt;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">token</span></code> (<em>string</em>)</dt>
+<dd>An Access Token as a raw string, being evaluated</dd>
+<dt><code class="docutils literal"><span class="pre">include</span></code> (<em>string</em>)</dt>
+<dd>A value for the <code class="docutils literal"><span class="pre">include</span></code> parameter in the request body. Default
+is to omit the parameter, also supports <code class="docutils literal"><span class="pre">&quot;identities_set&quot;</span></code>.</dd>
+</dl>
+</div></blockquote>
+<p><strong>External Documentation</strong></p>
 <p>See
 <a class="reference external" href="https://docs.globus.org/api/auth/reference/#token_introspection_post_v2_oauth2_token_introspect">Token Introspection</a>
 in the API documentation for details.</p>
