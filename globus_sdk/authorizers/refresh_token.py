@@ -128,7 +128,7 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         if self.access_token is None or (
                 self.expires_at is None or time.time() > self.expires_at):
             logger.debug(("RefreshTokenAuthorizer determined time has "
-                          "expired. Feching new Access Token"))
+                          "expired. Fetching new Access Token"))
             self._get_new_access_token()
         else:
             logger.debug(("RefreshTokenAuthorizer determined time has "
