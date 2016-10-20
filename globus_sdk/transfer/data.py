@@ -62,13 +62,9 @@ class TransferData(dict):
         # garbage overnight
         if sync_level is not None:
             sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
-            sync_level = sync_dict.get(sync_level, sync_level)
-            self['sync_level'] = sync_level
+            self['sync_level'] = sync_dict.get(sync_level, sync_level)
             logger.info("TransferData.sync_level = {} ({})"
-                        .format(sync_level,
-                                (x for x in sync_dict
-                                 if sync_dict[x] == sync_level).next()
-                                ))
+                        .format(self['sync_level'], sync_level))
 
         self["DATA"] = []
 
