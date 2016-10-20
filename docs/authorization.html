@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>API Authorization &mdash; globus-sdk-python 0.4.2 documentation</title>
+    <title>API Authorization &mdash; globus-sdk-python 0.4.3 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4.2',
+        VERSION:     '0.4.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="globus-sdk-python 0.4.2 documentation" href="index.html" />
+    <link rel="top" title="globus-sdk-python 0.4.3 documentation" href="index.html" />
     <link rel="next" title="Globus SDK Configuration" href="config.html" />
     <link rel="prev" title="Resouce Servers and Scopes" href="oauth/resource_servers.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="oauth/resource_servers.html" title="Resouce Servers and Scopes"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">globus-sdk-python 0.4.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">globus-sdk-python 0.4.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -295,7 +295,7 @@ unadorned.</p>
 
 <dl class="class">
 <dt id="globus_sdk.RefreshTokenAuthorizer">
-<em class="property">class </em><code class="descclassname">globus_sdk.</code><code class="descname">RefreshTokenAuthorizer</code><span class="sig-paren">(</span><em>refresh_token</em>, <em>auth_client</em>, <em>access_token=None</em>, <em>expires_at=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/globus_sdk/authorizers/refresh_token.html#RefreshTokenAuthorizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.RefreshTokenAuthorizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">globus_sdk.</code><code class="descname">RefreshTokenAuthorizer</code><span class="sig-paren">(</span><em>refresh_token</em>, <em>auth_client</em>, <em>access_token=None</em>, <em>expires_at=None</em>, <em>on_refresh=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/globus_sdk/authorizers/refresh_token.html#RefreshTokenAuthorizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.RefreshTokenAuthorizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#globus_sdk.authorizers.base.GlobusAuthorizer" title="globus_sdk.authorizers.base.GlobusAuthorizer"><code class="xref py py-class docutils literal"><span class="pre">globus_sdk.authorizers.base.GlobusAuthorizer</span></code></a></p>
 <p>Implements Authorization using a Refresh Token to periodically fetch
 renewed Access Tokens. It may be initialized with an Access Token, or it
@@ -328,6 +328,9 @@ usage of the <code class="docutils literal"><span class="pre">RefreshTokenAuthor
 <dd>Expiration time for the starting <code class="docutils literal"><span class="pre">access_token</span></code> expressed as a
 POSIX timestamp (i.e. seconds since the epoch)</dd>
 </dl>
+<p><code class="docutils literal"><span class="pre">on_refresh</span></code> (<em>callable</em>)
+Will be called as fn(TokenResponse) any time this authorizer
+fetches a new access_token</p>
 </div></blockquote>
 <dl class="method">
 <dt id="globus_sdk.RefreshTokenAuthorizer.set_authorization_header">
@@ -415,7 +418,7 @@ being fetched.</p>
         <li class="right" >
           <a href="oauth/resource_servers.html" title="Resouce Servers and Scopes"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">globus-sdk-python 0.4.2 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">globus-sdk-python 0.4.3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

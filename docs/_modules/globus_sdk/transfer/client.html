@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>globus_sdk.transfer.client &mdash; globus-sdk-python 0.4.2 documentation</title>
+    <title>globus_sdk.transfer.client &mdash; globus-sdk-python 0.4.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.4.2',
+        VERSION:     '0.4.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="globus-sdk-python 0.4.2 documentation" href="../../../index.html" />
+    <link rel="top" title="globus-sdk-python 0.4.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">globus-sdk-python 0.4.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">globus-sdk-python 0.4.3 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,7 +51,7 @@
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="n">exc</span><span class="p">,</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">globus_sdk.base</span> <span class="kn">import</span> <span class="n">BaseClient</span><span class="p">,</span> <span class="n">merge_params</span>
+<span class="kn">from</span> <span class="nn">globus_sdk.base</span> <span class="kn">import</span> <span class="n">BaseClient</span><span class="p">,</span> <span class="n">merge_params</span><span class="p">,</span> <span class="n">safe_stringify</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AccessTokenAuthorizer</span><span class="p">,</span> <span class="n">RefreshTokenAuthorizer</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.transfer.response</span> <span class="kn">import</span> <span class="p">(</span>
@@ -149,6 +149,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.get_endpoint({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
@@ -174,6 +175,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#update_endpoint_by_id&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.update_endpoint({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">)</span>
@@ -231,6 +233,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_by_id&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.delete_endpoint({})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">)</span>
@@ -349,6 +352,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.endpoint_autoactivate({})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s2">&quot;autoactivate&quot;</span><span class="p">)</span>
@@ -368,6 +372,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_activation/#deactivate_endpoint&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.endpoint_deactivate({})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s2">&quot;deactivate&quot;</span><span class="p">)</span>
@@ -391,6 +396,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_activation/#activate_endpoint&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.endpoint_activate({})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s2">&quot;activate&quot;</span><span class="p">)</span>
@@ -410,6 +416,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
                                <span class="s2">&quot;activation_requirements&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
@@ -429,6 +436,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.my_effective_pause_rule_list({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
@@ -452,6 +460,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.my_shared_endpoint_list({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
@@ -511,6 +520,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.endpoint_server_list({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;server_list&#39;</span><span class="p">)</span>
@@ -531,6 +541,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.get_endpoint_server({}, {}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">server_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
@@ -551,6 +562,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.add_endpoint_server({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s2">&quot;server&quot;</span><span class="p">)</span>
@@ -570,6 +582,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#update_endpoint_server_by_id&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.update_endpoint_server({}, {}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">server_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
@@ -590,6 +603,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_server_by_id&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.delete_endpoint_server({}, {})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">server_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
@@ -614,6 +628,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.endpoint_role_list({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;role_list&#39;</span><span class="p">)</span>
@@ -634,6 +649,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.add_endpoint_role({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;role&#39;</span><span class="p">)</span>
@@ -653,6 +669,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_roles/#get_endpoint_role_by_id&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.get_endpoint_role({}, {}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">role_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;role&#39;</span><span class="p">,</span> <span class="n">role_id</span><span class="p">)</span>
@@ -672,6 +689,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_roles/#delete_endpoint_role_by_id&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.delete_endpoint_role({}, {})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">role_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;role&#39;</span><span class="p">,</span> <span class="n">role_id</span><span class="p">)</span>
@@ -688,6 +706,7 @@
 <span class="sd">        :rtype: :class:`IterableTransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.IterableTransferResponse&gt;`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.endpoint_acl_list({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;access_list&#39;</span><span class="p">)</span>
@@ -701,6 +720,7 @@
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.get_endpoint_acl_rule({}, {}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;access&#39;</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">)</span>
@@ -732,7 +752,7 @@
 <span class="sd">        &gt;&gt;&gt;   &quot;permissions&quot;: &quot;rw&quot;,</span>
 <span class="sd">        &gt;&gt;&gt; }</span>
 <span class="sd">        &gt;&gt;&gt; result = tc.add_endpoint_acl_rule(endpoint_id, rule_data)</span>
-<span class="sd">        &gt;&gt;&gt; rule_id = result[&quot;id&quot;]</span>
+<span class="sd">        &gt;&gt;&gt; rule_id = result[&quot;access_id&quot;]</span>
 
 <span class="sd">        **External Documentation**</span>
 
@@ -741,6 +761,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/acl/#rest_access_create&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.add_endpoint_acl_rule({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;access&#39;</span><span class="p">)</span>
@@ -753,6 +774,7 @@
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.update_endpoint_acl_rule({}, {}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;access&#39;</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">)</span>
@@ -765,6 +787,7 @@
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.delete_endpoint_acl_rule({}, {})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint&#39;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s1">&#39;access&#39;</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">)</span>
@@ -855,6 +878,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/file_operations/#list_directory_contents&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.operation_ls({}, {})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;operation/endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="s2">&quot;ls&quot;</span><span class="p">)</span>
@@ -880,6 +904,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/file_operations/#make_directory&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.operation_mkdir({}, {}, {})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
         <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;operation/endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
@@ -910,6 +935,7 @@
 <span class="sd">        &lt;https://docs.globus.org/api/transfer/file_operations/#rename&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.operation_rename({}, {}, {}, {})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">oldpath</span><span class="p">,</span> <span class="n">newpath</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
         <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;operation/endpoint&quot;</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span>
@@ -1218,7 +1244,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">globus-sdk-python 0.4.2 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">globus-sdk-python 0.4.3 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
