@@ -703,7 +703,7 @@ class TransferClient(BaseClient):
         >>>   "permissions": "rw",
         >>> }
         >>> result = tc.add_endpoint_acl_rule(endpoint_id, rule_data)
-        >>> rule_id = result["id"]
+        >>> rule_id = result["access_id"]
 
         **External Documentation**
 
