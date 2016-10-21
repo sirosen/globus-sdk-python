@@ -29,18 +29,16 @@ class AuthClient(BaseClient):
     Secret.
     Some resources may be available with either authentication type.
 
+    **Examples**
+
     Initializing an ``AuthClient`` to authenticate a user making calls to the
     Globus Auth service with an access token takes the form
 
-    >>> from globus_sdk import AuthClient
-    >>> # AccessTokenAuthorizer is used, loading from the auth_token value in
-    >>> # your configuration
-    >>> ac = AuthClient()
-
-    or explicitly as
-
     >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
     >>> ac = AuthClient(authorizer=AccessTokenAuthorizer('<token_string>'))
+
+    You can, of course, use other kinds of Authorizers (notably the
+    ``RefreshTokenAuthorizer``).
     """
     def __init__(self, client_id=None, authorizer=None, **kwargs):
         self.client_id = client_id
@@ -73,6 +71,8 @@ class AuthClient(BaseClient):
 
         Available with any authentication/client type.
 
+        **Examples**
+
         >>> ac = globus_sdk.AuthClient()
         >>> # by IDs
         >>> r = ac.get_identities(ids="46bd0f56-e24f-11e5-a510-131bef46955c")
@@ -95,6 +95,9 @@ class AuthClient(BaseClient):
         >>> ac.get_identities(
         >>>     usernames='globus@globus.org,auth@globus.org')
         ...
+
+
+        **External Documentation**
 
         See
         `Identities Resources \
@@ -194,11 +197,11 @@ class AuthClient(BaseClient):
         """
         Revoke a token. It can be an Access Token or a Refresh token.
 
-        Regardless of whether or not your client was issued the token, or of
-        any other unusual conditions, this call should always succeed and
-        revoke the token so long as the server can understand the request.
-        That is, it is best to try to make well-formed calls to this method,
-        but it is possible for malformed calls to still result in revocation.
+        This call should be used to revoke tokens issued to your client,
+        rendering them inert and not further usable. Typically, this is
+        incorporated into "logout" functionality, but it should also be used if
+        the client detects that its tokens are in an unsafe location (e.x.
+        found in a world-readable logfile).
 
         You can check the "active" status of the token after revocation if you
         want to confirm that it was revoked.
@@ -214,15 +217,6 @@ class AuthClient(BaseClient):
               speed the revocation process. Primarily for internal use
 
         **Examples**
-
-        Because this call can work even when you have the wrong credentials, it
-        can even be called with no credentials at all:
-
-        >>> from globus_sdk import AuthClient
-        >>> ac = AuthClient()
-        >>> ac.oauth2_revoke_token('<token_string>')
-
-        Or you could do it with a credentialed client type as well:
 
         >>> from globus_sdk import ConfidentialAppAuthClient
         >>> ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
