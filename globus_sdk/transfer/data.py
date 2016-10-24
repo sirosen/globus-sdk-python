@@ -79,6 +79,9 @@ class TransferData(dict):
         self["DATA"] = []
 
         self.update(kwargs)
+        for option, value in kwargs.items():
+            logger.info("TransferData.{} = {} (option passed in via kwargs)"
+                        .format(option, value))
 
     def add_item(self, source_path, destination_path, recursive=False):
         """
@@ -137,7 +140,11 @@ class DeleteData(dict):
             logger.debug("DeleteData.label = {}".format(label))
 
         self["DATA"] = []
+
         self.update(kwargs)
+        for option, value in kwargs.items():
+            logger.info("DeleteData.{} = {} (option passed in via kwargs)"
+                        .format(option, value))
 
     def add_item(self, path):
         """
