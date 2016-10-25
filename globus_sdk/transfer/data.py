@@ -25,7 +25,7 @@ class TransferData(dict):
     ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"`` if you want
     greater clarity in client code.
 
-    Includes fetching the submission ID as part of document generation. The
+    If ``submission_id`` isn't passed, one will be fetched automatically. The
     submission ID can be pulled out of here to inspect, but the document
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
@@ -35,13 +35,15 @@ class TransferData(dict):
     documentation for example usage.
     """
     def __init__(self, transfer_client, source_endpoint, destination_endpoint,
-                 label=None, sync_level=None, verify_checksum=False,
-                 preserve_timestamp=False, encrypt_data=False, **kwargs):
+                 label=None, submission_id=None, sync_level=None,
+                 verify_checksum=False, preserve_timestamp=False,
+                 encrypt_data=False, **kwargs):
         source_endpoint = safe_stringify(source_endpoint)
         destination_endpoint = safe_stringify(destination_endpoint)
         logger.info("Creating a new TransferData object")
         self["DATA_TYPE"] = "transfer"
-        self["submission_id"] = transfer_client.get_submission_id()["value"]
+        self["submission_id"] = submission_id or \
+            transfer_client.get_submission_id()["value"]
         logger.info("TransferData.submission_id = {}"
                     .format(self["submission_id"]))
         self["source_endpoint"] = source_endpoint
@@ -112,7 +114,7 @@ class DeleteData(dict):
     At least one item must be added using
     :meth:`add_item <globus_sdk.DeleteData.add_item>`.
 
-    Includes fetching the submission ID as part of document generation. The
+    If ``submission_id`` isn't passed, one will be fetched automatically. The
     submission ID can be pulled out of here to inspect, but the document
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
@@ -121,11 +123,12 @@ class DeleteData(dict):
     documentation for example usage.
     """
     def __init__(self, transfer_client, endpoint, label=None,
-                 recursive=False, **kwargs):
+                 submission_id=None, recursive=False, **kwargs):
         endpoint = safe_stringify(endpoint)
         logger.info("Creating a new DeleteData object")
         self["DATA_TYPE"] = "delete"
-        self["submission_id"] = transfer_client.get_submission_id()["value"]
+        self["submission_id"] = submission_id or \
+            transfer_client.get_submission_id()["value"]
         logger.info("DeleteData.submission_id = {}"
                     .format(self["submission_id"]))
         self["endpoint"] = endpoint
