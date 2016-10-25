@@ -35,7 +35,8 @@ class TransferData(dict):
     documentation for example usage.
     """
     def __init__(self, transfer_client, source_endpoint, destination_endpoint,
-                 label=None, sync_level=None, **kwargs):
+                 label=None, sync_level=None, verify_checksum=False,
+                 preserve_timestamp=False, encrypt_data=False, **kwargs):
         source_endpoint = safe_stringify(source_endpoint)
         destination_endpoint = safe_stringify(destination_endpoint)
         logger.info("Creating a new TransferData object")
@@ -49,6 +50,15 @@ class TransferData(dict):
         self["destination_endpoint"] = destination_endpoint
         logger.info("TransferData.destination_endpoint = {}"
                     .format(destination_endpoint))
+        self["verify_checksum"] = verify_checksum
+        logger.info("TransferData.verify_checksum = {}"
+                    .format(verify_checksum))
+        self["preserve_timestamp"] = preserve_timestamp
+        logger.info("TransferData.preserve_timestamp = {}"
+                    .format(preserve_timestamp))
+        self["encrypt_data"] = encrypt_data
+        logger.info("TransferData.preserve_timestamp = {}"
+                    .format(encrypt_data))
 
         if label is not None:
             self["label"] = label
@@ -69,6 +79,9 @@ class TransferData(dict):
         self["DATA"] = []
 
         self.update(kwargs)
+        for option, value in kwargs.items():
+            logger.info("TransferData.{} = {} (option passed in via kwargs)"
+                        .format(option, value))
 
     def add_item(self, source_path, destination_path, recursive=False):
         """
@@ -127,7 +140,11 @@ class DeleteData(dict):
             logger.debug("DeleteData.label = {}".format(label))
 
         self["DATA"] = []
+
         self.update(kwargs)
+        for option, value in kwargs.items():
+            logger.info("DeleteData.{} = {} (option passed in via kwargs)"
+                        .format(option, value))
 
     def add_item(self, path):
         """
