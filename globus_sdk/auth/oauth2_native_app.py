@@ -152,7 +152,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
             'code_challenge': self.challenge,
             'code_challenge_method': 'S256',
             'access_type': (self.refresh_tokens and 'offline') or 'online'
-            }
+        }
         if additional_params:
             params.update(additional_params)
 

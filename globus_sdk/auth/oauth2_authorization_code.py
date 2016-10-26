@@ -102,7 +102,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
             'state': self.state,
             'response_type': 'code',
             'access_type': (self.refresh_tokens and 'offline') or 'online'
-            }
+        }
         if additional_params:
             params.update(additional_params)
 
