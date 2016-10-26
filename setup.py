@@ -38,5 +38,5 @@ setup(name="globus-sdk",
           "Topic :: Communications :: File Sharing",
           "Topic :: Internet :: WWW/HTTP",
           "Topic :: Software Development :: Libraries :: Python Modules",
-          ],
+      ],
       )
