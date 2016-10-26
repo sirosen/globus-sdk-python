@@ -25,7 +25,8 @@ class GlobusAPIError(GlobusError):
     def __init__(self, r, *args, **kw):
         self._underlying_response = r
         self.http_status = r.status_code
-        if "application/json" in r.headers["Content-Type"]:
+        if "Content-Type" in r.headers and (
+                "application/json" in r.headers["Content-Type"]):
             logger.debug(('Content-Type on error is application/json. '
                           'Doing error load from JSON'))
             try:
