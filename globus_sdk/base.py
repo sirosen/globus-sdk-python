@@ -17,6 +17,9 @@ class ClientLogAdapter(logging.LoggerAdapter):
     def process(self, msg, kwargs):
         return '[instance:{}] {}'.format(id(self.extra['client']), msg), kwargs
 
+    def warn(self, *args, **kwargs):
+        return self.warning(*args, **kwargs)
+
 
 class BaseClient(object):
     r"""
