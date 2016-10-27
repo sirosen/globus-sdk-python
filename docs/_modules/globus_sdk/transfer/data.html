@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>globus_sdk.transfer.data &mdash; globus-sdk-python 0.4.3 documentation</title>
+    <title>globus_sdk.transfer.data &mdash; globus-sdk-python 0.4.4 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.4.3',
+        VERSION:     '0.4.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="globus-sdk-python 0.4.3 documentation" href="../../../index.html" />
+    <link rel="top" title="globus-sdk-python 0.4.4 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">globus-sdk-python 0.4.3 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">globus-sdk-python 0.4.4 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -74,7 +74,7 @@
 <span class="sd">    ``&quot;exists&quot;``, ``&quot;size&quot;``, ``&quot;mtime&quot;``, or ``&quot;checksum&quot;`` if you want</span>
 <span class="sd">    greater clarity in client code.</span>
 
-<span class="sd">    Includes fetching the submission ID as part of document generation. The</span>
+<span class="sd">    If ``submission_id`` isn&#39;t passed, one will be fetched automatically. The</span>
 <span class="sd">    submission ID can be pulled out of here to inspect, but the document</span>
 <span class="sd">    can be used as-is multiple times over to retry a potential submission</span>
 <span class="sd">    failure (so there shouldn&#39;t be any need to inspect it).</span>
@@ -84,12 +84,15 @@
 <span class="sd">    documentation for example usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transfer_client</span><span class="p">,</span> <span class="n">source_endpoint</span><span class="p">,</span> <span class="n">destination_endpoint</span><span class="p">,</span>
-                 <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sync_level</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                 <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">submission_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sync_level</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">verify_checksum</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">preserve_timestamp</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">encrypt_data</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">source_endpoint</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">source_endpoint</span><span class="p">)</span>
         <span class="n">destination_endpoint</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">destination_endpoint</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating a new TransferData object&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;DATA_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;transfer&quot;</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;submission_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transfer_client</span><span class="o">.</span><span class="n">get_submission_id</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;submission_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">submission_id</span> <span class="ow">or</span> \
+            <span class="n">transfer_client</span><span class="o">.</span><span class="n">get_submission_id</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferData.submission_id = {}&quot;</span>
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;submission_id&quot;</span><span class="p">]))</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;source_endpoint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source_endpoint</span>
@@ -98,6 +101,15 @@
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;destination_endpoint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination_endpoint</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferData.destination_endpoint = {}&quot;</span>
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">destination_endpoint</span><span class="p">))</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;verify_checksum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">verify_checksum</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferData.verify_checksum = {}&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">verify_checksum</span><span class="p">))</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;preserve_timestamp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preserve_timestamp</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferData.preserve_timestamp = {}&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">preserve_timestamp</span><span class="p">))</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;encrypt_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encrypt_data</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferData.preserve_timestamp = {}&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encrypt_data</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
@@ -118,6 +130,9 @@
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;DATA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferData.{} = {} (option passed in via kwargs)&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
 
 <div class="viewcode-block" id="TransferData.add_item"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferData.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -148,7 +163,7 @@
 <span class="sd">    At least one item must be added using</span>
 <span class="sd">    :meth:`add_item &lt;globus_sdk.DeleteData.add_item&gt;`.</span>
 
-<span class="sd">    Includes fetching the submission ID as part of document generation. The</span>
+<span class="sd">    If ``submission_id`` isn&#39;t passed, one will be fetched automatically. The</span>
 <span class="sd">    submission ID can be pulled out of here to inspect, but the document</span>
 <span class="sd">    can be used as-is multiple times over to retry a potential submission</span>
 <span class="sd">    failure (so there shouldn&#39;t be any need to inspect it).</span>
@@ -157,11 +172,12 @@
 <span class="sd">    documentation for example usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transfer_client</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                 <span class="n">submission_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">endpoint</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating a new DeleteData object&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;DATA_TYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;delete&quot;</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;submission_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transfer_client</span><span class="o">.</span><span class="n">get_submission_id</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;submission_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">submission_id</span> <span class="ow">or</span> \
+            <span class="n">transfer_client</span><span class="o">.</span><span class="n">get_submission_id</span><span class="p">()[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;DeleteData.submission_id = {}&quot;</span>
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;submission_id&quot;</span><span class="p">]))</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;endpoint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">endpoint</span>
@@ -176,7 +192,11 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;DeleteData.label = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;DATA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;DeleteData.{} = {} (option passed in via kwargs)&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
 
 <div class="viewcode-block" id="DeleteData.add_item"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.DeleteData.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -224,7 +244,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">globus-sdk-python 0.4.3 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">globus-sdk-python 0.4.4 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Transfer Client &mdash; globus-sdk-python 0.4.3 documentation</title>
+    <title>Transfer Client &mdash; globus-sdk-python 0.4.4 documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.3',
+        VERSION:     '0.4.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="globus-sdk-python 0.4.3 documentation" href="../index.html" />
+    <link rel="top" title="globus-sdk-python 0.4.4 documentation" href="../index.html" />
     <link rel="up" title="Service Clients" href="../clients.html" />
     <link rel="next" title="Auth Client" href="auth.html" />
     <link rel="prev" title="Service Clients" href="../clients.html" /> 
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="../clients.html" title="Service Clients"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">globus-sdk-python 0.4.3 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">globus-sdk-python 0.4.4 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../clients.html" accesskey="U">Service Clients</a> &raquo;</li> 
       </ul>
     </div>  
@@ -1062,7 +1062,7 @@ second at a time:</p>
 <h2>Helper Objects<a class="headerlink" href="#helper-objects" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="globus_sdk.TransferData">
-<em class="property">class </em><code class="descclassname">globus_sdk.</code><code class="descname">TransferData</code><span class="sig-paren">(</span><em>transfer_client</em>, <em>source_endpoint</em>, <em>destination_endpoint</em>, <em>label=None</em>, <em>sync_level=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/data.html#TransferData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">globus_sdk.</code><code class="descname">TransferData</code><span class="sig-paren">(</span><em>transfer_client</em>, <em>source_endpoint</em>, <em>destination_endpoint</em>, <em>label=None</em>, <em>submission_id=None</em>, <em>sync_level=None</em>, <em>verify_checksum=False</em>, <em>preserve_timestamp=False</em>, <em>encrypt_data=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/data.html#TransferData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">dict</span></code></p>
 <p>Convenience class for constructing a transfer document, to use as the
 <cite>data</cite> parameter to
@@ -1073,7 +1073,7 @@ second at a time:</p>
 sync_level can be <code class="docutils literal"><span class="pre">0</span></code>, <code class="docutils literal"><span class="pre">1</span></code>, <code class="docutils literal"><span class="pre">2</span></code>, or <code class="docutils literal"><span class="pre">3</span></code>, but it can also be
 <code class="docutils literal"><span class="pre">&quot;exists&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;size&quot;</span></code>, <code class="docutils literal"><span class="pre">&quot;mtime&quot;</span></code>, or <code class="docutils literal"><span class="pre">&quot;checksum&quot;</span></code> if you want
 greater clarity in client code.</p>
-<p>Includes fetching the submission ID as part of document generation. The
+<p>If <code class="docutils literal"><span class="pre">submission_id</span></code> isn&#8217;t passed, one will be fetched automatically. The
 submission ID can be pulled out of here to inspect, but the document
 can be used as-is multiple times over to retry a potential submission
 failure (so there shouldn&#8217;t be any need to inspect it).</p>
@@ -1092,14 +1092,14 @@ document.</p>
 
 <dl class="class">
 <dt id="globus_sdk.DeleteData">
-<em class="property">class </em><code class="descclassname">globus_sdk.</code><code class="descname">DeleteData</code><span class="sig-paren">(</span><em>transfer_client</em>, <em>endpoint</em>, <em>label=None</em>, <em>recursive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/data.html#DeleteData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.DeleteData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">globus_sdk.</code><code class="descname">DeleteData</code><span class="sig-paren">(</span><em>transfer_client</em>, <em>endpoint</em>, <em>label=None</em>, <em>submission_id=None</em>, <em>recursive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/data.html#DeleteData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.DeleteData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">dict</span></code></p>
 <p>Convenience class for constructing a delete document, to use as the
 <cite>data</cite> parameter to
 <a class="reference internal" href="#globus_sdk.TransferClient.submit_delete" title="globus_sdk.TransferClient.submit_delete"><code class="xref py py-meth docutils literal"><span class="pre">submit_delete</span></code></a>.</p>
 <p>At least one item must be added using
 <a class="reference internal" href="#globus_sdk.DeleteData.add_item" title="globus_sdk.DeleteData.add_item"><code class="xref py py-meth docutils literal"><span class="pre">add_item</span></code></a>.</p>
-<p>Includes fetching the submission ID as part of document generation. The
+<p>If <code class="docutils literal"><span class="pre">submission_id</span></code> isn&#8217;t passed, one will be fetched automatically. The
 submission ID can be pulled out of here to inspect, but the document
 can be used as-is multiple times over to retry a potential submission
 failure (so there shouldn&#8217;t be any need to inspect it).</p>
@@ -1197,7 +1197,7 @@ provided when contacting <a class="reference external" href="mailto:support&#37;
         <li class="right" >
           <a href="../clients.html" title="Service Clients"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">globus-sdk-python 0.4.3 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">globus-sdk-python 0.4.4 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../clients.html" >Service Clients</a> &raquo;</li> 
       </ul>
     </div>
