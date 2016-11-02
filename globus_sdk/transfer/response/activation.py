@@ -139,3 +139,13 @@ class ActivationRequirementsResponse(TransferResponse):
             return (time.time() + time_seconds) < self.expires_at
         else:
             return time_seconds < self.expires_at
+
+    @property
+    def always_activated(self):
+        """
+        Returns True if the endpoint activation never expires
+        (e.g. shared endpoints, globus connect personal endpoints).
+
+        :rtype: ``bool``
+        """
+        return self["expires_in"] == -1
