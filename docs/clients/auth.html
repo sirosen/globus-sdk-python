@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Auth Client &mdash; globus-sdk-python 0.4.4 documentation</title>
+    <title>Auth Client &mdash; globus-sdk-python 0.4.5 documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.4.4',
+        VERSION:     '0.4.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="globus-sdk-python 0.4.4 documentation" href="../index.html" />
+    <link rel="top" title="globus-sdk-python 0.4.5 documentation" href="../index.html" />
     <link rel="up" title="Service Clients" href="../clients.html" />
     <link rel="next" title="Low Level API" href="base.html" />
     <link rel="prev" title="Transfer Client" href="transfer.html" /> 
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="transfer.html" title="Transfer Client"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">globus-sdk-python 0.4.4 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">globus-sdk-python 0.4.5 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../clients.html" accesskey="U">Service Clients</a> &raquo;</li> 
       </ul>
     </div>  
@@ -85,13 +85,14 @@ Globus Auth service with an access token takes the form</p>
 <code class="docutils literal"><span class="pre">RefreshTokenAuthorizer</span></code>).</p>
 <dl class="method">
 <dt id="globus_sdk.AuthClient.get_identities">
-<code class="descname">get_identities</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/auth/client_types/base.html#AuthClient.get_identities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.AuthClient.get_identities" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_identities</code><span class="sig-paren">(</span><em>usernames=None</em>, <em>ids=None</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/auth/client_types/base.html#AuthClient.get_identities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.AuthClient.get_identities" title="Permalink to this definition">¶</a></dt>
 <dd><p>GET /v2/api/identities</p>
 <p>Given <code class="docutils literal"><span class="pre">usernames=&lt;U&gt;</span></code> or (exclusive) <code class="docutils literal"><span class="pre">ids=&lt;I&gt;</span></code> as keyword
 arguments, looks up identity information for the set of identities
 provided.
 <code class="docutils literal"><span class="pre">&lt;U&gt;</span></code> and <code class="docutils literal"><span class="pre">&lt;I&gt;</span></code> in this case are comma-delimited strings listing
-multiple Identity Usernames or Identity IDs.</p>
+multiple Identity Usernames or Identity IDs, or iterables of strings,
+each of which is an Identity Username or Identity ID.</p>
 <p>Available with any authentication/client type.</p>
 <p><strong>Examples</strong></p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">AuthClient</span><span class="p">()</span>
@@ -106,7 +107,7 @@ multiple Identity Usernames or Identity IDs.</p>
 <span class="go">   u&#39;status&#39;: u&#39;unused&#39;,</span>
 <span class="go">   u&#39;username&#39;: u&#39;globus@globus.org&#39;}]}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span><span class="o">.</span><span class="n">get_identities</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">identities</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">ids</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="p">(</span><span class="s2">&quot;46bd0f56-e24f-11e5-a510-131bef46955c&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>         <span class="s2">&quot;168edc3d-c6ba-478c-9cf8-541ff5ebdc1c&quot;</span><span class="p">))</span>
 <span class="gp">...</span>
@@ -115,6 +116,16 @@ multiple Identity Usernames or Identity IDs.</p>
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span><span class="o">.</span><span class="n">get_identities</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">usernames</span><span class="o">=</span><span class="s1">&#39;globus@globus.org,auth@globus.org&#39;</span><span class="p">)</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>You could also use iterables:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span><span class="o">.</span><span class="n">get_identities</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">usernames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;globus@globus.org&#39;</span><span class="p">,</span> <span class="s1">&#39;auth@globus.org&#39;</span><span class="p">])</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span><span class="o">.</span><span class="n">get_identities</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;46bd0f56-e24f-11e5-a510-131bef46955c&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>         <span class="s2">&quot;168edc3d-c6ba-478c-9cf8-541ff5ebdc1c&quot;</span><span class="p">])</span>
 <span class="gp">...</span>
 </pre></div>
 </div>
@@ -472,7 +483,7 @@ in the API documentation for details.</p>
         <li class="right" >
           <a href="transfer.html" title="Transfer Client"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">globus-sdk-python 0.4.4 documentation</a> &raquo;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">globus-sdk-python 0.4.5 documentation</a> &raquo;</li>
           <li class="nav-item nav-item-1"><a href="../clients.html" >Service Clients</a> &raquo;</li> 
       </ul>
     </div>
