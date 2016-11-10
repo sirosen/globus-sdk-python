@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import six
+import collections
 import logging
 
 from globus_sdk import config
@@ -67,7 +69,8 @@ class AuthClient(BaseClient):
         arguments, looks up identity information for the set of identities
         provided.
         ``<U>`` and ``<I>`` in this case are comma-delimited strings listing
-        multiple Identity Usernames or Identity IDs.
+        multiple Identity Usernames or Identity IDs, or iterables of strings,
+        each of which is an Identity Username or Identity ID.
 
         Available with any authentication/client type.
 
@@ -85,7 +88,7 @@ class AuthClient(BaseClient):
            u'status': u'unused',
            u'username': u'globus@globus.org'}]}
         >>> ac.get_identities(
-        >>>     identities=",".join(
+        >>>     ids=",".join(
         >>>         ("46bd0f56-e24f-11e5-a510-131bef46955c",
         >>>          "168edc3d-c6ba-478c-9cf8-541ff5ebdc1c"))
         ...
@@ -94,6 +97,16 @@ class AuthClient(BaseClient):
         ...
         >>> ac.get_identities(
         >>>     usernames='globus@globus.org,auth@globus.org')
+        ...
+
+        You could also use iterables:
+
+        >>> ac.get_identities(
+        >>>     usernames=['globus@globus.org', 'auth@globus.org'])
+        ...
+        >>> ac.get_identities(
+        >>>     ids=["46bd0f56-e24f-11e5-a510-131bef46955c",
+        >>>          "168edc3d-c6ba-478c-9cf8-541ff5ebdc1c"])
         ...
 
 
@@ -105,6 +118,13 @@ class AuthClient(BaseClient):
         #v2_api_identities_resources>`_
         in the API documentation for details.
         """
+        def _convert_listarg(val):
+            if (isinstance(val, collections.Iterable) and
+                    not isinstance(val, six.string_types)):
+                return ','.join(safe_stringify(x) for x in val)
+            else:
+                return safe_stringify(val)
+
         self.logger.info('Looking up Globus Auth Identities')
 
         # if either of these params has a truthy value, stringify it safely,
@@ -112,9 +132,9 @@ class AuthClient(BaseClient):
         # thing"
         # most notably, lets `ids` take a single UUID object safely
         if usernames:
-            params['usernames'] = safe_stringify(usernames)
+            params['usernames'] = _convert_listarg(usernames)
         if ids:
-            params['ids'] = safe_stringify(ids)
+            params['ids'] = _convert_listarg(ids)
 
         self.logger.debug('params={}'.format(params))
 
