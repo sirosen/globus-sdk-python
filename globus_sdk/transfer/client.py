@@ -126,6 +126,16 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_by_id>`_
         in the REST documentation for details.
         """
+        if data.get('myproxy_server'):
+            if data.get('oauth_server'):
+                raise ValueError("an endpoint cannot be reconfigured to use "
+                                 "multiple identity providers for activation; "
+                                 "specify either MyProxy or OAuth, not both")
+            else:
+                data['oauth_server'] = None
+        elif data.get('oauth_server'):
+            data['myproxy_server'] = None
+
         endpoint_id = safe_stringify(endpoint_id)
         self.logger.info("TransferClient.update_endpoint({}, ...)"
                          .format(endpoint_id))
@@ -162,6 +172,11 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#create_endpoint>`_
         in the REST documentation for details.
         """
+        if data.get('myproxy_server') and data.get('oauth_server'):
+            raise ValueError("an endpoint cannot be created using multiple "
+                             "identity providers for activation; "
+                             "specify either MyProxy or OAuth, not both")
+
         self.logger.info("TransferClient.create_endpoint(...)")
         return self.post("endpoint", data)
 
