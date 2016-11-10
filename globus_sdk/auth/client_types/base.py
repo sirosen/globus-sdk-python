@@ -1,9 +1,11 @@
 from __future__ import print_function
 
+import six
+import collections
 import logging
 
 from globus_sdk import config
-from globus_sdk.base import BaseClient
+from globus_sdk.base import BaseClient, safe_stringify
 from globus_sdk.authorizers import AccessTokenAuthorizer, NullAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
 
@@ -59,7 +61,7 @@ class AuthClient(BaseClient):
 
         BaseClient.__init__(self, "auth", authorizer=authorizer, **kwargs)
 
-    def get_identities(self, **params):
+    def get_identities(self, usernames=None, ids=None, **params):
         r"""
         GET /v2/api/identities
 
@@ -67,7 +69,8 @@ class AuthClient(BaseClient):
         arguments, looks up identity information for the set of identities
         provided.
         ``<U>`` and ``<I>`` in this case are comma-delimited strings listing
-        multiple Identity Usernames or Identity IDs.
+        multiple Identity Usernames or Identity IDs, or iterables of strings,
+        each of which is an Identity Username or Identity ID.
 
         Available with any authentication/client type.
 
@@ -85,7 +88,7 @@ class AuthClient(BaseClient):
            u'status': u'unused',
            u'username': u'globus@globus.org'}]}
         >>> ac.get_identities(
-        >>>     identities=",".join(
+        >>>     ids=",".join(
         >>>         ("46bd0f56-e24f-11e5-a510-131bef46955c",
         >>>          "168edc3d-c6ba-478c-9cf8-541ff5ebdc1c"))
         ...
@@ -94,6 +97,16 @@ class AuthClient(BaseClient):
         ...
         >>> ac.get_identities(
         >>>     usernames='globus@globus.org,auth@globus.org')
+        ...
+
+        You could also use iterables:
+
+        >>> ac.get_identities(
+        >>>     usernames=['globus@globus.org', 'auth@globus.org'])
+        ...
+        >>> ac.get_identities(
+        >>>     ids=["46bd0f56-e24f-11e5-a510-131bef46955c",
+        >>>          "168edc3d-c6ba-478c-9cf8-541ff5ebdc1c"])
         ...
 
 
@@ -105,11 +118,30 @@ class AuthClient(BaseClient):
         #v2_api_identities_resources>`_
         in the API documentation for details.
         """
+        def _convert_listarg(val):
+            if (isinstance(val, collections.Iterable) and
+                    not isinstance(val, six.string_types)):
+                return ','.join(safe_stringify(x) for x in val)
+            else:
+                return safe_stringify(val)
+
         self.logger.info('Looking up Globus Auth Identities')
+
+        # if either of these params has a truthy value, stringify it safely,
+        # letting us consume args whose `__str__` methods produce "the right
+        # thing"
+        # most notably, lets `ids` take a single UUID object safely
+        if usernames:
+            params['usernames'] = _convert_listarg(usernames)
+        if ids:
+            params['ids'] = _convert_listarg(ids)
+
         self.logger.debug('params={}'.format(params))
-        if 'usernames' in params and 'identities' in params:
+
+        if 'usernames' in params and 'ids' in params:
             self.logger.warn(('get_identities call with both usernames and '
                               'identities set! Expected to result in errors'))
+
         return self.get("/v2/api/identities", params=params)
 
     def oauth2_get_authorize_url(self, additional_params=None):
