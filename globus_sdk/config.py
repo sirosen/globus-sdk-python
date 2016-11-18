@@ -112,13 +112,15 @@ class GlobusConfigParser(object):
 
 def _get_parser():
     """
-    Singleton pattern implemented via a global varaible and function.
+    Singleton pattern implemented via a global variable and function.
     There is only ever one _parser, and it is always returned by this function.
     """
     global _parser
     if _parser is None:
         _parser = GlobusConfigParser()
     return _parser
+
+
 # at import-time, it's None
 _parser = None
 
