@@ -117,7 +117,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         :rtype: :class:`OAuthTokenResponse \
         <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
-        logger.debug(('Performing Native App auth_code exchange. '
+        logger.debug(('Performing Authorization Code auth_code exchange. '
                       'Sending client_id and client_secret'))
         return self.auth_client.oauth2_token(
             {'grant_type': 'authorization_code',
