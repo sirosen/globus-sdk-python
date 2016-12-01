@@ -167,5 +167,6 @@ class ConfidentialAppAuthClient(AuthClient):
         in the API documentation for details.
         """
         self.logger.info('Checking token validity (introspect)')
-        body = merge_params({'token': token}, include=include)
+        body = {'token': token}
+        merge_params(body, include=include)
         return self.post("/v2/oauth2/token/introspect", text_body=body)
