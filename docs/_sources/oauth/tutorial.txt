@@ -4,7 +4,7 @@ OAuth2 SDK Tutorial
 -------------------
 
 This is a tutorial in the use of the Globus SDK to carry out an OAuth2
-Authentication flow.
+Native App Authentication flow.
 
 The goal here is to have a user authenticate in Globus Auth, and for the SDK
 to procure tokens which may be used to authenticate SDK calls against various
@@ -18,9 +18,10 @@ definition registered with Globus Auth.
 To do so, follow the relevant documentation for the
 `Globus Auth Service <https://docs.globus.org/api/auth/>`_.
 
-(Note: As of 2016-08-31, registering a client requires an out of band process
-with the Globus Team. This document assumes that you already have one)
-
+Make sure, when registering your application, that you enter
+``https://auth.globus.org/v2/web/auth-code`` into the "Redirect URIs" field.
+This is necessary to leverage the default behavior of the SDK, and is typically
+sufficient for this type of application.
 
 Native App Grant Explained
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
