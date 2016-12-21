@@ -57,7 +57,7 @@
   <div class="section" id="oauth2-sdk-tutorial">
 <span id="oauth-tutorial"></span><h1>OAuth2 SDK Tutorial<a class="headerlink" href="#oauth2-sdk-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This is a tutorial in the use of the Globus SDK to carry out an OAuth2
-Authentication flow.</p>
+Native App Authentication flow.</p>
 <p>The goal here is to have a user authenticate in Globus Auth, and for the SDK
 to procure tokens which may be used to authenticate SDK calls against various
 services for that user.</p>
@@ -67,8 +67,10 @@ services for that user.</p>
 definition registered with Globus Auth.
 To do so, follow the relevant documentation for the
 <a class="reference external" href="https://docs.globus.org/api/auth/">Globus Auth Service</a>.</p>
-<p>(Note: As of 2016-08-31, registering a client requires an out of band process
-with the Globus Team. This document assumes that you already have one)</p>
+<p>Make sure, when registering your application, that you enter
+<code class="docutils literal"><span class="pre">https://auth.globus.org/v2/web/auth-code</span></code> into the &#8220;Redirect URIs&#8221; field.
+This is necessary to leverage the default behavior of the SDK, and is typically
+sufficient for this type of application.</p>
 </div>
 <div class="section" id="native-app-grant-explained">
 <h2>Native App Grant Explained<a class="headerlink" href="#native-app-grant-explained" title="Permalink to this headline">¶</a></h2>
