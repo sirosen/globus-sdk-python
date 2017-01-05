@@ -19,9 +19,14 @@ class PaginatedResource(GlobusResponse, six.Iterator):
     - They support `limit` and `offset` query params, with `limit` being a
       count of elements to return, and offset being an offset into the result
       set (as opposed to a page number), 0-based
+      OR
+      They support a `marker` query param, which is an opaque value
     - They return a JSON result with `has_next_page` as a boolean key,
       indicating whether or not there are more results available -- even if the
       hard limit for the API forbids requesting these results
+      OR
+      They return a JSON result with `marker` as a key indicating whether or
+      not there are more results available
     - Individual results are JSON objects inside of an array named `DATA` in
       the returned JSON document
 
@@ -40,6 +45,9 @@ class PaginatedResource(GlobusResponse, six.Iterator):
     # pages have a 'has_next_page', but use 'last_key' rather than 'offset' +
     # 'limit'
     PAGING_STYLE_LAST_KEY = 2
+    # pages have a 'marker' attribute, which refers to the "next page" of
+    # results, but which is opaque
+    PAGING_STYLE_MARKER = 3
 
     # bind an object at class def time to act as a sentinel value for iteration
     # Basically grabbing something that can't be duplicated by iteration
@@ -82,6 +90,14 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         self.max_total_results = max_total_results
         self.offset = offset
         self.paging_style = paging_style
+
+        # counter for how many results we've gotten thusfar, used to cap paging
+        # in non-offset based styles
+        self.num_results_fetched = 0
+
+        # potentially necessary params during paging
+        self.limit = None
+        self.next_marker = None
 
         # check the requested num results to see if it exceeds the maximum
         # total number of results allowed by the API
@@ -163,22 +179,72 @@ class PaginatedResource(GlobusResponse, six.Iterator):
 
         This method is the real workhorse of this entire module.
         """
-        # now, cap the limit per request to the max per request size
-        limit = min(self.num_results, self.max_results_per_call)
+        if not self.client_kwargs['params']:
+            self.client_kwargs['params'] = {}
+
+        # to start with, cap the limit per request to the max per request size
+        self.limit = min(self.num_results, self.max_results_per_call)
+
+        def _set_params_for_next_call():
+            # if we're about to request more results than the user asked
+            # for, limit ourselves on the last paginated call to the API
+            if self.offset + self.limit > self.num_results:
+                self.limit = self.num_results - self.offset
+
+            # all paging styles support limit
+            # MARKER doesn't have it documented, but it is in fact supported
+            self.client_kwargs['params']['limit'] = self.limit
+
+            # if the paging is done by marker, just carry over the marker
+            if self.paging_style == self.PAGING_STYLE_MARKER:
+                if self.next_marker:
+                    self.client_kwargs['params']['marker'] = (
+                        self.next_marker)
+            # these params work for all paging styles *except* MARKER
+            else:
+                self.client_kwargs['params']['offset'] = self.offset
+
+        def _check_has_next_page(res):
+            """
+            Check that the API says there are more results available.
+
+            Additionally, update the PaginatedResource.maker or
+            PaginatedResource.offset based on the response
+            """
+            # if the paging style is MARKER, look at the marker
+            if self.paging_style == self.PAGING_STYLE_MARKER:
+                # marker may be 0, null, or absent if no more results
+                # API docs aren't 100% clear -- looks like 0 is what we should
+                # expect, but we'll also accept null or absent to be safe
+                self.next_marker = res.get('next_marker')
+                return bool(self.next_marker)
+
+            # start doing the offset maths and see if we have another page to
+            # fetch
+            # step size is the number of results per call -- we'll catch this
+            # "walking off the end" of the requested results afterwards
+            self.offset += self.max_results_per_call
+
+            # if it's HAS_NEXT, the check is easy, as it's explicitly part of
+            # the response
+            if self.paging_style == self.PAGING_STYLE_HAS_NEXT:
+                # just return the has_next_page value
+                return res['has_next_page']
+
+            # if paging is TOTAL oriented, check if we've reached the total
+            if self.paging_style == self.PAGING_STYLE_TOTAL:
+                return self.offset < res['total']
+
+            logger.error("PaginatedResource.paging_style={} is invalid"
+                         .format(self.paging_style))
+            raise ValueError(
+                'Invalid Paging Style Given to PaginatedResource')
 
         has_next_page = True
         while has_next_page:
             logger.debug(("PaginatedResource should have more results, "
                           "requesting them now"))
-            # if we're about to request more results than the user asked
-            # for, limit ourselves on the last paginated call to the API
-            if self.offset + limit > self.num_results:
-                limit = self.num_results - self.offset
-
-            if not self.client_kwargs['params']:
-                self.client_kwargs['params'] = {}
-            self.client_kwargs['params']['offset'] = self.offset
-            self.client_kwargs['params']['limit'] = limit
+            _set_params_for_next_call()
 
             # fetch a page of results and walk them, yielding them as the
             # iterated elements wrapped in GlobusResponse objects
@@ -187,19 +253,16 @@ class PaginatedResource(GlobusResponse, six.Iterator):
             res = self.client_method(self.client_path, **self.client_kwargs)
             for item in res:
                 yield GlobusResponse(item)
+                # increment the "num results" counter
+                self.num_results_fetched += 1
 
-            self.offset += self.max_results_per_call
+                # ensure that even if the paging style requires that we fetch
+                # more results than were requested, we still only yield the
+                # number that were requested -- returning here will result in a
+                # StopIteration because this is a generator function
+                # CAREFUL! make sure we catch num_results_fetched==num_results
+                # otherwise, we could end up making one-too-many API calls
+                if self.num_results_fetched >= self.num_results:
+                    return
 
-            # do we have another page of results to fetch?
-            if self.paging_style == self.PAGING_STYLE_HAS_NEXT:
-                # set to False if we've reached the given limit
-                has_next_page = res['has_next_page']
-            elif self.paging_style == self.PAGING_STYLE_TOTAL:
-                has_next_page = self.offset < res['total']
-            else:
-                logger.error("PaginatedResource.paging_style={} is invalid"
-                             .format(self.paging_style))
-                raise ValueError(
-                    'Invalid Paging Style Given to PaginatedResource')
-
-            has_next_page = has_next_page and self.offset < self.num_results
+            has_next_page = _check_has_next_page(res)
