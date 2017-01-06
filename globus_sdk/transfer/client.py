@@ -294,9 +294,9 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
-        >>> while (r["code"] == "AutoActivateFailed"):
+        >>> while (r["code"] == "AutoActivationFailed"):
         >>>     print("Endpoint requires manual activation, please open "
         >>>           "the following URL in a browser to activate the "
         >>>           "endpoint:")
@@ -310,6 +310,27 @@ class TransferClient(BaseClient):
         because many endpoints require activation via OAuth MyProxy,
         which must be done in a browser anyway. Web based clients can
         link directly to the URL.
+
+        You also might want messaging or logging depending on why and how the
+        operation succeeded, in which case you'll need to look at the value of
+        the "code" field and either decide on your own messaging or use the
+        response's "message" field.
+
+        >>> tc = globus_sdk.TransferClient(...)
+        >>> r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
+        >>> if r['code'] == 'AutoActivationFailed':
+        >>>     print('Endpoint({}) Not Active! Error! Source message: {}'
+        >>>           .format(ep_id, r['message']))
+        >>>     sys.exit(1)
+        >>> elif r['code'] == 'AutoActivated.CachedCredential':
+        >>>     print('Endpoint({}) autoactivated using a cached credential.'
+        >>>           .format(ep_id))
+        >>> elif r['code'] == 'AutoActivated.GlobusOnlineCredential':
+        >>>     print(('Endpoint({}) autoactivated using a built-in Globus '
+        >>>            'credential.').format(ep_id))
+        >>> elif r['code'] = 'AlreadyActivated':
+        >>>     print('Endpoint({}) already active until at least {}'
+        >>>           .format(ep_id, 3600))
 
         **External Documentation**
 

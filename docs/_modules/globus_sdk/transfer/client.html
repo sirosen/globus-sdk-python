@@ -343,9 +343,9 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)</span>
-<span class="sd">        &gt;&gt;&gt; while (r[&quot;code&quot;] == &quot;AutoActivateFailed&quot;):</span>
+<span class="sd">        &gt;&gt;&gt; while (r[&quot;code&quot;] == &quot;AutoActivationFailed&quot;):</span>
 <span class="sd">        &gt;&gt;&gt;     print(&quot;Endpoint requires manual activation, please open &quot;</span>
 <span class="sd">        &gt;&gt;&gt;           &quot;the following URL in a browser to activate the &quot;</span>
 <span class="sd">        &gt;&gt;&gt;           &quot;endpoint:&quot;)</span>
@@ -359,6 +359,27 @@
 <span class="sd">        because many endpoints require activation via OAuth MyProxy,</span>
 <span class="sd">        which must be done in a browser anyway. Web based clients can</span>
 <span class="sd">        link directly to the URL.</span>
+
+<span class="sd">        You also might want messaging or logging depending on why and how the</span>
+<span class="sd">        operation succeeded, in which case you&#39;ll need to look at the value of</span>
+<span class="sd">        the &quot;code&quot; field and either decide on your own messaging or use the</span>
+<span class="sd">        response&#39;s &quot;message&quot; field.</span>
+
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
+<span class="sd">        &gt;&gt;&gt; r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)</span>
+<span class="sd">        &gt;&gt;&gt; if r[&#39;code&#39;] == &#39;AutoActivationFailed&#39;:</span>
+<span class="sd">        &gt;&gt;&gt;     print(&#39;Endpoint({}) Not Active! Error! Source message: {}&#39;</span>
+<span class="sd">        &gt;&gt;&gt;           .format(ep_id, r[&#39;message&#39;]))</span>
+<span class="sd">        &gt;&gt;&gt;     sys.exit(1)</span>
+<span class="sd">        &gt;&gt;&gt; elif r[&#39;code&#39;] == &#39;AutoActivated.CachedCredential&#39;:</span>
+<span class="sd">        &gt;&gt;&gt;     print(&#39;Endpoint({}) autoactivated using a cached credential.&#39;</span>
+<span class="sd">        &gt;&gt;&gt;           .format(ep_id))</span>
+<span class="sd">        &gt;&gt;&gt; elif r[&#39;code&#39;] == &#39;AutoActivated.GlobusOnlineCredential&#39;:</span>
+<span class="sd">        &gt;&gt;&gt;     print((&#39;Endpoint({}) autoactivated using a built-in Globus &#39;</span>
+<span class="sd">        &gt;&gt;&gt;            &#39;credential.&#39;).format(ep_id))</span>
+<span class="sd">        &gt;&gt;&gt; elif r[&#39;code&#39;] = &#39;AlreadyActivated&#39;:</span>
+<span class="sd">        &gt;&gt;&gt;     print(&#39;Endpoint({}) already active until at least {}&#39;</span>
+<span class="sd">        &gt;&gt;&gt;           .format(ep_id, 3600))</span>
 
 <span class="sd">        **External Documentation**</span>
 

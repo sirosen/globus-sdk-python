@@ -279,9 +279,9 @@ endpoint is not already activated or going to expire within an
 hour (3600 seconds). If that fails, direct the user to the
 globus website to perform activation:</p>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_autoactivate</span><span class="p">(</span><span class="n">ep_id</span><span class="p">,</span> <span class="n">if_expires_in</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;AutoActivateFailed&quot;</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;AutoActivationFailed&quot;</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Endpoint requires manual activation, please open &quot;</span>
 <span class="gp">&gt;&gt;&gt; </span>          <span class="s2">&quot;the following URL in a browser to activate the &quot;</span>
 <span class="gp">&gt;&gt;&gt; </span>          <span class="s2">&quot;endpoint:&quot;</span><span class="p">)</span>
@@ -296,6 +296,27 @@ globus website to perform activation:</p>
 because many endpoints require activation via OAuth MyProxy,
 which must be done in a browser anyway. Web based clients can
 link directly to the URL.</p>
+<p>You also might want messaging or logging depending on why and how the
+operation succeeded, in which case you&#8217;ll need to look at the value of
+the &#8220;code&#8221; field and either decide on your own messaging or use the
+response&#8217;s &#8220;message&#8221; field.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_autoactivate</span><span class="p">(</span><span class="n">ep_id</span><span class="p">,</span> <span class="n">if_expires_in</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AutoActivationFailed&#39;</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Endpoint(</span><span class="si">{}</span><span class="s1">) Not Active! Error! Source message: </span><span class="si">{}</span><span class="s1">&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span>          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ep_id</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">elif</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AutoActivated.CachedCredential&#39;</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Endpoint(</span><span class="si">{}</span><span class="s1">) autoactivated using a cached credential.&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span>          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ep_id</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">elif</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AutoActivated.GlobusOnlineCredential&#39;</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">((</span><span class="s1">&#39;Endpoint(</span><span class="si">{}</span><span class="s1">) autoactivated using a built-in Globus &#39;</span>
+<span class="gp">&gt;&gt;&gt; </span>           <span class="s1">&#39;credential.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ep_id</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">elif</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AlreadyActivated&#39;</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Endpoint(</span><span class="si">{}</span><span class="s1">) already active until at least </span><span class="si">{}</span><span class="s1">&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span>          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ep_id</span><span class="p">,</span> <span class="mi">3600</span><span class="p">))</span>
+</pre></div>
+</div>
 <p><strong>External Documentation</strong></p>
 <p>See
 <a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint">Autoactivate endpoint </a>
