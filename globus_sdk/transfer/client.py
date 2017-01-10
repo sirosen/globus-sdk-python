@@ -1192,7 +1192,7 @@ class TransferClient(BaseClient):
 
     def task_pause_info(self, task_id, **params):
         """
-        ``POST /task/<task_id>/pause_info``
+        ``GET /task/<task_id>/pause_info``
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
@@ -1201,3 +1201,27 @@ class TransferClient(BaseClient):
                          .format(task_id))
         resource_path = self.qjoin_path("task", task_id, "pause_info")
         return self.get(resource_path, params=params)
+
+    def task_successful_transfers(self, task_id, num_results=100, **params):
+        """
+        ``GET /task/<task_id>/successful_transfers``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+
+        **External Documentation**
+
+        See
+        `Get Task Successful Transfers\
+        <https://docs.globus.org/api/transfer/task/#get_task_successful_transfers>`_
+        in the REST documentation for details.
+        """
+        self.logger.info("TransferClient.task_successful_transfers({}, ...)"
+                         .format(task_id))
+
+        resource_path = self.qjoin_path("task", task_id,
+                                        "successful_transfers")
+        return PaginatedResource(
+            self.get, resource_path, {'params': params},
+            num_results=num_results, max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_MARKER)
