@@ -1066,7 +1066,7 @@ second at a time:</p>
 <dl class="method">
 <dt id="globus_sdk.TransferClient.task_pause_info">
 <code class="descname">task_pause_info</code><span class="sig-paren">(</span><em>task_id</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/client.html#TransferClient.task_pause_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferClient.task_pause_info" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">POST</span> <span class="pre">/task/&lt;task_id&gt;/pause_info</span></code></p>
+<dd><p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">/task/&lt;task_id&gt;/pause_info</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1075,6 +1075,24 @@ second at a time:</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="globus_sdk.TransferClient.task_successful_transfers">
+<code class="descname">task_successful_transfers</code><span class="sig-paren">(</span><em>task_id</em>, <em>num_results=100</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/client.html#TransferClient.task_successful_transfers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferClient.task_successful_transfers" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">/task/&lt;task_id&gt;/successful_transfers</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of <a class="reference internal" href="../responses.html#globus_sdk.response.GlobusResponse" title="globus_sdk.response.GlobusResponse"><code class="xref py py-class docutils literal"><span class="pre">GlobusResponse</span></code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/task/#get_task_successful_transfers">Get Task Successful Transfers</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 </dd></dl>

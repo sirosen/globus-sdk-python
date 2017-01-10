@@ -63,86 +63,32 @@ attempt to load configuration.</p>
 </div>
 <p>additionally, the shell environment variables loaded into Python&#8217;s <cite>os.environ</cite>
 will be searched for configuration.</p>
-<div class="section" id="precedence">
-<h2>Precedence<a class="headerlink" href="#precedence" title="Permalink to this headline">¶</a></h2>
-<p>The precedence rules for config are very simple.
-Configuration is loaded with this precendence order</p>
+<p>The precedence rules are very simply</p>
 <ol class="arabic simple">
 <li>Environment</li>
 <li><code class="docutils literal"><span class="pre">~/.globus.cfg</span></code></li>
 <li><code class="docutils literal"><span class="pre">/etc/globus.cfg</span></code></li>
 </ol>
-<p>If a value is defined in <code class="docutils literal"><span class="pre">~/.globus.cfg</span></code> or the environment, it doesn&#8217;t
-matter what it&#8217;s set to in <code class="docutils literal"><span class="pre">/etc/globus.cfg</span></code>.
-If a value is defined in the environment, it doesn&#8217;t matter if it&#8217;s set in
-<code class="docutils literal"><span class="pre">~/.globus.cfg</span></code> or <code class="docutils literal"><span class="pre">/etc/globus.cfg</span></code></p>
-</div>
 <div class="section" id="config-format">
 <h2>Config Format<a class="headerlink" href="#config-format" title="Permalink to this headline">¶</a></h2>
-<p>The format for the configuration files is the same, but of course it will
-differ from the way that environment variables are inspected.
-Config files are INI formatted, so they take the general form</p>
-<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[SectionName1]</span>
+<p>Config files are INI formatted, so they take the general form</p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[SectionName]</span>
 <span class="na">key1</span> <span class="o">=</span> <span class="s">value1</span>
 <span class="na">key2</span> <span class="o">=</span> <span class="s">value2</span>
 </pre></div>
 </div>
-<p>If you don&#8217;t specify a section name, parsing is permissive and will assume
-that you intended your values to be part of the <code class="docutils literal"><span class="pre">general</span></code> section.</p>
-<p>So, the following two config files are 100% equivalent:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="c1"># with a section header!</span>
-<span class="k">[general]</span>
-<span class="na">auth_token</span> <span class="o">=</span> <span class="s">abc123</span>
-<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">def456</span>
-</pre></div>
+<p>At present, there are no configuration parameters which you should set in
+config files.</p>
+<p>The Globus CLI uses the <code class="docutils literal"><span class="pre">[cli]</span></code> section to store configuration information.</p>
 </div>
-<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="c1"># no section header!</span>
-<span class="na">auth_token</span> <span class="o">=</span> <span class="s">abc123</span>
-<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">def456</span>
-</pre></div>
-</div>
-<p>However, the following config file would be invalid because it creates an
-ambiguity:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="c1"># no section header!</span>
-<span class="na">auth_token</span> <span class="o">=</span> <span class="s">abc123</span>
-<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">def456</span>
-
-<span class="c1"># but also a section header!</span>
-<span class="k">[general]</span>
-<span class="na">auth_token</span> <span class="o">=</span> <span class="s">xyz987</span>
-
-<span class="c1"># what value should general:auth_token have?</span>
-</pre></div>
-</div>
-<p>Environment variables can only modify a value in the <code class="docutils literal"><span class="pre">general</span></code> configuration
-section.
-They take the form <code class="docutils literal"><span class="pre">GLOBUS_SDK_&lt;uppercase_keyname&gt;</span></code>.
-For example, <code class="docutils literal"><span class="pre">GLOBUS_SDK_AUTH_TOKEN=abc123</span></code> sets the <code class="docutils literal"><span class="pre">general:auth_token</span></code>
-value to <code class="docutils literal"><span class="pre">abc123</span></code>.</p>
-<p><code class="docutils literal"><span class="pre">GLOBUS_SDK_...</span></code> environment variables are very rarely the best way to set a
-value, but they let you override values defined in your configuration when
-necessary.</p>
-<p>There is one very important exception to these rules:
-<code class="docutils literal"><span class="pre">GLOBUS_SDK_ENVIRONMENT</span></code> is a shell variable that can be used to point the
-SDK to an alternate set of Globus Servers.
-We currently have plans to create a beta environment that you can use with
+<div class="section" id="environment-variables">
+<h2>Environment Variables<a class="headerlink" href="#environment-variables" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">GLOBUS_SDK_ENVIRONMENT</span></code> is a shell variable that can be used to point the
+SDK to an alternate set of Globus Servers.</p>
+<p>We currently have plans to create a beta environment that you can use with
 <code class="docutils literal"><span class="pre">GLOBUS_SDK_ENVIRONMENT=beta</span></code> to get a developer preview of upcoming
 features, but this is not available yet. For now, this variable should be left
 unset.</p>
-</div>
-<div class="section" id="configuration-parameters">
-<h2>Configuration Parameters<a class="headerlink" href="#configuration-parameters" title="Permalink to this headline">¶</a></h2>
-<p>The following are the configuration parameters you can provide in the config
-files, documented in a sample INI file:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[general]</span>
-<span class="c1"># a token scoped for the Globus Auth service, used by default whenever you</span>
-<span class="c1"># instantiate an AuthClient() object</span>
-<span class="na">auth_token</span> <span class="o">=</span> <span class="s">...</span>
-<span class="c1"># a token scoped for the Transfer service, used by default whenever you</span>
-<span class="c1"># instantiate an TransferClient() object</span>
-<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">...</span>
-</pre></div>
-</div>
 </div>
 </div>
 
@@ -155,9 +101,8 @@ files, documented in a sample INI file:</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Globus SDK Configuration</a><ul>
-<li><a class="reference internal" href="#precedence">Precedence</a></li>
 <li><a class="reference internal" href="#config-format">Config Format</a></li>
-<li><a class="reference internal" href="#configuration-parameters">Configuration Parameters</a></li>
+<li><a class="reference internal" href="#environment-variables">Environment Variables</a></li>
 </ul>
 </li>
 </ul>
