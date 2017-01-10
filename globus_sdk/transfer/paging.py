@@ -1,7 +1,6 @@
 import logging
 import six
 
-from globus_sdk import exc
 from globus_sdk.response import GlobusResponse
 from globus_sdk.transfer.response import IterableTransferResponse
 
@@ -14,6 +13,13 @@ class PaginatedResource(GlobusResponse, six.Iterator):
     This is not a top level helper func because it depends upon the pagination
     implementation of the Transfer API, which may not be the implementation
     chosen by other, future APIs.
+
+    This is a class and not a function because it needs to enforce distinct
+    actions between initialization and iteration. If defined as a generator
+    function with the `yield` syntax, python won't let us distinguish between
+    creating the iterable object and iterating it.
+    To eagerly trigger errors from the first call, we need to wrap it up in a
+    class.
 
     Expectations about Paginated Transfer API Resources:
     - They support `limit` and `offset` query params, with `limit` being a
@@ -29,13 +35,6 @@ class PaginatedResource(GlobusResponse, six.Iterator):
       not there are more results available
     - Individual results are JSON objects inside of an array named `DATA` in
       the returned JSON document
-
-    This is a class and not a function because it needs to enforce distinct
-    actions between initialization and iteration. If defined as a generator
-    function with the `yield` syntax, python won't let us distinguish between
-    creating the iterable object and iterating it.
-    To eagerly trigger errors from the first call, we need to wrap it up in a
-    class.
     """
 
     # pages have 'has_next_page', 'offset', and 'limit'
@@ -58,7 +57,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
                  # passthrough stuff for making a TransferClient method call
                  client_method, path, client_kwargs,
                  # paging parameters
-                 num_results=10, max_results_per_call=1000,
+                 num_results=None, max_results_per_call=1000,
                  max_total_results=None, offset=0,
                  paging_style=PAGING_STYLE_HAS_NEXT):
         """
@@ -67,49 +66,66 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         "paging style", which defines which kind of Transfer paging behavior
         we'll see.
 
-        max_results_per_call and max_total_results are fairly self-descriptive.
-        They are limits imposed by the API, but which the SDK must be aware of
-        and respect.
-        This also takes a number of results to return, `num_results`. It isn't
-        immediately obvious why num_results and max_total_results aren't one in
-        the same, so to explain: num_results is the number of results the user
-        requested. max_total_results is a limit on the number of results that
-        can be requested. The caller could handle this, but it's nice and
-        uniform to put the num results >? max_total_results check in here.
+        **Parameters**
 
-        Offset is an offset into the result set, and is only applicable if
-        paging style is HAS_KEY or TOTAL.
+          ``client_method``
+            A **bound** method of a ``TransferClient``. Most commonly, the
+            ``get`` method.
+
+          ``path``
+            The base URI for the paged API calls being made, as would be passed
+            to ``client_method``
+
+          ``num_results``
+            The number of results requested by the user. We'll cap paged
+            results at this value. May be left at None, which means "fetch all
+            results".
+
+          ``max_results_per_call``
+            The maximum page size from the API
+
+          ``max_total_results``
+            The API limit on the total number of results that can be fetched
+            via the API. If this is not None and ``num_results`` is, then
+            ``num_results`` will be set to this value.
+
+          ``offset``
+            An offset into the result set. Used for certain paging types to
+            start paging at a specific point.
+
+          ``paging_style``
+            An value from an enum on this class which tells us how paging works
+            for this API.
         """
         logger.info("Creating PaginatedResource({}) on {}(instance:{}):{}:{}"
                     .format(paging_style,
                             client_method.__self__.__class__.__name__,
                             id(client_method.__self__),
                             client_method.__name__, path))
-        self.num_results = num_results
         self.max_results_per_call = max_results_per_call
         self.max_total_results = max_total_results
         self.offset = offset
         self.paging_style = paging_style
 
-        # counter for how many results we've gotten thusfar, used to cap paging
-        # in non-offset based styles
-        self.num_results_fetched = 0
+        # check the requested num results to see if it exceeds the maximum
+        # total number of results allowed by the API or if it is not set and
+        # there is a maximum number of results
+        # effectively:
+        # - cap num_results with max_total_results (min)
+        # - ignore max total results if it's None
+        if (self.max_total_results is not None and
+                (num_results is None or
+                 num_results > self.max_total_results)):
+            num_results = self.max_total_results
+
+        self.num_results = num_results
 
         # potentially necessary params during paging
         self.limit = None
         self.next_marker = None
-
-        # check the requested num results to see if it exceeds the maximum
-        # total number of results allowed by the API
-        # only check if there is a max_total_results though
-        if (self.max_total_results is not None and
-                num_results > self.max_total_results):
-            logger.error(("PaginatedResource would overrun limits set by API. "
-                          "Please request a lower num_results"))
-            raise exc.PaginationOverrunError((
-                'Paginated call would exceed API limit. Pass a smaller '
-                'num_results parameter -- the maximum for this call is {0}')
-                .format(self.max_total_results))
+        # counter for how many results we've gotten thusfar, used to cap paging
+        # in non-offset based styles
+        self.num_results_fetched = 0
 
         # what function call does this class instance wrap up?
         self.client_method = client_method
@@ -183,12 +199,15 @@ class PaginatedResource(GlobusResponse, six.Iterator):
             self.client_kwargs['params'] = {}
 
         # to start with, cap the limit per request to the max per request size
-        self.limit = min(self.num_results, self.max_results_per_call)
+        self.limit = self.max_results_per_call
+        if self.num_results is not None:
+            self.limit = min(self.num_results, self.limit)
 
         def _set_params_for_next_call():
             # if we're about to request more results than the user asked
             # for, limit ourselves on the last paginated call to the API
-            if self.offset + self.limit > self.num_results:
+            if (self.num_results is not None and
+                    self.offset + self.limit > self.num_results):
                 self.limit = self.num_results - self.offset
 
             # all paging styles support limit
@@ -262,7 +281,8 @@ class PaginatedResource(GlobusResponse, six.Iterator):
                 # StopIteration because this is a generator function
                 # CAREFUL! make sure we catch num_results_fetched==num_results
                 # otherwise, we could end up making one-too-many API calls
-                if self.num_results_fetched >= self.num_results:
+                if (self.num_results is not None and
+                        self.num_results_fetched >= self.num_results):
                     return
 
             has_next_page = _check_has_next_page(res)
