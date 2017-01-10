@@ -1241,7 +1241,7 @@
 
 <div class="viewcode-block" id="TransferClient.task_pause_info"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.task_pause_info">[docs]</a>    <span class="k">def</span> <span class="nf">task_pause_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        ``POST /task/&lt;task_id&gt;/pause_info``</span>
+<span class="sd">        ``GET /task/&lt;task_id&gt;/pause_info``</span>
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
@@ -1249,7 +1249,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.task_pause_info({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>
         <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">&quot;pause_info&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resource_path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resource_path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TransferClient.task_successful_transfers"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.task_successful_transfers">[docs]</a>    <span class="k">def</span> <span class="nf">task_successful_transfers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">num_results</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ``GET /task/&lt;task_id&gt;/successful_transfers``</span>
+
+<span class="sd">        :rtype: iterable of :class:`GlobusResponse</span>
+<span class="sd">                &lt;globus_sdk.response.GlobusResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get Task Successful Transfers\</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task/#get_task_successful_transfers&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.task_successful_transfers({}, ...)&quot;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>
+
+        <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span>
+                                        <span class="s2">&quot;successful_transfers&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PaginatedResource</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="n">resource_path</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">},</span>
+            <span class="n">num_results</span><span class="o">=</span><span class="n">num_results</span><span class="p">,</span> <span class="n">max_results_per_call</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+            <span class="n">paging_style</span><span class="o">=</span><span class="n">PaginatedResource</span><span class="o">.</span><span class="n">PAGING_STYLE_MARKER</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>
