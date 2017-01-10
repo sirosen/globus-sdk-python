@@ -45,6 +45,28 @@ class GlobusAPIError(GlobusError):
         args = self._get_args()
         GlobusError.__init__(self, *args)
 
+    @property
+    def raw_json(self):
+        """
+        Get the verbatim error message received from a Globus API, interpreted
+        as a JSON string and evaluated as a *dict*
+
+        If the body cannot be loaded as JSON, this is None
+        """
+        r = self._underlying_response
+        if "Content-Type" in r.headers and (
+                "application/json" in r.headers["Content-Type"]):
+            return r.json()
+        else:
+            return None
+
+    @property
+    def raw_text(self):
+        """
+        Get the verbatim error message receved from a Globus API as a *string*
+        """
+        return self._underlying_response.text
+
     def _get_args(self):
         """
         Get arguments to pass to the Exception base class. These args are
