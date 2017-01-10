@@ -104,19 +104,12 @@ class TransferAPIError(GlobusAPIError):
         self.request_id = data["request_id"]
 
 
-class PaginationOverrunError(GlobusError):
-    """
-    Deprecated: remove in a future release.
-
-    Paginated results exceeded a limit set by our API. Too many pages of
-    results were being requested, and the API maximum would be exceeded.
-    """
-
-
 class InvalidDocumentBodyError(GlobusError):
     """
-    Paginated results exceeded a limit set by our API. Too many pages of
-    results were being requested, and the API maximum would be exceeded.
+    The body of the document being sent to Globus is somehow malformed.
+
+    For example, a call that requires a specific format (XML, JSON, etc.) not
+    being given data in that format.
     """
 
 

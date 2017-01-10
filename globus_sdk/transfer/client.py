@@ -253,14 +253,13 @@ class TransferClient(BaseClient):
 
         It is important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query.
-        If you attempt to exceed this limit, you will trigger a
-        :class:`PaginationOverrunError <globus_sdk.exc.PaginationOverrunError>`
+        You can request the maximum number of results either explicitly, with
+        ``num_results=1000``, or by stating that you want no limit by setting
+        it to ``None``:
 
-        >>> for ep in tc.endpoint_search('globus', # a very common string
-        >>>                             num_results=1200): # num too large!
+        >>> for ep in tc.endpoint_search('String to search for!',
+        >>>                             num_results=None):
         >>>     print(ep['display_name'])
-
-        will trigger this error.
 
         **External Documentation**
 
