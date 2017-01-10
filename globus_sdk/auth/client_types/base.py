@@ -298,3 +298,31 @@ class AuthClient(BaseClient):
         return self.post(
             '/v2/oauth2/token', response_class=response_class,
             text_body=form_data)
+
+    def oauth2_userinfo(self):
+        """
+        Call the Userinfo endpoint of Globus Auth.
+        Userinfo is specified as part of the OpenID Connect (OIDC) standard,
+        and Globus Auth's Userinfo is OIDC-compliant.
+
+        The exact data returned will depend upon the set of OIDC-related scopes
+        which were used to acquire the token being used for this call. For
+        details, see the **External Documentation** below.
+
+        **Examples**
+
+        >>> ac = AuthClient(...)
+        >>> info = ac.oauth2_userinfo()
+        >>> print('Effective Identity "{}" has Full Name "{}" and Email "{}"'
+        >>>       .format(info["sub"], info["name"], info["email"]))
+
+        **External Documentation**
+
+        See
+        `Userinfo \
+        <https://docs.globus.org/api/auth/reference/
+        #get_or_post_v2_oauth2_userinfo_resource>`_
+        in the API documentation for details.
+        """
+        self.logger.info('Looking up OIDC-style Userinfo from Globus Auth')
+        return self.get('/v2/oauth2/userinfo')
