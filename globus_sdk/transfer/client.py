@@ -976,7 +976,7 @@ class TransferClient(BaseClient):
 
         See
         `Submit a transfer task \
-        <https://docs.globus.org/api/transfer/task_submit/#submit_a_transfer_task>`_
+        <https://docs.globus.org/api/transfer/task_submit/#submit_transfer_task>`_
         in the REST documentation for more details.
         """
         self.logger.info("TransferClient.submit_transfer(...)")
@@ -1005,7 +1005,7 @@ class TransferClient(BaseClient):
 
         See
         `Submit a delete task \
-        <https://docs.globus.org/api/transfer/task_submit/#submit_a_delete_task>`_
+        <https://docs.globus.org/api/transfer/task_submit/#submit_delete_task>`_
         in the REST documentation for details.
         """
         self.logger.info("TransferClient.submit_delete(...)")
