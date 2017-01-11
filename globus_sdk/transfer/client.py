@@ -944,6 +944,22 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        Submission IDs are required to submit tasks to the Transfer service
+        via the :meth:`submit_transfer <.submit_transfer>` and
+        :meth:`submit_delete <.submit_delete>` methods.
+
+        Most users will not need to call this method directly, as the
+        convenience classes :class:`TransferData <globus_sdk.TransferData>`
+        and :class:`DeleteData <globus_sdk.DeleteData>` will call it
+        automatically if they are not passed a ``submission_id`` explicitly.
+
+        **External Documentation**
+
+        See
+        `Get a submission id \
+        <https://docs.globus.org/api/transfer/task_submit/#get_submission_id>`_
+        in the REST documentation for more details.
         """
         self.logger.info("TransferClient.get_submission_id({})".format(params))
         return self.get("submission_id", params=params)
