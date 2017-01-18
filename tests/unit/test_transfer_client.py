@@ -1,24 +1,19 @@
 import globus_sdk
 
 from tests.framework import (
-    TokenCollection, CapturedIOTestCase, get_client_data,
-    GO_EP1_ID, GO_EP2_ID)
+    CapturedIOTestCase, get_client_data,
+    GO_EP1_ID, GO_EP2_ID, SDKTESTER1A_NATIVE1_RT)
 
 
 class TransferClientTests(CapturedIOTestCase):
-    @TokenCollection.skip_unless_1a_native1_rt()
     def test_get_endpoint(self):
         """
         Get endpoint on go#ep1 and go#ep2, validate results
         """
-        rt = TokenCollection.sdktester1a_native1_rt
-        # the skip decorator should guarantee this, but play it safe and check
-        # again
-        self.assertIsNotNone(rt)
-
         ac = globus_sdk.NativeAppAuthClient(
             client_id=get_client_data()["native_app_client1"]["id"])
-        authorizer = globus_sdk.RefreshTokenAuthorizer(rt, ac)
+        authorizer = globus_sdk.RefreshTokenAuthorizer(
+            SDKTESTER1A_NATIVE1_RT, ac)
         tc = globus_sdk.TransferClient(authorizer=authorizer)
 
         # load the tutorial endpoint documents

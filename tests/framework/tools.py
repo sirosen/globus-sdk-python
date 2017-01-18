@@ -15,6 +15,8 @@ def get_client_data():
     dirname = get_fixture_file_dir()
     ret = {}
     for fname in ('native_app_client1', 'confidential_app_client1'):
-        with open(os.path.join(dirname, fname)) as f:
+        with open(os.path.join(dirname,
+                               'auth_fixtures',
+                               fname + '.json')) as f:
             ret[fname] = json.load(f)
     return ret

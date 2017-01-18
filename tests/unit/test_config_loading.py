@@ -15,6 +15,9 @@ from tests.framework import get_fixture_file_dir, CapturedIOTestCase
 
 
 class ConfigLoaderTests(CapturedIOTestCase):
+    def tearDown(self):
+        globus_sdk.config._parser = None
+
     def _load_config_file(self, filename):
         filename = os.path.join(
             get_fixture_file_dir(), 'sample_configs', filename)
