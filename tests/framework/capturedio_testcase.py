@@ -10,7 +10,7 @@ try:
 except ImportError:
     from io import StringIO
 
-from globus_sdk.tests.framework.patched_testcase import PatchedTestCase
+from tests.framework.patched_testcase import PatchedTestCase
 
 
 class CapturedIOTestCase(PatchedTestCase):
