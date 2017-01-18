@@ -15,5 +15,4 @@ install:
   - pip install -r test-requirements.txt
 cache: pip
 script:
-  - flake8
-  - nose2
+  - make test
