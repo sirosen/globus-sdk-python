@@ -124,7 +124,7 @@ Some rules and tips for the python and documentation in this project.
       a new module or adding a circular import, add the new module
   - Import non-`globus_sdk` modules and packages before importing from within
       `globus_sdk`
-  - Ensure all public API methods return a `GlobusReponse` or sublcass thereof,
+  - Ensure all public API methods return a `GlobusResponse` or subclass thereof,
       or explicitly document their exceptional status
   - Think very hard before adding a new dependency -- keep the dependencies of
       `globus_sdk` as lightweight as possible
