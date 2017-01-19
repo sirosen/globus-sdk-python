@@ -6,10 +6,11 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-  - "3.5-dev"
+  - "3.6"
+  - "3.6-dev"
 matrix:
   allow_failures:
-    - python: "3.5-dev"
+    - python: "3.6-dev"
 install:
   - pip install .
   - pip install -r test-requirements.txt
