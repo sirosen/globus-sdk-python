@@ -24,7 +24,6 @@ def _get_lib_config_path():
         import pkg_resources
         path = pkg_resources.resource_filename("globus_sdk", fname)
         logger.debug("pkg_resources load of lib config success")
-        import pkg_resources
     except ImportError:
         logger.debug(("pkg_resources load of lib config failed, failing over "
                       "to path joining"))
@@ -126,6 +125,8 @@ _parser = None
 
 
 def get_service_url(environment, service):
+    logger.debug("Service URL Lookup for \"{}\" under env \"{}\""
+                 .format(service, environment))
     p = _get_parser()
     option = service + "_service"
     # TODO: validate with urlparse?

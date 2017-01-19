@@ -48,6 +48,12 @@ class GlobusResponse(object):
             raise TypeError(('This type of GlobusResponse object '
                              'does not support indexing.'))
 
+    def __contains__(self, item):
+        """
+        ``x in GlobusResponse`` is an alias for ``x in GlobusResponse.data``
+        """
+        return item in self.data
+
     @property
     def data(self):
         """

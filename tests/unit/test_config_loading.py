@@ -3,7 +3,6 @@ Test Config Loading produces expected results.
 """
 
 import os
-import unittest
 
 try:
     import mock
@@ -12,13 +11,16 @@ except ImportError:
 
 import globus_sdk.config
 
+from tests.framework import get_fixture_file_dir, CapturedIOTestCase
 
-class ConfigLoaderTests(unittest.TestCase):
+
+class ConfigLoaderTests(CapturedIOTestCase):
+    def tearDown(self):
+        globus_sdk.config._parser = None
+
     def _load_config_file(self, filename):
         filename = os.path.join(
-            os.path.dirname(__file__),
-            'sample_configs',
-            filename)
+            get_fixture_file_dir(), 'sample_configs', filename)
 
         globus_sdk.config._parser = None
 

@@ -22,6 +22,7 @@ A few quick rules if you don't want to read this full document:
       before opening a new issue or pull request
   - Any features which change the public API of the SDK must include
       documentation updates
+  - `make test` must pass
 
 Reporting Bugs
 ==============
@@ -123,6 +124,7 @@ Some rules and tips for the python and documentation in this project.
       a new module or adding a circular import, add the new module
   - Import non-`globus_sdk` modules and packages before importing from within
       `globus_sdk`
-  - Ensure all public API methods return a `GlobusReponse` or sublcass thereof
+  - Ensure all public API methods return a `GlobusReponse` or sublcass thereof,
+      or explicitly document their exceptional status
   - Think very hard before adding a new dependency -- keep the dependencies of
       `globus_sdk` as lightweight as possible
