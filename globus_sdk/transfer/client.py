@@ -230,6 +230,26 @@ class TransferClient(BaseClient):
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
+        **Parameters**
+
+            ``filter_fulltext`` (*string*)
+              The string to use in a full text search on endpoints.
+              Effectively, the "search query" which is being requested.
+
+            ``filter_scope`` (*string*)
+              A "scope" within which to search for endpoints. This must be one
+              of the limited and known names known to the service, which can be
+              found documented in the **External Documentation** below.
+
+            ``num_results`` (*int* or *None*)
+              default ``25``
+              The number of search results to fetch from the service. May be
+              set to ``None`` to request the maximum allowable number of
+              results.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
         **Examples**
 
         Search for a given string as a fulltext search:
@@ -253,14 +273,13 @@ class TransferClient(BaseClient):
 
         It is important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query.
-        If you attempt to exceed this limit, you will trigger a
-        :class:`PaginationOverrunError <globus_sdk.exc.PaginationOverrunError>`
+        You can request the maximum number of results either explicitly, with
+        ``num_results=1000``, or by stating that you want no limit by setting
+        it to ``None``:
 
-        >>> for ep in tc.endpoint_search('globus', # a very common string
-        >>>                             num_results=1200): # num too large!
+        >>> for ep in tc.endpoint_search('String to search for!',
+        >>>                             num_results=None):
         >>>     print(ep['display_name'])
-
-        will trigger this error.
 
         **External Documentation**
 
@@ -1033,10 +1052,49 @@ class TransferClient(BaseClient):
 
     def endpoint_manager_task_list(self, num_results=10, **params):
         """
+        Get a list of tasks visible via ``activity_monitor`` role, as opposed
+        to tasks owned by the current user.
+
         ``GET endpoint_manager/task_list``
 
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
+
+        **Parameters**
+
+            ``num_results`` (*int* or *None*)
+              default ``10``
+              The number of tasks to fetch from the service. May be set to
+              ``None`` to request the maximum allowable number of results.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **Examples**
+
+        Fetch the default number (10) of tasks and print some basic info:
+
+        >>> tc = TransferClient(...)
+        >>> for task in tc.endpoint_manager_task_list():
+        >>>     print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
+        >>>         task["task_id"], task["source_endpoint"],
+        >>>         task["destination_endpoint"), task["owner_string"])
+
+        Do that same operation on *all* tasks visible via ``activity_monitor``
+        status:
+
+        >>> tc = TransferClient(...)
+        >>> for task in tc.endpoint_manager_task_list(num_results=None):
+        >>>     print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
+        >>>         task["task_id"], task["source_endpoint"],
+        >>>         task["destination_endpoint"), task["owner_string"])
+
+        **External Documentation**
+
+        See
+        `Advanced Endpoint Management: Get tasks \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_tasks>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.endpoint_manager_task_list(...)")
         path = self.qjoin_path('endpoint_manager', 'task_list')
@@ -1047,10 +1105,39 @@ class TransferClient(BaseClient):
 
     def task_list(self, num_results=10, **params):
         """
+        Get an iterable of task documents owned by the current user.
+
         ``GET /task_list``
 
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
+
+        **Parameters**
+
+            ``num_results`` (*int* or *None*)
+              default ``10``
+              The number of tasks to fetch from the service. May be set to
+              ``None`` to request the maximum allowable number of results.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **Examples**
+
+        Fetch the default number (10) of tasks and print some basic info:
+
+        >>> tc = TransferClient(...)
+        >>> for task in tc.task_list():
+        >>>     print("Task({}): {} -> {}".format(
+        >>>         task["task_id"], task["source_endpoint"],
+        >>>         task["destination_endpoint"))
+
+        **External Documentation**
+
+        See
+        `Task list \
+        <https://docs.globus.org/api/transfer/task/#get_task_list>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.task_list(...)")
         return PaginatedResource(
@@ -1060,10 +1147,42 @@ class TransferClient(BaseClient):
 
     def task_event_list(self, task_id, num_results=10, **params):
         """
+        List events (for example, faults and errors) for a given Task.
+
         ``GET /task/<task_id>/event_list``
 
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
+
+        **Parameters**
+
+            ``task_id`` (*string*)
+              The task to inspect.
+
+            ``num_results`` (*int* or *None*)
+              default ``10``
+              The number of events to fetch from the service. May be set to
+              ``None`` to request the maximum allowable number of results.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **Examples**
+
+        Fetch the default number (10) of events and print some basic info:
+
+        >>> tc = TransferClient(...)
+        >>> task_id = ...
+        >>> for event in tc.task_event_list(task_id):
+        >>>     print("Event on Task({}) at {}:\n{}".format(
+        >>>         task_id, event["time"], event["description"))
+
+        **External Documentation**
+
+        See
+        `Get event list \
+        <https://docs.globus.org/api/transfer/task/#get_event_list>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.task_event_list({}, ...)"
                          .format(task_id))
@@ -1220,10 +1339,36 @@ class TransferClient(BaseClient):
 
     def task_successful_transfers(self, task_id, num_results=100, **params):
         """
+        Get the successful file transfers for a completed Task.
+
         ``GET /task/<task_id>/successful_transfers``
 
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
+
+        **Parameters**
+
+            ``task_id`` (*string*)
+              The task to inspect.
+
+            ``num_results`` (*int* or *None*)
+              default ``100``
+              The number of file transfer records to fetch from the service.
+              May be set to ``None`` to request the maximum allowable number of
+              results.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **Examples**
+
+        Fetch all transferred files for a task and print some basic info:
+
+        >>> tc = TransferClient(...)
+        >>> task_id = ...
+        >>> for info in tc.task_successful_transfers(task_id):
+        >>>     print("{} -> {}".format(
+        >>>         info["source_path"], info["destination_path"))
 
         **External Documentation**
 
