@@ -439,7 +439,7 @@ class TransferClient(BaseClient):
 
         See
         `Get my effective endpoint pause rules \
-        <https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules>`_
+        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_pause_rules>`_
         in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
@@ -544,7 +544,7 @@ class TransferClient(BaseClient):
 
         See
         `Get endpoint server list \
-        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
+        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
@@ -631,7 +631,7 @@ class TransferClient(BaseClient):
 
         See
         `Get list of endpoint roles \
-        <https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles>`_
+        <https://docs.globus.org/api/transfer/endpoint_roles/#role_list>`_
         in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
@@ -652,7 +652,7 @@ class TransferClient(BaseClient):
 
         See
         `Create endpoint role \
-        <https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role>`_
+        <https://docs.globus.org/api/transfer/endpoint_roles/#create_role>`_
         in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
@@ -711,6 +711,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get list of access rules \
+        <https://docs.globus.org/api/transfer/acl/#rest_access_get_list>`_
+        in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
         self.logger.info("TransferClient.endpoint_acl_list({}, ...)"
@@ -725,6 +732,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get access rule by id \
+        <https://docs.globus.org/api/transfer/acl/#get_access_rule_by_id>`_
+        in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
         self.logger.info("TransferClient.get_endpoint_acl_rule({}, {}, ...)"
@@ -779,6 +793,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Update access rule \
+        <https://docs.globus.org/api/transfer/acl/#update_access_rule>`_
+        in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
         self.logger.info("TransferClient.update_endpoint_acl_rule({}, {}, ...)"
@@ -792,6 +813,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Delete access rule \
+        <https://docs.globus.org/api/transfer/acl/#delete_access_rule>`_
+        in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
         self.logger.info("TransferClient.delete_endpoint_acl_rule({}, {})"
@@ -809,6 +837,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get list of bookmarks \
+        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_list_of_bookmarks>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.bookmark_list({})".format(params))
         return self.get('bookmark_list', params=params,
@@ -820,6 +855,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Create bookmark \
+        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#create_bookmark>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.create_bookmark({})"
                          .format(bookmark_data))
@@ -831,6 +873,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get bookmark by id \
+        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_bookmark_by_id>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.get_bookmark({})".format(bookmark_id))
         path = self.qjoin_path('bookmark', bookmark_id)
@@ -842,6 +891,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Update bookmark \
+        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#update_bookmark>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.update_bookmark({})"
                          .format(bookmark_id))
@@ -854,6 +910,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Delete bookmark by id\
+        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#delete_bookmark_by_id>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.delete_bookmark({})"
                          .format(bookmark_id))
@@ -1175,7 +1238,7 @@ class TransferClient(BaseClient):
         >>> task_id = ...
         >>> for event in tc.task_event_list(task_id):
         >>>     print("Event on Task({}) at {}:\n{}".format(
-        >>>         task_id, event["time"], event["description"))
+        >>>         task_id, event["time"], event["description"])
 
         **External Documentation**
 
@@ -1198,6 +1261,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get task by id \
+        <https://docs.globus.org/api/transfer/task/#get_task_by_id>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.get_task({}, ...)".format(task_id))
         resource_path = self.qjoin_path("task", task_id)
@@ -1209,6 +1279,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Update task by id \
+        <https://docs.globus.org/api/transfer/task/#update_task_by_id>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.update_task({}, ...)".format(task_id))
         resource_path = self.qjoin_path("task", task_id)
@@ -1220,6 +1297,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Cancel task by id \
+        <https://docs.globus.org/api/transfer/task/#cancel_task_by_id>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.cancel_task({})".format(task_id))
         resource_path = self.qjoin_path("task", task_id, "cancel")
@@ -1331,6 +1415,13 @@ class TransferClient(BaseClient):
 
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get task pause info \
+        <https://docs.globus.org/api/transfer/task/#get_task_pause_info>`_
+        in the REST documentation for details.
         """
         self.logger.info("TransferClient.task_pause_info({}, ...)"
                          .format(task_id))
