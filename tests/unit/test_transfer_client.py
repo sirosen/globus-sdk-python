@@ -8,7 +8,10 @@ from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
 
-class TransferClientTests(CapturedIOTestCase):
+# class that has setUp and tearDown for all transfer client testing classes
+class BaseTransferClientTests(CapturedIOTestCase):
+
+    __test__ = False  # prevents base class from trying to run tests
 
     @classmethod
     def setUpClass(self):
@@ -59,37 +62,27 @@ class TransferClientTests(CapturedIOTestCase):
     def setUp(self):
         """
         Calls clean to prevent collisions with pre-existing data,
-        sets up a non shared test endpoint,
-        sets up a test shared endpoint
+        sets up a test endpoint
         """
         self.clean()
 
-        # non shared endpoint
+        # test endpoint
         data = {"display_name": "SDK Test Endpoint",
                 "description": "Endpoint for testing the SDK"}
         r = self.tc.create_endpoint(data)
         self.test_ep_id = r["id"]
-
-        # TODO: move shared endpoint tests to another class
-        # to save time for tests that don't need this
-
-        # shared endpoint hosted on go#ep1
-        share_path = "/~/share"
-        self.tc.operation_mkdir(GO_EP1_ID, path=share_path)
-        shared_data = {"DATA_TYPE": "shared_endpoint",
-                       "host_endpoint": GO_EP1_ID,
-                       "host_path": share_path,
-                       "display_name": "SDK Test Shared Endpoint",
-                       "description": "Shared Endpoint for testing the SDK"
-                       }
-        r = self.tc.create_shared_endpoint(shared_data)
-        self.test_share_ep_id = r["id"]
 
     def tearDown(self):
         """
         Calls clean to remove any data created in setUp or testing
         """
         self.clean()
+
+
+# class for transfer client tests that don't require time intensive setup
+class TransferClientTests(BaseTransferClientTests):
+
+    __test__ = True  # marks sub-class as having tests
 
     def test_get_endpoint(self):
         """
@@ -193,48 +186,6 @@ class TransferClientTests(CapturedIOTestCase):
     # def test_endpoint_manager_monitored_endpoints(self):
         # TODO: test against monitored endpoint
 
-    def test_endpoint_search(self):
-        """
-        Searches by fulltext, owner_id, and scopes, validates results
-        """
-
-        # full-text and cap of num_results
-        search_string = "tutorial"
-        cap = 5
-        text_doc = self.tc.endpoint_search(search_string, num_results=cap)
-        # confirm the results are in the right format, are capped correctly,
-        # and that the results have the search string in their display names
-        self.assertIsInstance(text_doc, PaginatedResource)
-        results_count = 0
-        for ep in text_doc:
-            self.assertIn(search_string, str.lower(str(ep["display_name"])))
-            results_count += 1
-        self.assertEqual(results_count, cap)
-
-        # owner-id param
-        params = {"filter_owner_id": GO_USER_ID}
-        owner_doc = self.tc.endpoint_search(**params)
-        # confirm format, and that all results are from GO
-        self.assertIsInstance(owner_doc, PaginatedResource)
-        for ep in owner_doc:
-            self.assertEqual(ep["owner_id"], GO_USER_ID)
-
-        # scope: my endpoints
-        my_doc = self.tc.endpoint_search(filter_scope="my-endpoints")
-        # confirm format, and that all results are owned by SDK tester
-        self.assertIsInstance(my_doc, PaginatedResource)
-        for ep in my_doc:
-            self.assertEqual(ep["owner_id"], SDK_USER_ID)
-
-        # scope: shared endpoints
-        my_doc = self.tc.endpoint_search(filter_scope="shared-by-me")
-        # confirm format, and that all results are shared by SDK tester
-        self.assertIsInstance(my_doc, PaginatedResource)
-        for ep in my_doc:
-            self.assertEqual(ep["owner_id"], SDK_USER_ID)
-            self.assertIsNotNone(ep["sharing_target_root_path"])
-            self.assertIsNotNone(ep["host_endpoint_id"])
-
     def test_endpoint_autoactivate(self):
         """
         Deactivates, then auto-activates tutorial endpoint,
@@ -306,21 +257,6 @@ class TransferClientTests(CapturedIOTestCase):
         # confirm doc data type and that it has the DATA field
         self.assertEqual(pause_doc["DATA_TYPE"], "pause_rule_list")
         self.assertIn("DATA", pause_doc)
-
-    def test_my_shared_endpoint_list(self):
-        """
-        Gets my shared endpoint list, validates results
-        """
-
-        # get shared endpoint list
-        share_doc = self.tc.my_shared_endpoint_list(GO_EP1_ID)
-
-        # confirm doc type, and that test_share_ep_id is on the list
-        self.assertEqual(share_doc["DATA_TYPE"], "endpoint_list")
-        share_test_found = False
-        for ep in share_doc:
-            share_test_found = (ep["id"] == self.test_share_ep_id)
-        self.assertTrue(share_test_found)
 
     def test_create_shared_endpoint(self):
         """
@@ -566,125 +502,6 @@ class TransferClientTests(CapturedIOTestCase):
         #     self.tc.get_endpoint_role(self.test_ep_id, role_id)
         # self.assertEqual(apiErr.exception.http_status, 404)
         # self.assertEqual(apiErr.exception.code, "RoleNotFound")
-
-    def test_endpoint_acl_list(self):
-        """
-        Gets endpoint access rule list from test_ep, validates results
-        """
-
-        # get endpoint role list
-        list_doc = self.tc.endpoint_acl_list(self.test_share_ep_id)
-
-        # validate responce has been put into
-        self.assertEqual(list_doc["DATA_TYPE"], "access_list")
-        self.assertIn("DATA", list_doc)
-        # confirm that each access rule has some expected values
-        for access in list_doc["DATA"]:
-            self.assertEqual(access["DATA_TYPE"], "access")
-            self.assertIn("id", access)
-            self.assertIn("principal_type", access)
-            self.assertIn("principal", access)
-            self.assertIn("permissions", access)
-
-    def test_get_endpoint_acl_rule(self):
-        """
-        Adds access rule to test_share_ep, gets it by id, validates results
-        """
-
-        # get access rule id through test_add_endpoint_acl_rule
-        access_id = self.test_add_endpoint_acl_rule()
-
-        # get the access rule by id
-        get_doc = self.tc.get_endpoint_acl_rule(self.test_share_ep_id,
-                                                access_id)
-
-        # validate results
-        self.assertEqual(get_doc["DATA_TYPE"], "access")
-        self.assertEqual(get_doc["id"], access_id)
-
-    def test_add_endpoint_acl_rule(self):
-        """
-        Adds access rule to test_share_ep, validates results,
-        then confirms get sees the new access rule,
-        returns the access_id for use in testing get update and delete
-        """
-
-        # add root read access to all users logged in with auth
-        add_data = {"DATA_TYPE": "access",
-                    "principal_type": "all_authenticated_users",
-                    "principal": "",
-                    "path": "/",
-                    "permissions": "r"
-                    }
-        add_doc = self.tc.add_endpoint_acl_rule(self.test_share_ep_id,
-                                                add_data)
-
-        # validate results
-        self.assertEqual(add_doc["DATA_TYPE"], "access_create_result")
-        self.assertEqual(add_doc["code"], "Created")
-        self.assertEqual(add_doc["message"],
-                         "Access rule created successfully.")
-        self.assertIn("access_id", add_doc)
-
-        # confirm get sees new access rule
-        access_id = add_doc["access_id"]
-        get_doc = self.tc.get_endpoint_acl_rule(self.test_share_ep_id,
-                                                access_id)
-        self.assertEqual(get_doc["id"], access_id)
-        for item in add_data:
-            self.assertEqual(get_doc[item], add_data[item])
-
-        # return access_id
-        return access_id
-
-    def test_update_endpoint_acl_rule(self):
-        """
-        Adds access rule to test_share_ep, updates that access rule,
-        validates results, then confirms get sees the new changes
-        """
-
-        # get access rule id through test_add_endpoint_acl_rule
-        access_id = self.test_add_endpoint_acl_rule()
-
-        # update the access rule by id
-        update_data = {"permissions": "rw"}
-        update_doc = self.tc.update_endpoint_acl_rule(self.test_share_ep_id,
-                                                      access_id, update_data)
-
-        # validate results
-        self.assertEqual(update_doc["DATA_TYPE"], "result")
-        self.assertEqual(update_doc["code"], "Updated")
-        self.assertIn("permissions updated successfully",
-                      update_doc["message"])
-
-        # confirm get sees new permissions
-        get_doc = self.tc.get_endpoint_acl_rule(self.test_share_ep_id,
-                                                access_id)
-        self.assertEqual(get_doc["permissions"], update_data["permissions"])
-
-    def test_delete_endpoint_acl_rule(self):
-        """
-        Adds access rule to test_share_ep, deletes that access rule,
-        validates results, then confirms get no longer sees the access rule
-        """
-
-        # get access rule id through test_add_endpoint_acl_rule
-        access_id = self.test_add_endpoint_acl_rule()
-
-        # delete the access rule by id
-        delete_doc = self.tc.delete_endpoint_acl_rule(self.test_share_ep_id,
-                                                      access_id)
-
-        # validate results
-        self.assertEqual(delete_doc["DATA_TYPE"], "result")
-        self.assertEqual(delete_doc["code"], "Deleted")
-        self.assertIn("deleted successfully", delete_doc["message"])
-
-        # confirm get no longer sees the access rule
-        with self.assertRaises(TransferAPIError) as apiErr:
-            self.tc.get_endpoint_acl_rule(self.test_share_ep_id, access_id)
-        self.assertEqual(apiErr.exception.http_status, 404)
-        self.assertEqual(apiErr.exception.code, "AccessRuleNotFound")
 
     def test_bookmark_list(self):
         """
@@ -1296,3 +1113,206 @@ class TransferClientTests(CapturedIOTestCase):
             self.assertEqual(success["DATA_TYPE"], "successful_transfer")
             self.assertIn("source_path", success)
             self.assertIn("destination_path", success)
+
+
+# class for Transfer Client Tests that require a shared endpoint
+# since tearDown takes significantly longer if a shared endpoint was made
+class SharedTransferClientTests(BaseTransferClientTests):
+
+    __test__ = True  # marks sub-class as having tests
+
+    def setUp(self):
+        """
+        calls BaseTransferClientTest setUp,
+        then sets up a test shared endpoint
+        """
+        super(SharedTransferClientTests, self).setUp()
+
+        # shared endpoint hosted on go#ep1
+        share_path = "/~/share"
+        self.tc.operation_mkdir(GO_EP1_ID, path=share_path)
+        shared_data = {"DATA_TYPE": "shared_endpoint",
+                       "host_endpoint": GO_EP1_ID,
+                       "host_path": share_path,
+                       "display_name": "SDK Test Shared Endpoint",
+                       "description": "Shared Endpoint for testing the SDK"
+                       }
+        r = self.tc.create_shared_endpoint(shared_data)
+        self.test_share_ep_id = r["id"]
+
+    def test_endpoint_search(self):
+        """
+        Searches by fulltext, owner_id, and scopes, validates results
+        """
+
+        # full-text and cap of num_results
+        search_string = "tutorial"
+        cap = 5
+        text_doc = self.tc.endpoint_search(search_string, num_results=cap)
+        # confirm the results are in the right format, are capped correctly,
+        # and that the results have the search string in their display names
+        self.assertIsInstance(text_doc, PaginatedResource)
+        results_count = 0
+        for ep in text_doc:
+            self.assertIn(search_string, str.lower(str(ep["display_name"])))
+            results_count += 1
+        self.assertEqual(results_count, cap)
+
+        # owner-id param
+        params = {"filter_owner_id": GO_USER_ID}
+        owner_doc = self.tc.endpoint_search(**params)
+        # confirm format, and that all results are from GO
+        self.assertIsInstance(owner_doc, PaginatedResource)
+        for ep in owner_doc:
+            self.assertEqual(ep["owner_id"], GO_USER_ID)
+
+        # scope: my endpoints
+        my_doc = self.tc.endpoint_search(filter_scope="my-endpoints")
+        # confirm format, and that all results are owned by SDK tester
+        self.assertIsInstance(my_doc, PaginatedResource)
+        for ep in my_doc:
+            self.assertEqual(ep["owner_id"], SDK_USER_ID)
+
+        # scope: shared endpoints
+        my_doc = self.tc.endpoint_search(filter_scope="shared-by-me")
+        # confirm format, and that all results are shared by SDK tester
+        self.assertIsInstance(my_doc, PaginatedResource)
+        for ep in my_doc:
+            self.assertEqual(ep["owner_id"], SDK_USER_ID)
+            self.assertIsNotNone(ep["sharing_target_root_path"])
+            self.assertIsNotNone(ep["host_endpoint_id"])
+
+    def test_my_shared_endpoint_list(self):
+        """
+        Gets my shared endpoint list, validates results
+        """
+
+        # get shared endpoint list
+        share_doc = self.tc.my_shared_endpoint_list(GO_EP1_ID)
+
+        # confirm doc type, and that test_share_ep_id is on the list
+        self.assertEqual(share_doc["DATA_TYPE"], "endpoint_list")
+        share_test_found = False
+        for ep in share_doc:
+            share_test_found = (ep["id"] == self.test_share_ep_id
+                                or share_test_found)
+        self.assertTrue(share_test_found)
+
+    def test_endpoint_acl_list(self):
+        """
+        Gets endpoint access rule list from test_ep, validates results
+        """
+
+        # get endpoint role list
+        list_doc = self.tc.endpoint_acl_list(self.test_share_ep_id)
+
+        # validate responce has been put into
+        self.assertEqual(list_doc["DATA_TYPE"], "access_list")
+        self.assertIn("DATA", list_doc)
+        # confirm that each access rule has some expected values
+        for access in list_doc["DATA"]:
+            self.assertEqual(access["DATA_TYPE"], "access")
+            self.assertIn("id", access)
+            self.assertIn("principal_type", access)
+            self.assertIn("principal", access)
+            self.assertIn("permissions", access)
+
+    def test_get_endpoint_acl_rule(self):
+        """
+        Adds access rule to test_share_ep, gets it by id, validates results
+        """
+
+        # get access rule id through test_add_endpoint_acl_rule
+        access_id = self.test_add_endpoint_acl_rule()
+
+        # get the access rule by id
+        get_doc = self.tc.get_endpoint_acl_rule(self.test_share_ep_id,
+                                                access_id)
+
+        # validate results
+        self.assertEqual(get_doc["DATA_TYPE"], "access")
+        self.assertEqual(get_doc["id"], access_id)
+
+    def test_add_endpoint_acl_rule(self):
+        """
+        Adds access rule to test_share_ep, validates results,
+        then confirms get sees the new access rule,
+        returns the access_id for use in testing get update and delete
+        """
+
+        # add root read access to all users logged in with auth
+        add_data = {"DATA_TYPE": "access",
+                    "principal_type": "all_authenticated_users",
+                    "principal": "",
+                    "path": "/",
+                    "permissions": "r"
+                    }
+        add_doc = self.tc.add_endpoint_acl_rule(self.test_share_ep_id,
+                                                add_data)
+
+        # validate results
+        self.assertEqual(add_doc["DATA_TYPE"], "access_create_result")
+        self.assertEqual(add_doc["code"], "Created")
+        self.assertEqual(add_doc["message"],
+                         "Access rule created successfully.")
+        self.assertIn("access_id", add_doc)
+
+        # confirm get sees new access rule
+        access_id = add_doc["access_id"]
+        get_doc = self.tc.get_endpoint_acl_rule(self.test_share_ep_id,
+                                                access_id)
+        self.assertEqual(get_doc["id"], access_id)
+        for item in add_data:
+            self.assertEqual(get_doc[item], add_data[item])
+
+        # return access_id
+        return access_id
+
+    def test_update_endpoint_acl_rule(self):
+        """
+        Adds access rule to test_share_ep, updates that access rule,
+        validates results, then confirms get sees the new changes
+        """
+
+        # get access rule id through test_add_endpoint_acl_rule
+        access_id = self.test_add_endpoint_acl_rule()
+
+        # update the access rule by id
+        update_data = {"permissions": "rw"}
+        update_doc = self.tc.update_endpoint_acl_rule(self.test_share_ep_id,
+                                                      access_id, update_data)
+
+        # validate results
+        self.assertEqual(update_doc["DATA_TYPE"], "result")
+        self.assertEqual(update_doc["code"], "Updated")
+        self.assertIn("permissions updated successfully",
+                      update_doc["message"])
+
+        # confirm get sees new permissions
+        get_doc = self.tc.get_endpoint_acl_rule(self.test_share_ep_id,
+                                                access_id)
+        self.assertEqual(get_doc["permissions"], update_data["permissions"])
+
+    def test_delete_endpoint_acl_rule(self):
+        """
+        Adds access rule to test_share_ep, deletes that access rule,
+        validates results, then confirms get no longer sees the access rule
+        """
+
+        # get access rule id through test_add_endpoint_acl_rule
+        access_id = self.test_add_endpoint_acl_rule()
+
+        # delete the access rule by id
+        delete_doc = self.tc.delete_endpoint_acl_rule(self.test_share_ep_id,
+                                                      access_id)
+
+        # validate results
+        self.assertEqual(delete_doc["DATA_TYPE"], "result")
+        self.assertEqual(delete_doc["code"], "Deleted")
+        self.assertIn("deleted successfully", delete_doc["message"])
+
+        # confirm get no longer sees the access rule
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc.get_endpoint_acl_rule(self.test_share_ep_id, access_id)
+        self.assertEqual(apiErr.exception.http_status, 404)
+        self.assertEqual(apiErr.exception.code, "AccessRuleNotFound")
