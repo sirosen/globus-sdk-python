@@ -260,6 +260,28 @@ different nature of the Dependent Token Grant response</dd>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="globus_sdk.AuthClient.oauth2_userinfo">
+<code class="descname">oauth2_userinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/auth/client_types/base.html#AuthClient.oauth2_userinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.AuthClient.oauth2_userinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the Userinfo endpoint of Globus Auth.
+Userinfo is specified as part of the OpenID Connect (OIDC) standard,
+and Globus Auth&#8217;s Userinfo is OIDC-compliant.</p>
+<p>The exact data returned will depend upon the set of OIDC-related scopes
+which were used to acquire the token being used for this call. For
+details, see the <strong>External Documentation</strong> below.</p>
+<p><strong>Examples</strong></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span> <span class="o">=</span> <span class="n">AuthClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">ac</span><span class="o">.</span><span class="n">oauth2_userinfo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Effective Identity &quot;</span><span class="si">{}</span><span class="s1">&quot; has Full Name &quot;</span><span class="si">{}</span><span class="s1">&quot; and Email &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span>      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;sub&quot;</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/auth/reference/#get_or_post_v2_oauth2_userinfo_resource">Userinfo</a>
+in the API documentation for details.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">

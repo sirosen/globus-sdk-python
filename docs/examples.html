@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Globus Auth / OAuth2 &mdash; globus-sdk-python 0.4.6 documentation</title>
+    <title>Globus SDK Examples &mdash; globus-sdk-python 0.4.6 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="globus-sdk-python 0.4.6 documentation" href="index.html" />
-    <link rel="next" title="OAuth Flows" href="oauth/flows.html" />
-    <link rel="prev" title="Exceptions" href="exceptions.html" /> 
+    <link rel="next" title="API Authorization" href="examples/authorization.html" />
+    <link rel="prev" title="Optional Dependencies" href="optional_dependencies.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,10 +38,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="oauth/flows.html" title="OAuth Flows"
+          <a href="examples/authorization.html" title="API Authorization"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="exceptions.html" title="Exceptions"
+          <a href="optional_dependencies.html" title="Optional Dependencies"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">globus-sdk-python 0.4.6 documentation</a> &raquo;</li> 
       </ul>
@@ -52,32 +52,15 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="globus-auth-oauth2">
-<h1>Globus Auth / OAuth2<a class="headerlink" href="#globus-auth-oauth2" title="Permalink to this headline">¶</a></h1>
-<p>Globus offers Authentication and Authorization services through an OAuth2
-service, Globus Auth.</p>
-<p>Globus Auth acts as an Authorization Server, and allows users to authenticate
-with, and link together, identities from a wide range of Identity Providers.</p>
-<p>Although the <a class="reference internal" href="clients/auth.html#globus_sdk.AuthClient" title="globus_sdk.AuthClient"><code class="xref py py-class docutils literal"><span class="pre">AuthClient</span></code></a> class documentation
-covers normal interactions with Globus Auth, the OAuth2 flows are significantly
-more complex.</p>
-<p>This section documents the supported types of authentication and how to carry
-them out, as well as providing some necessary background on various OAuth2
-elements.</p>
-<p class="rubric">Credentials are for Users and also for Applications</p>
-<p>It is very important that our goal in OAuth2 is not to get credentials for an
-application on its own, but rather for the application as a <em>client</em> to Globus
-which is acting <em>on behalf of a user</em>.</p>
-<p>Therefore, if you are writing an application called <strong>foo</strong>, and a user
-<strong>bar&#64;example.com</strong> is using <strong>foo</strong>, the credentials produced belong to the
-combination of <strong>foo</strong> and <strong>bar&#64;example.com</strong>.
-The resulting credentials represent the rights and permission for <strong>foo</strong> to
-perform actions for <strong>bar&#64;example.com</strong> on systems authenticated via Globus.</p>
-<p class="rubric">OAuth2 Documentation</p>
+  <div class="section" id="globus-sdk-examples">
+<span id="examples"></span><h1>Globus SDK Examples<a class="headerlink" href="#globus-sdk-examples" title="Permalink to this headline">¶</a></h1>
+<p>Each of these pages contains an example of a piece of SDK functionality.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="oauth/flows.html">OAuth Flows</a></li>
-<li class="toctree-l1"><a class="reference internal" href="oauth/resource_servers.html">Resouce Servers and Scopes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/authorization.html">API Authorization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/native_app.html">Native App Login</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/client_credentials.html">Client Credentials Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/three_legged_oauth.html">Three Legged OAuth with Flask</a></li>
 </ul>
 </div>
 </div>
@@ -89,15 +72,15 @@ perform actions for <strong>bar&#64;example.com</strong> on systems authenticate
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="exceptions.html"
-                        title="previous chapter">Exceptions</a></p>
+  <p class="topless"><a href="optional_dependencies.html"
+                        title="previous chapter">Optional Dependencies</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="oauth/flows.html"
-                        title="next chapter">OAuth Flows</a></p>
+  <p class="topless"><a href="examples/authorization.html"
+                        title="next chapter">API Authorization</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/oauth.txt"
+      <li><a href="_sources/examples.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -125,10 +108,10 @@ perform actions for <strong>bar&#64;example.com</strong> on systems authenticate
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="oauth/flows.html" title="OAuth Flows"
+          <a href="examples/authorization.html" title="API Authorization"
              >next</a> |</li>
         <li class="right" >
-          <a href="exceptions.html" title="Exceptions"
+          <a href="optional_dependencies.html" title="Optional Dependencies"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">globus-sdk-python 0.4.6 documentation</a> &raquo;</li> 
       </ul>

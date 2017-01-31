@@ -32,6 +32,7 @@ Table of Contents
    config
    deprecations
    optional_dependencies
+   examples
 
 License
 =======

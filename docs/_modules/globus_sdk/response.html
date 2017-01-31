@@ -49,7 +49,7 @@
   <h1>Source code for globus_sdk.response</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="GlobusResponse"><a class="viewcode-back" href="../../responses.html#globus_sdk.response.GlobusResponse">[docs]</a><span class="k">class</span> <span class="nc">GlobusResponse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -65,7 +65,7 @@
 
 <span class="sd">    &gt;&gt;&gt; print(&quot;Response ID&quot;: r[&quot;id&quot;]) # alias for r.data[&quot;id&quot;]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ``GlobusResponse`` objects *always* wrap some kind of data to</span>
 <span class="sd">        return to a caller. Most basic actions on a GlobusResponse are</span>
@@ -73,13 +73,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;{0}({1!r})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;{0}({1!r})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="c1"># force evaluation of the data property outside of the upcoming</span>
         <span class="c1"># try-catch so that we don&#39;t accidentally catch TypeErrors thrown</span>
         <span class="c1"># during the getter function itself</span>
@@ -96,6 +96,12 @@
             <span class="c1"># class at large, or just a particular call&#39;s `data` property</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span><span class="s1">&#39;This type of GlobusResponse object &#39;</span>
                              <span class="s1">&#39;does not support indexing.&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ``x in GlobusResponse`` is an alias for ``x in GlobusResponse.data``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -122,10 +128,10 @@
 <span class="sd">    :ivar http_status: HTTP status code returned by the server (int)</span>
 <span class="sd">    :ivar content_type: Content-Type header returned by the server (str)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">http_response</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">http_response</span><span class="p">):</span>
         <span class="c1"># the API response as some form of HTTP response object will be the</span>
         <span class="c1"># underlying data of an API response</span>
-        <span class="n">GlobusResponse</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">http_response</span><span class="p">)</span>
+        <span class="n">GlobusResponse</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">http_response</span><span class="p">)</span>
         <span class="c1"># NB: the word &#39;code&#39; is confusing because we use it in the</span>
         <span class="c1"># error body, and status_code is not much better. http_code, or</span>
         <span class="c1"># http_status_code if we wanted to be really explicit, is</span>

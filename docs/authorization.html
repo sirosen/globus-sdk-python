@@ -62,134 +62,11 @@ These are a very simple class of generic objects which define a way of getting
 an up-to-date <code class="docutils literal"><span class="pre">Authorization</span></code> header, and trying to handle a 401 (if that
 header is expired).</p>
 <p>Whenever using the <a class="reference internal" href="clients.html#clients"><span class="std std-ref">Service Clients</span></a>, you should be passing in an
-authorizer when you create a new client unless otherwise specified.
-The type of authorizer you will use depends very much on your application, but
-if you want examples you should look at the <a class="reference internal" href="#examples-ref"><span class="std std-ref">examples section</span></a>.
+authorizer when you create a new client unless otherwise specified.</p>
+<p>The type of authorizer you will use depends very much on your application, but
+if you want examples you should look at the <a class="reference internal" href="examples/authorization.html#examples-authorization"><span class="std std-ref">examples section</span></a>.
 It may help to start with the examples and come back to the full documentation
 afterwards.</p>
-<div class="section" id="examples">
-<span id="examples-ref"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>Using an authorizer is hard to grasp without a few examples to reference.
-The basic usage should be to create these at client instantiation time.</p>
-<div class="section" id="access-token-authorization-on-authclient-and-transferclient">
-<h3>Access Token Authorization on AuthClient and TransferClient<a class="headerlink" href="#access-token-authorization-on-authclient-and-transferclient" title="Permalink to this headline">¶</a></h3>
-<p>Perhaps you&#8217;re in a part of your application that only sees Access Tokens.
-Access Tokens are used to directly authenticate calls against Globus APIs, and
-are limited-lifetime credentials.
-You have distinct Access Tokens for each Globus service which you want to
-access.</p>
-<p>With the tokens in hand, it&#8217;s just as simple as the <a class="reference internal" href="#globus_sdk.BasicAuthorizer" title="globus_sdk.BasicAuthorizer"><code class="xref py py-class docutils literal"><span class="pre">BasicAuthorizer</span></code></a> case.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="n">AuthClient</span><span class="p">,</span> <span class="n">TransferClient</span><span class="p">,</span> <span class="n">AccessTokenAuthorizer</span>
-
-<span class="n">AUTH_ACCESS_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
-<span class="n">TRANSFER_ACCESS_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
-
-<span class="c1"># note that we don&#39;t provide the client ID in this case</span>
-<span class="c1"># we aren&#39;t forbidden from doing so, but if you&#39;re using an Access Token</span>
-<span class="c1"># you can&#39;t do the OAuth2 flows</span>
-<span class="c1"># including it is allowed, but could be confusing since it won&#39;t be used</span>
-<span class="n">auth_client</span> <span class="o">=</span> <span class="n">AuthClient</span><span class="p">(</span>
-    <span class="n">authorizer</span><span class="o">=</span><span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="n">AUTH_ACCESS_TOKEN</span><span class="p">))</span>
-
-<span class="n">transfer_client</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span>
-    <span class="n">authorizer</span><span class="o">=</span><span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="n">TRANSFER_ACCESS_TOKEN</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="refresh-token-authorization-on-authclient-and-transferclient">
-<h3>Refresh Token Authorization on AuthClient and TransferClient<a class="headerlink" href="#refresh-token-authorization-on-authclient-and-transferclient" title="Permalink to this headline">¶</a></h3>
-<p>Refresh Tokens are long-lived credentials used to get new Access Tokens
-whenever they expire.
-However, it would be very awkward to create a new client instance every time
-your credentials expire!
-Instead, use a <a class="reference internal" href="#globus_sdk.RefreshTokenAuthorizer" title="globus_sdk.RefreshTokenAuthorizer"><code class="xref py py-class docutils literal"><span class="pre">RefreshTokenAuthorizer</span></code></a> to automatically re-up your credentials
-whenever they near expiration.
-Unfortunately, re-upping credentials is an operation that requires having
-client credentials for Globus Auth, so creating the authorizer is more complex
-this time.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AuthClient</span><span class="p">,</span> <span class="n">TransferClient</span><span class="p">,</span> <span class="n">ConfidentialAppAuthClient</span><span class="p">,</span>
-                        <span class="n">RefreshTokenAuthorizer</span><span class="p">)</span>
-
-<span class="c1"># for doing the refresh</span>
-<span class="n">CLIENT_ID</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
-<span class="n">CLIENT_SECRET</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
-
-<span class="c1"># the actual tokens</span>
-<span class="n">AUTH_REFRESH_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
-<span class="n">TRANSFER_REFRESH_TOKEN</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
-
-<span class="c1"># making the authorizer requires that we have an AuthClient which can talk</span>
-<span class="c1"># OAuth2 to Globus Auth</span>
-<span class="n">internal_auth_client</span> <span class="o">=</span> <span class="n">ConfidentialAppAuthClient</span><span class="p">(</span><span class="n">CLIENT_ID</span><span class="p">,</span> <span class="n">CLIENT_SECRET</span><span class="p">)</span>
-
-<span class="c1"># now let&#39;s bake a couple of authorizers</span>
-<span class="n">auth_authorizer</span> <span class="o">=</span> <span class="n">RefreshTokenAuthorizer</span><span class="p">(</span><span class="n">AUTH_REFRESH_TOKEN</span><span class="p">,</span>
-                                         <span class="n">internal_auth_client</span><span class="p">)</span>
-<span class="n">transfer_authorizer</span> <span class="o">=</span> <span class="n">RefreshTokenAuthorizer</span><span class="p">(</span><span class="n">TRANSFER_REFRESH_TOKEN</span><span class="p">,</span>
-                                             <span class="n">internal_auth_client</span><span class="p">)</span>
-
-<span class="c1"># auth_client here is totally different from &quot;internal_auth_client&quot; above</span>
-<span class="c1"># the former is being used to request new tokens periodically, while this</span>
-<span class="c1"># one represents a user authenticated with those tokens</span>
-<span class="n">auth_client</span> <span class="o">=</span> <span class="n">AuthClient</span><span class="p">(</span><span class="n">authorizer</span><span class="o">=</span><span class="n">auth_authorizer</span><span class="p">)</span>
-<span class="c1"># transfer_client doesn&#39;t have to contend with this duality -- it&#39;s always</span>
-<span class="c1"># representing a user</span>
-<span class="n">transfer_client</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="n">authorizer</span><span class="o">=</span><span class="n">transfer_authorizer</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="the-implicit-authorizers">
-<h3>The Implicit Authorizers<a class="headerlink" href="#the-implicit-authorizers" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal"><span class="pre">AuthClient</span></code> and <code class="docutils literal"><span class="pre">TransferClient</span></code> define a method of loading tokens from
-the config files and creating an authorizer.</p>
-<p>In the future, this will change to support refresh tokens in the config, but
-today it is done with access tokens.</p>
-<p>If you have a config file that reads as</p>
-<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[general]</span>
-<span class="na">auth_token</span> <span class="o">=</span> <span class="s">&quot;abc123&quot;</span>
-<span class="na">transfer_token</span> <span class="o">=</span> <span class="s">&quot;xyz456&quot;</span>
-</pre></div>
-</div>
-<p>Then you can create <code class="docutils literal"><span class="pre">AuthClient</span></code> and <code class="docutils literal"><span class="pre">TransferClient</span></code> instances with no
-arguments:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">auth_client</span> <span class="o">=</span> <span class="n">AuthClient</span><span class="p">()</span>
-<span class="n">transfer_client</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>This is really just the same as doing this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">auth_client</span> <span class="o">=</span> <span class="n">AuthClient</span><span class="p">(</span>
-    <span class="n">authorizer</span><span class="o">=</span><span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="s2">&quot;abc123&quot;</span><span class="p">))</span>
-
-<span class="n">transfer_client</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span>
-    <span class="n">authorizer</span><span class="o">=</span><span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="s2">&quot;xyz456&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="basic-auth-on-an-authclient">
-<h3>Basic Auth on an AuthClient<a class="headerlink" href="#basic-auth-on-an-authclient" title="Permalink to this headline">¶</a></h3>
-<p>If you&#8217;re using an <a class="reference internal" href="clients/auth.html#globus_sdk.AuthClient" title="globus_sdk.AuthClient"><code class="xref py py-class docutils literal"><span class="pre">AuthClient</span></code></a> to do OAuth2
-flows, you likely want to authenticate it using your client credentials (the
-client ID and client secret).
-Using the <code class="docutils literal"><span class="pre">BasicAuthorizer</span></code>, although simple, is wrong because it doesn&#8217;t
-tell <code class="docutils literal"><span class="pre">AuthClient</span></code> what type of client it is.</p>
-<p>The preferred method is to use one of the <code class="docutils literal"><span class="pre">AuthClient</span></code> subclasses which
-automatically specifies its authorizer.
-By way of example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="n">ConfidentialAppAuthClient</span>
-
-<span class="n">CLIENT_ID</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
-<span class="n">CLIENT_SECRET</span> <span class="o">=</span> <span class="s1">&#39;...&#39;</span>
-
-<span class="n">client</span> <span class="o">=</span> <span class="n">ConfidentialAppAuthClient</span><span class="p">(</span><span class="n">CLIENT_ID</span><span class="p">,</span> <span class="n">CLIENT_SECRET</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>and you&#8217;re off to the races!</p>
-<p>Under the hood, this is implicitly running</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">AuthClient</span><span class="p">(</span><span class="n">authorizer</span><span class="o">=</span><span class="n">BasicAuthorizer</span><span class="p">(</span><span class="n">CLIENT_ID</span><span class="p">,</span> <span class="n">CLIENT_SECRET</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
 <div class="section" id="the-authorizer-interface">
 <h2>The Authorizer Interface<a class="headerlink" href="#the-authorizer-interface" title="Permalink to this headline">¶</a></h2>
 <p>We define the interface for <code class="docutils literal"><span class="pre">GlobusAuthorizer</span></code> objects in terms of an
@@ -363,13 +240,6 @@ being fetched.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">API Authorization</a><ul>
-<li><a class="reference internal" href="#examples">Examples</a><ul>
-<li><a class="reference internal" href="#access-token-authorization-on-authclient-and-transferclient">Access Token Authorization on AuthClient and TransferClient</a></li>
-<li><a class="reference internal" href="#refresh-token-authorization-on-authclient-and-transferclient">Refresh Token Authorization on AuthClient and TransferClient</a></li>
-<li><a class="reference internal" href="#the-implicit-authorizers">The Implicit Authorizers</a></li>
-<li><a class="reference internal" href="#basic-auth-on-an-authclient">Basic Auth on an AuthClient</a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#the-authorizer-interface">The Authorizer Interface</a></li>
 <li><a class="reference internal" href="#authorizer-types">Authorizer Types</a></li>
 </ul>
