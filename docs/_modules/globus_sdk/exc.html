@@ -50,7 +50,7 @@
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">textwrap</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="GlobusError"><a class="viewcode-back" href="../../exceptions.html#globus_sdk.exc.GlobusError">[docs]</a><span class="k">class</span> <span class="nc">GlobusError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -71,7 +71,7 @@
 <span class="sd">                   useful to developers, but there may be cases where it&#39;s</span>
 <span class="sd">                   suitable for display to end users.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_underlying_response</span> <span class="o">=</span> <span class="n">r</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">http_status</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span>
         <span class="k">if</span> <span class="s2">&quot;Content-Type&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span> <span class="ow">and</span> <span class="p">(</span>
@@ -92,7 +92,29 @@
             <span class="c1"># other types</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_text</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_args</span><span class="p">()</span>
-        <span class="n">GlobusError</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">GlobusError</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">raw_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the verbatim error message received from a Globus API, interpreted</span>
+<span class="sd">        as a JSON string and evaluated as a *dict*</span>
+
+<span class="sd">        If the body cannot be loaded as JSON, this is None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_underlying_response</span>
+        <span class="k">if</span> <span class="s2">&quot;Content-Type&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="s2">&quot;application/json&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">raw_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the verbatim error message receved from a Globus API as a *string*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_underlying_response</span><span class="o">.</span><span class="n">text</span>
 
     <span class="k">def</span> <span class="nf">_get_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -140,9 +162,9 @@
 <span class="sd">    :ivar request_id: Unique identifier for the request, which should be</span>
 <span class="sd">                      provided when contacting support@globus.org.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">request_id</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="n">GlobusAPIError</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">GlobusAPIError</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">http_status</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span>
@@ -153,17 +175,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">request_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;request_id&quot;</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="PaginationOverrunError"><a class="viewcode-back" href="../../exceptions.html#globus_sdk.exc.PaginationOverrunError">[docs]</a><span class="k">class</span> <span class="nc">PaginationOverrunError</span><span class="p">(</span><span class="n">GlobusError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Paginated results exceeded a limit set by our API. Too many pages of</span>
-<span class="sd">    results were being requested, and the API maximum would be exceeded.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
-
-
 <span class="k">class</span> <span class="nc">InvalidDocumentBodyError</span><span class="p">(</span><span class="n">GlobusError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Paginated results exceeded a limit set by our API. Too many pages of</span>
-<span class="sd">    results were being requested, and the API maximum would be exceeded.</span>
+<span class="sd">    The body of the document being sent to Globus is somehow malformed.</span>
+
+<span class="sd">    For example, a call that requires a specific format (XML, JSON, etc.) not</span>
+<span class="sd">    being given data in that format.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
@@ -200,7 +217,7 @@
 <span class="sd">        ``message`` (*string*)</span>
 <span class="sd">          An additional message to include</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dep_names</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dep_names</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
 <span class="s2">        You are missing optional dependencies required in order to use {0}</span>
 <span class="s2">        In order to use this feature of the Globus SDK, you must install:</span>

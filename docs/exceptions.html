@@ -141,6 +141,20 @@ suitable for display to end users.</li>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="globus_sdk.exc.GlobusAPIError.raw_json">
+<code class="descname">raw_json</code><a class="headerlink" href="#globus_sdk.exc.GlobusAPIError.raw_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the verbatim error message received from a Globus API, interpreted
+as a JSON string and evaluated as a <em>dict</em></p>
+<p>If the body cannot be loaded as JSON, this is None</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="globus_sdk.exc.GlobusAPIError.raw_text">
+<code class="descname">raw_text</code><a class="headerlink" href="#globus_sdk.exc.GlobusAPIError.raw_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the verbatim error message receved from a Globus API as a <em>string</em></p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -162,14 +176,6 @@ suitable for display to end users.</li>
 <em class="property">class </em><code class="descclassname">globus_sdk.exc.</code><code class="descname">GlobusTimeoutError</code><a class="reference internal" href="_modules/globus_sdk/exc.html#GlobusTimeoutError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.exc.GlobusTimeoutError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#globus_sdk.exc.NetworkError" title="globus_sdk.exc.NetworkError"><code class="xref py py-class docutils literal"><span class="pre">globus_sdk.exc.NetworkError</span></code></a></p>
 <p>The REST request timed out.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="globus_sdk.exc.PaginationOverrunError">
-<em class="property">class </em><code class="descclassname">globus_sdk.exc.</code><code class="descname">PaginationOverrunError</code><a class="reference internal" href="_modules/globus_sdk/exc.html#PaginationOverrunError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.exc.PaginationOverrunError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#globus_sdk.exc.GlobusError" title="globus_sdk.exc.GlobusError"><code class="xref py py-class docutils literal"><span class="pre">globus_sdk.exc.GlobusError</span></code></a></p>
-<p>Paginated results exceeded a limit set by our API. Too many pages of
-results were being requested, and the API maximum would be exceeded.</p>
 </dd></dl>
 
 </div>

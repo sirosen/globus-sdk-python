@@ -67,8 +67,8 @@
 <span class="sd">    &lt;https://docs.globus.org/api/transfer/endpoint_activation/#activation_requirements_document&gt;`_</span>
 <span class="sd">    in the API documentation for details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">TransferResponse</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">TransferResponse</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># at initialization time, capture expires_in and convert to an absolute</span>
         <span class="c1"># timestamp -- otherwise, the time between receiving the response and</span>
@@ -81,7 +81,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">supports_auto_activation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the document lists Auto-Activation as an available type of</span>
 <span class="sd">        activation.</span>
 <span class="sd">        Typically good to use when you need to catch endpoints that require web</span>

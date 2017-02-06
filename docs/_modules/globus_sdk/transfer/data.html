@@ -57,7 +57,7 @@
 
 <span class="kn">from</span> <span class="nn">globus_sdk.base</span> <span class="kn">import</span> <span class="n">safe_stringify</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="TransferData"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferData">[docs]</a><span class="k">class</span> <span class="nc">TransferData</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
@@ -83,7 +83,7 @@
 <span class="sd">    :meth:`submit_transfer &lt;globus_sdk.TransferClient.submit_transfer&gt;`</span>
 <span class="sd">    documentation for example usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transfer_client</span><span class="p">,</span> <span class="n">source_endpoint</span><span class="p">,</span> <span class="n">destination_endpoint</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transfer_client</span><span class="p">,</span> <span class="n">source_endpoint</span><span class="p">,</span> <span class="n">destination_endpoint</span><span class="p">,</span>
                  <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">submission_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sync_level</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">verify_checksum</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">preserve_timestamp</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                  <span class="n">encrypt_data</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -171,7 +171,7 @@
 <span class="sd">    See the :meth:`submit_delete &lt;globus_sdk.TransferClient.submit_delete&gt;`</span>
 <span class="sd">    documentation for example usage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transfer_client</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transfer_client</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">submission_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">endpoint</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating a new DeleteData object&quot;</span><span class="p">)</span>

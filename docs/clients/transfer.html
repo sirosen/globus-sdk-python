@@ -225,6 +225,25 @@ GET /endpoint_search?filter_fulltext=&lt;filter_fulltext&gt;&amp;filter_scope=&l
 </tr>
 </tbody>
 </table>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">filter_fulltext</span></code> (<em>string</em>)</dt>
+<dd>The string to use in a full text search on endpoints.
+Effectively, the &#8220;search query&#8221; which is being requested.</dd>
+<dt><code class="docutils literal"><span class="pre">filter_scope</span></code> (<em>string</em>)</dt>
+<dd>A &#8220;scope&#8221; within which to search for endpoints. This must be one
+of the limited and known names known to the service, which can be
+found documented in the <strong>External Documentation</strong> below.</dd>
+<dt><code class="docutils literal"><span class="pre">num_results</span></code> (<em>int</em> or <em>None</em>)</dt>
+<dd>default <code class="docutils literal"><span class="pre">25</span></code>
+The number of search results to fetch from the service. May be
+set to <code class="docutils literal"><span class="pre">None</span></code> to request the maximum allowable number of
+results.</dd>
+<dt><code class="docutils literal"><span class="pre">params</span></code></dt>
+<dd>Any additional parameters will be passed through as query params.</dd>
+</dl>
+</div></blockquote>
 <p><strong>Examples</strong></p>
 <p>Search for a given string as a fulltext search:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
@@ -247,14 +266,14 @@ If you want more than the default, 25, elements, do like so:</p>
 </div>
 <p>It is important to be aware that the Endpoint Search API limits
 you to 1000 results for any search query.
-If you attempt to exceed this limit, you will trigger a
-<a class="reference internal" href="../exceptions.html#globus_sdk.exc.PaginationOverrunError" title="globus_sdk.exc.PaginationOverrunError"><code class="xref py py-class docutils literal"><span class="pre">PaginationOverrunError</span></code></a></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ep</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_search</span><span class="p">(</span><span class="s1">&#39;globus&#39;</span><span class="p">,</span> <span class="c1"># a very common string</span>
-<span class="gp">&gt;&gt;&gt; </span>                            <span class="n">num_results</span><span class="o">=</span><span class="mi">1200</span><span class="p">):</span> <span class="c1"># num too large!</span>
+You can request the maximum number of results either explicitly, with
+<code class="docutils literal"><span class="pre">num_results=1000</span></code>, or by stating that you want no limit by setting
+it to <code class="docutils literal"><span class="pre">None</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ep</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_search</span><span class="p">(</span><span class="s1">&#39;String to search for!&#39;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                            <span class="n">num_results</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="s1">&#39;display_name&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>will trigger this error.</p>
 <p><strong>External Documentation</strong></p>
 <p>For additional information, see <a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_search">Endpoint Search</a>.
 in the REST documentation for details.</p>
@@ -866,6 +885,17 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p>Submission IDs are required to submit tasks to the Transfer service
+via the <a class="reference internal" href="#globus_sdk.TransferClient.submit_transfer" title="globus_sdk.TransferClient.submit_transfer"><code class="xref py py-meth docutils literal"><span class="pre">submit_transfer</span></code></a> and
+<a class="reference internal" href="#globus_sdk.TransferClient.submit_delete" title="globus_sdk.TransferClient.submit_delete"><code class="xref py py-meth docutils literal"><span class="pre">submit_delete</span></code></a> methods.</p>
+<p>Most users will not need to call this method directly, as the
+convenience classes <a class="reference internal" href="#globus_sdk.TransferData" title="globus_sdk.TransferData"><code class="xref py py-class docutils literal"><span class="pre">TransferData</span></code></a>
+and <a class="reference internal" href="#globus_sdk.DeleteData" title="globus_sdk.DeleteData"><code class="xref py py-class docutils literal"><span class="pre">DeleteData</span></code></a> will call it
+automatically if they are not passed a <code class="docutils literal"><span class="pre">submission_id</span></code> explicitly.</p>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/task_submit/#get_submission_id">Get a submission id</a>
+in the REST documentation for more details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -898,7 +928,7 @@ in the REST documentation for details.</p>
 a <a class="reference internal" href="#globus_sdk.TransferData" title="globus_sdk.TransferData"><code class="xref py py-class docutils literal"><span class="pre">TransferData</span></code></a> object.</p>
 <p><strong>External Documentation</strong></p>
 <p>See
-<a class="reference external" href="https://docs.globus.org/api/transfer/task_submit/#submit_a_transfer_task">Submit a transfer task</a>
+<a class="reference external" href="https://docs.globus.org/api/transfer/task_submit/#submit_transfer_task">Submit a transfer task</a>
 in the REST documentation for more details.</p>
 </dd></dl>
 
@@ -927,28 +957,78 @@ in the REST documentation for more details.</p>
 a <a class="reference internal" href="#globus_sdk.DeleteData" title="globus_sdk.DeleteData"><code class="xref py py-class docutils literal"><span class="pre">DeleteData</span></code></a> object.</p>
 <p><strong>External Documentation</strong></p>
 <p>See
-<a class="reference external" href="https://docs.globus.org/api/transfer/task_submit/#submit_a_delete_task">Submit a delete task</a>
+<a class="reference external" href="https://docs.globus.org/api/transfer/task_submit/#submit_delete_task">Submit a delete task</a>
 in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="globus_sdk.TransferClient.endpoint_manager_task_list">
 <code class="descname">endpoint_manager_task_list</code><span class="sig-paren">(</span><em>num_results=10</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/client.html#TransferClient.endpoint_manager_task_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferClient.endpoint_manager_task_list" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">endpoint_manager/task_list</span></code></p>
+<dd><blockquote>
+<div><p>Get a list of tasks visible via <code class="docutils literal"><span class="pre">activity_monitor</span></code> role, as opposed
+to tasks owned by the current user.</p>
+<p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">endpoint_manager/task_list</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of <a class="reference internal" href="../responses.html#globus_sdk.response.GlobusResponse" title="globus_sdk.response.GlobusResponse"><code class="xref py py-class docutils literal"><span class="pre">GlobusResponse</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body">iterable of <a class="reference internal" href="../responses.html#globus_sdk.response.GlobusResponse" title="globus_sdk.response.GlobusResponse"><code class="xref py py-class docutils literal"><span class="pre">GlobusResponse</span></code></a></td>
 </tr>
 </tbody>
 </table>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">num_results</span></code> (<em>int</em> or <em>None</em>)</dt>
+<dd>default <code class="docutils literal"><span class="pre">10</span></code>
+The number of tasks to fetch from the service. May be set to
+<code class="docutils literal"><span class="pre">None</span></code> to request the maximum allowable number of results.</dd>
+<dt><code class="docutils literal"><span class="pre">params</span></code></dt>
+<dd>Any additional parameters will be passed through as query params.</dd>
+</dl>
+</div></blockquote>
+<p><strong>Examples</strong></p>
+<p>Fetch the default number (10) of tasks and print some basic info:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_manager_task_list</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Task(</span><span class="si">{}</span><span class="s2">): </span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>was submitted by
+{}&#8221;.format(</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span>        <span class="n">task</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">],</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;source_endpoint&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">task</span><span class="p">[</span><span class="s2">&quot;destination_endpoint&quot;</span><span class="p">),</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;owner_string&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Do that same operation on <em>all</em> tasks visible via <code class="docutils literal"><span class="pre">activity_monitor</span></code>
+status:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_manager_task_list</span><span class="p">(</span><span class="n">num_results</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Task(</span><span class="si">{}</span><span class="s2">): </span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>was submitted by
+{}&#8221;.format(</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span>        <span class="n">task</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">],</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;source_endpoint&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">task</span><span class="p">[</span><span class="s2">&quot;destination_endpoint&quot;</span><span class="p">),</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;owner_string&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_tasks">Advanced Endpoint Management: Get tasks</a>
+in the REST documentation for details.</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
 <dt id="globus_sdk.TransferClient.task_list">
 <code class="descname">task_list</code><span class="sig-paren">(</span><em>num_results=10</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/client.html#TransferClient.task_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferClient.task_list" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">/task_list</span></code></p>
+<dd><p>Get an iterable of task documents owned by the current user.</p>
+<p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">/task_list</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -957,20 +1037,79 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">num_results</span></code> (<em>int</em> or <em>None</em>)</dt>
+<dd>default <code class="docutils literal"><span class="pre">10</span></code>
+The number of tasks to fetch from the service. May be set to
+<code class="docutils literal"><span class="pre">None</span></code> to request the maximum allowable number of results.</dd>
+<dt><code class="docutils literal"><span class="pre">params</span></code></dt>
+<dd>Any additional parameters will be passed through as query params.</dd>
+</dl>
+</div></blockquote>
+<p><strong>Examples</strong></p>
+<p>Fetch the default number (10) of tasks and print some basic info:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">task_list</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Task(</span><span class="si">{}</span><span class="s2">): </span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">task</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">],</span> <span class="n">task</span><span class="p">[</span><span class="s2">&quot;source_endpoint&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">task</span><span class="p">[</span><span class="s2">&quot;destination_endpoint&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/task/#get_task_list">Task list</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="globus_sdk.TransferClient.task_event_list">
 <code class="descname">task_event_list</code><span class="sig-paren">(</span><em>task_id</em>, <em>num_results=10</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/client.html#TransferClient.task_event_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferClient.task_event_list" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">/task/&lt;task_id&gt;/event_list</span></code></p>
+<dd><blockquote>
+<div><p>List events (for example, faults and errors) for a given Task.</p>
+<p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">/task/&lt;task_id&gt;/event_list</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of <a class="reference internal" href="../responses.html#globus_sdk.response.GlobusResponse" title="globus_sdk.response.GlobusResponse"><code class="xref py py-class docutils literal"><span class="pre">GlobusResponse</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body">iterable of <a class="reference internal" href="../responses.html#globus_sdk.response.GlobusResponse" title="globus_sdk.response.GlobusResponse"><code class="xref py py-class docutils literal"><span class="pre">GlobusResponse</span></code></a></td>
 </tr>
 </tbody>
 </table>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">task_id</span></code> (<em>string</em>)</dt>
+<dd>The task to inspect.</dd>
+<dt><code class="docutils literal"><span class="pre">num_results</span></code> (<em>int</em> or <em>None</em>)</dt>
+<dd>default <code class="docutils literal"><span class="pre">10</span></code>
+The number of events to fetch from the service. May be set to
+<code class="docutils literal"><span class="pre">None</span></code> to request the maximum allowable number of results.</dd>
+<dt><code class="docutils literal"><span class="pre">params</span></code></dt>
+<dd>Any additional parameters will be passed through as query params.</dd>
+</dl>
+</div></blockquote>
+<p><strong>Examples</strong></p>
+<p>Fetch the default number (10) of events and print some basic info:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">task_event_list</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Event on Task(</span><span class="si">{}</span><span class="s2">) at </span><span class="si">{}</span><span class="s2">:</span>
+</pre></div>
+</div>
+</div></blockquote>
+<dl class="docutils">
+<dt>{}&#8221;.format(</dt>
+<dd><div class="first highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span>        <span class="n">task_id</span><span class="p">,</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><strong>External Documentation</strong></p>
+<p class="last">See
+<a class="reference external" href="https://docs.globus.org/api/transfer/task/#get_event_list">Get event list</a>
+in the REST documentation for details.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -1080,7 +1219,8 @@ second at a time:</p>
 <dl class="method">
 <dt id="globus_sdk.TransferClient.task_successful_transfers">
 <code class="descname">task_successful_transfers</code><span class="sig-paren">(</span><em>task_id</em>, <em>num_results=100</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/client.html#TransferClient.task_successful_transfers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferClient.task_successful_transfers" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">/task/&lt;task_id&gt;/successful_transfers</span></code></p>
+<dd><p>Get the successful file transfers for a completed Task.</p>
+<p><code class="docutils literal"><span class="pre">GET</span> <span class="pre">/task/&lt;task_id&gt;/successful_transfers</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1089,6 +1229,29 @@ second at a time:</p>
 </tr>
 </tbody>
 </table>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">task_id</span></code> (<em>string</em>)</dt>
+<dd>The task to inspect.</dd>
+<dt><code class="docutils literal"><span class="pre">num_results</span></code> (<em>int</em> or <em>None</em>)</dt>
+<dd>default <code class="docutils literal"><span class="pre">100</span></code>
+The number of file transfer records to fetch from the service.
+May be set to <code class="docutils literal"><span class="pre">None</span></code> to request the maximum allowable number of
+results.</dd>
+<dt><code class="docutils literal"><span class="pre">params</span></code></dt>
+<dd>Any additional parameters will be passed through as query params.</dd>
+</dl>
+</div></blockquote>
+<p><strong>Examples</strong></p>
+<p>Fetch all transferred files for a task and print some basic info:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">task_successful_transfers</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">info</span><span class="p">[</span><span class="s2">&quot;source_path&quot;</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;destination_path&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
 <p><strong>External Documentation</strong></p>
 <p>See
 <a class="reference external" href="https://docs.globus.org/api/transfer/task/#get_task_successful_transfers">Get Task Successful Transfers</a>

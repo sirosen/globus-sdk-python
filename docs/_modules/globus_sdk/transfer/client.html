@@ -58,11 +58,11 @@
     <span class="n">TransferResponse</span><span class="p">,</span> <span class="n">IterableTransferResponse</span><span class="p">,</span> <span class="n">ActivationRequirementsResponse</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.transfer.paging</span> <span class="kn">import</span> <span class="n">PaginatedResource</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="TransferClient"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient">[docs]</a><span class="k">class</span> <span class="nc">TransferClient</span><span class="p">(</span><span class="n">BaseClient</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Client for the</span>
 <span class="sd">    `Globus Transfer API &lt;https://docs.globus.org/api/transfer/&gt;`_.</span>
 
@@ -108,7 +108,7 @@
     <span class="n">error_class</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">TransferAPIError</span>
     <span class="n">default_response_class</span> <span class="o">=</span> <span class="n">TransferResponse</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">authorizer</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="c1"># TODO: remove; this is a temporary backwards compatibility hack</span>
             <span class="n">access_token</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_transfer_token</span><span class="p">(</span>
@@ -118,7 +118,7 @@
                              <span class="s1">&#39;Switch to use of AccessTokenAuthorizer&#39;</span><span class="p">))</span>
                 <span class="n">authorizer</span> <span class="o">=</span> <span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
 
-        <span class="n">BaseClient</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;transfer&quot;</span><span class="p">,</span> <span class="n">base_path</span><span class="o">=</span><span class="s2">&quot;/v0.10/&quot;</span><span class="p">,</span>
+        <span class="n">BaseClient</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;transfer&quot;</span><span class="p">,</span> <span class="n">base_path</span><span class="o">=</span><span class="s2">&quot;/v0.10/&quot;</span><span class="p">,</span>
                             <span class="n">authorizer</span><span class="o">=</span><span class="n">authorizer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="c1"># Convenience methods, providing more pythonic access to common REST</span>
@@ -270,7 +270,7 @@
 
 <div class="viewcode-block" id="TransferClient.endpoint_search"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.endpoint_search">[docs]</a>    <span class="k">def</span> <span class="nf">endpoint_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_fulltext</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">filter_scope</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                         <span class="n">num_results</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        .. parsed-literal::</span>
 
 <span class="sd">            GET /endpoint_search\</span>
@@ -278,6 +278,26 @@
 
 <span class="sd">        :rtype: iterable of :class:`GlobusResponse</span>
 <span class="sd">                &lt;globus_sdk.response.GlobusResponse&gt;`</span>
+
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">            ``filter_fulltext`` (*string*)</span>
+<span class="sd">              The string to use in a full text search on endpoints.</span>
+<span class="sd">              Effectively, the &quot;search query&quot; which is being requested.</span>
+
+<span class="sd">            ``filter_scope`` (*string*)</span>
+<span class="sd">              A &quot;scope&quot; within which to search for endpoints. This must be one</span>
+<span class="sd">              of the limited and known names known to the service, which can be</span>
+<span class="sd">              found documented in the **External Documentation** below.</span>
+
+<span class="sd">            ``num_results`` (*int* or *None*)</span>
+<span class="sd">              default ``25``</span>
+<span class="sd">              The number of search results to fetch from the service. May be</span>
+<span class="sd">              set to ``None`` to request the maximum allowable number of</span>
+<span class="sd">              results.</span>
+
+<span class="sd">            ``params``</span>
+<span class="sd">              Any additional parameters will be passed through as query params.</span>
 
 <span class="sd">        **Examples**</span>
 
@@ -302,14 +322,13 @@
 
 <span class="sd">        It is important to be aware that the Endpoint Search API limits</span>
 <span class="sd">        you to 1000 results for any search query.</span>
-<span class="sd">        If you attempt to exceed this limit, you will trigger a</span>
-<span class="sd">        :class:`PaginationOverrunError &lt;globus_sdk.exc.PaginationOverrunError&gt;`</span>
+<span class="sd">        You can request the maximum number of results either explicitly, with</span>
+<span class="sd">        ``num_results=1000``, or by stating that you want no limit by setting</span>
+<span class="sd">        it to ``None``:</span>
 
-<span class="sd">        &gt;&gt;&gt; for ep in tc.endpoint_search(&#39;globus&#39;, # a very common string</span>
-<span class="sd">        &gt;&gt;&gt;                             num_results=1200): # num too large!</span>
+<span class="sd">        &gt;&gt;&gt; for ep in tc.endpoint_search(&#39;String to search for!&#39;,</span>
+<span class="sd">        &gt;&gt;&gt;                             num_results=None):</span>
 <span class="sd">        &gt;&gt;&gt;     print(ep[&#39;display_name&#39;])</span>
-
-<span class="sd">        will trigger this error.</span>
 
 <span class="sd">        **External Documentation**</span>
 
@@ -328,7 +347,7 @@
             <span class="n">max_total_results</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TransferClient.endpoint_autoactivate"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.endpoint_autoactivate">[docs]</a>    <span class="k">def</span> <span class="nf">endpoint_autoactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ``POST /endpoint/&lt;endpoint_id&gt;/autoactivate``</span>
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
@@ -993,6 +1012,22 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        Submission IDs are required to submit tasks to the Transfer service</span>
+<span class="sd">        via the :meth:`submit_transfer &lt;.submit_transfer&gt;` and</span>
+<span class="sd">        :meth:`submit_delete &lt;.submit_delete&gt;` methods.</span>
+
+<span class="sd">        Most users will not need to call this method directly, as the</span>
+<span class="sd">        convenience classes :class:`TransferData &lt;globus_sdk.TransferData&gt;`</span>
+<span class="sd">        and :class:`DeleteData &lt;globus_sdk.DeleteData&gt;` will call it</span>
+<span class="sd">        automatically if they are not passed a ``submission_id`` explicitly.</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get a submission id \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task_submit/#get_submission_id&gt;`_</span>
+<span class="sd">        in the REST documentation for more details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.get_submission_id({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">params</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;submission_id&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
@@ -1025,7 +1060,7 @@
 
 <span class="sd">        See</span>
 <span class="sd">        `Submit a transfer task \</span>
-<span class="sd">        &lt;https://docs.globus.org/api/transfer/task_submit/#submit_a_transfer_task&gt;`_</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task_submit/#submit_transfer_task&gt;`_</span>
 <span class="sd">        in the REST documentation for more details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.submit_transfer(...)&quot;</span><span class="p">)</span>
@@ -1054,7 +1089,7 @@
 
 <span class="sd">        See</span>
 <span class="sd">        `Submit a delete task \</span>
-<span class="sd">        &lt;https://docs.globus.org/api/transfer/task_submit/#submit_a_delete_task&gt;`_</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task_submit/#submit_delete_task&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.submit_delete(...)&quot;</span><span class="p">)</span>
@@ -1066,10 +1101,49 @@
 
 <div class="viewcode-block" id="TransferClient.endpoint_manager_task_list"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.endpoint_manager_task_list">[docs]</a>    <span class="k">def</span> <span class="nf">endpoint_manager_task_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_results</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of tasks visible via ``activity_monitor`` role, as opposed</span>
+<span class="sd">        to tasks owned by the current user.</span>
+
 <span class="sd">        ``GET endpoint_manager/task_list``</span>
 
 <span class="sd">        :rtype: iterable of :class:`GlobusResponse</span>
 <span class="sd">                &lt;globus_sdk.response.GlobusResponse&gt;`</span>
+
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">            ``num_results`` (*int* or *None*)</span>
+<span class="sd">              default ``10``</span>
+<span class="sd">              The number of tasks to fetch from the service. May be set to</span>
+<span class="sd">              ``None`` to request the maximum allowable number of results.</span>
+
+<span class="sd">            ``params``</span>
+<span class="sd">              Any additional parameters will be passed through as query params.</span>
+
+<span class="sd">        **Examples**</span>
+
+<span class="sd">        Fetch the default number (10) of tasks and print some basic info:</span>
+
+<span class="sd">        &gt;&gt;&gt; tc = TransferClient(...)</span>
+<span class="sd">        &gt;&gt;&gt; for task in tc.endpoint_manager_task_list():</span>
+<span class="sd">        &gt;&gt;&gt;     print(&quot;Task({}): {} -&gt; {}\n  was submitted by\n  {}&quot;.format(</span>
+<span class="sd">        &gt;&gt;&gt;         task[&quot;task_id&quot;], task[&quot;source_endpoint&quot;],</span>
+<span class="sd">        &gt;&gt;&gt;         task[&quot;destination_endpoint&quot;), task[&quot;owner_string&quot;])</span>
+
+<span class="sd">        Do that same operation on *all* tasks visible via ``activity_monitor``</span>
+<span class="sd">        status:</span>
+
+<span class="sd">        &gt;&gt;&gt; tc = TransferClient(...)</span>
+<span class="sd">        &gt;&gt;&gt; for task in tc.endpoint_manager_task_list(num_results=None):</span>
+<span class="sd">        &gt;&gt;&gt;     print(&quot;Task({}): {} -&gt; {}\n  was submitted by\n  {}&quot;.format(</span>
+<span class="sd">        &gt;&gt;&gt;         task[&quot;task_id&quot;], task[&quot;source_endpoint&quot;],</span>
+<span class="sd">        &gt;&gt;&gt;         task[&quot;destination_endpoint&quot;), task[&quot;owner_string&quot;])</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Advanced Endpoint Management: Get tasks \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_tasks&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.endpoint_manager_task_list(...)&quot;</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;endpoint_manager&#39;</span><span class="p">,</span> <span class="s1">&#39;task_list&#39;</span><span class="p">)</span>
@@ -1080,10 +1154,39 @@
 
 <div class="viewcode-block" id="TransferClient.task_list"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.task_list">[docs]</a>    <span class="k">def</span> <span class="nf">task_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_results</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get an iterable of task documents owned by the current user.</span>
+
 <span class="sd">        ``GET /task_list``</span>
 
 <span class="sd">        :rtype: iterable of :class:`GlobusResponse</span>
 <span class="sd">                &lt;globus_sdk.response.GlobusResponse&gt;`</span>
+
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">            ``num_results`` (*int* or *None*)</span>
+<span class="sd">              default ``10``</span>
+<span class="sd">              The number of tasks to fetch from the service. May be set to</span>
+<span class="sd">              ``None`` to request the maximum allowable number of results.</span>
+
+<span class="sd">            ``params``</span>
+<span class="sd">              Any additional parameters will be passed through as query params.</span>
+
+<span class="sd">        **Examples**</span>
+
+<span class="sd">        Fetch the default number (10) of tasks and print some basic info:</span>
+
+<span class="sd">        &gt;&gt;&gt; tc = TransferClient(...)</span>
+<span class="sd">        &gt;&gt;&gt; for task in tc.task_list():</span>
+<span class="sd">        &gt;&gt;&gt;     print(&quot;Task({}): {} -&gt; {}&quot;.format(</span>
+<span class="sd">        &gt;&gt;&gt;         task[&quot;task_id&quot;], task[&quot;source_endpoint&quot;],</span>
+<span class="sd">        &gt;&gt;&gt;         task[&quot;destination_endpoint&quot;))</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Task list \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task/#get_task_list&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.task_list(...)&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">PaginatedResource</span><span class="p">(</span>
@@ -1093,10 +1196,42 @@
 
 <div class="viewcode-block" id="TransferClient.task_event_list"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.task_event_list">[docs]</a>    <span class="k">def</span> <span class="nf">task_event_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">num_results</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List events (for example, faults and errors) for a given Task.</span>
+
 <span class="sd">        ``GET /task/&lt;task_id&gt;/event_list``</span>
 
 <span class="sd">        :rtype: iterable of :class:`GlobusResponse</span>
 <span class="sd">                &lt;globus_sdk.response.GlobusResponse&gt;`</span>
+
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">            ``task_id`` (*string*)</span>
+<span class="sd">              The task to inspect.</span>
+
+<span class="sd">            ``num_results`` (*int* or *None*)</span>
+<span class="sd">              default ``10``</span>
+<span class="sd">              The number of events to fetch from the service. May be set to</span>
+<span class="sd">              ``None`` to request the maximum allowable number of results.</span>
+
+<span class="sd">            ``params``</span>
+<span class="sd">              Any additional parameters will be passed through as query params.</span>
+
+<span class="sd">        **Examples**</span>
+
+<span class="sd">        Fetch the default number (10) of events and print some basic info:</span>
+
+<span class="sd">        &gt;&gt;&gt; tc = TransferClient(...)</span>
+<span class="sd">        &gt;&gt;&gt; task_id = ...</span>
+<span class="sd">        &gt;&gt;&gt; for event in tc.task_event_list(task_id):</span>
+<span class="sd">        &gt;&gt;&gt;     print(&quot;Event on Task({}) at {}:\n{}&quot;.format(</span>
+<span class="sd">        &gt;&gt;&gt;         task_id, event[&quot;time&quot;], event[&quot;description&quot;))</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get event list \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task/#get_event_list&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.task_event_list({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>
@@ -1140,7 +1275,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">resource_path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TransferClient.task_wait"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.task_wait">[docs]</a>    <span class="k">def</span> <span class="nf">task_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Wait until a Task is complete or fails, with a time limit. If the task</span>
 <span class="sd">        is &quot;ACTIVE&quot; after time runs out, returns ``False``. Otherwise returns</span>
 <span class="sd">        ``True``.</span>
@@ -1253,10 +1388,36 @@
 
 <div class="viewcode-block" id="TransferClient.task_successful_transfers"><a class="viewcode-back" href="../../../clients/transfer.html#globus_sdk.TransferClient.task_successful_transfers">[docs]</a>    <span class="k">def</span> <span class="nf">task_successful_transfers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">num_results</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the successful file transfers for a completed Task.</span>
+
 <span class="sd">        ``GET /task/&lt;task_id&gt;/successful_transfers``</span>
 
 <span class="sd">        :rtype: iterable of :class:`GlobusResponse</span>
 <span class="sd">                &lt;globus_sdk.response.GlobusResponse&gt;`</span>
+
+<span class="sd">        **Parameters**</span>
+
+<span class="sd">            ``task_id`` (*string*)</span>
+<span class="sd">              The task to inspect.</span>
+
+<span class="sd">            ``num_results`` (*int* or *None*)</span>
+<span class="sd">              default ``100``</span>
+<span class="sd">              The number of file transfer records to fetch from the service.</span>
+<span class="sd">              May be set to ``None`` to request the maximum allowable number of</span>
+<span class="sd">              results.</span>
+
+<span class="sd">            ``params``</span>
+<span class="sd">              Any additional parameters will be passed through as query params.</span>
+
+<span class="sd">        **Examples**</span>
+
+<span class="sd">        Fetch all transferred files for a task and print some basic info:</span>
+
+<span class="sd">        &gt;&gt;&gt; tc = TransferClient(...)</span>
+<span class="sd">        &gt;&gt;&gt; task_id = ...</span>
+<span class="sd">        &gt;&gt;&gt; for info in tc.task_successful_transfers(task_id):</span>
+<span class="sd">        &gt;&gt;&gt;     print(&quot;{} -&gt; {}&quot;.format(</span>
+<span class="sd">        &gt;&gt;&gt;         info[&quot;source_path&quot;], info[&quot;destination_path&quot;))</span>
 
 <span class="sd">        **External Documentation**</span>
 

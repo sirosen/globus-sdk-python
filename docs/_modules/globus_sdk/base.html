@@ -71,7 +71,7 @@
 
 
 <div class="viewcode-block" id="BaseClient"><a class="viewcode-back" href="../../clients/base.html#globus_sdk.base.BaseClient">[docs]</a><span class="k">class</span> <span class="nc">BaseClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple client with error handling for Globus REST APIs. Implemented</span>
 <span class="sd">    as a wrapper around a ``requests.Session`` object, with a simplified</span>
 <span class="sd">    interface that does not directly expose anything from requests.</span>
@@ -102,12 +102,12 @@
 
     <span class="n">BASE_USER_AGENT</span> <span class="o">=</span> <span class="s1">&#39;globus-sdk-py-{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">__version__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">base_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">app_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="c1"># get the fully qualified name of the client class, so that it&#39;s a</span>
         <span class="c1"># child of globus_sdk</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">ClientLogAdapter</span><span class="p">(</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__module__</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">),</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
             <span class="p">{</span><span class="s1">&#39;client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating client of type {} for service &quot;{}&quot;&#39;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">service</span><span class="p">))</span>

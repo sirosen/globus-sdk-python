@@ -58,7 +58,7 @@
 <span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="n">AccessTokenAuthorizer</span><span class="p">,</span> <span class="n">NullAuthorizer</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.token_response</span> <span class="kn">import</span> <span class="n">OAuthTokenResponse</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="AuthClient"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient">[docs]</a><span class="k">class</span> <span class="nc">AuthClient</span><span class="p">(</span><span class="n">BaseClient</span><span class="p">):</span>
@@ -91,7 +91,7 @@
 <span class="sd">    You can, of course, use other kinds of Authorizers (notably the</span>
 <span class="sd">    ``RefreshTokenAuthorizer``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="n">client_id</span>
 
         <span class="c1"># an AuthClient may contain a GlobusOAuth2FlowManager in order to</span>
@@ -108,10 +108,10 @@
                              <span class="s1">&#39;Switch to use of AccessTokenAuthorizer&#39;</span><span class="p">))</span>
                 <span class="n">authorizer</span> <span class="o">=</span> <span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
 
-        <span class="n">BaseClient</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="n">authorizer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">BaseClient</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="n">authorizer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AuthClient.get_identities"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.get_identities">[docs]</a>    <span class="k">def</span> <span class="nf">get_identities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usernames</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        GET /v2/api/identities</span>
 
 <span class="sd">        Given ``usernames=&lt;U&gt;`` or (exclusive) ``ids=&lt;I&gt;`` as keyword</span>
@@ -247,7 +247,7 @@
             <span class="n">auth_code</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AuthClient.oauth2_refresh_token"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.oauth2_refresh_token">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_refresh_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">refresh_token</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Exchange a refresh token for a :class:`OAuthTokenResponse</span>
 <span class="sd">        &lt;globus_sdk.auth.token_response.OAuthTokenResponse&gt;`, containing</span>
 <span class="sd">        an access token.</span>
@@ -346,7 +346,35 @@
         <span class="c1"># a form POST</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
             <span class="s1">&#39;/v2/oauth2/token&#39;</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">response_class</span><span class="p">,</span>
-            <span class="n">text_body</span><span class="o">=</span><span class="n">form_data</span><span class="p">)</span></div></div>
+            <span class="n">text_body</span><span class="o">=</span><span class="n">form_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthClient.oauth2_userinfo"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.oauth2_userinfo">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_userinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call the Userinfo endpoint of Globus Auth.</span>
+<span class="sd">        Userinfo is specified as part of the OpenID Connect (OIDC) standard,</span>
+<span class="sd">        and Globus Auth&#39;s Userinfo is OIDC-compliant.</span>
+
+<span class="sd">        The exact data returned will depend upon the set of OIDC-related scopes</span>
+<span class="sd">        which were used to acquire the token being used for this call. For</span>
+<span class="sd">        details, see the **External Documentation** below.</span>
+
+<span class="sd">        **Examples**</span>
+
+<span class="sd">        &gt;&gt;&gt; ac = AuthClient(...)</span>
+<span class="sd">        &gt;&gt;&gt; info = ac.oauth2_userinfo()</span>
+<span class="sd">        &gt;&gt;&gt; print(&#39;Effective Identity &quot;{}&quot; has Full Name &quot;{}&quot; and Email &quot;{}&quot;&#39;</span>
+<span class="sd">        &gt;&gt;&gt;       .format(info[&quot;sub&quot;], info[&quot;name&quot;], info[&quot;email&quot;]))</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Userinfo \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/auth/reference/</span>
+<span class="sd">        #get_or_post_v2_oauth2_userinfo_resource&gt;`_</span>
+<span class="sd">        in the API documentation for details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Looking up OIDC-style Userinfo from Globus Auth&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/v2/oauth2/userinfo&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

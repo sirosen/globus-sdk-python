@@ -55,7 +55,7 @@
 <span class="kn">from</span> <span class="nn">globus_sdk.response</span> <span class="kn">import</span> <span class="n">GlobusHTTPResponse</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.exc</span> <span class="kn">import</span> <span class="n">GlobusOptionalDependencyError</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_convert_token_info_dict</span><span class="p">(</span><span class="n">source_dict</span><span class="p">):</span>
@@ -81,8 +81,8 @@
 <span class="sd">    Class for responses from the OAuth2 code for tokens exchange used in</span>
 <span class="sd">    3-legged OAuth flows.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">GlobusHTTPResponse</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">GlobusHTTPResponse</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># call the helper at the top level</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_by_resource_server</span> <span class="o">=</span> <span class="p">{</span>
@@ -173,7 +173,7 @@
             <span class="n">access_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">,</span>
             <span class="n">audience</span><span class="o">=</span><span class="n">auth_client</span><span class="o">.</span><span class="n">client_id</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Make printing responses more convenient by only showing the</span>
         <span class="c1"># (typically important) token info</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">by_resource_server</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
@@ -186,8 +186,8 @@
 <span class="sd">    :meth:`oauth2_get_dependent_tokens \</span>
 <span class="sd">    &lt;globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens&gt;`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">GlobusHTTPResponse</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">GlobusHTTPResponse</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># call the helper on everything in the response array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_by_resource_server</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>

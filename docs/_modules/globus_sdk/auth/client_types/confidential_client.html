@@ -56,7 +56,7 @@
     <span class="n">GlobusAuthorizationCodeFlowManager</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.token_response</span> <span class="kn">import</span> <span class="n">OAuthDependentTokenResponse</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ConfidentialAppAuthClient"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.ConfidentialAppAuthClient">[docs]</a><span class="k">class</span> <span class="nc">ConfidentialAppAuthClient</span><span class="p">(</span><span class="n">AuthClient</span><span class="p">):</span>
@@ -81,13 +81,13 @@
     <span class="c1"># only allow basic auth -- anything else means you&#39;re misusing the client</span>
     <span class="n">allowed_authorizer_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">BasicAuthorizer</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;authorizer&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;ArgumentError(ConfidentialAppClient.authorizer)&#39;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Cannot give a ConfidentialAppAuthClient an authorizer&quot;</span><span class="p">)</span>
 
-        <span class="n">AuthClient</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+        <span class="n">AuthClient</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span>
             <span class="n">authorizer</span><span class="o">=</span><span class="n">BasicAuthorizer</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">),</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -95,7 +95,7 @@
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">client_id</span><span class="p">))</span>
 
 <div class="viewcode-block" id="ConfidentialAppAuthClient.oauth2_client_credentials_tokens"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.ConfidentialAppAuthClient.oauth2_client_credentials_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">oauth2_client_credentials_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requested_scopes</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform an OAuth2 Client Credentials Grant to get access tokens which</span>
 <span class="sd">        directly represent your client and allow it to act on its own</span>
 <span class="sd">        (independent of any user authorization).</span>

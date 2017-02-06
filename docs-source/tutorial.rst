@@ -112,8 +112,8 @@ Run the following code sample to get your Access Tokens:
 
 
 Managing credentials is one of the more advanced features of the SDK.
-If you want to read in depth about these steps, please see our explicit
-:ref:`OAuth2 Tutorial <oauth_tutorial>`.
+If you want to read in depth about these steps, please look through our various
+:ref:`Examples <examples>`.
 
 .. _tutorial_step4:
 
@@ -158,9 +158,8 @@ Advanced 1: Exploring the OAuthTokenResponse
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We powered through the OAuth2 flow in the basic tutorial.
-Though you can get a lot of detail out of the full
-:ref:`OAuth2 Tutorial <oauth_tutorial>`, the token response itself is of
-particular interest.
+It's worth looking closer at the token response itself, as it is of particular
+interest.
 This is the ultimate product of the flow, and it contains all of the
 credentials that we'll want and need moving forward.
 
