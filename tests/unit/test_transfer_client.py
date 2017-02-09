@@ -1,5 +1,5 @@
+from random import getrandbits
 import globus_sdk
-
 from tests.framework import (CapturedIOTestCase, get_client_data,
                              GO_EP1_ID, GO_EP2_ID,
                              GO_USER_ID, SDK_USER_ID,
@@ -24,59 +24,42 @@ class BaseTransferClientTests(CapturedIOTestCase):
             SDKTESTER1A_NATIVE1_RT, ac)
         self.tc = globus_sdk.TransferClient(authorizer=authorizer)
 
-    def clean(self):
-        """
-        Deletes all endpoints owned by SDK Tester
-        deletes all files and folders in SDK Tester's home directory
-        on both go#ep1 and go#ep2
-        Deletes all of SDK Tester's bookmarks
-        """
-        # clean SDK Tester's home /~/ on go#ep1 and go#ep2
-        ep_ids = [GO_EP1_ID, GO_EP2_ID]
-        task_ids = []
-        for ep_id in ep_ids:
-            kwargs = {"notify_on_succeeded": False}  # prevent email spam
-            ddata = globus_sdk.DeleteData(self.tc, ep_id, recursive=True,
-                                          **kwargs)
-            r = self.tc.operation_ls(ep_id)
-            for item in r:
-                ddata.add_item("/~/" + item["name"])
-            if len(ddata["DATA"]):
-                r = self.tc.submit_delete(ddata)
-                task_ids.append(r["task_id"])
-
-        # clean endpoints owned by SDK Tester
-        r = self.tc.endpoint_search(filter_scope="my-endpoints")
-        for ep in r:
-            self.tc.delete_endpoint(ep["id"])
-
-        # clean SDK Tester's bookmarks
-        r = self.tc.bookmark_list()
-        for bookmark in r:
-            self.tc.delete_bookmark(bookmark["id"])
-
-        # wait for deletes to complete
-        for task_id in task_ids:
-            self.tc.task_wait(task_id, polling_interval=1)
-
     def setUp(self):
         """
-        Calls clean to prevent collisions with pre-existing data,
-        sets up a test endpoint
+        Creates a list for tracking cleanup of assets created during testing
+        Sets up a test endpoint
         """
-        self.clean()
+        # list of dicts, each containing a function and a list of args
+        # to pass to that function s.t. calling f(*args) cleans an asset
+        self.asset_cleanup = []
 
-        # test endpoint
-        data = {"display_name": "SDK Test Endpoint",
+        # test endpoint, uses 128 bits of randomness to prevent collision
+        data = {"display_name": "SDK Test Endpoint-" + str(getrandbits(128)),
                 "description": "Endpoint for testing the SDK"}
         r = self.tc.create_endpoint(data)
         self.test_ep_id = r["id"]
+        self.asset_cleanup.append({"function": self.tc.delete_endpoint,
+                                   "args": [r["id"]],
+                                   "name": "test_ep"})  # for ease of removal
 
     def tearDown(self):
         """
-        Calls clean to remove any data created in setUp or testing
+        Parses created_assets to destroy all assets created during testing
         """
-        self.clean()
+        # call the cleanup functions with the arguments they were given
+        for cleanup in self.asset_cleanup:
+            cleanup["function"](*cleanup["args"])
+
+    def deleteHelper(self, ep_id, path):
+        """
+        Helper function for cleanup. Deletes by path and endpoint,
+        """
+        kwargs = {"notify_on_succeeded": False}  # prevent email spam
+        ddata = globus_sdk.DeleteData(self.tc, ep_id,
+                                      label="deleteHelper",
+                                      recursive=True, **kwargs)
+        ddata.add_item(path)
+        self.tc.submit_delete(ddata)
 
 
 # class for transfer client tests that don't require time intensive setup
@@ -111,7 +94,8 @@ class TransferClientTests(BaseTransferClientTests):
         """
 
         # update the test endpoint's display name and description
-        update_data = {"display_name": "Updated display_name",
+        # name is randomized to prevent collision
+        update_data = {"display_name": "Updated-" + str(getrandbits(128)),
                        "description": "Updated description"}
         update_doc = self.tc.update_endpoint(self.test_ep_id, update_data)
 
@@ -127,7 +111,7 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(get_doc["description"], update_data["description"])
 
         # repeat with different data
-        update_data2 = {"display_name": "Updated again display_name",
+        update_data2 = {"display_name": "Updated-" + str(getrandbits(128)),
                         "description": "Updated again description"}
         update_doc2 = self.tc.update_endpoint(self.test_ep_id, update_data2)
 
@@ -149,7 +133,7 @@ class TransferClientTests(BaseTransferClientTests):
         """
 
         # create the endpoint
-        create_data = {"display_name": "Test Create"}
+        create_data = {"display_name": "Test Create-" + str(getrandbits(128))}
         create_doc = self.tc.create_endpoint(create_data)
 
         # confirm response is a successful creation
@@ -162,6 +146,10 @@ class TransferClientTests(BaseTransferClientTests):
         # confirm get works on endpoint and returns expected data
         get_doc = self.tc.get_endpoint(create_doc["id"])
         self.assertEqual(get_doc["display_name"], create_data["display_name"])
+
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.tc.delete_endpoint,
+                                   "args": [create_doc["id"]]})
 
     def test_delete_endpoint(self):
         """
@@ -183,58 +171,21 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(apiErr.exception.http_status, 404)
         self.assertEqual(apiErr.exception.code, "EndpointDeleted")
 
+        # stop tracking endpoint for cleanup
+        for cleanup in self.asset_cleanup:
+            if "name" in cleanup and cleanup["name"] == "test_ep":
+                self.asset_cleanup.remove(cleanup)
+                break
+
     # def test_endpoint_manager_monitored_endpoints(self):
         # TODO: test against monitored endpoint
 
-    def test_endpoint_autoactivate(self):
-        """
-        Deactivates, then auto-activates tutorial endpoint,
-        confirms activation through get,
-        confirms trying again with if_expires_in returns AlreadyActivated
-        """
-
-        # deactivate
-        self.tc.endpoint_deactivate(GO_EP1_ID)
-
-        # auto-activate and check for successful response code
-        auto_doc = self.tc.endpoint_autoactivate(GO_EP1_ID)
-        self.assertEqual(auto_doc["code"],
-                         "AutoActivated.GlobusOnlineCredential")
-
-        # confirm get sees the endpoint as activated now
-        get_doc = self.tc.get_endpoint(GO_EP1_ID)
-        self.assertTrue(get_doc["activated"])
-
-        # confirm if_expires_in sees the endpoint as activated
-        params = {"if_expires_in": "60"}
-        expires_doc = self.tc.endpoint_autoactivate(GO_EP1_ID, **params)
-        self.assertEqual(expires_doc["code"], "AlreadyActivated")
-
-        # TODO: test against an endpoint we are not allowed to activate
-
-    def test_endpoint_deactivate(self):
-        """
-        Auto-activates, then deactivates tutorial endpoint,
-        confirms deactivation through get
-        """
-
-        # activate
-        self.tc.endpoint_autoactivate(GO_EP1_ID)
-
-        # deactivate and check for successful response code
-        deact_doc = self.tc.endpoint_deactivate(GO_EP1_ID)
-        self.assertEqual(deact_doc["code"], "Deactivated")
-
-        # confirm get sees the endpoint as activated now
-        get_doc = self.tc.get_endpoint(GO_EP1_ID)
-        self.assertFalse(get_doc["activated"])
-
     # def test_endpoint_activate(self):
-        # TODO: test against an endpoint that uses MyProxy instead of OAuth2
+        # TODO: test against an endpoint that uses MyProxy
 
     def test_endpoint_get_activation_requirements(self):
         """
-        Gets activation requirements on tutorial endpoint, validate results
+        Gets activation requirements on tutorial endpoint, validates results
         """
 
         # get requirements
@@ -265,12 +216,15 @@ class TransferClientTests(BaseTransferClientTests):
         """
 
         # create shared endpoint
-        share_path = "/~/test_share/"
+        # dir and name are randomized to prevent collision
+        share_path = "/~/test_share-" + str(getrandbits(128)) + "/"
         self.tc.operation_mkdir(GO_EP1_ID, path=share_path)
         shared_data = {"DATA_TYPE": "shared_endpoint",
                        "host_endpoint": GO_EP1_ID,
                        "host_path": share_path,
-                       "display_name": "SDK Test Create Shared Endpoint",
+                       "display_name":
+                       "SDK Test Create Shared Endpoint-"
+                       + str(getrandbits(128)),
                        }
         share_doc = self.tc.create_shared_endpoint(shared_data)
 
@@ -282,6 +236,13 @@ class TransferClientTests(BaseTransferClientTests):
         get_data = self.tc.get_endpoint(share_doc["id"])
         self.assertEqual(get_data["host_endpoint_id"], GO_EP1_ID)
         self.assertEqual(get_data["sharing_target_root_path"], share_path)
+
+        # track assets for cleanup
+        # TODO: track .globus?
+        self.asset_cleanup.append({"function": self.tc.delete_endpoint,
+                                   "args": [share_doc["id"]]})
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, share_path]})
 
     def test_endpoint_server_list(self):
         """
@@ -411,7 +372,7 @@ class TransferClientTests(BaseTransferClientTests):
         """
         For now, just confirms only managed endpoints can have roles added
 
-        Goal:
+        TODO:
         Adds a role to the test endpoint, validates results
         returns role_id for use in get and delete
         """
@@ -467,11 +428,11 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(get_doc["principal"], SDK_USER_ID)
         self.assertEqual(get_doc["role"], "administrator")
 
-    # def delete_endpoint_role(self, endpoint_id, role_id):
+    def delete_endpoint_role(self, endpoint_id, role_id):
         """
         For now, just confirms only managed endpoints can have roles deleted
 
-        Goal:
+        TODO:
         Deletes role from test_endpoint, validates results
         """
 
@@ -528,8 +489,8 @@ class TransferClientTests(BaseTransferClientTests):
         returns bookmark_id for use in testing get update and delete
         """
 
-        # create bookmark
-        bookmark_data = {"name": "SDK Test Bookmark",
+        # create bookmark, name is randomized to prevent collision
+        bookmark_data = {"name": "SDK Test Bookmark-" + str(getrandbits(128)),
                          "endpoint_id": GO_EP1_ID,
                          "path": "/~/"}
         create_doc = self.tc.create_bookmark(bookmark_data)
@@ -548,6 +509,11 @@ class TransferClientTests(BaseTransferClientTests):
         for item in bookmark_data:
             self.assertEqual(get_doc[item], bookmark_data[item])
 
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.tc.delete_bookmark,
+                                   "args": [bookmark_id],
+                                   "name": "test_bookmark"})  # for removal
+
         # return bookmark_id
         return bookmark_id
 
@@ -556,7 +522,7 @@ class TransferClientTests(BaseTransferClientTests):
         Creates a bookmark, gets it, validates results
         """
 
-        # create bookmark
+        # get bookmark from test_create_bookmark
         bookmark_id = self.test_create_bookmark()
 
         # get bookmark
@@ -575,11 +541,12 @@ class TransferClientTests(BaseTransferClientTests):
         then confirms get sees the updated data
         """
 
-        # create bookmark
+        # get bookmark from test_create_bookmark
         bookmark_id = self.test_create_bookmark()
 
-        # update bookmark name
-        update_data = {"name": "Updated SDK Test Bookmark"}
+        # update bookmark name, randomized to prevent collision
+        update_data = {"name":
+                       "Updated SDK Test Bookmark-" + str(getrandbits(128))}
         update_doc = self.tc.update_bookmark(bookmark_id, update_data)
 
         # validate results
@@ -597,7 +564,7 @@ class TransferClientTests(BaseTransferClientTests):
         then confirms get no longer sees the bookmark
         """
 
-        # create bookmark
+        # get bookmark from test_create_bookmark
         bookmark_id = self.test_create_bookmark()
 
         # delete bookmark
@@ -613,6 +580,12 @@ class TransferClientTests(BaseTransferClientTests):
             self.tc.get_bookmark(bookmark_id)
         self.assertEqual(apiErr.exception.http_status, 404)
         self.assertEqual(apiErr.exception.code, "BookmarkNotFound")
+
+        # stop tracking asset for deletion
+        for cleanup in self.asset_cleanup:
+            if "name" in cleanup and cleanup["name"] == "test_bookmark":
+                self.asset_cleanup.remove(cleanup)
+                break
 
     def test_operation_ls(self):
         """
@@ -680,7 +653,7 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(filter_doc["DATA_TYPE"], "file_list")
         self.assertEqual(filter_doc["endpoint"], GO_EP1_ID)
         self.assertEqual(filter_doc["path"], path)
-        # confirm only the .globus dir was returned
+        # confirm only file 3 was returned
         file_data = iter(filter_doc["DATA"]).next()
         self.assertEqual(file_data["name"], file_name)
         self.assertTrue(file_data["size"] > min_size)
@@ -691,8 +664,8 @@ class TransferClientTests(BaseTransferClientTests):
         confirms ls sees the new directory
         """
 
-        # perform mkdir operation
-        dir_name = "test_dir"
+        # perform mkdir operation, name randomized to prevent collision
+        dir_name = "test_dir-" + str(getrandbits(128))
         path = "/~/" + dir_name
         mkdir_doc = self.tc.operation_mkdir(GO_EP1_ID, path)
 
@@ -708,19 +681,23 @@ class TransferClientTests(BaseTransferClientTests):
         ls_doc = self.tc.operation_ls(GO_EP1_ID, **params)
         self.assertNotEqual(ls_doc["DATA"], [])
 
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, path]})
+
     def test_operation_rename(self):
         """
         Performs mkdir operation, renames the directory,
         confirms ls sees the new directory and not the old one.
         """
 
-        # perform mkdir operation
-        old_name = "old"
+        # perform mkdir operation, name randomized to prevent collision
+        old_name = "old_dir-" + str(getrandbits(128))
         old_path = "/~/" + old_name
         self.tc.operation_mkdir(GO_EP1_ID, old_path)
 
-        # rename the directory
-        new_name = "new"
+        # rename the directory, name randomized to prevent collision
+        new_name = "new_dir-" + str(getrandbits(128))
         new_path = "/~/" + new_name
         rename_doc = self.tc.operation_rename(GO_EP1_ID, old_path, new_path)
 
@@ -741,6 +718,10 @@ class TransferClientTests(BaseTransferClientTests):
         params = {"filter": filter_string}
         ls_doc = self.tc.operation_ls(GO_EP1_ID, **params)
         self.assertEqual(ls_doc["DATA"], [])
+
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, new_path]})
 
     def test_operation_get_submission_id(self):
         """
@@ -768,9 +749,16 @@ class TransferClientTests(BaseTransferClientTests):
         tests recursive and submission_id parameters
         """
 
+        # dir for testing transfers in, name randomized to prevent collision
+        dest_dir = "transfer_dest_dir-" + str(getrandbits(128))
+        dest_path = "/~/" + dest_dir + "/"
+        self.tc.operation_mkdir(GO_EP1_ID, dest_path)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, dest_path]})
+
         # individual file and recursive dir transfer
         source_path = "/share/godata/"
-        dest_path = "/~/"
         kwargs = {"notify_on_succeeded": False}  # prevent email spam
         tdata = globus_sdk.TransferData(self.tc, GO_EP2_ID,
                                         GO_EP1_ID, **kwargs)
@@ -795,13 +783,12 @@ class TransferClientTests(BaseTransferClientTests):
             self.tc.task_wait(task_id, timeout=30, polling_interval=1))
         # confirm file and dir are visible by ls
         filter_string = "name:" + file_name + "," + dir_name
-        params = {"filter": filter_string}
+        params = {"path": dest_path, "filter": filter_string}
         ls_doc = self.tc.operation_ls(GO_EP1_ID, **params)
         self.assertEqual(len(ls_doc["DATA"]), 2)
         # confirm 3 .txt files are found in dir
-        path = dest_path + dir_name
         filter_string = "name:~*.txt"
-        params = {"path": path, "filter": filter_string}
+        params = {"path": dest_path + dir_name, "filter": filter_string}
         ls_doc = self.tc.operation_ls(GO_EP1_ID, **params)
         self.assertEqual(len(ls_doc["DATA"]), 3)
 
@@ -830,6 +817,10 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(resub_transfer_doc["submission_id"], sub_id)
         self.assertEqual(resub_transfer_doc["task_id"], sub_task_id)
 
+        # wait for submission to finish before moving on to cleanup
+        self.assertTrue(self.tc.task_wait(sub_transfer_doc["task_id"],
+                                          timeout=30, polling_interval=1))
+
     def test_submit_delete(self):
         """
         Transfers a file and makes a dir in go#ep1, then deletes them,
@@ -837,9 +828,16 @@ class TransferClientTests(BaseTransferClientTests):
         Confirms resubmission using the same data returns a Duplicate response
         """
 
-        # transfer file into go#ep1/~/
+        # dir for testing deletes in, name randomized to prevent collision
+        dest_dir = "delete_dest_dir-" + str(getrandbits(128))
+        dest_path = "/~/" + dest_dir + "/"
+        self.tc.operation_mkdir(GO_EP1_ID, dest_path)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, dest_path]})
+
+        # transfer file into go#ep1/~/dir_name
         source_path = "/share/godata/"
-        dest_path = "/~/"
         kwargs = {"notify_on_succeeded": False}  # prevent email spam
         tdata = globus_sdk.TransferData(self.tc, GO_EP2_ID,
                                         GO_EP1_ID, **kwargs)
@@ -847,9 +845,9 @@ class TransferClientTests(BaseTransferClientTests):
         tdata.add_item(source_path + file_name, dest_path + file_name)
         transfer_doc = self.tc.submit_transfer(tdata)
 
-        # make a dir
+        # make a dir to delete
         dir_name = "test_dir"
-        path = "/~/" + dir_name
+        path = dest_path + dir_name
         self.tc.operation_mkdir(GO_EP1_ID, path)
 
         # wait for transfer to complete
@@ -877,7 +875,7 @@ class TransferClientTests(BaseTransferClientTests):
                                           polling_interval=1))
         # confirm file and dir are no longer visible by ls
         filter_string = "name:" + file_name + "," + dir_name
-        params = {"filter": filter_string}
+        params = {"path": dest_path, "filter": filter_string}
         ls_doc = self.tc.operation_ls(GO_EP1_ID, **params)
         self.assertEqual(ls_doc["DATA"], [])
 
@@ -909,7 +907,7 @@ class TransferClientTests(BaseTransferClientTests):
             self.assertIn("type", task)
             self.assertIn("status", task)
 
-        # test num_results param
+        # test num_results param, assumes SDK tester has run at least 20 tasks
         cap = 20
         num_doc = self.tc.task_list(num_results=cap)
         # confirm results were capped
@@ -957,9 +955,16 @@ class TransferClientTests(BaseTransferClientTests):
         returns the task_id for use in other test functions
         """
 
+        # dir the test transfer, name randomized to prevent collision
+        dest_dir = "get_task_dest_dir-" + str(getrandbits(128))
+        dest_path = "/~/" + dest_dir + "/"
+        self.tc.operation_mkdir(GO_EP1_ID, dest_path)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, dest_path]})
+
         # submit transfer task
         source_path = "/share/godata/"
-        dest_path = "/~/"
         kwargs = {"notify_on_succeeded": False}  # prevent email spam
         tdata = globus_sdk.TransferData(self.tc, GO_EP2_ID,
                                         GO_EP1_ID, **kwargs)
@@ -1001,7 +1006,7 @@ class TransferClientTests(BaseTransferClientTests):
         transfer_doc = self.tc.submit_transfer(tdata)
         task_id = transfer_doc["task_id"]
 
-        # update task, deadline is in the past to facilitate cleanup
+        # update task, deadline is in the past for automatic cleanup
         update_data = {"DATA_TYPE": "task", "label": "updated",
                        "deadline": "2000-01-01 00:00:06+00:00"}
         update_doc = self.tc.update_task(task_id, update_data)
@@ -1078,8 +1083,9 @@ class TransferClientTests(BaseTransferClientTests):
 
         self.assertFalse(self.tc.task_wait(never_id, timeout=1))
 
-        # cancel to facilitate cleanup
-        self.tc.cancel_task(never_id)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.tc.cancel_task,
+                                   "args": [never_id]})
 
     def test_task_pause_info(self):
         """
@@ -1128,17 +1134,26 @@ class SharedTransferClientTests(BaseTransferClientTests):
         """
         super(SharedTransferClientTests, self).setUp()
 
-        # shared endpoint hosted on go#ep1
-        share_path = "/~/share"
+        # shared endpoint hosted on go#ep1,
+        # name and dir randomized to prevent collision
+        share_path = "/~/share-" + str(getrandbits(128))
         self.tc.operation_mkdir(GO_EP1_ID, path=share_path)
         shared_data = {"DATA_TYPE": "shared_endpoint",
                        "host_endpoint": GO_EP1_ID,
                        "host_path": share_path,
-                       "display_name": "SDK Test Shared Endpoint",
+                       "display_name":
+                       "SDK Test Shared Endpoint-" + str(getrandbits(128)),
                        "description": "Shared Endpoint for testing the SDK"
                        }
         r = self.tc.create_shared_endpoint(shared_data)
         self.test_share_ep_id = r["id"]
+
+        # track assets for cleanup
+        # TODO: track .globus?
+        self.asset_cleanup.append({"function": self.tc.delete_endpoint,
+                                   "args": [r["id"]]})
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, share_path]})
 
     def test_endpoint_search(self):
         """
@@ -1182,6 +1197,51 @@ class SharedTransferClientTests(BaseTransferClientTests):
             self.assertIsNotNone(ep["sharing_target_root_path"])
             self.assertIsNotNone(ep["host_endpoint_id"])
 
+    def test_endpoint_autoactivate(self):
+        """
+        Deactivates, then auto-activates shared endpoint,
+        confirms activation through get,
+        confirms trying again with if_expires_in returns AlreadyActivated
+        """
+
+        # deactivate
+        self.tc.endpoint_deactivate(self.test_share_ep_id)
+
+        # auto-activate and check for successful response code
+
+        auto_doc = self.tc.endpoint_autoactivate(self.test_share_ep_id)
+        self.assertEqual(auto_doc["code"],
+                         "AutoActivated.GlobusOnlineCredential")
+
+        # confirm get sees the endpoint as activated now
+        get_doc = self.tc.get_endpoint(self.test_share_ep_id)
+        self.assertTrue(get_doc["activated"])
+
+        # confirm if_expires_in sees the endpoint as activated
+        params = {"if_expires_in": "60"}
+        expires_doc = self.tc.endpoint_autoactivate(
+            self.test_share_ep_id, **params)
+        self.assertEqual(expires_doc["code"], "AlreadyActivated")
+
+        # TODO: test against an endpoint we are not allowed to activate
+
+    def test_endpoint_deactivate(self):
+        """
+        Auto-activates, then deactivates shared endpoint,
+        confirms deactivation through get
+        """
+
+        # activate
+        self.tc.endpoint_autoactivate(self.test_share_ep_id)
+
+        # deactivate and check for successful response code
+        deact_doc = self.tc.endpoint_deactivate(self.test_share_ep_id)
+        self.assertEqual(deact_doc["code"], "Deactivated")
+
+        # confirm get sees the endpoint as deactivated now
+        get_doc = self.tc.get_endpoint(self.test_share_ep_id)
+        self.assertFalse(get_doc["activated"])
+
     def test_my_shared_endpoint_list(self):
         """
         Gets my shared endpoint list, validates results
@@ -1200,7 +1260,7 @@ class SharedTransferClientTests(BaseTransferClientTests):
 
     def test_endpoint_acl_list(self):
         """
-        Gets endpoint access rule list from test_ep, validates results
+        Gets endpoint access rule list from test_share_ep, validates results
         """
 
         # get endpoint role list
