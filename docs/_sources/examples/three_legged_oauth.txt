@@ -23,7 +23,13 @@ allowing for a fresh login if desired.
 Register an App
 ~~~~~~~~~~~~~~~
 
-Go to `developers.globus.org <https://developers.globus.org/>`_ and register a new application.
+In order to complete an OAuth2 flow to get tokens, you must have a client
+definition registered with Globus Auth.
+To do so, follow the relevant documentation for the
+`Globus Auth Service <https://docs.globus.org/api/auth/>`_ or go directly to
+`developers.globus.org <https://developers.globus.org/>`_ to do the
+registration.
+
 Make sure that the "Native App" checkbox is unchecked, and list
 ``http://localhost:5000/login`` in the "Redirect URIs".
 
