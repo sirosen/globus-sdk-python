@@ -157,33 +157,6 @@ def _bool_cast(value):
     raise ValueError("Invalid config bool")
 
 
-def _get_token(tok_type, environment):
-    p = _get_parser()
-
-    tkn = p.get(tok_type, environment=environment,
-                failover_to_general=True, check_env=True)
-
-    return tkn
-
-
-def get_auth_token(environment):
-    """
-    Fetch any auth token from the config, if one is present
-    """
-    logger.warn(("Fetching auth_token from config -- this behavior will "
-                 "be removed in a future version of the SDK"))
-    return _get_token('auth_token', environment)
-
-
-def get_transfer_token(environment):
-    """
-    Fetch any transfer token from the config, if one is present
-    """
-    logger.warn(("Fetching transfer_token from config -- this behavior will "
-                 "be removed in a future version of the SDK"))
-    return _get_token('transfer_token', environment)
-
-
 def get_default_environ():
     """
     Get the default environment to look for in the config, as a string.

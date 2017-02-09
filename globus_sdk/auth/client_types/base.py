@@ -50,15 +50,6 @@ class AuthClient(BaseClient):
         # managers
         self.current_oauth2_flow_manager = None
 
-        if authorizer is None:
-            # TODO: remove; this is a temporary backwards compatibility hack
-            access_token = config.get_auth_token(
-                kwargs.get('environment', config.get_default_environ()))
-            if access_token is not None:
-                logger.warn(('Using deprecated config token. '
-                             'Switch to use of AccessTokenAuthorizer'))
-                authorizer = AccessTokenAuthorizer(access_token)
-
         BaseClient.__init__(self, "auth", authorizer=authorizer, **kwargs)
 
     def get_identities(self, usernames=None, ids=None, **params):
