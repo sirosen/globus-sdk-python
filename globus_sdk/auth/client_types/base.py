@@ -4,9 +4,8 @@ import six
 import collections
 import logging
 
-from globus_sdk import config
 from globus_sdk.base import BaseClient, safe_stringify
-from globus_sdk.authorizers import AccessTokenAuthorizer, NullAuthorizer
+from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
 
 logger = logging.getLogger(__name__)
@@ -50,15 +49,6 @@ class AuthClient(BaseClient):
         # managers
         self.current_oauth2_flow_manager = None
 
-        if authorizer is None:
-            # TODO: remove; this is a temporary backwards compatibility hack
-            access_token = config.get_auth_token(
-                kwargs.get('environment', config.get_default_environ()))
-            if access_token is not None:
-                logger.warn(('Using deprecated config token. '
-                             'Switch to use of AccessTokenAuthorizer'))
-                authorizer = AccessTokenAuthorizer(access_token)
-
         BaseClient.__init__(self, "auth", authorizer=authorizer, **kwargs)
 
     def get_identities(self, usernames=None, ids=None, **params):
@@ -76,7 +66,7 @@ class AuthClient(BaseClient):
 
         **Examples**
 
-        >>> ac = globus_sdk.AuthClient()
+        >>> ac = globus_sdk.AuthClient(...)
         >>> # by IDs
         >>> r = ac.get_identities(ids="46bd0f56-e24f-11e5-a510-131bef46955c")
         >>> r.data
