@@ -67,7 +67,7 @@ class AuthClient(BaseClient):
 
         **Examples**
 
-        >>> ac = globus_sdk.AuthClient()
+        >>> ac = globus_sdk.AuthClient(...)
         >>> # by IDs
         >>> r = ac.get_identities(ids="46bd0f56-e24f-11e5-a510-131bef46955c")
         >>> r.data

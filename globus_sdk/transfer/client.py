@@ -39,19 +39,6 @@ class TransferClient(BaseClient):
         <globus_sdk.authorizers.base.GlobusAuthorizer>`)
 
           An authorizer instance used for all calls to Globus Transfer
-
-    **Examples**
-
-    For example, you could instantiate a new ``TransferClient`` using
-
-    >>> from globus_sdk import TransferClient
-    >>> tc = TransferClient()
-
-    and all calls made on ``tc`` will be authenticated using the access token
-    implicitly passed to the :class:`AccessTokenAuthorizer
-    <globus_sdk.authorizers.AccessTokenAuthorizer>`. This is the default
-    behavior -- loading the access token from the config value named
-    ``transfer_token``.
     """
     # disallow basic auth
     allowed_authorizer_types = [AccessTokenAuthorizer,
@@ -79,7 +66,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> endpoint = tc.get_endpoint(endpoint_id)
         >>> print("Endpoint name:",
         >>>       endpoint["display_name"] or endpoint["canonical_name"])
@@ -105,7 +92,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> epup = dict(display_name="My New Endpoint Name",
         >>>             description="Better Description")
         >>> update_result = tc.update_endpoint(endpoint_id, epup)
@@ -142,7 +129,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> ep_data = {
         >>>   "DATA_TYPE": "endpoint",
         >>>   "display_name": display_name,
@@ -180,7 +167,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> delete_result = tc.delete_endpoint(endpoint_id)
 
         **External Documentation**
@@ -245,7 +232,7 @@ class TransferClient(BaseClient):
 
         Search for a given string as a fulltext search:
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> for ep in tc.endpoint_search('String to search for!'):
         >>>     print(ep['display_name'])
 
@@ -479,7 +466,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> shared_ep_data = {
         >>>   "DATA_TYPE": "shared_endpoint",
         >>>   "host_endpoint": host_endpoint_id,
@@ -754,7 +741,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> rule_data = {
         >>>   "DATA_TYPE": "access",
         >>>   "principal_type": "identity",
@@ -927,7 +914,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> for entry in tc.operation_ls(ep_id, path="/~/project1/"):
         >>>     print(entry["name"], entry["type"])
 
@@ -954,7 +941,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> tc.operation_mkdir(ep_id, path="/~/newdir/")
 
         **External Documentation**
@@ -984,7 +971,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> tc.operation_rename(ep_id, oldpath="/~/file1.txt",
         >>>                     newpath="/~/project1data.txt")
 
@@ -1046,7 +1033,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> tdata = globus_sdk.TransferData(tc, source_endpoint_id,
         >>>                                 destination_endpoint_id,
         >>>                                 label="SDK example",
@@ -1080,7 +1067,7 @@ class TransferClient(BaseClient):
 
         **Examples**
 
-        >>> tc = globus_sdk.TransferClient()
+        >>> tc = globus_sdk.TransferClient(...)
         >>> ddata = globus_sdk.DeleteData(tc, endpoint_id, recursive=True)
         >>> ddata.add_item("/dir/to/delete/")
         >>> ddata.add_item("/file/to/delete/file.txt")
@@ -1323,7 +1310,7 @@ class TransferClient(BaseClient):
         If you want to wait for a task to terminate, but want to warn every
         minute that it doesn't terminate, you could:
 
-        >>> tc = TransferClient()
+        >>> tc = TransferClient(...)
         >>> while not tc.task_wait(task_id, timeout=60):
         >>>     print("Another minute went by without {0} terminating"
         >>>           .format(task_id))
@@ -1331,7 +1318,7 @@ class TransferClient(BaseClient):
         Or perhaps you want to check on a task every minute for 10 minutes, and
         give up if it doesn't complete in that time:
 
-        >>> tc = TransferClient()
+        >>> tc = TransferClient(...)
         >>> done = tc.task_wait(task_id, timeout=600, polling_interval=60):
         >>> if not done:
         >>>     print("{0} didn't successfully terminate!"
@@ -1342,7 +1329,7 @@ class TransferClient(BaseClient):
         You could print dots while you wait for a task by only waiting one
         second at a time:
 
-        >>> tc = TransferClient()
+        >>> tc = TransferClient(...)
         >>> while not tc.task_wait(task_id, timeout=1, polling_interval=1):
         >>>     print(".", end="")
         >>> print("\n{0} completed!".format(task_id))
