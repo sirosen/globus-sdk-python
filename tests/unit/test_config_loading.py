@@ -31,13 +31,6 @@ class ConfigLoaderTests(CapturedIOTestCase):
                 'globus_sdk.config.GlobusConfigParser._load_config', loadconf):
             globus_sdk.config._get_parser()
 
-    def test_per_env_auth_tkn(self):
-        self._load_config_file('per_env_auth_tkn.cfg')
-
-        assert globus_sdk.config.get_auth_token('general') == 'abc123'
-        assert globus_sdk.config.get_auth_token('default') == 'XYZ0'
-        assert globus_sdk.config.get_auth_token('beta') == 'XYZ1'
-
     def test_verify_ssl_true(self):
         self._load_config_file('verify_ssl_true.cfg')
 

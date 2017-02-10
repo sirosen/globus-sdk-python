@@ -4,9 +4,8 @@ import six
 import collections
 import logging
 
-from globus_sdk import config
 from globus_sdk.base import BaseClient, safe_stringify
-from globus_sdk.authorizers import AccessTokenAuthorizer, NullAuthorizer
+from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
 
 logger = logging.getLogger(__name__)
