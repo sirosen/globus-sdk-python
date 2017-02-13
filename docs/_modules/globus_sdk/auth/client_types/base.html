@@ -53,9 +53,8 @@
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.base</span> <span class="kn">import</span> <span class="n">BaseClient</span><span class="p">,</span> <span class="n">safe_stringify</span>
-<span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="n">AccessTokenAuthorizer</span><span class="p">,</span> <span class="n">NullAuthorizer</span>
+<span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="n">NullAuthorizer</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.auth.token_response</span> <span class="kn">import</span> <span class="n">OAuthTokenResponse</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -99,15 +98,6 @@
         <span class="c1"># managers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_oauth2_flow_manager</span> <span class="o">=</span> <span class="bp">None</span>
 
-        <span class="k">if</span> <span class="n">authorizer</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c1"># TODO: remove; this is a temporary backwards compatibility hack</span>
-            <span class="n">access_token</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_auth_token</span><span class="p">(</span>
-                <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;environment&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get_default_environ</span><span class="p">()))</span>
-            <span class="k">if</span> <span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s1">&#39;Using deprecated config token. &#39;</span>
-                             <span class="s1">&#39;Switch to use of AccessTokenAuthorizer&#39;</span><span class="p">))</span>
-                <span class="n">authorizer</span> <span class="o">=</span> <span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
-
         <span class="n">BaseClient</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="n">authorizer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AuthClient.get_identities"><a class="viewcode-back" href="../../../../clients/auth.html#globus_sdk.AuthClient.get_identities">[docs]</a>    <span class="k">def</span> <span class="nf">get_identities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usernames</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
@@ -125,7 +115,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; ac = globus_sdk.AuthClient()</span>
+<span class="sd">        &gt;&gt;&gt; ac = globus_sdk.AuthClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; # by IDs</span>
 <span class="sd">        &gt;&gt;&gt; r = ac.get_identities(ids=&quot;46bd0f56-e24f-11e5-a510-131bef46955c&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; r.data</span>

@@ -80,16 +80,6 @@ query parameters.</p>
 <blockquote>
 <div>An authorizer instance used for all calls to Globus Transfer</div></blockquote>
 </div></blockquote>
-<p><strong>Examples</strong></p>
-<p>For example, you could instantiate a new <code class="docutils literal"><span class="pre">TransferClient</span></code> using</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="k">import</span> <span class="n">TransferClient</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>and all calls made on <code class="docutils literal"><span class="pre">tc</span></code> will be authenticated using the access token
-implicitly passed to the <code class="xref py py-class docutils literal"><span class="pre">AccessTokenAuthorizer</span></code>. This is the default
-behavior &#8211; loading the access token from the config value named
-<code class="docutils literal"><span class="pre">transfer_token</span></code>.</p>
 <dl class="method">
 <dt id="globus_sdk.TransferClient.get_endpoint">
 <code class="descname">get_endpoint</code><span class="sig-paren">(</span><em>endpoint_id</em>, <em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/globus_sdk/transfer/client.html#TransferClient.get_endpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#globus_sdk.TransferClient.get_endpoint" title="Permalink to this definition">¶</a></dt>
@@ -103,7 +93,7 @@ behavior &#8211; loading the access token from the config value named
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Endpoint name:&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>      <span class="n">endpoint</span><span class="p">[</span><span class="s2">&quot;display_name&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">endpoint</span><span class="p">[</span><span class="s2">&quot;canonical_name&quot;</span><span class="p">])</span>
@@ -128,7 +118,7 @@ in the REST documentation for details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epup</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">display_name</span><span class="o">=</span><span class="s2">&quot;My New Endpoint Name&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Better Description&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">update_result</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">update_endpoint</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">,</span> <span class="n">epup</span><span class="p">)</span>
@@ -153,7 +143,7 @@ in the REST documentation for details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ep_data</span> <span class="o">=</span> <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>  <span class="s2">&quot;DATA_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;endpoint&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>  <span class="s2">&quot;display_name&quot;</span><span class="p">:</span> <span class="n">display_name</span><span class="p">,</span>
@@ -187,7 +177,7 @@ in the REST documentation for details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">delete_result</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">delete_endpoint</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -246,7 +236,7 @@ results.</dd>
 </div></blockquote>
 <p><strong>Examples</strong></p>
 <p>Search for a given string as a fulltext search:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ep</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">endpoint_search</span><span class="p">(</span><span class="s1">&#39;String to search for!&#39;</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ep</span><span class="p">[</span><span class="s1">&#39;display_name&#39;</span><span class="p">])</span>
 </pre></div>
@@ -413,7 +403,7 @@ in the REST documentation for details.</p>
 </table>
 <p><strong>External Documentation</strong></p>
 <p>See
-<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules">Get my effective endpoint pause rules</a>
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint/#get_endpoint_pause_rules">Get my effective endpoint pause rules</a>
 in the REST documentation for details.</p>
 </dd></dl>
 
@@ -455,7 +445,7 @@ in the REST documentation for details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">shared_ep_data</span> <span class="o">=</span> <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>  <span class="s2">&quot;DATA_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;shared_endpoint&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>  <span class="s2">&quot;host_endpoint&quot;</span><span class="p">:</span> <span class="n">host_endpoint_id</span><span class="p">,</span>
@@ -506,7 +496,7 @@ in the REST documentation for details.</p>
 </table>
 <p><strong>External Documentation</strong></p>
 <p>See
-<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list">Get endpoint server list</a>
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_by_id">Get endpoint server list</a>
 in the REST documentation for details.</p>
 </dd></dl>
 
@@ -578,7 +568,7 @@ in the REST documentation for details.</p>
 </table>
 <p><strong>External Documentation</strong></p>
 <p>See
-<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles">Get list of endpoint roles</a>
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_roles/#role_list">Get list of endpoint roles</a>
 in the REST documentation for details.</p>
 </dd></dl>
 
@@ -596,7 +586,7 @@ in the REST documentation for details.</p>
 </table>
 <p><strong>External Documentation</strong></p>
 <p>See
-<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role">Create endpoint role</a>
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_roles/#create_role">Create endpoint role</a>
 in the REST documentation for details.</p>
 </dd></dl>
 
@@ -648,6 +638,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/acl/#rest_access_get_list">Get list of access rules</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -662,6 +656,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/acl/#get_access_rule_by_id">Get access rule by id</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -686,7 +684,7 @@ in the REST documentation for details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rule_data</span> <span class="o">=</span> <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>  <span class="s2">&quot;DATA_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;access&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>  <span class="s2">&quot;principal_type&quot;</span><span class="p">:</span> <span class="s2">&quot;identity&quot;</span><span class="p">,</span>
@@ -716,6 +714,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/acl/#update_access_rule">Update access rule</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -730,6 +732,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/acl/#delete_access_rule">Delete access rule</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -744,6 +750,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_list_of_bookmarks">Get list of bookmarks</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -758,6 +768,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_bookmarks/#create_bookmark">Create bookmark</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -772,6 +786,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_bookmark_by_id">Get bookmark by id</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -786,6 +804,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_bookmarks/#update_bookmark">Update bookmark</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -800,6 +822,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/endpoint_bookmarks/#delete_bookmark_by_id">Delete bookmark by id</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -815,7 +841,7 @@ in the REST documentation for details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">tc</span><span class="o">.</span><span class="n">operation_ls</span><span class="p">(</span><span class="n">ep_id</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/~/project1/&quot;</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
 </pre></div>
@@ -839,7 +865,7 @@ in the REST documentation for details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span><span class="o">.</span><span class="n">operation_mkdir</span><span class="p">(</span><span class="n">ep_id</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/~/newdir/&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -862,7 +888,7 @@ in the REST documentation for details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span><span class="o">.</span><span class="n">operation_rename</span><span class="p">(</span><span class="n">ep_id</span><span class="p">,</span> <span class="n">oldpath</span><span class="o">=</span><span class="s2">&quot;/~/file1.txt&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="n">newpath</span><span class="o">=</span><span class="s2">&quot;/~/project1data.txt&quot;</span><span class="p">)</span>
 </pre></div>
@@ -911,7 +937,7 @@ in the REST documentation for more details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tdata</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferData</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">source_endpoint_id</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                                <span class="n">destination_endpoint_id</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;SDK example&quot;</span><span class="p">,</span>
@@ -945,7 +971,7 @@ in the REST documentation for more details.</p>
 </tbody>
 </table>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ddata</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">DeleteData</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">endpoint_id</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ddata</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;/dir/to/delete/&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ddata</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="s2">&quot;/file/to/delete/file.txt&quot;</span><span class="p">)</span>
@@ -1101,7 +1127,7 @@ The number of events to fetch from the service. May be set to
 </div></blockquote>
 <dl class="docutils">
 <dt>{}&#8221;.format(</dt>
-<dd><div class="first highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span>        <span class="n">task_id</span><span class="p">,</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">))</span>
+<dd><div class="first highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span>        <span class="n">task_id</span><span class="p">,</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p><strong>External Documentation</strong></p>
@@ -1124,6 +1150,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/task/#get_task_by_id">Get task by id</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1138,6 +1168,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/task/#update_task_by_id">Update task by id</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1152,6 +1186,10 @@ in the REST documentation for details.</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/task/#cancel_task_by_id">Cancel task by id</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1175,7 +1213,7 @@ status. Minimum 1</dd>
 <p><strong>Examples</strong></p>
 <p>If you want to wait for a task to terminate, but want to warn every
 minute that it doesn&#8217;t terminate, you could:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="ow">not</span> <span class="n">tc</span><span class="o">.</span><span class="n">task_wait</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Another minute went by without </span><span class="si">{0}</span><span class="s2"> terminating&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span>          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>
@@ -1183,7 +1221,7 @@ minute that it doesn&#8217;t terminate, you could:</p>
 </div>
 <p>Or perhaps you want to check on a task every minute for 10 minutes, and
 give up if it doesn&#8217;t complete in that time:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">done</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">task_wait</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> didn&#39;t successfully terminate!&quot;</span>
@@ -1194,7 +1232,7 @@ give up if it doesn&#8217;t complete in that time:</p>
 </div>
 <p>You could print dots while you wait for a task by only waiting one
 second at a time:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tc</span> <span class="o">=</span> <span class="n">TransferClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="ow">not</span> <span class="n">tc</span><span class="o">.</span><span class="n">task_wait</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">polling_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{0}</span><span class="s2"> completed!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>
@@ -1214,6 +1252,10 @@ second at a time:</p>
 </tr>
 </tbody>
 </table>
+<p><strong>External Documentation</strong></p>
+<p>See
+<a class="reference external" href="https://docs.globus.org/api/transfer/task/#get_task_pause_info">Get task pause info</a>
+in the REST documentation for details.</p>
 </dd></dl>
 
 <dl class="method">

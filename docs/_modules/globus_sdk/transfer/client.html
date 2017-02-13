@@ -50,7 +50,7 @@
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="n">exc</span><span class="p">,</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">globus_sdk</span> <span class="kn">import</span> <span class="n">exc</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.base</span> <span class="kn">import</span> <span class="n">BaseClient</span><span class="p">,</span> <span class="n">merge_params</span><span class="p">,</span> <span class="n">safe_stringify</span>
 <span class="kn">from</span> <span class="nn">globus_sdk.authorizers</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AccessTokenAuthorizer</span><span class="p">,</span> <span class="n">RefreshTokenAuthorizer</span><span class="p">)</span>
@@ -88,19 +88,6 @@
 <span class="sd">        &lt;globus_sdk.authorizers.base.GlobusAuthorizer&gt;`)</span>
 
 <span class="sd">          An authorizer instance used for all calls to Globus Transfer</span>
-
-<span class="sd">    **Examples**</span>
-
-<span class="sd">    For example, you could instantiate a new ``TransferClient`` using</span>
-
-<span class="sd">    &gt;&gt;&gt; from globus_sdk import TransferClient</span>
-<span class="sd">    &gt;&gt;&gt; tc = TransferClient()</span>
-
-<span class="sd">    and all calls made on ``tc`` will be authenticated using the access token</span>
-<span class="sd">    implicitly passed to the :class:`AccessTokenAuthorizer</span>
-<span class="sd">    &lt;globus_sdk.authorizers.AccessTokenAuthorizer&gt;`. This is the default</span>
-<span class="sd">    behavior -- loading the access token from the config value named</span>
-<span class="sd">    ``transfer_token``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># disallow basic auth</span>
     <span class="n">allowed_authorizer_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">AccessTokenAuthorizer</span><span class="p">,</span>
@@ -109,15 +96,6 @@
     <span class="n">default_response_class</span> <span class="o">=</span> <span class="n">TransferResponse</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">authorizer</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c1"># TODO: remove; this is a temporary backwards compatibility hack</span>
-            <span class="n">access_token</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_transfer_token</span><span class="p">(</span>
-                <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;environment&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get_default_environ</span><span class="p">()))</span>
-            <span class="k">if</span> <span class="n">access_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s1">&#39;Using deprecated config token. &#39;</span>
-                             <span class="s1">&#39;Switch to use of AccessTokenAuthorizer&#39;</span><span class="p">))</span>
-                <span class="n">authorizer</span> <span class="o">=</span> <span class="n">AccessTokenAuthorizer</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
-
         <span class="n">BaseClient</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;transfer&quot;</span><span class="p">,</span> <span class="n">base_path</span><span class="o">=</span><span class="s2">&quot;/v0.10/&quot;</span><span class="p">,</span>
                             <span class="n">authorizer</span><span class="o">=</span><span class="n">authorizer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -137,7 +115,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; endpoint = tc.get_endpoint(endpoint_id)</span>
 <span class="sd">        &gt;&gt;&gt; print(&quot;Endpoint name:&quot;,</span>
 <span class="sd">        &gt;&gt;&gt;       endpoint[&quot;display_name&quot;] or endpoint[&quot;canonical_name&quot;])</span>
@@ -163,7 +141,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; epup = dict(display_name=&quot;My New Endpoint Name&quot;,</span>
 <span class="sd">        &gt;&gt;&gt;             description=&quot;Better Description&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; update_result = tc.update_endpoint(endpoint_id, epup)</span>
@@ -200,7 +178,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; ep_data = {</span>
 <span class="sd">        &gt;&gt;&gt;   &quot;DATA_TYPE&quot;: &quot;endpoint&quot;,</span>
 <span class="sd">        &gt;&gt;&gt;   &quot;display_name&quot;: display_name,</span>
@@ -238,7 +216,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; delete_result = tc.delete_endpoint(endpoint_id)</span>
 
 <span class="sd">        **External Documentation**</span>
@@ -303,7 +281,7 @@
 
 <span class="sd">        Search for a given string as a fulltext search:</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; for ep in tc.endpoint_search(&#39;String to search for!&#39;):</span>
 <span class="sd">        &gt;&gt;&gt;     print(ep[&#39;display_name&#39;])</span>
 
@@ -488,7 +466,7 @@
 
 <span class="sd">        See</span>
 <span class="sd">        `Get my effective endpoint pause rules \</span>
-<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_my_effective_endpoint_pause_rules&gt;`_</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_endpoint_pause_rules&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
@@ -537,7 +515,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; shared_ep_data = {</span>
 <span class="sd">        &gt;&gt;&gt;   &quot;DATA_TYPE&quot;: &quot;shared_endpoint&quot;,</span>
 <span class="sd">        &gt;&gt;&gt;   &quot;host_endpoint&quot;: host_endpoint_id,</span>
@@ -593,7 +571,7 @@
 
 <span class="sd">        See</span>
 <span class="sd">        `Get endpoint server list \</span>
-<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list&gt;`_</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_by_id&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
@@ -680,7 +658,7 @@
 
 <span class="sd">        See</span>
 <span class="sd">        `Get list of endpoint roles \</span>
-<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_roles/#get_list_of_endpoint_roles&gt;`_</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_roles/#role_list&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
@@ -701,7 +679,7 @@
 
 <span class="sd">        See</span>
 <span class="sd">        `Create endpoint role \</span>
-<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_roles/#create_endpoint_role&gt;`_</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_roles/#create_role&gt;`_</span>
 <span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
@@ -760,6 +738,13 @@
 
 <span class="sd">        :rtype: :class:`IterableTransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.IterableTransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get list of access rules \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/acl/#rest_access_get_list&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.endpoint_acl_list({}, ...)&quot;</span>
@@ -774,6 +759,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get access rule by id \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/acl/#get_access_rule_by_id&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.get_endpoint_acl_rule({}, {}, ...)&quot;</span>
@@ -798,7 +790,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; rule_data = {</span>
 <span class="sd">        &gt;&gt;&gt;   &quot;DATA_TYPE&quot;: &quot;access&quot;,</span>
 <span class="sd">        &gt;&gt;&gt;   &quot;principal_type&quot;: &quot;identity&quot;,</span>
@@ -828,6 +820,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Update access rule \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/acl/#update_access_rule&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.update_endpoint_acl_rule({}, {}, ...)&quot;</span>
@@ -841,6 +840,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Delete access rule \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/acl/#delete_access_rule&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">endpoint_id</span> <span class="o">=</span> <span class="n">safe_stringify</span><span class="p">(</span><span class="n">endpoint_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.delete_endpoint_acl_rule({}, {})&quot;</span>
@@ -858,6 +864,13 @@
 
 <span class="sd">        :rtype: :class:`IterableTransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.IterableTransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get list of bookmarks \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_list_of_bookmarks&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.bookmark_list({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">params</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bookmark_list&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
@@ -869,6 +882,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Create bookmark \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_bookmarks/#create_bookmark&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.create_bookmark({})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bookmark_data</span><span class="p">))</span>
@@ -880,6 +900,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get bookmark by id \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_bookmark_by_id&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.get_bookmark({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bookmark_id</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s1">&#39;bookmark&#39;</span><span class="p">,</span> <span class="n">bookmark_id</span><span class="p">)</span>
@@ -891,6 +918,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Update bookmark \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_bookmarks/#update_bookmark&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.update_bookmark({})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bookmark_id</span><span class="p">))</span>
@@ -903,6 +937,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Delete bookmark by id\</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/endpoint_bookmarks/#delete_bookmark_by_id&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.delete_bookmark({})&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bookmark_id</span><span class="p">))</span>
@@ -922,7 +963,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; for entry in tc.operation_ls(ep_id, path=&quot;/~/project1/&quot;):</span>
 <span class="sd">        &gt;&gt;&gt;     print(entry[&quot;name&quot;], entry[&quot;type&quot;])</span>
 
@@ -949,7 +990,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; tc.operation_mkdir(ep_id, path=&quot;/~/newdir/&quot;)</span>
 
 <span class="sd">        **External Documentation**</span>
@@ -979,7 +1020,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; tc.operation_rename(ep_id, oldpath=&quot;/~/file1.txt&quot;,</span>
 <span class="sd">        &gt;&gt;&gt;                     newpath=&quot;/~/project1data.txt&quot;)</span>
 
@@ -1041,7 +1082,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; tdata = globus_sdk.TransferData(tc, source_endpoint_id,</span>
 <span class="sd">        &gt;&gt;&gt;                                 destination_endpoint_id,</span>
 <span class="sd">        &gt;&gt;&gt;                                 label=&quot;SDK example&quot;,</span>
@@ -1075,7 +1116,7 @@
 
 <span class="sd">        **Examples**</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = globus_sdk.TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; ddata = globus_sdk.DeleteData(tc, endpoint_id, recursive=True)</span>
 <span class="sd">        &gt;&gt;&gt; ddata.add_item(&quot;/dir/to/delete/&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; ddata.add_item(&quot;/file/to/delete/file.txt&quot;)</span>
@@ -1224,7 +1265,7 @@
 <span class="sd">        &gt;&gt;&gt; task_id = ...</span>
 <span class="sd">        &gt;&gt;&gt; for event in tc.task_event_list(task_id):</span>
 <span class="sd">        &gt;&gt;&gt;     print(&quot;Event on Task({}) at {}:\n{}&quot;.format(</span>
-<span class="sd">        &gt;&gt;&gt;         task_id, event[&quot;time&quot;], event[&quot;description&quot;))</span>
+<span class="sd">        &gt;&gt;&gt;         task_id, event[&quot;time&quot;], event[&quot;description&quot;])</span>
 
 <span class="sd">        **External Documentation**</span>
 
@@ -1247,6 +1288,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get task by id \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task/#get_task_by_id&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.get_task({}, ...)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>
         <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span>
@@ -1258,6 +1306,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Update task by id \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task/#update_task_by_id&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.update_task({}, ...)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>
         <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">)</span>
@@ -1269,6 +1324,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Cancel task by id \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task/#cancel_task_by_id&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.cancel_task({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>
         <span class="n">resource_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qjoin_path</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">&quot;cancel&quot;</span><span class="p">)</span>
@@ -1297,7 +1359,7 @@
 <span class="sd">        If you want to wait for a task to terminate, but want to warn every</span>
 <span class="sd">        minute that it doesn&#39;t terminate, you could:</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; while not tc.task_wait(task_id, timeout=60):</span>
 <span class="sd">        &gt;&gt;&gt;     print(&quot;Another minute went by without {0} terminating&quot;</span>
 <span class="sd">        &gt;&gt;&gt;           .format(task_id))</span>
@@ -1305,7 +1367,7 @@
 <span class="sd">        Or perhaps you want to check on a task every minute for 10 minutes, and</span>
 <span class="sd">        give up if it doesn&#39;t complete in that time:</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; done = tc.task_wait(task_id, timeout=600, polling_interval=60):</span>
 <span class="sd">        &gt;&gt;&gt; if not done:</span>
 <span class="sd">        &gt;&gt;&gt;     print(&quot;{0} didn&#39;t successfully terminate!&quot;</span>
@@ -1316,7 +1378,7 @@
 <span class="sd">        You could print dots while you wait for a task by only waiting one</span>
 <span class="sd">        second at a time:</span>
 
-<span class="sd">        &gt;&gt;&gt; tc = TransferClient()</span>
+<span class="sd">        &gt;&gt;&gt; tc = TransferClient(...)</span>
 <span class="sd">        &gt;&gt;&gt; while not tc.task_wait(task_id, timeout=1, polling_interval=1):</span>
 <span class="sd">        &gt;&gt;&gt;     print(&quot;.&quot;, end=&quot;&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; print(&quot;\n{0} completed!&quot;.format(task_id))</span>
@@ -1380,6 +1442,13 @@
 
 <span class="sd">        :rtype: :class:`TransferResponse</span>
 <span class="sd">                &lt;globus_sdk.transfer.response.TransferResponse&gt;`</span>
+
+<span class="sd">        **External Documentation**</span>
+
+<span class="sd">        See</span>
+<span class="sd">        `Get task pause info \</span>
+<span class="sd">        &lt;https://docs.globus.org/api/transfer/task/#get_task_pause_info&gt;`_</span>
+<span class="sd">        in the REST documentation for details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;TransferClient.task_pause_info({}, ...)&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_id</span><span class="p">))</span>

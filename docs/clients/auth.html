@@ -95,7 +95,7 @@ multiple Identity Usernames or Identity IDs, or iterables of strings,
 each of which is an Identity Username or Identity ID.</p>
 <p>Available with any authentication/client type.</p>
 <p><strong>Examples</strong></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">AuthClient</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ac</span> <span class="o">=</span> <span class="n">globus_sdk</span><span class="o">.</span><span class="n">AuthClient</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># by IDs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">ac</span><span class="o">.</span><span class="n">get_identities</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;46bd0f56-e24f-11e5-a510-131bef46955c&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">data</span>
