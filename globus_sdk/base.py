@@ -426,12 +426,13 @@ def merge_params(base_params, **more_params):
 
 def safe_stringify(value):
     """
-    Convert bytes by decoding, strings verbatim, and __str__ on anything
-    else
+    Converts incoming value to a unicode string. Convert bytes by decoding,
+    anything else has __str__ called, then is converted to bytes and then to
+    unicode to deal with python 2 and 3 differing in definitions of string
     """
+    if isinstance(value, six.text_type):
+        return value
     if isinstance(value, bytes):
         return value.decode('utf-8')
-    elif isinstance(value, six.string_types):
-        return value
     else:
-        return str(value)
+        return six.b(str(value)).decode('utf-8')
