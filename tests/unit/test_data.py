@@ -7,59 +7,52 @@ from tests.framework import (CapturedIOTestCase, get_client_data,
 
 class DataTests(CapturedIOTestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         """
-        Creates two TransferData objects and two Delete objects for testing,
-        one with defaults and one with custom paramaters
-
+        Sets up transfer client for creating Data objects
         """
-        super(DataTests, self).setUp()
-
         ac = globus_sdk.NativeAppAuthClient(
             client_id=get_client_data()["native_app_client1"]["id"])
         authorizer = globus_sdk.RefreshTokenAuthorizer(
             SDKTESTER1A_NATIVE1_RT, ac)
         self.tc = globus_sdk.TransferClient(authorizer=authorizer)
 
-        # constants
-        self.label = "label"
-        self.params = {"param1": "value1", "param2": "value2"}
-
-        # default transfer data
+    def setUp(self):
+        """
+        Creates a TransferData objects and a DeleteData object for testing
+        """
+        super(DataTests, self).setUp()
         self.tdata = globus_sdk.TransferData(self.tc, GO_EP1_ID, GO_EP2_ID)
-        # transfer data with paramaters
-        self.param_tdata = globus_sdk.TransferData(self.tc,
-                                                   GO_EP1_ID, GO_EP2_ID,
-                                                   label=self.label,
-                                                   sync_level="exists",
-                                                   **self.params)
-        # default delete data
         self.ddata = globus_sdk.DeleteData(self.tc, GO_EP1_ID)
-        # delete data with paramaters
-        self.param_ddata = globus_sdk.DeleteData(self.tc, GO_EP1_ID,
-                                                 label=self.label,
-                                                 recursive="True",
-                                                 **self.params)
 
     def test_tranfer_init(self):
         """
+        Creates TransferData objects with and without parameters,
         Verifies TransferData field initialization
         """
-
         # default init
-        self.assertEqual(self.tdata["DATA_TYPE"], "transfer")
-        self.assertEqual(self.tdata["source_endpoint"], GO_EP1_ID)
-        self.assertEqual(self.tdata["destination_endpoint"], GO_EP2_ID)
-        self.assertIn("submission_id", self.tdata)
-        self.assertIn("DATA", self.tdata)
-        self.assertEqual(len(self.tdata["DATA"]), 0)
+        default_tdata = globus_sdk.TransferData(self.tc, GO_EP1_ID, GO_EP2_ID)
+        self.assertEqual(default_tdata["DATA_TYPE"], "transfer")
+        self.assertEqual(default_tdata["source_endpoint"], GO_EP1_ID)
+        self.assertEqual(default_tdata["destination_endpoint"], GO_EP2_ID)
+        self.assertIn("submission_id", default_tdata)
+        self.assertIn("DATA", default_tdata)
+        self.assertEqual(len(default_tdata["DATA"]), 0)
 
         # init with params
-        self.assertEqual(self.param_tdata["label"], self.label)
+        label = "label"
+        params = {"param1": "value1", "param2": "value2"}
+        param_tdata = globus_sdk.TransferData(self.tc,
+                                              GO_EP1_ID, GO_EP2_ID,
+                                              label=label,
+                                              sync_level="exists",
+                                              **params)
+        self.assertEqual(param_tdata["label"], label)
         # sync_level of "exists" should be converted to 0
-        self.assertEqual(self.param_tdata["sync_level"], 0)
-        for par in self.params:
-            self.assertEqual(self.param_tdata[par], self.params[par])
+        self.assertEqual(param_tdata["sync_level"], 0)
+        for par in params:
+            self.assertEqual(param_tdata[par], params[par])
 
     def test_transfer_add_item(self):
         """
@@ -93,17 +86,24 @@ class DataTests(CapturedIOTestCase):
         """
 
         # default init
-        self.assertEqual(self.ddata["DATA_TYPE"], "delete")
-        self.assertEqual(self.ddata["endpoint"], GO_EP1_ID)
-        self.assertIn("submission_id", self.ddata)
-        self.assertIn("DATA", self.ddata)
-        self.assertEqual(len(self.ddata["DATA"]), 0)
+        default_ddata = globus_sdk.DeleteData(self.tc, GO_EP1_ID)
+        self.assertEqual(default_ddata["DATA_TYPE"], "delete")
+        self.assertEqual(default_ddata["endpoint"], GO_EP1_ID)
+        self.assertIn("submission_id", default_ddata)
+        self.assertIn("DATA", default_ddata)
+        self.assertEqual(len(default_ddata["DATA"]), 0)
 
         # init with params
-        self.assertEqual(self.param_ddata["label"], self.label)
-        self.assertEqual(self.param_ddata["recursive"], "True")
-        for par in self.params:
-            self.assertEqual(self.param_ddata[par], self.params[par])
+        label = "label"
+        params = {"param1": "value1", "param2": "value2"}
+        param_ddata = globus_sdk.DeleteData(self.tc, GO_EP1_ID,
+                                            label=label,
+                                            recursive="True",
+                                            **params)
+        self.assertEqual(param_ddata["label"], label)
+        self.assertEqual(param_ddata["recursive"], "True")
+        for par in params:
+            self.assertEqual(param_ddata[par], params[par])
 
     def test_delete_add_item(self):
         """

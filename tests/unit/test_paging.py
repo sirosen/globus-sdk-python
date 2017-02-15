@@ -6,7 +6,7 @@ from globus_sdk.transfer.paging import PaginatedResource
 from globus_sdk.transfer.response import IterableTransferResponse
 
 
-class PagingSimulator():
+class PagingSimulator(object):
 
     def __init__(self, n):
         self.n = n  # the number of simulated items
@@ -32,7 +32,7 @@ class PagingSimulator():
         # make the simulated response
         response = requests.Response()
         response._content = bytes(json.dumps(data))
-        response.headers["Content-Type"] = "text/plain"
+        response.headers["Content-Type"] = "application/json"
         return IterableTransferResponse(response)
 
 
