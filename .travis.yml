@@ -7,10 +7,16 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  # allow failures on CPython dev and pypy
+  # we want to be warned about these, but they aen't critical
   - "3.6-dev"
+  - "pypy"
+  - "pypy3"
 matrix:
   allow_failures:
     - python: "3.6-dev"
+    - python: "pypy"
+    - python: "pypy3"
 install:
   - pip install .
   - pip install -r test-requirements.txt
