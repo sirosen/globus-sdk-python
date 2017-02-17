@@ -56,7 +56,7 @@ def clean():
         r = tc.operation_ls(ep_id)
         for item in r:
             ddata.add_item("/~/" + item["name"])
-            print ("deleting {}: {}".format(item["type"], item["name"]))
+            print("deleting {}: {}".format(item["type"], item["name"]))
             file_deletions += 1
         if len(ddata["DATA"]):
             r = tc.submit_delete(ddata)
@@ -67,7 +67,7 @@ def clean():
     r = tc.bookmark_list()
     for bookmark in r:
         tc.delete_bookmark(bookmark["id"])
-        print ("deleting bookmark: {}".format(bookmark["name"]))
+        print("deleting bookmark: {}".format(bookmark["name"]))
         bookmark_deletions += 1
 
     # clean endpoints owned by SDK Tester
@@ -75,7 +75,7 @@ def clean():
     r = tc.endpoint_search(filter_scope="my-endpoints")
     for ep in r:
         tc.delete_endpoint(ep["id"])
-        print ("deleting endpoint: {}".format(ep["display_name"]))
+        print("deleting endpoint: {}".format(ep["display_name"]))
         endpoint_deletions += 1
 
     # wait for deletes to complete
