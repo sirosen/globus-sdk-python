@@ -416,7 +416,7 @@ class TransferClientTests(BaseTransferClientTests):
 
         # get role id from role list, assumes admin id is first
         list_doc = self.tc.endpoint_role_list(self.test_ep_id)
-        role_id = iter(list_doc["DATA"]).next()["id"]
+        role_id = next(iter(list_doc["DATA"]))["id"]
 
         # get the role by its id
         get_doc = self.tc.get_endpoint_role(self.test_ep_id, role_id)
@@ -441,7 +441,7 @@ class TransferClientTests(BaseTransferClientTests):
 
         # get role id from role list
         list_doc = self.tc.endpoint_role_list(self.test_ep_id)
-        role_id = iter(list_doc["DATA"]).next()["id"]
+        role_id = next(iter(list_doc["DATA"]))["id"]
 
         with self.assertRaises(TransferAPIError) as apiErr:
             self.tc.delete_endpoint_role(self.test_ep_id, role_id)
@@ -654,7 +654,7 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(filter_doc["endpoint"], GO_EP1_ID)
         self.assertEqual(filter_doc["path"], path)
         # confirm only file 3 was returned
-        file_data = iter(filter_doc["DATA"]).next()
+        file_data = next(iter(filter_doc["DATA"]))
         self.assertEqual(file_data["name"], file_name)
         self.assertTrue(file_data["size"] > min_size)
 
