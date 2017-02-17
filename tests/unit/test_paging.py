@@ -93,7 +93,7 @@ class PaginatedResourceTests(CapturedIOTestCase):
 
         generator = pr.iterable_func()
         for i in range(self.n):
-            self.assertEqual(next(generator)["value"], i)
+            self.assertEqual(six.next(generator)["value"], i)
 
         with self.assertRaises(StopIteration):
-            next(generator)
+            six.next(generator)

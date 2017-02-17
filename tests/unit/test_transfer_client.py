@@ -1,4 +1,6 @@
 from random import getrandbits
+from datetime import datetime, timedelta
+
 import globus_sdk
 from tests.framework import (CapturedIOTestCase, get_client_data,
                              GO_EP1_ID, GO_EP2_ID,
@@ -6,6 +8,32 @@ from tests.framework import (CapturedIOTestCase, get_client_data,
                              SDKTESTER1A_NATIVE1_RT)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
+
+
+def setUpModule():
+    """
+    Cleans out any files in ~/.globus/sharing/ on go#ep1 older than an hour
+    TODO: remove this once deleting shared directories does full cleanup
+    """
+    ac = globus_sdk.NativeAppAuthClient(
+        client_id=get_client_data()["native_app_client1"]["id"])
+    authorizer = globus_sdk.RefreshTokenAuthorizer(
+        SDKTESTER1A_NATIVE1_RT, ac)
+    tc = globus_sdk.TransferClient(authorizer=authorizer)
+
+    path = "~/.globus/sharing/"
+    hour_ago = datetime.utcnow() - timedelta(hours=1)
+    filter_string = "last_modified:," + hour_ago.strftime("%Y-%m-%d %H:%M:%S")
+    old_files = tc.operation_ls(GO_EP1_ID, path=path, filter=filter_string)
+
+    kwargs = {"notify_on_succeeded": False, "notify_on_fail": False}
+    ddata = globus_sdk.DeleteData(tc, GO_EP1_ID, **kwargs)
+
+    for item in old_files:
+        ddata.add_item(path + item["name"])
+
+    if len(ddata["DATA"]):
+        tc.submit_delete(ddata)
 
 
 # class that has setUp and tearDown for all transfer client testing classes
@@ -29,6 +57,7 @@ class BaseTransferClientTests(CapturedIOTestCase):
         Creates a list for tracking cleanup of assets created during testing
         Sets up a test endpoint
         """
+        super(BaseTransferClientTests, self).setUp()
         # list of dicts, each containing a function and a list of args
         # to pass to that function s.t. calling f(*args) cleans an asset
         self.asset_cleanup = []
@@ -46,6 +75,7 @@ class BaseTransferClientTests(CapturedIOTestCase):
         """
         Parses created_assets to destroy all assets created during testing
         """
+        super(BaseTransferClientTests, self).tearDown()
         # call the cleanup functions with the arguments they were given
         for cleanup in self.asset_cleanup:
             cleanup["function"](*cleanup["args"])
@@ -416,7 +446,7 @@ class TransferClientTests(BaseTransferClientTests):
 
         # get role id from role list, assumes admin id is first
         list_doc = self.tc.endpoint_role_list(self.test_ep_id)
-        role_id = next(iter(list_doc["DATA"]))["id"]
+        role_id = list_doc["DATA"][0]["id"]
 
         # get the role by its id
         get_doc = self.tc.get_endpoint_role(self.test_ep_id, role_id)
@@ -441,7 +471,7 @@ class TransferClientTests(BaseTransferClientTests):
 
         # get role id from role list
         list_doc = self.tc.endpoint_role_list(self.test_ep_id)
-        role_id = next(iter(list_doc["DATA"]))["id"]
+        role_id = list_doc["DATA"][0]["id"]
 
         with self.assertRaises(TransferAPIError) as apiErr:
             self.tc.delete_endpoint_role(self.test_ep_id, role_id)
@@ -654,7 +684,7 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(filter_doc["endpoint"], GO_EP1_ID)
         self.assertEqual(filter_doc["path"], path)
         # confirm only file 3 was returned
-        file_data = next(iter(filter_doc["DATA"]))
+        file_data = filter_doc["DATA"][0]
         self.assertEqual(file_data["name"], file_name)
         self.assertTrue(file_data["size"] > min_size)
 
