@@ -24,9 +24,7 @@ def setUpModule():
     path = "~/.globus/sharing/"
     hour_ago = datetime.utcnow() - timedelta(hours=1)
     filter_string = "last_modified:," + hour_ago.strftime("%Y-%m-%d %H:%M:%S")
-
-    ls_params = {"path": path, "filter": filter_string}
-    old_files = tc.operation_ls(GO_EP1_ID, **ls_params)
+    old_files = tc.operation_ls(GO_EP1_ID, path=path, filter=filter_string)
 
     kwargs = {"notify_on_succeeded": False, "notify_on_fail": False}
     ddata = globus_sdk.DeleteData(tc, GO_EP1_ID, **kwargs)
