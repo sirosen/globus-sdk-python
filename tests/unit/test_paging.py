@@ -1,5 +1,6 @@
 import requests
 import json
+import six
 
 from tests.framework import (CapturedIOTestCase)
 from globus_sdk.transfer.paging import PaginatedResource
@@ -31,7 +32,7 @@ class PagingSimulator(object):
 
         # make the simulated response
         response = requests.Response()
-        response._content = bytes(json.dumps(data))
+        response._content = six.b(json.dumps(data))
         response.headers["Content-Type"] = "application/json"
         return IterableTransferResponse(response)
 
@@ -92,7 +93,7 @@ class PaginatedResourceTests(CapturedIOTestCase):
 
         generator = pr.iterable_func()
         for i in range(self.n):
-            self.assertEqual(generator.next()["value"], i)
+            self.assertEqual(six.next(generator)["value"], i)
 
         with self.assertRaises(StopIteration):
-            generator.next()
+            six.next(generator)
