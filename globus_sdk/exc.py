@@ -31,7 +31,7 @@ class GlobusAPIError(GlobusError):
                           'Doing error load from JSON'))
             try:
                 self._load_from_json(r.json())
-            except KeyError:
+            except (KeyError, ValueError):
                 logger.error(('Error body could not be JSON decoded! '
                               'This means the Content-Type is wrong, or the '
                               'body is malformed!'))
@@ -56,7 +56,13 @@ class GlobusAPIError(GlobusError):
         r = self._underlying_response
         if "Content-Type" in r.headers and (
                 "application/json" in r.headers["Content-Type"]):
-            return r.json()
+            try:
+                return r.json()
+            except ValueError:
+                logger.error(('Error body could not be JSON decoded! '
+                              'This means the Content-Type is wrong, or the '
+                              'body is malformed!'))
+                return None
         else:
             return None
 
