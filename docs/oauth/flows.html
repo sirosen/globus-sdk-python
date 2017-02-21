@@ -151,9 +151,9 @@ attempt.</p>
 used to extract default values for the flow, and also to make calls
 to the Auth service. This SHOULD be a <code class="docutils literal"><span class="pre">NativeAppAuthClient</span></code></dd>
 <dt><code class="docutils literal"><span class="pre">requested_scopes</span></code> (<em>string</em>)</dt>
-<dd>The scopes on the token(s) being requested. Defaults to a set of
-commonly desired scopes for Globus. Given as a space-separated
-string</dd>
+<dd>The scopes on the token(s) being requested, as a space-separated
+string. Defaults to <code class="docutils literal"><span class="pre">openid</span> <span class="pre">profile</span> <span class="pre">email</span>
+<span class="pre">urn:globus:auth:scope:transfer.api.globus.org:all</span></code></dd>
 <dt><code class="docutils literal"><span class="pre">redirect_uri</span></code> (<em>string</em>)</dt>
 <dd>The page that users should be directed to after authenticating at the
 authorize URL. Defaults to
@@ -245,9 +245,9 @@ also to make calls to the Auth service. It MUST be a
 <dd>The page that users should be directed to after authenticating at the
 authorize URL. Required.</dd>
 <dt><code class="docutils literal"><span class="pre">requested_scopes</span></code> (<em>string</em>)</dt>
-<dd>The scopes on the token(s) being requested. Defaults to a set of
-commonly desired scopes for Globus. Given as a space-separated
-string</dd>
+<dd>The scopes on the token(s) being requested, as a space-separated
+string. Defaults to <code class="docutils literal"><span class="pre">openid</span> <span class="pre">profile</span> <span class="pre">email</span>
+<span class="pre">urn:globus:auth:scope:transfer.api.globus.org:all</span></code></dd>
 <dt><code class="docutils literal"><span class="pre">state</span></code> (<em>string</em>)</dt>
 <dd>This is a way of your application passing information back to itself
 in the course of the OAuth flow. Because the user will navigate away
