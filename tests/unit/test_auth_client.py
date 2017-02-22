@@ -7,7 +7,6 @@ import globus_sdk
 from tests.framework import (CapturedIOTestCase,
                              get_client_data, get_user_data,
                              SDKTESTER1A_NATIVE1_AUTH_RT)
-from globus_sdk.auth import GlobusNativeAppFlowManager
 from globus_sdk.exc import GlobusAPIError
 
 
@@ -156,20 +155,26 @@ class AuthClientTests(CapturedIOTestCase):
 
     def test_oauth2_exchange_code_for_tokens(self):
         """
-        Confirms flow required and an invalid code returns a 401,
-        Correct usage can only be tested in integration tests
+        Confirms flow required to exchange code,
+        Does a mock exchange for tokens, validates results.
+        Further tested in integration tests.
         """
         # no auth flow
         with self.assertRaises(ValueError):
             self.ac.oauth2_exchange_code_for_tokens("")
 
-        # bad code
-        self.ac.current_oauth2_flow_manager = GlobusNativeAppFlowManager(
-            self.ac, None)
-        with self.assertRaises(GlobusAPIError) as apiErr:
-            self.ac.oauth2_exchange_code_for_tokens("bad_code")
-        self.assertEqual(apiErr.exception.http_status, 401)
-        self.assertEqual(apiErr.exception.code, "Error")  # json is malformed?
+        # set up mock auth flow
+        mock_flow = mock.Mock()
+        mock_code = "mock-code"
+        mock_tokens = {"access_token": "mock_token"}
+        mock_flow.exchange_code_for_tokens = mock.Mock(
+            return_value=mock_tokens)
+        self.ac.current_oauth2_flow_manager = mock_flow
+
+        # exchange and validate results from mock auth flow
+        token_res = self.ac.oauth2_exchange_code_for_tokens(mock_code)
+        self.assertEqual(token_res, mock_tokens)
+        mock_flow.exchange_code_for_tokens.assert_called_once_with(mock_code)
 
     def test_oauth2_refresh_token(self):
         """
