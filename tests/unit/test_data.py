@@ -1,7 +1,7 @@
 import globus_sdk
 
 from tests.framework import (CapturedIOTestCase, get_client_data,
-                             SDKTESTER1A_NATIVE1_RT,
+                             SDKTESTER1A_NATIVE1_TRANSFER_RT,
                              GO_EP1_ID, GO_EP2_ID)
 
 
@@ -15,7 +15,7 @@ class DataTests(CapturedIOTestCase):
         ac = globus_sdk.NativeAppAuthClient(
             client_id=get_client_data()["native_app_client1"]["id"])
         authorizer = globus_sdk.RefreshTokenAuthorizer(
-            SDKTESTER1A_NATIVE1_RT, ac)
+            SDKTESTER1A_NATIVE1_TRANSFER_RT, ac)
         self.tc = globus_sdk.TransferClient(authorizer=authorizer)
 
     def setUp(self):

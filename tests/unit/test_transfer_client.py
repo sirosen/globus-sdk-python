@@ -2,10 +2,10 @@ from random import getrandbits
 from datetime import datetime, timedelta
 
 import globus_sdk
-from tests.framework import (CapturedIOTestCase, get_client_data,
+from tests.framework import (CapturedIOTestCase,
+                             get_client_data, get_user_data,
                              GO_EP1_ID, GO_EP2_ID,
-                             GO_USER_ID, SDK_USER_ID,
-                             SDKTESTER1A_NATIVE1_RT)
+                             SDKTESTER1A_NATIVE1_TRANSFER_RT)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -18,7 +18,7 @@ def setUpModule():
     ac = globus_sdk.NativeAppAuthClient(
         client_id=get_client_data()["native_app_client1"]["id"])
     authorizer = globus_sdk.RefreshTokenAuthorizer(
-        SDKTESTER1A_NATIVE1_RT, ac)
+        SDKTESTER1A_NATIVE1_TRANSFER_RT, ac)
     tc = globus_sdk.TransferClient(authorizer=authorizer)
 
     path = "~/.globus/sharing/"
@@ -52,7 +52,7 @@ class BaseTransferClientTests(CapturedIOTestCase):
         ac = globus_sdk.NativeAppAuthClient(
             client_id=get_client_data()["native_app_client1"]["id"])
         authorizer = globus_sdk.RefreshTokenAuthorizer(
-            SDKTESTER1A_NATIVE1_RT, ac)
+            SDKTESTER1A_NATIVE1_TRANSFER_RT, ac)
         self.tc = globus_sdk.TransferClient(authorizer=authorizer)
 
     def setUp(self):
@@ -413,7 +413,7 @@ class TransferClientTests(BaseTransferClientTests):
         # add the new role
         add_data = {"DATA_TYPE": "role",
                     "principal_type": "identity",
-                    "principal": GO_USER_ID,
+                    "principal": get_user_data()["go"]["id"],
                     "role": "access_manager"
                     }
 
@@ -458,7 +458,8 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(get_doc["DATA_TYPE"], "role")
         self.assertEqual(get_doc["id"], role_id)
         self.assertEqual(get_doc["principal_type"], "identity")
-        self.assertEqual(get_doc["principal"], SDK_USER_ID)
+        self.assertEqual(get_doc["principal"],
+                         get_user_data()["sdktester1a"]["id"])
         self.assertEqual(get_doc["role"], "administrator")
 
     def delete_endpoint_role(self, endpoint_id, role_id):
@@ -935,7 +936,8 @@ class TransferClientTests(BaseTransferClientTests):
         # validate tasks have some expected fields
         for task in list_doc:
             self.assertEqual(task["DATA_TYPE"], "task")
-            self.assertEqual(task["owner_id"], SDK_USER_ID)
+            self.assertEqual(task["owner_id"],
+                             get_user_data()["sdktester1a"]["id"])
             self.assertIn("task_id", task)
             self.assertIn("type", task)
             self.assertIn("status", task)
@@ -1014,7 +1016,8 @@ class TransferClientTests(BaseTransferClientTests):
         get_doc = self.tc.get_task(task_id)
         self.assertEqual(get_doc["DATA_TYPE"], "task")
         self.assertEqual(get_doc["task_id"], task_id)
-        self.assertEqual(get_doc["owner_id"], SDK_USER_ID)
+        self.assertEqual(get_doc["owner_id"],
+                         get_user_data()["sdktester1a"]["id"])
         self.assertEqual(get_doc["type"], "TRANSFER")
         self.assertIn("status", get_doc)
 
@@ -1207,26 +1210,28 @@ class SharedTransferClientTests(BaseTransferClientTests):
         self.assertEqual(results_count, cap)
 
         # owner-id param
-        params = {"filter_owner_id": GO_USER_ID}
+        params = {"filter_owner_id": get_user_data()["go"]["id"]}
         owner_doc = self.tc.endpoint_search(**params)
         # confirm format, and that all results are from GO
         self.assertIsInstance(owner_doc, PaginatedResource)
         for ep in owner_doc:
-            self.assertEqual(ep["owner_id"], GO_USER_ID)
+            self.assertEqual(ep["owner_id"], get_user_data()["go"]["id"])
 
         # scope: my endpoints
         my_doc = self.tc.endpoint_search(filter_scope="my-endpoints")
         # confirm format, and that all results are owned by SDK tester
         self.assertIsInstance(my_doc, PaginatedResource)
         for ep in my_doc:
-            self.assertEqual(ep["owner_id"], SDK_USER_ID)
+            self.assertEqual(ep["owner_id"],
+                             get_user_data()["sdktester1a"]["id"])
 
         # scope: shared endpoints
         my_doc = self.tc.endpoint_search(filter_scope="shared-by-me")
         # confirm format, and that all results are shared by SDK tester
         self.assertIsInstance(my_doc, PaginatedResource)
         for ep in my_doc:
-            self.assertEqual(ep["owner_id"], SDK_USER_ID)
+            self.assertEqual(ep["owner_id"],
+                             get_user_data()["sdktester1a"]["id"])
             self.assertIsNotNone(ep["sharing_target_root_path"])
             self.assertIsNotNone(ep["host_endpoint_id"])
 

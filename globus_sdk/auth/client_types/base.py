@@ -187,7 +187,7 @@ class AuthClient(BaseClient):
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(
             auth_code)
 
-    def oauth2_refresh_token(self, refresh_token):
+    def oauth2_refresh_token(self, refresh_token, additional_params=None):
         r"""
         Exchange a refresh token for a :class:`OAuthTokenResponse
         <globus_sdk.auth.token_response.OAuthTokenResponse>`, containing
@@ -213,6 +213,8 @@ class AuthClient(BaseClient):
         form_data = {'refresh_token': refresh_token,
                      'grant_type': 'refresh_token'}
 
+        if additional_params:
+            form_data.update(additional_params)
         return self.oauth2_token(form_data)
 
     def oauth2_revoke_token(self, token, additional_params=None):

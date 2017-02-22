@@ -6,7 +6,7 @@ import globus_sdk
 from globus_sdk.base import (BaseClient, safe_stringify,
                              slash_join, merge_params)
 from tests.framework import (CapturedIOTestCase, get_client_data,
-                             SDKTESTER1A_NATIVE1_RT)
+                             SDKTESTER1A_NATIVE1_TRANSFER_RT)
 from globus_sdk.exc import GlobusAPIError
 
 
@@ -20,7 +20,7 @@ class BaseClientTests(CapturedIOTestCase):
         ac = globus_sdk.NativeAppAuthClient(
             client_id=get_client_data()["native_app_client1"]["id"])
         authorizer = globus_sdk.RefreshTokenAuthorizer(
-            SDKTESTER1A_NATIVE1_RT, ac)
+            SDKTESTER1A_NATIVE1_TRANSFER_RT, ac)
         self.bc = BaseClient("transfer", base_path="/v0.10/",
                              authorizer=authorizer)
 
