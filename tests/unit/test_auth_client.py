@@ -1,9 +1,13 @@
+try:
+    import mock
+except ImportError:
+    from unittest import mock
+
 import globus_sdk
 from tests.framework import (CapturedIOTestCase,
                              get_client_data, get_user_data,
                              SDKTESTER1A_NATIVE1_AUTH_RT)
-from globus_sdk.auth import (GlobusNativeAppFlowManager,
-                             GlobusAuthorizationCodeFlowManager)
+from globus_sdk.auth import GlobusNativeAppFlowManager
 from globus_sdk.exc import GlobusAPIError
 
 
@@ -15,92 +19,112 @@ class AuthClientTests(CapturedIOTestCase):
         """
         super(AuthClientTests, self).setUp()
 
-        self.access_token = self.test_oauth2_token()
+        # get access token
+        client_id = get_client_data()["native_app_client1"]["id"]
+        form_data = {'refresh_token': SDKTESTER1A_NATIVE1_AUTH_RT,
+                     'grant_type': 'refresh_token',
+                     'client_id': client_id}
+        token_res = globus_sdk.AuthClient().oauth2_token(form_data)
+        self.access_token = token_res["access_token"]
+
+        # make auth client
         self.ac = globus_sdk.AuthClient(
             authorizer=globus_sdk.AccessTokenAuthorizer(self.access_token),
-            client_id=get_client_data()["native_app_client1"]["id"])
+            client_id=client_id)
 
-    def test_get_identities(self):
+    def test_get_identities_singleton(self):
         """
-        Makes calls to the get identities resource using singleton and lists
-        of ids and usernames, both in use and not. Validates results.
-        Confirms incorrect requests throw GlobusAPIErrors
+        gets identities with single username and id values, validates results.
         """
-        def get_identity(identities, uid=None, username=None):
-            """
-            helper for getting identities since response order isn't guaranteed
-            """
-            for identity in identities:
-                if identity["id"] == uid or identity["username"] == username:
-                    return identity
-            return None
-
-        # expected values
-        sdk_expected = get_user_data()["sdktester1a"]
-        go_expected = get_user_data()["go"]
-
         # get single ID
         id_res = self.ac.get_identities(
             ids=get_user_data()["sdktester1a"]["id"])
-        sdk_identity = get_identity(
-            id_res["identities"], uid=get_user_data()["sdktester1a"]["id"])
-        for item in sdk_expected:
-            self.assertEqual(sdk_identity[item], sdk_expected[item])
-
-        # get multiple IDs
-        unused_id = "12345678-1234-1234-1234-1234567890ab"
-        ids = [get_user_data()["sdktester1a"]["id"],
-               get_user_data()["go"]["id"], unused_id]
-        id_res = self.ac.get_identities(ids=ids)
-        # validate sdk
-        sdk_identity = get_identity(
-            id_res["identities"], uid=get_user_data()["sdktester1a"]["id"])
-        for item in sdk_expected:
-            self.assertEqual(sdk_identity[item], sdk_expected[item])
-        # validate go
-        go_identity = get_identity(id_res["identities"],
-                                   uid=get_user_data()["go"]["id"])
-        for item in go_expected:
-            self.assertEqual(go_identity[item], go_expected[item])
-        unused_identity = get_identity(id_res["identities"], uid=unused_id)
-        # confirm unused id isn't returned
-        self.assertIsNone(unused_identity)
+        sdk_identity = id_res["identities"][0]
+        for item in get_user_data()["sdktester1a"]:
+            self.assertEqual(sdk_identity[item],
+                             get_user_data()["sdktester1a"][item])
 
         # get single username
         id_res = self.ac.get_identities(
             usernames=get_user_data()["sdktester1a"]["username"])
-        sdk_identity = get_identity(
-            id_res["identities"],
-            username=get_user_data()["sdktester1a"]["username"])
-        for item in sdk_expected:
-            self.assertEqual(sdk_identity[item], sdk_expected[item])
+        sdk_identity = id_res["identities"][0]
+        for item in get_user_data()["sdktester1a"]:
+            self.assertEqual(sdk_identity[item],
+                             get_user_data()["sdktester1a"][item])
 
-        # get multiple usernames
+    def get_identity(self, identities, uid=None, username=None):
+        """
+        helper for getting identities since response order isn't guaranteed
+        """
+        for identity in identities:
+            if identity["id"] == uid or identity["username"] == username:
+                return identity
+        return None
+
+    def test_get_identites_ids(self):
+        """
+        gets identities with a list of ids, validates results
+        """
+        unused_id = "12345678-1234-1234-1234-1234567890ab"
+        ids = [get_user_data()["sdktester1a"]["id"],
+               get_user_data()["go"]["id"], unused_id]
+        id_res = self.ac.get_identities(ids=ids)
+
+        # validate sdk
+        sdk_identity = self.get_identity(
+            id_res["identities"], uid=get_user_data()["sdktester1a"]["id"])
+        for item in get_user_data()["sdktester1a"]:
+            self.assertEqual(sdk_identity[item],
+                             get_user_data()["sdktester1a"][item])
+
+        # validate go
+        go_identity = self.get_identity(id_res["identities"],
+                                        uid=get_user_data()["go"]["id"])
+        for item in get_user_data()["go"]:
+            self.assertEqual(go_identity[item], get_user_data()["go"][item])
+        unused_identity = self.get_identity(id_res["identities"],
+                                            uid=unused_id)
+
+        # confirm unused id isn't returned
+        self.assertIsNone(unused_identity)
+
+    def test_get_identities_usernames(self):
+        """
+        gets identities with a list of usernames, validates results.
+        """
         unused_username = "unused@unused.org"
         usernames = [get_user_data()["sdktester1a"]["username"],
                      get_user_data()["go"]["username"], unused_username]
         id_res = self.ac.get_identities(usernames=usernames)
+
         # validate sdk
-        sdk_identity = get_identity(
+        sdk_identity = self.get_identity(
             id_res["identities"],
             username=get_user_data()["sdktester1a"]["username"])
-        for item in sdk_expected:
-            self.assertEqual(sdk_identity[item], sdk_expected[item])
+        for item in get_user_data()["sdktester1a"]:
+            self.assertEqual(sdk_identity[item],
+                             get_user_data()["sdktester1a"][item])
+
         # validate go
-        go_identity = get_identity(
+        go_identity = self.get_identity(
             id_res["identities"], username=get_user_data()["go"]["username"])
-        for item in go_expected:
-            self.assertEqual(go_identity[item], go_expected[item])
-        unused_identity = get_identity(id_res["identities"],
-                                       username=unused_username)
+        for item in get_user_data()["go"]:
+            self.assertEqual(go_identity[item], get_user_data()["go"][item])
+        unused_identity = self.get_identity(id_res["identities"],
+                                            username=unused_username)
+
         # validate unused
         self.assertEqual(unused_identity["username"], unused_username)
         self.assertEqual(unused_identity["name"], None)
         self.assertEqual(unused_identity["status"], "unused")
 
+    def test_get_identities_errors(self):
+        """
+        Confirms bad and unauthorized requests to get_identities throw errors
+        """
         # bad request
         with self.assertRaises(GlobusAPIError) as apiErr:
-            self.ac.get_identities(usernames=usernames, ids=ids)
+            self.ac.get_identities(usernames=["a", "b"], ids=["0", "1"])
         self.assertEqual(apiErr.exception.http_status, 400)
         self.assertEqual(apiErr.exception.code, "INVALID_PARAMETERS")
 
@@ -112,41 +136,23 @@ class AuthClientTests(CapturedIOTestCase):
 
     def test_oauth2_get_authorize_url(self):
         """
-        Gets an authorize url after starting a native app auth flow, a
-        confidential app auth flow, and no auth flow. Validates results.
+        Gets an authorize url with no auth flow and a mock auth flow.
+        Confirms expected results. Further tested in integration tests.
         """
-        base_url = "https://auth.globus.org/v2/"
-
-        # no auth flow
+        # no auth flow raises an error
         with self.assertRaises(ValueError):
             self.ac.oauth2_get_authorize_url()
 
-        # native auth flow
-        self.ac.current_oauth2_flow_manager = GlobusNativeAppFlowManager(
-            self.ac, None)
-        url_res = self.ac.oauth2_get_authorize_url()
-        # validate results
-        expected_vals = [base_url + "oauth2/authorize?", "code_challenge=",
-                         "scope=", "openid", "profile", "email",
-                         "access_type=online", "state=_default",
-                         "response_type=code",
-                         "client_id=" + self.ac.client_id]
-        for val in expected_vals:
-            self.assertIn(val, url_res)
+        # set up mock auth flow
+        mock_url = "test-url-return-value.org"
+        mock_flow = mock.Mock()
+        mock_flow.get_authorize_url = mock.Mock(return_value=mock_url)
+        self.ac.current_oauth2_flow_manager = mock_flow
 
-        # confidential auth flow
-        uri = "test-redirect-uri.org"
-        self.ac.current_oauth2_flow_manager = (
-            GlobusAuthorizationCodeFlowManager(self.ac, uri))
+        # get and validate results from mock auth flow
         url_res = self.ac.oauth2_get_authorize_url()
-        # validate results
-        expected_vals = [base_url + "oauth2/authorize?",
-                         "access_type=online", "state=_default",
-                         "scope=", "openid", "profile", "email",
-                         "response_type=code", "redirect_uri=" + uri,
-                         "client_id=" + self.ac.client_id]
-        for val in expected_vals:
-            self.assertIn(val, url_res)
+        self.assertEqual(url_res, mock_url)
+        mock_flow.get_authorize_url.assert_called_once()
 
     def test_oauth2_exchange_code_for_tokens(self):
         """
