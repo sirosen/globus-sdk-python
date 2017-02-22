@@ -125,19 +125,28 @@ class AuthClientTests(CapturedIOTestCase):
         self.ac.current_oauth2_flow_manager = GlobusNativeAppFlowManager(
             self.ac, None)
         url_res = self.ac.oauth2_get_authorize_url()
-        self.assertIn(base_url + "oauth2/authorize?code_challenge=", url_res)
+        # validate results
+        expected_vals = [base_url + "oauth2/authorize?", "code_challenge=",
+                         "scope=", "openid", "profile", "email",
+                         "access_type=online", "state=_default",
+                         "response_type=code",
+                         "client_id=" + self.ac.client_id]
+        for val in expected_vals:
+            self.assertIn(val, url_res)
 
         # confidential auth flow
         uri = "test-redirect-uri.org"
         self.ac.current_oauth2_flow_manager = (
             GlobusAuthorizationCodeFlowManager(self.ac, uri))
         url_res = self.ac.oauth2_get_authorize_url()
-        self.assertIn(base_url + "oauth2/authorize?", url_res)
-        expected_args = ["access_type=online", "state=_default",
+        # validate results
+        expected_vals = [base_url + "oauth2/authorize?",
+                         "access_type=online", "state=_default",
+                         "scope=", "openid", "profile", "email",
                          "response_type=code", "redirect_uri=" + uri,
                          "client_id=" + self.ac.client_id]
-        for arg in expected_args:
-            self.assertIn(arg, url_res)
+        for val in expected_vals:
+            self.assertIn(val, url_res)
 
     def test_oauth2_exchange_code_for_tokens(self):
         """
