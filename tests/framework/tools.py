@@ -20,3 +20,14 @@ def get_client_data():
                                fname + '.json')) as f:
             ret[fname] = json.load(f)
     return ret
+
+
+def get_user_data():
+    dirname = get_fixture_file_dir()
+    ret = {}
+    for uname in ('sdktester1a', 'go'):
+        with open(os.path.join(dirname,
+                               'auth_fixtures',
+                               uname + '@globusid.org.json')) as f:
+            ret[uname] = json.load(f)
+    return ret

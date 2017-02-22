@@ -4,7 +4,8 @@ from globus_sdk import NativeAppAuthClient
 
 
 CLIENT_ID = 'd0f1d9b0-bd81-4108-be74-ea981664453a'
-SCOPES = 'urn:globus:auth:scope:transfer.api.globus.org:all'
+SCOPES = ('openid profile email '
+          'urn:globus:auth:scope:transfer.api.globus.org:all')
 
 get_input = getattr(__builtins__, 'raw_input', input)
 
@@ -20,5 +21,7 @@ auth_code = get_input('Enter the auth code: ').strip()
 tokens = client.oauth2_exchange_code_for_tokens(auth_code).by_resource_server
 
 transfer_token = tokens['transfer.api.globus.org']['refresh_token']
+auth_token = tokens['auth.globus.org']['refresh_token']
 
-print('Token: {}'.format(transfer_token))
+print('Transfer Token: {}'.format(transfer_token))
+print('Auth Token    : {}'.format(auth_token))
