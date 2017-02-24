@@ -14,10 +14,11 @@ def get_fixture_file_dir():
 def get_client_data():
     dirname = get_fixture_file_dir()
     ret = {}
-    for fname in ('native_app_client1', 'confidential_app_client1'):
+    for fname in ("native_app_client1", "confidential_app_client1",
+                  "resource_server_client"):
         with open(os.path.join(dirname,
-                               'auth_fixtures',
-                               fname + '.json')) as f:
+                               "auth_fixtures",
+                               fname + ".json")) as f:
             ret[fname] = json.load(f)
     return ret
 
@@ -25,9 +26,9 @@ def get_client_data():
 def get_user_data():
     dirname = get_fixture_file_dir()
     ret = {}
-    for uname in ('sdktester1a', 'go'):
+    for uname in ("sdktester1a", "go"):
         with open(os.path.join(dirname,
-                               'auth_fixtures',
-                               uname + '@globusid.org.json')) as f:
+                               "auth_fixtures",
+                               uname + "@globusid.org.json")) as f:
             ret[uname] = json.load(f)
     return ret
