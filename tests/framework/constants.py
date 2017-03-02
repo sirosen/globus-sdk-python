@@ -6,12 +6,12 @@ GO_EP2_ID = "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
 # ------ #
 # sdktester1a@globusid.org transfer refresh token for Native App 1
 SDKTESTER1A_NATIVE1_TRANSFER_RT = (
-    "AQEAAAAAAASDACYy_O7mQx-CCTX9ZGg7FAHiv5v3bU"
-    "2b1puK1jxRXnt69ClBpJbtygAjS7BHLokxKRyRQ-7H")
+    "AQEAAAAAAASDALhXmQdX30NbEIkIvDDyC2ngifCIVd"
+    "ta2mMc1JlM5dYWlzrBS0sxr5t55n2--PjKTCTbrE3K")
 # sdktester1a@globusid.org auth refresh token for Native App 1
 SDKTESTER1A_NATIVE1_AUTH_RT = (
-    "AQEAAAAAAASC_0CX1ozEsZ-F4SjhFhMPgi-MgyxWTn"
-    "e0_Tl6Wx3HnVMO3QUnVhDx65xXrR0Y0p8mBAJWjl-R")
+    "AQEAAAAAAASC_zJT5zvwFgYUyY38YIXghtaUXr1amo"
+    "0PLeJLJ2G_iwjbIutwOansrW6RpTQ2WkWsfidYUAyY")
 # ---------- #
 # end tokens #
 # ---------- #
