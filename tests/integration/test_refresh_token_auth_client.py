@@ -80,20 +80,6 @@ class RefreshTokenAuthorizerIntegrationTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "AuthenticationFailed")
 
-    def test_invalid_refresh_token(self):
-        """
-        Invalidates the Authorizer's refresh_token, confirms access_token
-        continues to function.
-        """
-        # TODO: Get a new refresh_token to revoke here instead
-        self.authorizer.refresh_token = None
-
-        # make request, confirm successful
-        get_res = self.tc.get_endpoint(GO_EP1_ID)
-        self.assertEqual(get_res["id"], GO_EP1_ID)
-        # confirm no new token was gotten
-        self.assertEqual(self.access_token, self.authorizer.access_token)
-
     def test_invalid_tokens(self):
         """
         Invalidates the Authorizer's refresh_token and access_tokens,
