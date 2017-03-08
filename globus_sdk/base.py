@@ -329,15 +329,9 @@ class BaseClient(object):
                 return self._session.request(
                     method=method, url=url, headers=rheaders, params=params,
                     data=text_body, verify=self._verify)
-            except requests.Timeout as e:
-                self.logger.error("TimeoutError on request")
-                raise exc.GlobusTimeoutError(*e.args)
-            except requests.ConnectionError as e:
-                self.logger.error("ConnectionError on request")
-                raise exc.GlobusConnectionError(*e.args)
             except requests.RequestException as e:
                 self.logger.error("NetworkError on request")
-                raise exc.NetworkError(*e.args)
+                raise exc.convert_request_exception(e)
 
         # initial request
         r = send_request()
