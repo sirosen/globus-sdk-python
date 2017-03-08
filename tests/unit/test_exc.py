@@ -169,7 +169,7 @@ class NetworkErrorTests(CapturedIOTestCase):
         """
         msg = "wrapper message"
         with self.assertRaises(NetworkError) as err:
-            raise NetworkError(self.exc, msg)
+            raise NetworkError(msg, self.exc)
 
         self.assertEqual(err.exception.message, msg)
         self.assertEqual(err.exception.underlying_exception.message,
@@ -184,7 +184,7 @@ class NetworkErrorTests(CapturedIOTestCase):
         """
         msg = "wrapper message"
         with self.assertRaises(GlobusTimeoutError) as err:
-            raise GlobusTimeoutError(self.timeout_exc, msg)
+            raise GlobusTimeoutError(msg, self.timeout_exc)
 
         self.assertEqual(err.exception.message, msg)
         self.assertEqual(err.exception.underlying_exception.message,
@@ -199,7 +199,7 @@ class NetworkErrorTests(CapturedIOTestCase):
         """
         msg = "wrapper message"
         with self.assertRaises(GlobusConnectionError) as err:
-            raise GlobusConnectionError(self.connection_exc, msg)
+            raise GlobusConnectionError(msg, self.connection_exc)
 
         self.assertEqual(err.exception.message, msg)
         self.assertEqual(err.exception.underlying_exception.message,
