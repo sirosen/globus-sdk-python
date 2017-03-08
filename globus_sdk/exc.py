@@ -1,5 +1,6 @@
 import logging
 import textwrap
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -141,11 +142,17 @@ class InvalidDocumentBodyError(GlobusError):
     """
 
 
-# Thin wrappers around requests exceptions, so the SDK is API independent.
+# Wrappers around requests exceptions, so the SDK is API independent.
 class NetworkError(GlobusError):
     """
     Error communicating with the REST API server.
+
+    Holds onto original exception data, but also takes a message
+    to explain potentially confusing or inconsistent exceptions passed to us
     """
+    def __init__(self, msg, exc, *args, **kw):
+        super(NetworkError, self).__init__(msg)
+        self.underlying_exception = exc
 
 
 class GlobusTimeoutError(NetworkError):
@@ -154,6 +161,17 @@ class GlobusTimeoutError(NetworkError):
 
 class GlobusConnectionError(NetworkError):
     """A connection error occured while making a REST request."""
+
+
+def convert_request_exception(exc):
+    """Converts incoming requests.Exception to a Globus NetworkError"""
+
+    if isinstance(exc, requests.Timeout):
+        return GlobusTimeoutError("TimeoutError on request", exc)
+    elif isinstance(exc, requests.ConnectionError):
+        return GlobusConnectionError("ConnectionError on request", exc)
+    else:
+        return NetworkError("NetworkError on request", exc)
 
 
 class GlobusOptionalDependencyError(GlobusError, NotImplementedError):

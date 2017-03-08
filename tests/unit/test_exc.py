@@ -3,7 +3,9 @@ import json
 import six
 
 from globus_sdk.exc import (GlobusAPIError, TransferAPIError,
-                            GlobusOptionalDependencyError)
+                            GlobusOptionalDependencyError,
+                            NetworkError, GlobusTimeoutError,
+                            GlobusConnectionError, convert_request_exception)
 from tests.framework import CapturedIOTestCase
 
 
@@ -147,6 +149,78 @@ class TransferAPIErrorTests(APIErrorTests):
             raise TransferAPIError(self.malformed_response)
         expected = ("403", "Error", "{", None)
         self.assertEqual(apiErr.exception._get_args(), expected)
+
+
+class NetworkErrorTests(CapturedIOTestCase):
+
+    def setUp(self):
+        """
+        Sets up simple exceptions to wrap
+        """
+        super(NetworkErrorTests, self).setUp()
+        self.exc = requests.RequestException("exc_message")
+        self.timeout_exc = requests.Timeout("timeout_message")
+        self.connection_exc = requests.ConnectionError("connection_message")
+
+    def test_networkError(self):
+        """
+        Raises a NetworkError wrapped around a RequestException
+        Confirms wrapped data is available, but new message is used
+        """
+        msg = "wrapper message"
+        with self.assertRaises(NetworkError) as err:
+            raise NetworkError(msg, self.exc)
+
+        self.assertEqual(str(err.exception), msg)
+        self.assertEqual(err.exception.underlying_exception.args,
+                         self.exc.args)
+
+    def test_timeoutError(self):
+        """
+        Raises a GlobusTimeoutError wrapped around a request Timeout
+        Confirms wrapped data is available, but new message is used
+        """
+        msg = "wrapper message"
+        with self.assertRaises(GlobusTimeoutError) as err:
+            raise GlobusTimeoutError(msg, self.timeout_exc)
+
+        self.assertEqual(str(err.exception), msg)
+        self.assertEqual(err.exception.underlying_exception.args,
+                         self.timeout_exc.args)
+
+    def test_connectionError(self):
+        """
+        Raises a GlobusTimeoutError wrapped around a request ConnectionError
+        Confirms wrapped data is available, but new message is used
+        """
+        msg = "wrapper message"
+        with self.assertRaises(GlobusConnectionError) as err:
+            raise GlobusConnectionError(msg, self.connection_exc)
+
+        self.assertEqual(str(err.exception), msg)
+        self.assertEqual(err.exception.underlying_exception.args,
+                         self.connection_exc.args)
+
+    def test_convert_request_exception(self):
+        """
+        Converts known request exceptions into Globus NetworkErrors,
+        confirms expected values.
+        """
+        # NetworkError
+        conv = convert_request_exception(self.exc)
+        self.assertIsInstance(conv, NetworkError)
+        self.assertEqual(conv.underlying_exception.args,
+                         self.exc.args)
+        # Timeout Error
+        conv = convert_request_exception(self.timeout_exc)
+        self.assertIsInstance(conv, GlobusTimeoutError)
+        self.assertEqual(conv.underlying_exception.args,
+                         self.timeout_exc.args)
+        # Connection Error
+        conv = convert_request_exception(self.connection_exc)
+        self.assertIsInstance(conv, GlobusConnectionError)
+        self.assertEqual(conv.underlying_exception.args,
+                         self.connection_exc.args)
 
 
 class GlobusOptionalDependencyErrorTests(CapturedIOTestCase):
