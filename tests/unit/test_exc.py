@@ -171,9 +171,7 @@ class NetworkErrorTests(CapturedIOTestCase):
         with self.assertRaises(NetworkError) as err:
             raise NetworkError(msg, self.exc)
 
-        self.assertEqual(err.exception.message, msg)
-        self.assertEqual(err.exception.underlying_exception.message,
-                         self.exc.message)
+        self.assertEqual(str(err.exception), msg)
         self.assertEqual(err.exception.underlying_exception.args,
                          self.exc.args)
 
@@ -186,9 +184,7 @@ class NetworkErrorTests(CapturedIOTestCase):
         with self.assertRaises(GlobusTimeoutError) as err:
             raise GlobusTimeoutError(msg, self.timeout_exc)
 
-        self.assertEqual(err.exception.message, msg)
-        self.assertEqual(err.exception.underlying_exception.message,
-                         self.timeout_exc.message)
+        self.assertEqual(str(err.exception), msg)
         self.assertEqual(err.exception.underlying_exception.args,
                          self.timeout_exc.args)
 
@@ -201,9 +197,7 @@ class NetworkErrorTests(CapturedIOTestCase):
         with self.assertRaises(GlobusConnectionError) as err:
             raise GlobusConnectionError(msg, self.connection_exc)
 
-        self.assertEqual(err.exception.message, msg)
-        self.assertEqual(err.exception.underlying_exception.message,
-                         self.connection_exc.message)
+        self.assertEqual(str(err.exception), msg)
         self.assertEqual(err.exception.underlying_exception.args,
                          self.connection_exc.args)
 
@@ -215,22 +209,16 @@ class NetworkErrorTests(CapturedIOTestCase):
         # NetworkError
         conv = convert_request_exception(self.exc)
         self.assertIsInstance(conv, NetworkError)
-        self.assertEqual(conv.underlying_exception.message,
-                         self.exc.message)
         self.assertEqual(conv.underlying_exception.args,
                          self.exc.args)
         # Timeout Error
         conv = convert_request_exception(self.timeout_exc)
         self.assertIsInstance(conv, GlobusTimeoutError)
-        self.assertEqual(conv.underlying_exception.message,
-                         self.timeout_exc.message)
         self.assertEqual(conv.underlying_exception.args,
                          self.timeout_exc.args)
         # Connection Error
         conv = convert_request_exception(self.connection_exc)
         self.assertIsInstance(conv, GlobusConnectionError)
-        self.assertEqual(conv.underlying_exception.message,
-                         self.connection_exc.message)
         self.assertEqual(conv.underlying_exception.args,
                          self.connection_exc.args)
 
