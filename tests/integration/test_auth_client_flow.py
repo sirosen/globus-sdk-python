@@ -40,12 +40,12 @@ class AuthClientIntegrationTests(CapturedIOTestCase):
         # starting flow with specified paramaters
         flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(
             ac, requested_scopes="scopes", redirect_uri="uri",
-            state="state", verifier="verifier", refresh_tokens=True)
+            state="state", verifier=("a" * 43), refresh_tokens=True)
         ac.current_oauth2_flow_manager = flow_manager
 
         # get url_and validate results
         url_res = ac.oauth2_get_authorize_url()
-        verifier, remade_challenge = make_native_app_challenge("verifier")
+        verifier, remade_challenge = make_native_app_challenge("a" * 43)
         expected_vals = [ac.base_url + "v2/oauth2/authorize?",
                          "client_id=" + ac.client_id,
                          "redirect_uri=" + "uri",

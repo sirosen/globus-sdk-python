@@ -1,7 +1,8 @@
 import logging
-import uuid
 import hashlib
 import base64
+import re
+import os
 from six.moves.urllib.parse import urlencode
 
 from globus_sdk.base import slash_join
@@ -18,18 +19,38 @@ def make_native_app_challenge(verifier=None):
     of it. The challenge is sent at the start of the flow, and the secret is
     sent at the end, proving that the same client that started the flow is
     continuing it.
-    Hashing is always done with simple SHA256
+
+    Hashing is always done with simple SHA256.
+
+    See RFC 7636 for details.
+
+    **Parameters**
+
+        ``verifier`` (*string*)
+        The code verifier string used to construct the code challenge.
+        Must be at least 43 characters long and not longer than 128 characters.
+        Must only contain the following characters: [a-zA-Z0-9~_.-].
     """
-    if not verifier:
+
+    if verifier:
+        if not 43 <= len(verifier) <= 128:
+            raise ValueError(
+                'verifier must be 43-128 characters long: {}'.format(
+                    len(verifier)))
+        if bool(re.search(r'[^a-zA-Z0-9~_.-]', verifier)):
+            raise ValueError('verifier contained invalid characters')
+    else:
         logger.info(('Autogenerating verifier secret. On low-entropy systems '
                      'this may be insecure'))
 
-    # unless provided, the "secret" is just a UUID4
-    code_verifier = verifier or str(uuid.uuid4())
+    code_verifier = (verifier or
+                     base64.urlsafe_b64encode(
+                         os.urandom(32)).decode('utf-8').rstrip('='))
     # hash it, pull out a digest
     hashed_verifier = hashlib.sha256(code_verifier.encode('utf-8')).digest()
-    # urlsafe base64 encode that hash
-    code_challenge = base64.urlsafe_b64encode(hashed_verifier).decode('utf-8')
+    # urlsafe base64 encode that hash and strip the padding
+    code_challenge = base64.urlsafe_b64encode(
+        hashed_verifier).decode('utf-8').rstrip('=')
 
     # return the verifier and the encoded hash
     return code_verifier, code_challenge
