@@ -20,7 +20,7 @@ class GlobusAuthorizationCodeFlowManagerTests(CapturedIOTestCase):
         self.ac.base_url = "base_url/"
         self.flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(
             self.ac, requested_scopes="scopes", redirect_uri="uri",
-            state="state", verifier="verifier")
+            state="state")
 
     def test_get_authorize_url(self):
         """

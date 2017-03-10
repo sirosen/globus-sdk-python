@@ -65,7 +65,7 @@ class NativeAppAuthClientIntegrationTests(CapturedIOTestCase):
         # confirms flow initialized with specified values
         flow = self.nac.oauth2_start_flow(
             requested_scopes="scopes", redirect_uri="uri",
-            state="state", verifier="verifier", refresh_tokens=True)
+            state="state", verifier=("v" * 43), refresh_tokens=True)
         self.assertIsInstance(flow, GlobusNativeAppFlowManager)
         self.assertEqual(flow.redirect_uri, "uri")
         self.assertEqual(flow.requested_scopes, "scopes")
@@ -74,7 +74,7 @@ class NativeAppAuthClientIntegrationTests(CapturedIOTestCase):
 
         # confirm client can get url via flow
         url_res = self.nac.oauth2_get_authorize_url()
-        verifier, remade_challenge = make_native_app_challenge("verifier")
+        verifier, remade_challenge = make_native_app_challenge("v" * 43)
         expected_vals = [self.nac.base_url + "v2/oauth2/authorize?",
                          "client_id=" + self.nac.client_id,
                          "redirect_uri=" + "uri",
