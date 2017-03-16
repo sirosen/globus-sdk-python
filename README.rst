@@ -12,6 +12,6 @@ including the Transfer API and the Globus Auth API.
 Documentation
 -------------
 
-| Full Documentation: http://globus.github.io/globus-sdk-python/
+| Full Documentation: http://globus-sdk-python.readthedocs.io/
 | Source Code: https://github.com/globus/globus-sdk-python
 | REST Documentation: https://docs.globus.org
