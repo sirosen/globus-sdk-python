@@ -61,15 +61,12 @@ test/no-opts: remove-opt-dependencies
 
 
 
-$(VIRTUALENV)/bin/sphinx-build: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/pip install sphinx==1.4.1
 # docs needs full install because sphinx will actually try to do
 # imports! Otherwise, we'll be missing dependencies like `requests`
+$(VIRTUALENV)/bin/sphinx-build: $(VIRTUALENV) docs-requirements.txt
+	$(VIRTUALENV)/bin/pip install -r docs-requirements.txt
 docs: $(VIRTUALENV) $(VIRTUALENV)/bin/sphinx-build
-	-rm -r docs
-	mkdir docs
-	touch docs/.nojekyll
-	. $(VIRTUALENV)/bin/activate && $(MAKE) -C docs-source/ html
+	. $(VIRTUALENV)/bin/activate && $(MAKE) -C docs/ clean html
 
 
 clean:
