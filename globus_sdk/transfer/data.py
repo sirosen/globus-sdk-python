@@ -37,7 +37,7 @@ class TransferData(dict):
     def __init__(self, transfer_client, source_endpoint, destination_endpoint,
                  label=None, submission_id=None, sync_level=None,
                  verify_checksum=False, preserve_timestamp=False,
-                 encrypt_data=False, **kwargs):
+                 encrypt_data=False, deadline=None, **kwargs):
         source_endpoint = safe_stringify(source_endpoint)
         destination_endpoint = safe_stringify(destination_endpoint)
         logger.info("Creating a new TransferData object")
@@ -65,6 +65,10 @@ class TransferData(dict):
         if label is not None:
             self["label"] = label
             logger.debug("TransferData.label = {}".format(label))
+
+        if deadline is not None:
+            self["deadline"] = str(deadline)
+            logger.debug("TransferData.deadline = {}".format(deadline))
 
         # map the sync_level (if it's a nice string) to one of the known int
         # values
@@ -123,7 +127,7 @@ class DeleteData(dict):
     documentation for example usage.
     """
     def __init__(self, transfer_client, endpoint, label=None,
-                 submission_id=None, recursive=False, **kwargs):
+                 submission_id=None, recursive=False, deadline=None, **kwargs):
         endpoint = safe_stringify(endpoint)
         logger.info("Creating a new DeleteData object")
         self["DATA_TYPE"] = "delete"
@@ -141,6 +145,10 @@ class DeleteData(dict):
         if label is not None:
             self["label"] = label
             logger.debug("DeleteData.label = {}".format(label))
+
+        if deadline is not None:
+            self["deadline"] = str(deadline)
+            logger.debug("DeleteData.deadline = {}".format(deadline))
 
         self["DATA"] = []
 
