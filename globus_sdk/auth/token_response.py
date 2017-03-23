@@ -34,15 +34,17 @@ class OAuthTokenResponse(GlobusHTTPResponse):
     """
     def __init__(self, *args, **kwargs):
         GlobusHTTPResponse.__init__(self, *args, **kwargs)
+        self._init_rs_dict()
 
+    def _init_rs_dict(self):
         # call the helper at the top level
         self._by_resource_server = {
-            self.resource_server: _convert_token_info_dict(self)}
+            self['resource_server']: _convert_token_info_dict(self)}
         # call the helper on everything in 'other_tokens'
         self._by_resource_server.update(dict(
             (unprocessed_item['resource_server'],
              _convert_token_info_dict(unprocessed_item))
-            for unprocessed_item in self.other_tokens))
+            for unprocessed_item in self['other_tokens']))
 
     @property
     def by_resource_server(self):
@@ -55,50 +57,6 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         doing inspection of access tokens and refresh tokens.
         """
         return self._by_resource_server
-
-    @property
-    def expires_at_seconds(self):
-        """
-        A POSIX timestamp representation of the expiration
-        time for the top-level token in the response.
-        """
-        top_level_token = self._by_resource_server[self.resource_server]
-        return top_level_token['expires_at_seconds']
-
-    @property
-    def expires_in(self):
-        """
-        The ``expires_in`` value for the top-level token in the response.
-        """
-        return int(self.expires_at_seconds - time.time())
-
-    @property
-    def access_token(self):
-        """
-        The ``access_token`` value for the top-level token in the response.
-        """
-        return self['access_token']
-
-    @property
-    def refresh_token(self):
-        """
-        The ``refresh_token`` value for the top-level token in the response.
-        """
-        return self.get('refresh_token')
-
-    @property
-    def resource_server(self):
-        """
-        The ``resource_server`` value for the top-level token in the response.
-        """
-        return self['resource_server']
-
-    @property
-    def other_tokens(self):
-        """
-        The array of tokens other than the top-level one.
-        """
-        return self['other_tokens']
 
     def decode_id_token(self, auth_client):
         """
@@ -121,7 +79,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
 
         return jwt.decode(
             self['id_token'], jwk_data,
-            access_token=self.access_token,
+            access_token=self['access_token'],
             audience=auth_client.client_id)
 
     def __str__(self):
@@ -130,30 +88,23 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         return json.dumps(self.by_resource_server, indent=2)
 
 
-class OAuthDependentTokenResponse(GlobusHTTPResponse):
+class OAuthDependentTokenResponse(OAuthTokenResponse):
     """
     Class for responses from the OAuth2 code for tokens retrieved by the
     OAuth2 Dependent Token Extension Grant. For more complete docs, see
     :meth:`oauth2_get_dependent_tokens \
     <globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens>`
     """
-    def __init__(self, *args, **kwargs):
-        GlobusHTTPResponse.__init__(self, *args, **kwargs)
-
+    def _init_rs_dict(self):
         # call the helper on everything in the response array
         self._by_resource_server = dict(
             (unprocessed_item['resource_server'],
              _convert_token_info_dict(unprocessed_item))
             for unprocessed_item in self.data)
 
-    @property
-    def by_resource_server(self):
-        """
-        Representation of the token response in a ``dict`` indexed by resource
-        server.
-
-        Although ``OAuthDependentTokenResponse.data`` is still available and
-        valid, this representation is typically more desirable for applications
-        trying to use the resulting tokens.
-        """
-        return self._by_resource_server
+    def decode_id_token(self, auth_client):
+        # just in case
+        raise NotImplementedError(
+            ('OAuthDependentTokenResponse.decode_id_token() is not and cannot '
+             'be implemented. Dependent Tokens data does not include an '
+             'id_token'))
