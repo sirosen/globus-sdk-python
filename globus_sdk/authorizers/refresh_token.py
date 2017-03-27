@@ -110,8 +110,16 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
         """
         token_response = self.auth_client.oauth2_refresh_token(
             self.refresh_token)
-        self._set_expiration_time(token_response.expires_at_seconds)
-        self.access_token = token_response.access_token
+
+        token_data = token_response.by_resource_server.values()
+        if len(token_data) != 1:
+            raise ValueError(
+                "Attempting refresh for refresh token authorizer "
+                "didn't return exactly one value. Possible service error.")
+        token_data = token_data[0]
+
+        self._set_expiration_time(token_data['expires_at_seconds'])
+        self.access_token = token_data['access_token']
         logger.info(("RefreshTokenAuthorizer.access_token updated to "
                      '"...{}" (last 5 chars)')
                     .format(self.access_token[-5:]))

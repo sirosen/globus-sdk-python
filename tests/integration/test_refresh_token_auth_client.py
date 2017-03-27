@@ -25,9 +25,12 @@ class RefreshTokenAuthorizerIntegrationTests(CapturedIOTestCase):
                      'grant_type': 'refresh_token',
                      'client_id': client_id}
         token_res = globus_sdk.AuthClient().oauth2_token(form_data)
+        token_res = token_res.by_resource_server
 
-        self.access_token = token_res.access_token
-        self.expires_at = token_res.expires_at_seconds
+        self.access_token = token_res[
+            'transfer.api.globus.org']['access_token']
+        self.expires_at = token_res[
+            'transfer.api.globus.org']['expires_at_seconds']
 
         self.on_refresh = mock.Mock()
         self.nac = globus_sdk.NativeAppAuthClient(

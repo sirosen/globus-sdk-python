@@ -117,54 +117,6 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
             self.assertIn(server_data["expires_at_seconds"],
                           (expected - 1, expected, expected + 1))
 
-    def test_expires_at_seconds(self):
-        """
-        Gets response's expires_at_seconds attribute, confirms expected value
-        """
-        # assumes test runs within 1 second range
-        expected = int(time.time()) + self.top_token["expires_in"]
-        self.assertIn(self.response.expires_at_seconds,
-                      (expected - 1, expected, expected + 1))
-
-    def test_expires_in(self):
-        """
-        Gets two measurements of response's expires_in attribute,
-        Sanity checks that expires_in decreases as time goes on
-        """
-        first_measure = self.response.expires_in
-        time.sleep(1.1)
-        second_measure = self.response.expires_in
-        self.assertTrue(first_measure <= self.top_token["expires_in"])
-        self.assertTrue(second_measure < first_measure)
-
-    def test_access_token(self):
-        """
-        Gets response's access_token attribute, confirms expected value
-        """
-        self.assertEqual(self.response.access_token,
-                         self.top_token["access_token"])
-
-    def test_refresh_token(self):
-        """
-        Gets response's refresh_token attribute, confirms expected value
-        """
-        self.assertEqual(self.response.refresh_token,
-                         self.top_token["refresh_token"])
-
-    def test_resource_server(self):
-        """
-        Gets response's resource_server attribute, confirms expected value
-        """
-        self.assertEqual(self.response.resource_server,
-                         self.top_token["resource_server"])
-
-    def test_other_tokens(self):
-        """
-        Gets response's other_tokens attribute, confirms expected value
-        """
-        self.assertEqual(self.response.other_tokens,
-                         self.top_token["other_tokens"])
-
     @unittest.skipIf(JOSE_FLAG, "python-jose successfully imported")
     def test_decode_id_token_no_jose(self):
         """
