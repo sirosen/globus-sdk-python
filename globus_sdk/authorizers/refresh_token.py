@@ -116,7 +116,8 @@ class RefreshTokenAuthorizer(GlobusAuthorizer):
             raise ValueError(
                 "Attempting refresh for refresh token authorizer "
                 "didn't return exactly one value. Possible service error.")
-        token_data = token_data[0]
+        # get the first (and only) item from this iterable
+        token_data = next(iter(token_data))
 
         self._set_expiration_time(token_data['expires_at_seconds'])
         self.access_token = token_data['access_token']
