@@ -5,7 +5,7 @@ except ImportError:
     from unittest import mock
 
 from globus_sdk.authorizers import RefreshTokenAuthorizer
-from globus_sdk.authorizers.refresh_token import EXPIRES_ADJUST_SECONDS
+from globus_sdk.authorizers.renewing import EXPIRES_ADJUST_SECONDS
 from tests.framework import CapturedIOTestCase
 
 
