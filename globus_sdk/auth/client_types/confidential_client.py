@@ -156,7 +156,7 @@ class ConfidentialAppAuthClient(AuthClient):
 
           ``include`` (*string*)
             A value for the ``include`` parameter in the request body. Default
-            is to omit the parameter, also supports ``"identities_set"``.
+            is to omit the parameter, also supports ``"identity_set"``.
 
         **External Documentation**
 
