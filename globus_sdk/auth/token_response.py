@@ -116,7 +116,8 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         logger.debug('Fetch JWK Data: Start')
         oidc_conf = auth_client.get('/.well-known/openid-configuration')
         jwks_uri = oidc_conf['jwks_uri']
-        jwk_data = requests.get(jwks_uri).json()
+        # use the auth_client's decision on ssl_verify=yes/no
+        jwk_data = requests.get(jwks_uri, verify=auth_client._verify).json()
         logger.debug('Fetch JWK Data: Complete')
 
         return jwt.decode(

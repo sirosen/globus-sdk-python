@@ -55,6 +55,7 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         # mock AuthClient
         self.ac = mock.Mock()
         self.ac.client_id = get_client_data()["native_app_client1"]["id"]
+        self.ac._verify = True
         self.ac.get = mock.Mock(return_value={
             "jwks_uri":
             u"https://auth.globus.org/jwk.json"})
