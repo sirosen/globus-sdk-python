@@ -72,7 +72,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         """
         res = self.confidential_client.oauth2_client_credentials_tokens(
             requested_scopes=self.scopes)
-        if res["other_tokens"]:
+        if res.other_tokens:
             raise GlobusError(("ClientCredentialsAuthorizer created with "
                                "scopes {} got back multiple Access Tokens. "
                                "Make sure the set of scopes are only for "
