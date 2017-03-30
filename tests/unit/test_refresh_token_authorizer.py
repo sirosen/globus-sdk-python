@@ -25,8 +25,13 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
 
         # mock response value for simulating a refresh token grant response
         self.response = mock.Mock()
-        self.response.expires_at_seconds = int(time.time()) + 1000
-        self.response.access_token = "access_token_2"
+        self.response.by_resource_server = {
+            "rs1": {
+                "expires_at_seconds": int(time.time()) + 1000,
+                "access_token": "access_token_2"
+            }
+        }
+        self.rs_data = self.response.by_resource_server['rs1']
 
         # mock AuthClient for testing
         self.ac = mock.Mock()
@@ -44,11 +49,12 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         """
         authorizer = RefreshTokenAuthorizer(
             self.refresh_token, self.ac, access_token=self.access_token)
-        self.assertEqual(authorizer.access_token, self.response.access_token)
+        self.assertEqual(authorizer.access_token, self.rs_data['access_token'])
 
         authorizer = RefreshTokenAuthorizer(
-            self.refresh_token, self.ac, expires_at=self.access_token)
-        self.assertEqual(authorizer.access_token, self.response.access_token)
+            self.refresh_token, self.ac,
+            expires_at=self.rs_data['expires_at_seconds'])
+        self.assertEqual(authorizer.access_token, self.rs_data['access_token'])
 
     def test_set_expiration_time(self):
         """
@@ -76,9 +82,9 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         self.authorizer._get_new_access_token()
         # confirm side effects
         self.assertEqual(self.authorizer.access_token,
-                         self.response.access_token)
+                         self.rs_data['access_token'])
         self.assertEqual(self.authorizer.expires_at,
-                         self.response.expires_at_seconds -
+                         self.rs_data['expires_at_seconds'] -
                          EXPIRES_ADJUST_SECONDS)
         self.ac.oauth2_refresh_token.assert_called_once_with(
             self.refresh_token)
@@ -98,9 +104,9 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         time.sleep(1)
         self.authorizer._check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
-                         self.response.access_token)
+                         self.rs_data['access_token'])
         self.assertEqual(self.authorizer.expires_at,
-                         self.response.expires_at_seconds -
+                         self.rs_data['expires_at_seconds'] -
                          EXPIRES_ADJUST_SECONDS)
 
     def test_check_expiration_time_no_token(self):
@@ -110,9 +116,9 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         self.authorizer.access_token = None
         self.authorizer._check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
-                         self.response.access_token)
+                         self.rs_data['access_token'])
         self.assertEqual(self.authorizer.expires_at,
-                         self.response.expires_at_seconds -
+                         self.rs_data['expires_at_seconds'] -
                          EXPIRES_ADJUST_SECONDS)
 
     def test_check_expiration_time_no_expiration(self):
@@ -122,9 +128,9 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         self.authorizer.expires_at = None
         self.authorizer._check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
-                         self.response.access_token)
+                         self.rs_data['access_token'])
         self.assertEqual(self.authorizer.expires_at,
-                         self.response.expires_at_seconds -
+                         self.rs_data['expires_at_seconds'] -
                          EXPIRES_ADJUST_SECONDS)
 
     def test_set_authorization_header(self):
@@ -160,7 +166,7 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         self.authorizer.set_authorization_header(header_dict)
         # confirm value
         self.assertEqual(header_dict["Authorization"],
-                         "Bearer " + self.response.access_token)
+                         "Bearer " + self.rs_data['access_token'])
 
     def test_set_authorization_header_no_token(self):
         """
@@ -173,7 +179,7 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         self.authorizer.set_authorization_header(header_dict)
         # confirm value
         self.assertEqual(header_dict["Authorization"],
-                         "Bearer " + self.response.access_token)
+                         "Bearer " + self.rs_data['access_token'])
 
     def test_set_authorization_header_no_expires(self):
         """
@@ -186,7 +192,7 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         self.authorizer.set_authorization_header(header_dict)
         # confirm value
         self.assertEqual(header_dict["Authorization"],
-                         "Bearer " + self.response.access_token)
+                         "Bearer " + self.rs_data['access_token'])
 
     def test_handle_missing_authorization(self):
         """
