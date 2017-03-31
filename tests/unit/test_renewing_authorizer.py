@@ -11,15 +11,15 @@ from tests.framework import CapturedIOTestCase
 
 class MockRenewer(RenewingAuthorizer):
     """
-    Class that implements RenewingAuthorizer so that _get_token_response
+    Class that implements RenewingAuthorizer so that _get_token_data
     can return known values for testing
     """
-    def __init__(self, mock_response, **kwargs):
-        self.mock_response = mock_response
+    def __init__(self, token_data, **kwargs):
+        self.token_data = token_data
         super(MockRenewer, self).__init__(**kwargs)
 
-    def _get_token_response(self):
-        return self.mock_response
+    def _get_token_data(self):
+        return self.token_data
 
 
 class RenewingAuthorizerTests(CapturedIOTestCase):
@@ -35,14 +35,13 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         self.expires_at = int(time.time()) + EXPIRES_ADJUST_SECONDS + 1
         self.on_refresh = mock.Mock()
 
-        # mock token_response values
-        self.mock_response = mock.Mock()
-        self.mock_response.expires_at_seconds = int(time.time()) + 1000
-        self.mock_response.access_token = "access_token_2"
+        # mock token_data values
+        self.token_data = {"expires_at_seconds": int(time.time()) + 1000,
+                           "access_token": "access_token_2"}
 
         # set up an authorizer that inherits from RenewingAuthorizor
         self.authorizer = MockRenewer(
-            self.mock_response, access_token=self.access_token,
+            self.token_data, access_token=self.access_token,
             expires_at=self.expires_at, on_refresh=self.on_refresh)
 
     def test_init(self):
@@ -51,15 +50,15 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         and a MockRenewer with an expires_at, but no access_token.
         Confirms that a new access_token is gotten for safety
         """
-        authorizer = MockRenewer(self.mock_response,
+        authorizer = MockRenewer(self.token_data,
                                  access_token=self.access_token)
         self.assertEqual(authorizer.access_token,
-                         self.mock_response.access_token)
+                         self.token_data["access_token"])
 
-        authorizer = MockRenewer(self.mock_response,
+        authorizer = MockRenewer(self.token_data,
                                  expires_at=self.expires_at)
         self.assertEqual(authorizer.access_token,
-                         self.mock_response.access_token)
+                         self.token_data["access_token"])
 
     def test_set_expiration_time(self):
         """
@@ -77,7 +76,7 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
 
     def test_get_new_access_token(self):
         """
-        Calls get_new_acces token, confirms that the mock _get_token_response
+        Calls get_new_acces token, confirms that the mock _get_token_data
         is used and that the mock on_refresh function is called.
         """
         # confirm starting with original access_token
@@ -87,9 +86,9 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         self.authorizer._get_new_access_token()
         # confirm side effects
         self.assertEqual(self.authorizer.access_token,
-                         self.mock_response.access_token)
+                         self.token_data["access_token"])
         self.assertEqual(self.authorizer.expires_at,
-                         self.mock_response.expires_at_seconds -
+                         self.token_data["expires_at_seconds"] -
                          EXPIRES_ADJUST_SECONDS)
         self.on_refresh.assert_called_once()
 
@@ -107,9 +106,9 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         time.sleep(1)
         self.authorizer._check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
-                         self.mock_response.access_token)
+                         self.token_data["access_token"])
         self.assertEqual(self.authorizer.expires_at,
-                         self.mock_response.expires_at_seconds -
+                         self.token_data["expires_at_seconds"] -
                          EXPIRES_ADJUST_SECONDS)
 
     def test_check_expiration_time_no_token(self):
@@ -119,9 +118,9 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         self.authorizer.access_token = None
         self.authorizer._check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
-                         self.mock_response.access_token)
+                         self.token_data["access_token"])
         self.assertEqual(self.authorizer.expires_at,
-                         self.mock_response.expires_at_seconds -
+                         self.token_data["expires_at_seconds"] -
                          EXPIRES_ADJUST_SECONDS)
 
     def test_check_expiration_time_no_expiration(self):
@@ -131,9 +130,9 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         self.authorizer.expires_at = None
         self.authorizer._check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
-                         self.mock_response.access_token)
+                         self.token_data["access_token"])
         self.assertEqual(self.authorizer.expires_at,
-                         self.mock_response.expires_at_seconds -
+                         self.token_data["expires_at_seconds"] -
                          EXPIRES_ADJUST_SECONDS)
 
     def test_set_authorization_header(self):
@@ -169,7 +168,7 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         self.authorizer.set_authorization_header(header_dict)
         # confirm value
         self.assertEqual(header_dict["Authorization"],
-                         "Bearer " + self.mock_response.access_token)
+                         "Bearer " + self.token_data["access_token"])
 
     def test_set_authorization_header_no_token(self):
         """
@@ -182,7 +181,7 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         self.authorizer.set_authorization_header(header_dict)
         # confirm value
         self.assertEqual(header_dict["Authorization"],
-                         "Bearer " + self.mock_response.access_token)
+                         "Bearer " + self.token_data["access_token"])
 
     def test_set_authorization_header_no_expires(self):
         """
@@ -195,7 +194,7 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         self.authorizer.set_authorization_header(header_dict)
         # confirm value
         self.assertEqual(header_dict["Authorization"],
-                         "Bearer " + self.mock_response.access_token)
+                         "Bearer " + self.token_data["access_token"])
 
     def test_handle_missing_authorization(self):
         """

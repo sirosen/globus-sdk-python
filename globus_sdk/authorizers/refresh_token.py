@@ -52,15 +52,24 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
             "Setting up RefreshTokenAuthorizer with auth_client = "
             "instance: {}".format(id(auth_client))))
 
-        # required for _get_token_response
+        # required for _get_token_data
         self.refresh_token = refresh_token
         self.auth_client = auth_client
 
         super(RefreshTokenAuthorizer, self).__init__(
             access_token, expires_at, on_refresh)
 
-    def _get_token_response(self):
+    def _get_token_data(self):
         """
-        Return the token response from a refresh token grant.
+        Make a refresh token grant, get the tokens .by_resource_server,
+        Ensure that only one token was gotten, and return that token.
         """
-        return self.auth_client.oauth2_refresh_token(self.refresh_token)
+        res = self.auth_client.oauth2_refresh_token(self.refresh_token)
+
+        token_data = res.by_resource_server.values()
+        if len(token_data) != 1:
+            raise ValueError(
+                "Attempting refresh for refresh token authorizer "
+                "didn't return exactly one token. Possible service error.")
+
+        return next(iter(token_data))

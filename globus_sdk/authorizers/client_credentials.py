@@ -1,7 +1,6 @@
 import logging
 
 from globus_sdk.authorizers.renewing import RenewingAuthorizer
-from globus_sdk.exc import GlobusError
 
 logger = logging.getLogger(__name__)
 
@@ -58,24 +57,26 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
             " instance:{} and scopes = "
             "{}".format(id(confidential_client), scopes)))
 
-        # values for _get_token_response
+        # values for _get_token_data
         self.confidential_client = confidential_client
         self.scopes = scopes
 
         super(ClientCredentialsAuthorizer, self).__init__(
             access_token, expires_at, on_refresh)
 
-    def _get_token_response(self):
+    def _get_token_data(self):
         """
-        Return the token response from a client credentials grant.
-        Make sure there is only one Access Token in the token response.
+        Make a client credentials grant, get the tokens .by_resource_server,
+        Ensure that only one token was gotten, and return that token.
         """
         res = self.confidential_client.oauth2_client_credentials_tokens(
             requested_scopes=self.scopes)
-        if res.other_tokens:
-            raise GlobusError(("ClientCredentialsAuthorizer created with "
-                               "scopes {} got back multiple Access Tokens. "
-                               "Make sure the set of scopes are only for "
-                               "one resource server.".format(self.scopes)))
 
-        return res
+        token_data = res.by_resource_server.values()
+        if len(token_data) != 1:
+            raise ValueError(
+                "Attempting get new access token for client credentials "
+                "authorizer didn't return exactly one token. Ensure scopes "
+                "{} are for only one resource server.".format(self.scopes))
+
+        return next(iter(token_data))

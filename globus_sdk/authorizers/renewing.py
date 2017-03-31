@@ -25,7 +25,7 @@ class RenewingAuthorizer(GlobusAuthorizer):
     expiration time, callbacks on renewal, and 401 handling.
 
     To make an authorizer that implements this class simply implement
-    the _get_token_response method for that authorization type.
+    the _get_token_data method for that authorization type.
     """
 
     def __init__(self, access_token=None, expires_at=None, on_refresh=None):
@@ -61,12 +61,13 @@ class RenewingAuthorizer(GlobusAuthorizer):
             self._get_new_access_token()
 
     @abc.abstractmethod
-    def _get_token_response(self):
+    def _get_token_data(self):
         """
-        Get a token_response using whatever flow or credentials
-        the specific authorizer implementing this class uses.
-        This response is expected to have an access_token field
-        and a expires_at_seonds field at the top level.
+        Get the first element of token_response.by_resource_server using
+        whatever flow or client or credentials the specific authorizer
+        implementing this class uses.
+        This method is expected to enforce that by_resource_server is only
+        returning one access token, and return a ValueError otherwise.
         """
 
     def _set_expiration_time(self, expires_at):
@@ -80,23 +81,26 @@ class RenewingAuthorizer(GlobusAuthorizer):
 
     def _get_new_access_token(self):
         """
-        Given a token response from _get_token_response,
+        Given token data from _get_token_data,
         set the access token and expiration time, and call on_refresh
         """
-        token_response = self._get_token_response()
-        self._set_expiration_time(token_response.expires_at_seconds)
-        self.access_token = token_response.access_token
+        # get the first (and only) item from this iterable
+        token_data = self._get_token_data()
+
+        self._set_expiration_time(token_data['expires_at_seconds'])
+        self.access_token = token_data['access_token']
+
         logger.info(("RenewingAuthorizer.access_token updated to "
                      '"...{}" (last 5 chars)')
                     .format(self.access_token[-5:]))
 
         if callable(self.on_refresh):
-            self.on_refresh(token_response)
+            self.on_refresh(token_data)
             logger.debug("Invoked on_refresh callback")
 
     def _check_expiration_time(self):
         """
-        Check if the expiration timer is done, and trigger a refresh if it is.
+        Check if the expiration timer is done, and renew the token if it is.
         """
         logger.debug("RenewingAuthorizer checking expiration time")
         if self.access_token is None or (
@@ -122,7 +126,7 @@ class RenewingAuthorizer(GlobusAuthorizer):
 
     def handle_missing_authorization(self, *args, **kwargs):
         """
-        The refresh token handler can respond to a service 401 by immediately
+        The renewing authorizer can respond to a service 401 by immediately
         invalidating its current Access Token. When this happens, the next call
         to ``set_authorization_header()`` will result in a new Access Token
         being fetched.

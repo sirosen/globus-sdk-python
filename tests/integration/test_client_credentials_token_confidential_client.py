@@ -5,7 +5,7 @@ except ImportError:
 
 import globus_sdk
 from tests.framework import CapturedIOTestCase, get_client_data, GO_EP1_ID
-from globus_sdk.exc import GlobusAPIError, GlobusError
+from globus_sdk.exc import GlobusAPIError
 
 
 class ClientCredentialsAuthorizerIntegrationTests(CapturedIOTestCase):
@@ -26,9 +26,10 @@ class ClientCredentialsAuthorizerIntegrationTests(CapturedIOTestCase):
             client_id, client_secret)
         token_res = self.internal_client.oauth2_client_credentials_tokens(
             requested_scopes=self.scopes)
+        token_data = token_res.by_resource_server["transfer.api.globus.org"]
 
-        self.access_token = token_res.access_token
-        self.expires_at = token_res.expires_at_seconds
+        self.access_token = token_data["access_token"]
+        self.expires_at = token_data["expires_at_seconds"]
 
         self.on_refresh = mock.Mock()
 
@@ -88,9 +89,9 @@ class ClientCredentialsAuthorizerIntegrationTests(CapturedIOTestCase):
         multi_server_scopes = (
             "urn:globus:auth:scope:transfer.api.globus.org:all email")
 
-        with self.assertRaises(GlobusError) as err:
+        with self.assertRaises(ValueError) as err:
             globus_sdk.ClientCredentialsAuthorizer(
                 self.internal_client, scopes=multi_server_scopes)
 
-        self.assertIn("got back multiple Access Tokens", str(err.exception))
+        self.assertIn("didn't return exactly one token", str(err.exception))
         self.assertIn(multi_server_scopes, str(err.exception))
