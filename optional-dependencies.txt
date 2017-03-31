@@ -1,2 +1,0 @@
-# don't specify version -- grab the latest!
-python-jose
