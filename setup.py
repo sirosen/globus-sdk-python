@@ -17,8 +17,13 @@ setup(name="globus-sdk",
       packages=find_packages(),
       install_requires=[
           'requests>=2.0.0,<3.0.0',
-          'six==1.10.0'
+          'six>=1.10.0,<2.0.0'
       ],
+
+      extras_require={
+          'jwt': ['python-jose>=1.3.0,<2.0.0']
+      },
+
       include_package_data=True,
 
       keywords=["globus", "file transfer"],
