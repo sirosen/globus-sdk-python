@@ -68,7 +68,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         except ImportError:
             logger.error('OptionalDependencyError(python-jose)')
             raise GlobusOptionalDependencyError(
-                ["python-jose"],
+                ["python-jose or globus_sdk[jwt]"],
                 "JWT Parsing via OAuthTokenResponse.id_token")
 
         logger.debug('Fetch JWK Data: Start')
