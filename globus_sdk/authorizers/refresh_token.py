@@ -43,7 +43,7 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
           POSIX timestamp (i.e. seconds since the epoch)
 
         ``on_refresh`` (*callable*)
-        Will be called as fn(TokenResponse) any time this authorizer
+        Will be called as fn(token_data) any time this authorizer
         fetches a new access_token
     """
     def __init__(self, refresh_token, auth_client,

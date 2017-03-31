@@ -15,7 +15,7 @@ EXPIRES_ADJUST_SECONDS = 60
 @six.add_metaclass(abc.ABCMeta)
 class RenewingAuthorizer(GlobusAuthorizer):
     """
-    A ``RenwingAuthorizer`` is an abstract superclass to any authorizer
+    A ``RenewingAuthorizer`` is an abstract superclass to any authorizer
     that needs to get new Access Tokens in order to form Authorization headers.
 
     It may be passed an initial Access Token, but if so must also be passed
@@ -24,7 +24,7 @@ class RenewingAuthorizer(GlobusAuthorizer):
     It provides methods that handle the logic for checking and adjusting
     expiration time, callbacks on renewal, and 401 handling.
 
-    To make an authorizer that implements this class simply implement
+    To make an authorizer that implements this class implement
     the _get_token_data method for that authorization type.
     """
 

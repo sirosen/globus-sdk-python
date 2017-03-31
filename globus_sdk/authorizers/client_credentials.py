@@ -15,7 +15,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
 
     >>> import globus_sdk
     >>> confidential_client = globus_sdk.ConfidentiallAppAuthClient(
-        client_id=..., client_secret=...)
+        client_id=..., client_secret=..., scopes=...)
     >>> cc_authorizer = globus_sdk.ClientCredentialsAuthorizer(
     >>>     confidential_client)
     >>> # create a new client
@@ -27,8 +27,8 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
 
     **Parameters**
 
-        ``confidential_client``(:class:`ConfidentialAppAuthClient
-            <globus_sdk.ConfidentialAppAuthClient>`)
+        ``confidential_client`` (:class:`ConfidentialAppAuthClient
+        <globus_sdk.ConfidentialAppAuthClient>`)
           ``ConfidentialAppAuthClient`` with a valid id and client secret
 
         ``scopes`` (*string*)
@@ -47,7 +47,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
           POSIX timestamp (i.e. seconds since the epoch)
 
         ``on_refresh`` (*callable*)
-          Will be called as fn(TokenResponse) any time this authorizer
+          Will be called as fn(token_data) any time this authorizer
           fetches a new access_token
     """
     def __init__(self, confidential_client, scopes,
