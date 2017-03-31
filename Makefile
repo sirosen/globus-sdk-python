@@ -3,7 +3,7 @@ PYTHON_VERSION ?=
 PYTHON_INTERPRETER=python$(PYTHON_VERSION)
 VIRTUALENV=.venv$(PYTHON_VERSION)
 
-.PHONY: docs build upload test test/opts test/no-opts clean help
+.PHONY: docs build upload test test/opts clean help
 
 
 help:
@@ -48,17 +48,12 @@ $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2: test-requirements.txt $(VIRTUA
 	# command sees that they exist and does not update their mtime
 	touch $(VIRTUALENV)/bin/flake8
 	touch $(VIRTUALENV)/bin/nose2
-opt-dependencies: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/pip install -r optional-dependencies.txt
-remove-opt-dependencies: $(VIRTUALENV)
-	-$(VIRTUALENV)/bin/pip uninstall -y -r optional-dependencies.txt
 
 test: $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2
 	$(VIRTUALENV)/bin/flake8
 	$(VIRTUALENV)/bin/nose2 --verbose
-test/opts: opt-dependencies
-	$(MAKE) test
-test/no-opts: remove-opt-dependencies
+test/opts: $(VIRTUALENV)
+	$(VIRTUALENV)/bin/pip install -e .[jwt]
 	$(MAKE) test
 
 
