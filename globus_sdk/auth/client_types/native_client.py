@@ -35,15 +35,6 @@ class NativeAppAuthClient(AuthClient):
         self.logger.info('Finished initializing client, client_id={}'
                          .format(client_id))
 
-    def oauth2_start_flow_native_app(self, *args, **kwargs):
-        """
-        Deprecated passthrough method for getting at ``self.oauth2_start_flow``
-        """
-        self.logger.warn(("Using oauth2_start_flow_native_app() is "
-                          "deprecated. Recommend upgrade to "
-                          "oauth2_start_flow()"))
-        return self.oauth2_start_flow(*args, **kwargs)
-
     def oauth2_start_flow(
             self, requested_scopes=None, redirect_uri=None,
             state='_default', verifier=None, refresh_tokens=False,
