@@ -77,15 +77,6 @@ class ConfidentialAppAuthClient(AuthClient):
             'grant_type': 'client_credentials',
             'scope': requested_scopes})
 
-    def oauth2_start_flow_authorization_code(self, *args, **kwargs):
-        """
-        Deprecated passthrough method for getting at ``self.oauth2_start_flow``
-        """
-        self.logger.warn(("Using oauth2_start_authorization_code() is "
-                          "deprecated. Recommend upgrade to "
-                          "oauth2_start_flow()"))
-        return self.oauth2_start_flow(*args, **kwargs)
-
     def oauth2_start_flow(
             self, redirect_uri, requested_scopes=None,
             state='_default', refresh_tokens=False):
