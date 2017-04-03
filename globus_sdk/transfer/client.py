@@ -522,7 +522,7 @@ class TransferClient(BaseClient):
         **External Documentation**
 
         See
-        `Get endpoint server list \
+        `Get endpoint server by id\
         <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
@@ -1093,7 +1093,7 @@ class TransferClient(BaseClient):
     #
 
     def endpoint_manager_task_list(self, num_results=10, **params):
-        """
+        r"""
         Get a list of tasks visible via ``activity_monitor`` role, as opposed
         to tasks owned by the current user.
 
@@ -1188,7 +1188,7 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
 
     def task_event_list(self, task_id, num_results=10, **params):
-        """
+        r"""
         List events (for example, faults and errors) for a given Task.
 
         ``GET /task/<task_id>/event_list``
