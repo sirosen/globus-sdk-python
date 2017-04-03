@@ -27,7 +27,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
 
     **Parameters**
 
-        ``confidential_client`` (:class:`ConfidentialAppAuthClient
+        ``confidential_client`` (:class:`ConfidentialAppAuthClient\
         <globus_sdk.ConfidentialAppAuthClient>`)
           ``ConfidentialAppAuthClient`` with a valid id and client secret
 
