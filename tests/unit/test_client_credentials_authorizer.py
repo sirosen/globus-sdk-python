@@ -3,22 +3,24 @@ try:
 except ImportError:
     from unittest import mock
 
-from globus_sdk.authorizers import RefreshTokenAuthorizer
+from globus_sdk.authorizers import ClientCredentialsAuthorizer
 from tests.framework import CapturedIOTestCase
 
 
-class RefreshTokenAuthorizerTests(CapturedIOTestCase):
+class ClientCredentialsAuthorizerTests(CapturedIOTestCase):
 
     def setUp(self):
         """
-        Sets up a RefreshTokenAuthorizer using a mock AuthClient for testing
+        Sets up a ClientCredentialsAuthorizer using a mock
+        ConfidentialAppAuthClient and fake scopes for testing
         """
-        super(RefreshTokenAuthorizerTests, self).setUp()
+        super(ClientCredentialsAuthorizerTests, self).setUp()
         # known values for testing
-        self.refresh_token = "refresh_token_1"
         self.access_token = "access_token_1"
         self.expires_at = -1
+        self.scopes = "scopes"
 
+        # mock response value for simulating a refresh token grant response
         # response values for simulating a refresh token grant response
         self.response = mock.Mock()
         self.response.by_resource_server = {
@@ -27,29 +29,29 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
                 "access_token": "access_token_2"
             }
         }
-        self.rs_data = self.response.by_resource_server['rs1']
+        self.rs_data = self.response.by_resource_server["rs1"]
 
-        # mock AuthClient for testing
-        self.ac = mock.Mock()
-        self.ac.oauth2_refresh_token = mock.Mock(
+        # mock ConfidentialAppAuthClient for testing
+        self.cac = mock.Mock()
+        self.cac.oauth2_client_credentials_tokens = mock.Mock(
             return_value=self.response)
 
-        self.authorizer = RefreshTokenAuthorizer(
-            self.refresh_token, self.ac, access_token=self.access_token,
+        self.authorizer = ClientCredentialsAuthorizer(
+            self.cac, self.scopes, access_token=self.access_token,
             expires_at=self.expires_at)
 
     def test_get_token_data(self):
         """
         Calls _get_token_data, confirms that the mock
-        AuthClient is used and the known data was returned.
+        ConfidentialAppAuthClient is used and the known data was returned.
         """
         # get new_access_token
         res = self.authorizer._get_token_data()
         # confirm expected response
         self.assertEqual(res, self.rs_data)
         # confirm mock ConfidentailAppAuthClient was used as expected
-        self.ac.oauth2_refresh_token.assert_called_once_with(
-            self.refresh_token)
+        self.cac.oauth2_client_credentials_tokens.assert_called_once_with(
+            requested_scopes=self.scopes)
 
     def test_multiple_resource_servers(self):
         """
@@ -68,4 +70,6 @@ class RefreshTokenAuthorizerTests(CapturedIOTestCase):
         }
         with self.assertRaises(ValueError) as err:
             self.authorizer._get_token_data()
+
         self.assertIn("didn't return exactly one token", str(err.exception))
+        self.assertIn(self.scopes, str(err.exception))

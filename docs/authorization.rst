@@ -22,7 +22,6 @@ if you want examples you should look at the :ref:`examples section
 It may help to start with the examples and come back to the full documentation
 afterwards.
 
-
 The Authorizer Interface
 ------------------------
 
@@ -32,6 +31,14 @@ Abstract Base Class:
 .. autoclass:: globus_sdk.authorizers.base.GlobusAuthorizer
     :members:
     :member-order: bysource
+
+``GlobusAuthorizer`` objects that fetch new access tokens when their existing
+ones expire or a 401 is received implement the RenewingAuthorizer class
+
+.. autoclass:: globus_sdk.authorizers.renewing.RenewingAuthorizer
+    :members: set_authorization_header, handle_missing_authorization
+    :member-order: bysource
+    :show-inheritance:
 
 Authorizer Types
 ----------------
@@ -55,6 +62,11 @@ All of these types of authorizers can be imported from
     :show-inheritance:
 
 .. autoclass:: globus_sdk.RefreshTokenAuthorizer
-    :members: set_authorization_header, handle_missing_authorization
+    :members:
+    :member-order: bysource
+    :show-inheritance:
+
+.. autoclass:: globus_sdk.ClientCredentialsAuthorizer
+    :members:
     :member-order: bysource
     :show-inheritance:
