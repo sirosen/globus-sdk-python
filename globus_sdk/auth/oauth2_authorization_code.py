@@ -3,7 +3,7 @@ from six.moves.urllib.parse import urlencode
 
 from globus_sdk.base import slash_join
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
-from globus_sdk.auth.oauth_flow_manager import GlobusOAuthFlowManager
+from globus_sdk.auth.oauth2_flow_manager import GlobusOAuthFlowManager
 
 logger = logging.getLogger(__name__)
 
