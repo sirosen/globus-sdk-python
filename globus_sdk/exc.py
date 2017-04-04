@@ -1,5 +1,6 @@
 import logging
 import textwrap
+import six
 import requests
 
 logger = logging.getLogger(__name__)
@@ -131,6 +132,30 @@ class TransferAPIError(GlobusAPIError):
         self.code = data["code"]
         self.message = data["message"]
         self.request_id = data["request_id"]
+
+
+class AuthAPIError(GlobusAPIError):
+    """
+    Error class for the API components of Globus Auth.
+
+    Customizes JSON parsing.
+    """
+    def _load_from_json(self, data):
+        """
+        Load error data from a JSON document.
+
+        Sets `code` statically because Auth doesn't have API error codes, and
+        looks for a top-level "error" attribute.
+        """
+        self.code = "Error"
+        if "message" in data:
+            self.message = data["message"]
+        elif "detail" in data:
+            self.message = data["detail"]
+        elif "error" in data and isinstance(data["error"], six.string_types):
+            self.message = data["error"]
+        else:
+            self.message = "no_extractable_message"
 
 
 class InvalidDocumentBodyError(GlobusError):

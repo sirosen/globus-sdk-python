@@ -4,6 +4,7 @@ import six
 import collections
 import logging
 
+from globus_sdk import exc
 from globus_sdk.base import BaseClient, safe_stringify
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
@@ -41,6 +42,8 @@ class AuthClient(BaseClient):
     You can, of course, use other kinds of Authorizers (notably the
     ``RefreshTokenAuthorizer``).
     """
+    error_class = exc.AuthAPIError
+
     def __init__(self, client_id=None, authorizer=None, **kwargs):
         self.client_id = client_id
 
