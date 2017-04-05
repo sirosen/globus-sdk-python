@@ -40,15 +40,15 @@ class ClientCredentialsAuthorizerTests(CapturedIOTestCase):
             self.cac, self.scopes, access_token=self.access_token,
             expires_at=self.expires_at)
 
-    def test_get_token_data(self):
+    def test_get_token_response(self):
         """
-        Calls _get_token_data, confirms that the mock
+        Calls _get_token_response, confirms that the mock
         ConfidentialAppAuthClient is used and the known data was returned.
         """
         # get new_access_token
-        res = self.authorizer._get_token_data()
+        res = self.authorizer._get_token_response()
         # confirm expected response
-        self.assertEqual(res, self.rs_data)
+        self.assertEqual(res, self.response)
         # confirm mock ConfidentailAppAuthClient was used as expected
         self.cac.oauth2_client_credentials_tokens.assert_called_once_with(
             requested_scopes=self.scopes)
@@ -56,7 +56,8 @@ class ClientCredentialsAuthorizerTests(CapturedIOTestCase):
     def test_multiple_resource_servers(self):
         """
         Sets the mock ConfidentialAppAuthClient to return multiple resource
-        servers. Confirms GlobusError is raised when _get_token_data is called.
+        servers. Confirms GlobusError is raised when _extract_token_data is
+        called.
         """
         self.response.by_resource_server = {
             "rs1": {
@@ -69,7 +70,7 @@ class ClientCredentialsAuthorizerTests(CapturedIOTestCase):
             }
         }
         with self.assertRaises(ValueError) as err:
-            self.authorizer._get_token_data()
+            self.authorizer._extract_token_data(self.response)
 
         self.assertIn("didn't return exactly one token", str(err.exception))
         self.assertIn(self.scopes, str(err.exception))

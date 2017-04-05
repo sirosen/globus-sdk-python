@@ -11,14 +11,18 @@ from tests.framework import CapturedIOTestCase
 
 class MockRenewer(RenewingAuthorizer):
     """
-    Class that implements RenewingAuthorizer so that _get_token_data
-    can return known values for testing
+    Class that implements RenewingAuthorizer so that _get_token_response and
+    _extract_token_data can return known values for testing
     """
     def __init__(self, token_data, **kwargs):
         self.token_data = token_data
+        self.token_response = mock.Mock()
         super(MockRenewer, self).__init__(**kwargs)
 
-    def _get_token_data(self):
+    def _get_token_response(self):
+        return self.token_response
+
+    def _extract_token_data(self, res):
         return self.token_data
 
 

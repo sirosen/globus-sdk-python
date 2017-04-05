@@ -64,14 +64,18 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         super(ClientCredentialsAuthorizer, self).__init__(
             access_token, expires_at, on_refresh)
 
-    def _get_token_data(self):
+    def _get_token_response(self):
         """
-        Make a client credentials grant, get the tokens .by_resource_server,
-        Ensure that only one token was gotten, and return that token.
+        Make a client credentials grant
         """
-        res = self.confidential_client.oauth2_client_credentials_tokens(
+        return self.confidential_client.oauth2_client_credentials_tokens(
             requested_scopes=self.scopes)
 
+    def _extract_token_data(self, res):
+        """
+        Get the tokens .by_resource_server,
+        Ensure that only one token was gotten, and return that token.
+        """
         token_data = res.by_resource_server.values()
         if len(token_data) != 1:
             raise ValueError(
