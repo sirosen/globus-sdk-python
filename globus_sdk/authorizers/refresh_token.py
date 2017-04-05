@@ -59,13 +59,17 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         super(RefreshTokenAuthorizer, self).__init__(
             access_token, expires_at, on_refresh)
 
-    def _get_token_data(self):
+    def _get_token_response(self):
         """
-        Make a refresh token grant, get the tokens .by_resource_server,
+        Make a refresh token grant
+        """
+        return self.auth_client.oauth2_refresh_token(self.refresh_token)
+
+    def _extract_token_data(self, res):
+        """
+        Get the tokens .by_resource_server,
         Ensure that only one token was gotten, and return that token.
         """
-        res = self.auth_client.oauth2_refresh_token(self.refresh_token)
-
         token_data = res.by_resource_server.values()
         if len(token_data) != 1:
             raise ValueError(

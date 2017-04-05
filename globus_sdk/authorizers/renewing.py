@@ -25,7 +25,8 @@ class RenewingAuthorizer(GlobusAuthorizer):
     expiration time, callbacks on renewal, and 401 handling.
 
     To make an authorizer that implements this class implement
-    the _get_token_data method for that authorization type.
+    the _get_token_response and _extract_token_data methods for that
+    authorization type,
     """
 
     def __init__(self, access_token=None, expires_at=None, on_refresh=None):
@@ -61,11 +62,17 @@ class RenewingAuthorizer(GlobusAuthorizer):
             self._get_new_access_token()
 
     @abc.abstractmethod
-    def _get_token_data(self):
+    def _get_token_response(self):
         """
-        Get the first element of token_response.by_resource_server using
-        whatever flow or client or credentials the specific authorizer
-        implementing this class uses.
+        Using whatever method the specific authorizer implementing this class
+        does, get a new token response.
+        """
+
+    @abc.abstractmethod
+    def _extract_token_data(self, res):
+        """
+        Given a token response object, get the first element of
+        token_response.by_resource_server
         This method is expected to enforce that by_resource_server is only
         returning one access token, and return a ValueError otherwise.
         """
@@ -81,11 +88,12 @@ class RenewingAuthorizer(GlobusAuthorizer):
 
     def _get_new_access_token(self):
         """
-        Given token data from _get_token_data,
+        Given token data from _get_token_response and _extract_token_data,
         set the access token and expiration time, and call on_refresh
         """
-        # get the first (and only) item from this iterable
-        token_data = self._get_token_data()
+        # get the first (and only) token
+        res = self._get_token_response()
+        token_data = self._extract_token_data(res)
 
         self._set_expiration_time(token_data['expires_at_seconds'])
         self.access_token = token_data['access_token']
@@ -95,7 +103,7 @@ class RenewingAuthorizer(GlobusAuthorizer):
                     .format(self.access_token[-5:]))
 
         if callable(self.on_refresh):
-            self.on_refresh(token_data)
+            self.on_refresh(res)
             logger.debug("Invoked on_refresh callback")
 
     def _check_expiration_time(self):
