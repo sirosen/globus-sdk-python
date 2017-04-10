@@ -144,8 +144,12 @@ class AuthAPIError(GlobusAPIError):
         """
         Load error data from a JSON document.
 
-        Sets `code` statically because Auth doesn't have API error codes, and
-        looks for a top-level "error" attribute.
+        Looks for a top-level "error" attribute in addition to the other
+        standard API error attributes. It's not clear whether or not this
+        should be a behavior of the base class.
+
+        Handles the case in which an error does not conform to base-class
+        expectations with a `no_extractable_message` message.
         """
         if "errors" in data:
             if len(data["errors"]) != 1:
