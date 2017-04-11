@@ -28,7 +28,7 @@ setup(name="globus-sdk",
 
       keywords=["globus", "file transfer"],
       classifiers=[
-          "Development Status :: 4 - Beta",
+          "Development Status :: 5 - Production",
           "Intended Audience :: Developers",
           "License :: OSI Approved :: Apache Software License",
           "Operating System :: MacOS :: MacOS X",
