@@ -18,17 +18,17 @@ A few quick rules if you don't want to read this full document:
   - All of your code *must* pass `flake8`. We won't consider merging code which
       doesn't pass `flake8`
   - Check if there's a matching
-      [issue](https://github.com/globus/globus-sdk-python/issues)
+      https://github.com/globus/globus-sdk-python/issues[issue]
       before opening a new issue or pull request
   - Any features which change the public API of the SDK must include
       documentation updates
   - `make test` must pass
 
 Reporting Bugs
-==============
+--------------
 
 We welcome any and all bugs on the
-[GitHub Issue Tracker](https://github.com/globus/globus-sdk-python/issues).
+https://github.com/globus/globus-sdk-python/issues[GitHub Issue Tracker].
 
 However, the best bug reports are ones which follow the following rules:
 
@@ -58,7 +58,7 @@ You can also help us a lot by including the following information:
 
 
 Requesting Enhancements
-=======================
+-----------------------
 
 When requesting new features, there are a few things we ask you to do in order
 to help us prioritize.
@@ -76,10 +76,10 @@ to help us prioritize.
       us to know.
 
 Submitting Pull Requests
-========================
+------------------------
 
 The most important thing about a pull request is that it meets the standards
-defined in this document's [Style Guide](#style-guide).
+defined in this document's <<style-guide,Style Guide>>.
 
 Beyond that, we have a few recommendations:
 
@@ -91,10 +91,10 @@ Beyond that, we have a few recommendations:
       implementations, and other cruft.
 
 Additionally, make sure you follow our rules for
-[Commit Messages](#commit-messages)
+<<commit-messages, Commit Messages>>
 
 Commit Messages
-===============
+---------------
 
 A few basic ground rules for what ideal commits should look like.
 
@@ -104,7 +104,7 @@ A few basic ground rules for what ideal commits should look like.
   - Present tense and imperative mood
 
 Style Guide
-===========
+-----------
 
 Some rules and tips for the python and documentation in this project.
 
