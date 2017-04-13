@@ -4,7 +4,7 @@ import globus_sdk
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from tests.framework import CapturedIOTestCase, get_client_data
 from globus_sdk.auth import GlobusAuthorizationCodeFlowManager
-from globus_sdk.exc import GlobusAPIError
+from globus_sdk.exc import AuthAPIError
 
 
 class ConfidentialAppAuthClientIntegrationTests(CapturedIOTestCase):
@@ -47,7 +47,7 @@ class ConfidentialAppAuthClientIntegrationTests(CapturedIOTestCase):
             self.assertIn(val, url_res)
 
         # confirm client can try exchanging code for tokens via flow
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             self.cac.oauth2_exchange_code_for_tokens("invalid_code")
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")
@@ -81,7 +81,7 @@ class ConfidentialAppAuthClientIntegrationTests(CapturedIOTestCase):
             self.assertIn(val, url_res)
 
         # confirm client can try exchanging code for tokens via flow
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             self.cac.oauth2_exchange_code_for_tokens("invalid_code")
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")

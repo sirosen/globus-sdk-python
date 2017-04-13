@@ -2,7 +2,7 @@ import globus_sdk
 from tests.framework import (CapturedIOTestCase,
                              get_client_data, get_user_data,
                              SDKTESTER1A_NATIVE1_AUTH_RT)
-from globus_sdk.exc import GlobusAPIError
+from globus_sdk.exc import AuthAPIError
 
 
 class NativeAppAuthClientTests(CapturedIOTestCase):
@@ -29,7 +29,7 @@ class NativeAppAuthClientTests(CapturedIOTestCase):
         """
         Confirms native apps aren't authorized to get_identities on their own
         """
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             self.nac.get_identities(ids=get_user_data()["sdktester1a"]["id"])
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "UNAUTHORIZED")
@@ -73,7 +73,7 @@ class NativeAppAuthClientTests(CapturedIOTestCase):
         self.assertFalse(rev_res["active"])
 
         # confirm token is no longer usable
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             ac = globus_sdk.AuthClient(
                 authorizer=globus_sdk.AccessTokenAuthorizer(access_token),
                 client_id=get_client_data()["native_app_client1"]["id"])

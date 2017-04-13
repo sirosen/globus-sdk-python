@@ -4,7 +4,7 @@ import globus_sdk
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_native_app import make_native_app_challenge
 from tests.framework import CapturedIOTestCase, get_client_data
-from globus_sdk.exc import GlobusAPIError
+from globus_sdk.exc import AuthAPIError
 
 
 class AuthClientIntegrationTests(CapturedIOTestCase):
@@ -111,7 +111,7 @@ class AuthClientIntegrationTests(CapturedIOTestCase):
         flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(ac)
         ac.current_oauth2_flow_manager = flow_manager
 
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             ac.oauth2_exchange_code_for_tokens("invalid_code")
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")
@@ -127,7 +127,7 @@ class AuthClientIntegrationTests(CapturedIOTestCase):
             ac, "uri")
         ac.current_oauth2_flow_manager = flow_manager
 
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             ac.oauth2_exchange_code_for_tokens("invalid_code")
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")
