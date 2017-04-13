@@ -86,12 +86,43 @@ class ConfidentialAppAuthClient(AuthClient):
             self, redirect_uri, requested_scopes=None,
             state='_default', refresh_tokens=False):
         """
-        Starts an Authorization Code OAuth2 flow by instantiating a
+        Starts or resumes an Authorization Code OAuth2 flow.
+
+        Under the hood, this is done by instantiating a
         :class:`GlobusAuthorizationCodeFlowManager
         <globus_sdk.auth.GlobusAuthorizationCodeFlowManager>`
 
-        All of the parameters to this method are passed to that class's
-        initializer verbatim.
+        **Parameters**
+
+            ``redirect_uri`` (*string*)
+              The page that users should be directed to after authenticating at
+              the authorize URL. Required.
+
+            ``requested_scopes`` (*iterable* or *string*)
+              The scopes on the token(s) being requested, as a space-separated
+              string or an iterable of strings. Defaults to ``openid profile
+              email urn:globus:auth:scope:transfer.api.globus.org:all``
+
+            ``state`` (*string*)
+              This is a way of your application passing information back to
+              itself in the course of the OAuth flow. Because the user will
+              navigate away from your application to complete the flow, this
+              parameter lets you pass an arbitrary string from the starting
+              page to the ``redirect_uri``
+
+            ``refresh_tokens`` (*bool*)
+              When True, request refresh tokens in addition to access tokens
+
+        **Examples**
+
+        You can see an example of this flow :ref:`in the usage examples
+        <examples_three_legged_oauth_login>`
+
+        **External Documentation**
+
+        The Authorization Code Grant flow is described
+        `in the Globus Auth Specification \
+        <https://docs.globus.org/api/auth/developer-guide/#obtaining-authorization>`_
         """
         self.logger.info('Starting OAuth2 Authorization Code Grant Flow')
         self.current_oauth2_flow_manager = GlobusAuthorizationCodeFlowManager(

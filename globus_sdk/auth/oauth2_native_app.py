@@ -73,7 +73,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
           used to extract default values for the flow, and also to make calls
           to the Auth service. This SHOULD be a ``NativeAppAuthClient``
 
-        ``requested_scopes`` (*iterable* *string*)
+        ``requested_scopes`` (*iterable* or *string*)
           The scopes on the token(s) being requested, as a space-separated
           string or iterable of strings. Defaults to ``openid profile email
           urn:globus:auth:scope:transfer.api.globus.org:all``
@@ -100,7 +100,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         ``refresh_tokens`` (*bool*)
           When True, request refresh tokens in addition to access tokens
 
-          ``prefill_named_grant`` (*string*)
+        ``prefill_named_grant`` (*string*)
           Optionally prefill the named grant label on the consent page
     """
 

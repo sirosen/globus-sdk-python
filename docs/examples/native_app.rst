@@ -1,3 +1,5 @@
+.. _examples_native_app_login:
+
 Native App Login
 ----------------
 
