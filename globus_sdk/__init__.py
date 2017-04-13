@@ -11,9 +11,10 @@ from globus_sdk.authorizers import (
     NullAuthorizer, BasicAuthorizer, AccessTokenAuthorizer,
     RefreshTokenAuthorizer, ClientCredentialsAuthorizer)
 
-from globus_sdk.exc import GlobusError, GlobusAPIError, TransferAPIError
 from globus_sdk.exc import (
-    NetworkError, GlobusConnectionError, GlobusTimeoutError)
+    GlobusError, GlobusAPIError, TransferAPIError,
+    NetworkError, GlobusConnectionError, GlobusTimeoutError,
+    GlobusOptionalDependencyError)
 
 from globus_sdk.version import __version__
 
