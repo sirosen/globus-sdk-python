@@ -2,14 +2,14 @@ import requests
 import json
 import six
 
-from globus_sdk.exc import (GlobusAPIError, TransferAPIError,
+from globus_sdk.exc import (GlobusAPIError, TransferAPIError, AuthAPIError,
                             GlobusOptionalDependencyError,
                             NetworkError, GlobusTimeoutError,
                             GlobusConnectionError, convert_request_exception)
 from tests.framework import CapturedIOTestCase
 
 
-# super class for Globus and Transfer APIError tests with shared setup
+# super class for Globus, Auth, and Transfer APIError tests with shared setup
 class APIErrorTests(CapturedIOTestCase):
 
     __test__ = False  # prevents base class from trying to run tests
@@ -148,6 +148,68 @@ class TransferAPIErrorTests(APIErrorTests):
         with self.assertRaises(TransferAPIError) as apiErr:
             raise TransferAPIError(self.malformed_response)
         expected = ("403", "Error", "{", None)
+        self.assertEqual(apiErr.exception._get_args(), expected)
+
+
+class AuthAPIErrorTests(APIErrorTests):
+
+    __test__ = True  # marks sub-class as having tests
+
+    def setUp(self):
+        """
+        Creates auth-like json responses in addition to the APIError
+        setUp responses for testing
+        """
+        super(AuthAPIErrorTests, self).setUp()
+
+        self.simple_auth_data = {"error": "simple auth error message"}
+        self.simple_auth_response = requests.Response()
+        self.simple_auth_response._content = six.b(
+            json.dumps(self.simple_auth_data))
+        self.simple_auth_response.headers["Content-Type"] = "application/json"
+        self.simple_auth_response.status_code = "404"
+
+        self.nested_auth_data = {"errors": [
+            {"detail": "nested auth error message", "code": "Auth Error"}]}
+        self.nested_auth_response = requests.Response()
+        self.nested_auth_response._content = six.b(
+            json.dumps(self.nested_auth_data))
+        self.nested_auth_response.headers["Content-Type"] = "application/json"
+        self.nested_auth_response.status_code = "404"
+
+    def test_get_args(self):
+        """
+        Gets args from all four response types, confirms expected results
+        implicitly tests _load_from_json
+        """
+        # simple auth
+        with self.assertRaises(AuthAPIError) as apiErr:
+            raise AuthAPIError(self.simple_auth_response)
+        expected = ("404", "Error", "simple auth error message")
+        self.assertEqual(apiErr.exception._get_args(), expected)
+
+        # nested auth
+        with self.assertRaises(AuthAPIError) as apiErr:
+            raise AuthAPIError(self.nested_auth_response)
+        expected = ("404", "Auth Error", "nested auth error message")
+        self.assertEqual(apiErr.exception._get_args(), expected)
+
+        # json in wrong format
+        with self.assertRaises(AuthAPIError) as apiErr:
+            raise AuthAPIError(self.json_response)
+        expected = ("400", "Json Error", "json error message")
+        self.assertEqual(apiErr.exception._get_args(), expected)
+
+        # text
+        with self.assertRaises(AuthAPIError) as apiErr:
+            raise AuthAPIError(self.text_response)
+        expected = ("401", "Error", "error message")
+        self.assertEqual(apiErr.exception._get_args(), expected)
+
+        # malformed json
+        with self.assertRaises(AuthAPIError) as apiErr:
+            raise AuthAPIError(self.malformed_response)
+        expected = ("403", "Error", "{")
         self.assertEqual(apiErr.exception._get_args(), expected)
 
 
