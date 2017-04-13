@@ -1,4 +1,5 @@
 import base64
+import six
 
 from globus_sdk.authorizers import BasicAuthorizer
 from tests.framework import CapturedIOTestCase
@@ -24,7 +25,7 @@ class BasicAuthorizerTests(CapturedIOTestCase):
         # confirm value
         self.assertEqual(header_dict["Authorization"][:6], "Basic ")
         decoded = base64.b64decode(
-            header_dict["Authorization"][6:]).decode('utf-8')
+            six.b(header_dict["Authorization"][6:])).decode('utf-8')
         self.assertEqual(decoded, "{0}:{1}".format(self.username,
                                                    self.password))
 
@@ -38,7 +39,7 @@ class BasicAuthorizerTests(CapturedIOTestCase):
         # confirm values
         self.assertEqual(header_dict["Authorization"][:6], "Basic ")
         decoded = base64.b64decode(
-            header_dict["Authorization"][6:]).decode('utf-8')
+            six.b(header_dict["Authorization"][6:])).decode('utf-8')
         self.assertEqual(decoded, "{0}:{1}".format(self.username,
                                                    self.password))
         self.assertEqual(header_dict["Header"], "value")
