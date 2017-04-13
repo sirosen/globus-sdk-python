@@ -3,6 +3,7 @@ import hashlib
 import base64
 import re
 import os
+import six
 from six.moves.urllib.parse import urlencode
 
 from globus_sdk.base import slash_join
@@ -72,9 +73,9 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
           used to extract default values for the flow, and also to make calls
           to the Auth service. This SHOULD be a ``NativeAppAuthClient``
 
-        ``requested_scopes`` (*string*)
+        ``requested_scopes`` (*iterable* *string*)
           The scopes on the token(s) being requested, as a space-separated
-          string. Defaults to ``openid profile email
+          string or iterable of strings. Defaults to ``openid profile email
           urn:globus:auth:scope:transfer.api.globus.org:all``
 
         ``redirect_uri`` (*string*)
@@ -119,6 +120,9 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
 
         # default to the default requested scopes
         self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
+        # convert scopes iterable to string immediately on load
+        if not isinstance(self.requested_scopes, six.string_types):
+            self.requested_scopes = " ".join(self.requested_scopes)
 
         # default to `/v2/web/auth-code` on whatever environment we're looking
         # at -- most typically it will be `https://auth.globus.org/`

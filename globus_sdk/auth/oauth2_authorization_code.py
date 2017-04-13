@@ -1,4 +1,5 @@
 import logging
+import six
 from six.moves.urllib.parse import urlencode
 
 from globus_sdk.base import slash_join
@@ -34,9 +35,9 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
           The page that users should be directed to after authenticating at the
           authorize URL. Required.
 
-        ``requested_scopes`` (*string*)
+        ``requested_scopes`` (*iterable* or *string*)
           The scopes on the token(s) being requested, as a space-separated
-          string. Defaults to ``openid profile email
+          string or an iterable of strings. Defaults to ``openid profile email
           urn:globus:auth:scope:transfer.api.globus.org:all``
 
         ``state`` (*string*)
@@ -55,6 +56,9 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
                  refresh_tokens=False):
         # default to the default requested scopes
         self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
+        # convert scopes iterable to string immediately on load
+        if not isinstance(self.requested_scopes, six.string_types):
+            self.requested_scopes = " ".join(self.requested_scopes)
 
         # store the remaining parameters directly, with no transformation
         self.client_id = auth_client.client_id

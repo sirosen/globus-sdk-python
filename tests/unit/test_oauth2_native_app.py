@@ -26,6 +26,13 @@ class GlobusNativeAppFlowManagerTests(CapturedIOTestCase):
             self.ac, requested_scopes="scopes", redirect_uri="uri",
             state="state")
 
+    def test_init_handles_iterable_scopes(self):
+        flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(
+            self.ac, requested_scopes=set(("scope1", "scope2")),
+            redirect_uri="uri", state="state")
+        self.assertIn(flow_manager.requested_scopes, ("scope1 scope2",
+                                                      "scope2 scope1"))
+
     def test_make_native_app_challenge(self):
         """
         Makes native app challenge with and without verifier,

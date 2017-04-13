@@ -31,7 +31,8 @@ class ConfidentialAppAuthClientIntegrationTests(CapturedIOTestCase):
         flow = self.cac.oauth2_start_flow("uri")
         self.assertIsInstance(flow, GlobusAuthorizationCodeFlowManager)
         self.assertEqual(flow.redirect_uri, "uri")
-        self.assertEqual(flow.requested_scopes, DEFAULT_REQUESTED_SCOPES)
+        self.assertEqual(flow.requested_scopes,
+                         " ".join(DEFAULT_REQUESTED_SCOPES))
         self.assertEqual(flow.state, "_default")
         self.assertFalse(flow.refresh_tokens)
 
@@ -40,7 +41,8 @@ class ConfidentialAppAuthClientIntegrationTests(CapturedIOTestCase):
         expected_vals = [self.cac.base_url + "v2/oauth2/authorize?",
                          "client_id=" + self.cac.client_id,
                          "redirect_uri=" + "uri",
-                         "scope=" + quote_plus(DEFAULT_REQUESTED_SCOPES),
+                         "scope=" + quote_plus(
+                             " ".join(DEFAULT_REQUESTED_SCOPES)),
                          "state=" + "_default",
                          "access_type=" + "online"]
         for val in expected_vals:
