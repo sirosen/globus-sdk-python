@@ -7,7 +7,7 @@ import globus_sdk
 from tests.framework import (CapturedIOTestCase,
                              get_client_data, get_user_data,
                              SDKTESTER1A_NATIVE1_AUTH_RT)
-from globus_sdk.exc import GlobusAPIError
+from globus_sdk.exc import AuthAPIError
 
 
 class AuthClientTests(CapturedIOTestCase):
@@ -122,13 +122,13 @@ class AuthClientTests(CapturedIOTestCase):
         Confirms bad and unauthorized requests to get_identities throw errors
         """
         # bad request
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             self.ac.get_identities(usernames=["a", "b"], ids=["0", "1"])
         self.assertEqual(apiErr.exception.http_status, 400)
         self.assertEqual(apiErr.exception.code, "INVALID_PARAMETERS")
 
         # no auth
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             globus_sdk.AuthClient().get_identities()
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "UNAUTHORIZED")
@@ -190,7 +190,7 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertEqual(ref_res["token_type"], "Bearer")
 
         # without valid client id
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             ref_res = self.ac.oauth2_refresh_token(SDKTESTER1A_NATIVE1_AUTH_RT)
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")  # json is malformed?
@@ -205,7 +205,7 @@ class AuthClientTests(CapturedIOTestCase):
                                               additional_params=param)
         self.assertFalse(rev_res["active"])
 
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             self.ac.get_identities()
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "UNAUTHORIZED")
@@ -244,7 +244,7 @@ class AuthClientTests(CapturedIOTestCase):
             get_user_data()["sdktester1a"]["id"])
 
         # unauthorized client
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             globus_sdk.AuthClient().oauth2_userinfo()
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "FORBIDDEN")

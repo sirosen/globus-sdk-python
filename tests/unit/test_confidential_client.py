@@ -5,7 +5,7 @@ except ImportError:
 
 import globus_sdk
 from tests.framework import CapturedIOTestCase, get_client_data
-from globus_sdk.exc import GlobusAPIError
+from globus_sdk.exc import AuthAPIError
 
 
 class ConfidentialAppAuthClientTests(CapturedIOTestCase):
@@ -84,7 +84,7 @@ class ConfidentialAppAuthClientTests(CapturedIOTestCase):
             self.assertIn("resource_server", token_info)
 
         # confirm non resource servers are unauthorized
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             self.cac.oauth2_client_credentials_tokens(access_token)
         self.assertEqual(apiErr.exception.http_status, 400)
         self.assertEqual(apiErr.exception.code, "UNKNOWN_SCOPE_ERROR")
@@ -92,7 +92,7 @@ class ConfidentialAppAuthClientTests(CapturedIOTestCase):
 
         # confirm invalid tokens are unauthorized
         invalid_token = tokens["auth.globus.org"]["access_token"]
-        with self.assertRaises(GlobusAPIError) as apiErr:
+        with self.assertRaises(AuthAPIError) as apiErr:
             self.cac.oauth2_client_credentials_tokens(invalid_token)
         self.assertEqual(apiErr.exception.http_status, 400)
         self.assertEqual(apiErr.exception.code, "UNKNOWN_SCOPE_ERROR")
