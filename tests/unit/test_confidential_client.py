@@ -1,3 +1,8 @@
+try:
+    import mock
+except ImportError:
+    from unittest import mock
+
 import globus_sdk
 from tests.framework import CapturedIOTestCase, get_client_data
 from globus_sdk.exc import GlobusAPIError
@@ -28,7 +33,14 @@ class ConfidentialAppAuthClientTests(CapturedIOTestCase):
         Confirm tokens allow use of userinfo for the client
         Returns access_token for testing
         """
-        token_res = self.cac.oauth2_client_credentials_tokens()
+        with mock.patch.object(self.cac, 'oauth2_token',
+                               side_effect=self.cac.oauth2_token) as m:
+            token_res = self.cac.oauth2_client_credentials_tokens(
+                requested_scopes="openid profile")
+            m.assert_called_once_with(
+                {"grant_type": "client_credentials",
+                 "scope": "openid profile"})
+
         # validate results
         self.assertIn("access_token", token_res)
         self.assertIn("expires_in", token_res)

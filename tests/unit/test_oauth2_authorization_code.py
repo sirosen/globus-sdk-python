@@ -18,9 +18,15 @@ class GlobusAuthorizationCodeFlowManagerTests(CapturedIOTestCase):
         self.ac = mock.Mock()
         self.ac.client_id = "client_id"
         self.ac.base_url = "base_url/"
-        self.flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(
+        self.flow_manager = globus_sdk.auth.GlobusAuthorizationCodeFlowManager(
             self.ac, requested_scopes="scopes", redirect_uri="uri",
             state="state")
+
+    def test_init_handles_iterable_scopes(self):
+        flow_manager = globus_sdk.auth.GlobusAuthorizationCodeFlowManager(
+            self.ac, requested_scopes=["scope1", "scope2"], redirect_uri="uri",
+            state="state")
+        self.assertEquals(flow_manager.requested_scopes, "scope1 scope2")
 
     def test_get_authorize_url(self):
         """
@@ -55,9 +61,7 @@ class GlobusAuthorizationCodeFlowManagerTests(CapturedIOTestCase):
         auth_code = "code"
         self.flow_manager.exchange_code_for_tokens(auth_code)
 
-        expected = {"client_id": self.ac.client_id,
-                    "grant_type": "authorization_code",
+        expected = {"grant_type": "authorization_code",
                     "code": auth_code.encode("utf-8"),
-                    "code_verifier": self.flow_manager.verifier,
                     "redirect_uri": self.flow_manager.redirect_uri}
         self.ac.oauth2_token.assert_called_with(expected)

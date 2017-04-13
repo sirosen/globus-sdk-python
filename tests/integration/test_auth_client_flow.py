@@ -27,7 +27,8 @@ class AuthClientIntegrationTests(CapturedIOTestCase):
                          "client_id=" + ac.client_id,
                          "redirect_uri=" +
                          quote_plus(ac.base_url + "v2/web/auth-code"),
-                         "scope=" + quote_plus(DEFAULT_REQUESTED_SCOPES),
+                         "scope=" + quote_plus(
+                             " ".join(DEFAULT_REQUESTED_SCOPES)),
                          "state=" + "_default",
                          "response_type=" + "code",
                          "code_challenge=" +
@@ -76,7 +77,8 @@ class AuthClientIntegrationTests(CapturedIOTestCase):
         expected_vals = [ac.base_url + "v2/oauth2/authorize?",
                          "client_id=" + ac.client_id,
                          "redirect_uri=" + "uri",
-                         "scope=" + quote_plus(DEFAULT_REQUESTED_SCOPES),
+                         "scope=" + quote_plus(
+                             " ".join(DEFAULT_REQUESTED_SCOPES)),
                          "state=" + "_default",
                          "response_type=" + "code",
                          "access_type=" + "online"]

@@ -1,3 +1,5 @@
+.. _examples_three_legged_oauth_login:
+
 Three Legged OAuth with Flask
 -----------------------------
 

@@ -31,7 +31,8 @@ class NativeAppAuthClientIntegrationTests(CapturedIOTestCase):
         self.assertIsInstance(flow, GlobusNativeAppFlowManager)
         self.assertEqual(flow.redirect_uri,
                          self.nac.base_url + "v2/web/auth-code")
-        self.assertEqual(flow.requested_scopes, DEFAULT_REQUESTED_SCOPES)
+        self.assertEqual(flow.requested_scopes,
+                         " ".join(DEFAULT_REQUESTED_SCOPES))
         self.assertEqual(flow.state, "_default")
         self.assertFalse(flow.refresh_tokens)
 
@@ -41,7 +42,8 @@ class NativeAppAuthClientIntegrationTests(CapturedIOTestCase):
                          "client_id=" + self.nac.client_id,
                          "redirect_uri=" +
                          quote_plus(self.nac.base_url + "v2/web/auth-code"),
-                         "scope=" + quote_plus(DEFAULT_REQUESTED_SCOPES),
+                         "scope=" + quote_plus(
+                             " ".join(DEFAULT_REQUESTED_SCOPES)),
                          "state=" + "_default",
                          "code_challenge=" + quote_plus(flow.challenge),
                          "access_type=" + "online"]
