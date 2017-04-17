@@ -91,7 +91,7 @@ Run the following code sample to get your Access Tokens:
     CLIENT_ID = '<YOUR_ID_HERE>'
 
     client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
-    client.oauth2_start_flow_native_app()
+    client.oauth2_start_flow()
 
     authorize_url = client.oauth2_get_authorize_url()
     print('Please go to this URL and login: {0}'.format(authorize_url))
@@ -168,7 +168,7 @@ Remember:
 .. code-block:: python
 
     client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
-    client.oauth2_start_flow_native_app()
+    client.oauth2_start_flow()
 
     print('Please go to this URL and login: {0}'
           .format(client.oauth2_get_authorize_url()))
@@ -239,7 +239,7 @@ tweak your login flow with one argument:
 .. code-block:: python
 
     client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
-    client.oauth2_start_flow_native_app(refresh_tokens=True)
+    client.oauth2_start_flow(refresh_tokens=True)
 
     print('Please go to this URL and login: {0}'
           .format(client.oauth2_get_authorize_url()))

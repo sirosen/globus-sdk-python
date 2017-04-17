@@ -146,7 +146,7 @@ class AuthClient(BaseClient):
     def oauth2_get_authorize_url(self, additional_params=None):
         """
         Get the authorization URL to which users should be sent.
-        This method may only be called after an ``oauth2_start_flow_*`` method
+        This method may only be called after ``oauth2_start_flow``
         has been called on this ``AuthClient``.
 
         **Parameters**
@@ -163,7 +163,7 @@ class AuthClient(BaseClient):
                                'get_authorize_url before start_flow)'))
             raise ValueError(
                 ('Cannot get authorize URL until starting an OAuth2 flow. '
-                 'Call one of the oauth2_start_flow_*() methods on this '
+                 'Call the oauth2_start_flow() method on this '
                  'AuthClient to resolve'))
         auth_url = self.current_oauth2_flow_manager.get_authorize_url(
             additional_params=additional_params)
@@ -190,7 +190,7 @@ class AuthClient(BaseClient):
                                'exchange_code before start_flow)'))
             raise ValueError(
                 ('Cannot exchange auth code until starting an OAuth2 flow. '
-                 'Call one of the oauth2_start_flow_*() methods on this '
+                 'Call the oauth2_start_flow() method on this '
                  'AuthClient to resolve'))
 
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(
