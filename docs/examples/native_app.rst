@@ -82,4 +82,4 @@ Simply add this option to the example above:
 
 .. code-block:: python
 
-    client.oauth2_start_flow_native_app(refresh_tokens=True)
+    client.oauth2_start_flow(refresh_tokens=True)
