@@ -184,20 +184,6 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id)
         return self.delete(path)
 
-    def endpoint_manager_monitored_endpoints(self, **params):
-        """
-        ``GET endpoint_manager/monitored_endpoints``
-
-        :rtype: iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
-        """
-        self.logger.info(
-            "TransferClient.endpoint_manager_monitored_endpoints({})"
-            .format(params))
-        path = self.qjoin_path('endpoint_manager', 'monitored_endpoints')
-        return self.get(path, params=params,
-                        response_class=IterableTransferResponse)
-
     def endpoint_search(self, filter_fulltext=None, filter_scope=None,
                         num_results=25, **params):
         r"""
@@ -1092,59 +1078,6 @@ class TransferClient(BaseClient):
     # Task inspection and management
     #
 
-    def endpoint_manager_task_list(self, num_results=10, **params):
-        r"""
-        Get a list of tasks visible via ``activity_monitor`` role, as opposed
-        to tasks owned by the current user.
-
-        ``GET endpoint_manager/task_list``
-
-        :rtype: iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
-
-        **Parameters**
-
-            ``num_results`` (*int* or *None*)
-              default ``10``
-              The number of tasks to fetch from the service. May be set to
-              ``None`` to request the maximum allowable number of results.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
-
-        **Examples**
-
-        Fetch the default number (10) of tasks and print some basic info:
-
-        >>> tc = TransferClient(...)
-        >>> for task in tc.endpoint_manager_task_list():
-        >>>     print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
-        >>>         task["task_id"], task["source_endpoint"],
-        >>>         task["destination_endpoint"), task["owner_string"])
-
-        Do that same operation on *all* tasks visible via ``activity_monitor``
-        status:
-
-        >>> tc = TransferClient(...)
-        >>> for task in tc.endpoint_manager_task_list(num_results=None):
-        >>>     print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
-        >>>         task["task_id"], task["source_endpoint"],
-        >>>         task["destination_endpoint"), task["owner_string"])
-
-        **External Documentation**
-
-        See
-        `Advanced Endpoint Management: Get tasks \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_tasks>`_
-        in the REST documentation for details.
-        """
-        self.logger.info("TransferClient.endpoint_manager_task_list(...)")
-        path = self.qjoin_path('endpoint_manager', 'task_list')
-        return PaginatedResource(
-            self.get, path, {'params': params},
-            num_results=num_results, max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_HAS_NEXT)
-
     def task_list(self, num_results=10, **params):
         """
         Get an iterable of task documents owned by the current user.
@@ -1451,6 +1384,118 @@ class TransferClient(BaseClient):
                          .format(task_id))
 
         resource_path = self.qjoin_path("task", task_id,
+                                        "successful_transfers")
+        return PaginatedResource(
+            self.get, resource_path, {'params': params},
+            num_results=num_results, max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_MARKER)
+
+    #
+    # advanced endpoint management (requires endpoint manager role)
+    #
+
+    def endpoint_manager_monitored_endpoints(self, **params):
+        """
+        ``GET endpoint_manager/monitored_endpoints``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+        """
+        self.logger.info(
+            "TransferClient.endpoint_manager_monitored_endpoints({})"
+            .format(params))
+        path = self.qjoin_path('endpoint_manager', 'monitored_endpoints')
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
+
+    def endpoint_manager_task_list(self, num_results=10, **params):
+        r"""
+        Get a list of tasks visible via ``activity_monitor`` role, as opposed
+        to tasks owned by the current user.
+
+        ``GET endpoint_manager/task_list``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+
+        **Parameters**
+
+            ``num_results`` (*int* or *None*)
+              default ``10``
+              The number of tasks to fetch from the service. May be set to
+              ``None`` to request the maximum allowable number of results.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **Examples**
+
+        Fetch the default number (10) of tasks and print some basic info:
+
+        >>> tc = TransferClient(...)
+        >>> for task in tc.endpoint_manager_task_list():
+        >>>     print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
+        >>>         task["task_id"], task["source_endpoint"],
+        >>>         task["destination_endpoint"), task["owner_string"])
+
+        Do that same operation on *all* tasks visible via ``activity_monitor``
+        status:
+
+        >>> tc = TransferClient(...)
+        >>> for task in tc.endpoint_manager_task_list(num_results=None):
+        >>>     print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
+        >>>         task["task_id"], task["source_endpoint"],
+        >>>         task["destination_endpoint"), task["owner_string"])
+
+        **External Documentation**
+
+        See
+        `Advanced Endpoint Management: Get tasks \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_tasks>`_
+        in the REST documentation for details.
+        """
+        self.logger.info("TransferClient.endpoint_manager_task_list(...)")
+        path = self.qjoin_path('endpoint_manager', 'task_list')
+        return PaginatedResource(
+            self.get, path, {'params': params},
+            num_results=num_results, max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_HAS_NEXT)
+
+    def endpoint_manager_task_successful_transfers(self, task_id,
+                                                   num_results=100, **params):
+        """
+        Get the successful file transfers for a completed Task as an admin.
+
+        ``GET /endpoint_manager/task/<task_id>/successful_transfers``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+
+        **Parameters**
+
+            ``task_id`` (*string*)
+              The task to inspect.
+
+            ``num_results`` (*int* or *None*)
+              default ``100``
+              The number of file transfer records to fetch from the service.
+              May be set to ``None`` to request the maximum allowable number of
+              results.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Get task successful transfers as admin\
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_successful_transfers_as_admin>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_task_"
+                          "successful_transfers({}, ...)".format(task_id)))
+
+        resource_path = self.qjoin_path("endpoint_manager", "task", task_id,
                                         "successful_transfers")
         return PaginatedResource(
             self.get, resource_path, {'params': params},
