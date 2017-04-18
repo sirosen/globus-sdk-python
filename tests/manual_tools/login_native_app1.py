@@ -11,8 +11,8 @@ get_input = getattr(__builtins__, 'raw_input', input)
 
 
 client = NativeAppAuthClient(client_id=CLIENT_ID)
-client.oauth2_start_flow_native_app(requested_scopes=SCOPES,
-                                    refresh_tokens=True)
+client.oauth2_start_flow(requested_scopes=SCOPES,
+                         refresh_tokens=True)
 url = client.oauth2_get_authorize_url()
 
 print("Native App Authorization URL: \n{}".format(url))

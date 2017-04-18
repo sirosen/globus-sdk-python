@@ -17,8 +17,7 @@ def clean():
 
     # create an authorized transfer client
     client = globus_sdk.NativeAppAuthClient(client_id=CLIENT_ID)
-    client.oauth2_start_flow_native_app(requested_scopes=SCOPES,
-                                        refresh_tokens=True)
+    client.oauth2_start_flow(requested_scopes=SCOPES)
     url = client.oauth2_get_authorize_url()
 
     print("Login with SDK Tester: \n{}".format(url))
@@ -72,11 +71,15 @@ def clean():
 
     # clean endpoints owned by SDK Tester
     endpoint_deletions = 0
-    r = tc.endpoint_search(filter_scope="my-endpoints")
-    for ep in r:
-        tc.delete_endpoint(ep["id"])
-        print("deleting endpoint: {}".format(ep["display_name"]))
-        endpoint_deletions += 1
+    cleaning = True
+    while(cleaning):
+        cleaning = False
+        r = tc.endpoint_search(filter_scope="my-endpoints", num_results=None)
+        for ep in r:
+            tc.delete_endpoint(ep["id"])
+            print("deleting endpoint: {}".format(ep["display_name"]))
+            endpoint_deletions += 1
+            cleaning = True
 
     # wait for deletes to complete
     for task_id in task_ids:

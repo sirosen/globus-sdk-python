@@ -30,6 +30,10 @@ SDKTESTER1A_NATIVE1_ID_TOKEN = (
 SDKTESTER1A_ID_ACCESS_TOKEN = (
     "AQBYuuk5AAAAAAAEgv9acyfVlpa9Jhe3A1LhzhzofL"
     "tYuM3-yBKxA7yZ6QAN9tosD4xRsxwaQ35pUXGM7dCj")
+# sdktester2b@globusid.org transfer refresh token for Native App 1
+SDKTESTER2B_NATIVE1_TRANSFER_RT = (
+    "AQEAAAAAAATZj3h-kuwerpWbwQYoWECsTrjqoaJv5Q"
+    "zPoq52QBnfxrOszPl714hF6iISZgTe0061E6sQPwjt")
 # ---------- #
 # end tokens #
 # ---------- #
