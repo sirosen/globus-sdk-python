@@ -1,3 +1,4 @@
+import re
 from random import getrandbits
 from datetime import datetime, timedelta
 
@@ -5,7 +6,8 @@ import globus_sdk
 from tests.framework import (CapturedIOTestCase,
                              get_client_data, get_user_data,
                              GO_EP1_ID, GO_EP2_ID,
-                             SDKTESTER1A_NATIVE1_TRANSFER_RT)
+                             SDKTESTER1A_NATIVE1_TRANSFER_RT,
+                             SDKTESTER2B_NATIVE1_TRANSFER_RT)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -209,9 +211,6 @@ class TransferClientTests(BaseTransferClientTests):
             if "name" in cleanup and cleanup["name"] == "test_ep":
                 self.asset_cleanup.remove(cleanup)
                 break
-
-    # def test_endpoint_manager_monitored_endpoints(self):
-        # TODO: test against monitored endpoint
 
     # def test_endpoint_activate(self):
         # TODO: test against an endpoint that uses MyProxy
@@ -1412,3 +1411,172 @@ class SharedTransferClientTests(BaseTransferClientTests):
             self.tc.get_endpoint_acl_rule(self.test_share_ep_id, access_id)
         self.assertEqual(apiErr.exception.http_status, 404)
         self.assertEqual(apiErr.exception.code, "AccessRuleNotFound")
+
+
+# class for Transfer Client Tests that require the activity_manager
+# role on an endpoint. Setup checks to see if the managed shared endpoint
+# exists and if not creates one. This endpoint is not removed during cleanup.
+class ManagerTransferClientTests(BaseTransferClientTests):
+
+    __test__ = True  # marks sub-class as having tests
+
+    @classmethod
+    def setUpClass(self):
+        """
+        Does an auth flow for sdktester2b's transfer client.
+        Sets up a shared endpoint on test gp#ep2 managed by sdktester1a,
+        and shares it with sdktester2b,
+        or sees that this endpoint already exits and gets its id.
+        """
+        super(ManagerTransferClientTests, self).setUpClass()
+
+        ac = globus_sdk.NativeAppAuthClient(
+            client_id=get_client_data()["native_app_client1"]["id"])
+        authorizer = globus_sdk.RefreshTokenAuthorizer(
+            SDKTESTER2B_NATIVE1_TRANSFER_RT, ac)
+        self.tc2 = globus_sdk.TransferClient(authorizer=authorizer)
+
+        try:
+            # shared endpoint hosted on go#ep2 managed by sdktester1a
+            host_path = "/~/managed_ep"
+            self.tc.operation_mkdir(GO_EP2_ID, path=host_path)
+            shared_data = {"DATA_TYPE": "shared_endpoint",
+                           "host_endpoint": GO_EP2_ID,
+                           "host_path": host_path,
+                           "display_name": "SDK Test Managed Endpoint",
+                           "description": "Endpoint for managed SDK testing"
+                           }
+            r = self.tc.create_shared_endpoint(shared_data)
+            self.managed_ep_id = r["id"]
+
+            # share read and write to sdktester2b
+            add_data = {"DATA_TYPE": "access",
+                        "principal_type": "identity",
+                        "principal": get_user_data()["sdktester2b"]["id"],
+                        "path": "/",
+                        "permissions": "rw"}
+            self.tc.add_endpoint_acl_rule(self.managed_ep_id, add_data)
+
+        except TransferAPIError as e:
+            if "already exists" in str(e):
+                shares = self.tc.my_shared_endpoint_list(GO_EP2_ID)
+                self.managed_ep_id = shares["DATA"][0]["id"]
+            else:
+                raise e
+
+    def test_endpoint_manager_monitored_endpoints(self):
+        """
+        Gets a list of all endpoints sdktester1a is an activity_manager on,
+        Confirms list contains managed_ep, and has some expected fields.
+        """
+        ep_doc = self.tc.endpoint_manager_monitored_endpoints()
+        expected_fields = ["my_effective_roles", "display_name",
+                           "owner_id", "owner_string"]
+
+        managed_found = False
+        for ep in ep_doc:
+            self.assertEqual(ep["DATA_TYPE"], "endpoint")
+            for field in expected_fields:
+                self.assertIn(field, ep)
+
+            if ep["id"] == self.managed_ep_id:
+                managed_found = True
+
+        self.assertTrue(managed_found)
+
+    def test_endpoint_manager_task_list(self):
+        """
+        Has sdktester2b submit transfer and delete task to the managed_ep
+        Then has sdktester1a get its endpoint manager task list
+        Confirms tasks submitted by sdktester2b on the managed endpoint
+        are visible, and some expected fields are present.
+        """
+        # sdktester2b submits tasks
+        # new dir with randomized name to prevent collision
+        dest_dir = "transfer_dest_dir-" + str(getrandbits(128))
+        dest_path = "/" + dest_dir + "/"
+        self.tc2.operation_mkdir(self.managed_ep_id, dest_path)
+
+        # transfer a file to the new dir
+        tdata = globus_sdk.TransferData(self.tc2, GO_EP1_ID,
+                                        self.managed_ep_id,
+                                        notify_on_succeeded=False)
+        source_path = "/share/godata/"
+        file_name = "file1.txt"
+        tdata.add_item(source_path + file_name, dest_path + file_name)
+        transfer_id = self.tc2.submit_transfer(tdata)["task_id"]
+
+        # delete the new dir
+        ddata = globus_sdk.DeleteData(self.tc2, self.managed_ep_id,
+                                      recursive=True,
+                                      notify_on_succeeded=False)
+        ddata.add_item(dest_path)
+        delete_id = self.tc2.submit_delete(ddata)["task_id"]
+
+        # sdktester1a gets endpoint manager task list
+        tasks_doc = self.tc.endpoint_manager_task_list(
+            filter_endpoint=GO_EP2_ID,
+            filter_user_id=get_user_data()["sdktester2b"]["id"])
+
+        # confirm submitted tasks can be found
+        # and tasks have some expected fields
+        expected_fields = ["username", "deadline", "type",
+                           "source_endpoint_id"]
+        delete_found = False
+        transfer_found = False
+        self.assertIsInstance(tasks_doc, PaginatedResource)
+        for task in tasks_doc:
+
+            for field in expected_fields:
+                self.assertIn(field, task)
+
+            if task["task_id"] == transfer_id:
+                transfer_found = True
+            if task["task_id"] == delete_id:
+                delete_found = True
+            if transfer_found and delete_found:
+                break
+
+        # fail if both not found
+        self.assertTrue(delete_found and transfer_found)
+
+    def test_endpoint_manager_task_successful_transfers(self):
+        """
+        Has sdktester2b submit a recursive transfer of share/godata to the
+        managed_ep. Waits for the task to complete, then has sdktester1a get
+        the successful transfers of the task as an admin. Confirms all 3 files
+        are seen, and some expected fields are present.
+        """
+        # new dir with randomized name to prevent collision
+        dest_dir = "transfer_dest_dir-" + str(getrandbits(128))
+        dest_path = "/" + dest_dir + "/"
+        self.tc2.operation_mkdir(self.managed_ep_id, dest_path)
+        # transfer a the files
+        tdata = globus_sdk.TransferData(self.tc2, GO_EP1_ID,
+                                        self.managed_ep_id,
+                                        notify_on_succeeded=False)
+        source_path = "/share/godata/"
+        tdata.add_item(source_path, dest_path, recursive=True)
+        task_id = self.tc2.submit_transfer(tdata)["task_id"]
+
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [self.managed_ep_id, dest_path]})
+        # wait for task to complete
+        self.assertTrue(
+            self.tc2.task_wait(task_id, timeout=30, polling_interval=1))
+
+        # sdktester1a gets successful transfers as admin
+        success_doc = self.tc.endpoint_manager_task_successful_transfers(
+            task_id)
+
+        # confirm results
+        self.assertIsInstance(success_doc, PaginatedResource)
+        count = 0
+        for transfer in success_doc:
+
+            self.assertEqual(transfer["DATA_TYPE"], "successful_transfer")
+            self.assertIsNotNone(re.match(dest_path + "file[1-3].txt",
+                                          transfer["destination_path"]))
+            count += 1
+        self.assertEqual(count, 3)
