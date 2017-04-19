@@ -1484,6 +1484,62 @@ class ManagerTransferClientTests(BaseTransferClientTests):
 
         self.assertTrue(managed_found)
 
+    def test_endpoint_manager_get_endpoint(self):
+        """
+        Gets the managed endpoint, confirms expected results
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        ep_doc = self.tc.endpoint_manager_get_endpoint(self.managed_ep_id)
+        self.assertEqual(ep_doc["DATA_TYPE"], "endpoint")
+        self.assertEqual(ep_doc["id"], self.managed_ep_id)
+        self.assertIsNone(ep_doc["in_use"])
+
+        # 403 for non managers
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_hosted_endpoint_list(self.managed_ep_id)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
+    # TODO: test against a non shared endpoint we have the manager role on
+    def test_endpoint_manager_hosted_endpoint_list(self):
+        """
+        Attempts to gets the list of shares hosted on the managed endpoint.
+        Confirms this fails as shares cannot themselves host shares.
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc.endpoint_manager_hosted_endpoint_list(self.managed_ep_id)
+
+        self.assertEqual(apiErr.exception.http_status, 409)
+        self.assertEqual(apiErr.exception.code, "Conflict")
+        self.assertIn("not a host endpoint", apiErr.exception.message)
+
+        # 403 for non managers
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_hosted_endpoint_list(self.managed_ep_id)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
+    def test_endpoint_manager_acl_list(self):
+        """
+        Gets ACL list from managed endpoint, validates results
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        list_doc = self.tc.endpoint_manager_acl_list(self.managed_ep_id)
+
+        self.assertEqual(list_doc["DATA_TYPE"], "access_list")
+        expected_fields = ["id", "principal", "principal_type", "permissions"]
+        for access in list_doc["DATA"]:
+            self.assertEqual(access["DATA_TYPE"], "access")
+            for field in expected_fields:
+                self.assertIn(field, access)
+
+        # 403 for non managers
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_acl_list(self.managed_ep_id)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
     def test_endpoint_manager_task_list(self):
         """
         Has sdktester2b submit transfer and delete task to the managed_ep
