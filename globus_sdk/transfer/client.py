@@ -1483,6 +1483,10 @@ class TransferClient(BaseClient):
         return self.get(path, params=params,
                         response_class=IterableTransferResponse)
 
+    #
+    # endpoint manager task methods
+    #
+
     def endpoint_manager_task_list(self, num_results=10, **params):
         r"""
         Get a list of tasks visible via ``activity_monitor`` role, as opposed
@@ -1536,6 +1540,95 @@ class TransferClient(BaseClient):
             num_results=num_results, max_results_per_call=1000,
             paging_style=PaginatedResource.PAGING_STYLE_HAS_NEXT)
 
+    def endpoint_manager_get_task(self, task_id, **params):
+        """
+        Get task info as an admin. Requires activity monitor effective role on
+        the destination endpoint of the task.
+
+        ``GET /endpoint_manager/task/<task_id>``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get task as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task>`_
+        in the REST documentation for details.
+        """
+        task_id = safe_stringify(task_id)
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "get_task({}, ...)".format(task_id)))
+        path = self.qjoin_path("endpoint_manager", "task", task_id)
+        return self.get(path, params=params)
+
+    def endpoint_manager_task_event_list(self, task_id,
+                                         num_results=10, **params):
+        """
+        List events (for example, faults and errors) for a given task as an
+        admin. Requires activity monitor effective role on the destination
+        endpoint of the task.
+
+        ``GET /task/<task_id>/event_list``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+
+        **Parameters**
+
+            ``task_id`` (*string*)
+              The task to inspect.
+
+            ``num_results`` (*int* or *None*)
+              default ``10``
+              The number of events to fetch from the service. May be set to
+              ``None`` to request the maximum allowable number of results.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Get task events as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_events>`_
+        in the REST documentation for details.
+        """
+        task_id = safe_stringify(task_id)
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "task_event_list({}, ...)".format(task_id)))
+        path = self.qjoin_path("endpoint_manager", "task",
+                               task_id, "event_list")
+        return PaginatedResource(
+            self.get, path, {"params": params},
+            num_results=num_results, max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_TOTAL)
+
+    def endpoint_manager_task_pause_info(self, task_id, **params):
+        """
+        Get details about why a task is paused as an admin. Requires activity
+        monitor effective role on the destination endpoint of the task.
+
+        ``GET /endpoint_manager/task/<task_id>/pause_info``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get task pause info as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_pause_info_as_admin>`_
+        in the REST documentation for details.
+        """
+        task_id = safe_stringify(task_id)
+        self.logger.info(("TransferClient.endpoint_manager_"
+                         "task_pause_info({}, ...)".format(task_id)))
+        path = self.qjoin_path("endpoint_manager", "task",
+                               task_id, "pause_info")
+        return self.get(path, params=params)
+
     def endpoint_manager_task_successful_transfers(self, task_id,
                                                    num_results=100, **params):
         """
@@ -1567,6 +1660,7 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_successful_transfers_as_admin>`_
         in the REST documentation for details.
         """
+        task_id = safe_stringify(task_id)
         self.logger.info(("TransferClient.endpoint_manager_task_"
                           "successful_transfers({}, ...)".format(task_id)))
 
