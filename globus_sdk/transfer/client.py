@@ -1396,15 +1396,90 @@ class TransferClient(BaseClient):
 
     def endpoint_manager_monitored_endpoints(self, **params):
         """
+        Get endpoints the current user is a monitor or manager on.
+
         ``GET endpoint_manager/monitored_endpoints``
 
         :rtype: iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
+
+        See
+        `Get monitored endpoints \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_monitored_endpoints>`_
+        in the REST documentation for details.
         """
         self.logger.info(
             "TransferClient.endpoint_manager_monitored_endpoints({})"
             .format(params))
         path = self.qjoin_path('endpoint_manager', 'monitored_endpoints')
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
+
+    def endpoint_manager_hosted_endpoint_list(self, endpoint_id, **params):
+        """
+        Get shared endpoints hosted on the given endpoint.
+
+        ``GET /endpoint_manager/endpoint/<endpoint_id>/hosted_endpoint_list``
+
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+
+        See
+        `Get hosted endpoint list \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_hosted_endpoint_list>`_
+        in the REST documentation for details.
+        """
+        endpoint_id = safe_stringify(endpoint_id)
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "hosted_endpoint_list({})".format(endpoint_id)))
+        path = self.qjoin_path("endpoint_manager", "endpoint",
+                               endpoint_id, "hosted_endpoint_list")
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
+
+    def endpoint_manager_get_endpoint(self, endpoint_id, **params):
+        """
+        Get endpoint details as an admin.
+
+        ``GET /endpoint_manager/endpoint/<endpoint_id>``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get endpoint as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#mc_get_endpoint>`_
+        in the REST documentation for details.
+        """
+        endpoint_id = safe_stringify(endpoint_id)
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "get_endpoint({})".format(endpoint_id)))
+        path = self.qjoin_path("endpoint_manager", "endpoint", endpoint_id)
+        return self.get(path, params=params)
+
+    def endpoint_manager_acl_list(self, endpoint_id, **params):
+        """
+        Get a list of access control rules on specified endpoint as an admin.
+
+        ``GET endpoint_manager/endpoint/<endpoint_id>/access_list``
+
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get endpoint access list as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_endpoint_access_list_as_admin>`_
+        in the REST documentation for details.
+        """
+        endpoint_id = safe_stringify(endpoint_id)
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "endpoint_acl_list({}, ...)".format(endpoint_id)))
+        path = self.qjoin_path("endpoint_manager", "endpoint",
+                               endpoint_id, "access_list")
         return self.get(path, params=params,
                         response_class=IterableTransferResponse)
 
