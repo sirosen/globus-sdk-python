@@ -1596,6 +1596,92 @@ class ManagerTransferClientTests(BaseTransferClientTests):
         # fail if both not found
         self.assertTrue(delete_found and transfer_found)
 
+    def test_endpoint_manager_get_task(self):
+        """
+        Has sdktester2b submit a no-op task on the managed endpoint
+        Confirms sdktester1a can view the task as an admin.
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        # sdktester2b subits no-op delete task
+        ddata = globus_sdk.DeleteData(self.tc2, self.managed_ep_id,
+                                      notify_on_succeeded=False)
+        ddata.add_item("no-op.txt")
+        task_id = self.tc2.submit_delete(ddata)["task_id"]
+
+        # sdktester1a gets the task as admin
+        task_doc = self.tc.endpoint_manager_get_task(task_id)
+
+        self.assertEqual(task_doc["task_id"], task_id)
+        self.assertEqual(task_doc["owner_id"],
+                         get_user_data()["sdktester2b"]["id"])
+        self.assertEqual(task_doc["type"], "DELETE")
+        self.assertIn("status", task_doc)
+
+        # 403 for non managers, even if they submitted the task
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_get_task(task_id)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
+    def test_endpoint_manager_task_event_list(self):
+        """
+        Has sdktester2b submit a no-op task on the managed endpoint.
+        Waits for task to fail, and confirms sdktester1a can see the
+        failure event as an admin.
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        # sdktester2b subits no-op delete task and waits for completion
+        ddata = globus_sdk.DeleteData(self.tc2, self.managed_ep_id,
+                                      notify_on_succeeded=False)
+        ddata.add_item("no-op.txt")
+        task_id = self.tc2.submit_delete(ddata)["task_id"]
+        self.assertTrue(
+            self.tc2.task_wait(task_id, timeout=30, polling_interval=1))
+
+        # sdktester1a gets the task event list as admin
+        events_doc = self.tc.endpoint_manager_task_event_list(task_id)
+        self.assertIsInstance(events_doc, PaginatedResource)
+
+        failure_event = events_doc[0]  # most recent event is first
+        self.assertEqual(failure_event["DATA_TYPE"], "event")
+        self.assertEqual(failure_event["code"], "FILE_NOT_FOUND")
+        self.assertEqual(failure_event["description"],
+                         "No such file or directory")
+
+        # 403 for non managers, even if they submitted the task
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_task_event_list(task_id)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
+    # TODO: further test once pause methods are implemented
+    def test_endpoint_manager_task_pause_info(self):
+        """
+        Has sdktester2b submit a no-op task on the managed endpoint.
+        Confirms sdktester1a can view pause_info of task.
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        # sdktester2b subits no-op delete task and waits for completion
+        ddata = globus_sdk.DeleteData(self.tc2, self.managed_ep_id,
+                                      notify_on_succeeded=False)
+        ddata.add_item("no-op.txt")
+        task_id = self.tc2.submit_delete(ddata)["task_id"]
+        self.assertTrue(
+            self.tc2.task_wait(task_id, timeout=30, polling_interval=1))
+
+        # sdktester1a gets the task pause info as admin
+        pause_doc = self.tc.endpoint_manager_task_pause_info(task_id)
+        self.assertEqual(pause_doc["DATA_TYPE"], "pause_info_limited")
+
+        for rule in pause_doc["pause_rules"]:
+            self.assertEqual(rule["DATA_TYPE"], "pause_rule_limited")
+
+        # 403 for non managers, even if they submitted the task
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_task_pause_info(task_id)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
     def test_endpoint_manager_task_successful_transfers(self):
         """
         Has sdktester2b submit a recursive transfer of share/godata to the
