@@ -26,7 +26,7 @@ def get_client_data():
 def get_user_data():
     dirname = get_fixture_file_dir()
     ret = {}
-    for uname in ("sdktester1a", "go"):
+    for uname in ("sdktester1a", "sdktester2b", "go"):
         with open(os.path.join(dirname,
                                "auth_fixtures",
                                uname + "@globusid.org.json")) as f:
