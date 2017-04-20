@@ -1,5 +1,6 @@
 import re
 import time
+import unittest
 from random import getrandbits
 from datetime import datetime, timedelta
 
@@ -1797,10 +1798,10 @@ class ManagerTransferClientTests(BaseTransferClientTests):
             self.assertEqual(task_doc["canceled_by_admin"], "SOURCE")
             self.assertEqual(task_doc["canceled_by_admin_message"], message)
 
-    # TODO: uncomment these tests when
+    # TODO: stop skipping these tests when
     # https://github.com/globusonline/koa/issues/49
     # is resolved.
-    '''
+    @unittest.skipIf(True, "github.com/globusonline/koa/issues/49")
     def test_endpoint_manager_pause_tasks(self):
         """
         Has sdktester2b submit three unauthorized transfers,
@@ -1828,6 +1829,7 @@ class ManagerTransferClientTests(BaseTransferClientTests):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @unittest.skipIf(True, "github.com/globusonline/koa/issues/49")
     def test_endpoint_manager_resume_tasks(self):
         """
         Has sdktester2b submit three unauthorized transfers,
@@ -1858,4 +1860,3 @@ class ManagerTransferClientTests(BaseTransferClientTests):
             self.tc2.endpoint_manager_resume_tasks(task_ids, message)
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
-    '''
