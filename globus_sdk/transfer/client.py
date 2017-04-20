@@ -1812,3 +1812,175 @@ class TransferClient(BaseClient):
         }
         path = self.qjoin_path("endpoint_manager", "admin_resume")
         return self.post(path, json_body=json_body, params=params)
+
+    #
+    # endpoint manager pause rule methods
+    #
+
+    def endpoint_manager_pause_rule_list(self, filter_endpoint=None,
+                                         filter_host_endpoint=None, **params):
+        """
+        Get a list of pause rules on endpoints that the current user has the
+        activity monitor effective role on.
+
+        ``GET /endpoint_manager/pause_rule_list``
+
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
+
+        **Parameters**
+
+            ``filter_endpoint`` (*string*)
+              Limit results to pause rules on this endpoint.
+
+            ``filter_endpoint`` (*string*)
+              Limit results to rules on endpoints hosted by this endpoint.
+              Must be activity monitor on this endpoint, not just the hosted
+              endpoints.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Get pause rules \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_pause_rules>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "pause_rule_list(...)"))
+        path = self.qjoin_path("endpoint_manager", "pause_rule_list")
+        merge_params(params, filter_endpoint=filter_endpoint,
+                     filter_host_endpoint=filter_host_endpoint)
+        return self.get(path, params=params,
+                        response_class=IterableTransferResponse)
+
+    def endpoint_manager_create_pause_rule(self, data):
+        """
+        Create a new pause rule. Requires the activity manager effective role
+        on the endpoint defined in the rule.
+
+        ``POST /endpoint_manager/pause_rule``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **Examples**
+
+        >>> tc = globus_sdk.TransferClient(...)
+        >>> rule_data = {
+        >>>   "DATA_TYPE": "pause_rule",
+        >>>   "message": "Message to users explaining why tasks are paused",
+        >>>   "endpoint_id": "339abc22-aab3-4b45-bb56-8d40535bfd80",
+        >>>   "identity_id": None,  # affect all users on endpoint
+        >>>   "start_time": None  # start now
+        >>> }
+        >>> create_result = tc.endpoint_manager_create_pause_rule(ep_data)
+        >>> rule_id = create_result["id"]
+
+        **External Documentation**
+
+        See
+        `Create pause rule \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#create_pause_rule>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "create_pause_rule(...)"))
+        path = self.qjoin_path("endpoint_manager", "pause_rule")
+        return self.post(path, data)
+
+    def endpoint_manager_get_pause_rule(self, pause_rule_id, **params):
+        """
+        Get an existing pause rule by ID. Requires the activity manager
+        effective role on the endpoint defined in the rule.
+
+        ``GET /endpoint_manager/pause_rule/<pause_rule_id>``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+       **Parameters**
+
+            ``pause_rule_id`` (*string*)
+              ID of pause rule to get.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Create pause rule \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_pause_rule>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "get_pause_rule({})".format(pause_rule_id)))
+        path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
+        return self.get(path, params=params)
+
+    def endpoint_manager_update_pause_rule(self, pause_rule_id, data):
+        """
+        Update an existing pause rule by ID. Requires the activity manager
+        effective role on the endpoint defined in the rule.
+        Note that non update-able fields in data will be ignored.
+
+        ``PUT /endpoint_manager/pause_rule/<pause_rule_id>``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **Examples**
+
+        >>> tc = globus_sdk.TransferClient(...)
+        >>> rule_data = {
+        >>>   "message": "Update to pause, reads are now allowed.",
+        >>>   "pause_ls": False,
+        >>>   "pause_task_transfer_read": False
+        >>> }
+        >>> update_result = tc.endpoint_manager_create_pause_rule(ep_data)
+
+        **External Documentation**
+
+        See
+        `Update pause rule \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#update_pause_rule>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "update_pause_rule({})".format(pause_rule_id)))
+        path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
+        return self.put(path, data)
+
+    def endpoint_manager_delete_pause_rule(self, pause_rule_id, **params):
+        """
+        Delete an existing pause rule by ID. Requires the user to see the
+        "editible" field of the rule as True. Any tasks affected by this rule
+        will no longer be once it is deleted.
+
+        ``DELETE /endpoint_manager/pause_rule/<pause_rule_id>``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+       **Parameters**
+
+            ``pause_rule_id`` (*string*)
+              ID of pause rule to delete.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Delete pause rule \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#delete_pause_rule>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "delete_pause_rule({})".format(pause_rule_id)))
+        path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
+        return self.delete(path, params=params)
