@@ -1670,3 +1670,145 @@ class TransferClient(BaseClient):
             self.get, resource_path, {'params': params},
             num_results=num_results, max_results_per_call=1000,
             paging_style=PaginatedResource.PAGING_STYLE_MARKER)
+
+    def endpoint_manager_cancel_tasks(self, task_ids, message, **params):
+        """
+        Cancel a list of tasks as an admin. Requires activity manager effective
+        role on the task(s) source or destination endpoint(s).
+
+        ``POST /endpoint_manager/admin_cancel``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **Parameters**
+
+            ``task_ids`` (*list of string*)
+              List of task ids to cancel.
+
+            ``message`` (*string*)
+              Message given to all users who's tasks have been canceled.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Cancel tasks as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#admin_cancel>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "cancel_tasks({},{})".format(task_ids, message)))
+        json_body = {
+            "message": safe_stringify(message),
+            "task_id_list": [safe_stringify(i) for i in task_ids]
+        }
+        path = self.qjoin_path("endpoint_manager", "admin_cancel")
+        return self.post(path, json_body=json_body, params=params)
+
+    def endpoint_manager_cancel_status(self, admin_cancel_id, **params):
+        """
+        Get the status of an an admin cancel (result of endpoint_manager_
+        cancel_tasks).
+
+        ``GET /endpoint_manager/admin_cancel/<admin_cancel_id>``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **Parameters**
+
+            ``admin_cancel_id`` (*string*)
+              The ID of the the cancel to inspect.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Get cancel status by id \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_cancel_status_by_id>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "cancel_status({})".format(admin_cancel_id)))
+        path = self.qjoin_path("endpoint_manager", "admin_cancel",
+                               admin_cancel_id)
+        return self.get(path, params=params)
+
+    def endpoint_manager_pause_tasks(self, task_ids, message, **params):
+        """
+        Pause a list of tasks as an admin. Requires activity manager effective
+        role on the task(s) source or destination endpoint(s).
+
+        ``POST /endpoint_manager/admin_pause``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **Parameters**
+
+            ``task_ids`` (*list of string*)
+              List of task ids to pause.
+
+            ``message`` (*string*)
+              Message given to all users who's tasks have been paused.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Cancel tasks as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#pause_tasks_as_admin>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "pause_tasks({},{})".format(task_ids, message)))
+        json_body = {
+            "message": safe_stringify(message),
+            "task_id_list": [safe_stringify(i) for i in task_ids]
+        }
+        path = self.qjoin_path("endpoint_manager", "admin_pause")
+        return self.post(path, json_body=json_body, params=params)
+
+    def endpoint_manager_resume_tasks(self, task_ids, message, **params):
+        """
+        Resume a list of tasks as an admin. Requires activity manager effective
+        role on the task(s) source or destination endpoint(s).
+
+        ``POST /endpoint_manager/admin_resume``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        **Parameters**
+
+            ``task_ids`` (*list of string*)
+              List of task ids to resume.
+
+            ``message`` (*string*)
+              Message given to all users who's tasks have been canceled.
+
+            ``params``
+              Any additional parameters will be passed through as query params.
+
+        **External Documentation**
+
+        See
+        `Cancel tasks as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#admin_cancel>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(("TransferClient.endpoint_manager_"
+                          "resume_tasks({},{})".format(task_ids, message)))
+        json_body = {
+            "message": safe_stringify(message),
+            "task_id_list": [safe_stringify(i) for i in task_ids]
+        }
+        path = self.qjoin_path("endpoint_manager", "admin_resume")
+        return self.post(path, json_body=json_body, params=params)
