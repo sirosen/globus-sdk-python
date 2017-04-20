@@ -1,4 +1,5 @@
 import re
+import time
 from random import getrandbits
 from datetime import datetime, timedelta
 
@@ -1604,7 +1605,7 @@ class ManagerTransferClientTests(BaseTransferClientTests):
         """
         # sdktester2b subits no-op delete task
         ddata = globus_sdk.DeleteData(self.tc2, self.managed_ep_id,
-                                      notify_on_succeeded=False)
+                                      notify_on_fail=False)
         ddata.add_item("no-op.txt")
         task_id = self.tc2.submit_delete(ddata)["task_id"]
 
@@ -1632,7 +1633,7 @@ class ManagerTransferClientTests(BaseTransferClientTests):
         """
         # sdktester2b subits no-op delete task and waits for completion
         ddata = globus_sdk.DeleteData(self.tc2, self.managed_ep_id,
-                                      notify_on_succeeded=False)
+                                      notify_on_fail=False)
         ddata.add_item("no-op.txt")
         task_id = self.tc2.submit_delete(ddata)["task_id"]
         self.assertTrue(
@@ -1722,3 +1723,139 @@ class ManagerTransferClientTests(BaseTransferClientTests):
                                           transfer["destination_path"]))
             count += 1
         self.assertEqual(count, 3)
+
+    def _unauthorized_transfers(self):
+        """
+        Helper that has sdktester2b submits 3 unauthorized transfers from the
+        managed endpoint, returns a list of their task_ids,
+        and tracks them for cleanup.
+        """
+        # submit the tasks
+        task_ids = []
+        for i in range(3):
+            tdata = globus_sdk.TransferData(self.tc2, self.managed_ep_id,
+                                            GO_EP1_ID, notify_on_fail=False)
+            tdata.add_item("/", "/", recursive=True)
+            task_ids.append(self.tc2.submit_transfer(tdata)["task_id"])
+
+        # track assets for cleanup
+        self.asset_cleanup.append(
+            {"function": self.tc.endpoint_manager_cancel_tasks,
+             "args": [task_ids, "Cleanup for unauthorized_transfers helper"]})
+
+        return task_ids
+
+    def test_endpoint_manager_cancel_tasks(self):
+        """
+        Get task ids from _unauthorized transfers, and has sdktester1a cancel
+        those tasks. Validates results.
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        # cancel the tasks
+        task_ids = self._unauthorized_transfers()
+        message = "SDK test cancel tasks"
+        cancel_doc = self.tc.endpoint_manager_cancel_tasks(task_ids, message)
+
+        # validate results
+        self.assertEqual(cancel_doc["DATA_TYPE"], "admin_cancel")
+        self.assertIn("done", cancel_doc)
+        self.assertIn("id", cancel_doc)
+
+        # 403 for non managers, even if they submitted the tasks
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_cancel_tasks(task_ids, message)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
+    def test_endpoint_manager_cancel_status(self):
+        """
+        Has sdktester2b submit three unauthorized transfers from the managed
+        endpoint, and sdktester1a admin_cancel those tasks.
+        Gets the cancel status of the cancel and validates results.
+        Loops while status is not done, then confirms all tasks canceled.
+        """
+        # cancel the tasks and get the cancel id
+        task_ids = self._unauthorized_transfers()
+        message = "SDK test cancel status"
+        cancel_id = self.tc.endpoint_manager_cancel_tasks(
+            task_ids, message)["id"]
+
+        # loop while not done or fail after 30 tries, 1 try per second
+        for tries in range(30):
+            # get and validate cancel status
+            status_doc = self.tc.endpoint_manager_cancel_status(cancel_id)
+            self.assertEqual(status_doc["DATA_TYPE"], "admin_cancel")
+            self.assertEqual(status_doc["id"], cancel_id)
+            if status_doc["done"]:
+                break
+            else:
+                time.sleep(1)
+
+        # confirm sdktester2b now sees all tasks as canceled by admin.
+        for task_id in task_ids:
+            task_doc = self.tc2.get_task(task_id)
+            self.assertEqual(task_doc["canceled_by_admin"], "SOURCE")
+            self.assertEqual(task_doc["canceled_by_admin_message"], message)
+
+    # TODO: uncomment these tests when
+    # https://github.com/globusonline/koa/issues/49
+    # is resolved.
+    '''
+    def test_endpoint_manager_pause_tasks(self):
+        """
+        Has sdktester2b submit three unauthorized transfers,
+        and sdktester1a pause the tasks as an admin.
+        Validates results and confirms the tasks are paused.
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        # pause the tasks
+        task_ids = self._unauthorized_transfers()
+        message = "SDK test pause tasks"
+        pause_doc = self.tc.endpoint_manager_pause_tasks(task_ids, message)
+
+        # validate results
+        self.assertEqual(pause_doc["DATA_TYPE"], "result")
+        self.assertEqual(pause_doc["code"], "PauseAccepted")
+
+        # confirm sdktester2b sees the tasks as paused
+        for task_id in task_ids:
+            task_doc = self.tc2.get_task(task_id)
+            self.assertTrue(task_doc["is_paused"])
+
+        # 403 for non managers
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_pause_tasks(task_ids, message)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
+    def test_endpoint_manager_resume_tasks(self):
+        """
+        Has sdktester2b submit three unauthorized transfers,
+        then sdktester1a pauses then resumes the tasks as an admin.
+        Confirms tasks go from paused to active.
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        # pause the tasks and confirm they are paused
+        task_ids = self._unauthorized_transfers()
+        message = "SDK test resume tasks"
+        self.tc.endpoint_manager_pause_tasks(task_ids, message)
+        for task_id in task_ids:
+            task_doc = self.tc2.get_task(task_id)
+            self.assertTrue(task_doc["is_paused"])
+
+        # resume the tasks and validate results
+        resume_doc = self.tc.endpoint_manager_resume_tasks(task_ids, message)
+        self.assertEqual(resume_doc["DATA_TYPE"], "result")
+        self.assertEqual(resume_doc["code"], "ResumeAccepted")
+
+        # confirm tasks are now active.
+        for task_id in task_ids:
+            task_doc = self.tc2.get_task(task_id)
+            self.assertFalse(task_doc["is_paused"])
+
+        # 403 for non managers
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_resume_tasks(task_ids, message)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+    '''
