@@ -1480,16 +1480,6 @@ class SharedTransferClientTests(BaseTransferClientTests):
         rule = list_doc["DATA"][0]
         self.assertEqual(rule["id"], rule_id)
 
-        # filterd by host endpoint
-        list_doc = self.tc.endpoint_manager_pause_rule_list(
-            filter_host_endpoint=GO_EP1_ID)
-        for rule in list_doc:
-            self.assertEqual(rule["DATA_TYPE"], "pause_rule")
-            if rule["id"] == rule_id:
-                break
-        else:
-            self.assertFalse("rule_id not found")
-
         # 403 for non managers
         with self.assertRaises(TransferAPIError) as apiErr:
             self.tc2.endpoint_manager_pause_rule_list()

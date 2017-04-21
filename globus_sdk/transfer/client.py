@@ -1817,8 +1817,7 @@ class TransferClient(BaseClient):
     # endpoint manager pause rule methods
     #
 
-    def endpoint_manager_pause_rule_list(self, filter_endpoint=None,
-                                         filter_host_endpoint=None, **params):
+    def endpoint_manager_pause_rule_list(self, filter_endpoint=None, **params):
         """
         Get a list of pause rules on endpoints that the current user has the
         activity monitor effective role on.
@@ -1851,8 +1850,7 @@ class TransferClient(BaseClient):
         self.logger.info(("TransferClient.endpoint_manager_"
                           "pause_rule_list(...)"))
         path = self.qjoin_path("endpoint_manager", "pause_rule_list")
-        merge_params(params, filter_endpoint=filter_endpoint,
-                     filter_host_endpoint=filter_host_endpoint)
+        merge_params(params, filter_endpoint=filter_endpoint)
         return self.get(path, params=params,
                         response_class=IterableTransferResponse)
 
