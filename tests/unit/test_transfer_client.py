@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import globus_sdk
 from tests.framework import (CapturedIOTestCase,
                              get_client_data, get_user_data,
-                             GO_EP1_ID, GO_EP2_ID,
+                             GO_EP1_ID, GO_EP2_ID, GO_EP1_SERVER_ID,
                              SDKTESTER1A_NATIVE1_TRANSFER_RT,
                              SDKTESTER2B_NATIVE1_TRANSFER_RT)
 from globus_sdk.exc import TransferAPIError
@@ -278,7 +278,6 @@ class TransferClientTests(BaseTransferClientTests):
         self.assertEqual(get_data["sharing_target_root_path"], share_path)
 
         # track assets for cleanup
-        # TODO: track .globus?
         self.asset_cleanup.append({"function": self.tc.delete_endpoint,
                                    "args": [share_doc["id"]]})
         self.asset_cleanup.append({"function": self.deleteHelper,
@@ -304,16 +303,12 @@ class TransferClientTests(BaseTransferClientTests):
         """
         Gets the go#ep1 server by id, validates results
         """
-
-        # TODO: confirm this value is in-fact constant, then add to constants
-        server_id = 207976
-
         # get a server id from the server list
-        get_doc = self.tc.get_endpoint_server(GO_EP1_ID, server_id)
+        get_doc = self.tc.get_endpoint_server(GO_EP1_ID, GO_EP1_SERVER_ID)
 
         # validate data_type and the existence of some expected fields
         self.assertEqual(get_doc["DATA_TYPE"], "server")
-        self.assertEqual(get_doc["id"], server_id)
+        self.assertEqual(get_doc["id"], GO_EP1_SERVER_ID)
         self.assertIn("hostname", get_doc)
         self.assertIn("port", get_doc)
 
@@ -1187,7 +1182,6 @@ class SharedTransferClientTests(BaseTransferClientTests):
         self.test_share_ep_id = r["id"]
 
         # track assets for cleanup
-        # TODO: track .globus?
         self.asset_cleanup.append({"function": self.tc.delete_endpoint,
                                    "args": [r["id"]]})
         self.asset_cleanup.append({"function": self.deleteHelper,
@@ -1292,11 +1286,11 @@ class SharedTransferClientTests(BaseTransferClientTests):
 
         # confirm doc type, and that test_share_ep_id is on the list
         self.assertEqual(share_doc["DATA_TYPE"], "endpoint_list")
-        share_test_found = False
         for ep in share_doc:
-            share_test_found = (ep["id"] == self.test_share_ep_id
-                                or share_test_found)
-        self.assertTrue(share_test_found)
+            if ep["id"] == self.test_share_ep_id:
+                break
+        else:
+            self.assertFalse("test share not found")
 
     def test_endpoint_acl_list(self):
         """
@@ -1579,7 +1573,9 @@ class SharedTransferClientTests(BaseTransferClientTests):
 
 
 # class for Transfer Client Tests that require the activity_manager
-# role on an endpoint but don't require a unique endpoint.
+# effective role on an endpoint but don't require a unique endpoint.
+# Setup checks to see if the managed shared endpoint exists and if not creates
+# one. This endpoint is not removed during cleanup.
 class ManagerTransferClientTests(BaseTransferClientTests):
 
     __test__ = True  # marks sub-class as having tests
@@ -1630,16 +1626,14 @@ class ManagerTransferClientTests(BaseTransferClientTests):
         expected_fields = ["my_effective_roles", "display_name",
                            "owner_id", "owner_string"]
 
-        managed_found = False
         for ep in ep_doc:
             self.assertEqual(ep["DATA_TYPE"], "endpoint")
             for field in expected_fields:
                 self.assertIn(field, ep)
-
             if ep["id"] == self.managed_ep_id:
-                managed_found = True
-
-        self.assertTrue(managed_found)
+                break
+        else:
+            self.assertFalse("managed endpoint not found")
 
     def test_endpoint_manager_get_endpoint(self):
         """
@@ -1818,13 +1812,11 @@ class ManagerTransferClientTests(BaseTransferClientTests):
         Confirms sdktester1a can view pause_info of task.
         Confirms 403 when non manager attempts to use this resource.
         """
-        # sdktester2b subits no-op delete task and waits for completion
+        # sdktester2b subits no-op delete task
         ddata = globus_sdk.DeleteData(self.tc2, self.managed_ep_id,
-                                      notify_on_succeeded=False)
+                                      notify_on_fail=False)
         ddata.add_item("no-op.txt")
         task_id = self.tc2.submit_delete(ddata)["task_id"]
-        self.assertTrue(
-            self.tc2.task_wait(task_id, timeout=30, polling_interval=1))
 
         # sdktester1a gets the task pause info as admin
         pause_doc = self.tc.endpoint_manager_task_pause_info(task_id)
@@ -1882,7 +1874,7 @@ class ManagerTransferClientTests(BaseTransferClientTests):
 
     def _unauthorized_transfers(self):
         """
-        Helper that has sdktester2b submits 3 unauthorized transfers from the
+        Helper that has sdktester2b submit 3 unauthorized transfers from the
         managed endpoint, returns a list of their task_ids,
         and tracks them for cleanup.
         """
