@@ -227,27 +227,24 @@ class TransferClientTests(BaseTransferClientTests):
         """
         Gets activation requirements on tutorial endpoint, validates results
         """
-
         # get requirements
         reqs_doc = self.tc.endpoint_get_activation_requirements(GO_EP1_ID)
 
-        # confirm doc data type and some expected fields
+        # validate data fields
         self.assertEqual(reqs_doc["DATA_TYPE"], "activation_requirements")
-        self.assertIn("activated", reqs_doc)
-        self.assertIn("auto_activation_supported", reqs_doc)
-        self.assertIn("DATA", reqs_doc)
+        self.assertEqual(reqs_doc["DATA"], [])
+        self.assertEqual(reqs_doc["expires_in"], -1)
+        self.assertIsNone(reqs_doc["expire_time"])
+        self.assertIsNone(reqs_doc["oauth_server"])
+        self.assertTrue(reqs_doc["auto_activation_supported"])
 
-    def test_my_effective_pause_rule_list(self):
-        """
-        Gets pause rule list from tutorial endpoint, validates results
-        """
-
-        # get the pause list
-        pause_doc = self.tc.my_effective_pause_rule_list(GO_EP1_ID)
-
-        # confirm doc data type and that it has the DATA field
-        self.assertEqual(pause_doc["DATA_TYPE"], "pause_rule_list")
-        self.assertIn("DATA", pause_doc)
+        # validate ActivationRequirementsResponse properties
+        self.assertIsInstance(
+            reqs_doc,
+            globus_sdk.transfer.response.ActivationRequirementsResponse)
+        self.assertTrue(reqs_doc.supports_auto_activation)
+        self.assertTrue(reqs_doc.supports_web_activation)
+        self.assertTrue(reqs_doc.always_activated)
 
     def test_create_shared_endpoint(self):
         """
@@ -402,101 +399,6 @@ class TransferClientTests(BaseTransferClientTests):
             self.assertIn("principal_type", role)
             self.assertIn("principal", role)
             self.assertIn("role", role)
-
-    def test_add_endpoint_role(self):
-        """
-        For now, just confirms only managed endpoints can have roles added
-        TODO:
-        Adds a role to the test endpoint, validates results
-        returns role_id for use in get and delete
-        """
-
-        # add the new role
-        add_data = {"DATA_TYPE": "role",
-                    "principal_type": "identity",
-                    "principal": get_user_data()["go"]["id"],
-                    "role": "access_manager"
-                    }
-
-        with self.assertRaises(TransferAPIError) as apiErr:
-            self.tc.add_endpoint_role(self.test_ep_id, add_data)
-        self.assertEqual(apiErr.exception.http_status, 409)
-        self.assertEqual(apiErr.exception.code, "Conflict")
-
-        # TODO: get managed endpoint to test against
-
-        # add_doc = self.tc.add_endpoint_role(self.test_ep_id, add_data)
-
-        # validate results
-        # self.assertEqual(add_doc["DATA_TYPE"], "role")
-        # self.assertIn("id", add_doc)
-        # role_id = add_doc["id"]
-
-        # confirm that get can see the new role
-        # get_doc = self.tc.get_endpoint_role(self.test_ep_id, role_id)
-        # self.assertEqual(get_doc["id"], role_id)
-        # for item in add_data:
-        #     self.assertEqual(get_doc[item], add_data[item])
-
-        # return server id
-        # return role_id
-
-    def test_get_endpoint_role(self):
-        """
-        Gets SDK tester's admin role from test_endpoint, validates results
-        """
-
-        # TODO: get role_id from add to remove needing the list
-
-        # get role id from role list, assumes admin id is first
-        list_doc = self.tc.endpoint_role_list(self.test_ep_id)
-        role_id = list_doc["DATA"][0]["id"]
-
-        # get the role by its id
-        get_doc = self.tc.get_endpoint_role(self.test_ep_id, role_id)
-
-        # validate results
-        self.assertEqual(get_doc["DATA_TYPE"], "role")
-        self.assertEqual(get_doc["id"], role_id)
-        self.assertEqual(get_doc["principal_type"], "identity")
-        self.assertEqual(get_doc["principal"],
-                         get_user_data()["sdktester1a"]["id"])
-        self.assertEqual(get_doc["role"], "administrator")
-
-    def delete_endpoint_role(self, endpoint_id, role_id):
-        """
-        For now, just confirms only managed endpoints can have roles deleted
-        TODO:
-        Deletes role from test_endpoint, validates results
-        """
-
-        # TODO: get role_id from add, to remove needing the list,
-        # and prevent issues that might arise from deleting our own admin role
-
-        # get role id from role list
-        list_doc = self.tc.endpoint_role_list(self.test_ep_id)
-        role_id = list_doc["DATA"][0]["id"]
-
-        with self.assertRaises(TransferAPIError) as apiErr:
-            self.tc.delete_endpoint_role(self.test_ep_id, role_id)
-        self.assertEqual(apiErr.exception.http_status, 409)
-        self.assertEqual(apiErr.exception.code, "Conflict")
-
-        # TODO: test against managed endpoint
-
-        # delete the role
-        # delete_doc = self.tc.delete_endpoint_role(self.test_ep_id, role_id)
-
-        # validate results
-        # self.assertEqual(get_doc["DATA_TYPE"], "results")
-        # self.assertEqual(get_doc["code"], "Deleted")
-        # self.assertIn("deleted successfully", get_doc["message"])
-
-        # confirm get no longer sees the role
-        # with self.assertRaises(TransferAPIError) as apiErr:
-        #     self.tc.get_endpoint_role(self.test_ep_id, role_id)
-        # self.assertEqual(apiErr.exception.http_status, 404)
-        # self.assertEqual(apiErr.exception.code, "RoleNotFound")
 
     def test_bookmark_list(self):
         """
@@ -1120,23 +1022,6 @@ class TransferClientTests(BaseTransferClientTests):
         self.asset_cleanup.append({"function": self.tc.cancel_task,
                                    "args": [never_id]})
 
-    def test_task_pause_info(self):
-        """
-        Gets the pause info for a task, validates results
-        """
-
-        # get pause info
-        task_id = self.test_get_task()
-        pause_doc = self.tc.task_pause_info(task_id)
-
-        # validate results
-        self.assertEqual(pause_doc["DATA_TYPE"], "pause_info_limited")
-        self.assertIsNone(pause_doc["source_pause_message"])
-        self.assertIsNone(pause_doc["destination_pause_message"])
-        self.assertIn("pause_rules", pause_doc)
-
-        # TODO: test against an endpoint with pause rules
-
     def test_task_successful_transfers(self):
         """
         Gets the successful transfers from a completed task, validates results
@@ -1237,12 +1122,10 @@ class SharedTransferClientTests(BaseTransferClientTests):
         confirms activation through get,
         confirms trying again with if_expires_in returns AlreadyActivated
         """
-
         # deactivate
         self.tc.endpoint_deactivate(self.test_share_ep_id)
 
         # auto-activate and check for successful response code
-
         auto_doc = self.tc.endpoint_autoactivate(self.test_share_ep_id)
         self.assertEqual(auto_doc["code"],
                          "AutoActivated.GlobusOnlineCredential")
@@ -1571,6 +1454,97 @@ class SharedTransferClientTests(BaseTransferClientTests):
                 self.asset_cleanup.remove(cleanup)
                 break
 
+    def test_task_pause_info(self):
+        """
+        Creates a pause rule on the shared endpoint, then submits a task
+        against it. Gets pause info for the task, validates results,
+        and confirms the task is paused (or about to be).
+        """
+        # create pause rule
+        rule_id = self.test_endpoint_manager_create_pause_rule()
+
+        # submit a no-op delete task
+        ddata = globus_sdk.DeleteData(self.tc, self.test_share_ep_id,
+                                      notify_on_fail=False)
+        ddata.add_item("no-op.txt")
+        task_id = self.tc.submit_delete(ddata)["task_id"]
+
+        # get pause info and validate
+        pause_doc = self.tc.task_pause_info(task_id)
+
+        # validate top level results
+        self.assertEqual(pause_doc["DATA_TYPE"], "pause_info_limited")
+        self.assertIsNone(pause_doc["source_pause_message"])
+        self.assertIsNone(pause_doc["destination_pause_message"])
+
+        # validate the rule results
+        rule = pause_doc["pause_rules"][0]  # should be the only rule
+        self.assertEqual(rule["DATA_TYPE"], "pause_rule_limited")
+        self.assertEqual(rule["id"], rule_id)
+        self.assertEqual(rule["message"], "SDK Test Pause Rule")
+        self.assertNotIn("modified_by", rule)
+        self.assertNotIn("modified_by_id", rule)
+
+    def test_my_effective_pause_rule_list(self):
+        """
+        Creates a pause rule on the shared endpoint, then gets pause rule list.
+        Validates results and confirms the pause rule is found.
+        """
+        # create pause rule
+        rule_id = self.test_endpoint_manager_create_pause_rule()
+
+        # get the pause list
+        pause_doc = self.tc.my_effective_pause_rule_list(self.test_share_ep_id)
+
+        # validate top level results
+        self.assertEqual(pause_doc["DATA_TYPE"], "pause_rule_list")
+
+        # validate the rule results
+        rule = pause_doc["DATA"][0]  # should be the only rule
+        self.assertEqual(rule["DATA_TYPE"], "pause_rule_limited")
+        self.assertEqual(rule["id"], rule_id)
+        self.assertEqual(rule["message"], "SDK Test Pause Rule")
+        self.assertNotIn("modified_by", rule)
+        self.assertNotIn("modified_by_id", rule)
+
+    def test_endpoint_manager_task_pause_info(self):
+        """
+        Creates a pause rule on the shared endpoint, then
+        has sdktester2b submit a no-op task on the shared endpoint.
+        Confirms sdktester1a can see the task is paused (or about to be).
+        Confirms 403 when non manager attempts to use this resource.
+        """
+        # sdktester1a creates pause rule
+        rule_id = self.test_endpoint_manager_create_pause_rule()
+
+        # sdktester2b subits no-op delete task
+        ddata = globus_sdk.DeleteData(self.tc2, self.test_share_ep_id,
+                                      notify_on_fail=False)
+        ddata.add_item("no-op.txt")
+        task_id = self.tc2.submit_delete(ddata)["task_id"]
+
+        # sdktester1a gets the task pause info as admin
+        pause_doc = self.tc.endpoint_manager_task_pause_info(task_id)
+
+        # validate top level results
+        self.assertEqual(pause_doc["DATA_TYPE"], "pause_info_limited")
+        self.assertIsNone(pause_doc["source_pause_message"])
+        self.assertIsNone(pause_doc["destination_pause_message"])
+
+        # validate the rule results
+        rule = pause_doc["pause_rules"][0]  # should be the only rule
+        self.assertEqual(rule["DATA_TYPE"], "pause_rule_limited")
+        self.assertEqual(rule["id"], rule_id)
+        self.assertEqual(rule["message"], "SDK Test Pause Rule")
+        # self.assertEqual(rule["modified_by_id"],
+        #                  get_user_data()["sdktester1a"]["id"])
+
+        # 403 for non managers, even if they submitted the task
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc2.endpoint_manager_task_pause_info(task_id)
+        self.assertEqual(apiErr.exception.http_status, 403)
+        self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
 
 # class for Transfer Client Tests that require the activity_manager
 # effective role on an endpoint but don't require a unique endpoint.
@@ -1805,32 +1779,6 @@ class ManagerTransferClientTests(BaseTransferClientTests):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
-    # TODO: further test once pause methods are implemented
-    def test_endpoint_manager_task_pause_info(self):
-        """
-        Has sdktester2b submit a no-op task on the managed endpoint.
-        Confirms sdktester1a can view pause_info of task.
-        Confirms 403 when non manager attempts to use this resource.
-        """
-        # sdktester2b subits no-op delete task
-        ddata = globus_sdk.DeleteData(self.tc2, self.managed_ep_id,
-                                      notify_on_fail=False)
-        ddata.add_item("no-op.txt")
-        task_id = self.tc2.submit_delete(ddata)["task_id"]
-
-        # sdktester1a gets the task pause info as admin
-        pause_doc = self.tc.endpoint_manager_task_pause_info(task_id)
-        self.assertEqual(pause_doc["DATA_TYPE"], "pause_info_limited")
-
-        for rule in pause_doc["pause_rules"]:
-            self.assertEqual(rule["DATA_TYPE"], "pause_rule_limited")
-
-        # 403 for non managers, even if they submitted the task
-        with self.assertRaises(TransferAPIError) as apiErr:
-            self.tc2.endpoint_manager_task_pause_info(task_id)
-        self.assertEqual(apiErr.exception.http_status, 403)
-        self.assertEqual(apiErr.exception.code, "PermissionDenied")
-
     def test_endpoint_manager_task_successful_transfers(self):
         """
         Has sdktester2b submit a recursive transfer of share/godata to the
@@ -2007,3 +1955,67 @@ class ManagerTransferClientTests(BaseTransferClientTests):
             self.tc2.endpoint_manager_resume_tasks(task_ids, message)
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
+    def test_add_endpoint_role(self):
+        """
+        Adds a role to the test share endpoint, validates results
+        returns role_id for use in get and delete
+        """
+        # add the new role
+        add_data = {"principal_type": "identity",
+                    "principal": get_user_data()["go"]["id"],
+                    "role": "access_manager"
+                    }
+        add_doc = self.tc.add_endpoint_role(self.managed_ep_id, add_data)
+        role_id = add_doc["id"]
+
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.tc.delete_endpoint_role,
+                                   "args": [self.managed_ep_id, role_id],
+                                   "name": "test_role"})
+
+        # validate results
+        for key in add_data:
+            self.assertEqual(add_doc[key], add_data[key])
+
+        # return role id
+        return role_id
+
+    def test_get_endpoint_role(self):
+        """
+        Gets role created in test_add_endpoint_role, validates results.
+        """
+        role_id = self.test_add_endpoint_role()
+        get_doc = self.tc.get_endpoint_role(self.managed_ep_id, role_id)
+
+        # validate results
+        self.assertEqual(get_doc["DATA_TYPE"], "role")
+        self.assertEqual(get_doc["id"], role_id)
+        self.assertEqual(get_doc["principal_type"], "identity")
+        self.assertEqual(get_doc["principal"],
+                         get_user_data()["go"]["id"])
+        self.assertEqual(get_doc["role"], "access_manager")
+
+    def test_delete_endpoint_role(self):
+        """
+        Deletes role created in test_add_endpoint_role, validates results.
+        """
+        role_id = self.test_add_endpoint_role()
+        delete_doc = self.tc.delete_endpoint_role(self.managed_ep_id, role_id)
+
+        # validate results
+        self.assertEqual(delete_doc["DATA_TYPE"], "result")
+        self.assertEqual(delete_doc["code"], "Deleted")
+        self.assertIn("deleted successfully", delete_doc["message"])
+
+        # confirm get no longer sees the role
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc.get_endpoint_role(self.managed_ep_id, role_id)
+        self.assertEqual(apiErr.exception.http_status, 404)
+        self.assertEqual(apiErr.exception.code, "RoleNotFound")
+
+        # stop tracking asset for cleanup
+        for cleanup in self.asset_cleanup:
+            if "name" in cleanup and cleanup["name"] == "test_role":
+                self.asset_cleanup.remove(cleanup)
+                break
