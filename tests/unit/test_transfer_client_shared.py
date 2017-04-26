@@ -513,3 +513,68 @@ class SharedTransferClientTests(TransferClientTestCase):
             self.tc2.endpoint_manager_task_pause_info(task_id)
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
+
+    def test_add_endpoint_role(self):
+        """
+        Adds a role to the test share endpoint, validates results
+        returns role_id for use in get and delete
+        """
+        # add the new role
+        add_data = {"principal_type": "identity",
+                    "principal": get_user_data()["go"]["id"],
+                    "role": "access_manager"
+                    }
+        add_doc = self.tc.add_endpoint_role(self.test_share_ep_id, add_data)
+        role_id = add_doc["id"]
+
+        # track asset for cleanup, make sure role is delete before share
+        self.asset_cleanup.insert(0, {"function": self.tc.delete_endpoint_role,
+                                      "args": [self.test_share_ep_id, role_id],
+                                      "name": "test_role"})
+
+        # validate results
+        for key in add_data:
+            self.assertEqual(add_doc[key], add_data[key])
+
+        # return role id
+        return role_id
+
+    def test_get_endpoint_role(self):
+        """
+        Gets role created in test_add_endpoint_role, validates results.
+        """
+        role_id = self.test_add_endpoint_role()
+        get_doc = self.tc.get_endpoint_role(self.test_share_ep_id, role_id)
+
+        # validate results
+        self.assertEqual(get_doc["DATA_TYPE"], "role")
+        self.assertEqual(get_doc["id"], role_id)
+        self.assertEqual(get_doc["principal_type"], "identity")
+        self.assertEqual(get_doc["principal"],
+                         get_user_data()["go"]["id"])
+        self.assertEqual(get_doc["role"], "access_manager")
+
+    def test_delete_endpoint_role(self):
+        """
+        Deletes role created in test_add_endpoint_role, validates results.
+        """
+        role_id = self.test_add_endpoint_role()
+        delete_doc = self.tc.delete_endpoint_role(
+            self.test_share_ep_id, role_id)
+
+        # validate results
+        self.assertEqual(delete_doc["DATA_TYPE"], "result")
+        self.assertEqual(delete_doc["code"], "Deleted")
+        self.assertIn("deleted successfully", delete_doc["message"])
+
+        # confirm get no longer sees the role
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc.get_endpoint_role(self.test_share_ep_id, role_id)
+        self.assertEqual(apiErr.exception.http_status, 404)
+        self.assertEqual(apiErr.exception.code, "RoleNotFound")
+
+        # stop tracking asset for cleanup
+        for cleanup in self.asset_cleanup:
+            if "name" in cleanup and cleanup["name"] == "test_role":
+                self.asset_cleanup.remove(cleanup)
+                break
