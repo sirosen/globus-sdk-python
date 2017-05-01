@@ -212,8 +212,7 @@ class AuthClientTests(CapturedIOTestCase):
 
     def test_oauth2_token(self):
         """
-        Gets an access_token using oauth2/token directly, validates results
-        returns the access_token for use in testing
+        Gets an access_token using oauth2/token directly, validates results.
         """
         client_id = get_client_data()["native_app_client1"]["id"]
         form_data = {'refresh_token': SDKTESTER1A_NATIVE1_AUTH_RT,
@@ -224,8 +223,6 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertIn("access_token", token_res)
         self.assertIn("expires_in", token_res)
         self.assertIn("scope", token_res)
-
-        return token_res["access_token"]
 
     def test_oauth2_userinfo(self):
         """
