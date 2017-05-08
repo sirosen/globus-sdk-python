@@ -4,6 +4,7 @@ extend ``dict``, so they can be passed seemlesly to
 :class:`TransferClient <globus_sdk.TransferClient>` methods without
 conversion.
 """
+from __future__ import unicode_literals
 import logging
 
 from globus_sdk.base import safe_stringify
@@ -96,6 +97,8 @@ class TransferData(dict):
         Appends a transfer_item document to the DATA key of the transfer
         document.
         """
+        source_path = safe_stringify(source_path)
+        destination_path = safe_stringify(destination_path)
         item_data = {
             "DATA_TYPE": "transfer_item",
             "source_path": source_path,
@@ -166,6 +169,7 @@ class DeleteData(dict):
         Appends a delete_item document to the DATA key of the delete
         document.
         """
+        path = safe_stringify(path)
         item_data = {
             "DATA_TYPE": "delete_item",
             "path": path,
