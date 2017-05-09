@@ -7,13 +7,13 @@ python:
   - "3.5"
   - "3.6"
   # allow failures on CPython dev and pypy
-  # we want to be warned about these, but they aen't critical
-  - "3.6-dev"
+  # we want to be warned about these, but they aren't critical
+  - "3.7-dev"
   - "pypy"
   - "pypy3"
 matrix:
   allow_failures:
-    - python: "3.6-dev"
+    - python: "3.7-dev"
     - python: "pypy"
     - python: "pypy3"
 cache: pip
