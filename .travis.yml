@@ -17,9 +17,5 @@ matrix:
     - python: "pypy"
     - python: "pypy3"
 cache: pip
-install:
-  - pip install -e .[jwt]
-  - pip install -r test-requirements.txt
 script:
-  - flake8
-  - nose2 --verbose
+  - make travis

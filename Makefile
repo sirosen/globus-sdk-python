@@ -1,7 +1,4 @@
-# default to system python
-PYTHON_VERSION ?=
-PYTHON_INTERPRETER=python$(PYTHON_VERSION)
-VIRTUALENV=.venv$(PYTHON_VERSION)
+VIRTUALENV=.venv
 
 .PHONY: docs build upload test test/opts clean help
 
@@ -27,7 +24,9 @@ localdev: $(VIRTUALENV)
 
 
 $(VIRTUALENV): setup.py
-	virtualenv --python $(PYTHON_INTERPRETER) $(VIRTUALENV)
+	virtualenv $(VIRTUALENV)
+	$(VIRTUALENV)/bin/pip install --upgrade pip
+	$(VIRTUALENV)/bin/pip install --upgrade setuptools
 	$(VIRTUALENV)/bin/python setup.py develop
 	# explicit touch to ensure good update time relative to setup.py
 	touch $(VIRTUALENV)
@@ -56,6 +55,13 @@ test/opts: $(VIRTUALENV)
 	$(VIRTUALENV)/bin/pip install -e .[jwt]
 	$(MAKE) test
 
+travis:
+	pip install --upgrade pip
+	pip install --upgrade "setuptools>=29,<30"
+	pip install -r test-requirements.txt
+	pip install -e .[jwt]
+	flake8
+	nose2 --verbose
 
 
 # docs needs full install because sphinx will actually try to do
