@@ -219,7 +219,11 @@ class PaginatedResource(GlobusResponse, six.Iterator):
                 if self.next_marker:
                     self.client_kwargs['params']['marker'] = (
                         self.next_marker)
+            elif self.paging_style == self.PAGING_STYLE_LAST_KEY:
+                if self.next_marker:
+                    self.client_kwargs['params']['last_key'] = self.next_marker
             # these params work for all paging styles *except* MARKER
+            # and LAST_KEY
             else:
                 self.client_kwargs['params']['offset'] = self.offset
 
@@ -230,6 +234,11 @@ class PaginatedResource(GlobusResponse, six.Iterator):
             Additionally, update the PaginatedResource.maker or
             PaginatedResource.offset based on the response
             """
+            # if the paging style is LAST_KEY, check has_next_page
+            if self.paging_style == self.PAGING_STYLE_LAST_KEY:
+                self.next_marker = res.get('last_key')
+                return res['has_next_page']
+
             # if the paging style is MARKER, look at the marker
             if self.paging_style == self.PAGING_STYLE_MARKER:
                 # marker may be 0, null, or absent if no more results
