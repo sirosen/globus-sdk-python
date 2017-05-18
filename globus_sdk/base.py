@@ -336,6 +336,8 @@ class BaseClient(object):
         # initial request
         r = send_request()
 
+        self.logger.debug('Request made to URL: {}'.format(r.url))
+
         # potential 401 retry handling
         if r.status_code == 401 and retry_401 and self.authorizer is not None:
             self.logger.debug('request got 401, checking retry-capability')
