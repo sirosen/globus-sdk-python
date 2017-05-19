@@ -1538,7 +1538,7 @@ class TransferClient(BaseClient):
         return PaginatedResource(
             self.get, path, {'params': params},
             num_results=num_results, max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_HAS_NEXT)
+            paging_style=PaginatedResource.PAGING_STYLE_LAST_KEY)
 
     def endpoint_manager_get_task(self, task_id, **params):
         """
