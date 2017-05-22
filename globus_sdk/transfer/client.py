@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import logging
 import time
 
@@ -846,6 +847,7 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_bookmark_by_id>`_
         in the REST documentation for details.
         """
+        bookmark_id = safe_stringify(bookmark_id)
         self.logger.info("TransferClient.get_bookmark({})".format(bookmark_id))
         path = self.qjoin_path('bookmark', bookmark_id)
         return self.get(path, params=params)
@@ -939,6 +941,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
+        path = safe_stringify(path)
         self.logger.info("TransferClient.operation_mkdir({}, {}, {})"
                          .format(endpoint_id, path, params))
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
@@ -970,6 +973,8 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         endpoint_id = safe_stringify(endpoint_id)
+        oldpath = safe_stringify(oldpath)
+        newpath = safe_stringify(newpath)
         self.logger.info("TransferClient.operation_rename({}, {}, {}, {})"
                          .format(endpoint_id, oldpath, newpath, params))
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
@@ -1699,11 +1704,13 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#admin_cancel>`_
         in the REST documentation for details.
         """
+        task_ids = [safe_stringify(i) for i in task_ids]
+        message = safe_stringify(message)
         self.logger.info(("TransferClient.endpoint_manager_"
                           "cancel_tasks({},{})".format(task_ids, message)))
         json_body = {
             "message": safe_stringify(message),
-            "task_id_list": [safe_stringify(i) for i in task_ids]
+            "task_id_list": task_ids
         }
         path = self.qjoin_path("endpoint_manager", "admin_cancel")
         return self.post(path, json_body=json_body, params=params)
@@ -1767,11 +1774,13 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#pause_tasks_as_admin>`_
         in the REST documentation for details.
         """
+        task_ids = [safe_stringify(i) for i in task_ids]
+        message = safe_stringify(message)
         self.logger.info(("TransferClient.endpoint_manager_"
                           "pause_tasks({},{})".format(task_ids, message)))
         json_body = {
             "message": safe_stringify(message),
-            "task_id_list": [safe_stringify(i) for i in task_ids]
+            "task_id_list": task_ids
         }
         path = self.qjoin_path("endpoint_manager", "admin_pause")
         return self.post(path, json_body=json_body, params=params)
@@ -1804,11 +1813,13 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#admin_cancel>`_
         in the REST documentation for details.
         """
+        task_ids = [safe_stringify(i) for i in task_ids]
+        message = safe_stringify(message)
         self.logger.info(("TransferClient.endpoint_manager_"
                           "resume_tasks({},{})".format(task_ids, message)))
         json_body = {
             "message": safe_stringify(message),
-            "task_id_list": [safe_stringify(i) for i in task_ids]
+            "task_id_list": task_ids
         }
         path = self.qjoin_path("endpoint_manager", "admin_resume")
         return self.post(path, json_body=json_body, params=params)
@@ -1914,6 +1925,7 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_pause_rule>`_
         in the REST documentation for details.
         """
+        pause_rule_id = safe_stringify(pause_rule_id)
         self.logger.info(("TransferClient.endpoint_manager_"
                           "get_pause_rule({})".format(pause_rule_id)))
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
@@ -1947,6 +1959,7 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#update_pause_rule>`_
         in the REST documentation for details.
         """
+        pause_rule_id = safe_stringify(pause_rule_id)
         self.logger.info(("TransferClient.endpoint_manager_"
                           "update_pause_rule({})".format(pause_rule_id)))
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
@@ -1978,6 +1991,7 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#delete_pause_rule>`_
         in the REST documentation for details.
         """
+        pause_rule_id = safe_stringify(pause_rule_id)
         self.logger.info(("TransferClient.endpoint_manager_"
                           "delete_pause_rule({})".format(pause_rule_id)))
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
