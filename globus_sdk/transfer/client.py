@@ -29,6 +29,12 @@ class TransferClient(BaseClient):
     :class:`TransferResponse <globus_sdk.transfer.response.TransferResponse>`
     object.
 
+    Some calls are paginated. If a call returns a :class:`PaginatedResource \
+    <globus_sdk.transfer.paging.PaginatedResource>` object, the result is an
+    iterator which can only be walked *once*. If you need to do multiple passes
+    over the result, call ``list()`` on the ``PaginatedResource`` or call the
+    original method again to get fresh results.
+
     Detailed documentation is available in the official REST API
     documentation, which is linked to from the method documentation. Methods
     that allow arbitrary keyword arguments will pass the extra arguments as
@@ -193,7 +199,9 @@ class TransferClient(BaseClient):
             GET /endpoint_search\
             ?filter_fulltext=<filter_fulltext>&filter_scope=<filter_scope>
 
-        :rtype: iterable of :class:`GlobusResponse
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
         **Parameters**
@@ -1089,7 +1097,9 @@ class TransferClient(BaseClient):
 
         ``GET /task_list``
 
-        :rtype: iterable of :class:`GlobusResponse
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
         **Parameters**
@@ -1131,7 +1141,9 @@ class TransferClient(BaseClient):
 
         ``GET /task/<task_id>/event_list``
 
-        :rtype: iterable of :class:`GlobusResponse
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
         **Parameters**
@@ -1351,7 +1363,9 @@ class TransferClient(BaseClient):
 
         ``GET /task/<task_id>/successful_transfers``
 
-        :rtype: iterable of :class:`GlobusResponse
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
         **Parameters**
@@ -1499,7 +1513,9 @@ class TransferClient(BaseClient):
 
         ``GET endpoint_manager/task_list``
 
-        :rtype: iterable of :class:`GlobusResponse
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
         **Parameters**
@@ -1577,7 +1593,9 @@ class TransferClient(BaseClient):
 
         ``GET /task/<task_id>/event_list``
 
-        :rtype: iterable of :class:`GlobusResponse
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
         **Parameters**
@@ -1641,7 +1659,9 @@ class TransferClient(BaseClient):
 
         ``GET /endpoint_manager/task/<task_id>/successful_transfers``
 
-        :rtype: iterable of :class:`GlobusResponse
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
         **Parameters**
@@ -1717,8 +1737,8 @@ class TransferClient(BaseClient):
 
     def endpoint_manager_cancel_status(self, admin_cancel_id, **params):
         """
-        Get the status of an an admin cancel (result of endpoint_manager_
-        cancel_tasks).
+        Get the status of an an admin cancel (result of
+        endpoint_manager_cancel_tasks).
 
         ``GET /endpoint_manager/admin_cancel/<admin_cancel_id>``
 

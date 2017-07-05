@@ -16,24 +16,27 @@ class PaginatedResource(GlobusResponse, six.Iterator):
 
     This is a class and not a function because it needs to enforce distinct
     actions between initialization and iteration. If defined as a generator
-    function with the `yield` syntax, python won't let us distinguish between
+    function with the ``yield`` syntax, python won't let us distinguish between
     creating the iterable object and iterating it.
     To eagerly trigger errors from the first call, we need to wrap it up in a
     class.
 
     Expectations about Paginated Transfer API Resources:
-    - They support `limit` and `offset` query params, with `limit` being a
-      count of elements to return, and offset being an offset into the result
+
+    - They support ``limit`` and ``offset`` query params, with ``limit`` being
+      a count of elements to return, and offset being an offset into the result
       set (as opposed to a page number), 0-based
       OR
-      They support a `marker` query param, which is an opaque value
-    - They return a JSON result with `has_next_page` as a boolean key,
+      They support a ``marker`` query param, which is an opaque value
+
+    - They return a JSON result with ``has_next_page`` as a boolean key,
       indicating whether or not there are more results available -- even if the
       hard limit for the API forbids requesting these results
       OR
-      They return a JSON result with `marker` as a key indicating whether or
+      They return a JSON result with ``marker`` as a key indicating whether or
       not there are more results available
-    - Individual results are JSON objects inside of an array named `DATA` in
+
+    - Individual results are JSON objects inside of an array named ``DATA`` in
       the returned JSON document
     """
 
@@ -153,6 +156,10 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         """
         To get the "data" on a PaginatedResource, fetch all pages and convert
         them into the only python data structure that makes sense: a list.
+
+        Note that this forces iteration/evaluation of all pages from the API.
+        It therefore may cause singificant IO spikes when used. You should
+        avoid using ``PaginatedResource.data`` property whenever possible.
         """
         return list(self)
 

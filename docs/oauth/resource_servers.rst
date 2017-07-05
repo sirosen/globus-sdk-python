@@ -1,5 +1,5 @@
 Resource Servers and Scopes
-==========================
+===========================
 
 What are Resource Servers, and how do they interact with scopes?
 

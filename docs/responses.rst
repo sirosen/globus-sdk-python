@@ -21,20 +21,12 @@ Generic Response Classes
    :members:
    :show-inheritance:
 
-Transfer Response Classes
--------------------------
 
-.. automodule:: globus_sdk.transfer.response
-   :members:
-   :show-inheritance:
+Service-Specific Response Classes
+---------------------------------
 
-Auth Response Classes
----------------------
+.. toctree::
+   :maxdepth: 1
 
-.. autoclass:: globus_sdk.auth.token_response.OAuthTokenResponse
-   :members:
-   :show-inheritance:
-
-.. autoclass:: globus_sdk.auth.token_response.OAuthDependentTokenResponse
-   :members:
-   :show-inheritance:
+   responses/transfer
+   responses/auth
