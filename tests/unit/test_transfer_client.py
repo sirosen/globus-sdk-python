@@ -2,7 +2,8 @@ from random import getrandbits
 
 import globus_sdk
 from tests.framework import (TransferClientTestCase, get_user_data,
-                             GO_EP1_ID, GO_EP2_ID, GO_EP1_SERVER_ID)
+                             GO_EP1_ID, GO_EP2_ID, GO_EP3_ID, GO_S3_ID,
+                             GO_EP1_SERVER_ID)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -563,6 +564,49 @@ class TransferClientTests(TransferClientTestCase):
         self.asset_cleanup.append({"function": self.deleteHelper,
                                    "args": [GO_EP1_ID, new_path]})
 
+    def test_operation_symlink(self):
+        """
+        Performs operation symlink creating valid and invalid symlinks
+        Confirms ls sees the symlinks target_paths and types correctly
+        Confirms non supporting endpoints raise 409
+        """
+        # perform operation_symlink with a valid target_path
+        # symlink path randomized to prevent collision
+        valid_target = "/share/godata/"
+        valid_name = "godata_symlink-" + str(getrandbits(128))
+        valid_path = "~/" + valid_name
+        self.tc.operation_symlink(GO_EP3_ID, valid_target, valid_path)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP3_ID, valid_path]})
+
+        # confirm ls sees valid symlink
+        filter_string = "name:" + valid_name
+        item = self.tc.operation_ls(GO_EP3_ID, filter=filter_string)["DATA"][0]
+        self.assertEqual(item["type"], "dir")
+        self.assertEqual(item["link_target"], valid_target)
+
+        # perform operation symlink with an invalid target_path
+        invalid_target = "/invalid/target/"
+        invalid_name = "invalid_symlink-" + str(getrandbits(128))
+        invalid_path = "~/" + invalid_name
+        self.tc.operation_symlink(GO_EP3_ID, invalid_target, invalid_path)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP3_ID, invalid_path]})
+
+        # confirm ls sees invalid symlink
+        filter_string = "name:" + invalid_name
+        item = self.tc.operation_ls(GO_EP3_ID, filter=filter_string)["DATA"][0]
+        self.assertEqual(item["type"], "invalid_symlink")
+        self.assertEqual(item["link_target"], invalid_target)
+
+        # confirm endpoints not supporting symlinks raise 409 NotSupported
+        with self.assertRaises(TransferAPIError) as apiErr:
+            self.tc.operation_symlink(GO_S3_ID, valid_target, valid_path)
+        self.assertEqual(apiErr.exception.http_status, 409)
+        self.assertEqual(apiErr.exception.code, "NotSupported")
+
     def test_operation_get_submission_id(self):
         """
         Gets a submission_id, validates results, checks UUID looks reasonable
@@ -588,7 +632,6 @@ class TransferClientTests(TransferClientTestCase):
         Submits transfer requests, validates results, confirms tasks completed
         tests recursive and submission_id parameters
         """
-
         # dir for testing transfers in, name randomized to prevent collision
         dest_dir = "transfer_dest_dir-" + str(getrandbits(128))
         dest_path = "/~/" + dest_dir + "/"
@@ -660,6 +703,120 @@ class TransferClientTests(TransferClientTestCase):
         # wait for submission to finish before moving on to cleanup
         self.assertTrue(self.tc.task_wait(sub_transfer_doc["task_id"],
                                           timeout=30, polling_interval=1))
+
+    def test_submit_transfer_keep_recursive_symlinks(self):
+        """
+        Submits transfer tasks from go#ep3:/share/symlinks/good/
+        with recursive_symlinks set to "keep"
+        Confirms symlinks are kept as symlinks at the destination.
+        """
+        # dir for testing transfers to, name randomized to prevent collision
+        keep_dir = "keep_symlink_dest_dir-" + str(getrandbits(128))
+        keep_path = "/~/" + keep_dir + "/"
+        self.tc.operation_mkdir(GO_EP3_ID, keep_path)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP3_ID, keep_path]})
+
+        # transfer from /share/symlink/good to keep_dir
+        tdata = globus_sdk.TransferData(self.tc, GO_EP3_ID, GO_EP3_ID,
+                                        recursive_symlinks="keep")
+        tdata.add_item("/share/symlinks/good/", keep_path, recursive=True)
+        task_id = self.tc.submit_transfer(tdata)["task_id"]
+
+        # confirm the symlinks are kept as symlinks
+        self.assertTrue(
+            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+        ls_doc = self.tc.operation_ls(GO_EP3_ID, path=keep_path)
+        self.assertEqual(len(ls_doc["DATA"]), 4)
+        for item in ls_doc:
+            self.assertIsNotNone(item["link_target"])
+
+    def test_submit_transfer_copy_recursive_symlinks(self):
+        """
+        Submits transfer tasks from go#ep3:/share/symlinks/good/
+        with recursive_symlinks set to "copy"
+        Confirms symlinks are kept as symlinks at the destination.
+        """
+        # dir for testing transfers to, name randomized to prevent collision
+        copy_dir = "copy_symlink_dest_dir-" + str(getrandbits(128))
+        copy_path = "/~/" + copy_dir + "/"
+        self.tc.operation_mkdir(GO_EP3_ID, copy_path)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP3_ID, copy_path]})
+
+        # transfer from /share/symlink/good to copy_dir
+        tdata = globus_sdk.TransferData(self.tc, GO_EP3_ID, GO_EP3_ID,
+                                        recursive_symlinks="copy")
+        tdata.add_item("/share/symlinks/good/", copy_path, recursive=True)
+        task_id = self.tc.submit_transfer(tdata)["task_id"]
+
+        # confirm the symlinks have their targets copied
+        self.assertTrue(
+            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+        ls_doc = self.tc.operation_ls(GO_EP3_ID, path=copy_path)
+        self.assertEqual(len(ls_doc["DATA"]), 4)
+        for item in ls_doc:
+            self.assertIsNone(item["link_target"])
+
+    def test_submit_transfer_ignore_recursive_symlinks(self):
+        # dir for testing transfers to, name randomized to prevent collision
+        ignore_dir = "ignore_symlink_dest_dir-" + str(getrandbits(128))
+        ignore_path = "/~/" + ignore_dir + "/"
+        self.tc.operation_mkdir(GO_EP3_ID, ignore_path)
+        # track asset for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP3_ID, ignore_path]})
+
+        # transfer from /share/symlink/good to ignore_dir
+        tdata = globus_sdk.TransferData(self.tc, GO_EP3_ID, GO_EP3_ID,
+                                        recursive_symlinks="ignore")
+        tdata.add_item("/share/symlinks/good/", ignore_path, recursive=True)
+        task_id = self.tc.submit_transfer(tdata)["task_id"]
+
+        # confirm the symlinks have their targets copied
+        self.assertTrue(
+            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+        ls_doc = self.tc.operation_ls(GO_EP3_ID, path=ignore_path)
+        self.assertEqual(len(ls_doc["DATA"]), 0)
+
+    def test_submit_transfer_symlink(self):
+        """
+        Transfers a symlink on go#ep3:/share/symlinks/good to go#ep3:~/
+        As a transfer_symlink_item and as a transfer_item
+        Confirms the symlink and the target are transfered as expected.
+        """
+        # transfer /share/symlink/good/file1.txt link \u2764
+        tdata = globus_sdk.TransferData(self.tc, GO_EP3_ID, GO_EP3_ID)
+        source_path = u"/share/symlinks/good/file1.txt link \u2764"
+
+        # add a transfer_symlink_item
+        link_name = "link-" + str(getrandbits(128))
+        link_dest = "~/" + link_name
+        tdata.add_symlink_item(source_path, link_dest)
+        # add a transfer_item
+        file_name = "file-" + str(getrandbits(128))
+        file_dest = "~/" + file_name
+        tdata.add_item(source_path, file_dest)
+
+        # submit the task
+        task_id = self.tc.submit_transfer(tdata)["task_id"]
+        self.assertTrue(
+            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+        # track assets for cleanup
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, link_dest]})
+        self.asset_cleanup.append({"function": self.deleteHelper,
+                                   "args": [GO_EP1_ID, file_dest]})
+
+        # confirm the transfer_symlink_item transfered the symlink
+        ls_doc = self.tc.operation_ls(GO_EP3_ID, filter="name:" + link_name)
+        self.assertEqual(ls_doc["DATA"][0]["link_target"],
+                         "/share/godata/file1.txt")
+        # confirm the transfer_item transfered the target
+        ls_doc = self.tc.operation_ls(GO_EP3_ID, filter="name:" + file_name)
+        self.assertIsNone(ls_doc["DATA"][0]["link_target"])
 
     def test_submit_delete(self):
         """

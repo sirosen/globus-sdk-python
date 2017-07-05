@@ -80,6 +80,21 @@ class DataTests(CapturedIOTestCase):
         self.assertEqual(r_data["destination_path"], dest_path)
         self.assertEqual(r_data["recursive"], True)
 
+    def test_transfer_add_symlink_item(self):
+        """
+        Adds a transfer_symlink_item to TransferData, verifies results
+        """
+        # add item
+        source_path = "source/path/"
+        dest_path = "dest/path/"
+        self.tdata.add_symlink_item(source_path, dest_path)
+        # verify results
+        self.assertEqual(len(self.tdata["DATA"]), 1)
+        data = self.tdata["DATA"][0]
+        self.assertEqual(data["DATA_TYPE"], "transfer_symlink_item")
+        self.assertEqual(data["source_path"], source_path)
+        self.assertEqual(data["destination_path"], dest_path)
+
     def test_delete_init(self):
         """
         Verifies DeleteData field initialization
