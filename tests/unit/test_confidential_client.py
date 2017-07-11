@@ -83,19 +83,21 @@ class ConfidentialAppAuthClientTests(CapturedIOTestCase):
             self.assertIn("expires_in", token_info)
             self.assertIn("resource_server", token_info)
 
-        # confirm non resource servers are unauthorized
-        with self.assertRaises(AuthAPIError) as apiErr:
-            self.cac.oauth2_client_credentials_tokens(access_token)
-        self.assertEqual(apiErr.exception.http_status, 400)
-        self.assertEqual(apiErr.exception.code, "UNKNOWN_SCOPE_ERROR")
-        '''
-
         # confirm invalid tokens are unauthorized
         invalid_token = tokens["auth.globus.org"]["access_token"]
         with self.assertRaises(AuthAPIError) as apiErr:
-            self.cac.oauth2_client_credentials_tokens(invalid_token)
-        self.assertEqual(apiErr.exception.http_status, 400)
-        self.assertEqual(apiErr.exception.code, "UNKNOWN_SCOPE_ERROR")
+            self.rsc.oauth2_get_dependent_tokens(access_token)
+        self.assertEqual(apiErr.exception.http_status, 401)
+        self.assertEqual(apiErr.exception.code, "Error")
+        '''
+
+        # confirm non resource servers are unauthorized
+        # TODO: use valid token here instead
+        invalid_token = tokens["auth.globus.org"]["access_token"]
+        with self.assertRaises(AuthAPIError) as apiErr:
+            self.cac.oauth2_get_dependent_tokens(invalid_token)
+        self.assertEqual(apiErr.exception.http_status, 401)
+        self.assertEqual(apiErr.exception.code, "Error")
 
     def test_oauth2_token_introspect(self):
         """
