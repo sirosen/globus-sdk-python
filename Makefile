@@ -35,8 +35,8 @@ $(VIRTUALENV): setup.py
 build: $(VIRTUALENV)
 	$(VIRTUALENV)/bin/python setup.py sdist bdist_egg
 
-$(VIRTUALENV)/bin/twine: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/pip install twine==1.6.5
+$(VIRTUALENV)/bin/twine: $(VIRTUALENV) upload-requirements.txt
+	$(VIRTUALENV)/bin/pip install -U -r upload-requirements.txt
 upload: $(VIRTUALENV)/bin/twine build
 	$(VIRTUALENV)/bin/twine upload dist/*
 
