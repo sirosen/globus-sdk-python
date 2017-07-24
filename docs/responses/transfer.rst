@@ -16,5 +16,5 @@ It is an iterable of ``GlobusRepsonse`` objects.
 
 
 .. autoclass:: globus_sdk.transfer.paging.PaginatedResource
-   :members:
+   :members: data
    :show-inheritance:
