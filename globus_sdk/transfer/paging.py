@@ -9,32 +9,17 @@ logger = logging.getLogger(__name__)
 
 class PaginatedResource(GlobusResponse, six.Iterator):
     """
-    A class that describes paginated Transfer API resources.
-    This is not a top level helper func because it depends upon the pagination
-    implementation of the Transfer API, which may not be the implementation
-    chosen by other, future APIs.
+    A ``PaginatedResource`` is an iterable response which implements the Python
+    iterator interface. As such, **you can only iterate over
+    PaginatedResources once**. Future iterations will be empty.
 
-    This is a class and not a function because it needs to enforce distinct
-    actions between initialization and iteration. If defined as a generator
-    function with the `yield` syntax, python won't let us distinguish between
-    creating the iterable object and iterating it.
-    To eagerly trigger errors from the first call, we need to wrap it up in a
-    class.
+    If you need fresh results, make a call for a new ``PaginatedResource``, and
+    if you want to cache and reuse results, convert to a list or other
+    structure. You may also want to read the docs on the :py:attr:`~data`
+    property.
 
-    Expectations about Paginated Transfer API Resources:
-    - They support `limit` and `offset` query params, with `limit` being a
-      count of elements to return, and offset being an offset into the result
-      set (as opposed to a page number), 0-based
-      OR
-      They support a `marker` query param, which is an opaque value
-    - They return a JSON result with `has_next_page` as a boolean key,
-      indicating whether or not there are more results available -- even if the
-      hard limit for the API forbids requesting these results
-      OR
-      They return a JSON result with `marker` as a key indicating whether or
-      not there are more results available
-    - Individual results are JSON objects inside of an array named `DATA` in
-      the returned JSON document
+    Because paginated data can be large, you will tend to get the best
+    performance by being sure to only iterate over the results once.
     """
 
     # pages have 'has_next_page', 'offset', and 'limit'
@@ -61,6 +46,36 @@ class PaginatedResource(GlobusResponse, six.Iterator):
                  max_total_results=None, offset=0,
                  paging_style=PAGING_STYLE_HAS_NEXT):
         """
+        A class that describes paginated Transfer API resources.
+        This is not a top level helper func because it depends upon the
+        pagination implementation of the Transfer API, which may not be the
+        implementation chosen by other, future APIs.
+
+        This is a class and not a function because it needs to enforce distinct
+        actions between initialization and iteration. If defined as a generator
+        function with the ``yield`` syntax, python won't let us distinguish
+        between creating the iterable object and iterating it.
+        To eagerly trigger errors from the first call, we need to wrap it up in
+        a class.
+
+        Expectations about Paginated Transfer API Resources:
+
+        - They support ``limit`` and ``offset`` query params, with ``limit``
+          being a count of elements to return, and offset being an offset into
+          the result set (as opposed to a page number), 0-based
+          OR
+          They support a ``marker`` query param, which is an opaque value
+
+        - They return a JSON result with ``has_next_page`` as a boolean key,
+          indicating whether or not there are more results available -- even if
+          the hard limit for the API forbids requesting these results
+          OR
+          They return a JSON result with ``marker`` as a key indicating whether
+          or not there are more results available
+
+        - Individual results are JSON objects inside of an array named ``DATA``
+          in the returned JSON document
+
         Takes a TransferClient method, a selection of its arguments, a variety
         of limits on result sizes, an offest into the result set, and a
         "paging style", which defines which kind of Transfer paging behavior
@@ -153,6 +168,10 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         """
         To get the "data" on a PaginatedResource, fetch all pages and convert
         them into the only python data structure that makes sense: a list.
+
+        Note that this forces iteration/evaluation of all pages from the API.
+        It therefore may cause singificant IO spikes when used. You should
+        avoid using the ``PaginatedResource.data`` property whenever possible.
         """
         return list(self)
 
