@@ -993,11 +993,14 @@ class TransferClient(BaseClient):
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
+        The ``path`` is the name of the symlink, and the ``symlink_target`` is
+        the path referenced by the symlink.
+
         **Examples**
 
         >>> tc = globus_sdk.TransferClient(...)
         >>> tc.operation_symlink(ep_id, symlink_target="/~/file1.txt",
-        >>>                     path="/~/file1.txt")
+        >>>                      path="/~/link-to-file1.txt")
 
         **External Documentation**
 
