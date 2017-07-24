@@ -41,3 +41,10 @@ SDKTESTER2B_NATIVE1_TRANSFER_RT = (
 # ---------- #
 # end tokens #
 # ---------- #
+
+
+# TransferClient task_wait parameters
+# 2 minutes
+DEFAULT_TASK_WAIT_TIMEOUT = 120
+# every 3 seconds
+DEFAULT_TASK_WAIT_POLLING_INTERVAL = 3

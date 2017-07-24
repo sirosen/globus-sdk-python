@@ -4,7 +4,9 @@ import six
 from random import getrandbits
 
 import globus_sdk
-from tests.framework import TransferClientTestCase, GO_EP1_ID
+from tests.framework import (
+    TransferClientTestCase, GO_EP1_ID,
+    DEFAULT_TASK_WAIT_TIMEOUT, DEFAULT_TASK_WAIT_POLLING_INTERVAL)
 
 
 class EncodingTests(TransferClientTestCase):
@@ -45,7 +47,9 @@ class EncodingTests(TransferClientTestCase):
         tdata.add_item(source_path, new_path, recursive=True)
         transfer_id = self.tc.submit_transfer(tdata)["task_id"]
         self.assertTrue(
-            self.tc.task_wait(transfer_id, timeout=30, polling_interval=1))
+            self.tc.task_wait(
+                transfer_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+                polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
         # confirm ls sees files inside the directory
         ls_doc = self.tc.operation_ls(GO_EP1_ID, path=new_path)
         expected = ["file1.txt", "file2.txt", "file3.txt"]
