@@ -11,6 +11,8 @@ def clean():
     SDK_USER_ID = "84942ca8-17c4-4080-9036-2f58e0093869"
     GO_EP1_ID = "ddb59aef-6d04-11e5-ba46-22000b92c6ec"
     GO_EP2_ID = "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
+    # TODO: remove EP3 when EP1 and EP2 support symlinks
+    GO_EP3_ID = "4be6107f-634d-11e7-a979-22000bf2d287"
     CLIENT_ID = 'd0f1d9b0-bd81-4108-be74-ea981664453a'
     SCOPES = 'urn:globus:auth:scope:transfer.api.globus.org:all'
     get_input = getattr(__builtins__, 'raw_input', input)
@@ -44,8 +46,8 @@ def clean():
 
     # now clean test assets
 
-    # clean SDK Tester's home /~/ on go#ep1 and go#ep2
-    ep_ids = [GO_EP1_ID, GO_EP2_ID]
+    # clean SDK Tester's home /~/ on go#ep1 go#ep2 and go#ep3
+    ep_ids = [GO_EP1_ID, GO_EP2_ID, GO_EP3_ID]
     task_ids = []
     file_deletions = 0
     for ep_id in ep_ids:

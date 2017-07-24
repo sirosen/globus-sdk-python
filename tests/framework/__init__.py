@@ -3,8 +3,8 @@ from tests.framework.transfer_client_testcase import TransferClientTestCase
 from tests.framework.tools import (get_fixture_file_dir,
                                    get_client_data, get_user_data)
 
-from tests.framework.constants import (GO_EP1_ID, GO_EP2_ID,
-                                       GO_EP1_SERVER_ID,
+from tests.framework.constants import (GO_EP1_ID, GO_EP2_ID, GO_EP3_ID,
+                                       GO_S3_ID, GO_EP1_SERVER_ID,
                                        SDKTESTER1A_NATIVE1_TRANSFER_RT,
                                        SDKTESTER1A_NATIVE1_AUTH_RT,
                                        SDKTESTER1A_NATIVE1_ID_TOKEN,
@@ -21,6 +21,8 @@ __all__ = [
 
     "GO_EP1_ID",
     "GO_EP2_ID",
+    "GO_EP3_ID",
+    "GO_S3_ID",
     "GO_EP1_SERVER_ID",
 
     "SDKTESTER1A_NATIVE1_TRANSFER_RT",

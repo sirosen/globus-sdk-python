@@ -38,7 +38,8 @@ class TransferData(dict):
     def __init__(self, transfer_client, source_endpoint, destination_endpoint,
                  label=None, submission_id=None, sync_level=None,
                  verify_checksum=False, preserve_timestamp=False,
-                 encrypt_data=False, deadline=None, **kwargs):
+                 encrypt_data=False, deadline=None,
+                 recursive_symlinks="ignore", **kwargs):
         source_endpoint = safe_stringify(source_endpoint)
         destination_endpoint = safe_stringify(destination_endpoint)
         logger.info("Creating a new TransferData object")
@@ -60,8 +61,11 @@ class TransferData(dict):
         logger.info("TransferData.preserve_timestamp = {}"
                     .format(preserve_timestamp))
         self["encrypt_data"] = encrypt_data
-        logger.info("TransferData.preserve_timestamp = {}"
+        logger.info("TransferData.encrypt_data = {}"
                     .format(encrypt_data))
+        self["recursive_symlinks"] = recursive_symlinks
+        logger.info("TransferData.recursive_symlinks = {}"
+                    .format(recursive_symlinks))
 
         if label is not None:
             self["label"] = label
@@ -92,7 +96,9 @@ class TransferData(dict):
 
     def add_item(self, source_path, destination_path, recursive=False):
         """
-        Add a file or directory to be transfered.
+        Add a file or directory to be transfered. If the item is a symlink
+        to a file or directory, the file or directory at the target of
+        the symlink will be transfered.
 
         Appends a transfer_item document to the DATA key of the transfer
         document.
@@ -106,6 +112,27 @@ class TransferData(dict):
             "recursive": recursive,
         }
         logger.debug('TransferData[{}, {}].add_item: "{}"->"{}"'
+                     .format(self["source_endpoint"],
+                             self["destination_endpoint"],
+                             source_path, destination_path))
+        self["DATA"].append(item_data)
+
+    def add_symlink_item(self, source_path, destination_path):
+        """
+        Add a symlink to be transfered as a symlink rather than as the
+        target of the symlink.
+
+        Appends a transfer_symlink_item document to the DATA key of the
+        transfer document.
+        """
+        source_path = safe_stringify(source_path)
+        destination_path = safe_stringify(destination_path)
+        item_data = {
+            "DATA_TYPE": "transfer_symlink_item",
+            "source_path": source_path,
+            "destination_path": destination_path,
+        }
+        logger.debug('TransferData[{}, {}].add_symlink_item: "{}"->"{}"'
                      .format(self["source_endpoint"],
                              self["destination_endpoint"],
                              source_path, destination_path))
@@ -162,9 +189,9 @@ class DeleteData(dict):
 
     def add_item(self, path):
         """
-        Add a file or directory to be deleted. If any of the paths are
-        directories, ``recursive`` must be set True on the top level
-        ``DeleteData``.
+        Add a file or directory or symlink to be deleted. If any of the paths
+        are directories, ``recursive`` must be set True on the top level
+        ``DeleteData``. Symlinks will never be followed, only deleted.
 
         Appends a delete_item document to the DATA key of the delete
         document.

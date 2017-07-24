@@ -980,9 +980,46 @@ class TransferClient(BaseClient):
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
                                         "rename")
         json_body = {
-            'DATA_TYPE': 'mkdir',
+            'DATA_TYPE': 'rename',
             'old_path': oldpath,
             'new_path': newpath
+        }
+        return self.post(resource_path, json_body=json_body, params=params)
+
+    def operation_symlink(self, endpoint_id, symlink_target, path, **params):
+        """
+        ``POST /operation/endpoint/<endpoint_id>/symlink``
+
+        :rtype: :class:`TransferResponse
+                <globus_sdk.transfer.response.TransferResponse>`
+
+        The ``path`` is the name of the symlink, and the ``symlink_target`` is
+        the path referenced by the symlink.
+
+        **Examples**
+
+        >>> tc = globus_sdk.TransferClient(...)
+        >>> tc.operation_symlink(ep_id, symlink_target="/~/file1.txt",
+        >>>                      path="/~/link-to-file1.txt")
+
+        **External Documentation**
+
+        See
+        `Symlink \
+        <https://docs.globus.org/api/transfer/file_operations/#symlink>`_
+        in the REST documentation for details.
+        """
+        endpoint_id = safe_stringify(endpoint_id)
+        symlink_target = safe_stringify(symlink_target)
+        path = safe_stringify(path)
+        self.logger.info("TransferClient.operation_symlink({}, {}, {}, {})"
+                         .format(endpoint_id, symlink_target, path, params))
+        resource_path = self.qjoin_path("operation/endpoint", endpoint_id,
+                                        "symlink")
+        json_body = {
+            "DATA_TYPE": "symlink",
+            "symlink_target": symlink_target,
+            "path": path
         }
         return self.post(resource_path, json_body=json_body, params=params)
 
