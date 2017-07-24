@@ -5,7 +5,10 @@ from random import getrandbits
 
 import globus_sdk
 from tests.framework import (TransferClientTestCase, get_user_data,
-                             GO_EP1_ID, GO_EP2_ID)
+                             GO_EP1_ID, GO_EP2_ID,
+
+                             DEFAULT_TASK_WAIT_TIMEOUT,
+                             DEFAULT_TASK_WAIT_POLLING_INTERVAL)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -228,7 +231,9 @@ class ManagerTransferClientTests(TransferClientTestCase):
         ddata.add_item("no-op.txt")
         task_id = self.tc2.submit_delete(ddata)["task_id"]
         self.assertTrue(
-            self.tc2.task_wait(task_id, timeout=30, polling_interval=1))
+            self.tc2.task_wait(
+                task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+                polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
 
         # sdktester1a gets the task event list as admin
         events_doc = self.tc.endpoint_manager_task_event_list(task_id)
@@ -270,7 +275,9 @@ class ManagerTransferClientTests(TransferClientTestCase):
                                    "args": [self.managed_ep_id, dest_path]})
         # wait for task to complete
         self.assertTrue(
-            self.tc2.task_wait(task_id, timeout=30, polling_interval=1))
+            self.tc2.task_wait(
+                task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+                polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
 
         # sdktester1a gets successful transfers as admin
         success_doc = self.tc.endpoint_manager_task_successful_transfers(

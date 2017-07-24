@@ -3,7 +3,10 @@ from random import getrandbits
 import globus_sdk
 from tests.framework import (TransferClientTestCase, get_user_data,
                              GO_EP1_ID, GO_EP2_ID, GO_EP3_ID, GO_S3_ID,
-                             GO_EP1_SERVER_ID)
+                             GO_EP1_SERVER_ID,
+
+                             DEFAULT_TASK_WAIT_TIMEOUT,
+                             DEFAULT_TASK_WAIT_POLLING_INTERVAL)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -663,7 +666,9 @@ class TransferClientTests(TransferClientTestCase):
         # confirm the task completed and the files were transfered
         task_id = transfer_doc["task_id"]
         self.assertTrue(
-            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+            self.tc.task_wait(
+                task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+                polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
         # confirm file and dir are visible by ls
         filter_string = "name:" + file_name + "," + dir_name
         params = {"path": dest_path, "filter": filter_string}
@@ -701,8 +706,10 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(resub_transfer_doc["task_id"], sub_task_id)
 
         # wait for submission to finish before moving on to cleanup
-        self.assertTrue(self.tc.task_wait(sub_transfer_doc["task_id"],
-                                          timeout=30, polling_interval=1))
+        self.assertTrue(self.tc.task_wait(
+            sub_transfer_doc["task_id"],
+            timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+            polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
 
     def test_submit_transfer_keep_recursive_symlinks(self):
         """
@@ -726,7 +733,9 @@ class TransferClientTests(TransferClientTestCase):
 
         # confirm the symlinks are kept as symlinks
         self.assertTrue(
-            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+            self.tc.task_wait(
+                task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+                polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
         ls_doc = self.tc.operation_ls(GO_EP3_ID, path=keep_path)
         self.assertEqual(len(ls_doc["DATA"]), 4)
         for item in ls_doc:
@@ -754,7 +763,9 @@ class TransferClientTests(TransferClientTestCase):
 
         # confirm the symlinks have their targets copied
         self.assertTrue(
-            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+            self.tc.task_wait(
+                task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+                polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
         ls_doc = self.tc.operation_ls(GO_EP3_ID, path=copy_path)
         self.assertEqual(len(ls_doc["DATA"]), 4)
         for item in ls_doc:
@@ -777,7 +788,9 @@ class TransferClientTests(TransferClientTestCase):
 
         # confirm the symlinks have their targets copied
         self.assertTrue(
-            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+            self.tc.task_wait(
+                task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+                polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
         ls_doc = self.tc.operation_ls(GO_EP3_ID, path=ignore_path)
         self.assertEqual(len(ls_doc["DATA"]), 0)
 
@@ -803,7 +816,9 @@ class TransferClientTests(TransferClientTestCase):
         # submit the task
         task_id = self.tc.submit_transfer(tdata)["task_id"]
         self.assertTrue(
-            self.tc.task_wait(task_id, timeout=30, polling_interval=1))
+            self.tc.task_wait(
+                task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+                polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
         # track assets for cleanup
         self.asset_cleanup.append({"function": self.deleteHelper,
                                    "args": [GO_EP1_ID, link_dest]})
@@ -848,8 +863,10 @@ class TransferClientTests(TransferClientTestCase):
         self.tc.operation_mkdir(GO_EP1_ID, path)
 
         # wait for transfer to complete
-        self.assertTrue(self.tc.task_wait(transfer_doc["task_id"],
-                                          timeout=30, polling_interval=1))
+        self.assertTrue(self.tc.task_wait(
+            transfer_doc["task_id"],
+            timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+            polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
 
         # delete the items
         ddata = globus_sdk.DeleteData(self.tc, GO_EP1_ID,
@@ -868,8 +885,9 @@ class TransferClientTests(TransferClientTestCase):
 
         # confirm the task completed and the files were deleted
         # wait for transfer to complete
-        self.assertTrue(self.tc.task_wait(task_id, timeout=30,
-                                          polling_interval=1))
+        self.assertTrue(self.tc.task_wait(
+            task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+            polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
         # confirm file and dir are no longer visible by ls
         filter_string = "name:" + file_name + "," + dir_name
         params = {"path": dest_path, "filter": filter_string}
@@ -969,8 +987,9 @@ class TransferClientTests(TransferClientTestCase):
 
         # wait for task to complete
         task_id = transfer_doc["task_id"]
-        self.assertTrue(self.tc.task_wait(task_id, timeout=30,
-                                          polling_interval=1))
+        self.assertTrue(self.tc.task_wait(
+            task_id, timeout=DEFAULT_TASK_WAIT_TIMEOUT,
+            polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
 
         # get the task by id
         get_doc = self.tc.get_task(task_id)
