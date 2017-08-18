@@ -1842,7 +1842,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint_manager", "admin_pause")
         return self.post(path, json_body=json_body, params=params)
 
-    def endpoint_manager_resume_tasks(self, task_ids, message, **params):
+    def endpoint_manager_resume_tasks(self, task_ids, **params):
         """
         Resume a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
@@ -1857,25 +1857,20 @@ class TransferClient(BaseClient):
             ``task_ids`` (*list of string*)
               List of task ids to resume.
 
-            ``message`` (*string*)
-              Message given to all users who's tasks have been canceled.
-
             ``params``
               Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
         See
-        `Cancel tasks as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#admin_cancel>`_
+        `Resume tasks as admin \
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#resume_tasks_as_admin>`_
         in the REST documentation for details.
         """
         task_ids = [safe_stringify(i) for i in task_ids]
-        message = safe_stringify(message)
         self.logger.info(("TransferClient.endpoint_manager_"
-                          "resume_tasks({},{})".format(task_ids, message)))
+                          "resume_tasks({})".format(task_ids)))
         json_body = {
-            "message": safe_stringify(message),
             "task_id_list": task_ids
         }
         path = self.qjoin_path("endpoint_manager", "admin_resume")

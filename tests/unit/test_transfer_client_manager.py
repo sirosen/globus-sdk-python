@@ -1,6 +1,5 @@
 import re
 import time
-import unittest
 from random import getrandbits
 
 import globus_sdk
@@ -367,10 +366,6 @@ class ManagerTransferClientTests(TransferClientTestCase):
             self.assertEqual(task_doc["canceled_by_admin"], "SOURCE")
             self.assertEqual(task_doc["canceled_by_admin_message"], message)
 
-    # TODO: stop skipping these tests when
-    # https://github.com/globusonline/koa/issues/49
-    # is resolved.
-    @unittest.skipIf(True, "github.com/globusonline/koa/issues/49")
     def test_endpoint_manager_pause_tasks(self):
         """
         Has sdktester2b submit three unauthorized transfers,
@@ -398,7 +393,6 @@ class ManagerTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
-    @unittest.skipIf(True, "github.com/globusonline/koa/issues/49")
     def test_endpoint_manager_resume_tasks(self):
         """
         Has sdktester2b submit three unauthorized transfers,
@@ -415,7 +409,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
             self.assertTrue(task_doc["is_paused"])
 
         # resume the tasks and validate results
-        resume_doc = self.tc.endpoint_manager_resume_tasks(task_ids, message)
+        resume_doc = self.tc.endpoint_manager_resume_tasks(task_ids)
         self.assertEqual(resume_doc["DATA_TYPE"], "result")
         self.assertEqual(resume_doc["code"], "ResumeAccepted")
 
@@ -426,6 +420,6 @@ class ManagerTransferClientTests(TransferClientTestCase):
 
         # 403 for non managers
         with self.assertRaises(TransferAPIError) as apiErr:
-            self.tc2.endpoint_manager_resume_tasks(task_ids, message)
+            self.tc2.endpoint_manager_resume_tasks(task_ids)
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
