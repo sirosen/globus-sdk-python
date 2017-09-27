@@ -14,6 +14,10 @@ part of your dependency on the ``globus_sdk`` package:
 - ``globus_sdk[jwt]``
 
 
+If you need to specify a version of ``globus_sdk`` while installing the ``jwt``
+extra, simply specify it like so: ``globus_sdk[jwt]==1.0.0``
+
+
 OIDC ID Tokens
 --------------
 
@@ -22,8 +26,5 @@ The :class:`OAuthTokenResponse
 conforming to the Open ID Connect specification.
 If you wish to decode this token via :meth:`decode_id_token
 <globus_sdk.auth.token_response.OAuthTokenResponse.decode_id_token>`, you must
-install ``python-jose``, which we use to implement ID Token verification.
-
-You may install supported versions of ``python-jose`` by install the SDK with
-its ``globus_sdk[jwt]`` extra. Simply specify ``globus_sdk[jwt]`` in your
-dependencies.
+install ``globus_sdk[jwt]``. This extra target includes dependencies which we
+use to implement ID Token verification.
