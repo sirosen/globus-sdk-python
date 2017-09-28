@@ -4,10 +4,10 @@ import six
 import time
 import unittest
 try:
-    import jose
-    JOSE_FLAG = True
+    import jwt
+    JWT_FLAG = True
 except ImportError:
-    JOSE_FLAG = False
+    JWT_FLAG = False
 try:
     import mock
 except ImportError:
@@ -57,8 +57,9 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         self.ac.client_id = get_client_data()["native_app_client1"]["id"]
         self.ac._verify = True
         self.ac.get = mock.Mock(return_value={
-            "jwks_uri":
-            u"https://auth.globus.org/jwk.json"})
+            "jwks_uri": "https://auth.globus.org/jwk.json",
+            "id_token_signing_alg_values_supported": ["RS512"]
+        })
 
     def test_convert_token_info_dict(self):
         """
@@ -118,15 +119,15 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
             self.assertIn(server_data["expires_at_seconds"],
                           (expected - 1, expected, expected + 1))
 
-    @unittest.skipIf(JOSE_FLAG, "python-jose successfully imported")
-    def test_decode_id_token_no_jose(self):
+    @unittest.skipIf(JWT_FLAG, "pyjwt successfully imported")
+    def test_decode_id_token_no_jwt(self):
         """
-        If jose was not imported, confirms OptionalDependencyError
+        If pyjwt was not imported, confirms OptionalDependencyError
         """
         with self.assertRaises(GlobusOptionalDependencyError):
             self.response.decode_id_token(self.ac)
 
-    @unittest.skipIf(not JOSE_FLAG, "python-jose not imported")
+    @unittest.skipIf(not JWT_FLAG, "pyjwt not imported")
     def test_decode_id_token_invalid_id(self):
         """
         Creates a response with an invalid id_token, and attempts to decode
@@ -137,16 +138,16 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         http_response.headers["Content-Type"] = "application/json"
         id_response = OAuthTokenResponse(http_response)
 
-        with self.assertRaises(jose.exceptions.JWTError):
+        with self.assertRaises(jwt.exceptions.InvalidTokenError):
             id_response.decode_id_token(self.ac)
 
-    @unittest.skipIf(not JOSE_FLAG, "python-jose not imported")
+    @unittest.skipIf(not JWT_FLAG, "pyjwt not imported")
     def test_decode_id_token_expired(self):
         """
         Attempt to decode an expired id_token, confirms that the token is
         decoded, but errors out on the expired signature.
         """
-        with self.assertRaises(jose.exceptions.ExpiredSignatureError):
+        with self.assertRaises(jwt.exceptions.ExpiredSignatureError):
             self.response.decode_id_token(self.ac)
 
 

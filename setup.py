@@ -21,7 +21,7 @@ setup(name="globus-sdk",
       ],
 
       extras_require={
-          'jwt': ['python-jose>=1.3.0,<2.0.0']
+          'jwt': ['pyjwt[crypto]>=1.5.3,<2.0.0']
       },
 
       include_package_data=True,

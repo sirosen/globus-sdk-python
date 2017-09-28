@@ -64,24 +64,28 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         """
         logger.info('Decoding ID Token "{}"'.format(self['id_token']))
         try:
-            from jose import jwt
+            import jwt
         except ImportError:
-            logger.error('OptionalDependencyError(python-jose)')
+            logger.error('OptionalDependencyError(jwt)')
             raise GlobusOptionalDependencyError(
-                ["python-jose or globus_sdk[jwt]"],
+                ["globus_sdk[jwt]"],
                 "JWT Parsing via OAuthTokenResponse.id_token")
 
         logger.debug('Fetch JWK Data: Start')
         oidc_conf = auth_client.get('/.well-known/openid-configuration')
         jwks_uri = oidc_conf['jwks_uri']
+        signing_algos = oidc_conf['id_token_signing_alg_values_supported']
+
         # use the auth_client's decision on ssl_verify=yes/no
         jwk_data = requests.get(jwks_uri, verify=auth_client._verify).json()
         logger.debug('Fetch JWK Data: Complete')
+        # decode from JWK to an RSA PEM key for JWT decoding
+        jwk_as_pem = jwt.algorithms.RSAAlgorithm.from_jwk(
+            json.dumps(jwk_data['keys'][0]))
 
         return jwt.decode(
-            self['id_token'], jwk_data,
-            access_token=self['access_token'],
-            audience=auth_client.client_id)
+            self['id_token'], jwk_as_pem,
+            algorithms=signing_algos, audience=auth_client.client_id)
 
     def __str__(self):
         # Make printing responses more convenient by only showing the
