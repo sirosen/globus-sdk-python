@@ -748,6 +748,9 @@ class TransferClient(BaseClient):
         >>> result = tc.add_endpoint_acl_rule(endpoint_id, rule_data)
         >>> rule_id = result["access_id"]
 
+        Note that if this rule is being created on a shared endpoint
+        the "path" field is relative to the "host_path" of the shared endpoint.
+
         **External Documentation**
 
         See
