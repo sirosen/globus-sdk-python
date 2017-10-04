@@ -1,6 +1,6 @@
 """
 Data helper classes for constructing Transfer API documents. All classes should
-extend ``dict``, so they can be passed seemlesly to
+extend ``dict``, so they can be passed seamlessly to
 :class:`TransferClient <globus_sdk.TransferClient>` methods without
 conversion.
 """
@@ -21,15 +21,69 @@ class TransferData(dict):
     At least one item must be added using
     :meth:`add_item <globus_sdk.TransferData.add_item>`.
 
-    For compatibility with older code and those knowledgeable about the API
-    sync_level can be ``0``, ``1``, ``2``, or ``3``, but it can also be
-    ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"`` if you want
-    greater clarity in client code.
-
     If ``submission_id`` isn't passed, one will be fetched automatically. The
     submission ID can be pulled out of here to inspect, but the document
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
+
+    **Parameters**
+
+      ``transfer_client`` (:class:`TransferClient <globus_sdk.TransferClient>`)
+        A ``TransferClient`` instance which will be used to get a submission ID
+        if one is not supplied. Should be the same instance that is used to
+        submit the transfer.
+
+      ``source_endpoint`` (*string*)
+        The endpoint ID of the source endpoint
+
+      ``destination_endpoint`` (*string*)
+        The endpoint ID of the destination endpoint
+
+      ``label`` (*string*) [optional]
+        A string label for the Task
+
+      ``submission_id`` (*string*) [optional]
+        A submission ID value fetched via
+        :meth:`get_submission_id \
+        <globus_sdk.TransferClient.get_submission_id>`. Defaults to using
+        ``transfer_client.get_submission_id``
+
+      ``sync_level`` (*int* or *string*) [optional]
+        For compatibility with older code and those knowledgeable about the API
+        sync_level can be ``0``, ``1``, ``2``, or ``3``, but it can also be
+        ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"`` if you want
+        greater clarity in client code.
+
+      ``verify_checksum`` (*bool*) [default: ``False``]
+        When true, perform additional integrity checks on each file after it is
+        transferred. This will create CPU load on both the origin and
+        destination of the transfer, and may even be a bottleneck if the
+        network speed is high enough.
+
+      ``preserve_timestamp`` (*bool*) [default: ``False``]
+        When true, Globus Transfer will attempt to set file timestamps on the
+        destination to match those on the origin.
+
+      ``encrypt_data`` (*bool*) [default: ``False``]
+        When true, all files will be TLS-protected during transfer.
+
+      ``deadline`` (*string* or *datetime*) [optional]
+        An ISO-8601 timestamp (as a string) or a datetime object which defines
+        a deadline for the transfer. At the deadline, even if the data transfer
+        is not complete, the job will be canceled.
+        We recommend ensuring that the timestamp is in UTC to avoid confusion
+        and ambiguity.
+
+      ``recursive_symlinks`` (*string*) [default: ``"ignore"``]
+        Specify the behavior of recursive directory transfers when encountering
+        symlinks. One of ``"ignore"``, ``"keep"``, or ``"copy"``. ``"ignore"``
+        skips symlinks, ``"keep"`` creates symlinks at the destination matching
+        the source (without modifying the link path at all), and ``"copy"``
+        follows symlinks on the source, failing if the link is invalid.
+
+    Any additional parameters are fed into the dict being created verbatim.
+
+    **Examples**
 
     See the
     :meth:`submit_transfer <globus_sdk.TransferClient.submit_transfer>`
