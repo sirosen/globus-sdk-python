@@ -14,7 +14,7 @@ setup(name="globus-sdk",
       author="Globus Team",
       author_email="support@globus.org",
       url="https://github.com/globus/globus-sdk-python",
-      packages=find_packages(),
+      packages=find_packages(exclude=['tests', 'tests.*']),
       install_requires=[
           'requests>=2.0.0,<3.0.0',
           'six>=1.10.0,<2.0.0'
