@@ -74,6 +74,9 @@ class TransferData(dict):
         We recommend ensuring that the timestamp is in UTC to avoid confusion
         and ambiguity.
 
+        Examples of ISO-8601 timestamps include ``2017-10-12 09:30Z``,
+        ``2017-10-12 12:33:54+00:00``, and ``2017-10-12``
+
       ``recursive_symlinks`` (*string*) [default: ``"ignore"``]
         Specify the behavior of recursive directory transfers when encountering
         symlinks. One of ``"ignore"``, ``"keep"``, or ``"copy"``. ``"ignore"``
@@ -235,6 +238,9 @@ class DeleteData(dict):
         is not complete, the job will be canceled.
         We recommend ensuring that the timestamp is in UTC to avoid confusion
         and ambiguity.
+
+        Examples of ISO-8601 timestamps include ``2017-10-12 09:30Z``,
+        ``2017-10-12 12:33:54+00:00``, and ``2017-10-12``
 
     **Examples**
 
