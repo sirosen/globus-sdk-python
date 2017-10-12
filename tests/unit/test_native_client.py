@@ -1,7 +1,7 @@
 import globus_sdk
 from tests.framework import (CapturedIOTestCase,
                              get_client_data, get_user_data,
-                             SDKTESTER1A_NATIVE1_AUTH_RT)
+                             SDKTESTER1A_NATIVE1_AUTH_RT, retry_errors)
 from globus_sdk.exc import AuthAPIError
 
 
@@ -25,6 +25,7 @@ class NativeAppAuthClientTests(CapturedIOTestCase):
                 client_id=get_client_data()["native_app_client1"]["id"],
                 authorizer=globus_sdk.AccessTokenAuthorizer(""))
 
+    @retry_errors()
     def test_get_identities(self):
         """
         Confirms native apps aren't authorized to get_identities on their own
@@ -34,6 +35,7 @@ class NativeAppAuthClientTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "UNAUTHORIZED")
 
+    @retry_errors()
     def test_oauth2_refresh_token(self):
         """
         Sends a refresh_token grant, validates results
@@ -60,6 +62,7 @@ class NativeAppAuthClientTests(CapturedIOTestCase):
         # return access_token
         return access_token
 
+    @retry_errors()
     def test_oauth2_revoke_token(self):
         """
         Gets an access_token from test_oauth2_refresh_token, then revokes it

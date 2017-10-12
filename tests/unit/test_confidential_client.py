@@ -4,7 +4,7 @@ except ImportError:
     from unittest import mock
 
 import globus_sdk
-from tests.framework import CapturedIOTestCase, get_client_data
+from tests.framework import CapturedIOTestCase, get_client_data, retry_errors
 from globus_sdk.exc import AuthAPIError
 
 
@@ -27,6 +27,7 @@ class ConfidentialAppAuthClientTests(CapturedIOTestCase):
             client_id=client_data["id"],
             client_secret=client_data["secret"])
 
+    @retry_errors()
     def test_oauth2_client_credentials_tokens(self):
         """
         Get client credentials tokens, validate results
@@ -57,6 +58,7 @@ class ConfidentialAppAuthClientTests(CapturedIOTestCase):
             userinfo_res["sub"],
             get_client_data()["confidential_app_client1"]["id"])
 
+    @retry_errors()
     def test_oauth2_get_dependent_tokens(self):
         """
         Gets dependent tokens for a client access_token, validates results
@@ -99,6 +101,7 @@ class ConfidentialAppAuthClientTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")
 
+    @retry_errors()
     def test_oauth2_token_introspect(self):
         """
         Introspects a client access_token, validates results

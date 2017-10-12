@@ -4,7 +4,8 @@ except ImportError:
     from unittest import mock
 
 import globus_sdk
-from tests.framework import CapturedIOTestCase, get_client_data, GO_EP1_ID
+from tests.framework import (
+    CapturedIOTestCase, get_client_data, GO_EP1_ID, retry_errors)
 from globus_sdk.exc import GlobusAPIError
 
 
@@ -39,6 +40,7 @@ class ClientCredentialsAuthorizerIntegrationTests(CapturedIOTestCase):
             on_refresh=self.on_refresh)
         self.tc = globus_sdk.TransferClient(authorizer=self.authorizer)
 
+    @retry_errors()
     def test_get_new_access_token(self):
         """
         Has the Authorizer get a new access_token via the ConfidentialAppClient
@@ -53,6 +55,7 @@ class ClientCredentialsAuthorizerIntegrationTests(CapturedIOTestCase):
         get_res = self.tc.get_endpoint(GO_EP1_ID)
         self.assertEqual(get_res["id"], GO_EP1_ID)
 
+    @retry_errors()
     def test_invalid_access_token(self):
         """
         Invalidates the Authorizer's access_token, then makes a request
@@ -67,6 +70,7 @@ class ClientCredentialsAuthorizerIntegrationTests(CapturedIOTestCase):
         self.on_refresh.assert_called_once()
         self.assertNotEqual(self.access_token, self.authorizer.access_token)
 
+    @retry_errors()
     def test_invalid_access_token_no_retry(self):
         """
         Invalidates the Authorizer's access_token, then makes a request
@@ -81,6 +85,7 @@ class ClientCredentialsAuthorizerIntegrationTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "AuthenticationFailed")
 
+    @retry_errors()
     def test_multiple_resource_servers(self):
         """
         Attempts to create a ClientCredentialsAuthorizer with scopes

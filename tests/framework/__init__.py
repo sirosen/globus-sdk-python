@@ -1,7 +1,8 @@
 from tests.framework.capturedio_testcase import CapturedIOTestCase
 from tests.framework.transfer_client_testcase import TransferClientTestCase
 from tests.framework.tools import (get_fixture_file_dir,
-                                   get_client_data, get_user_data)
+                                   get_client_data, get_user_data,
+                                   retry_errors)
 
 from tests.framework.constants import (GO_EP1_ID, GO_EP2_ID, GO_EP3_ID,
                                        GO_S3_ID, GO_EP1_SERVER_ID,
@@ -21,6 +22,7 @@ __all__ = [
     "get_fixture_file_dir",
     "get_client_data",
     "get_user_data",
+    "retry_errors",
 
     "GO_EP1_ID",
     "GO_EP2_ID",

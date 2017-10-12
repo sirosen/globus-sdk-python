@@ -2,7 +2,7 @@ from six.moves.urllib.parse import quote_plus
 
 import globus_sdk
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
-from tests.framework import CapturedIOTestCase, get_client_data
+from tests.framework import CapturedIOTestCase, get_client_data, retry_errors
 from globus_sdk.auth import GlobusAuthorizationCodeFlowManager
 from globus_sdk.exc import AuthAPIError
 
@@ -19,6 +19,7 @@ class ConfidentialAppAuthClientIntegrationTests(CapturedIOTestCase):
             client_id=client_data["id"],
             client_secret=client_data["secret"])
 
+    @retry_errors()
     def test_oauth2_start_flow_default(self):
         """
         Starts a default GlobusAuthorizationCodeFlowManager,
@@ -54,6 +55,7 @@ class ConfidentialAppAuthClientIntegrationTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")
 
+    @retry_errors()
     def test_oauth2_start_flow_specified(self):
         """
         Starts a GlobusAuthorizationCodeFlowManager with specified parameters,
