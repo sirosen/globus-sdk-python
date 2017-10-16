@@ -1830,7 +1830,7 @@ class TransferClient(BaseClient):
         **External Documentation**
 
         See
-        `Cancel tasks as admin \
+        `Pause tasks as admin \
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#pause_tasks_as_admin>`_
         in the REST documentation for details.
         """
@@ -1976,7 +1976,7 @@ class TransferClient(BaseClient):
         **External Documentation**
 
         See
-        `Create pause rule \
+        `Get pause rule \
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_pause_rule>`_
         in the REST documentation for details.
         """
@@ -2005,7 +2005,7 @@ class TransferClient(BaseClient):
         >>>   "pause_ls": False,
         >>>   "pause_task_transfer_read": False
         >>> }
-        >>> update_result = tc.endpoint_manager_create_pause_rule(ep_data)
+        >>> update_result = tc.endpoint_manager_update_pause_rule(ep_data)
 
         **External Documentation**
 

@@ -74,6 +74,9 @@ class TransferData(dict):
         We recommend ensuring that the timestamp is in UTC to avoid confusion
         and ambiguity.
 
+        Examples of ISO-8601 timestamps include ``2017-10-12 09:30Z``,
+        ``2017-10-12 12:33:54+00:00``, and ``2017-10-12``
+
       ``recursive_symlinks`` (*string*) [default: ``"ignore"``]
         Specify the behavior of recursive directory transfers when encountering
         symlinks. One of ``"ignore"``, ``"keep"``, or ``"copy"``. ``"ignore"``
@@ -206,6 +209,40 @@ class DeleteData(dict):
     submission ID can be pulled out of here to inspect, but the document
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
+
+    **Parameters**
+
+      ``transfer_client`` (:class:`TransferClient <globus_sdk.TransferClient>`)
+        A ``TransferClient`` instance which will be used to get a submission ID
+        if one is not supplied. Should be the same instance that is used to
+        submit the deletion.
+
+      ``endpoint`` (*string*)
+        The endpoint ID which is targeted by this deletion Task
+
+      ``label`` (*string*) [optional]
+        A string label for the Task
+
+      ``submission_id`` (*string*) [optional]
+        A submission ID value fetched via
+        :meth:`get_submission_id \
+        <globus_sdk.TransferClient.get_submission_id>`. Defaults to using
+        ``transfer_client.get_submission_id``
+
+      ``recursive`` (*bool*) [default: ``False``]
+        Recursively delete subdirectories on the target endpoint
+
+      ``deadline`` (*string* or *datetime*) [optional]
+        An ISO-8601 timestamp (as a string) or a datetime object which defines
+        a deadline for the transfer. At the deadline, even if the data deletion
+        is not complete, the job will be canceled.
+        We recommend ensuring that the timestamp is in UTC to avoid confusion
+        and ambiguity.
+
+        Examples of ISO-8601 timestamps include ``2017-10-12 09:30Z``,
+        ``2017-10-12 12:33:54+00:00``, and ``2017-10-12``
+
+    **Examples**
 
     See the :meth:`submit_delete <globus_sdk.TransferClient.submit_delete>`
     documentation for example usage.
