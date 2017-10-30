@@ -1,39 +1,46 @@
 import logging
 
 
+from globus_sdk.version import __version__
+
 from globus_sdk.response import GlobusResponse, GlobusHTTPResponse
-from globus_sdk.transfer import TransferClient
-from globus_sdk.transfer.data import TransferData, DeleteData
-from globus_sdk.auth import (
-    AuthClient, NativeAppAuthClient, ConfidentialAppAuthClient)
+
+from globus_sdk.exc import (
+    GlobusError, GlobusAPIError, TransferAPIError, SearchAPIError,
+    NetworkError, GlobusConnectionError, GlobusTimeoutError)
 
 from globus_sdk.authorizers import (
     NullAuthorizer, BasicAuthorizer, AccessTokenAuthorizer,
     RefreshTokenAuthorizer, ClientCredentialsAuthorizer)
 
-from globus_sdk.exc import GlobusError, GlobusAPIError, TransferAPIError
-from globus_sdk.exc import (
-    NetworkError, GlobusConnectionError, GlobusTimeoutError)
+from globus_sdk.auth import (
+    AuthClient, NativeAppAuthClient, ConfidentialAppAuthClient)
 
-from globus_sdk.version import __version__
+from globus_sdk.transfer import TransferClient
+from globus_sdk.transfer.data import TransferData, DeleteData
 
-__all__ = ["GlobusResponse", "GlobusHTTPResponse",
+from globus_sdk.search import SearchClient
 
-           "TransferClient", "TransferData", "DeleteData",
 
-           "AuthClient",
-           "NativeAppAuthClient",
-           "ConfidentialAppAuthClient",
+__all__ = (
+    "__version__",
 
-           "NullAuthorizer", "BasicAuthorizer",
-           "AccessTokenAuthorizer", "RefreshTokenAuthorizer",
-           "ClientCredentialsAuthorizer",
+    "GlobusResponse", "GlobusHTTPResponse",
 
-           "GlobusError", "GlobusAPIError", "TransferAPIError",
-           "NetworkError", "GlobusConnectionError", "GlobusTimeoutError",
-           "GlobusOptionalDependencyError",
+    "GlobusError", "GlobusAPIError", "TransferAPIError", "SearchAPIError",
+    "NetworkError", "GlobusConnectionError", "GlobusTimeoutError",
+    "GlobusOptionalDependencyError",
 
-           "__version__"]
+    "NullAuthorizer", "BasicAuthorizer",
+    "AccessTokenAuthorizer", "RefreshTokenAuthorizer",
+    "ClientCredentialsAuthorizer",
+
+    "AuthClient", "NativeAppAuthClient", "ConfidentialAppAuthClient",
+
+    "TransferClient", "TransferData", "DeleteData",
+
+    "SearchClient",
+)
 
 
 # configure logging for a library, per python best practices:
