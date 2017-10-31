@@ -241,8 +241,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         failure_event = events_doc[0]  # most recent event is first
         self.assertEqual(failure_event["DATA_TYPE"], "event")
         self.assertEqual(failure_event["code"], "FILE_NOT_FOUND")
-        self.assertEqual(failure_event["description"],
-                         "No such file or directory")
+        self.assertEqual(failure_event["description"], "file not found")
 
         # 403 for non managers, even if they submitted the task
         with self.assertRaises(TransferAPIError) as apiErr:
