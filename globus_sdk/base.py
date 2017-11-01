@@ -54,7 +54,7 @@ class BaseClient(object):
 
     BASE_USER_AGENT = 'globus-sdk-py-{0}'.format(__version__)
 
-    def __init__(self, service, environment=None,
+    def __init__(self, service, environment=None, base_url=None,
                  base_path=None, authorizer=None, app_name=None):
         # get the fully qualified name of the client class, so that it's a
         # child of globus_sdk
@@ -85,7 +85,10 @@ class BaseClient(object):
         self.environment = environment
         self.authorizer = authorizer
 
-        self.base_url = config.get_service_url(environment, service)
+        if base_url is None:
+            self.base_url = config.get_service_url(environment, service)
+        else:
+            self.base_url = base_url
         if base_path is not None:
             self.base_url = slash_join(self.base_url, base_path)
 
