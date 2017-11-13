@@ -94,4 +94,34 @@ When your tokens are expired, you should just request new ones by making
 another Client Credentials request.
 Depending on your needs, you may need to track the expiration times along with
 your tokens.
-The SDK does not offer any special facilities for doing this.
+
+Using ClientCredentialsAuthorizer
+---------------------------------
+
+The SDK also provides a specialized Authorizer which can be used to
+automatically handle token expiration.
+
+Use it like so:
+
+.. code-block:: python
+
+    import globus_sdk
+
+    # you must have a client ID
+    CLIENT_ID = '...'
+    # the secret, loaded from wherever you store it
+    CLIENT_SECRET = '...'
+
+    confidential_client = globus_sdk.ConfidentialAppAuthClient(
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+    scopes = "urn:globus:auth:scopes:transfer.api.globus.org:all"
+    cc_authorizer = globus_sdk.ClientCredentialsAuthorizer(
+        confidential_client, scopes)
+    # create a new client
+    transfer_client = globus_sdk.TransferClient(authorizer=cc_authorizer)
+
+    # usage is still the same
+    print("Endpoints Belonging to {}@clients.auth.globus.org:"
+          .format(CLIENT_ID))
+    for ep in tc.endpoint_search(filter_scope="my-endpoints"):
+        print("[{}] {}".format(ep["id"], ep["display_name"]))
