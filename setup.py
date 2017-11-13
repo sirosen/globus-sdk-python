@@ -1,5 +1,13 @@
 import os.path
+import sys
 from setuptools import setup, find_packages
+
+
+if sys.version_info < (2, 7):
+    raise NotImplementedError("""\n
+##############################################################
+# globus-sdk does not support python versions older than 2.7 #
+##############################################################""")
 
 
 # single source of truth for package version
