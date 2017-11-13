@@ -106,6 +106,7 @@ class GlobusConfigParser(object):
 
         if value is not None:
             value = type_cast(value)
+
         return value
 
 
@@ -131,6 +132,12 @@ def get_service_url(environment, service):
     option = service + "_service"
     # TODO: validate with urlparse?
     url = p.get(option, environment=environment)
+    if url is None:
+        raise ValueError(
+            ('Failed to find a url for service "{}" in environment "{}". '
+             "Please double-check that GLOBUS_SDK_ENVIRONMENT is set "
+             "correctly, or not set at all")
+            .format(service, environment))
     logger.debug("Service URL Lookup Result: \"{}\" is at \"{}\""
                  .format(service, url))
     return url
