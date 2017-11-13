@@ -172,6 +172,8 @@ def get_default_environ():
     which does not explicitly specify its environment will use this value.
     """
     env = os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
+    if env == 'production':
+        env = 'default'
     if env != 'default':
         logger.info(('On lookup, non-default environment: '
                      'GLOBUS_SDK_ENVIRONMENT={}'.format(env)))
