@@ -14,10 +14,11 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
     Example usage looks something like this:
 
     >>> import globus_sdk
-    >>> confidential_client = globus_sdk.ConfidentiallAppAuthClient(
-        client_id=..., client_secret=..., scopes=...)
+    >>> confidential_client = globus_sdk.ConfidentialAppAuthClient(
+        client_id=..., client_secret=...)
+    >>> scopes = "..."
     >>> cc_authorizer = globus_sdk.ClientCredentialsAuthorizer(
-    >>>     confidential_client)
+    >>>     confidential_client, scopes)
     >>> # create a new client
     >>> transfer_client = globus_sdk.TransferClient(authorizer=cc_authorizer)
 
