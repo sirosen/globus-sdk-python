@@ -116,8 +116,8 @@ class ConfigParserTests(CapturedIOTestCase):
             "https://transfer.api.beta.globus.org/")
 
         # missing values
-        self.assertEqual(
-            globus_sdk.config.get_service_url("nonexistant", "auth"), None)
+        with self.assertRaises(ValueError):
+            globus_sdk.config.get_service_url("nonexistent", "auth")
 
     def test_get_ssl_verify(self):
         """
