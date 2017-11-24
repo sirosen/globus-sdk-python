@@ -19,7 +19,7 @@ from globus_sdk.auth import (
 from globus_sdk.transfer import TransferClient
 from globus_sdk.transfer.data import TransferData, DeleteData
 
-from globus_sdk.search import SearchClient
+from globus_sdk.search import SearchClient, SearchQuery
 
 
 __all__ = (
@@ -39,7 +39,7 @@ __all__ = (
 
     "TransferClient", "TransferData", "DeleteData",
 
-    "SearchClient",
+    "SearchClient", "SearchQuery",
 )
 
 
