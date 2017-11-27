@@ -30,4 +30,5 @@ very simply::
 
    clients/transfer
    clients/auth
+   clients/search
    clients/base

@@ -12,14 +12,6 @@ logger = logging.getLogger(__name__)
 
 class SearchClient(BaseClient):
     r"""
-    BETA
-
-    The SearchClient interface is in Beta, but the Search API is a fully
-    supported, production service.
-    Its docs are visible here:
-    http://globus-search-docs.s3-website-us-east-1.amazonaws.com/stable/
-
-
     Client for the Globus Search API
 
     This class provides helper methods for most common resources in the
