@@ -1,7 +1,9 @@
+from __future__ import unicode_literals
+
 import logging
-import base64
 
 from globus_sdk.authorizers.base import GlobusAuthorizer
+from globus_sdk.utils import safe_b64encode
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +29,8 @@ class BasicAuthorizer(GlobusAuthorizer):
         self.username = username
         self.password = password
 
-        encoded = base64.b64encode(
-            bytes("{0}:{1}".format(username, password).encode("utf-8")))
-        self.header_val = "Basic %s" % encoded.decode('utf-8')
+        to_b64 = '{0}:{1}'.format(username, password)
+        self.header_val = "Basic %s" % safe_b64encode(to_b64)
 
     def set_authorization_header(self, header_dict):
         """
