@@ -1,7 +1,8 @@
 from random import getrandbits
 
 import globus_sdk
-from tests.framework import TransferClientTestCase, get_user_data, GO_EP1_ID
+from tests.framework import (
+    TransferClientTestCase, get_user_data, GO_EP1_ID, retry_errors)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -41,6 +42,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.asset_cleanup.append({"function": self.deleteHelper,
                                    "args": [GO_EP1_ID, share_path]})
 
+    @retry_errors()
     def test_endpoint_search(self):
         """
         Searches by fulltext, owner_id, and scopes, validates results
@@ -85,6 +87,7 @@ class SharedTransferClientTests(TransferClientTestCase):
             self.assertIsNotNone(ep["sharing_target_root_path"])
             self.assertIsNotNone(ep["host_endpoint_id"])
 
+    @retry_errors()
     def test_endpoint_autoactivate(self):
         """
         Deactivates, then auto-activates shared endpoint,
@@ -111,6 +114,7 @@ class SharedTransferClientTests(TransferClientTestCase):
 
         # TODO: test against an endpoint we are not allowed to activate
 
+    @retry_errors()
     def test_endpoint_deactivate(self):
         """
         Auto-activates, then deactivates shared endpoint,
@@ -128,6 +132,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         get_doc = self.tc.get_endpoint(self.test_share_ep_id)
         self.assertFalse(get_doc["activated"])
 
+    @retry_errors()
     def test_my_shared_endpoint_list(self):
         """
         Gets my shared endpoint list, validates results
@@ -144,6 +149,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         else:
             self.assertFalse("test share not found")
 
+    @retry_errors()
     def test_endpoint_acl_list(self):
         """
         Gets endpoint access rule list from test_share_ep, validates results
@@ -163,6 +169,7 @@ class SharedTransferClientTests(TransferClientTestCase):
             self.assertIn("principal", access)
             self.assertIn("permissions", access)
 
+    @retry_errors()
     def test_get_endpoint_acl_rule(self):
         """
         Adds access rule to test_share_ep, gets it by id, validates results
@@ -179,6 +186,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.assertEqual(get_doc["DATA_TYPE"], "access")
         self.assertEqual(get_doc["id"], access_id)
 
+    @retry_errors()
     def test_add_endpoint_acl_rule(self):
         """
         Adds access rule to test_share_ep, validates results,
@@ -214,6 +222,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         # return access_id
         return access_id
 
+    @retry_errors()
     def test_update_endpoint_acl_rule(self):
         """
         Adds access rule to test_share_ep, updates that access rule,
@@ -239,6 +248,7 @@ class SharedTransferClientTests(TransferClientTestCase):
                                                 access_id)
         self.assertEqual(get_doc["permissions"], update_data["permissions"])
 
+    @retry_errors()
     def test_delete_endpoint_acl_rule(self):
         """
         Adds access rule to test_share_ep, deletes that access rule,
@@ -263,6 +273,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 404)
         self.assertEqual(apiErr.exception.code, "AccessRuleNotFound")
 
+    @retry_errors()
     def test_endpoint_manager_create_pause_rule(self):
         """
         Creates a pause rule on the shared endpoint, validates results.
@@ -302,6 +313,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         # return id for use in other tests
         return rule_id
 
+    @retry_errors()
     def test_endpoint_manager_pause_rule_list(self):
         """
         Gets a pause_rule id from test_endpoint_manager_create_pause_rule.
@@ -332,6 +344,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_get_pause_rule(self):
         """
         Gets a pause rule created by test_endpoint_manager_create_pause_rule.
@@ -360,6 +373,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_update_pause_rule(self):
         """
         Updates a pause rule created by test_endpoint_manager_create_pause_rule
@@ -392,6 +406,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_delete_pause_rule(self):
         """
         Deletes a pause rule created by test_endpoint_manager_create_pause_rule
@@ -423,6 +438,7 @@ class SharedTransferClientTests(TransferClientTestCase):
                 self.asset_cleanup.remove(cleanup)
                 break
 
+    @retry_errors()
     def test_task_pause_info(self):
         """
         Creates a pause rule on the shared endpoint, then submits a task
@@ -454,6 +470,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.assertNotIn("modified_by", rule)
         self.assertNotIn("modified_by_id", rule)
 
+    @retry_errors()
     def test_my_effective_pause_rule_list(self):
         """
         Creates a pause rule on the shared endpoint, then gets pause rule list.
@@ -476,6 +493,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.assertNotIn("modified_by", rule)
         self.assertNotIn("modified_by_id", rule)
 
+    @retry_errors()
     def test_endpoint_manager_task_pause_info(self):
         """
         Creates a pause rule on the shared endpoint, then
@@ -514,6 +532,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_add_endpoint_role(self):
         """
         Adds a role to the test share endpoint, validates results
@@ -539,6 +558,7 @@ class SharedTransferClientTests(TransferClientTestCase):
         # return role id
         return role_id
 
+    @retry_errors()
     def test_get_endpoint_role(self):
         """
         Gets role created in test_add_endpoint_role, validates results.
@@ -554,6 +574,7 @@ class SharedTransferClientTests(TransferClientTestCase):
                          get_user_data()["go"]["id"])
         self.assertEqual(get_doc["role"], "access_manager")
 
+    @retry_errors()
     def test_delete_endpoint_role(self):
         """
         Deletes role created in test_add_endpoint_role, validates results.

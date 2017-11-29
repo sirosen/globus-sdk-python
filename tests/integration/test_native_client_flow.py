@@ -3,7 +3,7 @@ from six.moves.urllib.parse import quote_plus
 import globus_sdk
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_native_app import make_native_app_challenge
-from tests.framework import CapturedIOTestCase, get_client_data
+from tests.framework import CapturedIOTestCase, get_client_data, retry_errors
 from globus_sdk.auth import GlobusNativeAppFlowManager
 from globus_sdk.exc import AuthAPIError
 
@@ -18,6 +18,7 @@ class NativeAppAuthClientIntegrationTests(CapturedIOTestCase):
         self.nac = globus_sdk.NativeAppAuthClient(
             client_id=get_client_data()["native_app_client1"]["id"])
 
+    @retry_errors()
     def test_oauth2_start_flow_default(self):
         """
         Starts a default GlobusNativeAppFlowManager,
@@ -56,6 +57,7 @@ class NativeAppAuthClientIntegrationTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")
 
+    @retry_errors()
     def test_oauth2_start_flow_specified(self):
         """
         Starts a GlobusNativeAppFlowManager with specified parameters,

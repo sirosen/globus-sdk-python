@@ -6,7 +6,7 @@ import globus_sdk
 from globus_sdk.base import (BaseClient, safe_stringify,
                              slash_join, merge_params)
 from tests.framework import (CapturedIOTestCase, get_client_data,
-                             SDKTESTER1A_NATIVE1_TRANSFER_RT)
+                             SDKTESTER1A_NATIVE1_TRANSFER_RT, retry_errors)
 from globus_sdk.exc import GlobusAPIError
 
 
@@ -94,6 +94,7 @@ class BaseClientTests(CapturedIOTestCase):
         path = self.bc.qjoin_path(*parts)
         self.assertEqual(path, "/SDK/Test/Path/Items")
 
+    @retry_errors()
     def test_get(self):
         """
         Gets test endpoint, verifies results
@@ -121,6 +122,7 @@ class BaseClientTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 405)
         self.assertEqual(apiErr.exception.code, "ClientError.BadMethod")
 
+    @retry_errors()
     def test_post(self):
         """
         Makes a test endpoint, verifies results
@@ -159,6 +161,7 @@ class BaseClientTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 405)
         self.assertEqual(apiErr.exception.code, "ClientError.BadMethod")
 
+    @retry_errors()
     def test_delete(self):
         """
         Deletes the test endpoint, verifies results
@@ -198,6 +201,7 @@ class BaseClientTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 405)
         self.assertEqual(apiErr.exception.code, "ClientError.BadMethod")
 
+    @retry_errors()
     def test_put(self):
         """
         Updates test endpoint, verifies results

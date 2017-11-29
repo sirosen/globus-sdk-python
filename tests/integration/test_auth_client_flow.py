@@ -3,12 +3,13 @@ from six.moves.urllib.parse import quote_plus
 import globus_sdk
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_native_app import make_native_app_challenge
-from tests.framework import CapturedIOTestCase, get_client_data
+from tests.framework import CapturedIOTestCase, get_client_data, retry_errors
 from globus_sdk.exc import AuthAPIError
 
 
 class AuthClientIntegrationTests(CapturedIOTestCase):
 
+    @retry_errors()
     def test_oauth2_get_authorize_url_native(self):
         """
         Starts an auth flow with a NativeAppFlowManager, gets the authorize url
@@ -59,6 +60,7 @@ class AuthClientIntegrationTests(CapturedIOTestCase):
         for val in expected_vals:
             self.assertIn(val, url_res)
 
+    @retry_errors()
     def test_oauth2_get_authorize_url_confidential(self):
         """
         Starts an auth flow with a NativeAppFlowManager, gets the authorize url
@@ -103,6 +105,7 @@ class AuthClientIntegrationTests(CapturedIOTestCase):
         for val in expected_vals:
             self.assertIn(val, url_res)
 
+    @retry_errors()
     def test_oauth2_exchange_code_for_tokens_native(self):
         """
         Starts a NativeAppFlowManager, Confirms invalid code raises 401
@@ -118,6 +121,7 @@ class AuthClientIntegrationTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")
 
+    @retry_errors()
     def test_oauth2_exchange_code_for_tokens_confidential(self):
         """
         Starts an AuthorizationCodeFlowManager, Confirms bad code raises 401

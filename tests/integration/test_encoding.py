@@ -6,7 +6,8 @@ from random import getrandbits
 import globus_sdk
 from tests.framework import (
     TransferClientTestCase, GO_EP1_ID,
-    DEFAULT_TASK_WAIT_TIMEOUT, DEFAULT_TASK_WAIT_POLLING_INTERVAL)
+    DEFAULT_TASK_WAIT_TIMEOUT, DEFAULT_TASK_WAIT_POLLING_INTERVAL,
+    retry_errors)
 
 
 class EncodingTests(TransferClientTestCase):
@@ -99,6 +100,7 @@ class EncodingTests(TransferClientTestCase):
         else:
             self.assertEqual(type("literal"), six.text_type)
 
+    @retry_errors()
     def test_ascii_url_encoding(self):
         """
         Tests operations with an ASCII name that includes ' ' and '%"
@@ -108,6 +110,7 @@ class EncodingTests(TransferClientTestCase):
         self.dir_operations(name)
         self.ep_operations(name)
 
+    @retry_errors()
     def test_non_ascii_utf8(self):
         """
         Tests operations with a UTF-8 name containing non ASCII characters with
@@ -118,6 +121,7 @@ class EncodingTests(TransferClientTestCase):
         self.ep_operations(name)
 
     @unittest.skipIf(six.PY3, "test run with Python 3")
+    @retry_errors()
     def test_non_ascii_utf8_bytes(self):
         """
         Tests operations with a byte string encoded from non ASCII UTF-8.
@@ -129,6 +133,7 @@ class EncodingTests(TransferClientTestCase):
         self.dir_operations(byte_name, expected_name=uni_name)
         self.ep_operations(byte_name, expected_name=uni_name)
 
+    @retry_errors()
     def test_latin1(self):
         """
         Tests operations with latin-1 name that is not valid UTF-8.
@@ -143,6 +148,7 @@ class EncodingTests(TransferClientTestCase):
         self.ep_operations(name)
 
     @unittest.skipIf(six.PY3, "test run with Python 3")
+    @retry_errors()
     def test_invalid_utf8_bytes(self):
         """
         Tests operations with byte string that can be decoded with

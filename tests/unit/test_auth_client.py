@@ -6,7 +6,8 @@ except ImportError:
 import globus_sdk
 from tests.framework import (CapturedIOTestCase,
                              get_client_data, get_user_data,
-                             SDKTESTER1A_NATIVE1_AUTH_RT)
+                             SDKTESTER1A_NATIVE1_AUTH_RT,
+                             retry_errors)
 from globus_sdk.exc import AuthAPIError
 
 
@@ -31,6 +32,7 @@ class AuthClientTests(CapturedIOTestCase):
             authorizer=globus_sdk.AccessTokenAuthorizer(self.access_token),
             client_id=client_id)
 
+    @retry_errors()
     def test_get_identities_singleton(self):
         """
         gets identities with single username and id values, validates results.
@@ -60,6 +62,7 @@ class AuthClientTests(CapturedIOTestCase):
                 return identity
         return None
 
+    @retry_errors()
     def test_get_identites_ids(self):
         """
         gets identities with a list of ids, validates results
@@ -87,6 +90,7 @@ class AuthClientTests(CapturedIOTestCase):
         # confirm unused id isn't returned
         self.assertIsNone(unused_identity)
 
+    @retry_errors()
     def test_get_identities_usernames(self):
         """
         gets identities with a list of usernames, validates results.
@@ -117,6 +121,7 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertEqual(unused_identity["name"], None)
         self.assertEqual(unused_identity["status"], "unused")
 
+    @retry_errors()
     def test_get_identities_errors(self):
         """
         Confirms bad and unauthorized requests to get_identities throw errors
@@ -133,6 +138,7 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "UNAUTHORIZED")
 
+    @retry_errors()
     def test_oauth2_get_authorize_url(self):
         """
         Gets an authorize url with no auth flow and a mock auth flow.
@@ -153,6 +159,7 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertEqual(url_res, mock_url)
         mock_flow.get_authorize_url.assert_called_once()
 
+    @retry_errors()
     def test_oauth2_exchange_code_for_tokens(self):
         """
         Confirms flow required to exchange code,
@@ -176,6 +183,7 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertEqual(token_res, mock_tokens)
         mock_flow.exchange_code_for_tokens.assert_called_once_with(mock_code)
 
+    @retry_errors()
     def test_oauth2_refresh_token(self):
         """
         Gets an access token from the testing Refresh Token, validates results
@@ -195,6 +203,7 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "Error")  # json is malformed?
 
+    @retry_errors()
     def test_oauth2_revoke_token(self):
         """
         Revokes the access_token used in test AuthClient's authorizer
@@ -210,6 +219,7 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertEqual(apiErr.exception.http_status, 401)
         self.assertEqual(apiErr.exception.code, "UNAUTHORIZED")
 
+    @retry_errors()
     def test_oauth2_token(self):
         """
         Gets an access_token using oauth2/token directly, validates results.
@@ -224,6 +234,7 @@ class AuthClientTests(CapturedIOTestCase):
         self.assertIn("expires_in", token_res)
         self.assertIn("scope", token_res)
 
+    @retry_errors()
     def test_oauth2_userinfo(self):
         """
         Gets userinfo, validates results

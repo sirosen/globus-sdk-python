@@ -14,7 +14,8 @@ except ImportError:
     from unittest import mock
 
 from tests.framework import (CapturedIOTestCase, SDKTESTER1A_NATIVE1_ID_TOKEN,
-                             SDKTESTER1A_ID_ACCESS_TOKEN, get_client_data)
+                             SDKTESTER1A_ID_ACCESS_TOKEN, get_client_data,
+                             retry_errors)
 from globus_sdk.auth.token_response import (
     OAuthTokenResponse, OAuthDependentTokenResponse, _convert_token_info_dict)
 from globus_sdk.exc import GlobusOptionalDependencyError
@@ -127,6 +128,7 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         with self.assertRaises(GlobusOptionalDependencyError):
             self.response.decode_id_token(self.ac)
 
+    @retry_errors()
     @unittest.skipIf(not JWT_FLAG, "pyjwt not imported")
     def test_decode_id_token_invalid_id(self):
         """
@@ -141,6 +143,7 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         with self.assertRaises(jwt.exceptions.InvalidTokenError):
             id_response.decode_id_token(self.ac)
 
+    @retry_errors()
     @unittest.skipIf(not JWT_FLAG, "pyjwt not imported")
     def test_decode_id_token_expired(self):
         """

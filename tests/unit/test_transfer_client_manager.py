@@ -7,7 +7,9 @@ from tests.framework import (TransferClientTestCase, get_user_data,
                              GO_EP1_ID, GO_EP2_ID,
 
                              DEFAULT_TASK_WAIT_TIMEOUT,
-                             DEFAULT_TASK_WAIT_POLLING_INTERVAL)
+                             DEFAULT_TASK_WAIT_POLLING_INTERVAL,
+
+                             retry_errors)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -60,6 +62,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
             else:
                 raise e
 
+    @retry_errors()
     def test_endpoint_manager_monitored_endpoints(self):
         """
         Gets a list of all endpoints sdktester1a is an activity_manager on,
@@ -78,6 +81,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         else:
             self.assertFalse("managed endpoint not found")
 
+    @retry_errors()
     def test_endpoint_manager_get_endpoint(self):
         """
         Gets the managed endpoint, confirms expected results
@@ -95,6 +99,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
     # TODO: test against a non shared endpoint we have the manager role on
+    @retry_errors()
     def test_endpoint_manager_hosted_endpoint_list(self):
         """
         Attempts to gets the list of shares hosted on the managed endpoint.
@@ -114,6 +119,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_acl_list(self):
         """
         Gets ACL list from managed endpoint, validates results
@@ -134,6 +140,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_task_list(self):
         """
         Has sdktester2b submit transfer and delete task to the managed_ep
@@ -190,6 +197,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         # fail if both not found
         self.assertTrue(delete_found and transfer_found)
 
+    @retry_errors()
     def test_endpoint_manager_get_task(self):
         """
         Has sdktester2b submit a no-op task on the managed endpoint
@@ -217,6 +225,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_task_event_list(self):
         """
         Has sdktester2b submit a no-op task on the managed endpoint.
@@ -249,6 +258,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_task_successful_transfers(self):
         """
         Has sdktester2b submit a recursive transfer of share/godata to the
@@ -313,6 +323,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
 
         return task_ids
 
+    @retry_errors()
     def test_endpoint_manager_cancel_tasks(self):
         """
         Get task ids from _unauthorized transfers, and has sdktester1a cancel
@@ -335,6 +346,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_cancel_status(self):
         """
         Has sdktester2b submit three unauthorized transfers from the managed
@@ -365,6 +377,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
             self.assertEqual(task_doc["canceled_by_admin"], "SOURCE")
             self.assertEqual(task_doc["canceled_by_admin_message"], message)
 
+    @retry_errors()
     def test_endpoint_manager_pause_tasks(self):
         """
         Has sdktester2b submit three unauthorized transfers,
@@ -392,6 +405,7 @@ class ManagerTransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 403)
         self.assertEqual(apiErr.exception.code, "PermissionDenied")
 
+    @retry_errors()
     def test_endpoint_manager_resume_tasks(self):
         """
         Has sdktester2b submit three unauthorized transfers,

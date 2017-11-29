@@ -6,7 +6,9 @@ from tests.framework import (TransferClientTestCase, get_user_data,
                              GO_EP1_SERVER_ID,
 
                              DEFAULT_TASK_WAIT_TIMEOUT,
-                             DEFAULT_TASK_WAIT_POLLING_INTERVAL)
+                             DEFAULT_TASK_WAIT_POLLING_INTERVAL,
+
+                             retry_errors)
 from globus_sdk.exc import TransferAPIError
 from globus_sdk.transfer.paging import PaginatedResource
 
@@ -18,6 +20,7 @@ class TransferClientTests(TransferClientTestCase):
 
     __test__ = True  # marks sub-class as having tests
 
+    @retry_errors()
     def test_get_endpoint(self):
         """
         Gets endpoint on go#ep1 and go#ep2, validate results
@@ -38,6 +41,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(ep1_doc["canonical_name"], "go#ep1")
         self.assertEqual(ep2_doc["canonical_name"], "go#ep2")
 
+    @retry_errors()
     def test_update_endpoint(self):
         """
         Updates test endpoint, validate results,
@@ -78,6 +82,7 @@ class TransferClientTests(TransferClientTestCase):
                          update_data2["display_name"])
         self.assertEqual(get_doc2["description"], update_data2["description"])
 
+    @retry_errors()
     def test_create_endpoint(self):
         """
         Creates an endpoint, validates results
@@ -102,6 +107,7 @@ class TransferClientTests(TransferClientTestCase):
         self.asset_cleanup.append({"function": self.tc.delete_endpoint,
                                    "args": [create_doc["id"]]})
 
+    @retry_errors()
     def test_delete_endpoint(self):
         """
         Deletes the test endpoint, validates results
@@ -131,6 +137,7 @@ class TransferClientTests(TransferClientTestCase):
     # def test_endpoint_activate(self):
         # TODO: test against an endpoint that uses MyProxy
 
+    @retry_errors()
     def test_endpoint_get_activation_requirements(self):
         """
         Gets activation requirements on tutorial endpoint, validates results
@@ -154,6 +161,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertTrue(reqs_doc.supports_web_activation)
         self.assertTrue(reqs_doc.always_activated)
 
+    @retry_errors()
     def test_create_shared_endpoint(self):
         """
         Creates a shared endpoint, validates results,
@@ -188,6 +196,7 @@ class TransferClientTests(TransferClientTestCase):
         self.asset_cleanup.append({"function": self.deleteHelper,
                                    "args": [GO_EP1_ID, share_path]})
 
+    @retry_errors()
     def test_endpoint_server_list(self):
         """
         Gets endpoint server list for go#ep1, validates results
@@ -204,6 +213,7 @@ class TransferClientTests(TransferClientTestCase):
             self.assertEqual(server["DATA_TYPE"], "server")
             self.assertIn("id", server)
 
+    @retry_errors()
     def test_get_endpoint_server(self):
         """
         Gets the go#ep1 server by id, validates results
@@ -217,6 +227,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertIn("hostname", get_doc)
         self.assertIn("port", get_doc)
 
+    @retry_errors()
     def test_add_endpoint_server(self):
         """
         Adds a new server with a dummy hostname, validate results
@@ -240,6 +251,7 @@ class TransferClientTests(TransferClientTestCase):
         # return server id
         return server_id
 
+    @retry_errors()
     def test_update_endpoint_server(self):
         """
         Adds a new server, updates server data, validates results,
@@ -265,6 +277,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(get_doc["hostname"], update_data["hostname"])
         self.assertEqual(get_doc["port"], update_data["port"])
 
+    @retry_errors()
     def test_delete_endpoint_server(self):
         """
         Adds a new server, deletes it, validates results,
@@ -289,6 +302,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.code,
                          "ClientError.NotFound.ServerNotFound")
 
+    @retry_errors()
     def test_endpoint_role_list(self):
         """
         Gets the endpoint role list from the test endpoint, validates results
@@ -308,6 +322,7 @@ class TransferClientTests(TransferClientTestCase):
             self.assertIn("principal", role)
             self.assertIn("role", role)
 
+    @retry_errors()
     def test_bookmark_list(self):
         """
         Gets SDK user's bookmark list, validates results
@@ -327,6 +342,7 @@ class TransferClientTests(TransferClientTestCase):
             self.assertIn("endpoint_id", bookmark)
             self.assertIn("path", bookmark)
 
+    @retry_errors()
     def test_create_bookmark(self):
         """
         Creates a bookmark, validates results, confirms get sees bookmark,
@@ -361,6 +377,7 @@ class TransferClientTests(TransferClientTestCase):
         # return bookmark_id
         return bookmark_id
 
+    @retry_errors()
     def test_get_bookmark(self):
         """
         Creates a bookmark, gets it, validates results
@@ -379,6 +396,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertIn("endpoint_id", get_doc)
         self.assertIn("path", get_doc)
 
+    @retry_errors()
     def test_update_bookmark(self):
         """
         Creates a bookmark, updates it, validates results,
@@ -402,6 +420,7 @@ class TransferClientTests(TransferClientTestCase):
         get_doc = self.tc.get_bookmark(bookmark_id)
         self.assertEqual(get_doc["name"], update_data["name"])
 
+    @retry_errors()
     def test_delete_bookmark(self):
         """
         Creates a bookmark, deletes it, validates results,
@@ -431,6 +450,7 @@ class TransferClientTests(TransferClientTestCase):
                 self.asset_cleanup.remove(cleanup)
                 break
 
+    @retry_errors()
     def test_operation_ls(self):
         """
         Performs ls operations on go#ep1, tests path, show_hidden, limit,
@@ -502,6 +522,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(file_data["name"], file_name)
         self.assertTrue(file_data["size"] > min_size)
 
+    @retry_errors()
     def test_operation_mkdir(self):
         """
         Performs mkdir operation in go#ep1/~/, validates results,
@@ -529,6 +550,7 @@ class TransferClientTests(TransferClientTestCase):
         self.asset_cleanup.append({"function": self.deleteHelper,
                                    "args": [GO_EP1_ID, path]})
 
+    @retry_errors()
     def test_operation_rename(self):
         """
         Performs mkdir operation, renames the directory,
@@ -567,6 +589,7 @@ class TransferClientTests(TransferClientTestCase):
         self.asset_cleanup.append({"function": self.deleteHelper,
                                    "args": [GO_EP1_ID, new_path]})
 
+    @retry_errors()
     def test_operation_symlink(self):
         """
         Performs operation symlink creating valid and invalid symlinks
@@ -610,6 +633,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 409)
         self.assertEqual(apiErr.exception.code, "NotSupported")
 
+    @retry_errors()
     def test_operation_get_submission_id(self):
         """
         Gets a submission_id, validates results, checks UUID looks reasonable
@@ -630,6 +654,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(uuid[18], "-")
         self.assertEqual(uuid[23], "-")
 
+    @retry_errors()
     def test_submit_transfer(self):
         """
         Submits transfer requests, validates results, confirms tasks completed
@@ -711,6 +736,7 @@ class TransferClientTests(TransferClientTestCase):
             timeout=DEFAULT_TASK_WAIT_TIMEOUT,
             polling_interval=DEFAULT_TASK_WAIT_POLLING_INTERVAL))
 
+    @retry_errors()
     def test_submit_transfer_keep_recursive_symlinks(self):
         """
         Submits transfer tasks from go#ep3:/share/symlinks/good/
@@ -741,6 +767,7 @@ class TransferClientTests(TransferClientTestCase):
         for item in ls_doc:
             self.assertIsNotNone(item["link_target"])
 
+    @retry_errors()
     def test_submit_transfer_copy_recursive_symlinks(self):
         """
         Submits transfer tasks from go#ep3:/share/symlinks/good/
@@ -771,6 +798,7 @@ class TransferClientTests(TransferClientTestCase):
         for item in ls_doc:
             self.assertIsNone(item["link_target"])
 
+    @retry_errors()
     def test_submit_transfer_ignore_recursive_symlinks(self):
         # dir for testing transfers to, name randomized to prevent collision
         ignore_dir = "ignore_symlink_dest_dir-" + str(getrandbits(128))
@@ -794,6 +822,7 @@ class TransferClientTests(TransferClientTestCase):
         ls_doc = self.tc.operation_ls(GO_EP3_ID, path=ignore_path)
         self.assertEqual(len(ls_doc["DATA"]), 0)
 
+    @retry_errors()
     def test_submit_transfer_symlink(self):
         """
         Transfers a symlink on go#ep3:/share/symlinks/good to go#ep3:~/
@@ -833,6 +862,7 @@ class TransferClientTests(TransferClientTestCase):
         ls_doc = self.tc.operation_ls(GO_EP3_ID, filter="name:" + file_name)
         self.assertIsNone(ls_doc["DATA"][0]["link_target"])
 
+    @retry_errors()
     def test_submit_delete(self):
         """
         Transfers a file and makes a dir in go#ep1, then deletes them,
@@ -901,6 +931,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(resub_delete_doc["submission_id"], sub_id)
         self.assertEqual(resub_delete_doc["task_id"], task_id)
 
+    @retry_errors()
     def test_task_list(self):
         """
         Gets task list, validates results, tests num_results and filter params
@@ -937,6 +968,7 @@ class TransferClientTests(TransferClientTestCase):
             self.assertEqual(task["type"], "DELETE")
             self.assertEqual(task["status"], "SUCCEEDED")
 
+    @retry_errors()
     def test_task_event_list(self):
         """
         Gets the task event list for a completed transfer,
@@ -961,6 +993,7 @@ class TransferClientTests(TransferClientTestCase):
         for event in filter_doc:
             self.assertEqual(event["is_error"], True)
 
+    @retry_errors()
     def test_get_task(self):
         """
         Submits a transfer, waits for transfer to complete, gets transfer task
@@ -1003,6 +1036,7 @@ class TransferClientTests(TransferClientTestCase):
         # return task_id
         return task_id
 
+    @retry_errors()
     def test_update_task(self):
         """
         Submits an un-allowed transfer task, updates task, validates results,
@@ -1039,6 +1073,7 @@ class TransferClientTests(TransferClientTestCase):
         self.assertEqual(apiErr.exception.http_status, 409)
         self.assertEqual(apiErr.exception.code, "Conflict")
 
+    @retry_errors()
     def test_cancel_task(self):
         """
         Submits an un-allowed transfer task, cancels task, validates results,
@@ -1075,6 +1110,7 @@ class TransferClientTests(TransferClientTestCase):
             complete_doc["message"],
             "The task completed before the cancel request was processed.")
 
+    @retry_errors()
     def test_task_wait(self):
         """
         Waits on complete, and never completing tasks, confirms results
@@ -1102,6 +1138,7 @@ class TransferClientTests(TransferClientTestCase):
         self.asset_cleanup.append({"function": self.tc.cancel_task,
                                    "args": [never_id]})
 
+    @retry_errors()
     def test_task_successful_transfers(self):
         """
         Gets the successful transfers from a completed task, validates results
