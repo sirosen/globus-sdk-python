@@ -34,7 +34,7 @@ class PagingSimulator(object):
         response = requests.Response()
         response._content = six.b(json.dumps(data))
         response.headers["Content-Type"] = "application/json"
-        return IterableTransferResponse(response)
+        return IterableTransferResponse(None, response)
 
 
 class PaginatedResourceTests(CapturedIOTestCase):
