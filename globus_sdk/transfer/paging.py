@@ -144,6 +144,11 @@ class PaginatedResource(GlobusResponse, six.Iterator):
 
         # what function call does this class instance wrap up?
         self.client_method = client_method
+        if six.PY2:
+            self.client_object = client_method.im_self
+        else:
+            self.client_object = client_method.__self__
+
         self.client_path = path
         self.client_kwargs = client_kwargs
         self.client_kwargs['response_class'] = IterableTransferResponse
@@ -299,7 +304,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
             # dicts, so these handle well
             res = self.client_method(self.client_path, **self.client_kwargs)
             for item in res:
-                yield GlobusResponse(item)
+                yield GlobusResponse(self.client_object, item)
                 # increment the "num results" counter
                 self.num_results_fetched += 1
 
