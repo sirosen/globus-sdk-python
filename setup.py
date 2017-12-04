@@ -25,11 +25,13 @@ setup(name="globus-sdk",
       packages=find_packages(exclude=['tests', 'tests.*']),
       install_requires=[
           'requests>=2.0.0,<3.0.0',
-          'six>=1.10.0,<2.0.0'
+          'six>=1.10.0,<2.0.0',
+          'pyjwt[crypto]>=1.5.3,<2.0.0'
       ],
 
       extras_require={
-          'jwt': ['pyjwt[crypto]>=1.5.3,<2.0.0']
+          # empty extra included to support older installs
+          'jwt': []
       },
 
       include_package_data=True,
@@ -44,7 +46,6 @@ setup(name="globus-sdk",
           "Operating System :: POSIX",
           "Programming Language :: Python",
           "Programming Language :: Python :: 2.7",
-          "Programming Language :: Python :: 3.3",
           "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",
           "Programming Language :: Python :: 3.6",
