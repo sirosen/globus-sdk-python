@@ -1,6 +1,6 @@
 VIRTUALENV=.venv
 
-.PHONY: docs build upload test test/opts clean help
+.PHONY: docs build upload test clean help
 
 
 help:
@@ -11,8 +11,6 @@ help:
 	@echo "  localdev:     Setup local development env with a 'setup.py develop'"
 	@echo "  build:        Create the distributions which we like to upload to pypi"
 	@echo "  test:         Run the full suite of tests"
-	@echo "  test/opts:    Run the full suite of tests with optional dependencies installed"
-	@echo "  test/no-opts: Run the full suite of tests with optional dependencies explicitly uninstalled"
 	@echo "  docs:         Clean old HTML docs and rebuild them with sphinx"
 	@echo "  upload:       [build], but also upload to pypi using twine"
 	@echo "  clean:        Remove typically unwanted files, mostly from [build]"
@@ -51,15 +49,12 @@ $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2: test-requirements.txt $(VIRTUA
 test: $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2
 	$(VIRTUALENV)/bin/flake8
 	$(VIRTUALENV)/bin/nose2 --verbose
-test/opts: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/pip install -e .[jwt]
-	$(MAKE) test
 
 travis:
 	pip install --upgrade pip
 	pip install --upgrade "setuptools>=29,<30"
 	pip install -r test-requirements.txt
-	pip install -e .[jwt]
+	pip install -e .
 	flake8
 	nose2 --verbose
 
