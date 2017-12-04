@@ -358,9 +358,9 @@ class BaseClient(object):
             self.logger.debug('request completed with response code: {}'
                               .format(r.status_code))
             if response_class is None:
-                return self.default_response_class(r)
+                return self.default_response_class(self, r)
             else:
-                return response_class(r)
+                return response_class(self, r)
 
         self.logger.debug('request completed with (error) response code: {}'
                           .format(r.status_code))
