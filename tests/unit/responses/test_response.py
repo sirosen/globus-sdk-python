@@ -14,10 +14,10 @@ class GlobusResponseTests(CapturedIOTestCase):
         """
         super(GlobusResponseTests, self).setUp()
         self.dict_data = {"label1": "value1", "label2": "value2"}
-        self.dict_response = GlobusResponse(None, self.dict_data)
+        self.dict_response = GlobusResponse(self.dict_data)
 
         self.list_data = ["value1", "value2", "value3"]
-        self.list_response = GlobusResponse(None, self.list_data)
+        self.list_response = GlobusResponse(self.list_data)
 
     def test_data(self):
         """
@@ -87,21 +87,20 @@ class GlobusHTTPResponseTests(CapturedIOTestCase):
         json_response = requests.Response()
         json_response._content = six.b(json.dumps(self.json_data))
         json_response.headers["Content-Type"] = "application/json"
-        self.globus_json_response = GlobusHTTPResponse(None, json_response)
+        self.globus_json_response = GlobusHTTPResponse(json_response)
 
         # malformed json
         malformed_response = requests.Response()
         malformed_response._content = six.b("{")
         malformed_response.headers["Content-Type"] = "application/json"
-        self.globus_malformed_response = GlobusHTTPResponse(
-            None, malformed_response)
+        self.globus_malformed_response = GlobusHTTPResponse(malformed_response)
 
         # text
         self.text_data = "text data"
         text_response = requests.Response()
         text_response._content = six.b(self.text_data)
         text_response.headers["Content-Type"] = "text/plain"
-        self.globus_text_response = GlobusHTTPResponse(None, text_response)
+        self.globus_text_response = GlobusHTTPResponse(text_response)
 
     def test_data(self):
         """

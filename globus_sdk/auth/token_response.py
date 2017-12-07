@@ -62,9 +62,6 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         """
         A parsed ID Token (OIDC) as a dict.
 
-        Requires the globus-sdk[jwt] optional dependency. For more details, see
-        the :ref:`Optional Dependency Docs <optional_dependencies>`.
-
         **Parameters**
 
             ``auth_client`` (:class:`AuthClient <globus_sdk.AuthClient>`)

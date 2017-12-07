@@ -304,7 +304,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
             # dicts, so these handle well
             res = self.client_method(self.client_path, **self.client_kwargs)
             for item in res:
-                yield GlobusResponse(self.client_object, item)
+                yield GlobusResponse(item, client=self.client_object)
                 # increment the "num results" counter
                 self.num_results_fetched += 1
 

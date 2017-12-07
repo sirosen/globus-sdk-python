@@ -60,7 +60,7 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         http_response = requests.Response()
         http_response._content = six.b(json.dumps(self.top_token))
         http_response.headers["Content-Type"] = "application/json"
-        self.response = OAuthTokenResponse(self.ac, http_response)
+        self.response = OAuthTokenResponse(http_response)
 
     def test_convert_token_info_dict(self):
         """
@@ -141,7 +141,7 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         http_response = requests.Response()
         http_response._content = six.b(json.dumps(self.other_token1))
         http_response.headers["Content-Type"] = "application/json"
-        id_response = OAuthTokenResponse(self.ac, http_response)
+        id_response = OAuthTokenResponse(http_response)
 
         with self.assertRaises(jwt.exceptions.InvalidTokenError):
             id_response.decode_id_token()
@@ -186,7 +186,7 @@ class OAuthDependentTokenResponseTests(CapturedIOTestCase):
         data = [self.token1, self.token2, self.token3]
         http_response._content = six.b(json.dumps(data))
         http_response.headers["Content-Type"] = "application/json"
-        self.response = OAuthDependentTokenResponse(None, http_response)
+        self.response = OAuthDependentTokenResponse(http_response)
 
     def test_by_resource_server(self):
         """

@@ -21,7 +21,7 @@ class ActivationRequirementsResponseTests(CapturedIOTestCase):
         response = requests.Response()
         response.headers["Content-Type"] = "application/json"
         response._content = six.b(json.dumps(data))
-        return ActivationRequirementsResponse(None, response)
+        return ActivationRequirementsResponse(response)
 
     def test_expires_at(self):
         """
