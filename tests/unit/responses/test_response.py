@@ -32,7 +32,7 @@ class GlobusResponseTests(CapturedIOTestCase):
         """
         for item in self.dict_data:
             self.assertTrue(item in self.dict_response)
-        self.assertFalse("nonexistant" in self.dict_response)
+        self.assertFalse("nonexistent" in self.dict_response)
 
         for item in self.list_data:
             self.assertTrue(item in self.list_response)

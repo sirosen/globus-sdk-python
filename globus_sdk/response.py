@@ -15,13 +15,18 @@ class GlobusResponse(object):
     ``TypeError``.
 
     >>> print("Response ID": r["id"]) # alias for r.data["id"]
+
+    ``GlobusResponse`` objects *always* wrap some kind of data to
+    return to a caller. Most basic actions on a GlobusResponse are
+    just ways of interacting with this data.
     """
-    def __init__(self, data):
-        """
-        ``GlobusResponse`` objects *always* wrap some kind of data to
-        return to a caller. Most basic actions on a GlobusResponse are
-        just ways of interacting with this data.
-        """
+    def __init__(self, data, client=None):
+        # TODO: In v2, consider making client a required argument
+        # client is the originating client object, which can be used by
+        # advanced response classes to implement fancy methods which need to
+        # interact with the client
+        self._client = client
+
         self._data = data
 
     def __str__(self):
@@ -79,10 +84,10 @@ class GlobusHTTPResponse(GlobusResponse):
     :ivar http_status: HTTP status code returned by the server (int)
     :ivar content_type: Content-Type header returned by the server (str)
     """
-    def __init__(self, http_response):
+    def __init__(self, http_response, client=None):
         # the API response as some form of HTTP response object will be the
         # underlying data of an API response
-        GlobusResponse.__init__(self, http_response)
+        GlobusResponse.__init__(self, http_response, client=client)
         # NB: the word 'code' is confusing because we use it in the
         # error body, and status_code is not much better. http_code, or
         # http_status_code if we wanted to be really explicit, is

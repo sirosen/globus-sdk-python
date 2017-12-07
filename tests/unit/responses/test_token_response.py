@@ -47,12 +47,6 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
             "access_token": "invalid_access_token"}
         self.top_token["other_tokens"] = [self.other_token1, self.other_token2]
 
-        # create the response
-        http_response = requests.Response()
-        http_response._content = six.b(json.dumps(self.top_token))
-        http_response.headers["Content-Type"] = "application/json"
-        self.response = OAuthTokenResponse(http_response)
-
         # mock AuthClient
         self.ac = mock.Mock()
         self.ac.client_id = get_client_data()["native_app_client1"]["id"]
@@ -61,6 +55,12 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
             "jwks_uri": "https://auth.globus.org/jwk.json",
             "id_token_signing_alg_values_supported": ["RS512"]
         })
+
+        # create the response
+        http_response = requests.Response()
+        http_response._content = six.b(json.dumps(self.top_token))
+        http_response.headers["Content-Type"] = "application/json"
+        self.response = OAuthTokenResponse(http_response)
 
     def test_convert_token_info_dict(self):
         """
@@ -126,6 +126,9 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         If pyjwt was not imported, confirms OptionalDependencyError
         """
         with self.assertRaises(GlobusOptionalDependencyError):
+            self.response.decode_id_token()
+        # test with deprecated usage pattern too
+        with self.assertRaises(GlobusOptionalDependencyError):
             self.response.decode_id_token(self.ac)
 
     @retry_errors()
@@ -141,6 +144,9 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         id_response = OAuthTokenResponse(http_response)
 
         with self.assertRaises(jwt.exceptions.InvalidTokenError):
+            id_response.decode_id_token()
+        # test with deprecated usage pattern too
+        with self.assertRaises(jwt.exceptions.InvalidTokenError):
             id_response.decode_id_token(self.ac)
 
     @retry_errors()
@@ -150,6 +156,9 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
         Attempt to decode an expired id_token, confirms that the token is
         decoded, but errors out on the expired signature.
         """
+        with self.assertRaises(jwt.exceptions.ExpiredSignatureError):
+            self.response.decode_id_token()
+        # test with deprecated usage pattern too
         with self.assertRaises(jwt.exceptions.ExpiredSignatureError):
             self.response.decode_id_token(self.ac)
 

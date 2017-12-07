@@ -1,3 +1,5 @@
+.. _optional_dependencies:
+
 Optional Dependencies
 =====================
 
