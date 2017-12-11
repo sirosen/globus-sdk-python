@@ -29,7 +29,6 @@ __all__ = (
 
     "GlobusError", "GlobusAPIError", "TransferAPIError", "SearchAPIError",
     "NetworkError", "GlobusConnectionError", "GlobusTimeoutError",
-    "GlobusOptionalDependencyError",
 
     "NullAuthorizer", "BasicAuthorizer",
     "AccessTokenAuthorizer", "RefreshTokenAuthorizer",
