@@ -2,6 +2,7 @@ import logging
 import json
 import requests
 import time
+import six
 
 import jwt
 
@@ -24,8 +25,69 @@ def _convert_token_info_dict(source_dict):
         'access_token': source_dict['access_token'],
         'refresh_token': source_dict.get('refresh_token'),
         'token_type': source_dict.get('token_type'),
-        'expires_at_seconds': int(time.time() + expires_in)
+        'expires_at_seconds': int(time.time() + expires_in),
+        'resource_server': source_dict['resource_server']
     }
+
+
+class _ByScopesGetter(object):
+    """
+    A fancy dict-like object for looking up token data by scope name.
+    Allows usage like
+
+    >>> tokens = OAuthTokenResponse(...)
+    >>> tok = tokens.by_scopes['openid profile']['access_token']
+    """
+    def __init__(self, scope_map):
+        self.scope_map = scope_map
+
+    def __str__(self):
+        return json.dumps(self.scope_map)
+
+    def __iter__(self):
+        """iteration gets you every individual scope"""
+        return iter(self.scope_map.keys())
+
+    def __getitem__(self, scopename):
+        if not isinstance(scopename, six.string_types):
+            raise KeyError('by_scopes cannot contain non-string value "{}"'
+                           .format(scopename))
+
+        # split on spaces
+        scopes = scopename.split()
+        # collect every matching token in a set to dedup
+        # but collect actual results (dicts) in a list
+        rs_names = set()
+        toks = []
+        for scope in scopes:
+            try:
+                rs_names.add(self.scope_map[scope]['resource_server'])
+                toks.append(self.scope_map[scope])
+            except KeyError:
+                raise KeyError(('Scope specifier "{}" contains scope "{}" '
+                                "which was not found"
+                                ).format(scopename, scope))
+        # if there isn't exactly 1 token, it's an error
+        if len(rs_names) != 1:
+            raise KeyError(
+                'Scope specifier "{}" did not match exactly one token!'
+                .format(scopename))
+        # pop the only element in the set
+        return toks.pop()
+
+    def __contains__(self, item):
+        """
+        contains is driven by checking against getitem
+        that way, the definitions are always "in sync" if we update them in
+        the future
+        """
+        try:
+            self.__getitem__(item)
+            return True
+        except KeyError:
+            pass
+
+        return False
 
 
 class OAuthTokenResponse(GlobusHTTPResponse):
@@ -36,11 +98,20 @@ class OAuthTokenResponse(GlobusHTTPResponse):
     def __init__(self, *args, **kwargs):
         GlobusHTTPResponse.__init__(self, *args, **kwargs)
         self._init_rs_dict()
+        self._init_scopes_getter()
+
+    def _init_scopes_getter(self):
+        scope_map = {}
+        for rs, tok_data in self._by_resource_server.items():
+            for s in tok_data["scope"].split():
+                scope_map[s] = tok_data
+        self._by_scopes = _ByScopesGetter(scope_map)
 
     def _init_rs_dict(self):
         # call the helper at the top level
         self._by_resource_server = {
-            self['resource_server']: _convert_token_info_dict(self)}
+            self['resource_server']: _convert_token_info_dict(self)
+        }
         # call the helper on everything in 'other_tokens'
         self._by_resource_server.update(dict(
             (unprocessed_item['resource_server'],
@@ -58,6 +129,15 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         doing inspection of access tokens and refresh tokens.
         """
         return self._by_resource_server
+
+    @property
+    def by_scopes(self):
+        """
+        Representation of the token response in a dict-like object indexed by
+        scope name (or even space delimited scope names, so long as they match
+        the same token).
+        """
+        return self._by_scopes
 
     def decode_id_token(self, auth_client=None):
         """
