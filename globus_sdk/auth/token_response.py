@@ -136,6 +136,20 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         Representation of the token response in a dict-like object indexed by
         scope name (or even space delimited scope names, so long as they match
         the same token).
+
+        If you request scopes `scope1 scope2 scope3`, where `scope1` and
+        `scope2` are for the same service (and therefore map to the same
+        token), but `scope3` is for a different service, the following forms of
+        access are valid:
+
+        >>> tokens = ...
+        >>> # single scope
+        >>> token_data = tokens.by_scopes['scope1']
+        >>> token_data = tokens.by_scopes['scope2']
+        >>> token_data = tokens.by_scopes['scope3']
+        >>> # matching scopes
+        >>> token_data = tokens.by_scopes['scope1 scope2']
+        >>> token_data = tokens.by_scopes['scope2 scope1']
         """
         return self._by_scopes
 
