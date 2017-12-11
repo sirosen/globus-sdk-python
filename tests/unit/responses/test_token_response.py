@@ -2,12 +2,7 @@ import requests
 import json
 import six
 import time
-import unittest
-try:
-    import jwt
-    JWT_FLAG = True
-except ImportError:
-    JWT_FLAG = False
+import jwt
 try:
     import mock
 except ImportError:
@@ -18,7 +13,6 @@ from tests.framework import (CapturedIOTestCase, SDKTESTER1A_NATIVE1_ID_TOKEN,
                              retry_errors)
 from globus_sdk.auth.token_response import (
     OAuthTokenResponse, OAuthDependentTokenResponse, _convert_token_info_dict)
-from globus_sdk.exc import GlobusOptionalDependencyError
 
 
 class OAuthTokenResponseTests(CapturedIOTestCase):
@@ -120,19 +114,7 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
             self.assertIn(server_data["expires_at_seconds"],
                           (expected - 1, expected, expected + 1))
 
-    @unittest.skipIf(JWT_FLAG, "pyjwt successfully imported")
-    def test_decode_id_token_no_jwt(self):
-        """
-        If pyjwt was not imported, confirms OptionalDependencyError
-        """
-        with self.assertRaises(GlobusOptionalDependencyError):
-            self.response.decode_id_token()
-        # test with deprecated usage pattern too
-        with self.assertRaises(GlobusOptionalDependencyError):
-            self.response.decode_id_token(self.ac)
-
     @retry_errors()
-    @unittest.skipIf(not JWT_FLAG, "pyjwt not imported")
     def test_decode_id_token_invalid_id(self):
         """
         Creates a response with an invalid id_token, and attempts to decode
@@ -150,7 +132,6 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
             id_response.decode_id_token(self.ac)
 
     @retry_errors()
-    @unittest.skipIf(not JWT_FLAG, "pyjwt not imported")
     def test_decode_id_token_expired(self):
         """
         Attempt to decode an expired id_token, confirms that the token is

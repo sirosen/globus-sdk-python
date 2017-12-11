@@ -3,7 +3,6 @@ import json
 import six
 
 from globus_sdk.exc import (GlobusAPIError, TransferAPIError, AuthAPIError,
-                            GlobusOptionalDependencyError,
                             NetworkError, GlobusTimeoutError,
                             GlobusConnectionError, convert_request_exception)
 from tests.framework import CapturedIOTestCase
@@ -283,20 +282,3 @@ class NetworkErrorTests(CapturedIOTestCase):
         self.assertIsInstance(conv, GlobusConnectionError)
         self.assertEqual(conv.underlying_exception.args,
                          self.connection_exc.args)
-
-
-class GlobusOptionalDependencyErrorTests(CapturedIOTestCase):
-
-    def test_init(self):
-        """
-        Creates a GlobusOptionalDependencyError, confirms message is set
-        """
-
-        feature_name = "feature"
-        dep_names = ["dep1", "dep2", "dep3"]
-        with self.assertRaises(GlobusOptionalDependencyError) as depErr:
-            raise GlobusOptionalDependencyError(dep_names, feature_name)
-        self.assertIn("in order to use " + feature_name,
-                      depErr.exception.message)
-        for dep in dep_names:
-            self.assertIn(dep + "\n", depErr.exception.message)
