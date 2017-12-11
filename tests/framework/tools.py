@@ -65,4 +65,6 @@ def retry_errors(retries=2, error_classes=(NetworkError,)):
             assert last_error is not None
             raise last_error
 
+        return result_func
+
     return inner_decorator
