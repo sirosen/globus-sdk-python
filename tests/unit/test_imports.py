@@ -1,5 +1,9 @@
 import unittest
 import subprocess
+import os
+
+
+PYTHON_BINARY = os.environ.get('GLOBUS_TEST_PY', 'python')
 
 
 class TestImports(unittest.TestCase):
@@ -14,8 +18,9 @@ class TestImports(unittest.TestCase):
     """
 
     def _check_import_str(self, s):
-        proc = subprocess.Popen('python -c "{}"'.format(s), shell=True,
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen('{} -c "{}"'.format(PYTHON_BINARY, s),
+                                shell=True, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
         status = proc.wait()
         assert status is 0, str(proc.communicate())
 
