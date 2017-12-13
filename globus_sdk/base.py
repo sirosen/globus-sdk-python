@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import json
 import logging
+import time
 
 import requests
 import six
@@ -328,14 +329,29 @@ class BaseClient(object):
 
         # because a 401 can trigger retry, we need to wrap the retry-able thing
         # in a method
-        def send_request():
-            try:
-                return self._session.request(
-                    method=method, url=url, headers=rheaders, params=params,
-                    data=text_body, verify=self._verify)
-            except requests.RequestException as e:
+        def send_request(retries=4):
+            def _handle_exc(e):
                 self.logger.error("NetworkError on request")
                 raise exc.convert_request_exception(e)
+
+            try:
+                return self._session.request(
+                    method=method, url=url, headers=rheaders,
+                    params=params, data=text_body, verify=self._verify)
+            # according to requests docs, ConnectTimeout is safe to retry
+            # (because it's an error during the connection establishment)
+            # http://docs.python-requests.org/en/master/api/#requests.ConnectTimeout
+            except requests.ConnectTimeout as e:
+                if not retries:
+                    _handle_exc(e)
+                self.logger.info('ConnectTimeout, retrying')
+            except requests.RequestException as e:
+                _handle_exc(e)
+
+            # sleep 0.5s and retry if we reach this point -- means try
+            # failed, ConnectTimeout was caught but not reraised
+            time.sleep(0.5)
+            return send_request(retries=(retries - 1))
 
         # initial request
         r = send_request()
