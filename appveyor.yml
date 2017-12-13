@@ -17,8 +17,9 @@ install:
 
 test_script:
   # explicitly invoke under the build environment's python
-  - "%PYTHON%\\python.exe -m flake8"
-  - "%PYTHON%\\python.exe -m nose2"
+  - "set GLOBUS_TEST_PY=%PYTHON%\\python.exe"
+  - "%GLOBUS_TEST_PY% -m flake8"
+  - "%GLOBUS_TEST_PY% -m nose2"
 
 build: off
 deploy: off

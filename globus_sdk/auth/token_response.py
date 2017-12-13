@@ -3,8 +3,9 @@ import json
 import requests
 import time
 
+import jwt
+
 from globus_sdk.response import GlobusHTTPResponse
-from globus_sdk.exc import GlobusOptionalDependencyError
 
 logger = logging.getLogger(__name__)
 
@@ -70,13 +71,6 @@ class OAuthTokenResponse(GlobusHTTPResponse):
               this internally, so it is no longer necessary.
         """
         logger.info('Decoding ID Token "{}"'.format(self['id_token']))
-        try:
-            import jwt
-        except ImportError:
-            logger.error('OptionalDependencyError(jwt)')
-            raise GlobusOptionalDependencyError(
-                ["globus_sdk[jwt]"],
-                "JWT Parsing via OAuthTokenResponse.id_token")
 
         # warn (not error) on older usage pattern, but still respect it
         # FIXME: should be deprecated and removed in SDK v2
