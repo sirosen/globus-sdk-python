@@ -35,7 +35,8 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
             "id_token": "invalid_id_token",
             "access_token": SDKTESTER1A_ID_ACCESS_TOKEN}
         self.other_token2 = {  # valid id_token with invalid access_token
-            "resource_server": "server3", "expires_in": 30, "scope": "scope3",
+            "resource_server": "server3", "expires_in": 30,
+            "scope": "scope3 scope4",
             "refresh_token": "RT3", "other_tokens": [], "token_type": "3",
             "id_token": SDKTESTER1A_NATIVE1_ID_TOKEN,
             "access_token": "invalid_access_token"}
@@ -114,6 +115,35 @@ class OAuthTokenResponseTests(CapturedIOTestCase):
             self.assertIn(server_data["expires_at_seconds"],
                           (expected - 1, expected, expected + 1))
 
+    def test_by_scopes(self):
+        """
+        Gets by_scopes attribute from test response,
+        Confirms expected values found for top and other tokens
+        """
+        by_scopes = self.response.by_scopes
+
+        # confirm data by server matches known token values
+        for scope, token in [("scope1", self.top_token),
+                             ("scope2", self.other_token1),
+                             ("scope3", self.other_token2),
+                             ("scope4", self.other_token2),
+                             ("scope3 scope4", self.other_token2),
+                             ("scope4 scope3", self.other_token2)]:
+            scope_data = by_scopes[scope]
+            for key in ["scope", "access_token",
+                        "refresh_token", "token_type"]:
+                self.assertEqual(scope_data[key], token[key])
+            # assumes test runs within 1 second range
+            expected = int(time.time()) + token["expires_in"]
+            self.assertIn(scope_data["expires_at_seconds"],
+                          (expected - 1, expected, expected + 1))
+
+        self.assertIn('scope1', by_scopes)
+        self.assertIn('scope3', by_scopes)
+        self.assertNotIn('scope1 scope2', by_scopes)
+        self.assertNotIn('scope1 scope3', by_scopes)
+        self.assertIn('scope4 scope3', by_scopes)
+
     @retry_errors()
     def test_decode_id_token_invalid_id(self):
         """
@@ -159,7 +189,8 @@ class OAuthDependentTokenResponseTests(CapturedIOTestCase):
             "resource_server": "server2", "expires_in": 20, "scope": "scope2",
             "access_token": "AT2", "refresh_token": "RT2", "token_type": "2"}
         self.token3 = {
-            "resource_server": "server3", "expires_in": 30, "scope": "scope3",
+            "resource_server": "server3", "expires_in": 30,
+            "scope": "scope3 scope4",
             "access_token": "AT3", "refresh_token": "RT3", "token_type": "3"}
 
         # create the response
@@ -188,3 +219,32 @@ class OAuthDependentTokenResponseTests(CapturedIOTestCase):
             expected = int(time.time()) + token["expires_in"]
             self.assertIn(server_data["expires_at_seconds"],
                           (expected - 1, expected, expected + 1))
+
+    def test_by_scopes(self):
+        """
+        Gets by_scopes attribute from test response,
+        Confirms expected values found for top and other tokens
+        """
+        by_scopes = self.response.by_scopes
+
+        # confirm data by server matches known token values
+        for scope, token in [("scope1", self.token1),
+                             ("scope2", self.token2),
+                             ("scope3", self.token3),
+                             ("scope4", self.token3),
+                             ("scope3 scope4", self.token3),
+                             ("scope4 scope3", self.token3)]:
+            scope_data = by_scopes[scope]
+            for key in ["scope", "access_token",
+                        "refresh_token", "token_type"]:
+                self.assertEqual(scope_data[key], token[key])
+            # assumes test runs within 1 second range
+            expected = int(time.time()) + token["expires_in"]
+            self.assertIn(scope_data["expires_at_seconds"],
+                          (expected - 1, expected, expected + 1))
+
+        self.assertIn('scope1', by_scopes)
+        self.assertIn('scope3', by_scopes)
+        self.assertNotIn('scope1 scope2', by_scopes)
+        self.assertNotIn('scope1 scope3', by_scopes)
+        self.assertIn('scope4 scope3', by_scopes)
