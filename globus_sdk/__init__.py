@@ -7,7 +7,8 @@ from globus_sdk.response import GlobusResponse, GlobusHTTPResponse
 
 from globus_sdk.exc import (
     GlobusError, GlobusAPIError, TransferAPIError, SearchAPIError,
-    NetworkError, GlobusConnectionError, GlobusTimeoutError)
+    NetworkError, GlobusConnectionError, GlobusTimeoutError,
+    GlobusConnectTimeoutError)
 
 from globus_sdk.authorizers import (
     NullAuthorizer, BasicAuthorizer, AccessTokenAuthorizer,
@@ -29,6 +30,7 @@ __all__ = (
 
     "GlobusError", "GlobusAPIError", "TransferAPIError", "SearchAPIError",
     "NetworkError", "GlobusConnectionError", "GlobusTimeoutError",
+    "GlobusConnectTimeoutError",
 
     "NullAuthorizer", "BasicAuthorizer",
     "AccessTokenAuthorizer", "RefreshTokenAuthorizer",
