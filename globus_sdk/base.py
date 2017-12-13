@@ -43,6 +43,9 @@ class BaseClient(object):
           User-Agent string, and may be useful when debugging issues with the
           Globus Team
 
+       ``http_timeout`` (*float*)
+         Number of seconds to wait on HTTP connections. Default is 60.
+
     All other parameters are for internal use and should be ignored.
     """
 
@@ -55,7 +58,9 @@ class BaseClient(object):
     BASE_USER_AGENT = 'globus-sdk-py-{0}'.format(__version__)
 
     def __init__(self, service, environment=None, base_url=None,
-                 base_path=None, authorizer=None, app_name=None):
+                 base_path=None, authorizer=None, app_name=None,
+                 http_timeout=None,
+                 *args, **kwargs):
         # get the fully qualified name of the client class, so that it's a
         # child of globus_sdk
         self.logger = ClientLogAdapter(
@@ -102,6 +107,13 @@ class BaseClient(object):
 
         # verify SSL? Usually true
         self._verify = config.get_ssl_verify(environment)
+        # HTTP connection timeout
+        # this is passed verbatim to `requests`, and we therefore technically
+        # support a tuple for connect/read timeouts, but we don't need to
+        # advertise that... Just declare it as an float value
+        if http_timeout is None:
+            http_timeout = config.get_http_timeout(environment)
+        self._http_timeout = http_timeout
 
         # set application name if given
         self.app_name = None
@@ -332,7 +344,8 @@ class BaseClient(object):
             try:
                 return self._session.request(
                     method=method, url=url, headers=rheaders, params=params,
-                    data=text_body, verify=self._verify)
+                    data=text_body, verify=self._verify,
+                    timeout=self._http_timeout)
             except requests.RequestException as e:
                 self.logger.error("NetworkError on request")
                 raise exc.convert_request_exception(e)
