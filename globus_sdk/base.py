@@ -306,15 +306,17 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        if json_body is not None:
-            assert text_body is None
-            text_body = json.dumps(json_body)
-
         # copy
         rheaders = dict(self._headers)
         # expand
         if headers is not None:
             rheaders.update(headers)
+
+        if json_body is not None:
+            assert text_body is None
+            text_body = json.dumps(json_body)
+            # set appropriate content-type header
+            rheaders.update({'Content-Type': 'application/json'})
 
         # add Authorization header, or (if it's a NullAuthorizer) possibly
         # explicitly remove the Authorization header
