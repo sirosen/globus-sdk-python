@@ -45,6 +45,8 @@ class BaseClient(object):
 
        ``http_timeout`` (*float*)
          Number of seconds to wait on HTTP connections. Default is 60.
+         A value of -1 indicates that no timeout should be used (requests can
+         hang indefinitely).
 
     All other parameters are for internal use and should be ignored.
     """
@@ -114,6 +116,9 @@ class BaseClient(object):
         if http_timeout is None:
             http_timeout = config.get_http_timeout(environment)
         self._http_timeout = http_timeout
+        # handle -1 by passing None to requests
+        if self._http_timeout == -1:
+            self._http_timeout = None
 
         # set application name if given
         self.app_name = None

@@ -147,7 +147,7 @@ def get_http_timeout(environment):
     p = _get_parser()
     value = p.get("http_timeout", environment=environment,
                   failover_to_general=True, check_env=True,
-                  type_cast=int)
+                  type_cast=float)
     if value is None:
         value = 60
     logger.debug('default http_timeout set to {}'.format(value))
