@@ -6,8 +6,7 @@ Search Client (BETA)
 
 The SearchClient interface is in Beta, but the Search API is a fully
 supported, production service.
-Its docs are visible here:
-http://globus-search-docs.s3-website-us-east-1.amazonaws.com/stable/
+Its docs are visible here: https://docs.globus.org/api/search/
 
 
 .. autoclass:: globus_sdk.SearchClient

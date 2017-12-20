@@ -51,6 +51,13 @@ class SearchClient(BaseClient):
         >>> print(index["display_name"],
         >>>       "(" + index_id + "):",
         >>>       index["description"])
+
+        **External Documentation**
+
+        See
+        `Get Index Metadata \
+        <https://docs.globus.org/api/search/index_meta/>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         self.logger.info("SearchClient.get_index({})".format(index_id))
@@ -72,6 +79,13 @@ class SearchClient(BaseClient):
         >>> result = sc.search(index_id, 'query string')
         >>> advanced_result = sc.search(index_id, 'author: "Ada Lovelace"',
         >>>                             advanced=True)
+
+        **External Documentation**
+
+        See
+        `GET Search Query \
+        <https://docs.globus.org/api/search/search/#simple_get_query>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         merge_params(params, q=q, offset=offset, limit=limit,
@@ -114,6 +128,13 @@ class SearchClient(BaseClient):
         >>>   ]
         >>> }
         >>> search_result = sc.post_search(index_id, query_data)
+
+        **External Documentation**
+
+        See
+        `POST Search Query \
+        <https://docs.globus.org/api/search/search/#complex_post_query>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         self.logger.info("SearchClient.post_search({}, ...)"
@@ -170,6 +191,13 @@ class SearchClient(BaseClient):
         >>>   }
         >>> }
         >>> sc.ingest(index_id, ingest_data)
+
+        **External Documentation**
+
+        See
+        `Ingest \
+        <https://docs.globus.org/api/search/ingest/>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         self.logger.info("SearchClient.ingest({}, ...)".format(index_id))
@@ -201,6 +229,13 @@ class SearchClient(BaseClient):
         >>>   ]
         >>> }
         >>> sc.delete_by_query(index_id, query_data)
+
+        **External Documentation**
+
+        See
+        `Delete By Query \
+        <https://docs.globus.org/api/search/subject_ops/#delete_by_query>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         self.logger.info("SearchClient.delete_by_query({}, ...)"
@@ -223,6 +258,13 @@ class SearchClient(BaseClient):
 
         >>> sc = globus_sdk.SearchClient(...)
         >>> subject_data = sc.get_subject(index_id, 'http://example.com/abc')
+
+        **External Documentation**
+
+        See
+        `Get Subject \
+        <https://docs.globus.org/api/search/subject_ops/#get_by_subject>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         params = merge_params(params, subject=subject)
@@ -243,6 +285,13 @@ class SearchClient(BaseClient):
 
         >>> sc = globus_sdk.SearchClient(...)
         >>> subject_data = sc.get_subject(index_id, 'http://example.com/abc')
+
+        **External Documentation**
+
+        See
+        `Delete Subject \
+        <https://docs.globus.org/api/search/subject_ops/#delete_by_subject>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         params = merge_params(params, subject=subject)
@@ -274,6 +323,13 @@ class SearchClient(BaseClient):
         >>> sc = globus_sdk.SearchClient(...)
         >>> entry_data = sc.get_entry(index_id, 'http://example.com/foo/bar',
         >>>                           entry_id='foo/bar')
+
+        **External Documentation**
+
+        See
+        `Get Entry \
+        <https://docs.globus.org/api/search/entry_ops/#get_single_entry>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         params = merge_params(params, subject=subject, entry_id=entry_id)
@@ -313,6 +369,13 @@ class SearchClient(BaseClient):
         >>>         "foo/bar": "some val"
         >>>     }
         >>> })
+
+        **External Documentation**
+
+        See
+        `Create Entry \
+        <https://docs.globus.org/api/search/entry_ops/#create_single_entry>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         self.logger.info("SearchClient.create_entry({}, ...)".format(index_id))
@@ -336,6 +399,13 @@ class SearchClient(BaseClient):
         >>>         "foo/bar": "some val"
         >>>     }
         >>> })
+
+        **External Documentation**
+
+        See
+        `Update Entry \
+        <https://docs.globus.org/api/search/entry_ops/#update_single_entry>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         self.logger.info("SearchClient.update_entry({}, ...)".format(index_id))
@@ -360,6 +430,13 @@ class SearchClient(BaseClient):
         >>> sc = globus_sdk.SearchClient(...)
         >>> sc.delete_entry(index_id, "https://example.com/foo/bar",
         >>>                 entry_id="foo/bar")
+
+        **External Documentation**
+
+        See
+        `Delete Entry \
+        <https://docs.globus.org/api/search/entry_ops/#delete_single_entry>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         params = merge_params(params, subject=subject, entry_id=entry_id)
@@ -375,6 +452,13 @@ class SearchClient(BaseClient):
     def get_query_template(self, index_id, template_name):
         """
         ``GET /v1/index/<index_id>/query_template/<template_name>``
+
+        **External Documentation**
+
+        See
+        `Get Query Template \
+        <https://docs.globus.org/api/search/query_templates/#get_query_template>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         self.logger.info("SearchClient.get_query_template({}, {})"
@@ -386,6 +470,13 @@ class SearchClient(BaseClient):
     def get_query_template_list(self, index_id):
         """
         ``GET /v1/index/<index_id>/query_template``
+
+        **External Documentation**
+
+        See
+        `Get Query Template List \
+        <https://docs.globus.org/api/search/query_templates/#get_query_template_list>`_
+        in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
         self.logger.info("SearchClient.get_query_template_list({})"
