@@ -218,6 +218,11 @@ class GlobusTimeoutError(NetworkError):
     """The REST request timed out."""
 
 
+class GlobusConnectionTimeoutError(GlobusTimeoutError):
+    """The request timed out during connection establishment.
+    These errors are safe to retry."""
+
+
 class GlobusConnectionError(NetworkError):
     """A connection error occured while making a REST request."""
 
@@ -225,6 +230,9 @@ class GlobusConnectionError(NetworkError):
 def convert_request_exception(exc):
     """Converts incoming requests.Exception to a Globus NetworkError"""
 
+    if isinstance(exc, requests.ConnectTimeout):
+        return GlobusConnectionTimeoutError(
+            "ConnectTimeoutError on request", exc)
     if isinstance(exc, requests.Timeout):
         return GlobusTimeoutError("TimeoutError on request", exc)
     elif isinstance(exc, requests.ConnectionError):

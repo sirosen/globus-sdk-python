@@ -82,3 +82,7 @@ Error Classes
 .. autoclass:: globus_sdk.exc.GlobusTimeoutError
    :members:
    :show-inheritance:
+
+.. autoclass:: globus_sdk.exc.GlobusConnectionTimeoutError
+   :members:
+   :show-inheritance:
