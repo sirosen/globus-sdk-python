@@ -267,7 +267,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        params = merge_params(params, subject=subject)
+        merge_params(params, subject=subject)
 
         self.logger.info("SearchClient.get_subject({}, {}, ...)"
                          .format(index_id, subject))
@@ -294,7 +294,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        params = merge_params(params, subject=subject)
+        merge_params(params, subject=subject)
 
         self.logger.info("SearchClient.delete_subject({}, {}, ...)"
                          .format(index_id, subject))
@@ -332,7 +332,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        params = merge_params(params, subject=subject, entry_id=entry_id)
+        merge_params(params, subject=subject, entry_id=entry_id)
 
         self.logger.info("SearchClient.get_entry({}, {}, {}, ...)"
                          .format(index_id, subject, entry_id))
@@ -439,7 +439,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        params = merge_params(params, subject=subject, entry_id=entry_id)
+        merge_params(params, subject=subject, entry_id=entry_id)
         self.logger.info("SearchClient.delete_entry({}, {}, {}, ...)"
                          .format(index_id, subject, entry_id))
         path = self.qjoin_path("v1/index", index_id, "entry")
