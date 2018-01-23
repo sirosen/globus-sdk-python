@@ -27,6 +27,7 @@ Table of Contents
    clients
    responses
    exceptions
+   local_endpoints
    oauth
    authorization
    config

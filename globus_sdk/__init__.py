@@ -22,6 +22,8 @@ from globus_sdk.transfer.data import TransferData, DeleteData
 
 from globus_sdk.search import SearchClient, SearchQuery
 
+from globus_sdk.local_endpoint import LocalGlobusConnectPersonal
+
 
 __all__ = (
     "__version__",
@@ -41,6 +43,8 @@ __all__ = (
     "TransferClient", "TransferData", "DeleteData",
 
     "SearchClient", "SearchQuery",
+
+    'LocalGlobusConnectPersonal',
 )
 
 
