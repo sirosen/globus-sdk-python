@@ -30,10 +30,9 @@ class LocalGlobusConnectPersonal(object):
         installation.
 
         This value is loaded whenever it is first accessed, but saved after
-        that. To reload the endpoint ID, either create a new
-        LocalGlobusConnectPersonal, or delete the property with ``del``.
+        that.
 
-        Simple usage:
+        Usage:
 
         >>> from globus_sdk import TransferClient, LocalGlobusConnectPersonal
         >>> local_ep = LocalGlobusConnectPersonal()
@@ -42,20 +41,8 @@ class LocalGlobusConnectPersonal(object):
         >>> for f in tc.operation_ls(ep_id):
         >>>     print("Local file: ", f["name"])
 
-        Example of using ``del`` to reset the endpoint ID:
-
-        >>> local_ep = LocalGlobusConnectPersonal()
-        >>> x = local_ep.endpoint_id  # endpoint_id is now saved
-        >>>
-        >>> # while code is running, reinstall Globus Connect Personal,
-        >>> # thus generating a new endpoint ID
-        >>>
-        >>> assert x == local_ep.endpoint_id  # the value has not changed
-        >>> del local_ep.endpoint_id  # clear the endpoint_id , allowing it to
-        >>>                           # reload
-        >>>
-        >>> y = local_ep.endpoint_id  # y will now have the new value
-        >>> assert x != y  # and the value has changed, x still has the old val
+        You can also reset the value, causing it to load again on next access,
+        with ``del local_ep.endpoint_id``
         """
         if self._endpoint_id is None:
             try:
