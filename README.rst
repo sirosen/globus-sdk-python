@@ -2,16 +2,28 @@
     :alt: build status
     :target: https://travis-ci.org/globus/globus-sdk-python
 
+.. image:: https://img.shields.io/pypi/v/globus-sdk.svg
+    :alt: Latest Released Version
+    :target: https://pypi.org/project/globus-sdk/
+
+.. image:: https://img.shields.io/pypi/pyversions/globus-sdk.svg
+    :alt: Supported Python Versions
+    :target: https://pypi.org/project/globus-sdk/
+
+.. image:: https://img.shields.io/github/license/globus/globus-sdk-python.svg
+    :alt: License
+
+
 Globus SDK for Python
 =====================
 
 This SDK provides a convenient Pythonic interface to
-`Globus <https://www.globus.org>`_ REST APIs,
-including the Transfer API and the Globus Auth API.
+`Globus <https://www.globus.org>`_ APIs.
 
 Documentation
 -------------
 
 | Full Documentation: http://globus-sdk-python.readthedocs.io/
 | Source Code: https://github.com/globus/globus-sdk-python
-| REST Documentation: https://docs.globus.org
+| API Documentation: https://docs.globus.org/api/
+| Release History + Changelog: https://github.com/globus/globus-sdk-python/releases
