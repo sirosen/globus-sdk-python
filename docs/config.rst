@@ -44,7 +44,6 @@ Environment Variables
 ``GLOBUS_SDK_ENVIRONMENT`` is a shell variable that can be used to point the
 SDK to an alternate set of Globus Servers.
 
-We currently have plans to create a beta environment that you can use with
-``GLOBUS_SDK_ENVIRONMENT=beta`` to get a developer preview of upcoming
-features, but this is not available yet. For now, this variable should be left
-unset.
+For example, if you have an integration with Globus you may be asked to test
+against a preview of upcoming changes. To point the SDK at the Preview environment
+``GLOBUS_SDK_ENVIRONMENT=preview`` can be used.
