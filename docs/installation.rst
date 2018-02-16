@@ -1,7 +1,7 @@
 Installation
 ============
 
-The Globus SDK requires `Python <https://www.python.org/>`_ 2.7+ or 3.3+.
+The Globus SDK requires `Python <https://www.python.org/>`_ 2.7+ or 3.4+.
 If a supported version of Python is not already installed on your system, see
 this `Python installation guide \
 <http://docs.python-guide.org/en/latest/starting/installation/>`_.
