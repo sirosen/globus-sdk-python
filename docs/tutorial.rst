@@ -27,7 +27,7 @@ In order to complete an OAuth2 flow to get tokens, you must have a client or
 "app" definition registered with Globus.
 
 Navigate to the `Developer Site <https://developers.globus.org>`_ and select
-"Register an App with Globus."
+"Register your app with Globus."
 You will be prompted to login -- do so with the account you wish to use as your
 app's administrator.
 
@@ -35,7 +35,7 @@ When prompted, create a Project named "SDK Tutorial Project".
 Projects let you share the administrative burden of a collection of apps, but
 we won't be sharing the SDK Tutorial Project.
 
-In the "Manage Project" menu for "SDK Tutorial Project", select "Add new App".
+In the "Add..." menu for "SDK Tutorial Project", select "Add new app".
 
 Enter the following pieces of information:
 
