@@ -1,6 +1,7 @@
 import logging
 import six
 
+from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.response import GlobusResponse
 from globus_sdk.transfer.response import IterableTransferResponse
 
@@ -289,7 +290,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
 
             logger.error("PaginatedResource.paging_style={} is invalid"
                          .format(self.paging_style))
-            raise ValueError(
+            raise GlobusSDKUsageError(
                 'Invalid Paging Style Given to PaginatedResource')
 
         has_next_page = True

@@ -1,4 +1,6 @@
 import logging
+
+from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.auth.client_types.base import AuthClient
 from globus_sdk.auth.oauth2_native_app import GlobusNativeAppFlowManager
@@ -27,7 +29,7 @@ class NativeAppAuthClient(AuthClient):
     def __init__(self, client_id, **kwargs):
         if "authorizer" in kwargs:
             logger.error('ArgumentError(NativeAppClient.authorizer)')
-            raise ValueError(
+            raise GlobusSDKUsageError(
                 "Cannot give a NativeAppAuthClient an authorizer")
 
         AuthClient.__init__(

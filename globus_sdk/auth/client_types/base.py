@@ -162,7 +162,7 @@ class AuthClient(BaseClient):
         if not self.current_oauth2_flow_manager:
             self.logger.error(('OutOfOrderOperations('
                                'get_authorize_url before start_flow)'))
-            raise ValueError(
+            raise exc.GlobusSDKUsageError(
                 ('Cannot get authorize URL until starting an OAuth2 flow. '
                  'Call the oauth2_start_flow() method on this '
                  'AuthClient to resolve'))
@@ -189,7 +189,7 @@ class AuthClient(BaseClient):
         if not self.current_oauth2_flow_manager:
             self.logger.error(('OutOfOrderOperations('
                                'exchange_code before start_flow)'))
-            raise ValueError(
+            raise exc.GlobusSDKUsageError(
                 ('Cannot exchange auth code until starting an OAuth2 flow. '
                  'Call the oauth2_start_flow() method on this '
                  'AuthClient to resolve'))

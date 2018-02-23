@@ -78,7 +78,7 @@ class BaseClient(object):
                 type(authorizer) not in self.allowed_authorizer_types):
             self.logger.error("{} doesn't support authorizer={}"
                               .format(type(self), type(authorizer)))
-            raise ValueError(
+            raise exc.GlobusSDKUsageError(
                 ("{0} can only take authorizers from {1}, "
                  "but you have provided {2}").format(
                     type(self), self.allowed_authorizer_types,
