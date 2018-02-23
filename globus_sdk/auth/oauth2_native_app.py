@@ -6,6 +6,7 @@ import os
 import six
 from six.moves.urllib.parse import urlencode
 
+from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.base import slash_join
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_flow_manager import GlobusOAuthFlowManager
@@ -35,11 +36,11 @@ def make_native_app_challenge(verifier=None):
 
     if verifier:
         if not 43 <= len(verifier) <= 128:
-            raise ValueError(
+            raise GlobusSDKUsageError(
                 'verifier must be 43-128 characters long: {}'.format(
                     len(verifier)))
         if bool(re.search(r'[^a-zA-Z0-9~_.-]', verifier)):
-            raise ValueError('verifier contained invalid characters')
+            raise GlobusSDKUsageError('verifier contained invalid characters')
     else:
         logger.info(('Autogenerating verifier secret. On low-entropy systems '
                      'this may be insecure'))
@@ -114,7 +115,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         if not self.client_id:
             logger.error('Invalid auth_client ID to start Native App Flow: {}'
                          .format(self.client_id))
-            raise ValueError(
+            raise GlobusSDKUsageError(
                 'Invalid value for client_id. Got "{0}"'
                 .format(self.client_id))
 

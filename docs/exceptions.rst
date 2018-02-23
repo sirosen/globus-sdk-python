@@ -11,10 +11,10 @@ You can therefore capture *all* errors thrown by the SDK by looking for
     from globus_sdk import TransferClient, GlobusError
 
     try:
-        tc = TransferClient()
+        tc = TransferClient(...)
         # search with no parameters will throw an exception
         eps = tc.endpoint_search()
-    except exc.GlobusError:
+    except GlobusError:
         logging.exception("Globus Error!")
         raise
 
@@ -28,7 +28,7 @@ unexpected API conditions, you'll want to look for ``NetworkError`` and
                             GlobusError, GlobusAPIError, NetworkError)
 
     try:
-        tc = TransferClient()
+        tc = TransferClient(...)
 
         eps = tc.endpoint_search(filter_fulltext="myendpointsearch")
 
@@ -55,34 +55,40 @@ unexpected API conditions, you'll want to look for ``NetworkError`` and
 
 Of course, if you want to learn more information about the response, you should
 inspect it more than this.
-Malformed calls to Globus SDK methods may raise standard python exceptions
-(``ValueError``, etc.), but for correct usage, all errors will be instances of
-``GlobusError``.
+
+All errors raised by the SDK should be instances of ``GlobusError``.
+Malformed calls to Globus SDK methods typically raise ``GlobusSDKUsageError``,
+but, in rare cases, may raise standard python exceptions (``ValueError``,
+``OSError``, etc.)
 
 
 Error Classes
 -------------
 
-.. autoclass:: globus_sdk.exc.GlobusError
+.. autoclass:: globus_sdk.GlobusError
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.exc.GlobusAPIError
+.. autoclass:: globus_sdk.GlobusSDKUsageError
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.exc.NetworkError
+.. autoclass:: globus_sdk.GlobusAPIError
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.exc.GlobusConnectionError
+.. autoclass:: globus_sdk.NetworkError
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.exc.GlobusTimeoutError
+.. autoclass:: globus_sdk.GlobusConnectionError
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.exc.GlobusConnectionTimeoutError
+.. autoclass:: globus_sdk.GlobusTimeoutError
+   :members:
+   :show-inheritance:
+
+.. autoclass:: globus_sdk.GlobusConnectionTimeoutError
    :members:
    :show-inheritance:

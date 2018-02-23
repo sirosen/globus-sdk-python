@@ -6,7 +6,8 @@ from globus_sdk.version import __version__
 from globus_sdk.response import GlobusResponse, GlobusHTTPResponse
 
 from globus_sdk.exc import (
-    GlobusError, GlobusAPIError, TransferAPIError, SearchAPIError,
+    GlobusError, GlobusSDKUsageError,
+    GlobusAPIError, TransferAPIError, SearchAPIError,
     NetworkError, GlobusConnectionError, GlobusTimeoutError,
     GlobusConnectionTimeoutError)
 
@@ -30,7 +31,8 @@ __all__ = (
 
     "GlobusResponse", "GlobusHTTPResponse",
 
-    "GlobusError", "GlobusAPIError", "TransferAPIError", "SearchAPIError",
+    "GlobusError", "GlobusSDKUsageError",
+    "GlobusAPIError", "TransferAPIError", "SearchAPIError",
     "NetworkError", "GlobusConnectionError", "GlobusTimeoutError",
     "GlobusConnectionTimeoutError",
 

@@ -1,6 +1,7 @@
 import logging
 import six
 
+from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.base import merge_params
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
@@ -37,7 +38,7 @@ class ConfidentialAppAuthClient(AuthClient):
     def __init__(self, client_id, client_secret, **kwargs):
         if "authorizer" in kwargs:
             logger.error('ArgumentError(ConfidentialAppClient.authorizer)')
-            raise ValueError(
+            raise GlobusSDKUsageError(
                 "Cannot give a ConfidentialAppAuthClient an authorizer")
 
         AuthClient.__init__(

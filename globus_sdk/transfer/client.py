@@ -114,9 +114,10 @@ class TransferClient(BaseClient):
         """
         if data.get('myproxy_server'):
             if data.get('oauth_server'):
-                raise ValueError("an endpoint cannot be reconfigured to use "
-                                 "multiple identity providers for activation; "
-                                 "specify either MyProxy or OAuth, not both")
+                raise exc.GlobusSDKUsageError(
+                    "an endpoint cannot be reconfigured to use multiple "
+                    "identity providers for activation; specify either "
+                    "MyProxy or OAuth, not both")
             else:
                 data['oauth_server'] = None
         elif data.get('oauth_server'):
@@ -159,9 +160,10 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         if data.get('myproxy_server') and data.get('oauth_server'):
-            raise ValueError("an endpoint cannot be created using multiple "
-                             "identity providers for activation; "
-                             "specify either MyProxy or OAuth, not both")
+            raise exc.GlobusSDKUsageError(
+                "an endpoint cannot be created using multiple identity "
+                "providers for activation; specify either MyProxy or OAuth, "
+                "not both")
 
         self.logger.info("TransferClient.create_endpoint(...)")
         return self.post("endpoint", data)
@@ -1333,13 +1335,13 @@ class TransferClient(BaseClient):
             self.logger.error(
                 "task_wait() timeout={} is less than minimum of 1s"
                 .format(timeout))
-            raise ValueError(
+            raise exc.GlobusSDKUsageError(
                 "TransferClient.task_wait timeout has a minimum of 1")
         if polling_interval < 1:
             self.logger.error(
                 "task_wait() polling_interval={} is less than minimum of 1s"
                 .format(polling_interval))
-            raise ValueError(
+            raise exc.GlobusSDKUsageError(
                 "TransferClient.task_wait polling_interval has a minimum of 1")
 
         # ensure that we always wait at least one interval, even if the timeout

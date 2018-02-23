@@ -1,5 +1,7 @@
 import os
 
+from globus_sdk.exc import GlobusSDKUsageError
+
 
 def _on_windows():
     """
@@ -49,7 +51,7 @@ class LocalGlobusConnectPersonal(object):
                 if _on_windows():
                     appdata = os.getenv("LOCALAPPDATA")
                     if appdata is None:
-                        raise ValueError(
+                        raise GlobusSDKUsageError(
                             "LOCALAPPDATA not detected in Windows environment")
                     fname = os.path.join(
                         appdata, "Globus Connect\client-id.txt")

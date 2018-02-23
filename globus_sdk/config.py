@@ -7,7 +7,7 @@ from six.moves.configparser import (
     ConfigParser, MissingSectionHeaderError,
     NoOptionError, NoSectionError)
 
-from globus_sdk.exc import GlobusError
+from globus_sdk.exc import GlobusError, GlobusSDKUsageError
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +133,7 @@ def get_service_url(environment, service):
     # TODO: validate with urlparse?
     url = p.get(option, environment=environment)
     if url is None:
-        raise ValueError(
+        raise GlobusSDKUsageError(
             ('Failed to find a url for service "{}" in environment "{}". '
              "Please double-check that GLOBUS_SDK_ENVIRONMENT is set "
              "correctly, or not set at all")
