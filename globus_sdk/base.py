@@ -144,6 +144,7 @@ class BaseClient(object):
         """
         Render to a serializable dict for pickle.dump(s)
         """
+        self.logger.info('__getstate__() called; client being pickled')
         d = dict(self.__dict__)  # copy
         del d['logger']
         return d
@@ -154,6 +155,7 @@ class BaseClient(object):
         """
         self._init_logger_adapter()
         self.__dict__.update(d)
+        self.logger.info('__setstate__() finished; client unpickled')
 
     def set_app_name(self, app_name):
         """
