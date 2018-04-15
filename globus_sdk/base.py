@@ -63,11 +63,7 @@ class BaseClient(object):
                  base_path=None, authorizer=None, app_name=None,
                  http_timeout=None,
                  *args, **kwargs):
-        # get the fully qualified name of the client class, so that it's a
-        # child of globus_sdk
-        self.logger = ClientLogAdapter(
-            logging.getLogger(self.__module__ + '.' + self.__class__.__name__),
-            {'client': self})
+        self._init_logger_adapter()
         self.logger.info('Creating client of type {} for service "{}"'
                          .format(type(self), service))
         # if restrictions have been placed by a child class on the allowed
@@ -124,6 +120,42 @@ class BaseClient(object):
         self.app_name = None
         if app_name is not None:
             self.set_app_name(app_name)
+
+    def _init_logger_adapter(self):
+        """
+        Create & assign the self.logger LoggerAdapter
+        Used when initializing a new client, or unpickling.
+
+        Technically, this could result in a state change across a
+        pickle/unpickle -- file handles and other handlers could be detached,
+        etc.
+        However, that's better than a hard-fail on pickle.dump(s) calls.
+
+        Also, so long as loggers are attached at the module level -- as they
+        really ought to be -- everything will be fine.
+        """
+        # get the fully qualified name of the client class, so that it's a
+        # child of globus_sdk
+        self.logger = ClientLogAdapter(
+            logging.getLogger(self.__module__ + '.' + self.__class__.__name__),
+            {'client': self})
+
+    def __getstate__(self):
+        """
+        Render to a serializable dict for pickle.dump(s)
+        """
+        self.logger.info('__getstate__() called; client being pickled')
+        d = dict(self.__dict__)  # copy
+        del d['logger']
+        return d
+
+    def __setstate__(self, d):
+        """
+        Load from a serialized format, as in pickle.load(s)
+        """
+        self._init_logger_adapter()
+        self.__dict__.update(d)
+        self.logger.info('__setstate__() finished; client unpickled')
 
     def set_app_name(self, app_name):
         """
