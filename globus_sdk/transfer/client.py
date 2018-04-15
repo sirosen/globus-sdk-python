@@ -1162,7 +1162,7 @@ class TransferClient(BaseClient):
         >>> for task in tc.task_list():
         >>>     print("Task({}): {} -> {}".format(
         >>>         task["task_id"], task["source_endpoint"],
-        >>>         task["destination_endpoint"))
+        >>>         task["destination_endpoint"]))
 
         **External Documentation**
 
