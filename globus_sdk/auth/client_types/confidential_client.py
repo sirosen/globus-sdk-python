@@ -177,6 +177,16 @@ class ConfidentialAppAuthClient(AuthClient):
         ...     CLIENT_ID, CLIENT_SECRET)
         >>> ac.oauth2_token_introspect('<token_string>')
 
+        Get information about a Globus Auth token including the full identity
+        set of the user to whom it belongs
+
+        >>> ac = globus_sdk.ConfidentialAppAuthClient(
+        ...     CLIENT_ID, CLIENT_SECRET)
+        >>> data = ac.oauth2_token_introspect(
+        ...     '<token_string>', include='identity_set')
+        >>> for identity in data['identity_set']:
+        >>>     print('token authenticates for "{}"'.format(identity))
+
         **Parameters**
 
           ``token`` (*string*)
