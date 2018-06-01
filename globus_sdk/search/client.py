@@ -18,12 +18,26 @@ class SearchClient(BaseClient):
     API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
     from the base client that can be used to access any API resource.
 
-    **Parameters**
+    :param authorizer: An authorizer instance used for all calls to
+                       Globus Search
+    :type authorizer: :class:`GlobusAuthorizer \
+                      <globus_sdk.authorizers.base.GlobusAuthorizer>`
 
-        ``authorizer`` (:class:`GlobusAuthorizer\
-        <globus_sdk.authorizers.base.GlobusAuthorizer>`)
+    **Methods**
 
-          An authorizer instance used for all calls to Globus Search
+    *  :py:meth:`.get_index`
+    *  :py:meth:`.search`
+    *  :py:meth:`.post_search`
+    *  :py:meth:`.ingest`
+    *  :py:meth:`.delete_by_query`
+    *  :py:meth:`.get_subject`
+    *  :py:meth:`.delete_subject`
+    *  :py:meth:`.get_entry`
+    *  :py:meth:`.create_entry`
+    *  :py:meth:`.update_entry`
+    *  :py:meth:`.delete_entry`
+    *  :py:meth:`.get_query_template`
+    *  :py:meth:`.get_query_template_list`
     """
     # disallow basic auth
     allowed_authorizer_types = [AccessTokenAuthorizer,

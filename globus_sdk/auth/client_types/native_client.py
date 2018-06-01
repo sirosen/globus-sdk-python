@@ -21,6 +21,12 @@ class NativeAppAuthClient(AuthClient):
 
     Any keyword arguments given are passed through to the ``AuthClient``
     constructor.
+
+    **Methods**
+
+    *  :py:meth:`.NativeAppAuthClient.oauth2_start_flow`
+    *  :py:meth:`.NativeAppAuthClient.oauth2_refresh_token`
+
     """
     # don't allow any authorizer to be used on a native app client
     # it can't authorize it's calls, and shouldn't try to
