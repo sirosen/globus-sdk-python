@@ -26,7 +26,5 @@ Service-Specific Response Classes
 ---------------------------------
 
 .. toctree::
-   :maxdepth: 1
-
    responses/transfer
    responses/auth

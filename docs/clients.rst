@@ -26,8 +26,6 @@ very simply::
 .. rubric:: Client Types
 
 .. toctree::
-   :maxdepth: 1
-
    clients/transfer
    clients/auth
    clients/search

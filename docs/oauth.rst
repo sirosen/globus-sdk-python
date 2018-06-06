@@ -32,7 +32,5 @@ perform actions for **bar@example.com** on systems authenticated via Globus.
 .. rubric:: OAuth2 Documentation
 
 .. toctree::
-   :maxdepth: 1
-
    oauth/flows
    oauth/resource_servers
