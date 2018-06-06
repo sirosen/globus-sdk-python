@@ -33,3 +33,10 @@ body div.sphinxsidebar {
     /* globus blue */
     background-color: #27518F;
 }
+
+/* move horizontal rule separating class methods to be above, not below */
+dl.method {
+    border-bottom: none;
+    border-top: 1px solid #ccc;
+    padding-top: 15px;
+}
