@@ -52,7 +52,7 @@ test: $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2
 
 travis:
 	pip install --upgrade pip
-	pip install --upgrade "setuptools>=29,<30"
+	pip install --upgrade "setuptools>=29"
 	pip install -r test-requirements.txt
 	pip install -e .
 	flake8
