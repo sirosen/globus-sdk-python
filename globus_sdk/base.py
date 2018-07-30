@@ -318,6 +318,46 @@ class BaseClient(object):
                              response_class=response_class,
                              retry_401=retry_401)
 
+    def patch(self, path, json_body=None, params=None, headers=None,
+              text_body=None, response_class=None, retry_401=True):
+        """
+        Make a PATCH request to the specified path.
+
+        **Parameters**
+
+            ``path`` (*string*)
+              Path for the request, with or without leading slash
+
+            ``params`` (*dict*)
+              Parameters to be encoded as a query string
+
+            ``headers`` (*dict*)
+              HTTP headers to add to the request
+
+            ``json_body`` (*dict*)
+              Data which will be JSON encoded as the body of the request
+
+            ``text_body`` (*string or dict*)
+              Either a raw string that will serve as the request body, or a
+              dict which will be HTTP Form encoded
+
+            ``response_class`` (*class*)
+              Class for response object, overrides the client's
+              ``default_response_class``
+
+            ``retry_401`` (*bool*)
+              Retry on 401 responses with fresh Authorization if
+              ``self.authorizer`` supports it
+
+        :return: :class:`GlobusHTTPResponse \
+        <globus_sdk.response.GlobusHTTPResponse>` object
+        """
+        self.logger.debug('PATCH to {} with params {}'.format(path, params))
+        return self._request("PATCH", path, json_body=json_body, params=params,
+                             headers=headers, text_body=text_body,
+                             response_class=response_class,
+                             retry_401=retry_401)
+
     def _request(self, method, path, params=None, headers=None,
                  json_body=None, text_body=None,
                  response_class=None, retry_401=True):
