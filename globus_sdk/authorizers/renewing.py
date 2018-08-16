@@ -90,7 +90,8 @@ class RenewingAuthorizer(GlobusAuthorizer):
     def _get_new_access_token(self):
         """
         Given token data from _get_token_response and _extract_token_data,
-        set the access token and expiration time, and call on_refresh
+        set the access token and expiration time, calculate the new token
+        hash, and call on_refresh
         """
         # get the first (and only) token
         res = self._get_token_response()
