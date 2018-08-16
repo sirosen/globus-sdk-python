@@ -1,6 +1,7 @@
 import logging
 
 from globus_sdk.authorizers.base import GlobusAuthorizer
+from globus_sdk.utils.string_hashing import sha256_string
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +20,12 @@ class AccessTokenAuthorizer(GlobusAuthorizer):
     def __init__(self, access_token):
         logger.info(("Setting up an AccessTokenAuthorizer. It will use an "
                      "auth type of Bearer and cannot handle 401s."))
-        logger.debug('Bearer token ends in "...{}" (last 5 chars)'
-                     .format(access_token[-5:]))
         self.access_token = access_token
         self.header_val = "Bearer %s" % access_token
+
+        self.access_token_hash = sha256_string(self.access_token)
+        logger.debug('Bearer token has hash "{}"'
+                     .format(self.access_token_hash))
 
     def set_authorization_header(self, header_dict):
         """
@@ -30,6 +33,6 @@ class AccessTokenAuthorizer(GlobusAuthorizer):
         "Bearer <access_token>"
         """
         logger.debug(("Setting AccessToken Authorization Header: "
-                      '"Bearer ...{}" (last 5 chars)')
-                     .format(self.header_val[-5:]))
+                      '"Bearer token has hash "{}"')
+                     .format(self.access_token_hash))
         header_dict['Authorization'] = self.header_val

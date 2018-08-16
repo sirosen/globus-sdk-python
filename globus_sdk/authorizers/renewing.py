@@ -4,6 +4,7 @@ import logging
 import time
 
 from globus_sdk.authorizers.base import GlobusAuthorizer
+from globus_sdk.utils.string_hashing import sha256_string
 
 
 logger = logging.getLogger(__name__)
@@ -48,11 +49,11 @@ class RenewingAuthorizer(GlobusAuthorizer):
         # check access_token too -- it's not clear what it would mean to set
         # expiration without an access token
         if expires_at is not None and self.access_token is not None:
+            self.access_token_hash = sha256_string(self.access_token)
             logger.info(("Got both expires_at and access_token. "
                          "Will start by using "
-                         "RenewingAuthorizer.access_token = ...{} "
-                         "(last 5 chars)")
-                        .format(self.access_token[-5:]))
+                         'RenewingAuthorizer.access_token with hash "{}"')
+                        .format(self.access_token_hash))
             self._set_expiration_time(expires_at)
 
         # if these were unspecified, fetch a new access token
@@ -89,7 +90,8 @@ class RenewingAuthorizer(GlobusAuthorizer):
     def _get_new_access_token(self):
         """
         Given token data from _get_token_response and _extract_token_data,
-        set the access token and expiration time, and call on_refresh
+        set the access token and expiration time, calculate the new token
+        hash, and call on_refresh
         """
         # get the first (and only) token
         res = self._get_token_response()
@@ -97,10 +99,11 @@ class RenewingAuthorizer(GlobusAuthorizer):
 
         self._set_expiration_time(token_data['expires_at_seconds'])
         self.access_token = token_data['access_token']
+        self.access_token_hash = sha256_string(self.access_token)
 
-        logger.info(("RenewingAuthorizer.access_token updated to "
-                     '"...{}" (last 5 chars)')
-                    .format(self.access_token[-5:]))
+        logger.info(("RenewingAuthorizer.access_token updated to token "
+                     "with hash" '"{}"')
+                    .format(self.access_token_hash))
 
         if callable(self.on_refresh):
             self.on_refresh(res)
@@ -128,8 +131,8 @@ class RenewingAuthorizer(GlobusAuthorizer):
         """
         self._check_expiration_time()
         logger.debug(("Setting RefreshToken Authorization Header:"
-                      '"Bearer ...{}" (last 5 chars)')
-                     .format(self.access_token[-5:]))
+                      'Bearer token has hash "{}"')
+                     .format(self.access_token_hash))
         header_dict['Authorization'] = "Bearer %s" % self.access_token
 
     def handle_missing_authorization(self, *args, **kwargs):

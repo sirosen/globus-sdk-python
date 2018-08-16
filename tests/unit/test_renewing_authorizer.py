@@ -86,6 +86,9 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         # confirm starting with original access_token
         self.assertEqual(self.authorizer.access_token, self.access_token)
 
+        # take note of original access_token_hash
+        original_hash = self.authorizer.access_token_hash
+
         # get new_access_token
         self.authorizer._get_new_access_token()
         # confirm side effects
@@ -94,6 +97,8 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         self.assertEqual(self.authorizer.expires_at,
                          self.token_data["expires_at_seconds"] -
                          EXPIRES_ADJUST_SECONDS)
+        self.assertNotEqual(self.authorizer.access_token_hash,
+                            original_hash)
         self.on_refresh.assert_called_once()
 
     def test_check_expiration_time_valid(self):
