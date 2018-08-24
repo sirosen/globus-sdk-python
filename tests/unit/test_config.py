@@ -148,7 +148,7 @@ class ConfigParserTests(CapturedIOTestCase):
         with self.assertRaises(ValueError):
             globus_sdk.config._bool_cast("invalid")
 
-    def test_get_default_environ(self):
+    def test_get_globus_environ(self):
         """
         Confirms returns "default", or the value of GLOBUS_SDK_ENVIRONMENT
         """
@@ -157,10 +157,10 @@ class ConfigParserTests(CapturedIOTestCase):
         if "GLOBUS_SDK_ENVIRONMENT" in os.environ:
             prev_setting = os.environ["GLOBUS_SDK_ENVIRONMENT"]
             del os.environ["GLOBUS_SDK_ENVIRONMENT"]
-        self.assertEqual(globus_sdk.config.get_default_environ(), "default")
+        self.assertEqual(globus_sdk.config.get_globus_environ(), "default")
         # otherwise environ value
         os.environ["GLOBUS_SDK_ENVIRONMENT"] = "beta"
-        self.assertEqual(globus_sdk.config.get_default_environ(), "beta")
+        self.assertEqual(globus_sdk.config.get_globus_environ(), "beta")
 
         # cleanup for other tests
         if prev_setting:
