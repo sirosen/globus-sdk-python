@@ -360,7 +360,7 @@ class AuthClient(BaseClient):
 
         **Parameters**
 
-            ``response_type``
+            ``response_class``
               Defaults to :class:`OAuthTokenResponse \
               <globus_sdk.auth.token_response.OAuthTokenResponse>`. This is
               used by calls to the oauth2_token endpoint which need to
