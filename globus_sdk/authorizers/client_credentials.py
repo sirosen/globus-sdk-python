@@ -48,8 +48,16 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
           POSIX timestamp (i.e. seconds since the epoch)
 
         ``on_refresh`` (*callable*)
-          Will be called as fn(token_data) any time this authorizer
-          fetches a new access_token
+          A callback which is triggered any time this authorizer fetches a new
+          access_token. The ``on_refresh`` callable is invoked on the
+          :class:`OAuthTokenResponse \
+                  <globus_sdk.auth.token_response.OAuthTokenResponse>`
+          object resulting from the token being refreshed.
+          It should take only one argument, the token response object.
+
+          This is useful for implementing storage for Access Tokens, as the
+          ``on_refresh`` callback can be used to update the Access Tokens and
+          their expiration times.
     """
     def __init__(self, confidential_client, scopes,
                  access_token=None, expires_at=None, on_refresh=None):

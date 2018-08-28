@@ -28,6 +28,28 @@ class RenewingAuthorizer(GlobusAuthorizer):
     To make an authorizer that implements this class implement
     the _get_token_response and _extract_token_data methods for that
     authorization type,
+
+    **Parameters**
+
+        ``access_token`` (*string*)
+          Initial Access Token to use. Used only if ``expires_at`` is also set,
+          otherwise ignored.
+
+        ``expires_at`` (*int*)
+          Expiration time for the starting ``access_token`` expressed as a
+          POSIX timestamp (i.e. seconds since the epoch)
+
+        ``on_refresh`` (*callable*)
+          A callback which is triggered any time this authorizer fetches a new
+          access_token. The ``on_refresh`` callable is invoked on the
+          :class:`OAuthTokenResponse \
+                  <globus_sdk.auth.token_response.OAuthTokenResponse>`
+          object resulting from the token being refreshed.
+          It should take only one argument, the token response object.
+
+          This is useful for implementing storage for Access Tokens, as the
+          ``on_refresh`` callback can be used to update the Access Tokens and
+          their expiration times.
     """
 
     def __init__(self, access_token=None, expires_at=None, on_refresh=None):
@@ -109,9 +131,14 @@ class RenewingAuthorizer(GlobusAuthorizer):
             self.on_refresh(res)
             logger.debug("Invoked on_refresh callback")
 
-    def _check_expiration_time(self):
+    def check_expiration_time(self):
         """
         Check if the expiration timer is done, and renew the token if it is.
+
+        This is called implicitly by ``set_authorization_header``, but you can
+        call it explicitly if you want to ensure that a token gets refreshed.
+        This can be useful in order to get at a new, valid token via the
+        ``on_refresh`` handler.
         """
         logger.debug("RenewingAuthorizer checking expiration time")
         if self.access_token is None or (
@@ -129,7 +156,7 @@ class RenewingAuthorizer(GlobusAuthorizer):
         Once that's done, sets the ``Authorization`` header to
         "Bearer <access_token>"
         """
-        self._check_expiration_time()
+        self.check_expiration_time()
         logger.debug(("Setting RefreshToken Authorization Header:"
                       'Bearer token has hash "{}"')
                      .format(self.access_token_hash))
