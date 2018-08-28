@@ -152,18 +152,31 @@ class ConfigParserTests(CapturedIOTestCase):
         """
         Confirms returns "default", or the value of GLOBUS_SDK_ENVIRONMENT
         """
-        # default if no environ value exists
-        prev_setting = None
-        if "GLOBUS_SDK_ENVIRONMENT" in os.environ:
-            prev_setting = os.environ["GLOBUS_SDK_ENVIRONMENT"]
-            del os.environ["GLOBUS_SDK_ENVIRONMENT"]
-        self.assertEqual(globus_sdk.config.get_globus_environ(), "default")
-        # otherwise environ value
-        os.environ["GLOBUS_SDK_ENVIRONMENT"] = "beta"
-        self.assertEqual(globus_sdk.config.get_globus_environ(), "beta")
+        # mock environ to ensure it gets reset
+        with mock.patch.dict(os.environ):
+            # set an environment value, ensure that it's returned
+            os.environ["GLOBUS_SDK_ENVIRONMENT"] = "beta"
+            self.assertEqual(globus_sdk.config.get_globus_environ(), "beta")
 
-        # cleanup for other tests
-        if prev_setting:
-            os.environ["GLOBUS_SDK_ENVIRONMENT"] = prev_setting
-        else:
+            # clear that value, "default" should be returned
             del os.environ["GLOBUS_SDK_ENVIRONMENT"]
+            self.assertEqual(globus_sdk.config.get_globus_environ(), "default")
+
+            # ensure that passing a value returns that value
+            self.assertEqual(
+                globus_sdk.config.get_globus_environ("beta"), "beta")
+
+    def test_get_globus_environ_production(self):
+        """
+        Confirms that get_globus_environ translates "production" to "default",
+        including when special values are passed
+        """
+        # mock environ to ensure it gets reset
+        with mock.patch.dict(os.environ):
+            os.environ["GLOBUS_SDK_ENVIRONMENT"] = "production"
+            self.assertEqual(globus_sdk.config.get_globus_environ(), "default")
+
+            del os.environ["GLOBUS_SDK_ENVIRONMENT"]
+            # ensure that passing a value returns that value
+            self.assertEqual(
+                globus_sdk.config.get_globus_environ("production"), "default")
