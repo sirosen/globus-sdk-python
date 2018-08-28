@@ -175,17 +175,25 @@ def _bool_cast(value):
     raise ValueError("Invalid config bool")
 
 
-def get_default_environ():
+def get_globus_environ(inputenv=None):
     """
-    Get the default environment to look for in the config, as a string.
+    Get the environment to look for in the config, as a string.
+
     Typically just "default", but it can be overridden with
     `GLOBUS_SDK_ENVIRONMENT` in the shell environment. In that case, any client
     which does not explicitly specify its environment will use this value.
+
+    :param inputenv: An environment which was passed, e.g. to a client
+                     instantiation
     """
-    env = os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
+    if inputenv is None:
+        env = os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
+    else:
+        env = inputenv
+
     if env == 'production':
         env = 'default'
     if env != 'default':
         logger.info(('On lookup, non-default environment: '
-                     'GLOBUS_SDK_ENVIRONMENT={}'.format(env)))
+                     'globus_environment={}'.format(env)))
     return env

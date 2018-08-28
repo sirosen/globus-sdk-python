@@ -80,16 +80,16 @@ class BaseClient(object):
                     type(self), self.allowed_authorizer_types,
                     type(authorizer)))
 
-        # defer this default until instantiation time so that logging can
-        # capture the execution of the config load
-        if environment is None:
-            environment = config.get_default_environ()
+        # if an environment was passed, it will be used, but otherwise lookup
+        # the env var -- and in the special case of `production` translate to
+        # `default`, regardless of the source of that value
+        # logs the environment when it isn't `default`
+        self.environment = config.get_globus_environ(inputenv=environment)
 
-        self.environment = environment
         self.authorizer = authorizer
 
         if base_url is None:
-            self.base_url = config.get_service_url(environment, service)
+            self.base_url = config.get_service_url(self.environment, service)
         else:
             self.base_url = base_url
         if base_path is not None:
@@ -104,13 +104,13 @@ class BaseClient(object):
         }
 
         # verify SSL? Usually true
-        self._verify = config.get_ssl_verify(environment)
+        self._verify = config.get_ssl_verify(self.environment)
         # HTTP connection timeout
         # this is passed verbatim to `requests`, and we therefore technically
         # support a tuple for connect/read timeouts, but we don't need to
         # advertise that... Just declare it as an float value
         if http_timeout is None:
-            http_timeout = config.get_http_timeout(environment)
+            http_timeout = config.get_http_timeout(self.environment)
         self._http_timeout = http_timeout
         # handle -1 by passing None to requests
         if self._http_timeout == -1:
