@@ -105,7 +105,7 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         """
         Confirms nothing is done before the access_token expires,
         """
-        self.authorizer._check_expiration_time()
+        self.authorizer.check_expiration_time()
         self.assertEqual(self.authorizer.access_token, self.access_token)
 
     def test_check_expiration_time_expired(self):
@@ -113,7 +113,7 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         Confirms a new access_token is gotten after waiting for expiration
         """
         time.sleep(1)
-        self.authorizer._check_expiration_time()
+        self.authorizer.check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
                          self.token_data["access_token"])
         self.assertEqual(self.authorizer.expires_at,
@@ -125,7 +125,7 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         Confirms a new access_token is gotten if the old one is set to None
         """
         self.authorizer.access_token = None
-        self.authorizer._check_expiration_time()
+        self.authorizer.check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
                          self.token_data["access_token"])
         self.assertEqual(self.authorizer.expires_at,
@@ -137,7 +137,7 @@ class RenewingAuthorizerTests(CapturedIOTestCase):
         Confirms a new access_token is gotten if expires_at is set to None
         """
         self.authorizer.expires_at = None
-        self.authorizer._check_expiration_time()
+        self.authorizer.check_expiration_time()
         self.assertEqual(self.authorizer.access_token,
                          self.token_data["access_token"])
         self.assertEqual(self.authorizer.expires_at,
