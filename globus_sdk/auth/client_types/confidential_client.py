@@ -139,7 +139,7 @@ class ConfidentialAppAuthClient(AuthClient):
             state=state, refresh_tokens=refresh_tokens)
         return self.current_oauth2_flow_manager
 
-    def oauth2_get_dependent_tokens(self, token):
+    def oauth2_get_dependent_tokens(self, token, additional_params=None):
         """
         Does a `Dependent Token Grant
         <https://docs.globus.org/api/auth/reference/#dependent_token_grant_post_v2_oauth2_token>`_
@@ -166,14 +166,23 @@ class ConfidentialAppAuthClient(AuthClient):
           ``token`` (*string*)
             An Access Token as a raw string, being exchanged.
 
+          ``additional_params`` (*dict*)
+            A ``dict`` or ``None``, which specifies additional parameters
+            to include in the request body
+
         :rtype: :class:`OAuthTokenResponse
                 <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
         self.logger.info('Getting dependent tokens from access token')
-        return self.oauth2_token({
+        self.logger.debug('additional_params={}'.format(additional_params))
+        form_data = {
             'grant_type': 'urn:globus:auth:grant_type:dependent_token',
-            'token': token},
-            response_class=OAuthDependentTokenResponse)
+            'token': token}
+        if additional_params:
+            form_data.update(additional_params)
+
+        return self.oauth2_token(
+            form_data, response_class=OAuthDependentTokenResponse)
 
     def oauth2_token_introspect(self, token, include=None):
         """
