@@ -23,9 +23,8 @@ localdev: $(VIRTUALENV)
 
 $(VIRTUALENV): setup.py
 	virtualenv $(VIRTUALENV)
-	$(VIRTUALENV)/bin/pip install --upgrade pip
-	$(VIRTUALENV)/bin/pip install --upgrade setuptools
-	$(VIRTUALENV)/bin/python setup.py develop
+	$(VIRTUALENV)/bin/pip install -U pip setuptools
+	$(VIRTUALENV)/bin/pip install -e '.[development]'
 	# explicit touch to ensure good update time relative to setup.py
 	touch $(VIRTUALENV)
 
@@ -33,39 +32,21 @@ $(VIRTUALENV): setup.py
 build: $(VIRTUALENV)
 	$(VIRTUALENV)/bin/python setup.py sdist bdist_egg
 
-$(VIRTUALENV)/bin/twine: $(VIRTUALENV) upload-requirements.txt
-	$(VIRTUALENV)/bin/pip install -U -r upload-requirements.txt
-upload: $(VIRTUALENV)/bin/twine build
+upload: build
 	$(VIRTUALENV)/bin/twine upload dist/*
 
-$(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2: test-requirements.txt $(VIRTUALENV)
-	$(VIRTUALENV)/bin/pip install -r test-requirements.txt
-	# explicitly touch these files, otherwise we can have a weird thing happen
-	# where test-requirements is newer than the binaries, but the pip install
-	# command sees that they exist and does not update their mtime
-	touch $(VIRTUALENV)/bin/flake8
-	touch $(VIRTUALENV)/bin/nose2
-
-test: $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2
+test: $(VIRTUALENV)
 	$(VIRTUALENV)/bin/flake8
-	$(VIRTUALENV)/bin/nose2 --verbose
+	$(VIRTUALENV)/bin/pytest -v --cov=globus_sdk
 
 travis:
-	pip install --upgrade pip
-	pip install --upgrade "setuptools>=29"
-	pip install -r test-requirements.txt
-	pip install -e .
+	pip install -U pip setuptools
+	pip install -e '.[development]'
 	flake8
-	nose2 --verbose
+	pytest -v tests/
 
-
-# docs needs full install because sphinx will actually try to do
-# imports! Otherwise, we'll be missing dependencies like `requests`
-$(VIRTUALENV)/bin/sphinx-build: $(VIRTUALENV) docs-requirements.txt
-	$(VIRTUALENV)/bin/pip install -r docs-requirements.txt
-docs: $(VIRTUALENV) $(VIRTUALENV)/bin/sphinx-build
+docs: $(VIRTUALENV)
 	. $(VIRTUALENV)/bin/activate && $(MAKE) -C docs/ clean html
-
 
 clean:
 	-rm -r $(VIRTUALENV)
