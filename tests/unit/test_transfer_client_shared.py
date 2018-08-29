@@ -501,8 +501,12 @@ class SharedTransferClientTests(TransferClientTestCase):
         Confirms sdktester1a can see the task is paused (or about to be).
         Confirms 403 when non manager attempts to use this resource.
         """
-        # sdktester1a creates pause rule
+        # sdktester1a creates pause rule and gives sdktester2b an ACL
         rule_id = self.test_endpoint_manager_create_pause_rule()
+        acl_data = {
+            "path": "/", "permissions": "rw", "principal_type": "identity",
+            "principal": get_user_data()["sdktester2b"]["id"]}
+        self.tc.add_endpoint_acl_rule(self.test_share_ep_id, acl_data)
 
         # sdktester2b subits no-op delete task
         ddata = globus_sdk.DeleteData(self.tc2, self.test_share_ep_id,
