@@ -50,6 +50,8 @@ setup(name="globus-sdk",
               'pytest-xdist>=1.22.5,<2.0',
               # mock on py2 only
               'mock==2.0.0;python_version<"3.0"',
+              # mocking HTTP responses
+              'httpretty==0.9.5',
 
               # uploads to pypi
               'twine==1.9.1',
