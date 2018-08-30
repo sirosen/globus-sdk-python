@@ -1,0 +1,9 @@
+= Test Categories
+
+- unit
+  Simple tests that touch a single component or method and verify that it is
+  functioning correctly *in isolation* from the rest of the SDK.
+
+- functional
+  a.k.a. "integration" tests, which ensure that a full, user-like interaction
+  with the SDK works as expected.
