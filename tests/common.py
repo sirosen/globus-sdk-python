@@ -1,10 +1,25 @@
+# -*- coding: utf8 -*-
 """
 Common use helpers and utilities for all tests to leverage.
 Not so disorganized as a "utils" module and not so refined as a public package.
 """
+import inspect
+import os
 import httpretty
+import six
 
 from globus_sdk.base import slash_join
+
+# constants
+
+GO_EP1_ID = "ddb59aef-6d04-11e5-ba46-22000b92c6ec"
+GO_EP2_ID = "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
+# TODO: stop using EP3 once EP1 and EP2 support symlinks
+GO_EP3_ID = "4be6107f-634d-11e7-a979-22000bf2d287"
+GO_S3_ID = "cf9bcaa5-6d04-11e5-ba46-22000b92c6ec"
+GO_EP1_SERVER_ID = 207976
+
+# end constants
 
 
 def register_api_route(service, path, method=httpretty.GET,
@@ -16,7 +31,7 @@ def register_api_route(service, path, method=httpretty.GET,
     base_url_map = {
         'auth': 'https://auth.globus.org/',
         'nexus': 'https://nexus.api.globusonline.org/',
-        'transfer': 'https://transfer.api.globus.org/',
+        'transfer': 'https://transfer.api.globus.org/v0.10',
         'search': 'https://search.api.globus.org/'
     }
     assert service in base_url_map
@@ -29,3 +44,35 @@ def register_api_route(service, path, method=httpretty.GET,
 
     httpretty.register_uri(method, full_url, adding_headers=adding_headers,
                            **kwargs)
+
+
+def register_api_route_fixture_file(service, path, filename, **kwargs):
+    """
+    register an API route to serve the contents of a file, given the name of
+    that file in a `fixture_data` directory, adjacent to the current (calling)
+    module
+
+    i.e. in a dir like this:
+      path/to/tests
+      ├── test_mod.py
+      └── fixture_data
+          └── dat.txt
+
+    you can call
+    >>> register_api_route_fixture_file('transfer', '/foo', 'dat.txt')
+
+    in `test_mod.py`
+
+    it will "do the right thing" and find the abspath to dat.txt , and
+    load the contents of that file as the response for '/foo'
+    """
+    # get calling frame
+    frm = inspect.stack()[1]
+    # get filename from frame, make it absolute
+    modpath = os.path.abspath(frm[1])
+
+    abspath = os.path.join(os.path.dirname(modpath), "fixture_data", filename)
+    with open(abspath) as f:
+        body = six.b(f.read())
+
+    register_api_route(service, path, body=body, **kwargs)
