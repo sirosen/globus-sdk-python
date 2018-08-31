@@ -22,7 +22,8 @@ localdev: $(VIRTUALENV)
 
 
 $(VIRTUALENV): setup.py
-	virtualenv $(VIRTUALENV)
+	# don't recreate it if it already exists -- just run the setup steps
+	if [ ! -d "$(VIRTUALENV)" ]; then virtualenv $(VIRTUALENV); fi
 	$(VIRTUALENV)/bin/pip install -U pip setuptools
 	$(VIRTUALENV)/bin/pip install -e '.[development]'
 	# explicit touch to ensure good update time relative to setup.py
