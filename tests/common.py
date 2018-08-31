@@ -7,7 +7,15 @@ import inspect
 import os
 import httpretty
 import six
+import requests
+import json
 
+try:
+    import mock
+except ImportError:
+    from unittest import mock
+
+import globus_sdk
 from globus_sdk.base import slash_join
 
 # constants
@@ -76,3 +84,33 @@ def register_api_route_fixture_file(service, path, filename, **kwargs):
         body = six.b(f.read())
 
     register_api_route(service, path, body=body, **kwargs)
+
+
+def make_response(response_class=globus_sdk.GlobusHTTPResponse,
+                  status=200, headers=None, json_body=None, text=None):
+    """
+    Construct and return an SDK response object with a mocked requests.Response
+
+    Unlike mocking of an API route, this is meant for unit testing in which we
+    want to directly create the response.
+    """
+    r = mock.Mock(spec=requests.Response)
+    r.status_code = status
+    if headers:
+        r.headers = headers
+    else:
+        r.headers = {'Content-Type': 'application/json'}
+
+    if json_body:
+        r.json.return_value = json_body
+    else:
+        r.json.side_effect = ValueError('globus sdk mock value error')
+
+    if text:
+        r.text = text
+    elif json_body:
+        r.text = json.dumps(json_body)
+    else:
+        r.text = ''
+
+    return response_class(r)
