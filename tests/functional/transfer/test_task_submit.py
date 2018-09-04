@@ -98,6 +98,7 @@ def test_transfer_submit_success(client, transfer_data):
     res = client.submit_transfer(tdata)
 
     assert res
+    assert res['submission_id'] == 'foosubmitid'
     assert res['task_id'] == 'f51bdaea-ad78-11e8-823c-0a3b7ca8ce66'
 
 
@@ -114,4 +115,5 @@ def test_delete_submit_success(client, delete_data):
     res = client.submit_delete(ddata)
 
     assert res
+    assert res['submission_id'] == 'foosubmitid'
     assert res['task_id'] == 'b5370336-ad79-11e8-823c-0a3b7ca8ce66'
