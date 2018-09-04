@@ -31,7 +31,7 @@ $(VIRTUALENV): setup.py
 
 
 build: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/python setup.py sdist bdist_egg
+	$(VIRTUALENV)/bin/python setup.py sdist bdist_wheel
 
 $(VIRTUALENV)/bin/twine: $(VIRTUALENV) upload-requirements.txt
 	$(VIRTUALENV)/bin/pip install -U -r upload-requirements.txt
