@@ -51,6 +51,12 @@ def authorizer(on_refresh, token_data, expires_at):
                        expires_at=expires_at, on_refresh=on_refresh)
 
 
+@pytest.fixture
+def expired_authorizer(on_refresh, token_data, expires_at):
+    return MockRenewer(token_data, access_token=ACCESS_TOKEN,
+                       expires_at=expires_at - 1, on_refresh=on_refresh)
+
+
 def test_init(token_data, expires_at):
     """
     Creating a MockRenewer with partial data results in a new access token
@@ -110,14 +116,13 @@ def test_check_expiration_time_valid(authorizer):
     assert authorizer.access_token == ACCESS_TOKEN
 
 
-def test_check_expiration_time_expired(authorizer, token_data):
+def test_check_expiration_time_expired(expired_authorizer, token_data):
     """
-    Confirms a new access_token is gotten after waiting for expiration
+    Confirms a new access_token is gotten after expiration
     """
-    time.sleep(1)
-    authorizer.check_expiration_time()
-    assert authorizer.access_token == token_data["access_token"]
-    assert authorizer.expires_at == (
+    expired_authorizer.check_expiration_time()
+    assert expired_authorizer.access_token == token_data["access_token"]
+    assert expired_authorizer.expires_at == (
         token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS)
 
 
@@ -162,15 +167,14 @@ def test_set_authorization_header_existing(authorizer):
     assert header_dict["Header"] == "value"
 
 
-def test_set_authorization_header_expired(authorizer, token_data):
+def test_set_authorization_header_expired(expired_authorizer, token_data):
     """
-    Waits for the access_token to expire, then sets authorization header
+    Sets the access_token to be expired, then sets authorization header
     Confirms header value uses the new access_token.
     """
     header_dict = {}
-    time.sleep(1)
 
-    authorizer.set_authorization_header(header_dict)
+    expired_authorizer.set_authorization_header(header_dict)
     assert header_dict["Authorization"] == (
         "Bearer " + token_data["access_token"])
 
