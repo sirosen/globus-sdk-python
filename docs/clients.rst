@@ -30,3 +30,12 @@ very simply::
    clients/auth
    clients/search
    clients/base
+
+Multi-Thread and Multi-Process Safety
+-------------------------------------
+Each Globus SDK client class holds a networking session object to interact
+with the Globus API. Using a previously created service client object after
+forking or between multiple threads should be considered unsafe. In
+multi-processing applications, it is recommended to create service client
+objects after process forking and to ensure that there is only one service
+client instance created per process.
