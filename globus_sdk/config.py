@@ -62,7 +62,7 @@ class GlobusConfigParser(object):
             section=None, environment=None,
             failover_to_general=False, check_env=False,
             type_cast=str):
-        """
+        r"""
         Attempt to lookup an option in the config file. Optionally failover to
         the general section if the option is not found.
 

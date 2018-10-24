@@ -54,7 +54,7 @@ class LocalGlobusConnectPersonal(object):
                         raise GlobusSDKUsageError(
                             "LOCALAPPDATA not detected in Windows environment")
                     fname = os.path.join(
-                        appdata, "Globus Connect\client-id.txt")
+                        appdata, "Globus Connect\\client-id.txt")
                 else:
                     fname = os.path.expanduser(
                         "~/.globusonline/lta/client-id.txt")
