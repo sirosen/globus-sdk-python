@@ -154,7 +154,7 @@ class AuthClient(BaseClient):
         self.logger.debug("params={}".format(params))
 
         if "usernames" in params and "ids" in params:
-            self.logger.warn(
+            self.logger.warning(
                 (
                     "get_identities call with both usernames and "
                     "identities set! Expected to result in errors"

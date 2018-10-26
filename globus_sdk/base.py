@@ -21,6 +21,17 @@ class ClientLogAdapter(logging.LoggerAdapter):
         return "[instance:{}] {}".format(id(self.extra["client"]), msg), kwargs
 
     def warn(self, *args, **kwargs):
+        """
+        NOTE: although Logger.warn() is deprecated in python, we've now made
+        it part of the interface for clients. We should only remove this
+        carefully, as someone may be leveraging something like
+
+        >>> TransferClient.logger.warn(...)
+
+        even though that would be a bad idea. At the very least, removing it
+        should be a considered move, not just thrown in with warn() ->
+        warning() cleanup.
+        """
         return self.warning(*args, **kwargs)
 
 

@@ -118,7 +118,7 @@ class GlobusAPIError(GlobusError):
         """
         if "errors" in data:
             if len(data["errors"]) != 1:
-                logger.warn(
+                logger.warning(
                     (
                         "Doing JSON load of error response with multiple "
                         "errors. Exception data will only include the "
@@ -213,7 +213,7 @@ class AuthAPIError(GlobusAPIError):
         """
         if "errors" in data:
             if len(data["errors"]) != 1:
-                logger.warn(
+                logger.warning(
                     (
                         "Doing JSON load of error response with multiple "
                         "errors. Exception data will only include the "

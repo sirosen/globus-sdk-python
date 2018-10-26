@@ -109,7 +109,7 @@ class GlobusHTTPResponse(GlobusResponse):
         # if the caller *really* wants the raw body of the response, they can
         # always use text_body
         except ValueError:
-            logger.warn(
+            logger.warning(
                 ("GlobusHTTPResponse.data is null when body is not " "valid JSON")
             )
             return None

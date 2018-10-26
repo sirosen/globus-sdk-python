@@ -60,7 +60,7 @@ class RenewingAuthorizer(GlobusAuthorizer):
             )
         )
         if access_token is not None and expires_at is None:
-            logger.warn(
+            logger.warning(
                 (
                     "Initializing a RenewingAuthorizer with an "
                     "access_token and no expires_at time means that this "

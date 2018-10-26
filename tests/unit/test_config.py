@@ -30,7 +30,15 @@ def custom_config(configdata):
         configdata = six.StringIO(configdata)
 
     def loadconf(cfgparser):
-        cfgparser._parser.readfp(configdata)
+        # try to use the new version of this method, added in py3.2
+        try:
+            readfp_func = cfgparser._parser.read_file
+        # but failover to the pre-3.2 version
+        except AttributeError:
+            readfp_func = cfgparser._parser.readfp
+        # and fail-open if there's some other issue
+
+        readfp_func(configdata)
 
     with mock.patch("globus_sdk.config.GlobusConfigParser._load_config", loadconf):
         globus_sdk.config._get_parser()

@@ -182,7 +182,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         # warn (not error) on older usage pattern, but still respect it
         # FIXME: should be deprecated and removed in SDK v2
         if auth_client:
-            logger.warn(
+            logger.warning(
                 "Providing an auth_client to decode_id_token is no "
                 "longer required and may be deprecated in a future version "
                 "of the Globus SDK"
