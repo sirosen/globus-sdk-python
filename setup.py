@@ -39,7 +39,30 @@ setup(name="globus-sdk",
 
       extras_require={
           # empty extra included to support older installs
-          'jwt': []
+          'jwt': [],
+
+          # the _development extra is for SDK developers only
+          'development': [
+              # testing reqs
+              'flake8>=3.0,<4.0',
+              'pytest>=3.7.4,<4.0',
+              'pytest-cov>=2.5.1,<3.0',
+              'pytest-xdist>=1.22.5,<2.0',
+              # mock on py2, py3.4 and py3.5
+              # not just py2: py3 versions of mock don't all have the same
+              # interface!
+              'mock==2.0.0;python_version<"3.6"',
+              # mocking HTTP responses
+              'httpretty==0.9.5',
+
+              # builds + uploads to pypi
+              'twine==1.11.0',
+              'wheel==0.31.1',
+
+              # docs
+              'sphinx==1.4.1',
+              'guzzle_sphinx_theme==0.7.11',
+          ]
       },
 
       include_package_data=True,

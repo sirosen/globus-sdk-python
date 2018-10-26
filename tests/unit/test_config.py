@@ -1,182 +1,255 @@
-import os
+from contextlib import contextmanager
 try:
     import mock
 except ImportError:
     from unittest import mock
 
-import globus_sdk
-from globus_sdk.config import GlobusConfigParser
+import os
+import pytest
+import six
+from six.moves.configparser import ConfigParser
 
-from tests.framework import get_fixture_file_dir, CapturedIOTestCase
+import globus_sdk.config
 
 
-class ConfigParserTests(CapturedIOTestCase):
+@contextmanager
+def custom_config(configdata):
+    """
+    patch config with a file-like object or even a raw string (which will
+    get wrapped in a StringIO to be file-like)
 
-    def tearDown(self):
-        super(ConfigParserTests, self).tearDown()
-        globus_sdk.config._parser = None
+    test helper
+    """
 
-    def _load_config_file(self, filename):
-        """
-        Uses patch to bypass normal _load_config to load filename instead
-        """
-        filename = os.path.join(
-            get_fixture_file_dir(), 'sample_configs', filename)
+    # clear any existing parser
+    globus_sdk.config._parser = None
 
-        globus_sdk.config._parser = None
+    # not file-like, wrap it
+    if not hasattr(configdata, 'read'):
+        configdata = six.StringIO(configdata)
 
-        def loadconf(cfgparser):
-            cfgparser._parser.read([filename])
+    def loadconf(cfgparser):
+        cfgparser._parser.readfp(configdata)
 
-        with mock.patch(
-                'globus_sdk.config.GlobusConfigParser._load_config', loadconf):
-            globus_sdk.config._get_parser()
+    with mock.patch(
+            'globus_sdk.config.GlobusConfigParser._load_config', loadconf):
+        globus_sdk.config._get_parser()
+        yield
 
-    def test_get_lib_config_path(self):
-        """
-        Gets the globus.cfg file path, confirms valid config file exists there
-        """
-        file_name = "globus.cfg"
-        path = globus_sdk.config._get_lib_config_path()
-        self.assertEqual(path[-(len(file_name)):], file_name)
+    # clear that temporary parser
+    globus_sdk.config._parser = None
 
-        # make sure the cfg file at least has transfer and auth services
-        with open(path, "r") as f:
-            file_text = f.read()
-            self.assertIn("transfer_service", file_text)
-            self.assertIn("auth_service", file_text)
 
-    def test_init_and_load_config(self):
-        """
-        Creates a GlobusConfigParser object, veriries that calling _load_config
-        in __init__ gets general values for the internal ConfigParser
-        """
-        globus_parser = globus_sdk.config.GlobusConfigParser()
-        general_items = globus_parser._parser.items("general")
-        self.assertNotEqual(general_items, None)
+@contextmanager
+def only_lib_config():
+    """
+    patch config to only load library data, ignores /etc/ and ~
+    """
+    # clear any existing parser
+    globus_sdk.config._parser = None
 
-    def test_get(self):
-        """
-        Confirms that get reads expected results
-        Tests section, environment, failover_to_general, and check_env params
-        """
-        self._load_config_file("get_test.cfg")
-        gcp = globus_sdk.config._get_parser()
-        os.environ["GLOBUS_SDK_OPTION"] = "os_environ_value"
+    def loadconf(cfgparser):
+        cfgparser._parser.read([globus_sdk.config._get_lib_config_path()])
 
-        # no parameters
-        self.assertEqual(gcp.get("option"), "general_value")
-        # section
-        self.assertEqual(gcp.get("option", section="section"), "section_value")
-        # environment
-        self.assertEqual(gcp.get("option", environment="section"),
-                         "environment_value")
-        # failover_to_general
-        self.assertEqual(gcp.get("option", section="nonexistant"), None)
-        self.assertEqual(gcp.get("option", section="nonexistant",
-                                 failover_to_general=True), "general_value")
-        # check_env
-        self.assertEqual(gcp.get("option", check_env=True), "os_environ_value")
-        # environment > section
-        self.assertEqual(gcp.get("option", section="section",
-                                 environment="section"), "environment_value")
-        # check_env > enviroment
-        self.assertEqual(gcp.get("option", environment="section",
-                                 check_env=True), "os_environ_value")
+    with mock.patch(
+            'globus_sdk.config.GlobusConfigParser._load_config', loadconf):
+        yield
 
-    def test_get_parser(self):
-        """
-        Confirms that at starting time _parser is none,
-        but get_parser makes and returns a valid GlobusConfigParser
-        """
-        self.assertEqual(globus_sdk.config._parser, None)
-        self.assertIsInstance(globus_sdk.config._get_parser(),
-                              GlobusConfigParser)
-        self.assertIsInstance(globus_sdk.config._parser, GlobusConfigParser)
+    # clear that temporary parser
+    globus_sdk.config._parser = None
 
-    def test_get_service_url(self):
-        """
-        Confirms get_service_url returns expected results
-        Tests environments, services, and missing values
-        """
-        self._load_config_file("url_test.cfg")
 
-        # combinations of environments and services
-        self.assertEqual(
-            globus_sdk.config.get_service_url("default", "auth"),
-            "https://auth.globus.org/")
-        self.assertEqual(
-            globus_sdk.config.get_service_url("default", "transfer"),
-            "https://transfer.api.globusonline.org/")
-        self.assertEqual(
-            globus_sdk.config.get_service_url("beta", "auth"),
-            "https://auth.beta.globus.org/")
-        self.assertEqual(
-            globus_sdk.config.get_service_url("beta", "transfer"),
-            "https://transfer.api.beta.globus.org/")
+def test_get_lib_config():
+    """Test lib config file exists, is minimally well formed"""
+    path = globus_sdk.config._get_lib_config_path()
 
-        # missing values
-        with self.assertRaises(ValueError):
+    # name is "about right"
+    file_name = "globus.cfg"
+    assert path.endswith(file_name)
+
+    # ensure that it parses using configparser
+    parser = ConfigParser()
+    parser.read(path)
+
+    # and check that 'default' and 'preview' are populated
+    for env in ('default', 'preview'):
+        section = 'environment {}'.format(env)
+        for key in ('auth_service', 'nexus_service', 'transfer_service',
+                    'search_service'):
+            opt = parser.get(section, key)
+            assert opt
+
+
+def test_verify_ssl_true():
+    with custom_config("[environment default]\nssl_verify = true\n"):
+        assert globus_sdk.config.get_ssl_verify('default')
+
+
+def test_verify_ssl_false():
+    with custom_config("[environment default]\nssl_verify = false\n"):
+        assert not globus_sdk.config.get_ssl_verify('default')
+
+
+def test_verify_ssl_invalid():
+    with pytest.raises(ValueError):
+        with custom_config(
+                "[environment default]\nssl_verify = invalidvalue\n"):
+            assert not globus_sdk.config.get_ssl_verify('default')
+
+
+def test_init_loads():
+    """
+    ensure that initializing a config parser loads config
+    """
+    with only_lib_config():
+        conf = globus_sdk.config._get_parser()
+        assert conf._parser.items("general") is not None
+
+
+def test_conf_get():
+    """
+    Confirms that get reads expected results
+    Tests section, environment, failover_to_general, and check_env params
+    """
+    confio = six.StringIO("""\
+[general]
+option = general_value
+
+[section]
+option = section_value
+
+[environment section]
+option = environment_value
+
+[nonexistent]
+""")
+    with custom_config(confio):
+        conf = globus_sdk.config._get_parser()
+        with mock.patch.dict(os.environ):
+            os.environ['GLOBUS_SDK_OPTION'] = 'os_environ_value'
+            assert conf.get('option') == 'general_value'
+            assert conf.get('option', section='section') == 'section_value'
+            assert (conf.get('option', environment='section') ==
+                    'environment_value')
+            assert conf.get('option', section='nonexistent') is None
+            assert conf.get('option', section='nonexistent',
+                            failover_to_general=True) == 'general_value'
+            assert conf.get('option', check_env=True) == 'os_environ_value'
+            # environment > section
+            assert conf.get('option', section='section',
+                            environment='section') == 'environment_value'
+            # check_env > environment
+            assert conf.get('option', environment='section',
+                            check_env=True) == 'os_environ_value'
+
+
+def test_parser_is_singleton():
+    # do two fetches, assert 'is'
+    assert (globus_sdk.config._get_parser() is
+            globus_sdk.config._get_parser())
+
+
+def test_get_service_url():
+    """
+    Confirms get_service_url returns expected results
+    Tests environments, services, and missing values
+    """
+    confio = six.StringIO("""\
+[general]
+
+[environment default]
+auth_service = https://auth.globus.org/
+transfer_service = https://transfer.api.globus.org/
+
+[environment preview]
+auth_service = https://auth.preview.globus.org/
+transfer_service = https://transfer.api.preview.globus.org/
+
+[environment nonexistent]
+""")
+    with custom_config(confio):
+        assert (globus_sdk.config.get_service_url("default", "auth") ==
+                "https://auth.globus.org/")
+        assert (globus_sdk.config.get_service_url("default", "transfer") ==
+                "https://transfer.api.globus.org/")
+        assert (globus_sdk.config.get_service_url("preview", "auth") ==
+                "https://auth.preview.globus.org/")
+        assert (globus_sdk.config.get_service_url("preview", "transfer") ==
+                "https://transfer.api.preview.globus.org/")
+
+        with pytest.raises(ValueError):
             globus_sdk.config.get_service_url("nonexistent", "auth")
 
-    def test_get_ssl_verify(self):
-        """
-        Confirms get_ssl_verify returns expected results
-        Tests true/false, and invalid values
-        """
-        self._load_config_file("ssl_test.cfg")
 
-        # true
-        self.assertTrue(globus_sdk.config.get_ssl_verify("true"))
-        # false
-        self.assertFalse(globus_sdk.config.get_ssl_verify("false"))
-        # invalid
-        with self.assertRaises(ValueError):
-            globus_sdk.config.get_ssl_verify("invalid")
+def test_get_ssl_verify():
+    """
+    Confirms get_ssl_verify returns expected results
+    Tests true/false, and invalid values
+    """
+    confio = six.StringIO("""\
+[general]
 
-    def test_bool_cast(self):
-        """
-        Confirms bool cast returns correct bools from sets off string values
-        """
-        true_vals = [str(1), str(True), "1", "YES", "true", "True", "ON"]
-        for val in true_vals:
-            self.assertTrue(globus_sdk.config._bool_cast(val))
-        false_vals = [str(0), str(False), "0", "NO", "false", "False", "OFF"]
-        for val in false_vals:
-            self.assertFalse(globus_sdk.config._bool_cast(val))
-        # invalid string
-        with self.assertRaises(ValueError):
-            globus_sdk.config._bool_cast("invalid")
+[environment trueenv]
+ssl_verify = true
 
-    def test_get_globus_environ(self):
-        """
-        Confirms returns "default", or the value of GLOBUS_SDK_ENVIRONMENT
-        """
-        # mock environ to ensure it gets reset
-        with mock.patch.dict(os.environ):
-            # set an environment value, ensure that it's returned
-            os.environ["GLOBUS_SDK_ENVIRONMENT"] = "beta"
-            self.assertEqual(globus_sdk.config.get_globus_environ(), "beta")
+[environment falseenv]
+ssl_verify = false
 
-            # clear that value, "default" should be returned
-            del os.environ["GLOBUS_SDK_ENVIRONMENT"]
-            self.assertEqual(globus_sdk.config.get_globus_environ(), "default")
+[environment invalid]
+ssl_verify = invalid
 
-            # ensure that passing a value returns that value
-            self.assertEqual(
-                globus_sdk.config.get_globus_environ("beta"), "beta")
+[environment nonexistent]
+""")
+    with custom_config(confio):
+        assert globus_sdk.config.get_ssl_verify('trueenv')
+        assert not globus_sdk.config.get_ssl_verify('falseenv')
+        # default = True
+        assert globus_sdk.config.get_ssl_verify('nonexistent')
 
-    def test_get_globus_environ_production(self):
-        """
-        Confirms that get_globus_environ translates "production" to "default",
-        including when special values are passed
-        """
-        # mock environ to ensure it gets reset
-        with mock.patch.dict(os.environ):
-            os.environ["GLOBUS_SDK_ENVIRONMENT"] = "production"
-            self.assertEqual(globus_sdk.config.get_globus_environ(), "default")
+        with pytest.raises(ValueError):
+            globus_sdk.config.get_ssl_verify('invalid')
 
-            del os.environ["GLOBUS_SDK_ENVIRONMENT"]
-            # ensure that passing a value returns that value
-            self.assertEqual(
-                globus_sdk.config.get_globus_environ("production"), "default")
+
+@pytest.mark.parametrize(
+    "value, expected_result",
+    [(x, True) for x in [str(True), "1", "YES", "true", "True", "ON"]] +
+    [(x, False) for x in [str(False), "0", "NO", "false", "False", "OFF"]] +
+    [(x, ValueError) for x in ['invalid', "1.0", "0.0", "t", "f"]])
+def test_bool_cast(value, expected_result):
+    """
+    Confirms bool cast returns correct bools from sets of string values
+    """
+    if isinstance(expected_result, bool):
+        assert globus_sdk.config._bool_cast(value) == expected_result
+    else:
+        with pytest.raises(expected_result):
+            globus_sdk.config._bool_cast(value)
+
+
+def test_get_globus_environ():
+    with mock.patch.dict(os.environ):
+        # set an environment value, ensure that it's returned
+        os.environ["GLOBUS_SDK_ENVIRONMENT"] = "beta"
+        assert globus_sdk.config.get_globus_environ() == "beta"
+
+        # clear that value, "default" should be returned
+        del os.environ["GLOBUS_SDK_ENVIRONMENT"]
+        assert globus_sdk.config.get_globus_environ() == "default"
+
+        # ensure that passing a value returns that value
+        assert globus_sdk.config.get_globus_environ("beta") == "beta"
+
+
+def test_get_globus_environ_production():
+    """
+    Confirms that get_globus_environ translates "production" to "default",
+    including when special values are passed
+    """
+    # mock environ to ensure it gets reset
+    with mock.patch.dict(os.environ):
+        os.environ["GLOBUS_SDK_ENVIRONMENT"] = "production"
+        assert globus_sdk.config.get_globus_environ() == "default"
+
+        del os.environ["GLOBUS_SDK_ENVIRONMENT"]
+        # ensure that passing a value returns that value
+        assert globus_sdk.config.get_globus_environ("production") == "default"

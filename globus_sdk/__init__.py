@@ -7,7 +7,7 @@ from globus_sdk.response import GlobusResponse, GlobusHTTPResponse
 
 from globus_sdk.exc import (
     GlobusError, GlobusSDKUsageError,
-    GlobusAPIError, TransferAPIError, SearchAPIError,
+    GlobusAPIError, AuthAPIError, TransferAPIError, SearchAPIError,
     NetworkError, GlobusConnectionError, GlobusTimeoutError,
     GlobusConnectionTimeoutError)
 
@@ -32,7 +32,7 @@ __all__ = (
     "GlobusResponse", "GlobusHTTPResponse",
 
     "GlobusError", "GlobusSDKUsageError",
-    "GlobusAPIError", "TransferAPIError", "SearchAPIError",
+    "GlobusAPIError", "AuthAPIError", "TransferAPIError", "SearchAPIError",
     "NetworkError", "GlobusConnectionError", "GlobusTimeoutError",
     "GlobusConnectionTimeoutError",
 

@@ -12,14 +12,14 @@ install:
   # invoke python explicitly, and wrap it in build.cmd so that compilation of
   # C-extensions uses the correct python
   # for reference: https://packaging.python.org/appveyor/
-  - "build.cmd %PYTHON%\\python.exe -m pip install ."
-  - "build.cmd %PYTHON%\\python.exe -m pip install -r test-requirements.txt"
+  - "build.cmd %PYTHON%\\python.exe -m pip install -U pip setuptools"
+  - "build.cmd %PYTHON%\\python.exe -m pip install -e .[development]"
 
 test_script:
   # explicitly invoke under the build environment's python
   - "set GLOBUS_TEST_PY=%PYTHON%\\python.exe"
   - "%GLOBUS_TEST_PY% -m flake8"
-  - "%GLOBUS_TEST_PY% -m nose2"
+  - "%GLOBUS_TEST_PY% -m pytest -v  --cov=globus_sdk"
 
 build: off
 deploy: off
