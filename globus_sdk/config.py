@@ -3,9 +3,13 @@ Load config files once per interpreter invocation.
 """
 import logging
 import os
+
 from six.moves.configparser import (
-    ConfigParser, MissingSectionHeaderError,
-    NoOptionError, NoSectionError)
+    ConfigParser,
+    MissingSectionHeaderError,
+    NoOptionError,
+    NoSectionError,
+)
 
 from globus_sdk.exc import GlobusError, GlobusSDKUsageError
 
@@ -22,11 +26,13 @@ def _get_lib_config_path():
     try:
         logger.debug("Attempting pkg_resources load of lib config")
         import pkg_resources
+
         path = pkg_resources.resource_filename("globus_sdk", fname)
         logger.debug("pkg_resources load of lib config success")
     except ImportError:
-        logger.debug(("pkg_resources load of lib config failed, failing over "
-                      "to path joining"))
+        logger.debug(
+            ("pkg_resources load of lib config failed, failing over " "to path joining")
+        )
         pkg_path = os.path.dirname(__file__)
         path = os.path.join(pkg_path, fname)
     return path
@@ -36,7 +42,8 @@ class GlobusConfigParser(object):
     """
     Wraps a ConfigParser to do modified get()s and config file loading.
     """
-    _GENERAL_CONF_SECTION = 'general'
+
+    _GENERAL_CONF_SECTION = "general"
 
     def __init__(self):
         logger.debug("Loading SDK Config parser")
@@ -47,21 +54,36 @@ class GlobusConfigParser(object):
     def _load_config(self):
         # TODO: /etc is not windows friendly, not sure about expanduser
         try:
-            self._parser.read([_get_lib_config_path(), "/etc/globus.cfg",
-                               os.path.expanduser("~/.globus.cfg")])
+            self._parser.read(
+                [
+                    _get_lib_config_path(),
+                    "/etc/globus.cfg",
+                    os.path.expanduser("~/.globus.cfg"),
+                ]
+            )
         except MissingSectionHeaderError:
-            logger.error(("MissingSectionHeader means invalid config "
-                          "somewhere, and is often an indicator of a stale "
-                          "early form of the Globus SDK config"))
+            logger.error(
+                (
+                    "MissingSectionHeader means invalid config "
+                    "somewhere, and is often an indicator of a stale "
+                    "early form of the Globus SDK config"
+                )
+            )
             raise GlobusError(
                 "Failed to parse your ~/.globus.cfg Your config file may be "
                 "in an old format. Please ensure that the file's first line "
-                "is \"[general]\"")
+                'is "[general]"'
+            )
 
-    def get(self, option,
-            section=None, environment=None,
-            failover_to_general=False, check_env=False,
-            type_cast=str):
+    def get(
+        self,
+        option,
+        section=None,
+        environment=None,
+        failover_to_general=False,
+        check_env=False,
+        type_cast=str,
+    ):
         r"""
         Attempt to lookup an option in the config file. Optionally failover to
         the general section if the option is not found.
@@ -77,7 +99,7 @@ class GlobusConfigParser(object):
         # envrionment is just a fancy name for sections that start with
         # 'environment '
         if environment:
-            section = 'environment ' + environment
+            section = "environment " + environment
         # if you don't specify a section or an environment, assume it's the
         # general conf section
         if section is None:
@@ -87,22 +109,25 @@ class GlobusConfigParser(object):
         # *first* for a value -- env values have higher precedence than config
         # files so that you can locally override the behavior of a command in a
         # given shell or subshell
-        env_option_name = 'GLOBUS_SDK_{}'.format(option.upper())
+        env_option_name = "GLOBUS_SDK_{}".format(option.upper())
         value = None
         if check_env and env_option_name in os.environ:
-            logger.debug("Getting config value from environment: {}={}"
-                         .format(env_option_name, value))
+            logger.debug(
+                "Getting config value from environment: {}={}".format(
+                    env_option_name, value
+                )
+            )
             value = os.environ[env_option_name]
         else:
             try:
                 value = self._parser.get(section, option)
             except (NoOptionError, NoSectionError):
                 if failover_to_general:
-                    logger.debug("Config lookup of [{}]:{} failed, checking "
-                                 "[general] for a value as well"
-                                 .format(section, option))
-                    value = self.get(option,
-                                     section=self._GENERAL_CONF_SECTION)
+                    logger.debug(
+                        "Config lookup of [{}]:{} failed, checking "
+                        "[general] for a value as well".format(section, option)
+                    )
+                    value = self.get(option, section=self._GENERAL_CONF_SECTION)
 
         if value is not None:
             value = type_cast(value)
@@ -126,42 +151,52 @@ _parser = None
 
 
 def get_service_url(environment, service):
-    logger.debug("Service URL Lookup for \"{}\" under env \"{}\""
-                 .format(service, environment))
+    logger.debug(
+        'Service URL Lookup for "{}" under env "{}"'.format(service, environment)
+    )
     p = _get_parser()
     option = service + "_service"
     # TODO: validate with urlparse?
     url = p.get(option, environment=environment)
     if url is None:
         raise GlobusSDKUsageError(
-            ('Failed to find a url for service "{}" in environment "{}". '
-             "Please double-check that GLOBUS_SDK_ENVIRONMENT is set "
-             "correctly, or not set at all")
-            .format(service, environment))
-    logger.debug("Service URL Lookup Result: \"{}\" is at \"{}\""
-                 .format(service, url))
+            (
+                'Failed to find a url for service "{}" in environment "{}". '
+                "Please double-check that GLOBUS_SDK_ENVIRONMENT is set "
+                "correctly, or not set at all"
+            ).format(service, environment)
+        )
+    logger.debug('Service URL Lookup Result: "{}" is at "{}"'.format(service, url))
     return url
 
 
 def get_http_timeout(environment):
     p = _get_parser()
-    value = p.get("http_timeout", environment=environment,
-                  failover_to_general=True, check_env=True,
-                  type_cast=float)
+    value = p.get(
+        "http_timeout",
+        environment=environment,
+        failover_to_general=True,
+        check_env=True,
+        type_cast=float,
+    )
     if value is None:
         value = 60
-    logger.debug('default http_timeout set to {}'.format(value))
+    logger.debug("default http_timeout set to {}".format(value))
     return value
 
 
 def get_ssl_verify(environment):
     p = _get_parser()
-    value = p.get("ssl_verify", environment=environment,
-                  failover_to_general=False, check_env=True,
-                  type_cast=_bool_cast)
+    value = p.get(
+        "ssl_verify",
+        environment=environment,
+        failover_to_general=False,
+        check_env=True,
+        type_cast=_bool_cast,
+    )
     if value is None:
         return True
-    logger.debug('ssl_verify set to {}'.format(value))
+    logger.debug("ssl_verify set to {}".format(value))
     return value
 
 
@@ -187,13 +222,14 @@ def get_globus_environ(inputenv=None):
                      instantiation
     """
     if inputenv is None:
-        env = os.environ.get('GLOBUS_SDK_ENVIRONMENT', 'default')
+        env = os.environ.get("GLOBUS_SDK_ENVIRONMENT", "default")
     else:
         env = inputenv
 
-    if env == 'production':
-        env = 'default'
-    if env != 'default':
-        logger.info(('On lookup, non-default environment: '
-                     'globus_environment={}'.format(env)))
+    if env == "production":
+        env = "default"
+    if env != "default":
+        logger.info(
+            ("On lookup, non-default environment: " "globus_environment={}".format(env))
+        )
     return env

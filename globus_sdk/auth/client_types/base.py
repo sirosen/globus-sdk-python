@@ -1,14 +1,14 @@
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
-import six
 import collections
 import logging
 
+import six
+
 from globus_sdk import exc
-from globus_sdk.base import BaseClient, safe_stringify
-from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.auth.token_response import OAuthTokenResponse
+from globus_sdk.authorizers import NullAuthorizer
+from globus_sdk.base import BaseClient, safe_stringify
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,7 @@ class AuthClient(BaseClient):
     *  :py:meth:`.oauth2_userinfo`
 
     """
+
     error_class = exc.AuthAPIError
 
     def __init__(self, client_id=None, authorizer=None, **kwargs):
@@ -67,8 +68,7 @@ class AuthClient(BaseClient):
 
         BaseClient.__init__(self, "auth", authorizer=authorizer, **kwargs)
 
-    def get_identities(self, usernames=None, ids=None,
-                       provision=False, **params):
+    def get_identities(self, usernames=None, ids=None, provision=False, **params):
         r"""
         GET /v2/api/identities
 
@@ -128,31 +128,38 @@ class AuthClient(BaseClient):
         #v2_api_identities_resources>`_
         in the API documentation for details.
         """
+
         def _convert_listarg(val):
-            if (isinstance(val, collections.Iterable) and
-                    not isinstance(val, six.string_types)):
-                return ','.join(safe_stringify(x) for x in val)
+            if isinstance(val, collections.Iterable) and not isinstance(
+                val, six.string_types
+            ):
+                return ",".join(safe_stringify(x) for x in val)
             else:
                 return safe_stringify(val)
 
-        self.logger.info('Looking up Globus Auth Identities')
+        self.logger.info("Looking up Globus Auth Identities")
 
         # if either of these params has a truthy value, stringify it safely,
         # letting us consume args whose `__str__` methods produce "the right
         # thing"
         # most notably, lets `ids` take a single UUID object safely
         if usernames:
-            params['usernames'] = _convert_listarg(usernames)
-            params['provision'] = ('false' if str(provision).lower() == 'false'
-                                   else 'true')
+            params["usernames"] = _convert_listarg(usernames)
+            params["provision"] = (
+                "false" if str(provision).lower() == "false" else "true"
+            )
         if ids:
-            params['ids'] = _convert_listarg(ids)
+            params["ids"] = _convert_listarg(ids)
 
-        self.logger.debug('params={}'.format(params))
+        self.logger.debug("params={}".format(params))
 
-        if 'usernames' in params and 'ids' in params:
-            self.logger.warn(('get_identities call with both usernames and '
-                              'identities set! Expected to result in errors'))
+        if "usernames" in params and "ids" in params:
+            self.logger.warn(
+                (
+                    "get_identities call with both usernames and "
+                    "identities set! Expected to result in errors"
+                )
+            )
 
         return self.get("/v2/api/identities", params=params)
 
@@ -172,15 +179,20 @@ class AuthClient(BaseClient):
         :rtype: ``string``
         """
         if not self.current_oauth2_flow_manager:
-            self.logger.error(('OutOfOrderOperations('
-                               'get_authorize_url before start_flow)'))
+            self.logger.error(
+                ("OutOfOrderOperations(" "get_authorize_url before start_flow)")
+            )
             raise exc.GlobusSDKUsageError(
-                ('Cannot get authorize URL until starting an OAuth2 flow. '
-                 'Call the oauth2_start_flow() method on this '
-                 'AuthClient to resolve'))
+                (
+                    "Cannot get authorize URL until starting an OAuth2 flow. "
+                    "Call the oauth2_start_flow() method on this "
+                    "AuthClient to resolve"
+                )
+            )
         auth_url = self.current_oauth2_flow_manager.get_authorize_url(
-            additional_params=additional_params)
-        self.logger.info('Got authorization URL: {}'.format(auth_url))
+            additional_params=additional_params
+        )
+        self.logger.info("Got authorization URL: {}".format(auth_url))
         return auth_url
 
     def oauth2_exchange_code_for_tokens(self, auth_code):
@@ -196,18 +208,25 @@ class AuthClient(BaseClient):
           exchanging for tokens. Tokens are the credentials used to
           authenticate against Globus APIs.
         """
-        self.logger.info(('Final Step of 3-legged OAuth2 Flows: '
-                          'Exchanging authorization code for token(s)'))
+        self.logger.info(
+            (
+                "Final Step of 3-legged OAuth2 Flows: "
+                "Exchanging authorization code for token(s)"
+            )
+        )
         if not self.current_oauth2_flow_manager:
-            self.logger.error(('OutOfOrderOperations('
-                               'exchange_code before start_flow)'))
+            self.logger.error(
+                ("OutOfOrderOperations(" "exchange_code before start_flow)")
+            )
             raise exc.GlobusSDKUsageError(
-                ('Cannot exchange auth code until starting an OAuth2 flow. '
-                 'Call the oauth2_start_flow() method on this '
-                 'AuthClient to resolve'))
+                (
+                    "Cannot exchange auth code until starting an OAuth2 flow. "
+                    "Call the oauth2_start_flow() method on this "
+                    "AuthClient to resolve"
+                )
+            )
 
-        return self.current_oauth2_flow_manager.exchange_code_for_tokens(
-            auth_code)
+        return self.current_oauth2_flow_manager.exchange_code_for_tokens(auth_code)
 
     def oauth2_refresh_token(self, refresh_token, additional_params=None):
         r"""
@@ -230,10 +249,10 @@ class AuthClient(BaseClient):
         ``additional_params``
           A dict of extra params to encode in the refresh call.
         """
-        self.logger.info(('Executing token refresh; '
-                          'typically requires client credentials'))
-        form_data = {'refresh_token': refresh_token,
-                     'grant_type': 'refresh_token'}
+        self.logger.info(
+            ("Executing token refresh; " "typically requires client credentials")
+        )
+        form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
 
         if additional_params:
             form_data.update(additional_params)
@@ -290,20 +309,21 @@ class AuthClient(BaseClient):
         >>>     tok = do_new_login()
         >>> # at this point, tok is expected to be a valid token
         """
-        self.logger.info('Validating token')
-        body = {'token': token}
+        self.logger.info("Validating token")
+        body = {"token": token}
 
         # if this client has no way of authenticating itself but
         # it does have a client_id, we'll send that in the request
-        no_authentication = (self.authorizer is None or
-                             isinstance(self.authorizer, NullAuthorizer))
+        no_authentication = self.authorizer is None or isinstance(
+            self.authorizer, NullAuthorizer
+        )
         if no_authentication and self.client_id:
-            self.logger.debug('Validating token with unauthenticated client')
-            body.update({'client_id': self.client_id})
+            self.logger.debug("Validating token with unauthenticated client")
+            body.update({"client_id": self.client_id})
 
         if additional_params:
             body.update(additional_params)
-        return self.post('/v2/oauth2/token/validate', text_body=body)
+        return self.post("/v2/oauth2/token/validate", text_body=body)
 
     def oauth2_revoke_token(self, token, additional_params=None):
         """
@@ -334,20 +354,21 @@ class AuthClient(BaseClient):
         >>> ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
         >>> ac.oauth2_revoke_token('<token_string>')
         """
-        self.logger.info('Revoking token')
-        body = {'token': token}
+        self.logger.info("Revoking token")
+        body = {"token": token}
 
         # if this client has no way of authenticating itself but
         # it does have a client_id, we'll send that in the request
-        no_authentication = (self.authorizer is None or
-                             isinstance(self.authorizer, NullAuthorizer))
+        no_authentication = self.authorizer is None or isinstance(
+            self.authorizer, NullAuthorizer
+        )
         if no_authentication and self.client_id:
-            self.logger.debug('Revoking token with unauthenticated client')
-            body.update({'client_id': self.client_id})
+            self.logger.debug("Revoking token with unauthenticated client")
+            body.update({"client_id": self.client_id})
 
         if additional_params:
             body.update(additional_params)
-        return self.post('/v2/oauth2/token/revoke', text_body=body)
+        return self.post("/v2/oauth2/token/revoke", text_body=body)
 
     def oauth2_token(self, form_data, response_class=OAuthTokenResponse):
         """
@@ -372,12 +393,12 @@ class AuthClient(BaseClient):
 
         :rtype: ``response_class``
         """
-        self.logger.info('Fetching new token from Globus Auth')
+        self.logger.info("Fetching new token from Globus Auth")
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
         return self.post(
-            '/v2/oauth2/token', response_class=response_class,
-            text_body=form_data)
+            "/v2/oauth2/token", response_class=response_class, text_body=form_data
+        )
 
     def oauth2_userinfo(self):
         """
@@ -404,5 +425,5 @@ class AuthClient(BaseClient):
         #get_or_post_v2_oauth2_userinfo_resource>`_
         in the API documentation for details.
         """
-        self.logger.info('Looking up OIDC-style Userinfo from Globus Auth')
-        return self.get('/v2/oauth2/userinfo')
+        self.logger.info("Looking up OIDC-style Userinfo from Globus Auth")
+        return self.get("/v2/oauth2/userinfo")

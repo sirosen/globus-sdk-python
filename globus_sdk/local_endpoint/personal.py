@@ -20,6 +20,7 @@ class LocalGlobusConnectPersonal(object):
     These objects do *not* inherit from BaseClient and do not provide methods
     for interacting with any Globus Service APIs.
     """
+
     def __init__(self):
         self._endpoint_id = None
 
@@ -52,12 +53,11 @@ class LocalGlobusConnectPersonal(object):
                     appdata = os.getenv("LOCALAPPDATA")
                     if appdata is None:
                         raise GlobusSDKUsageError(
-                            "LOCALAPPDATA not detected in Windows environment")
-                    fname = os.path.join(
-                        appdata, "Globus Connect\\client-id.txt")
+                            "LOCALAPPDATA not detected in Windows environment"
+                        )
+                    fname = os.path.join(appdata, "Globus Connect\\client-id.txt")
                 else:
-                    fname = os.path.expanduser(
-                        "~/.globusonline/lta/client-id.txt")
+                    fname = os.path.expanduser("~/.globusonline/lta/client-id.txt")
                 with open(fname) as fp:
                     self._endpoint_id = fp.read().strip()
             except IOError as e:

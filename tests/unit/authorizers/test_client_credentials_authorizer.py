@@ -1,15 +1,16 @@
 import pytest
+
+from globus_sdk.authorizers import ClientCredentialsAuthorizer
+
 try:
     import mock
 except ImportError:
     from unittest import mock
 
-from globus_sdk.authorizers import ClientCredentialsAuthorizer
 
-
-ACCESS_TOKEN = 'access_token_1'
+ACCESS_TOKEN = "access_token_1"
 EXPIRES_AT = -1
-SCOPES = 'scopes'
+SCOPES = "scopes"
 
 
 @pytest.fixture
@@ -31,7 +32,8 @@ def client(response):
 @pytest.fixture
 def authorizer(client):
     return ClientCredentialsAuthorizer(
-        client, SCOPES, access_token=ACCESS_TOKEN, expires_at=EXPIRES_AT)
+        client, SCOPES, access_token=ACCESS_TOKEN, expires_at=EXPIRES_AT
+    )
 
 
 def test_get_token_response(authorizer, response, client):
@@ -42,7 +44,8 @@ def test_get_token_response(authorizer, response, client):
     res = authorizer._get_token_response()
     assert res == response
     client.oauth2_client_credentials_tokens.assert_called_once_with(
-        requested_scopes=SCOPES)
+        requested_scopes=SCOPES
+    )
 
 
 def test_multiple_resource_servers(authorizer, response):
@@ -52,7 +55,8 @@ def test_multiple_resource_servers(authorizer, response):
     called.
     """
     response.by_resource_server["rs2"] = {
-        "expires_at_seconds": -1, "access_token": "access_token_3"
+        "expires_at_seconds": -1,
+        "access_token": "access_token_3",
     }
     with pytest.raises(ValueError) as excinfo:
         authorizer._extract_token_data(response)

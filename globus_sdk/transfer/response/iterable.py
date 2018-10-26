@@ -13,5 +13,6 @@ class IterableTransferResponse(TransferResponse):
     >>> for item in r:
     >>>     print(item["name"], item["type"])
     """
+
     def __iter__(self):
         return iter(self["DATA"])

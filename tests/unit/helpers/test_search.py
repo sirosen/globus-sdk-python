@@ -2,6 +2,7 @@
 Unit tests for globus_sdk.SearchQuery
 """
 import pytest
+
 from globus_sdk import SearchQuery
 
 
@@ -18,117 +19,148 @@ def test_init():
         assert param_query[par] == params[par]
 
 
-@pytest.mark.parametrize(
-    'attrname', ['q', 'limit', 'offset', 'advanced'])
+@pytest.mark.parametrize("attrname", ["q", "limit", "offset", "advanced"])
 def test_set_method(attrname):
     query = SearchQuery()
-    method = getattr(
-        query, 'set_{}'.format('query' if attrname == 'q' else attrname))
+    method = getattr(query, "set_{}".format("query" if attrname == "q" else attrname))
     # start absent
     assert attrname not in query
     # returns self
-    assert method('foo') is query
+    assert method("foo") is query
     # sets value
-    assert query[attrname] == 'foo'
+    assert query[attrname] == "foo"
 
 
 def test_add_facet():
     query = SearchQuery()
-    assert 'facets' not in query
+    assert "facets" not in query
 
     # simple terms facet
     # returns self
-    assert query.add_facet('facetname', 'fieldname') is query
-    assert query['facets']
-    assert len(query['facets']) == 1
-    assert query['facets'][0] == {'type': 'terms', 'name': 'facetname',
-                                  'field_name': 'fieldname'}
+    assert query.add_facet("facetname", "fieldname") is query
+    assert query["facets"]
+    assert len(query["facets"]) == 1
+    assert query["facets"][0] == {
+        "type": "terms",
+        "name": "facetname",
+        "field_name": "fieldname",
+    }
 
     # terms with size
-    query.add_facet('n', 'f', size=5)
-    assert len(query['facets']) == 2
-    assert query['facets'][1] == {'type': 'terms', 'name': 'n',
-                                  'field_name': 'f', 'size': 5}
+    query.add_facet("n", "f", size=5)
+    assert len(query["facets"]) == 2
+    assert query["facets"][1] == {
+        "type": "terms",
+        "name": "n",
+        "field_name": "f",
+        "size": 5,
+    }
 
     # date histogram
-    query.add_facet('n', 'f', type='date_histogram', date_interval='year',
-                    histogram_range=(1870, 1880))
-    assert len(query['facets']) == 3
-    assert query['facets'][2] == {
-        'type': 'date_histogram', 'name': 'n', 'field_name': 'f',
-        'date_interval': 'year', 'histogram_range': {'low': 1870, 'high': 1880}
+    query.add_facet(
+        "n",
+        "f",
+        type="date_histogram",
+        date_interval="year",
+        histogram_range=(1870, 1880),
+    )
+    assert len(query["facets"]) == 3
+    assert query["facets"][2] == {
+        "type": "date_histogram",
+        "name": "n",
+        "field_name": "f",
+        "date_interval": "year",
+        "histogram_range": {"low": 1870, "high": 1880},
     }
 
     # unknown param
-    query.add_facet('facetname', 'fieldname', nonexistentparam='value1')
-    assert len(query['facets']) == 4
-    assert query['facets'][3] == {'type': 'terms', 'name': 'facetname',
-                                  'field_name': 'fieldname',
-                                  'nonexistentparam': 'value1'}
+    query.add_facet("facetname", "fieldname", nonexistentparam="value1")
+    assert len(query["facets"]) == 4
+    assert query["facets"][3] == {
+        "type": "terms",
+        "name": "facetname",
+        "field_name": "fieldname",
+        "nonexistentparam": "value1",
+    }
 
 
 def test_add_filter():
     query = SearchQuery()
-    assert 'filters' not in query
+    assert "filters" not in query
 
     # returns self
-    assert query.add_filter('f', [1, 2, 3]) is query
+    assert query.add_filter("f", [1, 2, 3]) is query
 
-    assert query['filters']
-    assert len(query['filters']) == 1
-    assert query['filters'][0] == {'field_name': 'f', 'type': 'match_all',
-                                   'values': [1, 2, 3]}
+    assert query["filters"]
+    assert len(query["filters"]) == 1
+    assert query["filters"][0] == {
+        "field_name": "f",
+        "type": "match_all",
+        "values": [1, 2, 3],
+    }
 
     # match_any + custom param
-    query.add_filter('f', [1, 2, 3], type='match_any', nonexistentparam='val1')
-    assert len(query['filters']) == 2
-    assert query['filters'][1] == {'field_name': 'f', 'type': 'match_any',
-                                   'values': [1, 2, 3],
-                                   'nonexistentparam': 'val1'}
+    query.add_filter("f", [1, 2, 3], type="match_any", nonexistentparam="val1")
+    assert len(query["filters"]) == 2
+    assert query["filters"][1] == {
+        "field_name": "f",
+        "type": "match_any",
+        "values": [1, 2, 3],
+        "nonexistentparam": "val1",
+    }
 
     # range
-    query.add_filter('f', [{'from': 1, 'to': 100}], type='range')
-    assert len(query['filters']) == 3
-    assert query['filters'][2] == {'field_name': 'f', 'type': 'range',
-                                   'values': [{'from': 1, 'to': 100}]}
+    query.add_filter("f", [{"from": 1, "to": 100}], type="range")
+    assert len(query["filters"]) == 3
+    assert query["filters"][2] == {
+        "field_name": "f",
+        "type": "range",
+        "values": [{"from": 1, "to": 100}],
+    }
 
 
 def test_add_boost():
     query = SearchQuery()
-    assert 'boosts' not in query
+    assert "boosts" not in query
 
     # returns self
-    assert query.add_boost('f', 2) == query
+    assert query.add_boost("f", 2) == query
 
-    assert query['boosts']
-    assert len(query['boosts']) == 1
-    assert query['boosts'][0] == {'field_name': 'f', 'factor': 2}
+    assert query["boosts"]
+    assert len(query["boosts"]) == 1
+    assert query["boosts"][0] == {"field_name": "f", "factor": 2}
 
     # custom param
-    query.add_boost('f', 1.1, nonexistentparam='value1')
-    assert len(query['boosts']) == 2
-    assert query['boosts'][1] == {'field_name': 'f', 'factor': 1.1,
-                                  'nonexistentparam': 'value1'}
+    query.add_boost("f", 1.1, nonexistentparam="value1")
+    assert len(query["boosts"]) == 2
+    assert query["boosts"][1] == {
+        "field_name": "f",
+        "factor": 1.1,
+        "nonexistentparam": "value1",
+    }
 
 
 def test_add_sort():
     query = SearchQuery()
-    assert 'sort' not in query
+    assert "sort" not in query
 
     # returns self
-    assert query.add_sort('f') is query
+    assert query.add_sort("f") is query
 
-    assert query['sort']
-    assert len(query['sort']) == 1
-    assert query['sort'][0] == {'field_name': 'f'}
+    assert query["sort"]
+    assert len(query["sort"]) == 1
+    assert query["sort"][0] == {"field_name": "f"}
 
     # with order
-    query.add_sort('f', order='asc')
-    assert len(query['sort']) == 2
-    assert query['sort'][1] == {'field_name': 'f', 'order': 'asc'}
+    query.add_sort("f", order="asc")
+    assert len(query["sort"]) == 2
+    assert query["sort"][1] == {"field_name": "f", "order": "asc"}
 
     # custom param
-    query.add_sort('f', order='asc', nonexistentparam='value1')
-    assert len(query['sort']) == 3
-    assert query['sort'][2] == {'field_name': 'f', 'order': 'asc',
-                                'nonexistentparam': 'value1'}
+    query.add_sort("f", order="asc", nonexistentparam="value1")
+    assert len(query["sort"]) == 3
+    assert query["sort"][2] == {
+        "field_name": "f",
+        "order": "asc",
+        "nonexistentparam": "value1",
+    }

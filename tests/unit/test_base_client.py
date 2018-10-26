@@ -1,14 +1,13 @@
 import json
-import uuid
 import logging.handlers
-import six
-import pytest
+import uuid
+
 import httpretty
+import pytest
+import six
 
 import globus_sdk
-from globus_sdk.base import (
-    BaseClient, slash_join, merge_params, safe_stringify)
-
+from globus_sdk.base import BaseClient, merge_params, safe_stringify, slash_join
 from tests.common import register_api_route
 
 
@@ -19,7 +18,7 @@ def auth_client():
 
 @pytest.fixture
 def base_client():
-    return BaseClient('transfer', base_path='/v0.10/')
+    return BaseClient("transfer", base_path="/v0.10/")
 
 
 # not particularly special, just a handy array of codes which should raise
@@ -29,6 +28,7 @@ ERROR_STATUS_CODES = (400, 404, 405, 409, 500, 503)
 
 class testObject(object):
     """test obj for safe_stringify testing"""
+
     def __str__(self):
         return "1"
 
@@ -41,7 +41,7 @@ def test_client_log_adapter(base_client):
     # make a MemoryHandler for capturing the log in a buffer)
     memory_handler = logging.handlers.MemoryHandler(1028)
     base_client.logger.logger.addHandler(memory_handler)
-    base_client.logger.logger.setLevel('INFO')
+    base_client.logger.logger.setLevel("INFO")
     # send the test message
     in_msg = "Testing ClientLogAdapter"
     base_client.logger.info(in_msg)
@@ -62,8 +62,9 @@ def test_set_app_name(base_client):
     base_client.set_app_name(app_name)
     # confirm results
     assert base_client.app_name == app_name
-    assert (base_client._headers['User-Agent'] ==
-            '{0}/{1}'.format(base_client.BASE_USER_AGENT, app_name))
+    assert base_client._headers["User-Agent"] == "{0}/{1}".format(
+        base_client.BASE_USER_AGENT, app_name
+    )
 
 
 def test_qjoin_path(base_client):
@@ -76,9 +77,8 @@ def test_qjoin_path(base_client):
 
 
 @pytest.mark.parametrize(
-    'method, allows_body',
-    [('get', False), ('delete', False),
-     ('post', True), ('put', True), ('patch', True)]
+    "method, allows_body",
+    [("get", False), ("delete", False), ("post", True), ("put", True), ("patch", True)],
 )
 def test_http_methods(method, allows_body, base_client):
     """
@@ -91,8 +91,9 @@ def test_http_methods(method, allows_body, base_client):
     """
     methodname = method.upper()
     resolved_method = getattr(base_client, method)
-    register_api_route("transfer", "/madeuppath/objectname", method=methodname,
-                       body='{"x": "y"}')
+    register_api_route(
+        "transfer", "/madeuppath/objectname", method=methodname, body='{"x": "y"}'
+    )
 
     # client should be able to compose the path itself
     path = base_client.qjoin_path("madeuppath", "objectname")
@@ -102,46 +103,48 @@ def test_http_methods(method, allows_body, base_client):
     req = httpretty.last_request()
 
     assert req.method == methodname
-    assert req.body == six.b('')
+    assert req.body == six.b("")
     assert "x" in res
-    assert res['x'] == 'y'
+    assert res["x"] == "y"
 
     if allows_body:
-        jsonbody = {'foo': 'bar'}
+        jsonbody = {"foo": "bar"}
         res = resolved_method(path, json_body=jsonbody)
         req = httpretty.last_request()
 
         assert req.method == methodname
         assert req.body == six.b(json.dumps(jsonbody))
         assert "x" in res
-        assert res['x'] == 'y'
+        assert res["x"] == "y"
 
-        res = resolved_method(path, text_body='abc')
+        res = resolved_method(path, text_body="abc")
         req = httpretty.last_request()
 
         assert req.method == methodname
-        assert req.body == six.b('abc')
+        assert req.body == six.b("abc")
         assert "x" in res
-        assert res['x'] == 'y'
+        assert res["x"] == "y"
 
     # send "bad" request
     for status in ERROR_STATUS_CODES:
         register_api_route(
-            "transfer", "/madeuppath/objectname", method=methodname,
+            "transfer",
+            "/madeuppath/objectname",
+            method=methodname,
             status=status,
-            body='{"x": "y", "code": "ErrorCode", "message": "foo"}')
+            body='{"x": "y", "code": "ErrorCode", "message": "foo"}',
+        )
 
         with pytest.raises(globus_sdk.GlobusAPIError) as excinfo:
             resolved_method("/madeuppath/objectname")
 
         assert excinfo.value.http_status == status
-        assert excinfo.value.raw_json['x'] == 'y'
-        assert excinfo.value.code == 'ErrorCode'
-        assert excinfo.value.message == 'foo'
+        assert excinfo.value.raw_json["x"] == "y"
+        assert excinfo.value.code == "ErrorCode"
+        assert excinfo.value.message == "foo"
 
 
-@pytest.mark.parametrize(
-    'a, b', [(a, b) for a in ['a', 'a/'] for b in ['b', '/b']])
+@pytest.mark.parametrize("a, b", [(a, b) for a in ["a", "a/"] for b in ["b", "/b"]])
 def test_slash_join(a, b):
     """
     slash_joins a's with and without trailing "/"
@@ -185,8 +188,7 @@ def test_merge_params():
     assert params == expected
 
 
-@pytest.mark.parametrize(
-    'value', ["1", str(1), b"1", u"1", 1, testObject()])
+@pytest.mark.parametrize("value", ["1", str(1), b"1", u"1", 1, testObject()])
 def test_safe_stringify(value):
     """
     safe_stringifies strings, bytes, explicit unicode, an int, an object

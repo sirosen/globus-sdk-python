@@ -9,6 +9,7 @@ def make_oauth_token_response():
     """
     response with conveniently formatted names to help with iteration in tests
     """
+
     def f(client=None):
         return make_response(
             response_class=globus_sdk.auth.token_response.OAuthTokenResponse,
@@ -28,7 +29,7 @@ def make_oauth_token_response():
                         "refresh_token": "refresh_token_2",
                         "resource_server": "resource_server_2",
                         "scope": "scope2 scope2:0 scope2:1",
-                        "token_type": "bearer"
+                        "token_type": "bearer",
                     },
                     {
                         "access_token": "access_token_3",
@@ -36,11 +37,13 @@ def make_oauth_token_response():
                         "refresh_token": "refresh_token_3",
                         "resource_server": "resource_server_3",
                         "scope": "scope3:0 scope3:1",
-                        "token_type": "bearer"
-                    }
-                ]
+                        "token_type": "bearer",
+                    },
+                ],
             },
-            client=client)
+            client=client,
+        )
+
     return f
 
 

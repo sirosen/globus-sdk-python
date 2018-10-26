@@ -1,12 +1,13 @@
-import pytest
 import time
+
+import pytest
+
+from globus_sdk.authorizers.renewing import EXPIRES_ADJUST_SECONDS, RenewingAuthorizer
+
 try:
     import mock
 except ImportError:
     from unittest import mock
-
-from globus_sdk.authorizers.renewing import (
-    RenewingAuthorizer, EXPIRES_ADJUST_SECONDS)
 
 
 class MockRenewer(RenewingAuthorizer):
@@ -14,6 +15,7 @@ class MockRenewer(RenewingAuthorizer):
     Class that implements RenewingAuthorizer so that _get_token_response and
     _extract_token_data can return known values for testing
     """
+
     def __init__(self, token_data, **kwargs):
         self.token_data = token_data
         self.token_response = mock.Mock()
@@ -26,7 +28,7 @@ class MockRenewer(RenewingAuthorizer):
         return self.token_data
 
 
-ACCESS_TOKEN = 'access_token_1'
+ACCESS_TOKEN = "access_token_1"
 
 
 @pytest.fixture
@@ -36,8 +38,10 @@ def expires_at():
 
 @pytest.fixture
 def token_data():
-    return {"expires_at_seconds": int(time.time()) + 1000,
-            "access_token": "access_token_2"}
+    return {
+        "expires_at_seconds": int(time.time()) + 1000,
+        "access_token": "access_token_2",
+    }
 
 
 @pytest.fixture
@@ -47,14 +51,22 @@ def on_refresh():
 
 @pytest.fixture
 def authorizer(on_refresh, token_data, expires_at):
-    return MockRenewer(token_data, access_token=ACCESS_TOKEN,
-                       expires_at=expires_at, on_refresh=on_refresh)
+    return MockRenewer(
+        token_data,
+        access_token=ACCESS_TOKEN,
+        expires_at=expires_at,
+        on_refresh=on_refresh,
+    )
 
 
 @pytest.fixture
 def expired_authorizer(on_refresh, token_data, expires_at):
-    return MockRenewer(token_data, access_token=ACCESS_TOKEN,
-                       expires_at=expires_at - 1, on_refresh=on_refresh)
+    return MockRenewer(
+        token_data,
+        access_token=ACCESS_TOKEN,
+        expires_at=expires_at - 1,
+        on_refresh=on_refresh,
+    )
 
 
 def test_init(token_data, expires_at):
@@ -62,8 +74,9 @@ def test_init(token_data, expires_at):
     Creating a MockRenewer with partial data results in a new access token
     being fetched, but complete data does not
     """
-    authorizer = MockRenewer(token_data, access_token=ACCESS_TOKEN,
-                             expires_at=expires_at)
+    authorizer = MockRenewer(
+        token_data, access_token=ACCESS_TOKEN, expires_at=expires_at
+    )
     assert authorizer.access_token == ACCESS_TOKEN
     assert authorizer.access_token != token_data["access_token"]
 
@@ -81,7 +94,7 @@ def test_init_expiration_time(authorizer, expires_at):
     assert authorizer.expires_at == expires_at - EXPIRES_ADJUST_SECONDS
 
 
-@pytest.mark.parametrize('input_time', [0, 60, 120, 1200])
+@pytest.mark.parametrize("input_time", [0, 60, 120, 1200])
 def test_set_expiration_time(input_time, authorizer, expires_at):
     """
     Confirms expiration time is set earlier than input value for a buffer
@@ -103,7 +116,8 @@ def test_get_new_access_token(authorizer, token_data, on_refresh):
     # confirm side effects
     assert authorizer.access_token == token_data["access_token"]
     assert authorizer.expires_at == (
-        token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS)
+        token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS
+    )
     assert authorizer.access_token_hash != original_hash
     on_refresh.assert_called_once()
 
@@ -123,7 +137,8 @@ def test_check_expiration_time_expired(expired_authorizer, token_data):
     expired_authorizer.check_expiration_time()
     assert expired_authorizer.access_token == token_data["access_token"]
     assert expired_authorizer.expires_at == (
-        token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS)
+        token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS
+    )
 
 
 def test_check_expiration_time_no_token(authorizer, token_data):
@@ -134,7 +149,8 @@ def test_check_expiration_time_no_token(authorizer, token_data):
     authorizer.check_expiration_time()
     assert authorizer.access_token == token_data["access_token"]
     assert authorizer.expires_at == (
-        token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS)
+        token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS
+    )
 
 
 def test_check_expiration_time_no_expiration(authorizer, token_data):
@@ -145,7 +161,8 @@ def test_check_expiration_time_no_expiration(authorizer, token_data):
     authorizer.check_expiration_time()
     assert authorizer.access_token == token_data["access_token"]
     assert authorizer.expires_at == (
-        token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS)
+        token_data["expires_at_seconds"] - EXPIRES_ADJUST_SECONDS
+    )
 
 
 def test_set_authorization_header(authorizer):
@@ -175,8 +192,7 @@ def test_set_authorization_header_expired(expired_authorizer, token_data):
     header_dict = {}
 
     expired_authorizer.set_authorization_header(header_dict)
-    assert header_dict["Authorization"] == (
-        "Bearer " + token_data["access_token"])
+    assert header_dict["Authorization"] == ("Bearer " + token_data["access_token"])
 
 
 def test_set_authorization_header_no_token(authorizer, token_data):
@@ -188,8 +204,7 @@ def test_set_authorization_header_no_token(authorizer, token_data):
     authorizer.access_token = None
 
     authorizer.set_authorization_header(header_dict)
-    assert header_dict["Authorization"] == (
-        "Bearer " + token_data["access_token"])
+    assert header_dict["Authorization"] == ("Bearer " + token_data["access_token"])
 
 
 def test_set_authorization_header_no_expires(authorizer, token_data):
@@ -201,8 +216,7 @@ def test_set_authorization_header_no_expires(authorizer, token_data):
     authorizer.expires_at = None
 
     authorizer.set_authorization_header(header_dict)
-    assert header_dict["Authorization"] == (
-        "Bearer " + token_data["access_token"])
+    assert header_dict["Authorization"] == ("Bearer " + token_data["access_token"])
 
 
 def test_handle_missing_authorization(authorizer):

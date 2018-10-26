@@ -16,6 +16,7 @@ class GlobusOAuthFlowManager(object):
     have to wrap it in order to provide a clean API surface anyway, we
     implement our own set of Flow objects.
     """
+
     def get_authorize_url(self):
         """
         This method consumes no arguments or keyword arguments, and produces a
@@ -29,7 +30,8 @@ class GlobusOAuthFlowManager(object):
         :rtype: ``string``
         """
         raise NotImplementedError(
-            '{0} does not implement get_authorize_url()'.format(type(self)))
+            "{0} does not implement get_authorize_url()".format(type(self))
+        )
 
     def exchange_code_for_tokens(self, auth_code):
         """
@@ -50,5 +52,5 @@ class GlobusOAuthFlowManager(object):
         :rtype: :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         """
         raise NotImplementedError(
-            '{0} does not implement exchange_code_for_tokens()'
-            .format(type(self)))
+            "{0} does not implement exchange_code_for_tokens()".format(type(self))
+        )

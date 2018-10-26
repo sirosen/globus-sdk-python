@@ -2,7 +2,6 @@ import logging
 
 from globus_sdk.authorizers.renewing import RenewingAuthorizer
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -54,18 +53,29 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
           ``on_refresh`` callback can be used to update the Access Tokens and
           their expiration times.
     """
-    def __init__(self, refresh_token, auth_client,
-                 access_token=None, expires_at=None, on_refresh=None):
-        logger.info((
-            "Setting up RefreshTokenAuthorizer with auth_client = "
-            "instance: {}".format(id(auth_client))))
+
+    def __init__(
+        self,
+        refresh_token,
+        auth_client,
+        access_token=None,
+        expires_at=None,
+        on_refresh=None,
+    ):
+        logger.info(
+            (
+                "Setting up RefreshTokenAuthorizer with auth_client = "
+                "instance: {}".format(id(auth_client))
+            )
+        )
 
         # required for _get_token_data
         self.refresh_token = refresh_token
         self.auth_client = auth_client
 
         super(RefreshTokenAuthorizer, self).__init__(
-            access_token, expires_at, on_refresh)
+            access_token, expires_at, on_refresh
+        )
 
     def _get_token_response(self):
         """
@@ -82,6 +92,7 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         if len(token_data) != 1:
             raise ValueError(
                 "Attempting refresh for refresh token authorizer "
-                "didn't return exactly one token. Possible service error.")
+                "didn't return exactly one token. Possible service error."
+            )
 
         return next(iter(token_data))

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 import json
 import logging
 
@@ -7,16 +8,17 @@ import six
 from six.moves.urllib.parse import quote
 
 from globus_sdk import config, exc
-from globus_sdk.version import __version__
 from globus_sdk.response import GlobusHTTPResponse
+from globus_sdk.version import __version__
 
 
 class ClientLogAdapter(logging.LoggerAdapter):
     """
     Stuff in the memory location of the client to make log records unambiguous.
     """
+
     def process(self, msg, kwargs):
-        return '[instance:{}] {}'.format(id(self.extra['client']), msg), kwargs
+        return "[instance:{}] {}".format(id(self.extra["client"]), msg), kwargs
 
     def warn(self, *args, **kwargs):
         return self.warning(*args, **kwargs)
@@ -57,28 +59,40 @@ class BaseClient(object):
     # a collection of authorizer types, or None to indicate "any"
     allowed_authorizer_types = None
 
-    BASE_USER_AGENT = 'globus-sdk-py-{0}'.format(__version__)
+    BASE_USER_AGENT = "globus-sdk-py-{0}".format(__version__)
 
-    def __init__(self, service, environment=None, base_url=None,
-                 base_path=None, authorizer=None, app_name=None,
-                 http_timeout=None,
-                 *args, **kwargs):
+    def __init__(
+        self,
+        service,
+        environment=None,
+        base_url=None,
+        base_path=None,
+        authorizer=None,
+        app_name=None,
+        http_timeout=None,
+        *args,
+        **kwargs
+    ):
         self._init_logger_adapter()
-        self.logger.info('Creating client of type {} for service "{}"'
-                         .format(type(self), service))
+        self.logger.info(
+            'Creating client of type {} for service "{}"'.format(type(self), service)
+        )
         # if restrictions have been placed by a child class on the allowed
         # authorizer types, make sure we are not in violation of those
         # constraints
         if self.allowed_authorizer_types is not None and (
-                authorizer is not None and
-                type(authorizer) not in self.allowed_authorizer_types):
-            self.logger.error("{} doesn't support authorizer={}"
-                              .format(type(self), type(authorizer)))
+            authorizer is not None
+            and type(authorizer) not in self.allowed_authorizer_types
+        ):
+            self.logger.error(
+                "{} doesn't support authorizer={}".format(type(self), type(authorizer))
+            )
             raise exc.GlobusSDKUsageError(
-                ("{0} can only take authorizers from {1}, "
-                 "but you have provided {2}").format(
-                    type(self), self.allowed_authorizer_types,
-                    type(authorizer)))
+                (
+                    "{0} can only take authorizers from {1}, "
+                    "but you have provided {2}"
+                ).format(type(self), self.allowed_authorizer_types, type(authorizer))
+            )
 
         # if an environment was passed, it will be used, but otherwise lookup
         # the env var -- and in the special case of `production` translate to
@@ -99,8 +113,8 @@ class BaseClient(object):
         # including basics for internal header dict
         self._session = requests.Session()
         self._headers = {
-            'Accept': 'application/json',
-            'User-Agent': self.BASE_USER_AGENT
+            "Accept": "application/json",
+            "User-Agent": self.BASE_USER_AGENT,
         }
 
         # verify SSL? Usually true
@@ -137,16 +151,17 @@ class BaseClient(object):
         # get the fully qualified name of the client class, so that it's a
         # child of globus_sdk
         self.logger = ClientLogAdapter(
-            logging.getLogger(self.__module__ + '.' + self.__class__.__name__),
-            {'client': self})
+            logging.getLogger(self.__module__ + "." + self.__class__.__name__),
+            {"client": self},
+        )
 
     def __getstate__(self):
         """
         Render to a serializable dict for pickle.dump(s)
         """
-        self.logger.info('__getstate__() called; client being pickled')
+        self.logger.info("__getstate__() called; client being pickled")
         d = dict(self.__dict__)  # copy
-        del d['logger']
+        del d["logger"]
         return d
 
     def __setstate__(self, d):
@@ -155,7 +170,7 @@ class BaseClient(object):
         """
         self._init_logger_adapter()
         self.__dict__.update(d)
-        self.logger.info('__setstate__() finished; client unpickled')
+        self.logger.info("__setstate__() finished; client unpickled")
 
     def set_app_name(self, app_name):
         """
@@ -167,14 +182,12 @@ class BaseClient(object):
         interacting with Globus Support.
         """
         self.app_name = app_name
-        self._headers['User-Agent'] = '{0}/{1}'.format(self.BASE_USER_AGENT,
-                                                       app_name)
+        self._headers["User-Agent"] = "{0}/{1}".format(self.BASE_USER_AGENT, app_name)
 
     def qjoin_path(self, *parts):
         return "/" + "/".join(quote(part) for part in parts)
 
-    def get(self, path, params=None, headers=None,
-            response_class=None, retry_401=True):
+    def get(self, path, params=None, headers=None, response_class=None, retry_401=True):
         """
         Make a GET request to the specified path.
 
@@ -200,13 +213,26 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug('GET to {} with params {}'.format(path, params))
-        return self._request("GET", path, params=params, headers=headers,
-                             response_class=response_class,
-                             retry_401=retry_401)
+        self.logger.debug("GET to {} with params {}".format(path, params))
+        return self._request(
+            "GET",
+            path,
+            params=params,
+            headers=headers,
+            response_class=response_class,
+            retry_401=retry_401,
+        )
 
-    def post(self, path, json_body=None, params=None, headers=None,
-             text_body=None, response_class=None, retry_401=True):
+    def post(
+        self,
+        path,
+        json_body=None,
+        params=None,
+        headers=None,
+        text_body=None,
+        response_class=None,
+        retry_401=True,
+    ):
         """
         Make a POST request to the specified path.
 
@@ -239,14 +265,21 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug('POST to {} with params {}'.format(path, params))
-        return self._request("POST", path, json_body=json_body, params=params,
-                             headers=headers, text_body=text_body,
-                             response_class=response_class,
-                             retry_401=retry_401)
+        self.logger.debug("POST to {} with params {}".format(path, params))
+        return self._request(
+            "POST",
+            path,
+            json_body=json_body,
+            params=params,
+            headers=headers,
+            text_body=text_body,
+            response_class=response_class,
+            retry_401=retry_401,
+        )
 
-    def delete(self, path, params=None, headers=None,
-               response_class=None, retry_401=True):
+    def delete(
+        self, path, params=None, headers=None, response_class=None, retry_401=True
+    ):
         """
         Make a DELETE request to the specified path.
 
@@ -272,14 +305,26 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug('DELETE to {} with params {}'.format(path, params))
-        return self._request("DELETE", path, params=params,
-                             headers=headers,
-                             response_class=response_class,
-                             retry_401=retry_401)
+        self.logger.debug("DELETE to {} with params {}".format(path, params))
+        return self._request(
+            "DELETE",
+            path,
+            params=params,
+            headers=headers,
+            response_class=response_class,
+            retry_401=retry_401,
+        )
 
-    def put(self, path, json_body=None, params=None, headers=None,
-            text_body=None, response_class=None, retry_401=True):
+    def put(
+        self,
+        path,
+        json_body=None,
+        params=None,
+        headers=None,
+        text_body=None,
+        response_class=None,
+        retry_401=True,
+    ):
         """
         Make a PUT request to the specified path.
 
@@ -312,14 +357,28 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug('PUT to {} with params {}'.format(path, params))
-        return self._request("PUT", path, json_body=json_body, params=params,
-                             headers=headers, text_body=text_body,
-                             response_class=response_class,
-                             retry_401=retry_401)
+        self.logger.debug("PUT to {} with params {}".format(path, params))
+        return self._request(
+            "PUT",
+            path,
+            json_body=json_body,
+            params=params,
+            headers=headers,
+            text_body=text_body,
+            response_class=response_class,
+            retry_401=retry_401,
+        )
 
-    def patch(self, path, json_body=None, params=None, headers=None,
-              text_body=None, response_class=None, retry_401=True):
+    def patch(
+        self,
+        path,
+        json_body=None,
+        params=None,
+        headers=None,
+        text_body=None,
+        response_class=None,
+        retry_401=True,
+    ):
         """
         Make a PATCH request to the specified path.
 
@@ -352,15 +411,29 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug('PATCH to {} with params {}'.format(path, params))
-        return self._request("PATCH", path, json_body=json_body, params=params,
-                             headers=headers, text_body=text_body,
-                             response_class=response_class,
-                             retry_401=retry_401)
+        self.logger.debug("PATCH to {} with params {}".format(path, params))
+        return self._request(
+            "PATCH",
+            path,
+            json_body=json_body,
+            params=params,
+            headers=headers,
+            text_body=text_body,
+            response_class=response_class,
+            retry_401=retry_401,
+        )
 
-    def _request(self, method, path, params=None, headers=None,
-                 json_body=None, text_body=None,
-                 response_class=None, retry_401=True):
+    def _request(
+        self,
+        method,
+        path,
+        params=None,
+        headers=None,
+        json_body=None,
+        text_body=None,
+        response_class=None,
+        retry_401=True,
+    ):
         """
 
         **Parameters**
@@ -405,26 +478,34 @@ class BaseClient(object):
             assert text_body is None
             text_body = json.dumps(json_body)
             # set appropriate content-type header
-            rheaders.update({'Content-Type': 'application/json'})
+            rheaders.update({"Content-Type": "application/json"})
 
         # add Authorization header, or (if it's a NullAuthorizer) possibly
         # explicitly remove the Authorization header
         if self.authorizer is not None:
-            self.logger.debug('request will have authorization of type {}'
-                              .format(type(self.authorizer)))
+            self.logger.debug(
+                "request will have authorization of type {}".format(
+                    type(self.authorizer)
+                )
+            )
             self.authorizer.set_authorization_header(rheaders)
 
         url = slash_join(self.base_url, path)
-        self.logger.debug('request will hit URL:{}'.format(url))
+        self.logger.debug("request will hit URL:{}".format(url))
 
         # because a 401 can trigger retry, we need to wrap the retry-able thing
         # in a method
         def send_request():
             try:
                 return self._session.request(
-                    method=method, url=url, headers=rheaders, params=params,
-                    data=text_body, verify=self._verify,
-                    timeout=self._http_timeout)
+                    method=method,
+                    url=url,
+                    headers=rheaders,
+                    params=params,
+                    data=text_body,
+                    verify=self._verify,
+                    timeout=self._http_timeout,
+                )
             except requests.RequestException as e:
                 self.logger.error("NetworkError on request")
                 raise exc.convert_request_exception(e)
@@ -432,30 +513,32 @@ class BaseClient(object):
         # initial request
         r = send_request()
 
-        self.logger.debug('Request made to URL: {}'.format(r.url))
+        self.logger.debug("Request made to URL: {}".format(r.url))
 
         # potential 401 retry handling
         if r.status_code == 401 and retry_401 and self.authorizer is not None:
-            self.logger.debug('request got 401, checking retry-capability')
+            self.logger.debug("request got 401, checking retry-capability")
             # note that although handle_missing_authorization returns a T/F
             # value, it may actually mutate the state of the authorizer and
             # therefore change the value set by the `set_authorization_header`
             # method
             if self.authorizer.handle_missing_authorization():
-                self.logger.debug('request can be retried')
+                self.logger.debug("request can be retried")
                 self.authorizer.set_authorization_header(rheaders)
                 r = send_request()
 
         if 200 <= r.status_code < 400:
-            self.logger.debug('request completed with response code: {}'
-                              .format(r.status_code))
+            self.logger.debug(
+                "request completed with response code: {}".format(r.status_code)
+            )
             if response_class is None:
                 return self.default_response_class(r, client=self)
             else:
                 return response_class(r, client=self)
 
-        self.logger.debug('request completed with (error) response code: {}'
-                          .format(r.status_code))
+        self.logger.debug(
+            "request completed with (error) response code: {}".format(r.status_code)
+        )
         raise self.error_class(r)
 
 
@@ -525,6 +608,6 @@ def safe_stringify(value):
     if isinstance(value, six.text_type):
         return value
     if isinstance(value, bytes):
-        return value.decode('utf-8')
+        return value.decode("utf-8")
     else:
-        return six.b(str(value)).decode('utf-8')
+        return six.b(str(value)).decode("utf-8")

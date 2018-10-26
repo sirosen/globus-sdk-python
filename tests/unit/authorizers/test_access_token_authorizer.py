@@ -2,8 +2,7 @@ import pytest
 
 from globus_sdk.authorizers import AccessTokenAuthorizer
 
-
-TOKEN = 'DUMMY_TOKEN'
+TOKEN = "DUMMY_TOKEN"
 
 
 @pytest.fixture

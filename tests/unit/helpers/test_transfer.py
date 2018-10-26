@@ -1,13 +1,13 @@
-import globus_sdk
 import pytest
 
+import globus_sdk
 from tests.common import GO_EP1_ID, GO_EP2_ID
 
 
 @pytest.fixture
 def client():
     def _mock_submission_id(*args, **kwargs):
-        return {'value': 'fooid'}
+        return {"value": "fooid"}
 
     tc = globus_sdk.TransferClient()
     tc.get_submission_id = _mock_submission_id
@@ -19,6 +19,7 @@ def client():
 def transfer_data(client):
     def _transfer_data(**kwargs):
         return globus_sdk.TransferData(client, GO_EP1_ID, GO_EP2_ID, **kwargs)
+
     return _transfer_data
 
 
@@ -26,6 +27,7 @@ def transfer_data(client):
 def delete_data(client):
     def _delete_data(**kwargs):
         return globus_sdk.DeleteData(client, GO_EP1_ID, **kwargs)
+
     return _delete_data
 
 

@@ -20,6 +20,7 @@ class GlobusResponse(object):
     return to a caller. Most basic actions on a GlobusResponse are
     just ways of interacting with this data.
     """
+
     def __init__(self, data, client=None):
         # TODO: In v2, consider making client a required argument
         # client is the originating client object, which can be used by
@@ -43,15 +44,15 @@ class GlobusResponse(object):
         try:
             return data[key]
         except TypeError:
-            logger.error("Can't index into responses of type {}"
-                         .format(type(self)))
+            logger.error("Can't index into responses of type {}".format(type(self)))
             # re-raise with an altered message -- the issue is that whatever
             # type of GlobusResponse you're working with doesn't support
             # indexing
             # "type" is ambiguous, but we don't know if it's the fault of the
             # class at large, or just a particular call's `data` property
-            raise TypeError(('This type of GlobusResponse object '
-                             'does not support indexing.'))
+            raise TypeError(
+                ("This type of GlobusResponse object " "does not support indexing.")
+            )
 
     def __contains__(self, item):
         """
@@ -84,6 +85,7 @@ class GlobusHTTPResponse(GlobusResponse):
     :ivar http_status: HTTP status code returned by the server (int)
     :ivar content_type: Content-Type header returned by the server (str)
     """
+
     def __init__(self, http_response, client=None):
         # the API response as some form of HTTP response object will be the
         # underlying data of an API response
@@ -107,8 +109,9 @@ class GlobusHTTPResponse(GlobusResponse):
         # if the caller *really* wants the raw body of the response, they can
         # always use text_body
         except ValueError:
-            logger.warn(('GlobusHTTPResponse.data is null when body is not '
-                         'valid JSON'))
+            logger.warn(
+                ("GlobusHTTPResponse.data is null when body is not " "valid JSON")
+            )
             return None
 
     @property
