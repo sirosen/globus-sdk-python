@@ -10,8 +10,9 @@
     :alt: Supported Python Versions
     :target: https://pypi.org/project/globus-sdk/
 
-.. image:: https://img.shields.io/github/license/globus/globus-sdk-python.svg
+.. image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
     :alt: License
+    :target: https://opensource.org/licenses/Apache-2.0
 
 
 Globus SDK for Python
