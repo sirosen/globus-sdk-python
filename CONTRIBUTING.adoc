@@ -14,8 +14,8 @@ Reporting Bugs & Requesting Features
 Linting & Testing
 -----------------
 
-- All code is autoformatted with [`black`](https://github.com/ambv/black) and
-    [`isort`](https://github.com/timothycrosley/isort). You may run
+- All code is autoformatted with https://github.com/ambv/black[black] and
+   https://github.com/timothycrosley/isort[isort]. You may run
     `make autoformat` to do this or configure these tools for use in your
     editor.
 - Code must pass `make lint`, which checks that autoformatting is clean and
