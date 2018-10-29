@@ -18,7 +18,7 @@ help:
 	@echo "  help:         Show this helptext"
 	@echo "  localdev:     Setup local development env with a 'setup.py develop'"
 	@echo "  build:        Create the distributions which we like to upload to pypi"
-	@echo "  lint:         All linting steps other than 'black'"
+	@echo "  lint:         All linting steps (may be limited by what your python version supports)"
 	@echo "  autoformat:   Run code autoformatters"
 	@echo "  test:         Run the full suite of tests"
 	@echo "  docs:         Clean old HTML docs and rebuild them with sphinx"
@@ -54,8 +54,8 @@ autoformat: $(VIRTUALENV)
 
 lint: $(VIRTUALENV)
 	if [ -f "$(VIRTUALENV)/bin/black" ]; then $(VIRTUALENV)/bin/black --check $(AUTOFORMAT_TARGETS); fi
-	$(VIRTUALENV)/bin/flake8
 	$(VIRTUALENV)/bin/isort --recursive --check-only $(AUTOFORMAT_TARGETS)
+	$(VIRTUALENV)/bin/flake8
 
 
 test: $(VIRTUALENV)
