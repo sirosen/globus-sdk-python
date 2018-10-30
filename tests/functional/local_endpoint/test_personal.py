@@ -1,15 +1,15 @@
-import tempfile
-import shutil
 import os
+import shutil
+import tempfile
+
+import pytest
+
+import globus_sdk
 
 try:
     import mock
 except ImportError:
     from unittest import mock
-
-import pytest
-
-import globus_sdk
 
 
 _IS_WINDOWS = os.name == "nt"
@@ -41,11 +41,9 @@ def mocked_homedir():
 def write_gcp_id_file(mocked_homedir):
     def _func_fixture(epid):
         if _IS_WINDOWS:
-            fpath = os.path.join(mocked_homedir, "Globus Connect",
-                                 "client-id.txt")
+            fpath = os.path.join(mocked_homedir, "Globus Connect", "client-id.txt")
         else:
-            fpath = os.path.join(mocked_homedir,
-                                 ".globusonline/lta/client-id.txt")
+            fpath = os.path.join(mocked_homedir, ".globusonline/lta/client-id.txt")
         with open(fpath, "w") as f:
             f.write(epid)
             f.write("\n")
