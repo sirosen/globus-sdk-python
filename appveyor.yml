@@ -7,6 +7,7 @@ environment:
     - PYTHON: "C:\\Python34-x64"
     - PYTHON: "C:\\Python35-x64"
     - PYTHON: "C:\\Python36-x64"
+    - PYTHON: "C:\\Python37-x64"
 
 install:
   # invoke python explicitly, and wrap it in build.cmd so that compilation of
@@ -17,7 +18,7 @@ install:
 
 test_script:
   # explicitly invoke under the build environment's python
-  - "%PYTHON%\\python.exe -m pytest -v --cov=globus_sdk"
+  - "%PYTHON%\\python.exe -m tox -e py"
 
 build: off
 deploy: off
