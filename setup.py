@@ -43,8 +43,10 @@ setup(
     extras_require={
         # empty extra included to support older installs
         "jwt": [],
-        # the _development extra is for SDK developers only
+        # the development extra is for SDK developers only
         "development": [
+            # drive testing with tox
+            "tox>=3.5.3,<4.0",
             # linting
             "flake8>=3.0,<4.0",
             "isort>=4.3,<5.0",
