@@ -5,6 +5,7 @@ extend ``dict``, so they can be passed seamlessly to
 conversion.
 """
 from __future__ import unicode_literals
+
 import logging
 
 from globus_sdk.base import safe_stringify
@@ -92,37 +93,44 @@ class TransferData(dict):
     :meth:`submit_transfer <globus_sdk.TransferClient.submit_transfer>`
     documentation for example usage.
     """
-    def __init__(self, transfer_client, source_endpoint, destination_endpoint,
-                 label=None, submission_id=None, sync_level=None,
-                 verify_checksum=False, preserve_timestamp=False,
-                 encrypt_data=False, deadline=None,
-                 recursive_symlinks="ignore", **kwargs):
+
+    def __init__(
+        self,
+        transfer_client,
+        source_endpoint,
+        destination_endpoint,
+        label=None,
+        submission_id=None,
+        sync_level=None,
+        verify_checksum=False,
+        preserve_timestamp=False,
+        encrypt_data=False,
+        deadline=None,
+        recursive_symlinks="ignore",
+        **kwargs
+    ):
         source_endpoint = safe_stringify(source_endpoint)
         destination_endpoint = safe_stringify(destination_endpoint)
         logger.info("Creating a new TransferData object")
         self["DATA_TYPE"] = "transfer"
-        self["submission_id"] = submission_id or \
-            transfer_client.get_submission_id()["value"]
-        logger.info("TransferData.submission_id = {}"
-                    .format(self["submission_id"]))
+        self["submission_id"] = (
+            submission_id or transfer_client.get_submission_id()["value"]
+        )
+        logger.info("TransferData.submission_id = {}".format(self["submission_id"]))
         self["source_endpoint"] = source_endpoint
-        logger.info("TransferData.source_endpoint = {}"
-                    .format(source_endpoint))
+        logger.info("TransferData.source_endpoint = {}".format(source_endpoint))
         self["destination_endpoint"] = destination_endpoint
-        logger.info("TransferData.destination_endpoint = {}"
-                    .format(destination_endpoint))
+        logger.info(
+            "TransferData.destination_endpoint = {}".format(destination_endpoint)
+        )
         self["verify_checksum"] = verify_checksum
-        logger.info("TransferData.verify_checksum = {}"
-                    .format(verify_checksum))
+        logger.info("TransferData.verify_checksum = {}".format(verify_checksum))
         self["preserve_timestamp"] = preserve_timestamp
-        logger.info("TransferData.preserve_timestamp = {}"
-                    .format(preserve_timestamp))
+        logger.info("TransferData.preserve_timestamp = {}".format(preserve_timestamp))
         self["encrypt_data"] = encrypt_data
-        logger.info("TransferData.encrypt_data = {}"
-                    .format(encrypt_data))
+        logger.info("TransferData.encrypt_data = {}".format(encrypt_data))
         self["recursive_symlinks"] = recursive_symlinks
-        logger.info("TransferData.recursive_symlinks = {}"
-                    .format(recursive_symlinks))
+        logger.info("TransferData.recursive_symlinks = {}".format(recursive_symlinks))
 
         if label is not None:
             self["label"] = label
@@ -140,16 +148,22 @@ class TransferData(dict):
         # garbage overnight
         if sync_level is not None:
             sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
-            self['sync_level'] = sync_dict.get(sync_level, sync_level)
-            logger.info("TransferData.sync_level = {} ({})"
-                        .format(self['sync_level'], sync_level))
+            self["sync_level"] = sync_dict.get(sync_level, sync_level)
+            logger.info(
+                "TransferData.sync_level = {} ({})".format(
+                    self["sync_level"], sync_level
+                )
+            )
 
         self["DATA"] = []
 
         self.update(kwargs)
         for option, value in kwargs.items():
-            logger.info("TransferData.{} = {} (option passed in via kwargs)"
-                        .format(option, value))
+            logger.info(
+                "TransferData.{} = {} (option passed in via kwargs)".format(
+                    option, value
+                )
+            )
 
     def add_item(self, source_path, destination_path, recursive=False):
         """
@@ -168,10 +182,14 @@ class TransferData(dict):
             "destination_path": destination_path,
             "recursive": recursive,
         }
-        logger.debug('TransferData[{}, {}].add_item: "{}"->"{}"'
-                     .format(self["source_endpoint"],
-                             self["destination_endpoint"],
-                             source_path, destination_path))
+        logger.debug(
+            'TransferData[{}, {}].add_item: "{}"->"{}"'.format(
+                self["source_endpoint"],
+                self["destination_endpoint"],
+                source_path,
+                destination_path,
+            )
+        )
         self["DATA"].append(item_data)
 
     def add_symlink_item(self, source_path, destination_path):
@@ -189,10 +207,14 @@ class TransferData(dict):
             "source_path": source_path,
             "destination_path": destination_path,
         }
-        logger.debug('TransferData[{}, {}].add_symlink_item: "{}"->"{}"'
-                     .format(self["source_endpoint"],
-                             self["destination_endpoint"],
-                             source_path, destination_path))
+        logger.debug(
+            'TransferData[{}, {}].add_symlink_item: "{}"->"{}"'.format(
+                self["source_endpoint"],
+                self["destination_endpoint"],
+                source_path,
+                destination_path,
+            )
+        )
         self["DATA"].append(item_data)
 
 
@@ -247,21 +269,28 @@ class DeleteData(dict):
     See the :meth:`submit_delete <globus_sdk.TransferClient.submit_delete>`
     documentation for example usage.
     """
-    def __init__(self, transfer_client, endpoint, label=None,
-                 submission_id=None, recursive=False, deadline=None, **kwargs):
+
+    def __init__(
+        self,
+        transfer_client,
+        endpoint,
+        label=None,
+        submission_id=None,
+        recursive=False,
+        deadline=None,
+        **kwargs
+    ):
         endpoint = safe_stringify(endpoint)
         logger.info("Creating a new DeleteData object")
         self["DATA_TYPE"] = "delete"
-        self["submission_id"] = submission_id or \
-            transfer_client.get_submission_id()["value"]
-        logger.info("DeleteData.submission_id = {}"
-                    .format(self["submission_id"]))
+        self["submission_id"] = (
+            submission_id or transfer_client.get_submission_id()["value"]
+        )
+        logger.info("DeleteData.submission_id = {}".format(self["submission_id"]))
         self["endpoint"] = endpoint
-        logger.info("DeleteData.endpoint = {}"
-                    .format(endpoint))
+        logger.info("DeleteData.endpoint = {}".format(endpoint))
         self["recursive"] = recursive
-        logger.info("DeleteData.recursive = {}"
-                    .format(recursive))
+        logger.info("DeleteData.recursive = {}".format(recursive))
 
         if label is not None:
             self["label"] = label
@@ -275,8 +304,9 @@ class DeleteData(dict):
 
         self.update(kwargs)
         for option, value in kwargs.items():
-            logger.info("DeleteData.{} = {} (option passed in via kwargs)"
-                        .format(option, value))
+            logger.info(
+                "DeleteData.{} = {} (option passed in via kwargs)".format(option, value)
+            )
 
     def add_item(self, path):
         """
@@ -288,10 +318,6 @@ class DeleteData(dict):
         document.
         """
         path = safe_stringify(path)
-        item_data = {
-            "DATA_TYPE": "delete_item",
-            "path": path,
-        }
-        logger.debug('DeleteData[{}].add_item: "{}"'
-                     .format(self["endpoint"], path))
+        item_data = {"DATA_TYPE": "delete_item", "path": path}
+        logger.debug('DeleteData[{}].add_item: "{}"'.format(self["endpoint"], path))
         self["DATA"].append(item_data)

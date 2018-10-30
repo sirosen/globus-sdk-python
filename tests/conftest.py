@@ -1,6 +1,5 @@
-import pytest
 import httpretty
-
+import pytest
 
 # disable the use of real sockets when HTTPretty socket mocking is in place --
 # if you make a real API call, it will immediately error

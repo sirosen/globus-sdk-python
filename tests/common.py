@@ -4,19 +4,21 @@ Common use helpers and utilities for all tests to leverage.
 Not so disorganized as a "utils" module and not so refined as a public package.
 """
 import inspect
-import os
-import httpretty
-import six
-import requests
 import json
+import os
+
+import httpretty
+import requests
+import six
+
+import globus_sdk
+from globus_sdk.base import slash_join
 
 try:
     import mock
 except ImportError:
     from unittest import mock
 
-import globus_sdk
-from globus_sdk.base import slash_join
 
 # constants
 
@@ -30,17 +32,18 @@ GO_EP1_SERVER_ID = 207976
 # end constants
 
 
-def register_api_route(service, path, method=httpretty.GET,
-                       adding_headers=None, **kwargs):
+def register_api_route(
+    service, path, method=httpretty.GET, adding_headers=None, **kwargs
+):
     """
     Handy wrapper for adding URIs to the HTTPretty state.
     """
     assert httpretty.is_enabled()
     base_url_map = {
-        'auth': 'https://auth.globus.org/',
-        'nexus': 'https://nexus.api.globusonline.org/',
-        'transfer': 'https://transfer.api.globus.org/v0.10',
-        'search': 'https://search.api.globus.org/'
+        "auth": "https://auth.globus.org/",
+        "nexus": "https://nexus.api.globusonline.org/",
+        "transfer": "https://transfer.api.globus.org/v0.10",
+        "search": "https://search.api.globus.org/",
     }
     assert service in base_url_map
     base_url = base_url_map.get(service)
@@ -48,10 +51,9 @@ def register_api_route(service, path, method=httpretty.GET,
 
     # can set it to `{}` explicitly to clear the default
     if adding_headers is None:
-        adding_headers = {'Content-Type': 'application/json'}
+        adding_headers = {"Content-Type": "application/json"}
 
-    httpretty.register_uri(method, full_url, adding_headers=adding_headers,
-                           **kwargs)
+    httpretty.register_uri(method, full_url, adding_headers=adding_headers, **kwargs)
 
 
 def register_api_route_fixture_file(service, path, filename, **kwargs):
@@ -113,49 +115,57 @@ class PickleableMockResponse(mock.NonCallableMock):
     seems to work, so this is the best thing I could figure out for now.
     - Stephen (2018-09-07)
     """
-    def __init__(self, status_code, json_body=None, text=None, headers=None,
-                 *args, **kwargs):
-        kwargs['spec'] = requests.Response
+
+    def __init__(
+        self, status_code, json_body=None, text=None, headers=None, *args, **kwargs
+    ):
+        kwargs["spec"] = requests.Response
         super(PickleableMockResponse, self).__init__(*args, **kwargs)
         self.__class__ = PickleableMockResponse
 
         # after mock initialization, setup various explicit attributes
         self.status_code = status_code
 
-        self.headers = headers or {'Content-Type': 'application/json'}
+        self.headers = headers or {"Content-Type": "application/json"}
 
         self._json_body = json_body
 
-        self.text = text or (json.dumps(json_body) if json_body else '')
+        self.text = text or (json.dumps(json_body) if json_body else "")
 
     def json(self):
         if self._json_body is not None:
             return self._json_body
         else:
-            raise ValueError('globus sdk mock value error')
+            raise ValueError("globus sdk mock value error")
 
     def __getstate__(self):
         """Custom getstate discards most of the magical mock stuff"""
-        keys = ['headers', 'text', '_json_body', 'status_code']
+        keys = ["headers", "text", "_json_body", "status_code"]
         return dict((k, self.__dict__[k]) for k in keys)
 
     def __setstate__(self, state):
         self.__dict__.update(state)
 
     def __reduce__(self):
-        return (_unpickle_pickleable_mock_response,
-                (self.status_code, self.__getstate__()))
+        return (
+            _unpickle_pickleable_mock_response,
+            (self.status_code, self.__getstate__()),
+        )
 
 
-def make_response(response_class=globus_sdk.GlobusHTTPResponse,
-                  status=200, headers=None, json_body=None, text=None,
-                  client=None):
+def make_response(
+    response_class=globus_sdk.GlobusHTTPResponse,
+    status=200,
+    headers=None,
+    json_body=None,
+    text=None,
+    client=None,
+):
     """
     Construct and return an SDK response object with a mocked requests.Response
 
     Unlike mocking of an API route, this is meant for unit testing in which we
     want to directly create the response.
     """
-    r = PickleableMockResponse(status, headers=headers, json_body=json_body,
-                               text=text)
+    r = PickleableMockResponse(status, headers=headers, json_body=json_body, text=text)
     return response_class(r, client=client)

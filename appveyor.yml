@@ -17,9 +17,7 @@ install:
 
 test_script:
   # explicitly invoke under the build environment's python
-  - "set GLOBUS_TEST_PY=%PYTHON%\\python.exe"
-  - "%GLOBUS_TEST_PY% -m flake8"
-  - "%GLOBUS_TEST_PY% -m pytest -v  --cov=globus_sdk"
+  - "%PYTHON%\\python.exe -m pytest -v --cov=globus_sdk"
 
 build: off
 deploy: off

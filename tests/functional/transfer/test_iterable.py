@@ -2,9 +2,7 @@
 Tests for IterableTransferResponse responses from TransferClient
 """
 import globus_sdk
-
 from tests.common import register_api_route
-
 
 SERVER_LIST_TEXT = """{
   "DATA": [
@@ -30,22 +28,22 @@ SERVER_LIST_TEXT = """{
 
 
 def test_server_list(client):
-    epid = 'epid'
+    epid = "epid"
     register_api_route(
-        'transfer', '/endpoint/{}/server_list'.format(epid),
-        body=SERVER_LIST_TEXT)
+        "transfer", "/endpoint/{}/server_list".format(epid), body=SERVER_LIST_TEXT
+    )
 
     res = client.endpoint_server_list(epid)
     # it should still be a subclass of GlobusResponse
     assert isinstance(res, globus_sdk.GlobusResponse)
 
     # fetch top-level attrs
-    assert res['DATA_TYPE'] == 'endpoint_server_list'
-    assert res['endpoint'] == 'go#ep1'
+    assert res["DATA_TYPE"] == "endpoint_server_list"
+    assert res["endpoint"] == "go#ep1"
 
     # intentionally access twice -- unlike PaginatedResource, this is allowed
     # and works
     assert len(list(res)) == 1
     assert len(list(res)) == 1
 
-    assert list(res)[0]['DATA_TYPE'] == 'server'
+    assert list(res)[0]["DATA_TYPE"] == "server"

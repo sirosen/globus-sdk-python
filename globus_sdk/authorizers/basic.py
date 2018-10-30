@@ -22,14 +22,19 @@ class BasicAuthorizer(GlobusAuthorizer):
         ``password`` (*string*)
           Password component for Basic Auth
     """
+
     def __init__(self, username, password):
-        logger.info(("Setting up a BasicAuthorizer. It will use an "
-                     "auth type of Basic and cannot handle 401s."))
+        logger.info(
+            (
+                "Setting up a BasicAuthorizer. It will use an "
+                "auth type of Basic and cannot handle 401s."
+            )
+        )
         logger.info("BasicAuthorizer.username = {}".format(username))
         self.username = username
         self.password = password
 
-        to_b64 = '{0}:{1}'.format(username, password)
+        to_b64 = "{0}:{1}".format(username, password)
         self.header_val = "Basic %s" % safe_b64encode(to_b64)
 
     def set_authorization_header(self, header_dict):
@@ -37,6 +42,9 @@ class BasicAuthorizer(GlobusAuthorizer):
         Sets the ``Authorization`` header to
         "Basic <base64 encoded username:password>"
         """
-        logger.debug(("Setting Basic Authorization Header: "
-                      '"Basic <{}:SECRET>"').format(self.username))
-        header_dict['Authorization'] = self.header_val
+        logger.debug(
+            ("Setting Basic Authorization Header: " '"Basic <{}:SECRET>"').format(
+                self.username
+            )
+        )
+        header_dict["Authorization"] = self.header_val

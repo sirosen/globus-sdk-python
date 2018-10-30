@@ -1,13 +1,13 @@
-from collections import namedtuple
-import requests
 import json
-import six
+from collections import namedtuple
+
 import pytest
+import requests
+import six
 
-from globus_sdk.response import GlobusResponse, GlobusHTTPResponse
+from globus_sdk.response import GlobusHTTPResponse, GlobusResponse
 
-
-_TestResponse = namedtuple('_TestResponse', ('data', 'r'))
+_TestResponse = namedtuple("_TestResponse", ("data", "r"))
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def malformed_http_response():
     malformed_response = requests.Response()
     malformed_response._content = six.b("{")
     malformed_response.headers["Content-Type"] = "application/json"
-    return _TestResponse('{', GlobusHTTPResponse(malformed_response))
+    return _TestResponse("{", GlobusHTTPResponse(malformed_response))
 
 
 @pytest.fixture
@@ -48,8 +48,13 @@ def text_http_response():
     return _TestResponse(text_data, GlobusHTTPResponse(text_response))
 
 
-def test_data(dict_response, list_response, json_http_response,
-              malformed_http_response, text_http_response):
+def test_data(
+    dict_response,
+    list_response,
+    json_http_response,
+    malformed_http_response,
+    text_http_response,
+):
     """
     Gets the data from the GlobusResponses, confirms results
     Gets the data from each HTTPResponse, confirms expected data from json
@@ -116,5 +121,5 @@ def test_text(json_http_response, malformed_http_response, text_http_response):
     Gets the text from each HTTPResponse, confirms expected results
     """
     assert json_http_response.r.text == json.dumps(json_http_response.data)
-    assert malformed_http_response.r.text == '{'
+    assert malformed_http_response.r.text == "{"
     assert text_http_response.r.text == text_http_response.data

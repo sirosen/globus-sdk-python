@@ -17,8 +17,7 @@ def test_set_authorization_header_existing():
     """
     Confirms that an existing Authorization field is removed
     """
-    header_dict = {"Header": "value",
-                   "Authorization": "previous_value"}
+    header_dict = {"Header": "value", "Authorization": "previous_value"}
     authorizer = NullAuthorizer()
     authorizer.set_authorization_header(header_dict)
     assert header_dict == {"Header": "value"}

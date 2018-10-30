@@ -59,26 +59,38 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
           ``on_refresh`` callback can be used to update the Access Tokens and
           their expiration times.
     """
-    def __init__(self, confidential_client, scopes,
-                 access_token=None, expires_at=None, on_refresh=None):
-        logger.info((
-            "Setting up ClientCredentialsAuthorizer with confidential_client ="
-            " instance:{} and scopes = "
-            "{}".format(id(confidential_client), scopes)))
+
+    def __init__(
+        self,
+        confidential_client,
+        scopes,
+        access_token=None,
+        expires_at=None,
+        on_refresh=None,
+    ):
+        logger.info(
+            (
+                "Setting up ClientCredentialsAuthorizer with confidential_client ="
+                " instance:{} and scopes = "
+                "{}".format(id(confidential_client), scopes)
+            )
+        )
 
         # values for _get_token_data
         self.confidential_client = confidential_client
         self.scopes = scopes
 
         super(ClientCredentialsAuthorizer, self).__init__(
-            access_token, expires_at, on_refresh)
+            access_token, expires_at, on_refresh
+        )
 
     def _get_token_response(self):
         """
         Make a client credentials grant
         """
         return self.confidential_client.oauth2_client_credentials_tokens(
-            requested_scopes=self.scopes)
+            requested_scopes=self.scopes
+        )
 
     def _extract_token_data(self, res):
         """
@@ -90,6 +102,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
             raise ValueError(
                 "Attempting get new access token for client credentials "
                 "authorizer didn't return exactly one token. Ensure scopes "
-                "{} are for only one resource server.".format(self.scopes))
+                "{} are for only one resource server.".format(self.scopes)
+            )
 
         return next(iter(token_data))

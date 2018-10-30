@@ -1,4 +1,5 @@
 import abc
+
 import six
 
 
@@ -10,6 +11,7 @@ class GlobusAuthorizer(object):
     It may also have handling for responses that indicate that it has provided
     an invalid Authorization header.
     """
+
     @abc.abstractmethod
     def set_authorization_header(header_dict):
         """

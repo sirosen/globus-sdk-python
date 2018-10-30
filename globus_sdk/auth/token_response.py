@@ -1,10 +1,10 @@
-import logging
 import json
-import requests
+import logging
 import time
-import six
 
 import jwt
+import requests
+import six
 
 from globus_sdk.response import GlobusHTTPResponse
 
@@ -18,15 +18,15 @@ def _convert_token_info_dict(source_dict):
         - "refresh_token"
         - "token_type"
     """
-    expires_in = source_dict.get('expires_in', 0)
+    expires_in = source_dict.get("expires_in", 0)
 
     return {
-        'scope': source_dict['scope'],
-        'access_token': source_dict['access_token'],
-        'refresh_token': source_dict.get('refresh_token'),
-        'token_type': source_dict.get('token_type'),
-        'expires_at_seconds': int(time.time() + expires_in),
-        'resource_server': source_dict['resource_server']
+        "scope": source_dict["scope"],
+        "access_token": source_dict["access_token"],
+        "refresh_token": source_dict.get("refresh_token"),
+        "token_type": source_dict.get("token_type"),
+        "expires_at_seconds": int(time.time() + expires_in),
+        "resource_server": source_dict["resource_server"],
     }
 
 
@@ -38,6 +38,7 @@ class _ByScopesGetter(object):
     >>> tokens = OAuthTokenResponse(...)
     >>> tok = tokens.by_scopes['openid profile']['access_token']
     """
+
     def __init__(self, scope_map):
         self.scope_map = scope_map
 
@@ -50,8 +51,9 @@ class _ByScopesGetter(object):
 
     def __getitem__(self, scopename):
         if not isinstance(scopename, six.string_types):
-            raise KeyError('by_scopes cannot contain non-string value "{}"'
-                           .format(scopename))
+            raise KeyError(
+                'by_scopes cannot contain non-string value "{}"'.format(scopename)
+            )
 
         # split on spaces
         scopes = scopename.split()
@@ -61,17 +63,22 @@ class _ByScopesGetter(object):
         toks = []
         for scope in scopes:
             try:
-                rs_names.add(self.scope_map[scope]['resource_server'])
+                rs_names.add(self.scope_map[scope]["resource_server"])
                 toks.append(self.scope_map[scope])
             except KeyError:
-                raise KeyError(('Scope specifier "{}" contains scope "{}" '
-                                "which was not found"
-                                ).format(scopename, scope))
+                raise KeyError(
+                    (
+                        'Scope specifier "{}" contains scope "{}" '
+                        "which was not found"
+                    ).format(scopename, scope)
+                )
         # if there isn't exactly 1 token, it's an error
         if len(rs_names) != 1:
             raise KeyError(
-                'Scope specifier "{}" did not match exactly one token!'
-                .format(scopename))
+                'Scope specifier "{}" did not match exactly one token!'.format(
+                    scopename
+                )
+            )
         # pop the only element in the set
         return toks.pop()
 
@@ -95,6 +102,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
     Class for responses from the OAuth2 code for tokens exchange used in
     3-legged OAuth flows.
     """
+
     def __init__(self, *args, **kwargs):
         GlobusHTTPResponse.__init__(self, *args, **kwargs)
         self._init_rs_dict()
@@ -102,7 +110,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
 
     def _init_scopes_getter(self):
         scope_map = {}
-        for rs, tok_data in self._by_resource_server.items():
+        for _rs, tok_data in self._by_resource_server.items():
             for s in tok_data["scope"].split():
                 scope_map[s] = tok_data
         self._by_scopes = _ByScopesGetter(scope_map)
@@ -110,13 +118,18 @@ class OAuthTokenResponse(GlobusHTTPResponse):
     def _init_rs_dict(self):
         # call the helper at the top level
         self._by_resource_server = {
-            self['resource_server']: _convert_token_info_dict(self)
+            self["resource_server"]: _convert_token_info_dict(self)
         }
         # call the helper on everything in 'other_tokens'
-        self._by_resource_server.update(dict(
-            (unprocessed_item['resource_server'],
-             _convert_token_info_dict(unprocessed_item))
-            for unprocessed_item in self['other_tokens']))
+        self._by_resource_server.update(
+            dict(
+                (
+                    unprocessed_item["resource_server"],
+                    _convert_token_info_dict(unprocessed_item),
+                )
+                for unprocessed_item in self["other_tokens"]
+            )
+        )
 
     @property
     def by_resource_server(self):
@@ -164,33 +177,38 @@ class OAuthTokenResponse(GlobusHTTPResponse):
               this token back to the OAuthTokenResponse. The SDK now tracks
               this internally, so it is no longer necessary.
         """
-        logger.info('Decoding ID Token "{}"'.format(self['id_token']))
+        logger.info('Decoding ID Token "{}"'.format(self["id_token"]))
 
         # warn (not error) on older usage pattern, but still respect it
         # FIXME: should be deprecated and removed in SDK v2
         if auth_client:
-            logger.warn(
-                'Providing an auth_client to decode_id_token is no '
-                'longer required and may be deprecated in a future version '
-                'of the Globus SDK')
+            logger.warning(
+                "Providing an auth_client to decode_id_token is no "
+                "longer required and may be deprecated in a future version "
+                "of the Globus SDK"
+            )
         else:
             auth_client = self._client
 
-        logger.debug('Fetch JWK Data: Start')
-        oidc_conf = auth_client.get('/.well-known/openid-configuration')
-        jwks_uri = oidc_conf['jwks_uri']
-        signing_algos = oidc_conf['id_token_signing_alg_values_supported']
+        logger.debug("Fetch JWK Data: Start")
+        oidc_conf = auth_client.get("/.well-known/openid-configuration")
+        jwks_uri = oidc_conf["jwks_uri"]
+        signing_algos = oidc_conf["id_token_signing_alg_values_supported"]
 
         # use the auth_client's decision on ssl_verify=yes/no
         jwk_data = requests.get(jwks_uri, verify=auth_client._verify).json()
-        logger.debug('Fetch JWK Data: Complete')
+        logger.debug("Fetch JWK Data: Complete")
         # decode from JWK to an RSA PEM key for JWT decoding
         jwk_as_pem = jwt.algorithms.RSAAlgorithm.from_jwk(
-            json.dumps(jwk_data['keys'][0]))
+            json.dumps(jwk_data["keys"][0])
+        )
 
         return jwt.decode(
-            self['id_token'], jwk_as_pem,
-            algorithms=signing_algos, audience=auth_client.client_id)
+            self["id_token"],
+            jwk_as_pem,
+            algorithms=signing_algos,
+            audience=auth_client.client_id,
+        )
 
     def __str__(self):
         # Make printing responses more convenient by only showing the
@@ -205,16 +223,23 @@ class OAuthDependentTokenResponse(OAuthTokenResponse):
     :meth:`oauth2_get_dependent_tokens \
     <globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens>`
     """
+
     def _init_rs_dict(self):
         # call the helper on everything in the response array
         self._by_resource_server = dict(
-            (unprocessed_item['resource_server'],
-             _convert_token_info_dict(unprocessed_item))
-            for unprocessed_item in self.data)
+            (
+                unprocessed_item["resource_server"],
+                _convert_token_info_dict(unprocessed_item),
+            )
+            for unprocessed_item in self.data
+        )
 
     def decode_id_token(self, auth_client):
         # just in case
         raise NotImplementedError(
-            ('OAuthDependentTokenResponse.decode_id_token() is not and cannot '
-             'be implemented. Dependent Tokens data does not include an '
-             'id_token'))
+            (
+                "OAuthDependentTokenResponse.decode_id_token() is not and cannot "
+                "be implemented. Dependent Tokens data does not include an "
+                "id_token"
+            )
+        )

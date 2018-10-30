@@ -1,21 +1,31 @@
-import requests
 import json
-import six
 import time
+
 import pytest
+import requests
+import six
 
 from globus_sdk.transfer.response import ActivationRequirementsResponse
 
 
-def make_response(activated=True, expires_in=0,
-                  auto_activation_supported=True,
-                  oauth_server=None, DATA=[]):
+def make_response(
+    activated=True,
+    expires_in=0,
+    auto_activation_supported=True,
+    oauth_server=None,
+    DATA=None,
+):
     """
     Helper for making ActivationRequirementsResponses with known fields
     """
-    data = {"activated": activated, "expires_in": expires_in,
-            "oauth_server": oauth_server, "DATA": DATA,
-            "auto_activation_supported": auto_activation_supported}
+    DATA = DATA or []
+    data = {
+        "activated": activated,
+        "expires_in": expires_in,
+        "oauth_server": oauth_server,
+        "DATA": DATA,
+        "auto_activation_supported": auto_activation_supported,
+    }
     response = requests.Response()
     response.headers["Content-Type"] = "application/json"
     response._content = six.b(json.dumps(data))
@@ -37,7 +47,7 @@ def test_expires_at():
     assert response.expires_at is None
 
 
-@pytest.mark.parametrize('value', (True, False))
+@pytest.mark.parametrize("value", (True, False))
 def test_supports_auto_activation(value):
     """
     Gets supports_auto_activation from made responses, validates results
@@ -54,15 +64,16 @@ def test_supports_web_activation():
     response = make_response(auto_activation_supported=True)
     assert response.supports_web_activation
     # has an oauth server,
-    response = make_response(auto_activation_supported=False,
-                             oauth_server="server")
+    response = make_response(auto_activation_supported=False, oauth_server="server")
     assert response.supports_web_activation
     # or one of the other documents is myproxy or delegate_myproxy,
-    response = make_response(auto_activation_supported=False,
-                             DATA=[{"type": "myproxy"}])
+    response = make_response(
+        auto_activation_supported=False, DATA=[{"type": "myproxy"}]
+    )
     assert response.supports_web_activation
-    response = make_response(auto_activation_supported=False,
-                             DATA=[{"type": "delegate_myproxy"}])
+    response = make_response(
+        auto_activation_supported=False, DATA=[{"type": "delegate_myproxy"}]
+    )
     assert response.supports_web_activation
 
     # otherwise false

@@ -18,6 +18,7 @@ class ActivationRequirementsResponse(TransferResponse):
     <https://docs.globus.org/api/transfer/endpoint_activation/#activation_requirements_document>`_
     in the API documentation for details.
     """
+
     def __init__(self, *args, **kwargs):
         TransferResponse.__init__(self, *args, **kwargs)
 
@@ -82,10 +83,13 @@ class ActivationRequirementsResponse(TransferResponse):
 
         :rtype: ``bool``
         """
-        return (self.supports_auto_activation or
-                self["oauth_server"] is not None or
-                any(x for x in self["DATA"]
-                    if x['type'] in ('myproxy', 'delegate_myproxy')))
+        return (
+            self.supports_auto_activation
+            or self["oauth_server"] is not None
+            or any(
+                x for x in self["DATA"] if x["type"] in ("myproxy", "delegate_myproxy")
+            )
+        )
 
     def active_until(self, time_seconds, relative_time=True):
         """

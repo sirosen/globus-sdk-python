@@ -1,6 +1,14 @@
-VIRTUALENV=.venv
+# allow specification of python version and venv loc for devs, so you can
+#    make test PYTHON_VERSION=python3.6 VIRTUALENV=.venv36
+#    make test PYTHON_VERSION=python2.7 VIRTUALENV=.venv27
+# and be happy
+# we don't need tox just to do this (though it might make life easier in the
+# future, especially now that tests are fast)
+PYTHON_VERSION?=python3
+VIRTUALENV?=.venv
+AUTOFORMAT_TARGETS=tests/ globus_sdk/ setup.py
 
-.PHONY: docs build upload test clean help
+.PHONY: docs build upload test lint autoformat clean help
 
 
 help:
@@ -10,6 +18,8 @@ help:
 	@echo "  help:         Show this helptext"
 	@echo "  localdev:     Setup local development env with a 'setup.py develop'"
 	@echo "  build:        Create the distributions which we like to upload to pypi"
+	@echo "  lint:         All linting steps (may be limited by what your python version supports)"
+	@echo "  autoformat:   Run code autoformatters"
 	@echo "  test:         Run the full suite of tests"
 	@echo "  docs:         Clean old HTML docs and rebuild them with sphinx"
 	@echo "  upload:       [build], but also upload to pypi using twine"
@@ -23,7 +33,7 @@ localdev: $(VIRTUALENV)
 
 $(VIRTUALENV): setup.py
 	# don't recreate it if it already exists -- just run the setup steps
-	if [ ! -d "$(VIRTUALENV)" ]; then virtualenv $(VIRTUALENV); fi
+	if [ ! -d "$(VIRTUALENV)" ]; then virtualenv --python=$(PYTHON_VERSION) $(VIRTUALENV); fi
 	$(VIRTUALENV)/bin/pip install -U pip setuptools
 	$(VIRTUALENV)/bin/pip install -e '.[development]'
 	# explicit touch to ensure good update time relative to setup.py
@@ -36,18 +46,32 @@ build: $(VIRTUALENV)
 upload: build
 	$(VIRTUALENV)/bin/twine upload dist/*
 
-test: $(VIRTUALENV)
+
+autoformat: $(VIRTUALENV)
+	$(VIRTUALENV)/bin/isort --recursive $(AUTOFORMAT_TARGETS)
+	if [ -f "$(VIRTUALENV)/bin/black" ]; then $(VIRTUALENV)/bin/black $(AUTOFORMAT_TARGETS); fi
+
+
+lint: $(VIRTUALENV)
+	if [ -f "$(VIRTUALENV)/bin/black" ]; then $(VIRTUALENV)/bin/black --check $(AUTOFORMAT_TARGETS); fi
+	$(VIRTUALENV)/bin/isort --recursive --check-only $(AUTOFORMAT_TARGETS)
 	$(VIRTUALENV)/bin/flake8
+
+
+test: $(VIRTUALENV)
 	$(VIRTUALENV)/bin/pytest -v --cov=globus_sdk
+
 
 travis:
 	pip install -U pip setuptools
 	pip install -e '.[development]'
-	flake8
+	$(MAKE) lint
 	pytest -v tests/
+
 
 docs: $(VIRTUALENV)
 	. $(VIRTUALENV)/bin/activate && $(MAKE) -C docs/ clean html
+
 
 clean:
 	-rm -r $(VIRTUALENV)
