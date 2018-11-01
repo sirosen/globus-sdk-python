@@ -3,7 +3,7 @@
 PYTHON_VERSION?=python3
 VIRTUALENV=.venv
 
-.PHONY: docs build upload test lint autoformat clean help
+.PHONY: docs build upload localdev test lint autoformat clean help
 
 help:
 	@echo "Globus SDK 'make' targets"
@@ -16,6 +16,7 @@ help:
 	@echo "  docs:         Clean old HTML docs and rebuild them with sphinx"
 	@echo "  clean:        Remove typically unwanted files, mostly from [build]"
 
+localdev: $(VIRTUALENV)
 $(VIRTUALENV): setup.py
 	# don't recreate it if it already exists -- just run the setup steps
 	if [ ! -d "$(VIRTUALENV)" ]; then virtualenv --python=$(PYTHON_VERSION) $(VIRTUALENV); fi
