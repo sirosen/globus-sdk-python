@@ -36,7 +36,7 @@ setup(
     url="https://github.com/globus/globus-sdk-python",
     packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
-        "requests>=2.0.0,<3.0.0",
+        "requests>=2.9.2,<3.0.0",
         "six>=1.10.0,<2.0.0",
         "pyjwt[crypto]>=1.5.3,<2.0.0",
     ],
