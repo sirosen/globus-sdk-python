@@ -1,0 +1,4 @@
+# https://docs.readthedocs.io/en/latest/yaml-config.html
+python:
+  pip_install: true
+  extra_requirements: development
