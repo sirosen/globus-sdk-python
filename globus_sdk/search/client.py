@@ -42,6 +42,7 @@ class SearchClient(BaseClient):
     *  :py:meth:`.delete_entry`
     *  :py:meth:`.get_query_template`
     *  :py:meth:`.get_query_template_list`
+    *  :py:meth:`.get_task`
     """
     # disallow basic auth
     allowed_authorizer_types = [
@@ -521,3 +522,23 @@ class SearchClient(BaseClient):
         self.logger.info("SearchClient.get_query_template_list({})".format(index_id))
         path = self.qjoin_path("v1/index", index_id, "query_template")
         return self.get(path)
+
+    #
+    # Task Management
+    #
+
+    def get_task(self, task_id, **params):
+        """
+        ``GET /v1/index/<task_id>``
+
+        **Examples**
+
+        >>> sc = globus_sdk.SearchClient(...)
+        >>> task = sc.get_task(task_id)
+        >>> assert task['index_id'] == known_index_id
+        >>> print(task["task_id"] + " | " + task['state'])
+        """
+        task_id = safe_stringify(task_id)
+        self.logger.info("SearchClient.get_task({})".format(task_id))
+        path = self.qjoin_path("v1/task", task_id)
+        return self.get(path, params=params)
