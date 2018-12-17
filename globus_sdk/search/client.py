@@ -529,7 +529,7 @@ class SearchClient(BaseClient):
 
     def get_task(self, task_id, **params):
         """
-        ``GET /v1/index/<task_id>``
+        ``GET /v1/task/<task_id>``
 
         **Examples**
 
@@ -541,4 +541,20 @@ class SearchClient(BaseClient):
         task_id = safe_stringify(task_id)
         self.logger.info("SearchClient.get_task({})".format(task_id))
         path = self.qjoin_path("v1/task", task_id)
+        return self.get(path, params=params)
+
+    def get_task_list(self, index_id, **params):
+        """
+        ``GET /v1/task_list/<index_id>``
+
+        **Examples**
+
+        >>> sc = globus_sdk.SearchClient(...)
+        >>> task_list = sc.get_task_list(index_id)
+        >>> for task in task_list['tasks']:
+        >>>     print(task["task_id"] + " | " + task['state'])
+        """
+        index_id = safe_stringify(index_id)
+        self.logger.info("SearchClient.get_task_list({})".format(index_id))
+        path = self.qjoin_path("v1/task_list", index_id)
         return self.get(path, params=params)
