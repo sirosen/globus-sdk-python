@@ -94,7 +94,7 @@ class TransferClient(BaseClient):
     *  :py:meth:`.submit_delete`
     *  :py:meth:`.task_list`
     *  :py:meth:`.task_event_list`
-    *  :py:meth:`.get_task`
+    *  :py:meth:`~.TransferClient.get_task`
     *  :py:meth:`.update_task`
     *  :py:meth:`.cancel_task`
     *  :py:meth:`.task_wait`
