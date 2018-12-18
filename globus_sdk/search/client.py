@@ -42,7 +42,8 @@ class SearchClient(BaseClient):
     *  :py:meth:`.delete_entry`
     *  :py:meth:`.get_query_template`
     *  :py:meth:`.get_query_template_list`
-    *  :py:meth:`.get_task`
+    *  :py:meth:`~.SearchClient.get_task`
+    *  :py:meth:`~.SearchClient.get_task_list`
     """
     # disallow basic auth
     allowed_authorizer_types = [
