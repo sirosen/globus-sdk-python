@@ -165,7 +165,8 @@ class TransferData(dict):
                 )
             )
 
-    def add_item(self, source_path, destination_path, recursive=False):
+    def add_item(self, source_path, destination_path,
+                 recursive=False, **params):
         """
         Add a file or directory to be transfered. If the item is a symlink
         to a file or directory, the file or directory at the target of
@@ -182,6 +183,8 @@ class TransferData(dict):
             "destination_path": destination_path,
             "recursive": recursive,
         }
+        item_data.update(params)
+
         logger.debug(
             'TransferData[{}, {}].add_item: "{}"->"{}"'.format(
                 self["source_endpoint"],
@@ -308,7 +311,7 @@ class DeleteData(dict):
                 "DeleteData.{} = {} (option passed in via kwargs)".format(option, value)
             )
 
-    def add_item(self, path):
+    def add_item(self, path, **params):
         """
         Add a file or directory or symlink to be deleted. If any of the paths
         are directories, ``recursive`` must be set True on the top level
@@ -319,5 +322,6 @@ class DeleteData(dict):
         """
         path = safe_stringify(path)
         item_data = {"DATA_TYPE": "delete_item", "path": path}
+        item_data.update(params)
         logger.debug('DeleteData[{}].add_item: "{}"'.format(self["endpoint"], path))
         self["DATA"].append(item_data)
