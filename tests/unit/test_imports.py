@@ -31,4 +31,4 @@ def test_import_str(importstring):
         stderr=subprocess.PIPE,
     )
     status = proc.wait()
-    assert status is 0, str(proc.communicate())
+    assert status == 0, str(proc.communicate())
