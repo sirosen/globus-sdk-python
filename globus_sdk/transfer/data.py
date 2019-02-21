@@ -165,8 +165,7 @@ class TransferData(dict):
                 )
             )
 
-    def add_item(self, source_path, destination_path,
-                 recursive=False, **params):
+    def add_item(self, source_path, destination_path, recursive=False, **params):
         """
         Add a file or directory to be transfered. If the item is a symlink
         to a file or directory, the file or directory at the target of
