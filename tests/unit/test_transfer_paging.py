@@ -93,6 +93,34 @@ def test_data(paging_simulator):
         assert item["value"] == expected
     assert pr_none.num_results_fetched == N
 
+    # limit < N should show more results available
+    pr_more_available = PaginatedResource(
+        paging_simulator.simulate_get,
+        "path",
+        {"params": {}},
+        max_results_per_call=10,
+        num_results=5,
+    )
+
+    # confirm results
+    for item, expected in zip(pr_more_available.data, range(N)):
+        assert item["value"] == expected
+    assert pr_more_available.limit_less_than_available_results is True
+
+    # limit > N should show no more results available
+    pr_no_more_available = PaginatedResource(
+        paging_simulator.simulate_get,
+        "path",
+        {"params": {}},
+        max_results_per_call=10,
+        num_results=N,
+    )
+
+    # confirm results
+    for item, expected in zip(pr_more_available.data, range(N)):
+        assert item["value"] == expected
+    assert pr_no_more_available.limit_less_than_available_results is False
+
 
 def test_iterable_func(paging_simulator):
     """
