@@ -129,6 +129,9 @@ class PaginatedResource(GlobusResponse, six.Iterator):
                 path,
             )
         )
+
+        self._limit_less_than_available_results = False
+
         self.max_results_per_call = max_results_per_call
         self.max_total_results = max_total_results
         self.offset = offset
@@ -179,6 +182,19 @@ class PaginatedResource(GlobusResponse, six.Iterator):
             # express this internally as "generator is null" -- just need some
             # way of making sure that it's clear
             self.generator = None
+
+    @property
+    def limit_less_than_available_results(self):
+        """
+        Indicates that the Transfer API had more results
+        available than were requested by way of the `limit` parameter.
+
+        Note: this will always be false until the iterator containing the
+        results has been exhausted.
+
+        :rtype: bool
+        """
+        return self._limit_less_than_available_results
 
     @property
     def data(self):
@@ -278,6 +294,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
             # if the paging style is LAST_KEY, check has_next_page
             if self.paging_style == self.PAGING_STYLE_LAST_KEY:
                 self.next_marker = res.get("last_key")
+                self.has_next_page = res["has_next_page"]
                 return res["has_next_page"]
 
             # if the paging style is MARKER, look at the marker
@@ -336,6 +353,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
                     self.num_results is not None
                     and self.num_results_fetched >= self.num_results
                 ):
+                    self._limit_less_than_available_results = True
                     return
 
             has_next_page = _check_has_next_page(res)
