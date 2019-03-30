@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class TransferData(dict):
-    """
+    r"""
     Convenience class for constructing a transfer document, to use as the
     `data` parameter to
     :meth:`submit_transfer <globus_sdk.TransferClient.submit_transfer>`.
@@ -50,16 +50,35 @@ class TransferData(dict):
         ``transfer_client.get_submission_id``
 
       ``sync_level`` (*int* or *string*) [optional]
-        For compatibility with older code and those knowledgeable about the API
-        sync_level can be ``0``, ``1``, ``2``, or ``3``, but it can also be
-        ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"`` if you want
-        greater clarity in client code.
+        ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"``
+        For compatibility, this can also be ``0``, ``1``, ``2``, or ``3``
+
+        The meanings are as follows:
+
+        ``0``, ``exists``
+          Determine whether or not to transfer based on file existence. If the
+          destination file is absent, do the transfer.
+
+        ``1``, ``size``
+          Determine whether or not to transfer based on the size of the file. If
+          destination file size does not match the source, do the transfer.
+
+        ``2``, ``mtime``
+          Determine whether or not to transfer based on modification times. If source
+          has a newer modififed time than the destination, do the transfer.
+
+        ``3``, ``checksum``
+          Determine whether or not to transfer based on checksums of file contents. If
+          source and destination contents differ, as determined by a checksum of their
+          contents, do the transfer.
 
       ``verify_checksum`` (*bool*) [default: ``False``]
-        When true, perform additional integrity checks on each file after it is
-        transferred. This will create CPU load on both the origin and
-        destination of the transfer, and may even be a bottleneck if the
-        network speed is high enough.
+        When true, after transfer verify that the source and destination file
+        checksums match. If they don't, re-transfer the entire file and keep
+        trying until it succeeds.
+
+        This will create CPU load on both the origin and destination of the transfer,
+        and may even be a bottleneck if the network speed is high enough.
 
       ``preserve_timestamp`` (*bool*) [default: ``False``]
         When true, Globus Transfer will attempt to set file timestamps on the
@@ -92,6 +111,16 @@ class TransferData(dict):
     See the
     :meth:`submit_transfer <globus_sdk.TransferClient.submit_transfer>`
     documentation for example usage.
+
+    **External Documentation**
+
+    See the
+    `Task document definition \
+    <https://docs.globus.org/api/transfer/task_submit/#document_types>`_
+    and
+    `Transfer specific fields \
+    <https://docs.globus.org/api/transfer/task_submit/#transfer_specific_fields>`_
+    in the REST documentation for more details on Transfer Task documents.
     """
 
     def __init__(
@@ -221,7 +250,7 @@ class TransferData(dict):
 
 
 class DeleteData(dict):
-    """
+    r"""
     Convenience class for constructing a delete document, to use as the
     `data` parameter to
     :meth:`submit_delete <globus_sdk.TransferClient.submit_delete>`.
@@ -270,6 +299,16 @@ class DeleteData(dict):
 
     See the :meth:`submit_delete <globus_sdk.TransferClient.submit_delete>`
     documentation for example usage.
+
+    **External Documentation**
+
+    See the
+    `Task document definition \
+    <https://docs.globus.org/api/transfer/task_submit/#document_types>`_
+    and
+    `Delete specific fields \
+    <https://docs.globus.org/api/transfer/task_submit/#delete_specific_fields>`_
+    in the REST documentation for more details on Delete Task documents.
     """
 
     def __init__(
