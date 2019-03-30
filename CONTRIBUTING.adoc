@@ -36,6 +36,7 @@ Expectations for Pull Requests
   - *List any issues closed by the pull request*
   - *Squash intermediate and fixup commits*. We recommend running
     `git rebase --interactive` prior to submitting a pull request.
+  - Add new work to the "Unreleased" section of the changelog
 
 These are our guidelines for good commit messages:
 
