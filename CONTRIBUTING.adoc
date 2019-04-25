@@ -21,11 +21,9 @@ Linting & Testing
    https://github.com/timothycrosley/isort[isort]. You may run
     `make autoformat` to do this or configure these tools for use in your
     editor.
-- Code must pass `make lint`, which checks that autoformatting is clean and
-    that `flake8` passes
-- All code must pass `make test`
+- All code must pass `make test`, which runs linting and tests.
 
-NOTE: `black` requires python3.6, so you may find it necessary to
+NOTE: `black` requires python3.6+, so you may find it necessary to
 `make clean autoformat PYTHON_VERSION=python3.6` or equivalent.
 
 Expectations for Pull Requests
