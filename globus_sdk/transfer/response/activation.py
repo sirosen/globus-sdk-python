@@ -46,7 +46,7 @@ class ActivationRequirementsResponse(TransferResponse):
         >>>     # use `from __future__ import print_function` in py2
         >>>     print(("This endpoint requires web activation. "
         >>>            "Please login and activate the endpoint here:\n"
-        >>>            "https://www.globus.org/app/endpoints/{}/activate")
+        >>>            "https://app.globus.org/file-manager?origin_id={}")
         >>>           .format(endpoint_id), file=sys.stderr)
         >>>     # py3 calls it `input()` in py2, use `raw_input()`
         >>>     input("Please Hit Enter When You Are Done")
