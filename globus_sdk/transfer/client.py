@@ -375,7 +375,7 @@ class TransferClient(BaseClient):
         >>>     print("Endpoint requires manual activation, please open "
         >>>           "the following URL in a browser to activate the "
         >>>           "endpoint:")
-        >>>     print("https://www.globus.org/app/endpoints/%s/activate"
+        >>>     print("https://app.globus.org/file-manager?origin_id=%s"
         >>>           % ep_id)
         >>>     # For python 2.X, use raw_input() instead
         >>>     input("Press ENTER after activating the endpoint:")
