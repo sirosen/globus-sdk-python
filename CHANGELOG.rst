@@ -1,14 +1,6 @@
 CHANGELOG
 =========
 
-Unreleased
-----------
-
-* Add a property to paginated responses to indicate that there are more results available than the user requested (`#346`_)
-* Add CHANGELOG file to the repo; not just GitHub releases
-
-.. _#346: https://github.com/globus/globus-sdk-python/pull/346
-
 v1.7.1
 ------
 
