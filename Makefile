@@ -2,17 +2,17 @@
 #    make autoformat PYTHON_VERSION=python3.6
 PYTHON_VERSION?=python3
 VIRTUALENV=.venv
+SDK_VERSION=$(shell grep '^__version__' globus_sdk/version.py | cut -d '"' -f2)
 
 .PHONY: help
 help:
 	@echo "Globus SDK 'make' targets"
 	@echo ""
 	@echo "  help:         Show this helptext"
-	@echo "  build:        Create the distributions which we like to upload to pypi"
-	@echo "  upload:       [build] + upload to pypi using twine"
 	@echo "  test:         Run the full suite of tests + linting"
 	@echo "  autoformat:   Run code autoformatters"
 	@echo "  docs:         Clean old HTML docs and rebuild them with sphinx"
+	@echo "  release:      create a signed tag, clean old builds, do a fresh build, and upload to pypi"
 	@echo "  clean:        Remove typically unwanted files, mostly from [build]"
 
 .PHONY: localdev
@@ -37,11 +37,15 @@ test: $(VIRTUALENV)
 .PHONY: docs
 docs: $(VIRTUALENV)
 	$(VIRTUALENV)/bin/tox -e docs
-.PHONY: build
-build: $(VIRTUALENV)
+
+.PHONY: showvars
+showvars:
+	@echo "SDK_VERSION=$(SDK_VERSION)"
+.PHONY: release
+release: $(VIRTUALENV)
+	git tag -s "$(SDK_VERSION)" -m "v$(SDK_VERSION)"
+	rm -rf dist
 	$(VIRTUALENV)/bin/python setup.py sdist bdist_wheel
-.PHONY: upload
-upload: build
 	$(VIRTUALENV)/bin/twine upload dist/*
 
 .PHONY: clean
