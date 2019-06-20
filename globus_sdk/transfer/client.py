@@ -341,9 +341,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         merge_params(params, filter_scope=filter_scope, filter_fulltext=filter_fulltext)
-        self.logger.info(
-            "TransferClient.endpoint_manager_monitored_endpoints({})".format(params)
-        )
+        self.logger.info("TransferClient.endpoint_search({})".format(params))
         return PaginatedResource(
             self.get,
             "endpoint_search",
