@@ -31,7 +31,7 @@ Table of Contents
    oauth
    authorization
    config
-   deprecations
+   versioning
    examples
 
 License
