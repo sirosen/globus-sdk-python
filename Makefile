@@ -1,7 +1,3 @@
-# allow specification of python version for devs. Examples:
-#    make autoformat PYTHON_VERSION=python3.6
-PYTHON_VERSION?=python3
-VIRTUALENV=.venv
 SDK_VERSION=$(shell grep '^__version__' globus_sdk/version.py | cut -d '"' -f2)
 
 .PHONY: help
@@ -16,38 +12,37 @@ help:
 	@echo "  clean:        Remove typically unwanted files, mostly from [build]"
 
 .PHONY: localdev
-localdev: $(VIRTUALENV)
-$(VIRTUALENV): setup.py
-	# don't recreate it if it already exists -- just run the setup steps
-	if [ ! -d "$(VIRTUALENV)" ]; then virtualenv --python=$(PYTHON_VERSION) $(VIRTUALENV); fi
-	$(VIRTUALENV)/bin/pip install -U pip setuptools
-	$(VIRTUALENV)/bin/pip install -e '.[development]'
+localdev: .venv
+.venv:
+	virtualenv --python=python3 .venv
+	.venv/bin/pip install -U pip setuptools
+	.venv/bin/pip install -e '.[development]'
 	# explicit touch to ensure good update time relative to setup.py
-	touch $(VIRTUALENV)
+	touch .venv
 
 # run outside of tox because specifying a tox environment for py3.6+ is awkward
 .PHONY: autoformat
-autoformat: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/isort --recursive tests/ globus_sdk/ setup.py
-	if [ -f "$(VIRTUALENV)/bin/black" ]; then $(VIRTUALENV)/bin/black  tests/ globus_sdk/ setup.py; fi
+autoformat: .venv
+	.venv/bin/isort --recursive tests/ globus_sdk/ setup.py
+	.venv/bin/black tests/ globus_sdk/ setup.py
 
 .PHONY: test
-test: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/tox
+test: .venv
+	.venv/bin/tox
 .PHONY: docs
-docs: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/tox -e docs
+docs: .venv
+	.venv/bin/tox -e docs
 
 .PHONY: showvars
 showvars:
 	@echo "SDK_VERSION=$(SDK_VERSION)"
 .PHONY: release
-release: $(VIRTUALENV)
+release: .venv
 	git tag -s "$(SDK_VERSION)" -m "v$(SDK_VERSION)"
 	rm -rf dist
-	$(VIRTUALENV)/bin/python setup.py sdist bdist_wheel
-	$(VIRTUALENV)/bin/twine upload dist/*
+	.venv/bin/python setup.py sdist bdist_wheel
+	.venv/bin/twine upload dist/*
 
 .PHONY: clean
 clean:
-	rm -rf $(VIRTUALENV) dist build *.egg-info .tox
+	rm -rf .venv dist build *.egg-info .tox
