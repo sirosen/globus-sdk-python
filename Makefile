@@ -1,43 +1,48 @@
-# allow specification of python version for devs. Examples:
-#    make autoformat PYTHON_VERSION=python3.6
-PYTHON_VERSION?=python3
-VIRTUALENV=.venv
+SDK_VERSION=$(shell grep '^__version__' globus_sdk/version.py | cut -d '"' -f2)
 
-.PHONY: docs build upload localdev test lint autoformat clean help
-
+.PHONY: help
 help:
 	@echo "Globus SDK 'make' targets"
 	@echo ""
 	@echo "  help:         Show this helptext"
-	@echo "  build:        Create the distributions which we like to upload to pypi"
-	@echo "  upload:       [build] + upload to pypi using twine"
 	@echo "  test:         Run the full suite of tests + linting"
 	@echo "  autoformat:   Run code autoformatters"
 	@echo "  docs:         Clean old HTML docs and rebuild them with sphinx"
+	@echo "  release:      create a signed tag, clean old builds, do a fresh build, and upload to pypi"
 	@echo "  clean:        Remove typically unwanted files, mostly from [build]"
 
-localdev: $(VIRTUALENV)
-$(VIRTUALENV): setup.py
-	# don't recreate it if it already exists -- just run the setup steps
-	if [ ! -d "$(VIRTUALENV)" ]; then virtualenv --python=$(PYTHON_VERSION) $(VIRTUALENV); fi
-	$(VIRTUALENV)/bin/pip install -U pip setuptools
-	$(VIRTUALENV)/bin/pip install -e '.[development]'
+.PHONY: localdev
+localdev: .venv
+.venv:
+	virtualenv --python=python3 .venv
+	.venv/bin/pip install -U pip setuptools
+	.venv/bin/pip install -e '.[development]'
 	# explicit touch to ensure good update time relative to setup.py
-	touch $(VIRTUALENV)
+	touch .venv
 
 # run outside of tox because specifying a tox environment for py3.6+ is awkward
-autoformat: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/isort --recursive tests/ globus_sdk/ setup.py
-	if [ -f "$(VIRTUALENV)/bin/black" ]; then $(VIRTUALENV)/bin/black  tests/ globus_sdk/ setup.py; fi
+.PHONY: autoformat
+autoformat: .venv
+	.venv/bin/isort --recursive tests/ globus_sdk/ setup.py
+	.venv/bin/black tests/ globus_sdk/ setup.py
 
-test: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/tox
-docs: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/tox -e docs
-build: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/python setup.py sdist bdist_wheel
-upload: build
-	$(VIRTUALENV)/bin/twine upload dist/*
+.PHONY: test
+test: .venv
+	.venv/bin/tox
+.PHONY: docs
+docs: .venv
+	.venv/bin/tox -e docs
 
+.PHONY: showvars
+showvars:
+	@echo "SDK_VERSION=$(SDK_VERSION)"
+.PHONY: release
+release: .venv
+	git tag -s "$(SDK_VERSION)" -m "v$(SDK_VERSION)"
+	rm -rf dist
+	.venv/bin/python setup.py sdist bdist_wheel
+	.venv/bin/twine upload dist/*
+
+.PHONY: clean
 clean:
-	rm -rf $(VIRTUALENV) dist build *.egg-info .tox
+	rm -rf .venv dist build *.egg-info .tox
