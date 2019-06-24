@@ -13,12 +13,19 @@ ACCESS_TOKEN = "access_token_1"
 EXPIRES_AT = -1
 
 
-@pytest.fixture
-def response():
+@pytest.fixture(params=["simple", "with_new_refresh_token"])
+def response(request):
     r = mock.Mock()
     r.by_resource_server = {
-        "rs1": {"expires_at_seconds": -1, "access_token": "access_token_2"}
-    }
+        "simple": {"rs1": {"expires_at_seconds": -1, "access_token": "access_token_2"}},
+        "with_new_refresh_token": {
+            "rs1": {
+                "expires_at_seconds": -1,
+                "access_token": "access_token_2",
+                "refresh_token": "refresh_token_2",
+            }
+        },
+    }[request.param]
     return r
 
 
@@ -50,9 +57,8 @@ def test_get_token_response(authorizer, client, response):
 
 def test_multiple_resource_servers(authorizer, response):
     """
-    Sets the mock ConfidentialAppAuthClient to return multiple resource
-    servers. Confirms GlobusError is raised when _extract_token_data is
-    called.
+    Sets the mock client to return multiple resource servers.
+    Confirms GlobusError is raised when _extract_token_data is called.
     """
     response.by_resource_server["rs2"] = {
         "expires_at_seconds": -1,
@@ -61,3 +67,19 @@ def test_multiple_resource_servers(authorizer, response):
     with pytest.raises(ValueError) as excinfo:
         authorizer._extract_token_data(response)
     assert "didn't return exactly one token" in str(excinfo.value)
+
+
+def test_conditional_refresh_token_update(authorizer, response):
+    """
+    Call check_expiration_time (triggering a refresh)
+    Confirm that the authorizer always udpates its access token and only updates
+    refresh_token if one was present in the response
+    """
+    authorizer.check_expiration_time()  # trigger refresh
+    token_data = response.by_resource_server["rs1"]
+    if "refresh_token" in token_data:  # if present, confirm refresh token was updated
+        assert authorizer.access_token == "access_token_2"
+        assert authorizer.refresh_token == "refresh_token_2"
+    else:  # otherwise, confirm no change
+        assert authorizer.access_token == "access_token_2"
+        assert authorizer.refresh_token == "refresh_token_1"

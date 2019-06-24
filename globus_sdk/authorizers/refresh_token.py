@@ -87,6 +87,9 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         """
         Get the tokens .by_resource_server,
         Ensure that only one token was gotten, and return that token.
+
+        If the token_data includes a "refresh_token" field, update self.refresh_token to
+        that value.
         """
         token_data = res.by_resource_server.values()
         if len(token_data) != 1:
@@ -95,4 +98,11 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
                 "didn't return exactly one token. Possible service error."
             )
 
-        return next(iter(token_data))
+        token_data = next(iter(token_data))
+
+        # handle refresh_token being present
+        # mandated by OAuth2: https://tools.ietf.org/html/rfc6749#section-6
+        if "refresh_token" in token_data:
+            self.refresh_token = token_data["refresh_token"]
+
+        return token_data
