@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+v1.8.0
+------
+
+* Add a property to paginated results which shows if more results are available (`#346`_)
+* Update docs to state that Globus SDK uses semver (`#357`_)
+* Fix `RefreshTokenAuthorizer` to handle a new `refresh_token` being sent back by Auth (`#359`_)
+* Fix typo in endpoint_search log message (`#355`_)
+* Fix Globus Web App activation links in docs (`#356`_)
+
+.. _#359: https://github.com/globus/globus-sdk-python/pull/359
+.. _#357: https://github.com/globus/globus-sdk-python/pull/357
+.. _#356: https://github.com/globus/globus-sdk-python/pull/356
+.. _#355: https://github.com/globus/globus-sdk-python/pull/355
+.. _#346: https://github.com/globus/globus-sdk-python/pull/346
+
 v1.7.1
 ------
 
