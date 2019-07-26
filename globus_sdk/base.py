@@ -117,8 +117,7 @@ class BaseClient(object):
             self.base_url = config.get_service_url(self.environment, service)
         else:
             self.base_url = base_url
-        if base_path is not None:
-            self.base_url = slash_join(self.base_url, base_path)
+        self.base_url = slash_join(self.base_url, base_path)
 
         # setup the basics for wrapping a Requests Session
         # including basics for internal header dict
@@ -558,6 +557,8 @@ def slash_join(a, b):
     Join a and b with a single slash, regardless of whether they already
     contain a trailing/leading slash or neither.
     """
+    if not b:  # "" or None, don't append a slash
+        return a
     if a.endswith("/"):
         if b.startswith("/"):
             return a[:-1] + b
