@@ -194,7 +194,15 @@ class TransferData(dict):
                 )
             )
 
-    def add_item(self, source_path, destination_path, recursive=False, **params):
+    def add_item(
+        self,
+        source_path,
+        destination_path,
+        recursive=False,
+        external_checksum=None,
+        checksum_algorithm=None,
+        **params
+    ):
         """
         Add a file or directory to be transfered. If the item is a symlink
         to a file or directory, the file or directory at the target of
@@ -202,6 +210,27 @@ class TransferData(dict):
 
         Appends a transfer_item document to the DATA key of the transfer
         document.
+
+        **Parameters**
+
+        ``source_path`` (*string*)
+        Path to the source directory or file to be transfered
+
+        ``destination_path`` (*string*)
+        Path to the source directory or file will be transfered to
+
+        ``recursive`` (*bool*)
+        Set to True if the target at source path is a directory
+
+        ``external_checksum`` (*string*)
+        A checksum to verify source file integrity before the transfer
+        and destination file integrity after the transfer. Cannot be used
+        with directories. Assumed to be an MD5 checksum unless
+        checksum_algorithm is also given.
+
+        ``checksum_algorithm`` (*string*)
+        Specifies the checksum algorithm to be used when verify_checksum is
+        True, sync_level is "checksum" or 3, or an external_checksum is given.
         """
         source_path = safe_stringify(source_path)
         destination_path = safe_stringify(destination_path)
@@ -210,6 +239,8 @@ class TransferData(dict):
             "source_path": source_path,
             "destination_path": destination_path,
             "recursive": recursive,
+            "external_checksum": external_checksum,
+            "checksum_algorithm": checksum_algorithm,
         }
         item_data.update(params)
 
@@ -230,6 +261,14 @@ class TransferData(dict):
 
         Appends a transfer_symlink_item document to the DATA key of the
         transfer document.
+
+        **Parameters**
+
+        ``source_path`` (*string*)
+        Path to the source symlink
+
+        ``destination_path`` (*string*)
+        Path to the source symlink will be transfered to
         """
         source_path = safe_stringify(source_path)
         destination_path = safe_stringify(destination_path)
