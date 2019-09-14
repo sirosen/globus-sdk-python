@@ -213,24 +213,24 @@ class TransferData(dict):
 
         **Parameters**
 
-        ``source_path`` (*string*)
-        Path to the source directory or file to be transfered
+          ``source_path`` (*string*)
+            Path to the source directory or file to be transfered
 
-        ``destination_path`` (*string*)
-        Path to the source directory or file will be transfered to
+          ``destination_path`` (*string*)
+            Path to the source directory or file will be transfered to
 
-        ``recursive`` (*bool*)
-        Set to True if the target at source path is a directory
+          ``recursive`` (*bool*)
+            Set to True if the target at source path is a directory
 
-        ``external_checksum`` (*string*)
-        A checksum to verify source file integrity before the transfer
-        and destination file integrity after the transfer. Cannot be used
-        with directories. Assumed to be an MD5 checksum unless
-        checksum_algorithm is also given.
+          ``external_checksum`` (*string*)
+            A checksum to verify source file integrity before the transfer
+            and destination file integrity after the transfer. Cannot be used
+            with directories. Assumed to be an MD5 checksum unless
+            checksum_algorithm is also given.
 
-        ``checksum_algorithm`` (*string*)
-        Specifies the checksum algorithm to be used when verify_checksum is
-        True, sync_level is "checksum" or 3, or an external_checksum is given.
+          ``checksum_algorithm`` (*string*)
+            Specifies the checksum algorithm to be used when verify_checksum is
+            True, sync_level is "checksum" or 3, or an external_checksum is given.
         """
         source_path = safe_stringify(source_path)
         destination_path = safe_stringify(destination_path)
@@ -264,11 +264,11 @@ class TransferData(dict):
 
         **Parameters**
 
-        ``source_path`` (*string*)
-        Path to the source symlink
+          ``source_path`` (*string*)
+            Path to the source symlink
 
-        ``destination_path`` (*string*)
-        Path to the source symlink will be transfered to
+          ``destination_path`` (*string*)
+            Path to the source symlink will be transfered to
         """
         source_path = safe_stringify(source_path)
         destination_path = safe_stringify(destination_path)
