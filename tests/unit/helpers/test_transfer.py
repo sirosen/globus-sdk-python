@@ -58,7 +58,7 @@ def test_tranfer_init(transfer_data):
 
 def test_transfer_add_item(transfer_data):
     """
-    Adds two items to TransferData, verifies results
+    Adds three items to TransferData, verifies results
     """
     tdata = transfer_data()
     # add item
@@ -72,6 +72,8 @@ def test_transfer_add_item(transfer_data):
     assert data["source_path"] == source_path
     assert data["destination_path"] == dest_path
     assert not data["recursive"]
+    assert data["external_checksum"] is None
+    assert data["checksum_algorithm"] is None
 
     # add recursive item
     tdata.add_item(source_path, dest_path, recursive=True)
@@ -82,6 +84,22 @@ def test_transfer_add_item(transfer_data):
     assert r_data["source_path"] == source_path
     assert r_data["destination_path"] == dest_path
     assert r_data["recursive"]
+    assert r_data["external_checksum"] is None
+    assert r_data["checksum_algorithm"] is None
+
+    checksum = "d577273ff885c3f84dadb8578bb41399"
+    algorithm = "MD5"
+    tdata.add_item(
+        source_path, dest_path, external_checksum=checksum, checksum_algorithm=algorithm
+    )
+    assert len(tdata["DATA"]) == 3
+    c_data = tdata["DATA"][2]
+    assert c_data["DATA_TYPE"] == "transfer_item"
+    assert c_data["source_path"] == source_path
+    assert c_data["destination_path"] == dest_path
+    assert not c_data["recursive"]
+    assert c_data["external_checksum"] == checksum
+    assert c_data["checksum_algorithm"] == algorithm
 
 
 def test_transfer_add_symlink_item(transfer_data):
