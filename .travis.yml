@@ -6,7 +6,8 @@ matrix:
     - python: "2.7"
       env: TOXENV=py,lowestdeps
     # py2 linting build (flake8 on py2 can flag different stuff)
-    - python: "2.7"
+    - name: "Python: 2.7 (linting)"
+      python: "2.7"
       env: TOXENV=lint
     # test on 3.4, 3.5, 3.6
     - python: "3.4"
@@ -16,14 +17,13 @@ matrix:
     - python: "3.6"
       env: TOXENV=py,lowestdeps
     # separate py3.6 linting build, which runs 'black --check' (no py2 support)
-    - python: "3.6"
+    - name: "Python: 3.6 (linting)"
+      python: "3.6"
       env: TOXENV=py36-lint
     - python: "3.7"
       env: TOXENV=py
-    - python: "3.8-dev"
+    - python: "3.8"
       env: TOXENV=py
-      # sudo:required gets us the VM builds where this python works
-      sudo: required
     - python: "pypy"
       env: TOXENV=py
     - python: "pypy3"
@@ -41,10 +41,10 @@ matrix:
       before_install:
         - choco install python2
         - python -m pip install --upgrade pip wheel
-    - name: "py3.7 + windows"
+    - name: "py3.8 + windows"
       os: windows
       language: shell
-      env: TOXENV=py,lowestdeps,py37-lint PATH=/c/Python37:/c/Python37/Scripts:$PATH
+      env: TOXENV=py,lowestdeps,py38-lint PATH=/c/Python38:/c/Python38/Scripts:$PATH
       before_install:
         - choco install python3
         - python -m pip install --upgrade pip wheel
@@ -61,7 +61,6 @@ matrix:
       env: TOXENV=py3,py3-lowestdeps,py37-lint
 
   allow_failures:
-    - python: "3.8-dev"
     - python: "pypy"
     - python: "pypy3"
     - python: "nightly"
