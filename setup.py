@@ -55,9 +55,9 @@ setup(
             # flake-bugbear requires py3.5+
             'flake8-bugbear==18.8.0;python_version>="3.5"',
             # testing
-            "pytest>=3.7.4,<4.0",
-            "pytest-cov>=2.5.1,<3.0",
-            "pytest-xdist>=1.22.5,<2.0",
+            "pytest<5.0",
+            "pytest-cov<3.0",
+            "pytest-xdist<2.0",
             # mock on py2, py3.4 and py3.5
             # not just py2: py3 versions of mock don't all have the same
             # interface!
