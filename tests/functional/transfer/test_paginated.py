@@ -1,9 +1,5 @@
-"""
-Tests for PaginatedResource responses from TransferClient
-"""
 import json
 
-import pytest
 import responses
 
 from tests.common import register_api_route
@@ -75,7 +71,7 @@ def test_endpoint_search_noresults(client):
     register_api_route("transfer", "/endpoint_search", body=EMPTY_SEARCH_RESULT)
 
     res = client.endpoint_search("search query!")
-    assert res.data == []
+    assert res["DATA"] == []
 
 
 def test_endpoint_search_one_page(client):
@@ -83,33 +79,12 @@ def test_endpoint_search_one_page(client):
         "transfer", "/endpoint_search", body=json.dumps(SINGLE_PAGE_SEARCH_RESULT)
     )
 
-    # without cranking up num_results, we'll only get 25
+    # without calling the paginated version, we only get one page
     res = client.endpoint_search("search query!")
-    assert len(list(res)) == 25
-
-    # paginated results don't have __getitem__ !
-    # attempting to __getitem__ on a response object defaults to a TypeError
-    with pytest.raises(TypeError):
-        res["DATA_TYPE"]
-
-    # second fetch is empty
-    assert list(res) == []
-
-    # reload
-    res = client.endpoint_search("search query!")
+    assert len(list(res)) == 100
+    assert res["DATA_TYPE"] == "endpoint_list"
     for res_obj in res:
         assert res_obj["DATA_TYPE"] == "endpoint"
-
-
-def test_endpoint_search_reduced(client):
-    register_api_route(
-        "transfer", "/endpoint_search", body=json.dumps(SINGLE_PAGE_SEARCH_RESULT)
-    )
-
-    # result has 100 items -- num_results caps it even if the API
-    # returns more
-    res = client.endpoint_search("search query!", num_results=10)
-    assert len(list(res)) == 10
 
 
 def test_endpoint_search_multipage(client):
@@ -117,16 +92,25 @@ def test_endpoint_search_multipage(client):
     for page in MULTIPAGE_SEARCH_RESULTS:
         register_api_route("transfer", "/endpoint_search", json=page)
 
-    # without cranking up num_results, we'll only get 25
+    # unpaginated, we'll only get one page
     res = list(client.endpoint_search("search_query"))
-    assert len(res) == 25
+    assert len(res) == 100
 
     # reset and reapply responses
     responses.reset()
     for page in MULTIPAGE_SEARCH_RESULTS:
         register_api_route("transfer", "/endpoint_search", json=page)
 
-    # num_results=None -> no limit
-    res = list(client.endpoint_search("search_query", num_results=None))
-    assert res[-1]["display_name"] == "SDK Test Stub 299"
-    assert len(res) == sum(len(x["DATA"]) for x in MULTIPAGE_SEARCH_RESULTS)
+    # paginated calls gets all pages
+    paginator = client.paginated.endpoint_search("search_query")
+    count_pages = 0
+    count_objects = 0
+    for page in paginator:
+        count_pages += 1
+        assert page["DATA_TYPE"] == "endpoint_list"
+        for res_obj in page:
+            count_objects += 1
+            assert res_obj["DATA_TYPE"] == "endpoint"
+
+    assert count_pages == len(MULTIPAGE_SEARCH_RESULTS)
+    assert count_objects == sum(len(x["DATA"]) for x in MULTIPAGE_SEARCH_RESULTS)
