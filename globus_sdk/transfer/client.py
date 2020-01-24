@@ -1507,6 +1507,12 @@ class TransferClient(BaseClient):
         """
         Get the successful file transfers for a completed Task.
 
+        .. note::
+
+            This does not include files that were checked but skipped as part of a sync
+            transfer, only files that were actually transferred, and does not include
+            any directories.
+
         ``GET /task/<task_id>/successful_transfers``
 
         :rtype: :class:`PaginatedResource
