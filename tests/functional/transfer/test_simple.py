@@ -3,7 +3,6 @@ import uuid
 
 import httpretty
 import pytest
-import six
 
 import globus_sdk
 from tests.common import (
@@ -60,7 +59,7 @@ def test_update_endpoint(client):
     assert update_doc["message"] == "Endpoint updated successfully"
 
     req = httpretty.last_request()
-    assert req.body == six.b(json.dumps(update_data))
+    assert req.body == json.dumps(update_data).encode("utf-8")
 
 
 def test_update_endpoint_rewrites_activation_servers(client):
@@ -76,17 +75,17 @@ def test_update_endpoint_rewrites_activation_servers(client):
     update_data = {"myproxy_server": "foo"}
     client.update_endpoint(epid, update_data.copy())
     req = httpretty.last_request()
-    assert req.body != six.b(json.dumps(update_data))
+    assert req.body != json.dumps(update_data).encode("utf-8")
     update_data["oauth_server"] = None
-    assert req.body == six.b(json.dumps(update_data))
+    assert req.body == json.dumps(update_data).encode("utf-8")
 
     # sending oauth_server implicitly adds myproxy_server=null
     update_data = {"oauth_server": "foo"}
     client.update_endpoint(epid, update_data.copy())
     req = httpretty.last_request()
-    assert req.body != six.b(json.dumps(update_data))
+    assert req.body != json.dumps(update_data).encode("utf-8")
     update_data["myproxy_server"] = None
-    assert req.body == six.b(json.dumps(update_data))
+    assert req.body == json.dumps(update_data).encode("utf-8")
 
 
 def test_update_endpoint_invalid_activation_servers(client):
@@ -112,7 +111,7 @@ def test_create_endpoint(client):
     assert create_doc["message"] == "Endpoint created successfully"
 
     req = httpretty.last_request()
-    assert req.body == six.b(json.dumps(create_data))
+    assert req.body == json.dumps(create_data).encode("utf-8")
 
 
 def test_create_endpoint_invalid_activation_servers(client):

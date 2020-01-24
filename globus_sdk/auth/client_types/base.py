@@ -3,8 +3,6 @@ from __future__ import print_function, unicode_literals
 import collections
 import logging
 
-import six
-
 from globus_sdk import exc
 from globus_sdk.auth.token_response import OAuthTokenResponse
 from globus_sdk.authorizers import NullAuthorizer
@@ -130,9 +128,7 @@ class AuthClient(BaseClient):
         """
 
         def _convert_listarg(val):
-            if isinstance(val, collections.Iterable) and not isinstance(
-                val, six.string_types
-            ):
+            if isinstance(val, collections.Iterable) and not isinstance(val, str):
                 return ",".join(safe_stringify(x) for x in val)
             else:
                 return safe_stringify(val)

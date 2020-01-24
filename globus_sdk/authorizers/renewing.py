@@ -2,8 +2,6 @@ import abc
 import logging
 import time
 
-import six
-
 from globus_sdk.authorizers.base import GlobusAuthorizer
 from globus_sdk.utils.string_hashing import sha256_string
 
@@ -13,8 +11,7 @@ logger = logging.getLogger(__name__)
 EXPIRES_ADJUST_SECONDS = 60
 
 
-@six.add_metaclass(abc.ABCMeta)
-class RenewingAuthorizer(GlobusAuthorizer):
+class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
     """
     A ``RenewingAuthorizer`` is an abstract superclass to any authorizer
     that needs to get new Access Tokens in order to form Authorization headers.

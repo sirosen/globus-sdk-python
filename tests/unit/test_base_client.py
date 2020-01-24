@@ -4,7 +4,6 @@ import uuid
 
 import httpretty
 import pytest
-import six
 
 import globus_sdk
 from globus_sdk.base import BaseClient, merge_params, safe_stringify, slash_join
@@ -103,7 +102,7 @@ def test_http_methods(method, allows_body, base_client):
     req = httpretty.last_request()
 
     assert req.method == methodname
-    assert req.body == six.b("")
+    assert req.body == b""
     assert "x" in res
     assert res["x"] == "y"
 
@@ -113,7 +112,7 @@ def test_http_methods(method, allows_body, base_client):
         req = httpretty.last_request()
 
         assert req.method == methodname
-        assert req.body == six.b(json.dumps(jsonbody))
+        assert req.body == json.dumps(jsonbody).encode("utf-8")
         assert "x" in res
         assert res["x"] == "y"
 
@@ -121,7 +120,7 @@ def test_http_methods(method, allows_body, base_client):
         req = httpretty.last_request()
 
         assert req.method == methodname
-        assert req.body == six.b("abc")
+        assert req.body == b"abc"
         assert "x" in res
         assert res["x"] == "y"
 
@@ -195,5 +194,5 @@ def test_safe_stringify(value):
     and confirms safe_stringify returns utf-8 encoding for all inputs
     """
     safe_value = safe_stringify(value)
+    assert type(safe_value) == str
     assert safe_value == u"1"
-    assert type(safe_value) == six.text_type

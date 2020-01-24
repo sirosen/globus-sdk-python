@@ -1,7 +1,5 @@
 import logging
 
-import six
-
 from globus_sdk.auth.client_types.base import AuthClient
 from globus_sdk.auth.oauth2_authorization_code import GlobusAuthorizationCodeFlowManager
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
@@ -87,7 +85,7 @@ class ConfidentialAppAuthClient(AuthClient):
         self.logger.info("Fetching token(s) using client credentials")
         requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
         # convert scopes iterable to string immediately on load
-        if not isinstance(requested_scopes, six.string_types):
+        if not isinstance(requested_scopes, str):
             requested_scopes = " ".join(requested_scopes)
 
         return self.oauth2_token(

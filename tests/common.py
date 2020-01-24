@@ -9,7 +9,6 @@ import os
 
 import httpretty
 import requests
-import six
 
 import globus_sdk
 from globus_sdk.base import slash_join
@@ -82,8 +81,8 @@ def register_api_route_fixture_file(service, path, filename, **kwargs):
     modpath = os.path.abspath(frm[1])
 
     abspath = os.path.join(os.path.dirname(modpath), "fixture_data", filename)
-    with open(abspath) as f:
-        body = six.b(f.read())
+    with open(abspath, "rb") as f:
+        body = f.read()
 
     register_api_route(service, path, body=body, **kwargs)
 

@@ -1,7 +1,5 @@
 import logging
-
-import six
-from six.moves.urllib.parse import urlencode
+import urllib.parse
 
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_flow_manager import GlobusOAuthFlowManager
@@ -63,7 +61,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         # default to the default requested scopes
         self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
         # convert scopes iterable to string immediately on load
-        if not isinstance(self.requested_scopes, six.string_types):
+        if not isinstance(self.requested_scopes, str):
             self.requested_scopes = " ".join(self.requested_scopes)
 
         # store the remaining parameters directly, with no transformation
@@ -118,7 +116,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         if additional_params:
             params.update(additional_params)
 
-        params = urlencode(params)
+        params = urllib.parse.urlencode(params)
         return "{0}?{1}".format(authorize_base_url, params)
 
     def exchange_code_for_tokens(self, auth_code):

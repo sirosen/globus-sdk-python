@@ -4,7 +4,6 @@ import time
 
 import jwt
 import requests
-import six
 
 from globus_sdk.response import GlobusHTTPResponse
 
@@ -50,7 +49,7 @@ class _ByScopesGetter(object):
         return iter(self.scope_map.keys())
 
     def __getitem__(self, scopename):
-        if not isinstance(scopename, six.string_types):
+        if not isinstance(scopename, str):
             raise KeyError(
                 'by_scopes cannot contain non-string value "{}"'.format(scopename)
             )

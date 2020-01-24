@@ -1,5 +1,6 @@
+from urllib.parse import quote_plus
+
 import pytest
-from six.moves.urllib.parse import quote_plus
 
 import globus_sdk
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES

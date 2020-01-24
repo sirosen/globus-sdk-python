@@ -1,7 +1,6 @@
 import logging
 
 import requests
-import six
 
 logger = logging.getLogger(__name__)
 
@@ -229,7 +228,7 @@ class AuthAPIError(GlobusAPIError):
             self.message = data["message"]
         elif "detail" in data:
             self.message = data["detail"]
-        elif "error" in data and isinstance(data["error"], six.string_types):
+        elif "error" in data and isinstance(data["error"], str):
             self.message = data["error"]
         else:
             self.message = "no_extractable_message"

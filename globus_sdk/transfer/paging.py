@@ -1,7 +1,5 @@
 import logging
 
-import six
-
 from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.response import GlobusResponse
 from globus_sdk.transfer.response import IterableTransferResponse
@@ -9,7 +7,7 @@ from globus_sdk.transfer.response import IterableTransferResponse
 logger = logging.getLogger(__name__)
 
 
-class PaginatedResource(GlobusResponse, six.Iterator):
+class PaginatedResource(GlobusResponse):
     """
     A ``PaginatedResource`` is an iterable response which implements the Python
     iterator interface. As such, **you can only iterate over
@@ -159,10 +157,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
 
         # what function call does this class instance wrap up?
         self.client_method = client_method
-        if six.PY2:
-            self.client_object = client_method.im_self
-        else:
-            self.client_object = client_method.__self__
+        self.client_object = client_method.__self__
 
         self.client_path = path
         self.client_kwargs = client_kwargs
