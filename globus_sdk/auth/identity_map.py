@@ -117,6 +117,11 @@ class IdentityMap(object):
       A list or other iterable of usernames or identity IDs (potentially mixed together)
       which will be used to seed the ``IdentityMap`` 's tracking of unresolved Identities.
 
+    ``cache`` (*Mapping*)
+      A dict or other mapping object which will be used to cache results. The default is
+      that results are cached once per IdentityMap object. If you want multiple
+      IdentityMaps to share data, explicitly pass the same ``cache`` to both.
+
     ``id_batch_size`` (*int*)
       A non-default batch size to use when communicating with Globus Auth. Leaving this
       set to the default is strongly recommended.
@@ -131,7 +136,7 @@ class IdentityMap(object):
 
     _default_id_batch_size = 100
 
-    def __init__(self, auth_client, identity_ids=None, id_batch_size=None):
+    def __init__(self, auth_client, identity_ids=None, cache=None, id_batch_size=None):
         self.auth_client = auth_client
         self.id_batch_size = id_batch_size or self._default_id_batch_size
 
@@ -141,7 +146,9 @@ class IdentityMap(object):
         )
 
         # the cache is a dict mapping IDs and Usernames
-        self._cache = {}
+        # a cache may be passed in via the constructor in order to make multiple
+        # IdentityMap objects share a cache
+        self._cache = cache if cache is not None else {}
 
     def _fetch_batch_including(self, key):
         """
@@ -217,6 +224,15 @@ class IdentityMap(object):
         """
         if key not in self._cache:
             self._fetch_batch_including(key)
+        # if the key was in the cache, double-check that it's not in the unresolved
+        # usernames or IDs for the IdentityMap
+        # otherwise, when a cache is being shared between IdentityMap instances, it's
+        # possible to call out to Auth unnecessarily
+        else:
+            if key in self.unresolved_ids:
+                self.unresolved_ids.remove(key)
+            elif key in self.unresolved_usernames:
+                self.unresolved_usernames.remove(key)
         return self._cache[key]
 
     def __delitem__(self, key):
