@@ -1,11 +1,16 @@
-import re
-
-# what qualifies as a valid Identity Username?
-_USERNAME_PATTERN = re.compile(r"^[a-zA-Z0-9]+.*@[a-zA-z0-9-]+\..*[a-zA-Z]+$")
+import uuid
 
 
 def is_username(val):
-    return _USERNAME_PATTERN.match(val) is not None
+    """
+    If the value parses as a UUID, then it's an ID, not a username.
+    If it does not parse as such, then it must be a username.
+    """
+    try:
+        uuid.UUID(val)
+        return False
+    except ValueError:
+        return True
 
 
 def split_ids_and_usernames(identity_ids):
@@ -49,7 +54,7 @@ class IdentityMap(object):
     - seed the ``IdentityMap`` with IDs and Usernames via :py:meth:`~IdentityMap.add` (you
       can also do this during initialization)
 
-    - retreive identity IDs or Usernames from the map
+    - retrieve identity IDs or Usernames from the map
 
     Because the map can be populated with a collection of identity IDs and Usernames
     prior to lookups being performed, it can improve the efficiency of these operations
@@ -71,7 +76,7 @@ class IdentityMap(object):
     Correct usage looks something like so::
 
         ac = globus_sdk.AuthClient(...)
-        idmap = globus_sdk.ext.IdentityMap(
+        idmap = globus_sdk.IdentityMap(
             ac, ["foo@globusid.org", "bar@uchicago.edu"]
         )
         idmap.add("baz@xsede.org")
