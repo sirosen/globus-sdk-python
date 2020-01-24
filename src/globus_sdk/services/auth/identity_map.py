@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Dict, Iterable, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, MutableMapping, Optional, Set, Tuple
 
 from .client import AuthClient
 
@@ -120,6 +120,10 @@ class IdentityMap:
     :param id_batch_size: A non-default batch size to use when communicating with Globus
         Auth. Leaving this set to the default is strongly recommended.
     :type id_batch_size: int, optional
+    :param cache:  A dict or other mapping object which will be used to cache results.
+        The default is that results are cached once per IdentityMap object. If you want
+        multiple IdentityMaps to share data, explicitly pass the same ``cache`` to both.
+    :type cache: MutableMapping, optional
 
     .. automethodlist:: globus_sdk.IdentityMap
         include_methods=__getitem__,__delitem__
@@ -133,6 +137,7 @@ class IdentityMap:
         identity_ids: Optional[Iterable[str]] = None,
         *,
         id_batch_size: Optional[int] = None,
+        cache: Optional[MutableMapping[str, Dict[str, Any]]] = None,
     ):
         self.auth_client = auth_client
         self.id_batch_size = id_batch_size or self._default_id_batch_size
@@ -142,8 +147,9 @@ class IdentityMap:
             [] if identity_ids is None else identity_ids
         )
 
-        # the cache is a dict mapping IDs and Usernames
-        self._cache: Dict[str, Dict[str, Any]] = {}
+        # a cache may be passed in via the constructor in order to make multiple
+        # IdentityMap objects share a cache
+        self._cache = cache if cache is not None else {}
 
     def _fetch_batch_including(self, key: str) -> None:
         """
@@ -219,6 +225,15 @@ class IdentityMap:
         """
         if key not in self._cache:
             self._fetch_batch_including(key)
+        # if the key was in the cache, double-check that it's not in the unresolved
+        # usernames or IDs for the IdentityMap
+        # otherwise, when a cache is being shared between IdentityMap instances, it's
+        # possible to call out to Auth unnecessarily
+        else:
+            if key in self.unresolved_ids:
+                self.unresolved_ids.remove(key)
+            elif key in self.unresolved_usernames:
+                self.unresolved_usernames.remove(key)
         return self._cache[key]
 
     def __delitem__(self, key: str) -> None:

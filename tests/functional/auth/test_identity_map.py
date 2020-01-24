@@ -167,3 +167,63 @@ def test_identity_map_del(client):
     # invalidated the cached ID data and are asking the IDMap to look it up again
     assert idmap.get(identity_id)["username"] == "sirosen@globus.org"
     assert len(responses.calls) == 2
+
+
+@pytest.mark.parametrize(
+    "lookup1,lookup2",
+    [
+        ("sirosen@globus.org", "sirosen@globus.org"),
+        ("sirosen@globus.org", "ae341a98-d274-11e5-b888-dbae3a8ba545"),
+        ("ae341a98-d274-11e5-b888-dbae3a8ba545", "sirosen@globus.org"),
+    ],
+)
+@pytest.mark.parametrize("initial_add", [True, False])
+def test_identity_map_shared_cache_match(client, initial_add, lookup1, lookup2):
+    register_api_route("auth", "/v2/api/identities", json=IDENTITIES_SINGLE_RESPONSE)
+    cache = {}
+    idmap1 = globus_sdk.IdentityMap(client, cache=cache)
+    idmap2 = globus_sdk.IdentityMap(client, cache=cache)
+    if initial_add:
+        idmap1.add(lookup1)
+        idmap2.add(lookup2)
+    # no requests yet...
+    assert len(responses.calls) == 0
+    # do the first lookup, it should make one request
+    assert idmap1[lookup1]["organization"] == "Globus Team"
+    assert len(responses.calls) == 1
+    # lookup more values and make sure that "everything matches"
+    assert idmap2[lookup2]["organization"] == "Globus Team"
+    assert idmap1[lookup1]["id"] == idmap2[lookup2]["id"]
+    assert idmap1[lookup2]["id"] == idmap2[lookup1]["id"]
+    # we've only made one request, because the shared cache captured this info on the
+    # very first call
+    assert len(responses.calls) == 1
+
+
+@pytest.mark.parametrize(
+    "lookup1,lookup2",
+    [
+        ("sirosen@globus.org", "globus@globus.org"),
+        (
+            "46bd0f56-e24f-11e5-a510-131bef46955c",
+            "ae341a98-d274-11e5-b888-dbae3a8ba545",
+        ),
+    ],
+)
+def test_identity_map_shared_cache_mismatch(client, lookup1, lookup2):
+    register_api_route("auth", "/v2/api/identities", json=IDENTITIES_MULTIPLE_RESPONSE)
+    cache = {}
+    idmap1 = globus_sdk.IdentityMap(client, [lookup1, lookup2], cache=cache)
+    idmap2 = globus_sdk.IdentityMap(client, cache=cache)
+    # no requests yet...
+    assert len(responses.calls) == 0
+    # do the first lookup, it should make one request
+    assert lookup1 in (idmap1[lookup1]["id"], idmap1[lookup1]["username"])
+    assert len(responses.calls) == 1
+    # lookup more values and make sure that "everything matches"
+    assert lookup2 in (idmap2[lookup2]["id"], idmap2[lookup2]["username"])
+    assert idmap1[lookup1]["id"] == idmap2[lookup1]["id"]
+    assert idmap1[lookup2]["id"] == idmap2[lookup2]["id"]
+    # we've only made one request, because the shared cache captured this info on the
+    # very first call
+    assert len(responses.calls) == 1
