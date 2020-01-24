@@ -50,11 +50,7 @@ def client():
 
 
 def test_identity_map(client):
-    register_api_route(
-        "auth",
-        "/v2/api/identities?usernames=sirosen@globus.org&provision=false",
-        body=IDENTITIES_SINGLE_RESPONSE,
-    )
+    register_api_route("auth", "/v2/api/identities", body=IDENTITIES_SINGLE_RESPONSE)
     idmap = globus_sdk.IdentityMap(client, ["sirosen@globus.org"])
     assert idmap["sirosen@globus.org"]["organization"] == "Globus Team"
 
@@ -113,11 +109,7 @@ def test_identity_map_add(client):
 
 
 def test_identity_map_add_after_lookup(client):
-    register_api_route(
-        "auth",
-        "/v2/api/identities?usernames=sirosen@globus.org&provision=false",
-        body=IDENTITIES_SINGLE_RESPONSE,
-    )
+    register_api_route("auth", "/v2/api/identities", body=IDENTITIES_SINGLE_RESPONSE)
     idmap = globus_sdk.IdentityMap(client)
     x = idmap["sirosen@globus.org"]["id"]
     # this is the key: adding it will indicate that we've already seen this ID, perhaps
@@ -128,12 +120,7 @@ def test_identity_map_add_after_lookup(client):
 
 def test_identity_map_multiple(client):
     register_api_route(
-        "auth",
-        (
-            "/v2/api/identities?"
-            "usernames=sirosen@globus.org,globus@globus.org&provision=false"
-        ),
-        body=IDENTITIES_MULTIPLE_RESPONSE,
+        "auth", ("/v2/api/identities"), body=IDENTITIES_MULTIPLE_RESPONSE
     )
     idmap = globus_sdk.IdentityMap(client, ["sirosen@globus.org", "globus@globus.org"])
     assert idmap["sirosen@globus.org"]["organization"] == "Globus Team"
@@ -151,11 +138,7 @@ def test_identity_map_multiple(client):
 
 
 def test_identity_map_keyerror(client):
-    register_api_route(
-        "auth",
-        "/v2/api/identities?usernames=sirosen2@globus.org&provision=false",
-        body=IDENTITIES_SINGLE_RESPONSE,
-    )
+    register_api_route("auth", "/v2/api/identities", body=IDENTITIES_SINGLE_RESPONSE)
     idmap = globus_sdk.IdentityMap(client)
     # a name which doesn't come back, indicating that it was not found, will KeyError
     with pytest.raises(KeyError):
@@ -167,11 +150,7 @@ def test_identity_map_keyerror(client):
 
 
 def test_identity_map_get_with_default(client):
-    register_api_route(
-        "auth",
-        "/v2/api/identities?usernames=sirosen2@globus.org&provision=false",
-        body=IDENTITIES_SINGLE_RESPONSE,
-    )
+    register_api_route("auth", "/v2/api/identities", body=IDENTITIES_SINGLE_RESPONSE)
     magic = object()  # sentinel value
     idmap = globus_sdk.IdentityMap(client)
     # a name which doesn't come back, if looked up with `get()` should return the
@@ -180,11 +159,7 @@ def test_identity_map_get_with_default(client):
 
 
 def test_identity_map_del(client):
-    register_api_route(
-        "auth",
-        "/v2/api/identities?usernames=sirosen@globus.org&provision=false",
-        body=IDENTITIES_SINGLE_RESPONSE,
-    )
+    register_api_route("auth", "/v2/api/identities", body=IDENTITIES_SINGLE_RESPONSE)
     idmap = globus_sdk.IdentityMap(client)
     identity_id = idmap["sirosen@globus.org"]["id"]
     del idmap[identity_id]
