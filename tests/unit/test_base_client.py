@@ -144,7 +144,11 @@ def test_http_methods(method, allows_body, base_client):
         assert excinfo.value.message == "foo"
 
 
-@pytest.mark.parametrize("a, b", [(a, b) for a in ["a", "a/"] for b in ["b", "/b"]])
+@pytest.mark.parametrize(
+    "a, b",
+    [(a, b) for a in ["a", "a/"] for b in ["b", "/b"]]
+    + [("a/b", c) for c in ["", None]],
+)
 def test_slash_join(a, b):
     """
     slash_joins a's with and without trailing "/"
