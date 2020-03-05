@@ -5,7 +5,7 @@ v1.9.0
 ------
 
 - Add `globus_sdk.IdentityMap`, a mapping-like object for Auth ID lookups (`#367`_)
-- Minor documentation and build improvements (`369`_, `362`_)
+- Minor documentation and build improvements (`#369`_, `#362`_)
 - Don't append trailing slashes when no path is given to a low-level client method like `get()` (`#364`_)
 - Add `external_checksum` and `checksum_algorithm` to `TransferData.add_item()` named arguments (`#365`_)
 
