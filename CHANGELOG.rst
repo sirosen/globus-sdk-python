@@ -1,6 +1,20 @@
 CHANGELOG
 =========
 
+v1.9.0
+------
+
+- Add `globus_sdk.IdentityMap`, a mapping-like object for Auth ID lookups (`#367`_)
+- Minor documentation and build improvements (`369`_, `362`_)
+- Don't append trailing slashes when no path is given to a low-level client method like `get()` (`#364`_)
+- Add `external_checksum` and `checksum_algorithm` to `TransferData.add_item()` named arguments (`#365`_)
+
+.. _#367: https://github.com/globus/globus-sdk-python/pull/367
+.. _#362: https://github.com/globus/globus-sdk-python/pull/362
+.. _#369: https://github.com/globus/globus-sdk-python/pull/369
+.. _#364: https://github.com/globus/globus-sdk-python/pull/364
+.. _#365: https://github.com/globus/globus-sdk-python/pull/365
+
 v1.8.0
 ------
 
