@@ -17,13 +17,48 @@ Reporting Bugs & Requesting Features
 Linting & Testing
 -----------------
 
-- All code is autoformatted with https://github.com/ambv/black[black] and
-   https://github.com/timothycrosley/isort[isort]. You may run
-    `make autoformat` to do this or configure these tools for use in your
-    editor.
-- All code must pass `make test`, which runs linting and tests.
+Testing the SDK requires https://tox.readthedocs.io/en/latest/[tox].
 
-NOTE: `black` requires python3.6+
+Once you have `tox` installed, you can run testing or linting on the repo
+with `tox` or `tox -e lint`. These are wrapped for convenience as `make test`
+and `make lint` as well.
+
+All code must pass `make lint test`, which runs linting and tests.
+
+Optional, but recommended linting setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For the best development experience, we recommend setting up linting and
+autofixing integrations with your editor and git. These settings are optional,
+but strongly recommended.
+
+Install pre-commit hooks
+++++++++++++++++++++++++
+
+This automatically formats and lints your staged changes when you commit.
+
+You must install https://pre-commit.com/[pre-commit] in order to use these
+hooks. Once you have the tool, just run
+
+    $ pre-commit install
+
+NOTE: If you need to bypass pre-commit hooks, you can commit with `--no-verify`
+
+Integrate Linters & Fixers with your Editor
++++++++++++++++++++++++++++++++++++++++++++
+
+All code is autoformatted with https://github.com/ambv/black[black] and
+https://github.com/timothycrosley/isort[isort], and checked with
+https://flake8.pycqa.org/[flake8].
+
+Many editors, including vim, emacs, Atom, and VS Code have plugins or
+extensions that allow them to automatically run `black` and `isort` whenever a
+file is saved, and show errors flagged by `flake8` in a separate pane, buffer,
+or sidebar.
+
+Configuring such editor integrations will save you time and energy, as your
+work will usually pass linting before you even run `make lint` or commit your
+changes.
 
 Expectations for Pull Requests
 ------------------------------
