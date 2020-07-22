@@ -14,9 +14,9 @@ if sys.version_info < (2, 7):
 
 # warn on older/untested python3s
 # it's not disallowed, but it could be an issue for some people
-if sys.version_info > (3,) and sys.version_info < (3, 4):
+if sys.version_info > (3,) and sys.version_info < (3, 5):
     warnings.warn(
-        "Installing globus-sdk on Python 3 versions older than 3.4 "
+        "Installing globus-sdk on Python 3 versions older than 3.5 "
         "may result in degraded functionality or even errors."
     )
 
@@ -49,11 +49,14 @@ setup(
             "tox>=3.5.3,<4.0",
             # linting
             "flake8>=3.0,<4.0",
-            "isort>=4.3,<5.0",
+            'isort>=5.1.4,<6.0;python_version>="3.6"',
             # black requires py3.6+
-            'black==18.9b0;python_version>="3.6"',
-            # flake-bugbear requires py3.5+
-            'flake8-bugbear==18.8.0;python_version>="3.5"',
+            # refrain from using 19.10b0 or later until
+            #   https://github.com/psf/black/issues/1288
+            # is fixed
+            'black==19.3b0;python_version>="3.6"',
+            # flake-bugbear requires py3.6+
+            'flake8-bugbear==20.1.4;python_version>="3.6"',
             # testing
             "pytest<5.0",
             "pytest-cov<3.0",
@@ -65,11 +68,11 @@ setup(
             # mocking HTTP responses
             "httpretty==0.9.5",
             # builds + uploads to pypi
-            "twine==1.11.0",
-            "wheel==0.31.1",
+            'twine==3.2.0;python_version>="3.6"',
+            'wheel==0.34.2;python_version>="3.6"',
             # docs
-            "sphinx==1.4.1",
-            "guzzle_sphinx_theme==0.7.11",
+            'sphinx==3.1.2;python_version>="3.6"',
+            'sphinx-material==0.0.30;python_version>="3.6"',
         ],
     },
     include_package_data=True,
@@ -83,10 +86,10 @@ setup(
         "Operating System :: POSIX",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Topic :: Communications :: File Sharing",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Software Development :: Libraries :: Python Modules",
