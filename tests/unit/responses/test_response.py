@@ -32,6 +32,13 @@ def json_http_response():
 
 
 @pytest.fixture
+def http_no_content_type_response():
+    res = requests.Response()
+    assert "Content-Type" not in res.headers
+    return _TestResponse(None, GlobusHTTPResponse(res))
+
+
+@pytest.fixture
 def malformed_http_response():
     malformed_response = requests.Response()
     malformed_response._content = six.b("{")
@@ -123,3 +130,10 @@ def test_text(json_http_response, malformed_http_response, text_http_response):
     assert json_http_response.r.text == json.dumps(json_http_response.data)
     assert malformed_http_response.r.text == "{"
     assert text_http_response.r.text == text_http_response.data
+
+
+def test_no_content_type_header(http_no_content_type_response):
+    """
+    Response without a Content-Type HTTP header should be okay
+    """
+    assert http_no_content_type_response.r.content_type is None
