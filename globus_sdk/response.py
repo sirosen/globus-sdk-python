@@ -96,7 +96,7 @@ class GlobusHTTPResponse(GlobusResponse):
         # clearer, but less consistent with requests (for better and
         # worse).
         self.http_status = http_response.status_code
-        self.content_type = http_response.headers["Content-Type"]
+        self.content_type = http_response.headers.get("Content-Type")
 
     @property
     def data(self):
