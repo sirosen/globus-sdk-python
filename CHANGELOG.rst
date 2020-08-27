@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+v1.9.1
+------
+
+- Fix `GlobusHTTPResponse` to handle responses with no `Content-Type` header (`#375`_)
+
+.. _#375: https://github.com/globus/globus-sdk-python/pull/375
+
 v1.9.0
 ------
 
