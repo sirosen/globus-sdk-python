@@ -1,0 +1,13 @@
+Releasing an SDK Version
+========================
+
+Create a PR which updates the changelog and bumps version
+
+Reviewer merges, then checks out `master` and runs `make release`. This will
+push to pypi and tag the current commit
+
+Reviewer pushes the tag to GitHub and goes to the releases page [1] to write up
+the release, using the changelog
+
+
+[1] GitHub Releases: https://github.com/globus/globus-sdk-python/releases
