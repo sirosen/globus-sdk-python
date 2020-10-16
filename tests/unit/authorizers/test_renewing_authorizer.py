@@ -33,7 +33,7 @@ ACCESS_TOKEN = "access_token_1"
 
 @pytest.fixture
 def expires_at():
-    return int(time.time()) + EXPIRES_ADJUST_SECONDS + 1
+    return int(time.time()) + EXPIRES_ADJUST_SECONDS + 10
 
 
 @pytest.fixture
@@ -64,7 +64,7 @@ def expired_authorizer(on_refresh, token_data, expires_at):
     return MockRenewer(
         token_data,
         access_token=ACCESS_TOKEN,
-        expires_at=expires_at - 1,
+        expires_at=expires_at - 11,
         on_refresh=on_refresh,
     )
 
