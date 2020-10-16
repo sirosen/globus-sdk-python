@@ -1,3 +1,0 @@
-# tricky! Specify an editable install with the development extra as a
-# "requirement" and be happy
--e ".[development]"
