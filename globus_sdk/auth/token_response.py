@@ -170,12 +170,10 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         """
         A parsed ID Token (OIDC) as a dict.
 
-        **Parameters**
-
-            ``auth_client`` (:class:`AuthClient <globus_sdk.AuthClient>`)
-              Deprecated parameter for providing the AuthClient used to request
-              this token back to the OAuthTokenResponse. The SDK now tracks
-              this internally, so it is no longer necessary.
+        :param auth_client: Deprecated parameter for providing the AuthClient used to
+            request this token back to the OAuthTokenResponse. The SDK now tracks this
+            internally, so it is no longer necessary.
+        :type auth_client: :class:`AuthClient <globus_sdk.AuthClient>`
         """
         logger.info('Decoding ID Token "{}"'.format(self["id_token"]))
 

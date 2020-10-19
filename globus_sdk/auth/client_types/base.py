@@ -159,13 +159,9 @@ class AuthClient(BaseClient):
         This method may only be called after ``oauth2_start_flow``
         has been called on this ``AuthClient``.
 
-        **Parameters**
-
-            ``additional_params`` (*dict*)
-              A ``dict`` or ``None``, which specifies additional query
-              parameters to include in the authorize URL. Primarily for
-              internal use
-
+        :param additional_params: Additional query parameters to include in the
+            authorize URL. Primarily for internal use
+        :type additional_params: dict, optional
         :rtype: ``string``
         """
         if not self.current_oauth2_flow_manager:
@@ -192,11 +188,11 @@ class AuthClient(BaseClient):
         :rtype: :class:`OAuthTokenResponse \
         <globus_sdk.auth.token_response.OAuthTokenResponse>`
 
-        ``auth_code``
-          An auth code typically obtained by sending the user to the authorize
-          URL. The code is a very short-lived credential which this method is
-          exchanging for tokens. Tokens are the credentials used to
-          authenticate against Globus APIs.
+        :param auth_code: An auth code typically obtained by sending the user to the
+            authorize URL. The code is a very short-lived credential which this method
+            is exchanging for tokens. Tokens are the credentials used to authenticate
+            against Globus APIs.
+        :type auth_code: str
         """
         self.logger.info(
             (
@@ -233,11 +229,11 @@ class AuthClient(BaseClient):
 
         plus any additional parameters you may specify.
 
-        ``refresh_token``
-          A raw Refresh Token string
+        :param refresh_token: A Globus Refresh Token as a string
+        :type refresh_token: str
 
-        ``additional_params``
-          A dict of extra params to encode in the refresh call.
+        :param additional_params: A dict of extra params to encode in the refresh call.
+        :type additional_params: dict, optional
         """
         self.logger.info(
             ("Executing token refresh; " "typically requires client credentials")
@@ -264,16 +260,12 @@ class AuthClient(BaseClient):
         - confirm that ``oauth2_revoke_token`` succeeded
         - at application boot, confirm no need to do fresh login
 
-        **Parameters**
-
-            ``token`` (*string*)
-              The token which should be validated. Can be a refresh token or an
-              access token
-
-            ``additional_params`` (*dict*)
-              A ``dict`` or ``None``, which specifies additional
-              parameters to include in the validation body. Primarily for
-              internal use
+        :param token: The token which should be validated. Can be a refresh token or an
+            access token
+        :type token: str
+        :param additional_params: Additional parameters to include in the validation
+            body. Primarily for internal use
+        :type additional_params: dict, optional
 
         **Examples**
 
@@ -328,15 +320,11 @@ class AuthClient(BaseClient):
         You can check the "active" status of the token after revocation if you
         want to confirm that it was revoked.
 
-        **Parameters**
-
-            ``token`` (*string*)
-              The token which should be revoked
-
-            ``additional_params`` (*dict*)
-              A ``dict`` or ``None``, which specifies additional
-              parameters to include in the revocation body, which can help
-              speed the revocation process. Primarily for internal use
+        :param token: The token which should be revoked
+        :type token: str
+        :param additional_params: Additional parameters to include in the revocation
+            body, which can help speed the revocation process. Primarily for internal
+            use
 
         **Examples**
 
@@ -369,18 +357,13 @@ class AuthClient(BaseClient):
         Generally, users of the SDK should not call this method unless they are
         implementing OAuth2 flows.
 
-        **Parameters**
-
-            ``response_class``
-              Defaults to :class:`OAuthTokenResponse \
-              <globus_sdk.auth.token_response.OAuthTokenResponse>`. This is
-              used by calls to the oauth2_token endpoint which need to
-              specialize their responses. For example,
-              :meth:`oauth2_get_dependent_tokens \
-              <globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens>`
-              requires a specialize response class to handle the dramatically
-              different nature of the Dependent Token Grant response
-
+        :param response_class: This is used by calls to the oauth2_token endpoint which
+            need to specialize their responses. For example,
+            :meth:`oauth2_get_dependent_tokens \
+            <globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens>`
+            requires a specialize response class to handle the dramatically different
+            format of the Dependent Token Grant response
+        :type response_class: class, optional
         :rtype: ``response_class``
         """
         self.logger.info("Fetching new token from Globus Auth")

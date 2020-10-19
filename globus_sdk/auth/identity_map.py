@@ -108,18 +108,15 @@ class IdentityMap(object):
         record = idmap.get("no-such-valid-id@example.org", None)
         username = record["username"] if record is not None else "NO_SUCH_IDENTITY"
 
-    **Parameters**
-
-    ``auth_client`` (*globus_sdk.AuthClient*)
-      The ``AuthClient`` object which will be used for lookups against Globus Auth
-
-    ``identity_ids`` (*iterable of strings*)
-      A list or other iterable of usernames or identity IDs (potentially mixed together)
-      which will be used to seed the ``IdentityMap`` 's tracking of unresolved Identities.
-
-    ``id_batch_size`` (*int*)
-      A non-default batch size to use when communicating with Globus Auth. Leaving this
-      set to the default is strongly recommended.
+    :param auth_client: The client object which will be used for lookups against Globus Auth
+    :type auth_client: :class:`AuthClient <globus_sdk.AuthClient>`
+    :param identity_ids: A list or other iterable of usernames or identity IDs (potentially
+        mixed together) which will be used to seed the ``IdentityMap`` 's tracking of
+        unresolved Identities.
+    :type identity_ids: iterable of str
+    :param id_batch_size: A non-default batch size to use when communicating with Globus
+        Auth. Leaving this set to the default is strongly recommended.
+    :type id_batch_size: int, optional
 
     .. automethodlist:: globus_sdk.IdentityMap
         include_methods=__getitem__,__delitem__
@@ -180,10 +177,9 @@ class IdentityMap(object):
         Returns True if the ID was added for lookup.
         Returns False if it was rejected as a duplicate of an already known name.
 
-        **Parameters**
-
-        ``identity_id`` (*string*)
-          A string Identity ID or Identity Name (a.k.a. "username") to add
+        :param identity_id: A string Identity ID or Identity Name (a.k.a. "username") to
+            add
+        :type identity_id: str
         """
         if identity_id in self._cache:
             return False
