@@ -43,17 +43,7 @@ class AuthClient(BaseClient):
     You can, of course, use other kinds of Authorizers (notably the
     ``RefreshTokenAuthorizer``).
 
-    **Methods**
-
-    *  :py:meth:`.get_identities`
-    *  :py:meth:`.oauth2_get_authorize_url`
-    *  :py:meth:`.oauth2_exchange_code_for_tokens`
-    *  :py:meth:`.AuthClient.oauth2_refresh_token`
-    *  :py:meth:`.oauth2_validate_token`
-    *  :py:meth:`.oauth2_revoke_token`
-    *  :py:meth:`.oauth2_token`
-    *  :py:meth:`.oauth2_userinfo`
-
+    .. automethodlist:: globus_sdk.AuthClient
     """
 
     error_class = exc.AuthAPIError

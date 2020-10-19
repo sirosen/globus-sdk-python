@@ -4,7 +4,13 @@
 import globus_sdk
 
 # sphinx extensions (minimally, we want autodoc and viewcode to build the site)
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.todo", "sphinx.ext.viewcode"]
+# plus, we have our own custom extension in the SDK to include
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
+    "globus_sdk._sphinxext",
+]
 
 # The master toctree document.
 master_doc = "index"

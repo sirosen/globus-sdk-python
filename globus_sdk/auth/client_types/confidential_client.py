@@ -30,13 +30,7 @@ class ConfidentialAppAuthClient(AuthClient):
     Any keyword arguments given are passed through to the ``AuthClient``
     constructor.
 
-    **Methods**
-
-    *  :py:meth:`.oauth2_client_credentials_tokens`
-    *  :py:meth:`.ConfidentialAppAuthClient.oauth2_start_flow`
-    *  :py:meth:`.oauth2_get_dependent_tokens`
-    *  :py:meth:`.oauth2_token_introspect`
-
+    .. automethodlist:: globus_sdk.ConfidentialAppAuthClient
     """
 
     # checked by BaseClient to see what authorizers are allowed for this client

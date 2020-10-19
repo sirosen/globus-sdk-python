@@ -121,12 +121,8 @@ class IdentityMap(object):
       A non-default batch size to use when communicating with Globus Auth. Leaving this
       set to the default is strongly recommended.
 
-    **Methods**
-
-    *  :py:meth:`~.IdentityMap.add`
-    *  :py:meth:`~.IdentityMap.get`
-    *  :py:meth:`~.IdentityMap.__getitem__`
-    *  :py:meth:`~.IdentityMap.__delitem__`
+    .. automethodlist:: globus_sdk.IdentityMap
+        include_methods=__getitem__,__delitem__
     """  # noqa
 
     _default_id_batch_size = 100

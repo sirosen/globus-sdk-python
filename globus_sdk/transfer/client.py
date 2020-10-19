@@ -52,73 +52,7 @@ class TransferClient(BaseClient):
     :type authorizer: :class:`GlobusAuthorizer\
                       <globus_sdk.authorizers.base.GlobusAuthorizer>`
 
-    **Methods**
-
-    *  :py:meth:`.get_endpoint`
-    *  :py:meth:`.update_endpoint`
-    *  :py:meth:`.create_endpoint`
-    *  :py:meth:`.delete_endpoint`
-    *  :py:meth:`.endpoint_search`
-    *  :py:meth:`.endpoint_autoactivate`
-    *  :py:meth:`.endpoint_deactivate`
-    *  :py:meth:`.endpoint_activate`
-    *  :py:meth:`.endpoint_get_activation_requirements`
-    *  :py:meth:`.my_effective_pause_rule_list`
-    *  :py:meth:`.my_shared_endpoint_list`
-    *  :py:meth:`.create_shared_endpoint`
-    *  :py:meth:`.endpoint_server_list`
-    *  :py:meth:`.get_endpoint_server`
-    *  :py:meth:`.add_endpoint_server`
-    *  :py:meth:`.update_endpoint_server`
-    *  :py:meth:`.delete_endpoint_server`
-    *  :py:meth:`.endpoint_role_list`
-    *  :py:meth:`.add_endpoint_role`
-    *  :py:meth:`.get_endpoint_role`
-    *  :py:meth:`.delete_endpoint_role`
-    *  :py:meth:`.endpoint_acl_list`
-    *  :py:meth:`.get_endpoint_acl_rule`
-    *  :py:meth:`.add_endpoint_acl_rule`
-    *  :py:meth:`.update_endpoint_acl_rule`
-    *  :py:meth:`.delete_endpoint_acl_rule`
-    *  :py:meth:`.bookmark_list`
-    *  :py:meth:`.create_bookmark`
-    *  :py:meth:`.get_bookmark`
-    *  :py:meth:`.update_bookmark`
-    *  :py:meth:`.delete_bookmark`
-    *  :py:meth:`.operation_ls`
-    *  :py:meth:`.operation_mkdir`
-    *  :py:meth:`.operation_rename`
-    *  :py:meth:`.operation_symlink`
-    *  :py:meth:`.get_submission_id`
-    *  :py:meth:`.submit_transfer`
-    *  :py:meth:`.submit_delete`
-    *  :py:meth:`.task_list`
-    *  :py:meth:`.task_event_list`
-    *  :py:meth:`~.TransferClient.get_task`
-    *  :py:meth:`.update_task`
-    *  :py:meth:`.cancel_task`
-    *  :py:meth:`.task_wait`
-    *  :py:meth:`.task_pause_info`
-    *  :py:meth:`.task_successful_transfers`
-    *  :py:meth:`.endpoint_manager_monitored_endpoints`
-    *  :py:meth:`.endpoint_manager_hosted_endpoint_list`
-    *  :py:meth:`.endpoint_manager_get_endpoint`
-    *  :py:meth:`.endpoint_manager_acl_list`
-    *  :py:meth:`.endpoint_manager_task_list`
-    *  :py:meth:`.endpoint_manager_get_task`
-    *  :py:meth:`.endpoint_manager_task_event_list`
-    *  :py:meth:`.endpoint_manager_task_pause_info`
-    *  :py:meth:`.endpoint_manager_task_successful_transfers`
-    *  :py:meth:`.endpoint_manager_cancel_tasks`
-    *  :py:meth:`.endpoint_manager_cancel_status`
-    *  :py:meth:`.endpoint_manager_pause_tasks`
-    *  :py:meth:`.endpoint_manager_resume_tasks`
-    *  :py:meth:`.endpoint_manager_pause_rule_list`
-    *  :py:meth:`.endpoint_manager_create_pause_rule`
-    *  :py:meth:`.endpoint_manager_get_pause_rule`
-    *  :py:meth:`.endpoint_manager_update_pause_rule`
-    *  :py:meth:`.endpoint_manager_delete_pause_rule`
-
+    .. automethodlist:: globus_sdk.TransferClient
     """
     # disallow basic auth
     allowed_authorizer_types = [
