@@ -27,84 +27,81 @@ class TransferData(dict):
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
 
-    **Parameters**
-
-      ``transfer_client`` (:class:`TransferClient <globus_sdk.TransferClient>`)
-        A ``TransferClient`` instance which will be used to get a submission ID
-        if one is not supplied. Should be the same instance that is used to
-        submit the transfer.
-
-      ``source_endpoint`` (*string*)
-        The endpoint ID of the source endpoint
-
-      ``destination_endpoint`` (*string*)
-        The endpoint ID of the destination endpoint
-
-      ``label`` (*string*) [optional]
-        A string label for the Task
-
-      ``submission_id`` (*string*) [optional]
-        A submission ID value fetched via
-        :meth:`get_submission_id \
+    :param transfer_client: A ``TransferClient`` instance which will be used to get a
+        submission ID if one is not supplied. Should be the same instance that is used
+        to submit the transfer.
+    :type transfer_client: :class:`TransferClient <globus_sdk.TransferClient>`
+    :param source_endpoint: The endpoint ID of the source endpoint
+    :type source_endpoint: str
+    :param destination_endpoint: The endpoint ID of the destination endpoint
+    :type destination_endpoint: str
+    :param label: A string label for the Task
+    :type label: str, optional
+    :param submission_id: A submission ID value fetched via :meth:`get_submission_id \
         <globus_sdk.TransferClient.get_submission_id>`. Defaults to using
         ``transfer_client.get_submission_id``
-
-      ``sync_level`` (*int* or *string*) [optional]
-        ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"``
-        For compatibility, this can also be ``0``, ``1``, ``2``, or ``3``
-
-        The meanings are as follows:
-
-        ``0``, ``exists``
-          Determine whether or not to transfer based on file existence. If the
-          destination file is absent, do the transfer.
-
-        ``1``, ``size``
-          Determine whether or not to transfer based on the size of the file. If
-          destination file size does not match the source, do the transfer.
-
-        ``2``, ``mtime``
-          Determine whether or not to transfer based on modification times. If source
-          has a newer modififed time than the destination, do the transfer.
-
-        ``3``, ``checksum``
-          Determine whether or not to transfer based on checksums of file contents. If
-          source and destination contents differ, as determined by a checksum of their
-          contents, do the transfer.
-
-      ``verify_checksum`` (*bool*) [default: ``False``]
-        When true, after transfer verify that the source and destination file
-        checksums match. If they don't, re-transfer the entire file and keep
-        trying until it succeeds.
-
-        This will create CPU load on both the origin and destination of the transfer,
-        and may even be a bottleneck if the network speed is high enough.
-
-      ``preserve_timestamp`` (*bool*) [default: ``False``]
-        When true, Globus Transfer will attempt to set file timestamps on the
-        destination to match those on the origin.
-
-      ``encrypt_data`` (*bool*) [default: ``False``]
-        When true, all files will be TLS-protected during transfer.
-
-      ``deadline`` (*string* or *datetime*) [optional]
-        An ISO-8601 timestamp (as a string) or a datetime object which defines
-        a deadline for the transfer. At the deadline, even if the data transfer
-        is not complete, the job will be canceled.
-        We recommend ensuring that the timestamp is in UTC to avoid confusion
-        and ambiguity.
-
-        Examples of ISO-8601 timestamps include ``2017-10-12 09:30Z``,
-        ``2017-10-12 12:33:54+00:00``, and ``2017-10-12``
-
-      ``recursive_symlinks`` (*string*) [default: ``"ignore"``]
-        Specify the behavior of recursive directory transfers when encountering
-        symlinks. One of ``"ignore"``, ``"keep"``, or ``"copy"``. ``"ignore"``
-        skips symlinks, ``"keep"`` creates symlinks at the destination matching
-        the source (without modifying the link path at all), and ``"copy"``
-        follows symlinks on the source, failing if the link is invalid.
+    :type submission_id: str, optional
+    :param sync_level: The method used to compare items between the source and
+        destination. One of  ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"``
+        See the section below on sync-level for an explanation of values.
+    :type sync_level: int or str, optional
+    :param verify_checksum: When true, after transfer verify that the source and
+        destination file checksums match. If they don't, re-transfer the entire file and
+        keep trying until it succeeds. This will create CPU load on both the origin and
+        destination of the transfer, and may even be a bottleneck if the network speed
+        is high enough.
+        [default: ``False``]
+    :type verify_checksum: bool, optional
+    :param preserve_timestamp: When true, Globus Transfer will attempt to set file
+        timestamps on the destination to match those on the origin. [default: ``False``]
+    :type preserve_timestamp: bool, optional
+    :param encrypt_data: When true, all files will be TLS-protected during transfer.
+        [default: ``False``]
+    :type encrypt_data: bool, optional
+    :param deadline: An ISO-8601 timestamp (as a string) or a datetime object which
+        defines a deadline for the transfer. At the deadline, even if the data transfer
+        is not complete, the job will be canceled. We recommend ensuring that the
+        timestamp is in UTC to avoid confusion and ambiguity. Examples of ISO-8601
+        timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
+        ``2017-10-12``
+    :type deadline: str or datetime, optional
+    :param recursive_symlinks: Specify the behavior of recursive directory transfers
+        when encountering symlinks. One of ``"ignore"``, ``"keep"``, or ``"copy"``.
+        ``"ignore"`` skips symlinks, ``"keep"`` creates symlinks at the destination
+        matching the source (without modifying the link path at all), and
+        ``"copy"`` follows symlinks on the source, failing if the link is invalid.
+        [default: ``"ignore"``]
+    :type recursive_symlinks: str
 
     Any additional parameters are fed into the dict being created verbatim.
+
+    **Sync Levels**
+
+    The values for ``sync_level`` are used to determine how comparisons are made between
+    files found both on the source and the destination. When files match, no data
+    transfer will occur.
+
+    For compatibility, this can be an integer ``0``, ``1``, ``2``, or ``3`` in addition
+    to the string values.
+
+    The meanings are as follows:
+
+    =====================   ========
+    value                   behavior
+    =====================   ========
+    ``0``, ``exists``       Determine whether or not to transfer based on file
+                            existence. If the destination file is absent, do the
+                            transfer.
+    ``1``, ``size``         Determine whether or not to transfer based on the size of
+                            the file. If destination file size does not match the
+                            source, do the transfer.
+    ``2``, ``mtime``        Determine whether or not to transfer based on modification
+                            times. If source has a newer modififed time than the
+                            destination, do the transfer.
+    ``3``, ``checksum``     Determine whether or not to transfer based on checksums of
+                            file contents. If source and destination contents differ, as
+                            determined by a checksum of their contents, do the transfer.
+    =====================   ========
 
     **Examples**
 
@@ -121,6 +118,8 @@ class TransferData(dict):
     `Transfer specific fields \
     <https://docs.globus.org/api/transfer/task_submit/#transfer_specific_fields>`_
     in the REST documentation for more details on Transfer Task documents.
+
+    .. automethodlist:: globus_sdk.TransferData
     """
 
     def __init__(
@@ -211,26 +210,22 @@ class TransferData(dict):
         Appends a transfer_item document to the DATA key of the transfer
         document.
 
-        **Parameters**
-
-          ``source_path`` (*string*)
-            Path to the source directory or file to be transfered
-
-          ``destination_path`` (*string*)
-            Path to the source directory or file will be transfered to
-
-          ``recursive`` (*bool*)
-            Set to True if the target at source path is a directory
-
-          ``external_checksum`` (*string*)
-            A checksum to verify source file integrity before the transfer
-            and destination file integrity after the transfer. Cannot be used
-            with directories. Assumed to be an MD5 checksum unless
-            checksum_algorithm is also given.
-
-          ``checksum_algorithm`` (*string*)
-            Specifies the checksum algorithm to be used when verify_checksum is
-            True, sync_level is "checksum" or 3, or an external_checksum is given.
+        :param source_path: Path to the source directory or file to be transfered
+        :type source_path: str
+        :param destination_path: Path to the source directory or file will be
+            transfered to
+        :type destination_path: str
+        :param recursive: Set to True if the target at source path is a directory
+        :type recursive: bool
+        :param external_checksum: A checksum to verify source file integrity before the
+            transfer and destination file integrity after the transfer. Cannot be used
+            with directories. Assumed to be an MD5 checksum unless checksum_algorithm
+            is also given.
+        :type external_checksum: str, optional
+        :param checksum_algorithm: Specifies the checksum algorithm to be used when
+            verify_checksum is True, sync_level is "checksum" or 3, or an
+            external_checksum is given.
+        :type checksum_algorithm: str, optional
         """
         source_path = safe_stringify(source_path)
         destination_path = safe_stringify(destination_path)
@@ -262,13 +257,10 @@ class TransferData(dict):
         Appends a transfer_symlink_item document to the DATA key of the
         transfer document.
 
-        **Parameters**
-
-          ``source_path`` (*string*)
-            Path to the source symlink
-
-          ``destination_path`` (*string*)
-            Path to the source symlink will be transfered to
+        :param source_path: Path to the source symlink
+        :type source_path: str
+        :param destination_path: Path to which the source symlink will be transfered
+        :type destination_path: str
         """
         source_path = safe_stringify(source_path)
         destination_path = safe_stringify(destination_path)
@@ -302,37 +294,28 @@ class DeleteData(dict):
     can be used as-is multiple times over to retry a potential submission
     failure (so there shouldn't be any need to inspect it).
 
-    **Parameters**
-
-      ``transfer_client`` (:class:`TransferClient <globus_sdk.TransferClient>`)
-        A ``TransferClient`` instance which will be used to get a submission ID
-        if one is not supplied. Should be the same instance that is used to
-        submit the deletion.
-
-      ``endpoint`` (*string*)
-        The endpoint ID which is targeted by this deletion Task
-
-      ``label`` (*string*) [optional]
-        A string label for the Task
-
-      ``submission_id`` (*string*) [optional]
-        A submission ID value fetched via
-        :meth:`get_submission_id \
-        <globus_sdk.TransferClient.get_submission_id>`. Defaults to using
-        ``transfer_client.get_submission_id``
-
-      ``recursive`` (*bool*) [default: ``False``]
-        Recursively delete subdirectories on the target endpoint
-
-      ``deadline`` (*string* or *datetime*) [optional]
-        An ISO-8601 timestamp (as a string) or a datetime object which defines
-        a deadline for the transfer. At the deadline, even if the data deletion
-        is not complete, the job will be canceled.
-        We recommend ensuring that the timestamp is in UTC to avoid confusion
-        and ambiguity.
-
-        Examples of ISO-8601 timestamps include ``2017-10-12 09:30Z``,
-        ``2017-10-12 12:33:54+00:00``, and ``2017-10-12``
+    :param transfer_client: A ``TransferClient`` instance which will be used to get a
+        submission ID if one is not supplied. Should be the same instance that is used
+        to submit the deletion.
+    :type transfer_client: :class:`TransferClient <globus_sdk.TransferClient>`
+    :param endpoint: The endpoint ID which is targeted by this deletion Task
+    :type endpoint: str
+    :param label: A string label for the Task
+    :type label: str, optional
+    :param submission_id: A submission ID value fetched via
+        :meth:`get_submission_id <globus_sdk.TransferClient.get_submission_id>`.
+        Defaults to using ``transfer_client.get_submission_id``
+    :type submission_id: str, optional
+    :param recursive: Recursively delete subdirectories on the target endpoint
+      [default: ``False``]
+    :type recursive: bool
+    :param deadline: An ISO-8601 timestamp (as a string) or a datetime object which
+        defines a deadline for the deletion. At the deadline, even if the data deletion
+        is not complete, the job will be canceled. We recommend ensuring that the
+        timestamp is in UTC to avoid confusion and ambiguity. Examples of ISO-8601
+        timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
+        ``2017-10-12``
+    :type deadline: str or datetime, optional
 
     **Examples**
 
@@ -348,6 +331,8 @@ class DeleteData(dict):
     `Delete specific fields \
     <https://docs.globus.org/api/transfer/task_submit/#delete_specific_fields>`_
     in the REST documentation for more details on Delete Task documents.
+
+    .. automethodlist:: globus_sdk.TransferData
     """
 
     def __init__(

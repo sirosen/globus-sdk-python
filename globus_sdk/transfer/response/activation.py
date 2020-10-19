@@ -120,16 +120,15 @@ class ActivationRequirementsResponse(TransferResponse):
         >>>     raise Exception("Endpoint won't be active long enough")
         >>> ...
 
-        **Parameters**
-
-          ``time_seconds``
-            Integer number of seconds into the future.
-
-          ``relative_time``
-            Defaults to True. When False, ``time_seconds`` is treated as a
-            POSIX timestamp (i.e. seconds since epoch as an integer) instead of
+        :param time_seconds: Number of seconds into the future.
+        :type time_seconds: int
+        :param relative_time: Defaults to True. When False, ``time_seconds`` is treated
+            as a POSIX timestamp (i.e. seconds since epoch as an integer) instead of
             its ordinary behavior.
+        :type relative_time: bool
 
+
+        :return: True if the Endpoint will be active until the deadline, False otherwise
         :rtype: ``bool``
         """
         # inactive endpoint

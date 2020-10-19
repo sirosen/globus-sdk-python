@@ -89,36 +89,26 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         "paging style", which defines which kind of Transfer paging behavior
         we'll see.
 
-        **Parameters**
-
-          ``client_method``
-            A **bound** method of a ``TransferClient``. Most commonly, the
+        :param client_method: A method of a ``TransferClient``. Most commonly, the
             ``get`` method.
-
-          ``path``
-            The base URI for the paged API calls being made, as would be passed
+        :type client_method: bound method
+        :param path: The base URI for the paged API calls being made, as would be passed
             to ``client_method``
-
-          ``num_results``
-            The number of results requested by the user. We'll cap paged
-            results at this value. May be left at None, which means "fetch all
-            results".
-
-          ``max_results_per_call``
-            The maximum page size from the API
-
-          ``max_total_results``
-            The API limit on the total number of results that can be fetched
-            via the API. If this is not None and ``num_results`` is, then
+        :type path: str
+        :param num_results: The number of results requested by the user. We'll cap paged
+            results at this value. May be left at None, which means "fetch all results".
+        :type num_results: int
+        :param max_results_per_call: The maximum page size from the API
+        :type max_results_per_call: int
+        :param max_total_results: The API limit on the total number of results that can
+            be fetched via the API. If this is not None and ``num_results`` is, then
             ``num_results`` will be set to this value.
-
-          ``offset``
-            An offset into the result set. Used for certain paging types to
+        :type max_total_results: int
+        :param offset: An offset into the result set. Used for certain paging types to
             start paging at a specific point.
-
-          ``paging_style``
-            An value from an enum on this class which tells us how paging works
-            for this API.
+        :type offset: int
+        :param paging_style: An value from an enum on this class which tells us how
+            paging works for this API.
         """
         logger.info(
             "Creating PaginatedResource({}) on {}(instance:{}):{}:{}".format(

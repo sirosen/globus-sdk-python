@@ -43,23 +43,17 @@ class BaseClient(object):
 
     You should *never* try to directly instantiate a ``BaseClient``.
 
-    **Parameters**
-
-        ``authorizer`` (:class:`GlobusAuthorizer\
-        <globus_sdk.authorizers.base.GlobusAuthorizer>`)
-
-          A ``GlobusAuthorizer`` which will generate Authorization headers
-
-        ``app_name`` (*string*)
-          Optional "nice name" for the application. Has no bearing on the
-          semantics of client actions. It is just passed as part of the
-          User-Agent string, and may be useful when debugging issues with the
-          Globus Team
-
-       ``http_timeout`` (*float*)
-         Number of seconds to wait on HTTP connections. Default is 60.
-         A value of -1 indicates that no timeout should be used (requests can
-         hang indefinitely).
+    :param authorizer: A ``GlobusAuthorizer`` which will generate Authorization headers
+    :type authorizer: :class:`GlobusAuthorizer\
+        <globus_sdk.authorizers.base.GlobusAuthorizer>`
+    :param app_name: Optional "nice name" for the application. Has no bearing on the
+        semantics of client actions. It is just passed as part of the User-Agent
+        string, and may be useful when debugging issues with the Globus Team
+    :type app_name: str
+    :param http_timeout: Number of seconds to wait on HTTP connections. Default is 60.
+        A value of -1 indicates that no timeout should be used (requests can hang
+        indefinitely).
+    :type http_timeout: float
 
     All other parameters are for internal use and should be ignored.
     """
@@ -201,24 +195,18 @@ class BaseClient(object):
         """
         Make a GET request to the specified path.
 
-        **Parameters**
-
-            ``path`` (*string*)
-              Path for the request, with or without leading slash
-
-            ``params`` (*dict*)
-              Parameters to be encoded as a query string
-
-            ``headers`` (*dict*)
-              HTTP headers to add to the request
-
-            ``response_class`` (*class*)
-              Class for response object, overrides the client's
-              ``default_response_class``
-
-            ``retry_401`` (*bool*)
-              Retry on 401 responses with fresh Authorization if
-              ``self.authorizer`` supports it
+        :param path: Path for the request, with or without leading slash
+        :type path: str
+        :param params: Parameters to be encoded as a query string
+        :type params: dict
+        :param headers: HTTP headers to add to the request
+        :type headers: dict
+        :param response_class: Class for response object, overrides the client's
+            ``default_response_class``
+        :type response_class: class
+        :param retry_401: Retry on 401 responses with fresh Authorization if
+            ``self.authorizer`` supports it
+        :type retry_401: bool
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -246,31 +234,23 @@ class BaseClient(object):
         """
         Make a POST request to the specified path.
 
-        **Parameters**
-
-            ``path`` (*string*)
-              Path for the request, with or without leading slash
-
-            ``params`` (*dict*)
-              Parameters to be encoded as a query string
-
-            ``headers`` (*dict*)
-              HTTP headers to add to the request
-
-            ``json_body`` (*dict*)
-              Data which will be JSON encoded as the body of the request
-
-            ``text_body`` (*string or dict*)
-              Either a raw string that will serve as the request body, or a
-              dict which will be HTTP Form encoded
-
-            ``response_class`` (*class*)
-              Class for response object, overrides the client's
-              ``default_response_class``
-
-            ``retry_401`` (*bool*)
-              Retry on 401 responses with fresh Authorization if
-              ``self.authorizer`` supports it
+        :param path: Path for the request, with or without leading slash
+        :type path: str
+        :param params: Parameters to be encoded as a query string
+        :type params: dict
+        :param headers: HTTP headers to add to the request
+        :type headers: dict
+        :param json_body: Data which will be JSON encoded as the body of the request
+        :type json_body: dict
+        :param text_body: Either a raw string that will serve as the request body, or a
+            dict which will be HTTP Form encoded
+        :type text_body: str or dict
+        :param response_class: Class for response object, overrides the client's
+            ``default_response_class``
+        :type response_class: class
+        :param retry_401: Retry on 401 responses with fresh Authorization if
+            ``self.authorizer`` supports it
+        :type retry_401: bool
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -293,24 +273,18 @@ class BaseClient(object):
         """
         Make a DELETE request to the specified path.
 
-        **Parameters**
-
-            ``path`` (*string*)
-              Path for the request, with or without leading slash
-
-            ``params`` (*dict*)
-              Parameters to be encoded as a query string
-
-            ``headers`` (*dict*)
-              HTTP headers to add to the request
-
-            ``response_class`` (*class*)
-              Class for response object, overrides the client's
-              ``default_response_class``
-
-            ``retry_401`` (*bool*)
-              Retry on 401 responses with fresh Authorization if
-              ``self.authorizer`` supports it
+        :param path: Path for the request, with or without leading slash
+        :type path: str
+        :param params: Parameters to be encoded as a query string
+        :type params: dict
+        :param headers: HTTP headers to add to the request
+        :type headers: dict
+        :param response_class: Class for response object, overrides the client's
+            ``default_response_class``
+        :type response_class: class
+        :param retry_401: Retry on 401 responses with fresh Authorization if
+            ``self.authorizer`` supports it
+        :type retry_401: bool
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -338,31 +312,23 @@ class BaseClient(object):
         """
         Make a PUT request to the specified path.
 
-        **Parameters**
-
-            ``path`` (*string*)
-              Path for the request, with or without leading slash
-
-            ``params`` (*dict*)
-              Parameters to be encoded as a query string
-
-            ``headers`` (*dict*)
-              HTTP headers to add to the request
-
-            ``json_body`` (*dict*)
-              Data which will be JSON encoded as the body of the request
-
-            ``text_body`` (*string or dict*)
-              Either a raw string that will serve as the request body, or a
-              dict which will be HTTP Form encoded
-
-            ``response_class`` (*class*)
-              Class for response object, overrides the client's
-              ``default_response_class``
-
-            ``retry_401`` (*bool*)
-              Retry on 401 responses with fresh Authorization if
-              ``self.authorizer`` supports it
+        :param path: Path for the request, with or without leading slash
+        :type path: str
+        :param params: Parameters to be encoded as a query string
+        :type params: dict
+        :param headers: HTTP headers to add to the request
+        :type headers: dict
+        :param json_body: Data which will be JSON encoded as the body of the request
+        :type json_body: dict
+        :param text_body: Either a raw string that will serve as the request body, or a
+            dict which will be HTTP Form encoded
+        :type text_body: str or dict
+        :param response_class: Class for response object, overrides the client's
+            ``default_response_class``
+        :type response_class: class
+        :param retry_401: Retry on 401 responses with fresh Authorization if
+            ``self.authorizer`` supports it
+        :type retry_401: bool
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -392,31 +358,23 @@ class BaseClient(object):
         """
         Make a PATCH request to the specified path.
 
-        **Parameters**
-
-            ``path`` (*string*)
-              Path for the request, with or without leading slash
-
-            ``params`` (*dict*)
-              Parameters to be encoded as a query string
-
-            ``headers`` (*dict*)
-              HTTP headers to add to the request
-
-            ``json_body`` (*dict*)
-              Data which will be JSON encoded as the body of the request
-
-            ``text_body`` (*string or dict*)
-              Either a raw string that will serve as the request body, or a
-              dict which will be HTTP Form encoded
-
-            ``response_class`` (*class*)
-              Class for response object, overrides the client's
-              ``default_response_class``
-
-            ``retry_401`` (*bool*)
-              Retry on 401 responses with fresh Authorization if
-              ``self.authorizer`` supports it
+        :param path: Path for the request, with or without leading slash
+        :type path: str
+        :param params: Parameters to be encoded as a query string
+        :type params: dict
+        :param headers: HTTP headers to add to the request
+        :type headers: dict
+        :param json_body: Data which will be JSON encoded as the body of the request
+        :type json_body: dict
+        :param text_body: Either a raw string that will serve as the request body, or a
+            dict which will be HTTP Form encoded
+        :type text_body: str or dict
+        :param response_class: Class for response object, overrides the client's
+            ``default_response_class``
+        :type response_class: class
+        :param retry_401: Retry on 401 responses with fresh Authorization if
+            ``self.authorizer`` supports it
+        :type retry_401: bool
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -445,35 +403,27 @@ class BaseClient(object):
         retry_401=True,
     ):
         """
+        Send an HTTP request
 
-        **Parameters**
-
-            ``method`` (*string*)
-              HTTP request method, as an all caps string
-
-            ``path`` (*string*)
-              Path for the request, with or without leading slash
-
-            ``params`` (*dict*)
-              Parameters to be encoded as a query string
-
-            ``headers`` (*dict*)
-              HTTP headers to add to the request
-
-            ``json_body`` (*dict*)
-              Data which will be JSON encoded as the body of the request
-
-            ``text_body`` (*string or dict*)
-              Either a raw string that will serve as the request body, or a
-              dict which will be HTTP Form encoded
-
-            ``response_class`` (*class*)
-              Class for response object, overrides the client's
-              ``default_response_class``
-
-            ``retry_401`` (*bool*)
-              Retry on 401 responses with fresh Authorization if
-              ``self.authorizer`` supports it
+        :param method: HTTP request method, as an all caps string
+        :type method: str
+        :param path: Path for the request, with or without leading slash
+        :type path: str
+        :param params: Parameters to be encoded as a query string
+        :type params: dict
+        :param headers: HTTP headers to add to the request
+        :type headers: dict
+        :param json_body: Data which will be JSON encoded as the body of the request
+        :type json_body: dict
+        :param text_body: Either a raw string that will serve as the request body, or a
+            dict which will be HTTP Form encoded
+        :type text_body: str or dict
+        :param response_class: Class for response object, overrides the client's
+            ``default_response_class``
+        :type response_class: class
+        :param retry_401: Retry on 401 responses with fresh Authorization if
+            ``self.authorizer`` supports it
+        :type retry_401: bool
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
