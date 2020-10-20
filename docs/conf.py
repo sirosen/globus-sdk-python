@@ -57,6 +57,7 @@ html_theme_options = {
     # If False, expand all TOC entries
     "globaltoc_collapse": False,
 }
+html_logo = "_static/logo.png"
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "friendly"

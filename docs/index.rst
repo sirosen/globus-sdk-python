@@ -25,10 +25,8 @@ Table of Contents
    installation
    tutorial
    clients
-   responses
    exceptions
    local_endpoints
-   oauth
    authorization
    config
    versioning

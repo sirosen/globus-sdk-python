@@ -12,14 +12,14 @@ do not map one-to-one onto the scopes that your application requested.
 
 This is a brief description Resource Servers to make sense of this response.
 
-Short-Short Version
--------------------
+Short Version
+-------------
 
 Resource Servers are just the OAuth2 name for services which use scopes on
 tokens to control access to their resources.
 
-Less-Short Version
-------------------
+Resource Servers may have multiple scopes
+-----------------------------------------
 
 When you request tokens, you do so with a set of scopes.
 Our default set consists of

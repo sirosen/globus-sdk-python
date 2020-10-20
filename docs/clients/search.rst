@@ -1,13 +1,8 @@
 .. module:: globus_sdk.search
 
 
-Search Client (BETA)
-====================
-
-The SearchClient interface is in Beta, but the Search API is a fully
-supported, production service.
-Its docs are visible here: https://docs.globus.org/api/search/
-
+Globus Search
+=============
 
 .. autoclass:: globus_sdk.SearchClient
    :members:
@@ -22,8 +17,11 @@ Helper Objects
    :members:
    :show-inheritance:
 
-Specialized Errors
-------------------
+Client Errors
+-------------
+
+When an error occurs, a ``SearchClient`` will raise this specialized type of
+error, rather than a generic ``GlobusAPIError``.
 
 .. autoclass:: globus_sdk.exc.SearchAPIError
    :members:
