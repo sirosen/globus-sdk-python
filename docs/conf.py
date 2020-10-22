@@ -12,9 +12,6 @@ extensions = [
     "globus_sdk._sphinxext",
 ]
 
-# The master toctree document.
-master_doc = "index"
-
 project = "globus-sdk-python"
 copyright = "2016, Globus"
 author = "Globus Team"
@@ -56,6 +53,11 @@ html_theme_options = {
     "globaltoc_depth": 2,
     # If False, expand all TOC entries
     "globaltoc_collapse": False,
+    # "hero" text (shown in the top banner)
+    "heroes": {
+        "index": "The Globus Standard Development Kit",
+        "clients": "Globus API Clients",
+    },
 }
 html_logo = "_static/logo.png"
 

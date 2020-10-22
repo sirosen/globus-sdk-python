@@ -44,7 +44,7 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         This is useful for implementing storage for Access Tokens, as the
         ``on_refresh`` callback can be used to update the Access Tokens and
         their expiration times.
-    :type on_refresh: callable, optiona
+    :type on_refresh: callable, optional
     """
 
     def __init__(

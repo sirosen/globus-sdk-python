@@ -3,6 +3,9 @@
 Globus Transfer
 ===============
 
+Client
+------
+
 The primary interface for the Globus Transfer API is the ``TransferClient``
 class.
 

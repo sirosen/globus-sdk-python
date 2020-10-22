@@ -5,8 +5,8 @@ Tutorial
 
 .. _getting_started:
 
-Getting Started
----------------
+First Steps
+-----------
 
 This is a tutorial in the use of the Globus SDK. It takes you through a simple
 step-by-step flow for registering your application, getting tokens, and using
