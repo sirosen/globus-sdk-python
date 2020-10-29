@@ -1,5 +1,5 @@
-Globus Auth / OAuth2
---------------------
+OAuth2
+------
 
 Globus offers Authentication and Authorization services through an OAuth2
 service, Globus Auth.
@@ -27,10 +27,3 @@ Therefore, if you are writing an application called **foo**, and a user
 combination of **foo** and **bar@example.com**.
 The resulting credentials represent the rights and permission for **foo** to
 perform actions for **bar@example.com** on systems authenticated via Globus.
-
-
-.. rubric:: OAuth2 Documentation
-
-.. toctree::
-   oauth/flows
-   oauth/resource_servers

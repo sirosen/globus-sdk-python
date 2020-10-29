@@ -4,10 +4,13 @@
 import globus_sdk
 
 # sphinx extensions (minimally, we want autodoc and viewcode to build the site)
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.todo", "sphinx.ext.viewcode"]
-
-# The master toctree document.
-master_doc = "index"
+# plus, we have our own custom extension in the SDK to include
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
+    "globus_sdk._sphinxext",
+]
 
 project = "globus-sdk-python"
 copyright = "2016, Globus"
@@ -50,7 +53,13 @@ html_theme_options = {
     "globaltoc_depth": 2,
     # If False, expand all TOC entries
     "globaltoc_collapse": False,
+    # "hero" text (shown in the top banner)
+    "heroes": {
+        "index": "The Globus Standard Development Kit",
+        "clients": "Globus API Clients",
+    },
 }
+html_logo = "_static/logo.png"
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "friendly"

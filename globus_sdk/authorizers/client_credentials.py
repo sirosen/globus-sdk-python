@@ -26,38 +26,30 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
     should be able to use a ClientCredentialsAuthorizer to act as
     the client itself.
 
-    **Parameters**
-
-        ``confidential_client`` (:class:`ConfidentialAppAuthClient\
-        <globus_sdk.ConfidentialAppAuthClient>`)
-          ``ConfidentialAppAuthClient`` with a valid id and client secret
-
-        ``scopes`` (*string*)
-          A string of space-separated scope names being requested for the
-          access tokens that will be used for the Authorization header.
-          These scopes must all be for the same resource server, or else
-          the token response will have multiple access tokens.
-
-        ``access_token`` (*string*)
-          Initial Access Token to use, only used if ``expires_at`` is also set.
-          Must be requested with the same set of scopes passed to this
-          authorizer.
-
-        ``expires_at`` (*int*)
-          Expiration time for the starting ``access_token`` expressed as a
-          POSIX timestamp (i.e. seconds since the epoch)
-
-        ``on_refresh`` (*callable*)
-          A callback which is triggered any time this authorizer fetches a new
-          access_token. The ``on_refresh`` callable is invoked on the
-          :class:`OAuthTokenResponse \
-                  <globus_sdk.auth.token_response.OAuthTokenResponse>`
-          object resulting from the token being refreshed.
-          It should take only one argument, the token response object.
-
-          This is useful for implementing storage for Access Tokens, as the
-          ``on_refresh`` callback can be used to update the Access Tokens and
-          their expiration times.
+    :param confidential_client: client object with a valid id and client secret
+    :type confidential_client: :class:`ConfidentialAppAuthClient\
+        <globus_sdk.ConfidentialAppAuthClient>`
+    :param scopes: A string of space-separated scope names being requested for the
+        access tokens that will be used for the Authorization header. These scopes must
+        all be for the same resource server, or else the token response will have
+        multiple access tokens.
+    :type scopes: str
+    :param access_token: Initial Access Token to use, only used if ``expires_at`` is
+        also set. Must be requested with the same set of scopes passed to this
+        authorizer.
+    :type access_token: str
+    :param expires_at: Expiration time for the starting ``access_token`` expressed as a
+        POSIX timestamp (i.e. seconds since the epoch)
+    :type expires_at: int, optional
+    :param on_refresh: A callback which is triggered any time this authorizer fetches a
+        new access_token. The ``on_refresh`` callable is invoked on the
+        :class:`OAuthTokenResponse <globus_sdk.auth.token_response.OAuthTokenResponse>`
+        object resulting from the token being refreshed. It should take only one
+        argument, the token response object.
+        This is useful for implementing storage for Access Tokens, as the
+        ``on_refresh`` callback can be used to update the Access Tokens and
+        their expiration times.
+    :type on_refresh: callable, optiona
     """
 
     def __init__(

@@ -23,19 +23,57 @@ very simply::
     for task in tc.task_list(num_results=25, filter="type:TRANSFER,DELETE"):
         print(task["task_id"], task["type"], task["status"])
 
-.. rubric:: Client Types
+.. rubric:: Multi-Thread and Multi-Process Safety
 
-.. toctree::
-   clients/transfer
-   clients/auth
-   clients/search
-   clients/base
-
-Multi-Thread and Multi-Process Safety
--------------------------------------
 Each Globus SDK client class holds a networking session object to interact
 with the Globus API. Using a previously created service client object after
 forking or between multiple threads should be considered unsafe. In
 multi-processing applications, it is recommended to create service client
 objects after process forking and to ensure that there is only one service
 client instance created per process.
+
+.. rubric:: Client Types
+
+:doc:`clients/base`
+    The Base Client provides methods which are accessible via any client
+    object. These methods correspond directly to HTTP verbs and represent
+    single HTTP requests.
+
+    For example, ``get()`` is a method of ``TransferClient`` and ``AuthClient``
+    objects, and for each of those it sends an HTTP ``GET`` to the target
+    service.
+
+:doc:`clients/auth`
+    Using Globus Auth in the SDK is done via several different client types
+    which represent different types of applications.
+
+    Additionally, there are objects for managing OAuth2 login flows and
+    customized responses which make it easier to unpack token responses.
+
+    The Globus Auth interface also includes the :class:`IdentityMap <globus_sdk.IdentityMap>`
+    object, which helps manage bulk identity lookups.
+
+:doc:`clients/transfer`
+    The Globus Transfer API is usable in the SDK through the
+    :class:`TransferClient <globus_sdk.TransferClient>` object.
+
+    Additionally, there are helper objects for assembling Transfer and Delete
+    Task data for submission to the service.
+
+    Customized response types simplify handling of paginated response data,
+    producing iterables of the underlying response types.
+
+:doc:`clients/search`
+    The Globus Search API is usable in the SDK through the
+    :class:`SearchClient <globus_sdk.SearchClient>` object.
+
+    Additionally, there is a :class:`SearchQuery <globus_sdk.SearchQuery>`
+    object which provides a chainable API for building query documents.
+
+.. toctree::
+   :caption: Table of Contents
+
+   clients/base
+   clients/transfer
+   clients/auth
+   clients/search

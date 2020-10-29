@@ -43,11 +43,9 @@ class GlobusOAuthFlowManager(object):
         The exchange process may be parameterized over attributes of the
         specific flow manager instance which is generating it.
 
-        **Parameters**
-
-            ``auth_code`` (*string*)
-              The authorization code which was produced from the authorization
-              flow
+        :param auth_code: The authorization code which was produced from the
+            authorization flow
+        :type auth_code: str
 
         :rtype: :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         """

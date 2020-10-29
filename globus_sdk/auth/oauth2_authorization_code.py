@@ -25,31 +25,25 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
     Secret (to prove that it really is the application that the user just
     authorized).
 
-    **Parameters**
-
-        ``auth_client`` (*ConfidentialAppAuthClient*)
-          The ``AuthClient`` used to extract default values for the flow, and
-          also to make calls to the Auth service. It MUST be a
-          ``ConfidentialAppAuthClient``
-
-        ``redirect_uri`` (*string*)
-          The page that users should be directed to after authenticating at the
-          authorize URL. Required.
-
-        ``requested_scopes`` (*iterable* or *string*)
-          The scopes on the token(s) being requested, as a space-separated
-          string or an iterable of strings. Defaults to ``openid profile email
-          urn:globus:auth:scope:transfer.api.globus.org:all``
-
-        ``state`` (*string*)
-          This is a way of your application passing information back to itself
-          in the course of the OAuth flow. Because the user will navigate away
-          from your application to complete the flow, this parameter lets you
-          pass an arbitrary string from the starting page to the
-          ``redirect_uri``
-
-        ``refresh_tokens`` (*bool*)
-          When True, request refresh tokens in addition to access tokens
+    :param auth_client: The ``AuthClient`` used to extract default values for the flow,
+        and also to make calls to the Auth service.
+    :type auth_client: :class:`ConfidentialAppAuthClient \
+        <globus_sdk.ConfidentialAppAuthClient>`
+    :param redirect_uri: The page that users should be directed to after authenticating
+        at the authorize URL.
+    :type redirect_uri: str
+    :param requested_scopes: The scopes on the token(s) being requested, as a
+        space-separated string or iterable of strings. Defaults to
+        ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
+    :type requested_scopes: str or iterable of str, optional
+    :param state: This string allows an application to pass information back to itself
+        in the course of the OAuth flow. Because the user will navigate away from the
+        application to complete the flow, this parameter lets the app pass an arbitrary
+        string from the starting page to the ``redirect_uri``
+    :type state: str, optional
+    :param refresh_tokens: When True, request refresh tokens in addition to access
+        tokens. [Default: ``False``]
+    :type refresh_tokens: bool, optional
     """
 
     def __init__(
@@ -85,13 +79,9 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         Start a Authorization Code flow by getting the authorization URL to
         which users should be sent.
 
-        **Parameters**
-
-            ``additional_params`` (*dict*)
-              A ``dict`` or ``None``, which specifies additional query
-              parameters to include in the authorize URL. Primarily for
-              internal use
-
+        :param additional_params: Additional parameters to include in the authorize URL.
+            Primarily for internal use
+        :type additional_params: dict, optional
         :rtype: ``string``
 
         The returned URL string is encoded to be suitable to display to users

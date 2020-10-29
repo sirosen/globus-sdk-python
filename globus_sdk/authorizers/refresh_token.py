@@ -26,32 +26,25 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
     at least ``TransferClient`` and ``AuthClient`` will automatically handle
     usage of the ``RefreshTokenAuthorizer``.
 
-    **Parameters**
-
-        ``refresh_token`` (*string*)
-          Refresh Token for Globus Auth
-
-        ``auth_client`` (:class:`AuthClient <globus_sdk.AuthClient>`)
-          ``AuthClient`` capable of using the ``refresh_token``
-
-        ``access_token`` (*string*)
-          Initial Access Token to use, only used if ``expires_at`` is also set
-
-        ``expires_at`` (*int*)
-          Expiration time for the starting ``access_token`` expressed as a
-          POSIX timestamp (i.e. seconds since the epoch)
-
-        ``on_refresh`` (*callable*)
-          A callback which is triggered any time this authorizer fetches a new
-          access_token. The ``on_refresh`` callable is invoked on the
-          :class:`OAuthTokenResponse \
-                  <globus_sdk.auth.token_response.OAuthTokenResponse>`
-          object resulting from the token being refreshed.
-          It should take only one argument, the token response object.
-
-          This is useful for implementing storage for Access Tokens, as the
-          ``on_refresh`` callback can be used to update the Access Tokens and
-          their expiration times.
+    :param refresh_token: Refresh Token for Globus Auth
+    :type refresh_token: str
+    :param auth_client: ``AuthClient`` capable of using the ``refresh_token``
+    :type auth_client: :class:`AuthClient <globus_sdk.AuthClient>`
+    :param access_token: Initial Access Token to use, only used if ``expires_at`` is
+        also set
+    :type access_token: str, optional
+    :param expires_at: Expiration time for the starting ``access_token`` expressed as a
+        POSIX timestamp (i.e. seconds since the epoch)
+    :type expires_at: int, optional
+    :param on_refresh: A callback which is triggered any time this authorizer fetches a
+        new access_token. The ``on_refresh`` callable is invoked on the
+        :class:`OAuthTokenResponse <globus_sdk.auth.token_response.OAuthTokenResponse>`
+        object resulting from the token being refreshed. It should take only one
+        argument, the token response object.
+        This is useful for implementing storage for Access Tokens, as the
+        ``on_refresh`` callback can be used to update the Access Tokens and
+        their expiration times.
+    :type on_refresh: callable, optional
     """
 
     def __init__(

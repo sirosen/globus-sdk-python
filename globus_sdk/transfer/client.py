@@ -52,73 +52,7 @@ class TransferClient(BaseClient):
     :type authorizer: :class:`GlobusAuthorizer\
                       <globus_sdk.authorizers.base.GlobusAuthorizer>`
 
-    **Methods**
-
-    *  :py:meth:`.get_endpoint`
-    *  :py:meth:`.update_endpoint`
-    *  :py:meth:`.create_endpoint`
-    *  :py:meth:`.delete_endpoint`
-    *  :py:meth:`.endpoint_search`
-    *  :py:meth:`.endpoint_autoactivate`
-    *  :py:meth:`.endpoint_deactivate`
-    *  :py:meth:`.endpoint_activate`
-    *  :py:meth:`.endpoint_get_activation_requirements`
-    *  :py:meth:`.my_effective_pause_rule_list`
-    *  :py:meth:`.my_shared_endpoint_list`
-    *  :py:meth:`.create_shared_endpoint`
-    *  :py:meth:`.endpoint_server_list`
-    *  :py:meth:`.get_endpoint_server`
-    *  :py:meth:`.add_endpoint_server`
-    *  :py:meth:`.update_endpoint_server`
-    *  :py:meth:`.delete_endpoint_server`
-    *  :py:meth:`.endpoint_role_list`
-    *  :py:meth:`.add_endpoint_role`
-    *  :py:meth:`.get_endpoint_role`
-    *  :py:meth:`.delete_endpoint_role`
-    *  :py:meth:`.endpoint_acl_list`
-    *  :py:meth:`.get_endpoint_acl_rule`
-    *  :py:meth:`.add_endpoint_acl_rule`
-    *  :py:meth:`.update_endpoint_acl_rule`
-    *  :py:meth:`.delete_endpoint_acl_rule`
-    *  :py:meth:`.bookmark_list`
-    *  :py:meth:`.create_bookmark`
-    *  :py:meth:`.get_bookmark`
-    *  :py:meth:`.update_bookmark`
-    *  :py:meth:`.delete_bookmark`
-    *  :py:meth:`.operation_ls`
-    *  :py:meth:`.operation_mkdir`
-    *  :py:meth:`.operation_rename`
-    *  :py:meth:`.operation_symlink`
-    *  :py:meth:`.get_submission_id`
-    *  :py:meth:`.submit_transfer`
-    *  :py:meth:`.submit_delete`
-    *  :py:meth:`.task_list`
-    *  :py:meth:`.task_event_list`
-    *  :py:meth:`~.TransferClient.get_task`
-    *  :py:meth:`.update_task`
-    *  :py:meth:`.cancel_task`
-    *  :py:meth:`.task_wait`
-    *  :py:meth:`.task_pause_info`
-    *  :py:meth:`.task_successful_transfers`
-    *  :py:meth:`.endpoint_manager_monitored_endpoints`
-    *  :py:meth:`.endpoint_manager_hosted_endpoint_list`
-    *  :py:meth:`.endpoint_manager_get_endpoint`
-    *  :py:meth:`.endpoint_manager_acl_list`
-    *  :py:meth:`.endpoint_manager_task_list`
-    *  :py:meth:`.endpoint_manager_get_task`
-    *  :py:meth:`.endpoint_manager_task_event_list`
-    *  :py:meth:`.endpoint_manager_task_pause_info`
-    *  :py:meth:`.endpoint_manager_task_successful_transfers`
-    *  :py:meth:`.endpoint_manager_cancel_tasks`
-    *  :py:meth:`.endpoint_manager_cancel_status`
-    *  :py:meth:`.endpoint_manager_pause_tasks`
-    *  :py:meth:`.endpoint_manager_resume_tasks`
-    *  :py:meth:`.endpoint_manager_pause_rule_list`
-    *  :py:meth:`.endpoint_manager_create_pause_rule`
-    *  :py:meth:`.endpoint_manager_get_pause_rule`
-    *  :py:meth:`.endpoint_manager_update_pause_rule`
-    *  :py:meth:`.endpoint_manager_delete_pause_rule`
-
+    .. automethodlist:: globus_sdk.TransferClient
     """
     # disallow basic auth
     allowed_authorizer_types = [
@@ -278,30 +212,25 @@ class TransferClient(BaseClient):
             GET /endpoint_search\
             ?filter_fulltext=<filter_fulltext>&filter_scope=<filter_scope>
 
+        :param filter_fulltext: The string to use in a full text search on endpoints.
+            Effectively, the "search query" which is being requested. May be omitted
+            with specific ``filter_scope`` values.
+        :type filter_fulltext: str, optional
+        :param filter_scope: A "scope" within which to search for endpoints. This must
+            be one of the limited and known names known to the service, which can be
+            found documented in the **External Documentation** below. Defaults to
+            searching all endpoints (in which case ``filter_fulltext`` is required)
+        :type filter_scope: str, optional
+        :param num_results: The number of search results to fetch from the service. May
+            be set to ``None`` to request the maximum allowable number of results.
+            [Default: ``25``]
+        :type num_results: int or None
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict
         :rtype: :class:`PaginatedResource
                 <globus_sdk.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
-
-        **Parameters**
-
-            ``filter_fulltext`` (*string*)
-              The string to use in a full text search on endpoints.
-              Effectively, the "search query" which is being requested.
-
-            ``filter_scope`` (*string*)
-              A "scope" within which to search for endpoints. This must be one
-              of the limited and known names known to the service, which can be
-              found documented in the **External Documentation** below.
-
-            ``num_results`` (*int* or *None*)
-              default ``25``
-              The number of search results to fetch from the service. May be
-              set to ``None`` to request the maximum allowable number of
-              results.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **Examples**
 
@@ -527,11 +456,8 @@ class TransferClient(BaseClient):
         """
         ``POST /shared_endpoint``
 
-        **Parameters**
-
-            ``data`` (*dict*)
-              A python dict representation of a ``shared_endpoint`` document
-
+        :param data: A python dict representation of a ``shared_endpoint`` document
+        :type data: dict
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
@@ -812,14 +738,10 @@ class TransferClient(BaseClient):
         """
         ``POST /endpoint/<endpoint_id>/access``
 
-        **Parameters**
-
-            ``endpoint_id`` (*string*)
-              ID of endpoint to which to add the acl
-
-            ``rule_data`` (*dict*)
-              A python dict representation of an ``access`` document
-
+        :param endpoint_id: ID of endpoint to which to add the acl
+        :type endpoint_id: str
+        :param rule_data: A python dict representation of an ``access`` document
+        :type rule_data: dict
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
 
@@ -1229,20 +1151,16 @@ class TransferClient(BaseClient):
 
         ``GET /task_list``
 
+        :param num_results: The number of tasks to fetch from the service. May be set to
+            ``None`` to request the maximum allowable number of results.
+            [Default: ``10``]
+        :type num_results: int or none
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
-
-        **Parameters**
-
-            ``num_results`` (*int* or *None*)
-              default ``10``
-              The number of tasks to fetch from the service. May be set to
-              ``None`` to request the maximum allowable number of results.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **Examples**
 
@@ -1277,23 +1195,18 @@ class TransferClient(BaseClient):
 
         ``GET /task/<task_id>/event_list``
 
+        :param task_id: The ID of the task to inspect.
+        :type task_id: str
+        :param num_results: The number of events to fetch from the service. May be set
+            to ``None`` to request the maximum allowable number of results.
+            [Default: ``10``]
+        :type num_results: int or None
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
-
-        **Parameters**
-
-            ``task_id`` (*string*)
-              The task to inspect.
-
-            ``num_results`` (*int* or *None*)
-              default ``10``
-              The number of events to fetch from the service. May be set to
-              ``None`` to request the maximum allowable number of results.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **Examples**
 
@@ -1383,17 +1296,13 @@ class TransferClient(BaseClient):
         is "ACTIVE" after time runs out, returns ``False``. Otherwise returns
         ``True``.
 
-        **Parameters**
-
-            ``task_id`` (*string*)
-              ID of the Task to wait on for completion
-
-            ``timeout`` (*int*)
-              Number of seconds to wait in total. Minimum 1
-
-            ``polling_interval`` (*int*)
-              Number of seconds between queries to Globus about the Task
-              status. Minimum 1
+        :param task_id: ID of the Task to wait on for completion
+        :type task_id: str
+        :param timeout: Number of seconds to wait in total. Minimum 1. [Default: ``10``]
+        :type timeout: int, optional
+        :param polling_interval: Number of seconds between queries to Globus about the
+            Task status. Minimum 1. [Default: ``10``]
+        :type polling_interval: int, optional
 
         **Examples**
 
@@ -1515,24 +1424,18 @@ class TransferClient(BaseClient):
 
         ``GET /task/<task_id>/successful_transfers``
 
+        :param task_id: The ID of the task to inspect.
+        :type task_id: str
+        :param num_results: The number of file transfer records to fetch from the
+            service. May be set to ``None`` to request the maximum allowable number of
+            results. [Default: ``100``]
+        :type num_results: int or None, optional
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
-
-        **Parameters**
-
-            ``task_id`` (*string*)
-              The task to inspect.
-
-            ``num_results`` (*int* or *None*)
-              default ``100``
-              The number of file transfer records to fetch from the service.
-              May be set to ``None`` to request the maximum allowable number of
-              results.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **Examples**
 
@@ -1677,20 +1580,16 @@ class TransferClient(BaseClient):
 
         ``GET endpoint_manager/task_list``
 
+        :param num_results: The number of tasks to fetch from the service. May be set to
+            ``None`` to request the maximum allowable number of results.
+            [Default: ``10``]
+        :type num_results: int or None, optional
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
-
-        **Parameters**
-
-            ``num_results`` (*int* or *None*)
-              default ``10``
-              The number of tasks to fetch from the service. May be set to
-              ``None`` to request the maximum allowable number of results.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **Examples**
 
@@ -1761,23 +1660,18 @@ class TransferClient(BaseClient):
 
         ``GET /task/<task_id>/event_list``
 
+        :param task_id: The ID of the task to inspect.
+        :type task_id: str
+        :param num_results: The number of events to fetch from the service. May be set
+            to ``None`` to request the maximum allowable number of results.
+            [Default: ``10``]
+        :type num_results: int or None, optional
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
-
-        **Parameters**
-
-            ``task_id`` (*string*)
-              The task to inspect.
-
-            ``num_results`` (*int* or *None*)
-              default ``10``
-              The number of events to fetch from the service. May be set to
-              ``None`` to request the maximum allowable number of results.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
@@ -1838,24 +1732,18 @@ class TransferClient(BaseClient):
 
         ``GET /endpoint_manager/task/<task_id>/successful_transfers``
 
+        :param task_id: The ID of the task to inspect.
+        :type task_id: str
+        :param num_results: The number of file transfer records to fetch from the
+            service. May be set to ``None`` to request the maximum allowable number of
+            results. [Default: ``100``]
+        :type num_results: int or None, optional
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
-
-        **Parameters**
-
-            ``task_id`` (*string*)
-              The task to inspect.
-
-            ``num_results`` (*int* or *None*)
-              default ``100``
-              The number of file transfer records to fetch from the service.
-              May be set to ``None`` to request the maximum allowable number of
-              results.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
@@ -1891,19 +1779,14 @@ class TransferClient(BaseClient):
 
         ``POST /endpoint_manager/admin_cancel``
 
+        :param task_ids: List of task ids to cancel.
+        :type task_ids: iterable of str
+        :param message: Message given to all users who's tasks have been canceled.
+        :type message: str
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
-
-        **Parameters**
-
-            ``task_ids`` (*list of string*)
-              List of task ids to cancel.
-
-            ``message`` (*string*)
-              Message given to all users who's tasks have been canceled.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
@@ -1931,16 +1814,12 @@ class TransferClient(BaseClient):
 
         ``GET /endpoint_manager/admin_cancel/<admin_cancel_id>``
 
+        :param admin_cancel_id: The ID of the the cancel job to inspect.
+        :type admin_cancel_id: str
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
-
-        **Parameters**
-
-            ``admin_cancel_id`` (*string*)
-              The ID of the the cancel to inspect.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
@@ -1965,19 +1844,14 @@ class TransferClient(BaseClient):
 
         ``POST /endpoint_manager/admin_pause``
 
+        :param task_ids: List of task ids to pause.
+        :type task_ids: iterable of str
+        :param message: Message given to all users who's tasks have been paused.
+        :type message: str
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
-
-        **Parameters**
-
-            ``task_ids`` (*list of string*)
-              List of task ids to pause.
-
-            ``message`` (*string*)
-              Message given to all users who's tasks have been paused.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
@@ -2005,16 +1879,12 @@ class TransferClient(BaseClient):
 
         ``POST /endpoint_manager/admin_resume``
 
+        :param task_ids: List of task ids to resume.
+        :type task_ids: iterable of str
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
-
-        **Parameters**
-
-            ``task_ids`` (*list of string*)
-              List of task ids to resume.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
@@ -2042,21 +1912,14 @@ class TransferClient(BaseClient):
 
         ``GET /endpoint_manager/pause_rule_list``
 
+        :param filter_endpoint: An endpoint ID. Limit results to rules on endpoints
+            hosted by this endpoint. Must be activity monitor on this endpoint, not just
+            the hosted endpoints.
+        :type filter_endpoint: str
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
-
-        **Parameters**
-
-            ``filter_endpoint`` (*string*)
-              Limit results to pause rules on this endpoint.
-
-            ``filter_endpoint`` (*string*)
-              Limit results to rules on endpoints hosted by this endpoint.
-              Must be activity monitor on this endpoint, not just the hosted
-              endpoints.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
@@ -2111,16 +1974,12 @@ class TransferClient(BaseClient):
 
         ``GET /endpoint_manager/pause_rule/<pause_rule_id>``
 
+        :param pause_rule_id: ID of pause rule to get.
+        :type pause_rule_id: str
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
-
-       **Parameters**
-
-            ``pause_rule_id`` (*string*)
-              ID of pause rule to get.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 
@@ -2185,16 +2044,12 @@ class TransferClient(BaseClient):
 
         ``DELETE /endpoint_manager/pause_rule/<pause_rule_id>``
 
+        :param pause_rule_id: The ID of the pause rule to delete.
+        :type pause_rule_id: str
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
         :rtype: :class:`TransferResponse
                 <globus_sdk.transfer.response.TransferResponse>`
-
-       **Parameters**
-
-            ``pause_rule_id`` (*string*)
-              ID of pause rule to delete.
-
-            ``params``
-              Any additional parameters will be passed through as query params.
 
         **External Documentation**
 

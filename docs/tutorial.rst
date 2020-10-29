@@ -1,7 +1,12 @@
 .. _tutorial:
 
-SDK Tutorial
-============
+Tutorial
+========
+
+.. _getting_started:
+
+First Steps
+-----------
 
 This is a tutorial in the use of the Globus SDK. It takes you through a simple
 step-by-step flow for registering your application, getting tokens, and using
@@ -21,7 +26,7 @@ to dig deeper into the SDK.
 .. _tutorial_step1:
 
 Step 1: Get a Client
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 In order to complete an OAuth2 flow to get tokens, you must have a client or
 "app" definition registered with Globus.
@@ -53,7 +58,7 @@ and click "Create App".
 .. _tutorial_step2:
 
 Step 2: Get and Save Client ID
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 On the "Apps" screen you should now see all of your Projects, probably just
 "SDK Tutorial Project", and all of the Apps they contain, probably just "SDK
@@ -74,7 +79,7 @@ available in the variable, ``CLIENT_ID``.
 .. _tutorial_step3:
 
 Step 3: Get Some Access Tokens!
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Talking to Globus Services as a user requires that you authenticate to your new
 App and get it Tokens, credentials proving that you logged into it and gave it
@@ -118,7 +123,7 @@ If you want to read in depth about these steps, please look through our various
 .. _tutorial_step4:
 
 Step 4: Use Your Tokens, Talk to the Service
---------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Continuing from the example above, you have two credentials to Globus Services
 on hand: the ``AUTH_TOKEN`` and the ``TRANSFER_TOKEN``.

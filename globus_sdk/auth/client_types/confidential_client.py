@@ -30,13 +30,7 @@ class ConfidentialAppAuthClient(AuthClient):
     Any keyword arguments given are passed through to the ``AuthClient``
     constructor.
 
-    **Methods**
-
-    *  :py:meth:`.oauth2_client_credentials_tokens`
-    *  :py:meth:`.ConfidentialAppAuthClient.oauth2_start_flow`
-    *  :py:meth:`.oauth2_get_dependent_tokens`
-    *  :py:meth:`.oauth2_token_introspect`
-
+    .. automethodlist:: globus_sdk.ConfidentialAppAuthClient
     """
 
     # checked by BaseClient to see what authorizers are allowed for this client
@@ -67,11 +61,9 @@ class ConfidentialAppAuthClient(AuthClient):
         This method does not use a ``GlobusOAuthFlowManager`` because it is not
         at all necessary to do so.
 
-        ``requested_scopes``
-          A string of space-separated scope names being requested for the
-          access token(s). Defaults to a set of commonly desired scopes for
-          Globus.
-
+        :param requested_scopes: Space-separated scope names being requested for the
+            access token(s). Defaults to a set of commonly desired scopes for Globus.
+        :type requested_scopes: str, optional
         :rtype: :class:`OAuthTokenResponse
                 <globus_sdk.auth.token_response.OAuthTokenResponse>`
 
@@ -108,26 +100,22 @@ class ConfidentialAppAuthClient(AuthClient):
         :class:`GlobusAuthorizationCodeFlowManager
         <globus_sdk.auth.GlobusAuthorizationCodeFlowManager>`
 
-        **Parameters**
-
+        :param redirect_uri: The page that users should be directed to after
+            authenticating at the authorize URL.
+        :type redirect_uri: str
             ``redirect_uri`` (*string*)
-              The page that users should be directed to after authenticating at
-              the authorize URL. Required.
-
-            ``requested_scopes`` (*iterable* or *string*)
-              The scopes on the token(s) being requested, as a space-separated
-              string or an iterable of strings. Defaults to ``openid profile
-              email urn:globus:auth:scope:transfer.api.globus.org:all``
-
-            ``state`` (*string*)
-              This is a way of your application passing information back to
-              itself in the course of the OAuth flow. Because the user will
-              navigate away from your application to complete the flow, this
-              parameter lets you pass an arbitrary string from the starting
-              page to the ``redirect_uri``
-
-            ``refresh_tokens`` (*bool*)
-              When True, request refresh tokens in addition to access tokens
+        :param requested_scopes: The scopes on the token(s) being requested, as a
+            space-separated string or an iterable of strings. Defaults to
+            ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
+        :type requested_scopes: str or iterable of str, optional
+        :param state: This string allows an application to pass information back to
+            itself in the course of the OAuth flow. Because the user will navigate away
+            from the application to complete the flow, this parameter lets the app pass
+            an arbitrary string from the starting page to the ``redirect_uri``
+        :type state: str, optional
+        :param refresh_tokens: When True, request refresh tokens in addition to access
+            tokens. [Default: ``False``]
+        :type refresh_tokens: bool, optional
 
         **Examples**
 
@@ -172,15 +160,10 @@ class ConfidentialAppAuthClient(AuthClient):
         this Grant to get those "Dependent" or "Downstream" tokens for Service
         B.
 
-        **Parameters**
-
-          ``token`` (*string*)
-            An Access Token as a raw string, being exchanged.
-
-          ``additional_params`` (*dict*)
-            A ``dict`` or ``None``, which specifies additional parameters
-            to include in the request body
-
+        :param token: A Globus Access Token as a string
+        :type token: str
+        :param additional_params: Additional parameters to include in the request body
+        :type additional_params: dict, optional
         :rtype: :class:`OAuthTokenResponse
                 <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
@@ -215,14 +198,11 @@ class ConfidentialAppAuthClient(AuthClient):
         >>> for identity in data['identity_set']:
         >>>     print('token authenticates for "{}"'.format(identity))
 
-        **Parameters**
-
-          ``token`` (*string*)
-            An Access Token as a raw string, being evaluated
-
-          ``include`` (*string*)
-            A value for the ``include`` parameter in the request body. Default
-            is to omit the parameter, also supports ``"identity_set"``.
+        :param token: An Access Token as a raw string, being evaluated
+        :type token: str
+        :param include: A value for the ``include`` parameter in the request body.
+            Default is to omit the parameter.
+        :type include: str, optional
 
         **External Documentation**
 

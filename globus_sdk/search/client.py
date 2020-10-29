@@ -29,21 +29,7 @@ class SearchClient(BaseClient):
 
     **Methods**
 
-    *  :py:meth:`.get_index`
-    *  :py:meth:`.search`
-    *  :py:meth:`.post_search`
-    *  :py:meth:`.ingest`
-    *  :py:meth:`.delete_by_query`
-    *  :py:meth:`.get_subject`
-    *  :py:meth:`.delete_subject`
-    *  :py:meth:`.get_entry`
-    *  :py:meth:`.create_entry`
-    *  :py:meth:`.update_entry`
-    *  :py:meth:`.delete_entry`
-    *  :py:meth:`.get_query_template`
-    *  :py:meth:`.get_query_template_list`
-    *  :py:meth:`~.SearchClient.get_task`
-    *  :py:meth:`~.SearchClient.get_task_list`
+    .. automethodlist:: globus_sdk.SearchClient
     """
     # disallow basic auth
     allowed_authorizer_types = [
