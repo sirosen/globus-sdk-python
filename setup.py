@@ -64,7 +64,7 @@ setup(
             # mock on py2
             'mock==2.0.0;python_version<"3.6"',
             # mocking HTTP responses
-            "httpretty==0.9.5",
+            "responses==0.12.1",
             # builds + uploads to pypi
             'twine==3.2.0;python_version>="3.6"',
             'wheel==0.34.2;python_version>="3.6"',

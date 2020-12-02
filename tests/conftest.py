@@ -1,20 +1,16 @@
-import httpretty
 import pytest
-
-# disable the use of real sockets when HTTPretty socket mocking is in place --
-# if you make a real API call, it will immediately error
-httpretty.httpretty.allow_net_connect = False
+import responses
 
 
 @pytest.fixture(autouse=True)
-def enable_httpretty():
+def mocked_responses():
     """
-    All tests enable HTTPretty patching of the python socket module, replacing
-    all network IO.
+    All tests enable `responses` patching of the `requests` package, replacing
+    all HTTP calls.
     """
-    httpretty.enable()
+    responses.start()
 
     yield
 
-    httpretty.disable()
-    httpretty.reset()
+    responses.stop()
+    responses.reset()
