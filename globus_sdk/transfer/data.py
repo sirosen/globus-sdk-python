@@ -210,6 +210,14 @@ class TransferData(dict):
         Appends a transfer_item document to the DATA key of the transfer
         document.
 
+        .. note::
+
+            The full path to the destination file must be provided for file items.
+            Parent directories of files are not allowed. See
+            `task submission documentation
+            <https://docs.globus.org/api/transfer/task_submit/#submit_transfer_task>`_
+            for more details.
+
         :param source_path: Path to the source directory or file to be transfered
         :type source_path: str
         :param destination_path: Path to the source directory or file will be
