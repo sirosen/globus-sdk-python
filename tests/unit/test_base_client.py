@@ -3,12 +3,11 @@ import logging.handlers
 import uuid
 
 import pytest
-import responses
 import six
 
 import globus_sdk
 from globus_sdk.base import BaseClient, merge_params, safe_stringify, slash_join
-from tests.common import register_api_route
+from tests.common import get_last_request, register_api_route
 
 
 @pytest.fixture
@@ -100,7 +99,7 @@ def test_http_methods(method, allows_body, base_client):
 
     # request with no body
     res = resolved_method(path)
-    req = responses.calls[-1].request
+    req = get_last_request()
 
     assert req.method == methodname
     assert req.body is None
@@ -110,7 +109,7 @@ def test_http_methods(method, allows_body, base_client):
     if allows_body:
         jsonbody = {"foo": "bar"}
         res = resolved_method(path, json_body=jsonbody)
-        req = responses.calls[-1].request
+        req = get_last_request()
 
         assert req.method == methodname
         assert req.body == json.dumps(jsonbody)
@@ -118,7 +117,7 @@ def test_http_methods(method, allows_body, base_client):
         assert res["x"] == "y"
 
         res = resolved_method(path, text_body="abc")
-        req = responses.calls[-1].request
+        req = get_last_request()
 
         assert req.method == methodname
         assert req.body == "abc"

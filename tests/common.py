@@ -32,8 +32,18 @@ GO_EP1_SERVER_ID = 207976
 # end constants
 
 
+def get_last_request():
+    return responses.calls[-1].request
+
+
 def register_api_route(
-    service, path, method=responses.GET, adding_headers=None, replace=False, **kwargs
+    service,
+    path,
+    method=responses.GET,
+    adding_headers=None,
+    replace=False,
+    match_querystring=False,
+    **kwargs
 ):
     """
     Handy wrapper for adding URIs to the response mock state.
@@ -53,9 +63,21 @@ def register_api_route(
         adding_headers = {"Content-Type": "application/json"}
 
     if replace:
-        responses.replace(method, full_url, headers=adding_headers, **kwargs)
+        responses.replace(
+            method,
+            full_url,
+            headers=adding_headers,
+            match_querystring=match_querystring,
+            **kwargs
+        )
     else:
-        responses.add(method, full_url, headers=adding_headers, **kwargs)
+        responses.add(
+            method,
+            full_url,
+            headers=adding_headers,
+            match_querystring=match_querystring,
+            **kwargs
+        )
 
 
 def register_api_route_fixture_file(service, path, filename, **kwargs):

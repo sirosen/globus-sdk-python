@@ -1,15 +1,14 @@
 import json
 import uuid
 
-import httpretty
 import pytest
-import six
 
 import globus_sdk
 from tests.common import (
     GO_EP1_ID,
     GO_EP1_SERVER_ID,
     GO_EP2_ID,
+    get_last_request,
     register_api_route_fixture_file,
 )
 
@@ -59,8 +58,8 @@ def test_update_endpoint(client):
     assert update_doc["code"] == "Updated"
     assert update_doc["message"] == "Endpoint updated successfully"
 
-    req = httpretty.last_request()
-    assert req.body == six.b(json.dumps(update_data))
+    req = get_last_request()
+    assert json.loads(req.body) == update_data
 
 
 def test_update_endpoint_rewrites_activation_servers(client):
@@ -75,18 +74,18 @@ def test_update_endpoint_rewrites_activation_servers(client):
     # sending myproxy_server implicitly adds oauth_server=null
     update_data = {"myproxy_server": "foo"}
     client.update_endpoint(epid, update_data.copy())
-    req = httpretty.last_request()
-    assert req.body != six.b(json.dumps(update_data))
+    req = get_last_request()
+    assert json.loads(req.body) != update_data
     update_data["oauth_server"] = None
-    assert req.body == six.b(json.dumps(update_data))
+    assert json.loads(req.body) == update_data
 
     # sending oauth_server implicitly adds myproxy_server=null
     update_data = {"oauth_server": "foo"}
     client.update_endpoint(epid, update_data.copy())
-    req = httpretty.last_request()
-    assert req.body != six.b(json.dumps(update_data))
+    req = get_last_request()
+    assert json.loads(req.body) != update_data
     update_data["myproxy_server"] = None
-    assert req.body == six.b(json.dumps(update_data))
+    assert json.loads(req.body) == update_data
 
 
 def test_update_endpoint_invalid_activation_servers(client):
@@ -111,8 +110,8 @@ def test_create_endpoint(client):
     assert create_doc["code"] == "Created"
     assert create_doc["message"] == "Endpoint created successfully"
 
-    req = httpretty.last_request()
-    assert req.body == six.b(json.dumps(create_data))
+    req = get_last_request()
+    assert json.loads(req.body) == create_data
 
 
 def test_create_endpoint_invalid_activation_servers(client):

@@ -1,8 +1,8 @@
-import httpretty
 import pytest
+import responses
 
 import globus_sdk
-from tests.common import register_api_route
+from tests.common import get_last_request, register_api_route
 
 IDENTITIES_MULTIPLE_RESPONSE = """\
 {
@@ -60,10 +60,9 @@ def test_identity_map(client):
     )
 
     # the last (only) API call was the one by username
-    last_req = httpretty.last_request()
-    assert "ids" not in last_req.querystring
-    assert last_req.querystring["usernames"] == ["sirosen@globus.org"]
-    assert last_req.querystring["provision"] == ["false"]
+    last_req = get_last_request()
+    assert "ids" not in last_req.params
+    assert last_req.params == {"usernames": "sirosen@globus.org", "provision": "false"}
 
 
 def test_identity_map_initialization_no_values(client):
@@ -126,15 +125,15 @@ def test_identity_map_multiple(client):
     assert idmap["sirosen@globus.org"]["organization"] == "Globus Team"
     assert idmap["globus@globus.org"]["organization"] is None
 
-    last_req = httpretty.last_request()
+    last_req = get_last_request()
     # order doesn't matter, but it should be just these two
     # if IdentityMap doesn't deduplicate correctly, it could send
     # `sirosen@globus.org,globus@globus.org,sirosen@globus.org` on the first lookup
-    assert last_req.querystring["usernames"] in [
-        ["sirosen@globus.org,globus@globus.org"],
-        ["globus@globus.org,sirosen@globus.org"],
+    assert last_req.params["usernames"] in [
+        "sirosen@globus.org,globus@globus.org",
+        "globus@globus.org,sirosen@globus.org",
     ]
-    assert last_req.querystring["provision"] == ["false"]
+    assert last_req.params["provision"] == "false"
 
 
 def test_identity_map_keyerror(client):
@@ -144,9 +143,8 @@ def test_identity_map_keyerror(client):
     with pytest.raises(KeyError):
         idmap["sirosen2@globus.org"]
 
-    last_req = httpretty.last_request()
-    assert last_req.querystring["usernames"] == ["sirosen2@globus.org"]
-    assert last_req.querystring["provision"] == ["false"]
+    last_req = get_last_request()
+    assert last_req.params == {"usernames": "sirosen2@globus.org", "provision": "false"}
 
 
 def test_identity_map_get_with_default(client):
@@ -165,8 +163,8 @@ def test_identity_map_del(client):
     del idmap[identity_id]
     assert idmap.get("sirosen@globus.org")["id"] == identity_id
     # we've only made one request so far
-    assert len(httpretty.httpretty.latest_requests) == 1
+    assert len(responses.calls) == 1
     # but a lookup by ID after a del is going to trigger another request because we've
     # invalidated the cached ID data and are asking the IDMap to look it up again
     assert idmap.get(identity_id)["username"] == "sirosen@globus.org"
-    assert len(httpretty.httpretty.latest_requests) == 2
+    assert len(responses.calls) == 2
