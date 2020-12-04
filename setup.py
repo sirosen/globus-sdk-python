@@ -49,14 +49,10 @@ setup(
             "tox>=3.5.3,<4.0",
             # linting
             "flake8>=3.0,<4.0",
-            'isort>=5.1.4,<6.0;python_version>="3.6"',
-            # black requires py3.6+
-            # refrain from using 19.10b0 or later until
-            #   https://github.com/psf/black/issues/1288
-            # is fixed
-            'black==19.3b0;python_version>="3.6"',
+            'isort>=5.6.4,<6.0;python_version>="3.6"',
+            'black==20.8b1;python_version>="3.6"',
             # flake-bugbear requires py3.6+
-            'flake8-bugbear==20.1.4;python_version>="3.6"',
+            'flake8-bugbear==20.11.1;python_version>="3.6"',
             # testing
             "pytest<5.0",
             "pytest-cov<3.0",
