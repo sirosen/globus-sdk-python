@@ -1,7 +1,10 @@
 name: Test
 on:
-  - push
-  - pull_request
+  push:
+  pull_request:
+  # build weekly at 4:00 AM UTC
+  schedule:
+    - cron: '0 4 * * 1'
 jobs:
   test:
     strategy:
