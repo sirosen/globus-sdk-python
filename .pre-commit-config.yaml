@@ -5,10 +5,7 @@ repos:
     - id: check-merge-conflict
     - id: trailing-whitespace
 - repo: https://github.com/python/black
-  # refrain from using 19.10b0 or later until
-  #   https://github.com/psf/black/issues/1288
-  # is fixed
-  rev: 19.3b0
+  rev: 20.8b1
   hooks:
     - id: black
       name: "Autoformat python files"
