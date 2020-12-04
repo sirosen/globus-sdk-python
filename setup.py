@@ -14,9 +14,9 @@ if sys.version_info < (2, 7):
 
 # warn on older/untested python3s
 # it's not disallowed, but it could be an issue for some people
-if sys.version_info > (3,) and sys.version_info < (3, 5):
+if sys.version_info > (3,) and sys.version_info < (3, 6):
     warnings.warn(
-        "Installing globus-sdk on Python 3 versions older than 3.5 "
+        "Installing globus-sdk on Python 3 versions older than 3.6 "
         "may result in degraded functionality or even errors."
     )
 
@@ -61,12 +61,10 @@ setup(
             "pytest<5.0",
             "pytest-cov<3.0",
             "pytest-xdist<2.0",
-            # mock on py2, py3.4 and py3.5
-            # not just py2: py3 versions of mock don't all have the same
-            # interface!
+            # mock on py2
             'mock==2.0.0;python_version<"3.6"',
             # mocking HTTP responses
-            "httpretty==0.9.5",
+            "responses==0.12.1",
             # builds + uploads to pypi
             'twine==3.2.0;python_version>="3.6"',
             'wheel==0.34.2;python_version>="3.6"',
@@ -86,10 +84,10 @@ setup(
         "Operating System :: POSIX",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Communications :: File Sharing",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Software Development :: Libraries :: Python Modules",

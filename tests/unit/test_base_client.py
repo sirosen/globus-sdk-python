@@ -2,13 +2,12 @@ import json
 import logging.handlers
 import uuid
 
-import httpretty
 import pytest
 import six
 
 import globus_sdk
 from globus_sdk.base import BaseClient, merge_params, safe_stringify, slash_join
-from tests.common import register_api_route
+from tests.common import get_last_request, register_api_route
 
 
 @pytest.fixture
@@ -92,7 +91,7 @@ def test_http_methods(method, allows_body, base_client):
     methodname = method.upper()
     resolved_method = getattr(base_client, method)
     register_api_route(
-        "transfer", "/madeuppath/objectname", method=methodname, body='{"x": "y"}'
+        "transfer", "/madeuppath/objectname", method=methodname, json={"x": "y"}
     )
 
     # client should be able to compose the path itself
@@ -100,28 +99,28 @@ def test_http_methods(method, allows_body, base_client):
 
     # request with no body
     res = resolved_method(path)
-    req = httpretty.last_request()
+    req = get_last_request()
 
     assert req.method == methodname
-    assert req.body == six.b("")
+    assert req.body is None
     assert "x" in res
     assert res["x"] == "y"
 
     if allows_body:
         jsonbody = {"foo": "bar"}
         res = resolved_method(path, json_body=jsonbody)
-        req = httpretty.last_request()
+        req = get_last_request()
 
         assert req.method == methodname
-        assert req.body == six.b(json.dumps(jsonbody))
+        assert req.body == json.dumps(jsonbody)
         assert "x" in res
         assert res["x"] == "y"
 
         res = resolved_method(path, text_body="abc")
-        req = httpretty.last_request()
+        req = get_last_request()
 
         assert req.method == methodname
-        assert req.body == six.b("abc")
+        assert req.body == "abc"
         assert "x" in res
         assert res["x"] == "y"
 
@@ -132,7 +131,8 @@ def test_http_methods(method, allows_body, base_client):
             "/madeuppath/objectname",
             method=methodname,
             status=status,
-            body='{"x": "y", "code": "ErrorCode", "message": "foo"}',
+            json={"x": "y", "code": "ErrorCode", "message": "foo"},
+            replace=True,
         )
 
         with pytest.raises(globus_sdk.GlobusAPIError) as excinfo:

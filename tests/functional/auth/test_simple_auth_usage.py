@@ -1,11 +1,10 @@
 import json
 import uuid
 
-import httpretty
 import pytest
 
 import globus_sdk
-from tests.common import register_api_route
+from tests.common import get_last_request, register_api_route
 
 
 class StringWrapper(object):
@@ -120,12 +119,11 @@ def test_get_identities_success(usernames, client, identities_single_response):
 
     assert res.data == json.loads(IDENTITIES_SINGLE_RESPONSE)
 
-    lastreq = httpretty.last_request()
-    assert "usernames" in lastreq.querystring
-    assert lastreq.querystring["usernames"] == ["globus@globus.org"]
-    # provision defaults to false
-    assert "provision" in lastreq.querystring
-    assert lastreq.querystring["provision"] == ["false"]
+    lastreq = get_last_request()
+    assert lastreq.params == {
+        "usernames": "globus@globus.org",
+        "provision": "false",  # provision defaults to false
+    }
 
 
 @pytest.mark.parametrize(
@@ -152,9 +150,9 @@ def test_get_identities_multiple_success(
 
     assert res.data == json.loads(IDENTITIES_MULTIPLE_RESPONSE)
 
-    lastreq = httpretty.last_request()
-    assert "usernames" in lastreq.querystring
-    assert lastreq.querystring["usernames"] == [expect]
+    lastreq = get_last_request()
+    assert "usernames" in lastreq.params
+    assert lastreq.params["usernames"] == expect
 
 
 @pytest.mark.parametrize(
@@ -170,9 +168,9 @@ def test_get_identities_multiple_success(
 )
 def test_get_identities_provision(inval, outval, client, identities_single_response):
     client.get_identities(usernames="globus@globus.org", provision=inval)
-    lastreq = httpretty.last_request()
-    assert "provision" in lastreq.querystring
-    assert lastreq.querystring["provision"] == [outval]
+    lastreq = get_last_request()
+    assert "provision" in lastreq.params
+    assert lastreq.params["provision"] == outval
 
 
 @pytest.mark.parametrize(
@@ -200,6 +198,6 @@ def test_get_identities_multiple_ids_success(ids, client, identities_multiple_re
 
     assert res.data == json.loads(IDENTITIES_MULTIPLE_RESPONSE)
 
-    lastreq = httpretty.last_request()
-    assert "ids" in lastreq.querystring
-    assert lastreq.querystring["ids"] == [expect]
+    lastreq = get_last_request()
+    assert "ids" in lastreq.params
+    assert lastreq.params["ids"] == expect

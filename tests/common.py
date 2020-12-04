@@ -7,8 +7,8 @@ import inspect
 import json
 import os
 
-import httpretty
 import requests
+import responses
 import six
 
 import globus_sdk
@@ -32,13 +32,22 @@ GO_EP1_SERVER_ID = 207976
 # end constants
 
 
+def get_last_request():
+    return responses.calls[-1].request
+
+
 def register_api_route(
-    service, path, method=httpretty.GET, adding_headers=None, **kwargs
+    service,
+    path,
+    method=responses.GET,
+    adding_headers=None,
+    replace=False,
+    match_querystring=False,
+    **kwargs
 ):
     """
-    Handy wrapper for adding URIs to the HTTPretty state.
+    Handy wrapper for adding URIs to the response mock state.
     """
-    assert httpretty.is_enabled()
     base_url_map = {
         "auth": "https://auth.globus.org/",
         "nexus": "https://nexus.api.globusonline.org/",
@@ -53,7 +62,22 @@ def register_api_route(
     if adding_headers is None:
         adding_headers = {"Content-Type": "application/json"}
 
-    httpretty.register_uri(method, full_url, adding_headers=adding_headers, **kwargs)
+    if replace:
+        responses.replace(
+            method,
+            full_url,
+            headers=adding_headers,
+            match_querystring=match_querystring,
+            **kwargs
+        )
+    else:
+        responses.add(
+            method,
+            full_url,
+            headers=adding_headers,
+            match_querystring=match_querystring,
+            **kwargs
+        )
 
 
 def register_api_route_fixture_file(service, path, filename, **kwargs):

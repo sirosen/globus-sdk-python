@@ -3,8 +3,8 @@ Tests for PaginatedResource responses from TransferClient
 """
 import json
 
-import httpretty
 import pytest
+import responses
 
 from tests.common import register_api_route
 
@@ -113,17 +113,18 @@ def test_endpoint_search_reduced(client):
 
 
 def test_endpoint_search_multipage(client):
-    pages = [json.dumps(x) for x in MULTIPAGE_SEARCH_RESULTS]
-    responses = [httpretty.Response(p) for p in pages]
-
-    register_api_route("transfer", "/endpoint_search", responses=responses)
+    # add each page
+    for page in MULTIPAGE_SEARCH_RESULTS:
+        register_api_route("transfer", "/endpoint_search", json=page)
 
     # without cranking up num_results, we'll only get 25
     res = list(client.endpoint_search("search_query"))
     assert len(res) == 25
 
-    # reapply (resets responses)
-    register_api_route("transfer", "/endpoint_search", responses=responses)
+    # reset and reapply responses
+    responses.reset()
+    for page in MULTIPAGE_SEARCH_RESULTS:
+        register_api_route("transfer", "/endpoint_search", json=page)
 
     # num_results=None -> no limit
     res = list(client.endpoint_search("search_query", num_results=None))
