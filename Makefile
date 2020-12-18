@@ -14,6 +14,7 @@ showvars:
 	@echo "SDK_VERSION=$(SDK_VERSION)"
 release:
 	git tag -s "$(SDK_VERSION)" -m "v$(SDK_VERSION)"
+	-git push $(shell git rev-parse --abbrev-ref @{push} | cut -d '/' -f1) refs/tags/$SDK_VERSION
 	tox -e publish-release
 
 .PHONY: clean
