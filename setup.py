@@ -61,6 +61,8 @@ setup(
             'mock==2.0.0;python_version<"3.6"',
             # mocking HTTP responses
             "responses==0.12.1",
+            # pyinstaller is needed in order to test the pyinstaller hook
+            'pyinstaller;python_version>="3.6"',
             # builds + uploads to pypi
             'twine==3.2.0;python_version>="3.6"',
             'wheel==0.34.2;python_version>="3.6"',
@@ -68,6 +70,9 @@ setup(
             'sphinx==3.1.2;python_version>="3.6"',
             'sphinx-material==0.0.30;python_version>="3.6"',
         ],
+    },
+    entry_points={
+        "pyinstaller40": ["hook-dirs = globus_sdk._pyinstaller:get_hook_dirs"]
     },
     include_package_data=True,
     keywords=["globus", "file transfer"],
