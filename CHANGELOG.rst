@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+v1.10.0
+-------
+
+- Add support for pyinstaller installation of globus-sdk (`#387`_)
+
+.. _#387: https://github.com/globus/globus-sdk-python/pull/387
+
 v1.9.1
 ------
 
