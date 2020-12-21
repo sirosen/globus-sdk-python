@@ -1,6 +1,6 @@
-.. image:: https://travis-ci.org/globus/globus-sdk-python.svg?branch=master
+.. image:: https://github.com/globus/globus-sdk-python/workflows/build/badge.svg?event=push
     :alt: build status
-    :target: https://travis-ci.org/globus/globus-sdk-python
+    :target: https://github.com/globus/globus-sdk-python/actions?query=workflow%3Abuild
 
 .. image:: https://img.shields.io/pypi/v/globus-sdk.svg
     :alt: Latest Released Version
