@@ -1,13 +1,9 @@
 import time
+from unittest import mock
 
 import pytest
 
 from globus_sdk.authorizers.renewing import EXPIRES_ADJUST_SECONDS, RenewingAuthorizer
-
-try:
-    import mock
-except ImportError:
-    from unittest import mock
 
 
 class MockRenewer(RenewingAuthorizer):

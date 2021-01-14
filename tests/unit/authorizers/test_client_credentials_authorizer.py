@@ -1,12 +1,8 @@
+from unittest import mock
+
 import pytest
 
 from globus_sdk.authorizers import ClientCredentialsAuthorizer
-
-try:
-    import mock
-except ImportError:
-    from unittest import mock
-
 
 ACCESS_TOKEN = "access_token_1"
 EXPIRES_AT = -1

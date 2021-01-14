@@ -1,16 +1,11 @@
 import os
 import shutil
 import tempfile
+from unittest import mock
 
 import pytest
 
 import globus_sdk
-
-try:
-    import mock
-except ImportError:
-    from unittest import mock
-
 
 _IS_WINDOWS = os.name == "nt"
 

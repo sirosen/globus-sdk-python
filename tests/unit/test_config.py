@@ -1,16 +1,12 @@
 import os
 from contextlib import contextmanager
+from unittest import mock
 
 import pytest
 import six
 from six.moves.configparser import ConfigParser
 
 import globus_sdk.config
-
-try:
-    import mock
-except ImportError:
-    from unittest import mock
 
 
 @contextmanager

@@ -6,6 +6,7 @@ Not so disorganized as a "utils" module and not so refined as a public package.
 import inspect
 import json
 import os
+from unittest import mock
 
 import requests
 import responses
@@ -13,12 +14,6 @@ import six
 
 import globus_sdk
 from globus_sdk.base import slash_join
-
-try:
-    import mock
-except ImportError:
-    from unittest import mock
-
 
 # constants
 
