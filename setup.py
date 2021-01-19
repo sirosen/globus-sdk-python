@@ -64,11 +64,11 @@ setup(
             # pyinstaller is needed in order to test the pyinstaller hook
             'pyinstaller;python_version>="3.6"',
             # builds + uploads to pypi
-            'twine==3.2.0;python_version>="3.6"',
-            'wheel==0.34.2;python_version>="3.6"',
+            'twine>=3,<4;python_version>="3.6"',
+            'wheel==0.36.2;python_version>="3.6"',
             # docs
-            'sphinx==3.1.2;python_version>="3.6"',
-            'sphinx-material==0.0.30;python_version>="3.6"',
+            'sphinx==3.4.3;python_version>="3.6"',
+            'sphinx-material==0.0.32;python_version>="3.6"',
         ],
     },
     entry_points={
