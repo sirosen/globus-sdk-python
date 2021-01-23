@@ -41,7 +41,7 @@ Testing, Development, and Contributing
 --------------------------------------
 
 Go to the
-`CONTRIBUTING <https://github.com/globus/globus-sdk-python/blob/master/CONTRIBUTING.adoc>`_
+`CONTRIBUTING <https://github.com/globus/globus-sdk-python/blob/main/CONTRIBUTING.adoc>`_
 guide for detail.
 
 Links
