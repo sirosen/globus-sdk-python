@@ -134,6 +134,8 @@ class TransferData(dict):
         preserve_timestamp=False,
         encrypt_data=False,
         deadline=None,
+        skip_source_errors=False,
+        fail_on_quota_errors=False,
         recursive_symlinks="ignore",
         **kwargs
     ):
@@ -159,6 +161,12 @@ class TransferData(dict):
         logger.info("TransferData.encrypt_data = {}".format(encrypt_data))
         self["recursive_symlinks"] = recursive_symlinks
         logger.info("TransferData.recursive_symlinks = {}".format(recursive_symlinks))
+        self["skip_source_errors"] = skip_source_errors
+        logger.info("TransferData.skip_source_errors = {}".format(skip_source_errors))
+        self["fail_on_quota_errors"] = fail_on_quota_errors
+        logger.info(
+            "TransferData.fail_on_quota_errors = {}".format(fail_on_quota_errors)
+        )
 
         if label is not None:
             self["label"] = label
