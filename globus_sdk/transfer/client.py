@@ -1418,9 +1418,10 @@ class TransferClient(BaseClient):
 
         .. note::
 
-            This does not include files that were checked but skipped as part of a sync
-            transfer or skipped due to skip_source_errors, only files that were
-            actually transferred, and does not include any directories.
+            Only files that were actually transferred are included. This does
+            not include directories, files that were checked but skipped as
+            part of a sync transfer, or files which were skipped due to
+            skip_source_errors being set on the task.
 
         ``GET /task/<task_id>/successful_transfers``
 
@@ -1505,7 +1506,10 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/task/#get_task_skipped_errors>`_
         in the REST documentation for details.
         """
-        self.logger.info("TransferClient.task_skipped_errors({}, ...)".format(task_id))
+        self.logger.info(
+            "TransferClient."
+            "endpoint_manager_task_skipped_errors({}, ...)".format(task_id)
+        )
 
         resource_path = self.qjoin_path("task", task_id, "skipped_errors")
         return PaginatedResource(
