@@ -1418,9 +1418,10 @@ class TransferClient(BaseClient):
 
         .. note::
 
-            This does not include files that were checked but skipped as part of a sync
-            transfer, only files that were actually transferred, and does not include
-            any directories.
+            Only files that were actually transferred are included. This does
+            not include directories, files that were checked but skipped as
+            part of a sync transfer, or files which were skipped due to
+            skip_source_errors being set on the task.
 
         ``GET /task/<task_id>/successful_transfers``
 
@@ -1459,6 +1460,58 @@ class TransferClient(BaseClient):
         )
 
         resource_path = self.qjoin_path("task", task_id, "successful_transfers")
+        return PaginatedResource(
+            self.get,
+            resource_path,
+            {"params": params},
+            num_results=num_results,
+            max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_MARKER,
+        )
+
+    def task_skipped_errors(self, task_id, num_results=100, **params):
+        """
+        Get path and error information for all paths that were skipped due
+        to skip_source_errors being set on a completed transfer Task.
+
+        ``GET /task/<task_id>/skipped_errors``
+
+        :param task_id: The ID of the task to inspect.
+        :type task_id: str
+        :param num_results: The number of file transfer records to fetch from the
+            service. May be set to ``None`` to request the maximum allowable number of
+            results. [Default: ``100``]
+        :type num_results: int or None, optional
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+
+        **Examples**
+
+        Fetch all skipped errors for a task and print some basic info:
+
+        >>> tc = TransferClient(...)
+        >>> task_id = ...
+        >>> for info in tc.task_skipped_errors(task_id):
+        >>>     print("{} -> {}".format(
+        >>>         info["error_code"], info["source_path"]))
+
+        **External Documentation**
+
+        See
+        `Get Task Skipped Errors\
+        <https://docs.globus.org/api/transfer/task/#get_task_skipped_errors>`_
+        in the REST documentation for details.
+        """
+        self.logger.info(
+            "TransferClient."
+            "endpoint_manager_task_skipped_errors({}, ...)".format(task_id)
+        )
+
+        resource_path = self.qjoin_path("task", task_id, "skipped_errors")
         return PaginatedResource(
             self.get,
             resource_path,
@@ -1762,6 +1815,52 @@ class TransferClient(BaseClient):
 
         resource_path = self.qjoin_path(
             "endpoint_manager", "task", task_id, "successful_transfers"
+        )
+        return PaginatedResource(
+            self.get,
+            resource_path,
+            {"params": params},
+            num_results=num_results,
+            max_results_per_call=1000,
+            paging_style=PaginatedResource.PAGING_STYLE_MARKER,
+        )
+
+    def endpoint_manager_task_skipped_errors(self, task_id, num_results=100, **params):
+        """
+        Get skipped errors for a completed Task as an admin.
+
+        ``GET /endpoint_manager/task/<task_id>/skipped_errors``
+
+        :param task_id: The ID of the task to inspect.
+        :type task_id: str
+        :param num_results: The number of skipped error records to fetch from the
+            service. May be set to ``None`` to request the maximum allowable number of
+            results. [Default: ``100``]
+        :type num_results: int or None, optional
+        :param params: Any additional parameters will be passed through as query params.
+        :type params: dict, optional
+        :rtype: :class:`PaginatedResource
+                <globus_sdk.transfer.paging.PaginatedResource>`,
+                an iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
+
+        **External Documentation**
+
+        See
+        `Get task skipped errors as admin\
+        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_skipped_errors_as_admin>`_
+        in the REST documentation for details.
+        """
+        task_id = safe_stringify(task_id)
+        self.logger.info(
+            (
+                "TransferClient.endpoint_manager_task_"
+                "skipped_errors({}, ...)".format(task_id)
+            )
+        )
+
+        resource_path = self.qjoin_path(
+            "endpoint_manager", "task", task_id, "skipped_errors"
         )
         return PaginatedResource(
             self.get,

@@ -72,6 +72,15 @@ class TransferData(dict):
         ``"copy"`` follows symlinks on the source, failing if the link is invalid.
         [default: ``"ignore"``]
     :type recursive_symlinks: str
+    :param skip_source_errors: When true, source permission denied and file
+        not found errors from the source endpoint will cause the offending
+        path to be skipped.
+        [default: ``False``]
+    :type skip_source_errors: bool, optional
+    :param fail_on_quota_errors: When true, quota exceeded errors will cause the
+        task to fail.
+        [default: ``False``]
+    :type fail_on_quota_errors: bool, optional
 
     Any additional parameters are fed into the dict being created verbatim.
 
@@ -134,6 +143,8 @@ class TransferData(dict):
         preserve_timestamp=False,
         encrypt_data=False,
         deadline=None,
+        skip_source_errors=False,
+        fail_on_quota_errors=False,
         recursive_symlinks="ignore",
         **kwargs
     ):
@@ -159,6 +170,12 @@ class TransferData(dict):
         logger.info("TransferData.encrypt_data = {}".format(encrypt_data))
         self["recursive_symlinks"] = recursive_symlinks
         logger.info("TransferData.recursive_symlinks = {}".format(recursive_symlinks))
+        self["skip_source_errors"] = skip_source_errors
+        logger.info("TransferData.skip_source_errors = {}".format(skip_source_errors))
+        self["fail_on_quota_errors"] = fail_on_quota_errors
+        logger.info(
+            "TransferData.fail_on_quota_errors = {}".format(fail_on_quota_errors)
+        )
 
         if label is not None:
             self["label"] = label
