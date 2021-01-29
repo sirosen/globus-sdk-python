@@ -4,7 +4,6 @@ extend ``dict``, so they can be passed seamlessly to
 :class:`TransferClient <globus_sdk.TransferClient>` methods without
 conversion.
 """
-from __future__ import unicode_literals
 
 import logging
 
@@ -146,7 +145,7 @@ class TransferData(dict):
         skip_source_errors=False,
         fail_on_quota_errors=False,
         recursive_symlinks="ignore",
-        **kwargs
+        **kwargs,
     ):
         source_endpoint = safe_stringify(source_endpoint)
         destination_endpoint = safe_stringify(destination_endpoint)
@@ -157,33 +156,29 @@ class TransferData(dict):
         )
         logger.info("TransferData.submission_id = {}".format(self["submission_id"]))
         self["source_endpoint"] = source_endpoint
-        logger.info("TransferData.source_endpoint = {}".format(source_endpoint))
+        logger.info(f"TransferData.source_endpoint = {source_endpoint}")
         self["destination_endpoint"] = destination_endpoint
-        logger.info(
-            "TransferData.destination_endpoint = {}".format(destination_endpoint)
-        )
+        logger.info(f"TransferData.destination_endpoint = {destination_endpoint}")
         self["verify_checksum"] = verify_checksum
-        logger.info("TransferData.verify_checksum = {}".format(verify_checksum))
+        logger.info(f"TransferData.verify_checksum = {verify_checksum}")
         self["preserve_timestamp"] = preserve_timestamp
-        logger.info("TransferData.preserve_timestamp = {}".format(preserve_timestamp))
+        logger.info(f"TransferData.preserve_timestamp = {preserve_timestamp}")
         self["encrypt_data"] = encrypt_data
-        logger.info("TransferData.encrypt_data = {}".format(encrypt_data))
+        logger.info(f"TransferData.encrypt_data = {encrypt_data}")
         self["recursive_symlinks"] = recursive_symlinks
-        logger.info("TransferData.recursive_symlinks = {}".format(recursive_symlinks))
+        logger.info(f"TransferData.recursive_symlinks = {recursive_symlinks}")
         self["skip_source_errors"] = skip_source_errors
-        logger.info("TransferData.skip_source_errors = {}".format(skip_source_errors))
+        logger.info(f"TransferData.skip_source_errors = {skip_source_errors}")
         self["fail_on_quota_errors"] = fail_on_quota_errors
-        logger.info(
-            "TransferData.fail_on_quota_errors = {}".format(fail_on_quota_errors)
-        )
+        logger.info(f"TransferData.fail_on_quota_errors = {fail_on_quota_errors}")
 
         if label is not None:
             self["label"] = label
-            logger.debug("TransferData.label = {}".format(label))
+            logger.debug(f"TransferData.label = {label}")
 
         if deadline is not None:
             self["deadline"] = str(deadline)
-            logger.debug("TransferData.deadline = {}".format(deadline))
+            logger.debug(f"TransferData.deadline = {deadline}")
 
         # map the sync_level (if it's a nice string) to one of the known int
         # values
@@ -217,7 +212,7 @@ class TransferData(dict):
         recursive=False,
         external_checksum=None,
         checksum_algorithm=None,
-        **params
+        **params,
     ):
         """
         Add a file or directory to be transfered. If the item is a symlink
@@ -368,7 +363,7 @@ class DeleteData(dict):
         submission_id=None,
         recursive=False,
         deadline=None,
-        **kwargs
+        **kwargs,
     ):
         endpoint = safe_stringify(endpoint)
         logger.info("Creating a new DeleteData object")
@@ -378,25 +373,23 @@ class DeleteData(dict):
         )
         logger.info("DeleteData.submission_id = {}".format(self["submission_id"]))
         self["endpoint"] = endpoint
-        logger.info("DeleteData.endpoint = {}".format(endpoint))
+        logger.info(f"DeleteData.endpoint = {endpoint}")
         self["recursive"] = recursive
-        logger.info("DeleteData.recursive = {}".format(recursive))
+        logger.info(f"DeleteData.recursive = {recursive}")
 
         if label is not None:
             self["label"] = label
-            logger.debug("DeleteData.label = {}".format(label))
+            logger.debug(f"DeleteData.label = {label}")
 
         if deadline is not None:
             self["deadline"] = str(deadline)
-            logger.debug("DeleteData.deadline = {}".format(deadline))
+            logger.debug(f"DeleteData.deadline = {deadline}")
 
         self["DATA"] = []
 
         self.update(kwargs)
         for option, value in kwargs.items():
-            logger.info(
-                "DeleteData.{} = {} (option passed in via kwargs)".format(option, value)
-            )
+            logger.info(f"DeleteData.{option} = {value} (option passed in via kwargs)")
 
     def add_item(self, path, **params):
         """

@@ -3,9 +3,7 @@ import hashlib
 import logging
 import os
 import re
-
-import six
-from six.moves.urllib.parse import urlencode
+import urllib.parse
 
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_flow_manager import GlobusOAuthFlowManager
@@ -42,10 +40,8 @@ def make_native_app_challenge(verifier=None):
             raise GlobusSDKUsageError("verifier contained invalid characters")
     else:
         logger.info(
-            (
-                "Autogenerating verifier secret. On low-entropy systems "
-                "this may be insecure"
-            )
+            "Autogenerating verifier secret. On low-entropy systems "
+            "this may be insecure"
         )
 
     code_verifier = verifier or base64.urlsafe_b64encode(os.urandom(32)).decode(
@@ -121,13 +117,13 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
                 )
             )
             raise GlobusSDKUsageError(
-                'Invalid value for client_id. Got "{0}"'.format(self.client_id)
+                f'Invalid value for client_id. Got "{self.client_id}"'
             )
 
         # default to the default requested scopes
         self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
         # convert scopes iterable to string immediately on load
-        if not isinstance(self.requested_scopes, six.string_types):
+        if not isinstance(self.requested_scopes, str):
             self.requested_scopes = " ".join(self.requested_scopes)
 
         # default to `/v2/web/auth-code` on whatever environment we're looking
@@ -147,15 +143,15 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         self.prefill_named_grant = prefill_named_grant
 
         logger.debug("Starting Native App Flow with params:")
-        logger.debug("auth_client.client_id={}".format(auth_client.client_id))
-        logger.debug("redirect_uri={}".format(self.redirect_uri))
-        logger.debug("refresh_tokens={}".format(refresh_tokens))
-        logger.debug("state={}".format(state))
-        logger.debug("requested_scopes={}".format(self.requested_scopes))
-        logger.debug("verifier=<REDACTED>,challenge={}".format(self.challenge))
+        logger.debug(f"auth_client.client_id={auth_client.client_id}")
+        logger.debug(f"redirect_uri={self.redirect_uri}")
+        logger.debug(f"refresh_tokens={refresh_tokens}")
+        logger.debug(f"state={state}")
+        logger.debug(f"requested_scopes={self.requested_scopes}")
+        logger.debug(f"verifier=<REDACTED>,challenge={self.challenge}")
 
         if prefill_named_grant is not None:
-            logger.debug("prefill_named_grant={}".format(self.prefill_named_grant))
+            logger.debug(f"prefill_named_grant={self.prefill_named_grant}")
 
     def get_authorize_url(self, additional_params=None):
         """
@@ -175,10 +171,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         authorize_base_url = slash_join(
             self.auth_client.base_url, "/v2/oauth2/authorize"
         )
-        logger.debug(
-            "Building authorization URI. Base URL: {}".format(authorize_base_url)
-        )
-        logger.debug("additional_params={}".format(additional_params))
+        logger.debug(f"Building authorization URI. Base URL: {authorize_base_url}")
+        logger.debug(f"additional_params={additional_params}")
 
         params = {
             "client_id": self.client_id,
@@ -195,8 +189,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         if additional_params:
             params.update(additional_params)
 
-        params = urlencode(params)
-        return "{0}?{1}".format(authorize_base_url, params)
+        params = urllib.parse.urlencode(params)
+        return f"{authorize_base_url}?{params}"
 
     def exchange_code_for_tokens(self, auth_code):
         """
@@ -207,10 +201,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
         logger.debug(
-            (
-                "Performing Native App auth_code exchange. "
-                "Sending verifier and client_id"
-            )
+            "Performing Native App auth_code exchange. "
+            "Sending verifier and client_id"
         )
         return self.auth_client.oauth2_token(
             {

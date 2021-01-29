@@ -86,10 +86,8 @@ def test_identity_map_initialization_mixed_and_duplicate_values(client):
             "ae341a98-d274-11e5-b888-dbae3a8ba545",
         ],
     )
-    assert idmap.unresolved_ids == set(["ae341a98-d274-11e5-b888-dbae3a8ba545"])
-    assert idmap.unresolved_usernames == set(
-        ["sirosen@globus.org", "globus@globus.org"]
-    )
+    assert idmap.unresolved_ids == {"ae341a98-d274-11e5-b888-dbae3a8ba545"}
+    assert idmap.unresolved_usernames == {"sirosen@globus.org", "globus@globus.org"}
 
 
 def test_identity_map_initialization_batch_size(client):

@@ -59,7 +59,7 @@ class AutoMethodList(Directive):
         yield "**Methods**"
         yield ""
         for methodname in _classname2methods(classname, include_methods):
-            yield "* :py:meth:`~{}.{}`".format(classname, methodname)
+            yield f"* :py:meth:`~{classname}.{methodname}`"
 
         yield ""
 

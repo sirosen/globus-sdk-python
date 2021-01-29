@@ -7,7 +7,7 @@ import globus_sdk
 from tests.common import get_last_request, register_api_route
 
 
-class StringWrapper(object):
+class StringWrapper:
     """Simple test object to be a non-string obj wrapping a string"""
 
     def __init__(self, s):

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 import logging
 
@@ -35,7 +33,7 @@ class ClientLogAdapter(logging.LoggerAdapter):
         return self.warning(*args, **kwargs)
 
 
-class BaseClient(object):
+class BaseClient:
     r"""
     Simple client with error handling for Globus REST APIs. Implemented
     as a wrapper around a ``requests.Session`` object, with a simplified
@@ -64,7 +62,7 @@ class BaseClient(object):
     # a collection of authorizer types, or None to indicate "any"
     allowed_authorizer_types = None
 
-    BASE_USER_AGENT = "globus-sdk-py-{0}".format(__version__)
+    BASE_USER_AGENT = f"globus-sdk-py-{__version__}"
 
     def __init__(
         self,
@@ -76,7 +74,7 @@ class BaseClient(object):
         app_name=None,
         http_timeout=None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         self._init_logger_adapter()
         self.logger.info(
@@ -94,8 +92,7 @@ class BaseClient(object):
             )
             raise exc.GlobusSDKUsageError(
                 (
-                    "{0} can only take authorizers from {1}, "
-                    "but you have provided {2}"
+                    "{} can only take authorizers from {}, but you have provided {}"
                 ).format(type(self), self.allowed_authorizer_types, type(authorizer))
             )
 
@@ -186,7 +183,7 @@ class BaseClient(object):
         interacting with Globus Support.
         """
         self.app_name = app_name
-        self._headers["User-Agent"] = "{0}/{1}".format(self.BASE_USER_AGENT, app_name)
+        self._headers["User-Agent"] = f"{self.BASE_USER_AGENT}/{app_name}"
 
     def qjoin_path(self, *parts):
         return "/" + "/".join(quote(part) for part in parts)
@@ -211,7 +208,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug("GET to {} with params {}".format(path, params))
+        self.logger.debug(f"GET to {path} with params {params}")
         return self._request(
             "GET",
             path,
@@ -255,7 +252,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug("POST to {} with params {}".format(path, params))
+        self.logger.debug(f"POST to {path} with params {params}")
         return self._request(
             "POST",
             path,
@@ -289,7 +286,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug("DELETE to {} with params {}".format(path, params))
+        self.logger.debug(f"DELETE to {path} with params {params}")
         return self._request(
             "DELETE",
             path,
@@ -333,7 +330,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug("PUT to {} with params {}".format(path, params))
+        self.logger.debug(f"PUT to {path} with params {params}")
         return self._request(
             "PUT",
             path,
@@ -379,7 +376,7 @@ class BaseClient(object):
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug("PATCH to {} with params {}".format(path, params))
+        self.logger.debug(f"PATCH to {path} with params {params}")
         return self._request(
             "PATCH",
             path,
@@ -451,7 +448,7 @@ class BaseClient(object):
             self.authorizer.set_authorization_header(rheaders)
 
         url = slash_join(self.base_url, path)
-        self.logger.debug("request will hit URL:{}".format(url))
+        self.logger.debug(f"request will hit URL:{url}")
 
         # because a 401 can trigger retry, we need to wrap the retry-able thing
         # in a method
@@ -473,7 +470,7 @@ class BaseClient(object):
         # initial request
         r = send_request()
 
-        self.logger.debug("Request made to URL: {}".format(r.url))
+        self.logger.debug(f"Request made to URL: {r.url}")
 
         # potential 401 retry handling
         if r.status_code == 401 and retry_401 and self.authorizer is not None:
@@ -488,16 +485,14 @@ class BaseClient(object):
                 r = send_request()
 
         if 200 <= r.status_code < 400:
-            self.logger.debug(
-                "request completed with response code: {}".format(r.status_code)
-            )
+            self.logger.debug(f"request completed with response code: {r.status_code}")
             if response_class is None:
                 return self.default_response_class(r, client=self)
             else:
                 return response_class(r, client=self)
 
         self.logger.debug(
-            "request completed with (error) response code: {}".format(r.status_code)
+            f"request completed with (error) response code: {r.status_code}"
         )
         raise self.error_class(r)
 
@@ -567,7 +562,7 @@ def safe_stringify(value):
     anything else has __str__ called, then is converted to bytes and then to
     unicode to deal with python 2 and 3 differing in definitions of string
     """
-    if isinstance(value, six.text_type):
+    if isinstance(value, str):
         return value
     if isinstance(value, bytes):
         return value.decode("utf-8")

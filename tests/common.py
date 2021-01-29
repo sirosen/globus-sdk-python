@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 """
 Common use helpers and utilities for all tests to leverage.
 Not so disorganized as a "utils" module and not so refined as a public package.
@@ -10,7 +9,6 @@ from unittest import mock
 
 import requests
 import responses
-import six
 
 import globus_sdk
 from globus_sdk.base import slash_join
@@ -101,8 +99,8 @@ def register_api_route_fixture_file(service, path, filename, **kwargs):
     modpath = os.path.abspath(frm[1])
 
     abspath = os.path.join(os.path.dirname(modpath), "fixture_data", filename)
-    with open(abspath) as f:
-        body = six.b(f.read())
+    with open(abspath, "rb") as f:
+        body = f.read()
 
     register_api_route(service, path, body=body, **kwargs)
 
@@ -139,7 +137,7 @@ class PickleableMockResponse(mock.NonCallableMock):
         self, status_code, json_body=None, text=None, headers=None, *args, **kwargs
     ):
         kwargs["spec"] = requests.Response
-        super(PickleableMockResponse, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.__class__ = PickleableMockResponse
 
         # after mock initialization, setup various explicit attributes
@@ -160,7 +158,7 @@ class PickleableMockResponse(mock.NonCallableMock):
     def __getstate__(self):
         """Custom getstate discards most of the magical mock stuff"""
         keys = ["headers", "text", "_json_body", "status_code"]
-        return dict((k, self.__dict__[k]) for k in keys)
+        return {k: self.__dict__[k] for k in keys}
 
     def __setstate__(self, state):
         self.__dict__.update(state)

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 
 from globus_sdk.authorizers.base import GlobusAuthorizer
@@ -22,16 +20,14 @@ class BasicAuthorizer(GlobusAuthorizer):
 
     def __init__(self, username, password):
         logger.info(
-            (
-                "Setting up a BasicAuthorizer. It will use an "
-                "auth type of Basic and cannot handle 401s."
-            )
+            "Setting up a BasicAuthorizer. It will use an "
+            "auth type of Basic and cannot handle 401s."
         )
-        logger.info("BasicAuthorizer.username = {}".format(username))
+        logger.info(f"BasicAuthorizer.username = {username}")
         self.username = username
         self.password = password
 
-        to_b64 = "{0}:{1}".format(username, password)
+        to_b64 = f"{username}:{password}"
         self.header_val = "Basic %s" % safe_b64encode(to_b64)
 
     def set_authorization_header(self, header_dict):

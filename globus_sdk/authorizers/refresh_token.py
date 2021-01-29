@@ -56,19 +56,15 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         on_refresh=None,
     ):
         logger.info(
-            (
-                "Setting up RefreshTokenAuthorizer with auth_client = "
-                "instance: {}".format(id(auth_client))
-            )
+            "Setting up RefreshTokenAuthorizer with auth_client = "
+            "instance: {}".format(id(auth_client))
         )
 
         # required for _get_token_data
         self.refresh_token = refresh_token
         self.auth_client = auth_client
 
-        super(RefreshTokenAuthorizer, self).__init__(
-            access_token, expires_at, on_refresh
-        )
+        super().__init__(access_token, expires_at, on_refresh)
 
     def _get_token_response(self):
         """

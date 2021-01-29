@@ -25,7 +25,7 @@ SINGLE_PAGE_SEARCH_RESULT = {
     "limit": 100,
     "has_next_page": False,
     "DATA": [
-        {"DATA_TYPE": "endpoint", "display_name": "SDK Test Stub {}".format(x)}
+        {"DATA_TYPE": "endpoint", "display_name": f"SDK Test Stub {x}"}
         for x in range(100)
     ],
 }
@@ -38,7 +38,7 @@ MULTIPAGE_SEARCH_RESULTS = [
         "limit": 100,
         "has_next_page": True,
         "DATA": [
-            {"DATA_TYPE": "endpoint", "display_name": "SDK Test Stub {}".format(x)}
+            {"DATA_TYPE": "endpoint", "display_name": f"SDK Test Stub {x}"}
             for x in range(100)
         ],
     },

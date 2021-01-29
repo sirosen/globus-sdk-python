@@ -1,4 +1,4 @@
-class GlobusOAuthFlowManager(object):
+class GlobusOAuthFlowManager:
     """
     An abstract class definition that defines the interface for the Flow
     Managers for Globus Auth.
@@ -30,7 +30,7 @@ class GlobusOAuthFlowManager(object):
         :rtype: ``string``
         """
         raise NotImplementedError(
-            "{0} does not implement get_authorize_url()".format(type(self))
+            "{} does not implement get_authorize_url()".format(type(self))
         )
 
     def exchange_code_for_tokens(self, auth_code):
@@ -50,5 +50,5 @@ class GlobusOAuthFlowManager(object):
         :rtype: :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         """
         raise NotImplementedError(
-            "{0} does not implement exchange_code_for_tokens()".format(type(self))
+            "{} does not implement exchange_code_for_tokens()".format(type(self))
         )

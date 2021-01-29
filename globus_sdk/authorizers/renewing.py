@@ -2,8 +2,6 @@ import abc
 import logging
 import time
 
-import six
-
 from globus_sdk.authorizers.base import GlobusAuthorizer
 from globus_sdk.utils.string_hashing import sha256_string
 
@@ -13,8 +11,7 @@ logger = logging.getLogger(__name__)
 EXPIRES_ADJUST_SECONDS = 60
 
 
-@six.add_metaclass(abc.ABCMeta)
-class RenewingAuthorizer(GlobusAuthorizer):
+class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
     """
     A ``RenewingAuthorizer`` is an abstract superclass to any authorizer
     that needs to get new Access Tokens in order to form Authorization headers.
@@ -48,19 +45,15 @@ class RenewingAuthorizer(GlobusAuthorizer):
 
     def __init__(self, access_token=None, expires_at=None, on_refresh=None):
         logger.info(
-            (
-                "Setting up a RenewingAuthorizer. It will use an "
-                "auth type of Bearer and can handle 401s."
-            )
+            "Setting up a RenewingAuthorizer. It will use an "
+            "auth type of Bearer and can handle 401s."
         )
         if access_token is not None and expires_at is None:
             logger.warning(
-                (
-                    "Initializing a RenewingAuthorizer with an "
-                    "access_token and no expires_at time means that this "
-                    "access_token will be discarded. You should either pass "
-                    "expires_at or not pass an access_token at all"
-                )
+                "Initializing a RenewingAuthorizer with an "
+                "access_token and no expires_at time means that this "
+                "access_token will be discarded. You should either pass "
+                "expires_at or not pass an access_token at all"
             )
             # coerce to None for simplicity / consistency
             access_token = None
@@ -133,9 +126,9 @@ class RenewingAuthorizer(GlobusAuthorizer):
         self.access_token_hash = sha256_string(self.access_token)
 
         logger.info(
-            (
-                "RenewingAuthorizer.access_token updated to token " "with hash" '"{}"'
-            ).format(self.access_token_hash)
+            ('RenewingAuthorizer.access_token updated to token with hash "{}"').format(
+                self.access_token_hash
+            )
         )
 
         if callable(self.on_refresh):
@@ -156,14 +149,12 @@ class RenewingAuthorizer(GlobusAuthorizer):
             self.expires_at is None or time.time() > self.expires_at
         ):
             logger.debug(
-                (
-                    "RenewingAuthorizer determined time has "
-                    "expired. Fetching new Access Token"
-                )
+                "RenewingAuthorizer determined time has "
+                "expired. Fetching new Access Token"
             )
             self._get_new_access_token()
         else:
-            logger.debug(("RenewingAuthorizer determined time has " "not yet expired"))
+            logger.debug("RenewingAuthorizer determined time has not yet expired")
 
     def set_authorization_header(self, header_dict):
         """
@@ -188,10 +179,8 @@ class RenewingAuthorizer(GlobusAuthorizer):
         being fetched.
         """
         logger.debug(
-            (
-                "RenewingAuthorizer seeing 401. Invalidating "
-                "token and preparing for refresh."
-            )
+            "RenewingAuthorizer seeing 401. Invalidating "
+            "token and preparing for refresh."
         )
         # None for expires_at invalidates any current token
         self.expires_at = None

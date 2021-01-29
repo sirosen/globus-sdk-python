@@ -76,7 +76,7 @@ def test_get_lib_config():
 
     # and check that 'default' and 'preview' are populated
     for env in ("default", "preview"):
-        section = "environment {}".format(env)
+        section = f"environment {env}"
         for key in (
             "auth_service",
             "nexus_service",

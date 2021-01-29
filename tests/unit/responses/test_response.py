@@ -41,7 +41,7 @@ def http_no_content_type_response():
 @pytest.fixture
 def malformed_http_response():
     malformed_response = requests.Response()
-    malformed_response._content = six.b("{")
+    malformed_response._content = b"{"
     malformed_response.headers["Content-Type"] = "application/json"
     return _TestResponse("{", GlobusHTTPResponse(malformed_response))
 

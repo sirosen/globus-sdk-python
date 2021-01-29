@@ -10,7 +10,7 @@ from globus_sdk.transfer.response import IterableTransferResponse
 N = 25
 
 
-class PagingSimulator(object):
+class PagingSimulator:
     def __init__(self, n):
         self.n = n  # the number of simulated items
 
@@ -137,7 +137,7 @@ def test_iterable_func(paging_simulator):
 
     generator = pr.iterable_func()
     for i in range(N):
-        assert six.next(generator)["value"] == i
+        assert next(generator)["value"] == i
 
     with pytest.raises(StopIteration):
-        six.next(generator)
+        next(generator)

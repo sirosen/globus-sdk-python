@@ -18,16 +18,14 @@ class AccessTokenAuthorizer(GlobusAuthorizer):
 
     def __init__(self, access_token):
         logger.info(
-            (
-                "Setting up an AccessTokenAuthorizer. It will use an "
-                "auth type of Bearer and cannot handle 401s."
-            )
+            "Setting up an AccessTokenAuthorizer. It will use an "
+            "auth type of Bearer and cannot handle 401s."
         )
         self.access_token = access_token
         self.header_val = "Bearer %s" % access_token
 
         self.access_token_hash = sha256_string(self.access_token)
-        logger.debug('Bearer token has hash "{}"'.format(self.access_token_hash))
+        logger.debug(f'Bearer token has hash "{self.access_token_hash}"')
 
     def set_authorization_header(self, header_dict):
         """

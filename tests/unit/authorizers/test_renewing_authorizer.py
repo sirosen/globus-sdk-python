@@ -15,7 +15,7 @@ class MockRenewer(RenewingAuthorizer):
     def __init__(self, token_data, **kwargs):
         self.token_data = token_data
         self.token_response = mock.Mock()
-        super(MockRenewer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _get_token_response(self):
         return self.token_response

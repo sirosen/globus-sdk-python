@@ -19,10 +19,10 @@ def test_get_endpoint(client):
     """
     # register get_endpoint mock data
     register_api_route_fixture_file(
-        "transfer", "/endpoint/{}".format(GO_EP1_ID), "get_endpoint_goep1.json"
+        "transfer", f"/endpoint/{GO_EP1_ID}", "get_endpoint_goep1.json"
     )
     register_api_route_fixture_file(
-        "transfer", "/endpoint/{}".format(GO_EP2_ID), "get_endpoint_goep2.json"
+        "transfer", f"/endpoint/{GO_EP2_ID}", "get_endpoint_goep2.json"
     )
 
     # load the tutorial endpoint documents
@@ -45,7 +45,7 @@ def test_get_endpoint(client):
 def test_update_endpoint(client):
     epid = uuid.uuid1()
     register_api_route_fixture_file(
-        "transfer", "/endpoint/{}".format(epid), "ep_update.json", method="PUT"
+        "transfer", f"/endpoint/{epid}", "ep_update.json", method="PUT"
     )
 
     # NOTE: pass epid as UUID, not str
@@ -68,7 +68,7 @@ def test_update_endpoint_rewrites_activation_servers(client):
     """
     epid = "example-id"
     register_api_route_fixture_file(
-        "transfer", "/endpoint/{}".format(epid), "ep_create.json", method="PUT"
+        "transfer", f"/endpoint/{epid}", "ep_create.json", method="PUT"
     )
 
     # sending myproxy_server implicitly adds oauth_server=null
