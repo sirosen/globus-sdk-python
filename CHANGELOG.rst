@@ -1,27 +1,41 @@
 CHANGELOG
 =========
 
+v1.11.0
+-------
+
+* Add support for task skipped errors via
+  `TransferClient.task_skipped_errors` and
+  `TransferClient.endpoint_manager_task_skipped_errors` (`#393`_)
+* Internal maintenance (`#389`_, `#390`_, `#391`_, `#392`_)
+
+.. _#393: https://github.com/globus/globus-sdk-python/pull/393
+.. _#392: https://github.com/globus/globus-sdk-python/pull/392
+.. _#391: https://github.com/globus/globus-sdk-python/pull/391
+.. _#390: https://github.com/globus/globus-sdk-python/pull/390
+.. _#389: https://github.com/globus/globus-sdk-python/pull/389
+
 v1.10.0
 -------
 
-- Add support for pyinstaller installation of globus-sdk (`#387`_)
+* Add support for pyinstaller installation of globus-sdk (`#387`_)
 
 .. _#387: https://github.com/globus/globus-sdk-python/pull/387
 
 v1.9.1
 ------
 
-- Fix `GlobusHTTPResponse` to handle responses with no `Content-Type` header (`#375`_)
+* Fix `GlobusHTTPResponse` to handle responses with no `Content-Type` header (`#375`_)
 
 .. _#375: https://github.com/globus/globus-sdk-python/pull/375
 
 v1.9.0
 ------
 
-- Add `globus_sdk.IdentityMap`, a mapping-like object for Auth ID lookups (`#367`_)
-- Minor documentation and build improvements (`#369`_, `#362`_)
-- Don't append trailing slashes when no path is given to a low-level client method like `get()` (`#364`_)
-- Add `external_checksum` and `checksum_algorithm` to `TransferData.add_item()` named arguments (`#365`_)
+* Add `globus_sdk.IdentityMap`, a mapping-like object for Auth ID lookups (`#367`_)
+* Minor documentation and build improvements (`#369`_, `#362`_)
+* Don't append trailing slashes when no path is given to a low-level client method like `get()` (`#364`_)
+* Add `external_checksum` and `checksum_algorithm` to `TransferData.add_item()` named arguments (`#365`_)
 
 .. _#367: https://github.com/globus/globus-sdk-python/pull/367
 .. _#362: https://github.com/globus/globus-sdk-python/pull/362
