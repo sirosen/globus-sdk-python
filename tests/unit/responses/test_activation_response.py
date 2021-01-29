@@ -3,7 +3,6 @@ import time
 
 import pytest
 import requests
-import six
 
 from globus_sdk.transfer.response import ActivationRequirementsResponse
 
@@ -28,7 +27,7 @@ def make_response(
     }
     response = requests.Response()
     response.headers["Content-Type"] = "application/json"
-    response._content = six.b(json.dumps(data))
+    response._content = json.dumps(data).encode("utf-8")
     return ActivationRequirementsResponse(response)
 
 

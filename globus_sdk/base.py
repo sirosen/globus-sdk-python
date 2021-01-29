@@ -1,9 +1,8 @@
 import json
 import logging
+import urllib.parse
 
 import requests
-import six
-from six.moves.urllib.parse import quote
 
 from globus_sdk import config, exc
 from globus_sdk.response import GlobusHTTPResponse
@@ -186,7 +185,7 @@ class BaseClient:
         self._headers["User-Agent"] = f"{self.BASE_USER_AGENT}/{app_name}"
 
     def qjoin_path(self, *parts):
-        return "/" + "/".join(quote(part) for part in parts)
+        return "/" + "/".join(urllib.parse.quote(part) for part in parts)
 
     def get(self, path, params=None, headers=None, response_class=None, retry_401=True):
         """
@@ -559,12 +558,11 @@ def merge_params(base_params, **more_params):
 def safe_stringify(value):
     """
     Converts incoming value to a unicode string. Convert bytes by decoding,
-    anything else has __str__ called, then is converted to bytes and then to
-    unicode to deal with python 2 and 3 differing in definitions of string
+    anything else has __str__ called.
+    Strings are checked to avoid duplications
     """
     if isinstance(value, str):
         return value
     if isinstance(value, bytes):
         return value.decode("utf-8")
-    else:
-        return six.b(str(value)).decode("utf-8")
+    return str(value)

@@ -19,7 +19,6 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "requests>=2.9.2,<3.0.0",
-        "six>=1.10.0,<2.0.0",
         "pyjwt[crypto]>=1.5.3,<2.0.0",
     ],
     extras_require={

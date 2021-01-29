@@ -2,7 +2,6 @@ import json
 
 import pytest
 import requests
-import six
 
 from globus_sdk.transfer.paging import PaginatedResource
 from globus_sdk.transfer.response import IterableTransferResponse
@@ -35,7 +34,7 @@ class PagingSimulator:
 
         # make the simulated response
         response = requests.Response()
-        response._content = six.b(json.dumps(data))
+        response._content = json.dumps(data).encode("utf-8")
         response.headers["Content-Type"] = "application/json"
         return IterableTransferResponse(response)
 

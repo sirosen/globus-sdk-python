@@ -1,7 +1,6 @@
 import base64
 
 import pytest
-import six
 
 from globus_sdk.authorizers import BasicAuthorizer
 
@@ -21,7 +20,9 @@ def test_set_authorization_header(authorizer):
     header_dict = {}
     authorizer.set_authorization_header(header_dict)
     assert header_dict["Authorization"][:6] == "Basic "
-    decoded = base64.b64decode(six.b(header_dict["Authorization"][6:])).decode("utf-8")
+    decoded = base64.b64decode(header_dict["Authorization"][6:].encode("utf-8")).decode(
+        "utf-8"
+    )
     assert decoded == f"{USERNAME}:{PASSWORD}"
 
 
@@ -32,7 +33,9 @@ def test_set_authorization_header_existing(authorizer):
     header_dict = {"Header": "value", "Authorization": "previous_value"}
     authorizer.set_authorization_header(header_dict)
     assert header_dict["Authorization"][:6] == "Basic "
-    decoded = base64.b64decode(six.b(header_dict["Authorization"][6:])).decode("utf-8")
+    decoded = base64.b64decode(header_dict["Authorization"][6:].encode("utf-8")).decode(
+        "utf-8"
+    )
     assert decoded == f"{USERNAME}:{PASSWORD}"
     assert header_dict["Header"] == "value"
 
@@ -57,5 +60,7 @@ def test_unicode_handling(username, password):
     authorizer.set_authorization_header(header_dict)
 
     assert header_dict["Authorization"][:6] == "Basic "
-    decoded = base64.b64decode(six.b(header_dict["Authorization"][6:])).decode("utf-8")
+    decoded = base64.b64decode(header_dict["Authorization"][6:].encode("utf-8")).decode(
+        "utf-8"
+    )
     assert decoded == f"{username}:{password}"

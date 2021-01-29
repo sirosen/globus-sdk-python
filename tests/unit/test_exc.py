@@ -3,7 +3,6 @@ from collections import namedtuple
 
 import pytest
 import requests
-import six
 
 from globus_sdk.exc import (
     AuthAPIError,
@@ -22,9 +21,9 @@ def _mk_response(data, status, headers=None, data_transform=None):
     resp = requests.Response()
 
     if data_transform:
-        resp._content = six.b(data_transform(data))
+        resp._content = data_transform(data).encode("utf-8")
     else:
-        resp._content = six.b(data)
+        resp._content = data.encode("utf-8")
 
     if headers:
         resp.headers.update(headers)

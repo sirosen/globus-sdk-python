@@ -3,7 +3,6 @@ from collections import namedtuple
 
 import pytest
 import requests
-import six
 
 from globus_sdk.response import GlobusHTTPResponse, GlobusResponse
 
@@ -26,7 +25,7 @@ def list_response():
 def json_http_response():
     json_data = {"label1": "value1", "label2": "value2"}
     json_response = requests.Response()
-    json_response._content = six.b(json.dumps(json_data))
+    json_response._content = json.dumps(json_data).encode("utf-8")
     json_response.headers["Content-Type"] = "application/json"
     return _TestResponse(json_data, GlobusHTTPResponse(json_response))
 
@@ -50,7 +49,7 @@ def malformed_http_response():
 def text_http_response():
     text_data = "text data"
     text_response = requests.Response()
-    text_response._content = six.b(text_data)
+    text_response._content = text_data.encode("utf-8")
     text_response.headers["Content-Type"] = "text/plain"
     return _TestResponse(text_data, GlobusHTTPResponse(text_response))
 

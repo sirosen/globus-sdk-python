@@ -1,5 +1,6 @@
+import urllib.parse
+
 import pytest
-from six.moves.urllib.parse import quote_plus
 
 import globus_sdk
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
@@ -26,11 +27,11 @@ def test_oauth2_get_authorize_url_native():
     expected_vals = [
         ac.base_url + "v2/oauth2/authorize?",
         "client_id=" + ac.client_id,
-        "redirect_uri=" + quote_plus(ac.base_url + "v2/web/auth-code"),
-        "scope=" + quote_plus(" ".join(DEFAULT_REQUESTED_SCOPES)),
+        "redirect_uri=" + urllib.parse.quote_plus(ac.base_url + "v2/web/auth-code"),
+        "scope=" + urllib.parse.quote_plus(" ".join(DEFAULT_REQUESTED_SCOPES)),
         "state=" + "_default",
         "response_type=" + "code",
-        "code_challenge=" + quote_plus(flow_manager.challenge),
+        "code_challenge=" + urllib.parse.quote_plus(flow_manager.challenge),
         "code_challenge_method=" + "S256",
         "access_type=" + "online",
     ]
@@ -58,7 +59,7 @@ def test_oauth2_get_authorize_url_native():
         "scope=" + "scopes",
         "state=" + "state",
         "response_type=" + "code",
-        "code_challenge=" + quote_plus(remade_challenge),
+        "code_challenge=" + urllib.parse.quote_plus(remade_challenge),
         "code_challenge_method=" + "S256",
         "access_type=" + "offline",
     ]
@@ -84,7 +85,7 @@ def test_oauth2_get_authorize_url_confidential():
         ac.base_url + "v2/oauth2/authorize?",
         "client_id=" + ac.client_id,
         "redirect_uri=" + "uri",
-        "scope=" + quote_plus(" ".join(DEFAULT_REQUESTED_SCOPES)),
+        "scope=" + urllib.parse.quote_plus(" ".join(DEFAULT_REQUESTED_SCOPES)),
         "state=" + "_default",
         "response_type=" + "code",
         "access_type=" + "online",
