@@ -17,15 +17,10 @@ setup(
     url="https://github.com/globus/globus-sdk-python",
     packages=find_packages(exclude=["tests", "tests.*"]),
     python_requires=">=3.6",
-    install_requires=[
-        "requests>=2.9.2,<3.0.0",
-        "pyjwt[crypto]>=1.5.3,<2.0.0",
-    ],
+    install_requires=["requests>=2.9.2,<3.0.0", "pyjwt[crypto]>=1.5.3,<2.0.0"],
     extras_require={
-        # empty extra included to support older installs
-        "jwt": [],
-        # the development extra is for SDK developers only
-        "development": [
+        # the dev extra is for SDK developers only
+        "dev": [
             # drive testing with tox
             "tox>=3.5.3,<4.0",
             # linting
@@ -48,7 +43,7 @@ setup(
             # docs
             "sphinx==3.4.3",
             "sphinx-material==0.0.32",
-        ],
+        ]
     },
     entry_points={
         "pyinstaller40": ["hook-dirs = globus_sdk._pyinstaller:get_hook_dirs"]
@@ -59,16 +54,10 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
-        "Operating System :: MacOS :: MacOS X",
-        "Operating System :: Microsoft :: Windows",
-        "Operating System :: POSIX",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
-        "Topic :: Communications :: File Sharing",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
 )
