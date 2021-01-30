@@ -302,7 +302,6 @@ class TransferClient(BaseClient):
         >>>           "endpoint:")
         >>>     print("https://app.globus.org/file-manager?origin_id=%s"
         >>>           % ep_id)
-        >>>     # For python 2.X, use raw_input() instead
         >>>     input("Press ENTER after activating the endpoint:")
         >>>     r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
 
