@@ -1,7 +1,6 @@
 import logging
 
 import requests
-import six
 
 logger = logging.getLogger(__name__)
 
@@ -42,28 +41,22 @@ class GlobusAPIError(GlobusError):
             "application/json" in r.headers["Content-Type"]
         ):
             logger.debug(
-                (
-                    "Content-Type on error is application/json. "
-                    "Doing error load from JSON"
-                )
+                "Content-Type on error is application/json. "
+                "Doing error load from JSON"
             )
             try:
                 self._load_from_json(r.json())
             except (KeyError, ValueError):
                 logger.error(
-                    (
-                        "Error body could not be JSON decoded! "
-                        "This means the Content-Type is wrong, or the "
-                        "body is malformed!"
-                    )
+                    "Error body could not be JSON decoded! "
+                    "This means the Content-Type is wrong, or the "
+                    "body is malformed!"
                 )
                 self._load_from_text(r.text)
         else:
             logger.debug(
-                (
-                    "Content-Type on error is unknown. "
-                    "Failing over to error load as text (default)"
-                )
+                "Content-Type on error is unknown. "
+                "Failing over to error load as text (default)"
             )
             # fallback to using the entire body as the message for all
             # other types
@@ -87,11 +80,9 @@ class GlobusAPIError(GlobusError):
                 return r.json()
             except ValueError:
                 logger.error(
-                    (
-                        "Error body could not be JSON decoded! "
-                        "This means the Content-Type is wrong, or the "
-                        "body is malformed!"
-                    )
+                    "Error body could not be JSON decoded! "
+                    "This means the Content-Type is wrong, or the "
+                    "body is malformed!"
                 )
                 return None
         else:
@@ -130,11 +121,9 @@ class GlobusAPIError(GlobusError):
         self.code = data["code"]
         if "message" in data:
             logger.debug(
-                (
-                    "Doing JSON load of error response with 'message' "
-                    "field. There may also be a useful 'detail' field "
-                    "to inspect"
-                )
+                "Doing JSON load of error response with 'message' "
+                "field. There may also be a useful 'detail' field "
+                "to inspect"
             )
             self.message = data["message"]
         else:
@@ -229,7 +218,7 @@ class AuthAPIError(GlobusAPIError):
             self.message = data["message"]
         elif "detail" in data:
             self.message = data["detail"]
-        elif "error" in data and isinstance(data["error"], six.string_types):
+        elif "error" in data and isinstance(data["error"], str):
             self.message = data["error"]
         else:
             self.message = "no_extractable_message"
@@ -254,7 +243,7 @@ class NetworkError(GlobusError):
     """
 
     def __init__(self, msg, exc, *args, **kw):
-        super(NetworkError, self).__init__(msg)
+        super().__init__(msg)
         self.underlying_exception = exc
 
 

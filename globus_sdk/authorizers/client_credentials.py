@@ -61,20 +61,16 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         on_refresh=None,
     ):
         logger.info(
-            (
-                "Setting up ClientCredentialsAuthorizer with confidential_client ="
-                " instance:{} and scopes = "
-                "{}".format(id(confidential_client), scopes)
-            )
+            "Setting up ClientCredentialsAuthorizer with confidential_client ="
+            " instance:{} and scopes = "
+            "{}".format(id(confidential_client), scopes)
         )
 
         # values for _get_token_data
         self.confidential_client = confidential_client
         self.scopes = scopes
 
-        super(ClientCredentialsAuthorizer, self).__init__(
-            access_token, expires_at, on_refresh
-        )
+        super().__init__(access_token, expires_at, on_refresh)
 
     def _get_token_response(self):
         """

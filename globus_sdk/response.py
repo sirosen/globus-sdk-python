@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class GlobusResponse(object):
+class GlobusResponse:
     """
     Generic response object, with a single ``data`` member.
 
@@ -34,7 +34,7 @@ class GlobusResponse(object):
         return repr(self)
 
     def __repr__(self):
-        return "{0}({1!r})".format(self.__class__.__name__, self.data)
+        return f"{self.__class__.__name__}({self.data!r})"
 
     def __getitem__(self, key):
         # force evaluation of the data property outside of the upcoming
@@ -51,7 +51,7 @@ class GlobusResponse(object):
             # "type" is ambiguous, but we don't know if it's the fault of the
             # class at large, or just a particular call's `data` property
             raise TypeError(
-                ("This type of GlobusResponse object " "does not support indexing.")
+                "This type of GlobusResponse object does not support indexing."
             )
 
     def __contains__(self, item):
@@ -110,7 +110,7 @@ class GlobusHTTPResponse(GlobusResponse):
         # always use text_body
         except ValueError:
             logger.warning(
-                ("GlobusHTTPResponse.data is null when body is not " "valid JSON")
+                "GlobusHTTPResponse.data is null when body is not valid JSON"
             )
             return None
 

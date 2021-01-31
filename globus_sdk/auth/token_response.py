@@ -4,7 +4,6 @@ import time
 
 import jwt
 import requests
-import six
 
 from globus_sdk.response import GlobusHTTPResponse
 
@@ -30,7 +29,7 @@ def _convert_token_info_dict(source_dict):
     }
 
 
-class _ByScopesGetter(object):
+class _ByScopesGetter:
     """
     A fancy dict-like object for looking up token data by scope name.
     Allows usage like
@@ -50,10 +49,8 @@ class _ByScopesGetter(object):
         return iter(self.scope_map.keys())
 
     def __getitem__(self, scopename):
-        if not isinstance(scopename, six.string_types):
-            raise KeyError(
-                'by_scopes cannot contain non-string value "{}"'.format(scopename)
-            )
+        if not isinstance(scopename, str):
+            raise KeyError(f'by_scopes cannot contain non-string value "{scopename}"')
 
         # split on spaces
         scopes = scopename.split()
@@ -122,13 +119,12 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         }
         # call the helper on everything in 'other_tokens'
         self._by_resource_server.update(
-            dict(
-                (
-                    unprocessed_item["resource_server"],
-                    _convert_token_info_dict(unprocessed_item),
+            {
+                unprocessed_item["resource_server"]: _convert_token_info_dict(
+                    unprocessed_item
                 )
                 for unprocessed_item in self["other_tokens"]
-            )
+            }
         )
 
     @property
@@ -224,20 +220,17 @@ class OAuthDependentTokenResponse(OAuthTokenResponse):
 
     def _init_rs_dict(self):
         # call the helper on everything in the response array
-        self._by_resource_server = dict(
-            (
-                unprocessed_item["resource_server"],
-                _convert_token_info_dict(unprocessed_item),
+        self._by_resource_server = {
+            unprocessed_item["resource_server"]: _convert_token_info_dict(
+                unprocessed_item
             )
             for unprocessed_item in self.data
-        )
+        }
 
     def decode_id_token(self, auth_client):
         # just in case
         raise NotImplementedError(
-            (
-                "OAuthDependentTokenResponse.decode_id_token() is not and cannot "
-                "be implemented. Dependent Tokens data does not include an "
-                "id_token"
-            )
+            "OAuthDependentTokenResponse.decode_id_token() is not and cannot "
+            "be implemented. Dependent Tokens data does not include an "
+            "id_token"
         )

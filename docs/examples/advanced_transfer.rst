@@ -24,6 +24,7 @@ Start out by computing the current time as a ``datetime``:
 .. code-block:: python
 
     import datetime
+
     now = datetime.datetime.utcnow()
 
 Then, compute a relative timestamp using ``timedelta``:
@@ -38,6 +39,7 @@ as in
 .. code-block:: python
 
     import globus_sdk
+
     # get various components needed for a Transfer Task
     # beyond the scope of this example
     transfer_client = globus_sdk.TransferClient(...)
@@ -46,8 +48,11 @@ as in
 
     # note how `future_1minute` is used here
     submission_data = globus_sdk.TransferData(
-        transfer_client, source_endpoint_uuid, dest_endpoint_uuid,
-        deadline=str(future_1minute))
+        transfer_client,
+        source_endpoint_uuid,
+        dest_endpoint_uuid,
+        deadline=str(future_1minute),
+    )
 
 
 Retrying Task Submission
@@ -84,17 +89,17 @@ retry logic from the core task submission logic.
     logger = logging.getLogger(__name__)
 
 
-    def retry_globus_function(func, retries=5, func_name='<func>'):
+    def retry_globus_function(func, retries=5, func_name="<func>"):
         """
         Define what it means to retry a "Globus Function", some function or
         method which produces Globus SDK errors on failure.
         """
+
         def actually_retry():
             """
             Helper: run the next retry
             """
-            return retry_globus_function(func, retries=(retries - 1),
-                                         func_name=func_name)
+            return retry_globus_function(func, retries=(retries - 1), func_name=func_name)
 
         def check_for_reraise():
             """
@@ -103,8 +108,7 @@ retry logic from the core task submission logic.
                     must be run inside an exception handler
             """
             if retries < 1:
-                logger.error('Retried {} too many times.'
-                             .format(func_name))
+                logger.error("Retried {} too many times.".format(func_name))
                 raise
 
         try:
@@ -112,13 +116,17 @@ retry logic from the core task submission logic.
         except NetworkError:
             # log with exc_info=True to capture a full stacktrace as a
             # debug-level log
-            logger.debug(('Globus func {} experienced a network error'
-                          .format(func_name)), exc_info=True)
+            logger.debug(
+                ("Globus func {} experienced a network error".format(func_name)),
+                exc_info=True,
+            )
             check_for_reraise()
         except GlobusAPIError:
             # again, log with exc_info=True to capture a full stacktrace
-            logger.warn(('Globus func {} experienced a network error'
-                         .format(func_name)), exc_info=True)
+            logger.warn(
+                ("Globus func {} experienced a network error".format(func_name)),
+                exc_info=True,
+            )
             check_for_reraise()
 
         # if we reach this point without returning or erroring, retry
@@ -141,14 +149,15 @@ constraint:
         # create a function with no arguments, for our retry handler
         def locally_bound_func():
             return transfer_client.submit_transfer(transfer_data)
-        return retry_globus_function(locally_bound_func,
-                                     func_name='submit_transfer')
+
+        return retry_globus_function(locally_bound_func, func_name="submit_transfer")
 
 Now we're finally all-set to create a ``TransferData`` and submit it:
 
 .. code-block:: python
 
     from globus_sdk import TransferClient, TransferData
+
     # get various components needed for a Transfer Task
     # beyond the scope of this example
     transfer_client = TransferClient(...)
@@ -156,10 +165,11 @@ Now we're finally all-set to create a ``TransferData`` and submit it:
     dest_endpoint_uuid = ...
 
     submission_data = TransferData(
-        transfer_client, source_endpoint_uuid, dest_endpoint_uuid)
+        transfer_client, source_endpoint_uuid, dest_endpoint_uuid
+    )
 
     # add any number of items to the submission data
-    submission_data.add_item('/source/path', 'dest/path')
+    submission_data.add_item("/source/path", "dest/path")
     ...
 
     # do it!

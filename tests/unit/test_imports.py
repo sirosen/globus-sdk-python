@@ -25,7 +25,7 @@ PYTHON_BINARY = os.environ.get("GLOBUS_TEST_PY", sys.executable)
 )
 def test_import_str(importstring):
     proc = subprocess.Popen(
-        '{} -c "{}"'.format(PYTHON_BINARY, importstring),
+        f'{PYTHON_BINARY} -c "{importstring}"',
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

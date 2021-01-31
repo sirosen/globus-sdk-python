@@ -1,16 +1,12 @@
+import io
 import os
+from configparser import ConfigParser
 from contextlib import contextmanager
+from unittest import mock
 
 import pytest
-import six
-from six.moves.configparser import ConfigParser
 
 import globus_sdk.config
-
-try:
-    import mock
-except ImportError:
-    from unittest import mock
 
 
 @contextmanager
@@ -27,7 +23,7 @@ def custom_config(configdata):
 
     # not file-like, wrap it
     if not hasattr(configdata, "read"):
-        configdata = six.StringIO(configdata)
+        configdata = io.StringIO(configdata)
 
     def loadconf(cfgparser):
         # try to use the new version of this method, added in py3.2
@@ -80,7 +76,7 @@ def test_get_lib_config():
 
     # and check that 'default' and 'preview' are populated
     for env in ("default", "preview"):
-        section = "environment {}".format(env)
+        section = f"environment {env}"
         for key in (
             "auth_service",
             "nexus_service",
@@ -121,7 +117,7 @@ def test_conf_get():
     Confirms that get reads expected results
     Tests section, environment, failover_to_general, and check_env params
     """
-    confio = six.StringIO(
+    confio = io.StringIO(
         """\
 [general]
 option = general_value
@@ -170,7 +166,7 @@ def test_get_service_url():
     Confirms get_service_url returns expected results
     Tests environments, services, and missing values
     """
-    confio = six.StringIO(
+    confio = io.StringIO(
         """\
 [general]
 
@@ -212,7 +208,7 @@ def test_get_ssl_verify():
     Confirms get_ssl_verify returns expected results
     Tests true/false, and invalid values
     """
-    confio = six.StringIO(
+    confio = io.StringIO(
         """\
 [general]
 

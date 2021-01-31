@@ -44,18 +44,18 @@ The shortest version of the flow looks like this:
     import globus_sdk
 
     # you must have a client ID
-    CLIENT_ID = '...'
+    CLIENT_ID = "..."
     # the secret, loaded from wherever you store it
-    CLIENT_SECRET = '...'
+    CLIENT_SECRET = "..."
 
     client = globus_sdk.ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
     token_response = client.oauth2_client_credentials_tokens()
 
     # the useful values that you want at the end of this
-    globus_auth_data = token_response.by_resource_server['auth.globus.org']
-    globus_transfer_data = token_response.by_resource_server['transfer.api.globus.org']
-    globus_auth_token = globus_auth_data['access_token']
-    globus_transfer_token = globus_transfer_data['access_token']
+    globus_auth_data = token_response.by_resource_server["auth.globus.org"]
+    globus_transfer_data = token_response.by_resource_server["transfer.api.globus.org"]
+    globus_auth_token = globus_auth_data["access_token"]
+    globus_transfer_token = globus_transfer_data["access_token"]
 
 
 Use the Resulting Tokens
@@ -71,8 +71,7 @@ For example, after running the code above,
 
     authorizer = globus_sdk.AccessTokenAuthorizer(globus_transfer_token)
     tc = globus_sdk.TransferClient(authorizer=authorizer)
-    print("Endpoints Belonging to {}@clients.auth.globus.org:"
-          .format(CLIENT_ID))
+    print("Endpoints Belonging to {}@clients.auth.globus.org:".format(CLIENT_ID))
     for ep in tc.endpoint_search(filter_scope="my-endpoints"):
         print("[{}] {}".format(ep["id"], ep["display_name"]))
 
@@ -108,20 +107,19 @@ Use it like so:
     import globus_sdk
 
     # you must have a client ID
-    CLIENT_ID = '...'
+    CLIENT_ID = "..."
     # the secret, loaded from wherever you store it
-    CLIENT_SECRET = '...'
+    CLIENT_SECRET = "..."
 
     confidential_client = globus_sdk.ConfidentialAppAuthClient(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET
+    )
     scopes = "urn:globus:auth:scope:transfer.api.globus.org:all"
-    cc_authorizer = globus_sdk.ClientCredentialsAuthorizer(
-        confidential_client, scopes)
+    cc_authorizer = globus_sdk.ClientCredentialsAuthorizer(confidential_client, scopes)
     # create a new client
     transfer_client = globus_sdk.TransferClient(authorizer=cc_authorizer)
 
     # usage is still the same
-    print("Endpoints Belonging to {}@clients.auth.globus.org:"
-          .format(CLIENT_ID))
+    print("Endpoints Belonging to {}@clients.auth.globus.org:".format(CLIENT_ID))
     for ep in tc.endpoint_search(filter_scope="my-endpoints"):
         print("[{}] {}".format(ep["id"], ep["display_name"]))

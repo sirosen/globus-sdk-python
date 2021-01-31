@@ -1,7 +1,5 @@
 import logging
 
-import six
-
 from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.response import GlobusResponse
 from globus_sdk.transfer.response import IterableTransferResponse
@@ -9,7 +7,7 @@ from globus_sdk.transfer.response import IterableTransferResponse
 logger = logging.getLogger(__name__)
 
 
-class PaginatedResource(GlobusResponse, six.Iterator):
+class PaginatedResource:
     """
     A ``PaginatedResource`` is an iterable response which implements the Python
     iterator interface. As such, **you can only iterate over
@@ -149,10 +147,7 @@ class PaginatedResource(GlobusResponse, six.Iterator):
 
         # what function call does this class instance wrap up?
         self.client_method = client_method
-        if six.PY2:
-            self.client_object = client_method.im_self
-        else:
-            self.client_object = client_method.__self__
+        self.client_object = client_method.__self__
 
         self.client_path = path
         self.client_kwargs = client_kwargs
@@ -216,10 +211,8 @@ class PaginatedResource(GlobusResponse, six.Iterator):
         # here and now
         if self.generator is None:
             logger.debug(
-                (
-                    "PaginatedResource never got results, "
-                    "iteration empty (not an error!)"
-                )
+                "PaginatedResource never got results, "
+                "iteration empty (not an error!)"
             )
             raise StopIteration()
 
@@ -312,14 +305,14 @@ class PaginatedResource(GlobusResponse, six.Iterator):
                 return self.offset < res["total"]
 
             logger.error(
-                "PaginatedResource.paging_style={} is invalid".format(self.paging_style)
+                f"PaginatedResource.paging_style={self.paging_style} is invalid"
             )
             raise GlobusSDKUsageError("Invalid Paging Style Given to PaginatedResource")
 
         has_next_page = True
         while has_next_page:
             logger.debug(
-                ("PaginatedResource should have more results, " "requesting them now")
+                "PaginatedResource should have more results, requesting them now"
             )
             _set_params_for_next_call()
 

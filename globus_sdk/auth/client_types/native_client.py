@@ -37,7 +37,7 @@ class NativeAppAuthClient(AuthClient):
         AuthClient.__init__(
             self, client_id=client_id, authorizer=NullAuthorizer(), **kwargs
         )
-        self.logger.info("Finished initializing client, client_id={}".format(client_id))
+        self.logger.info(f"Finished initializing client, client_id={client_id}")
 
     def oauth2_start_flow(
         self,

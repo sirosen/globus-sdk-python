@@ -1,7 +1,5 @@
 import logging
-
-import six
-from six.moves.urllib.parse import urlencode
+import urllib.parse
 
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_flow_manager import GlobusOAuthFlowManager
@@ -57,7 +55,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         # default to the default requested scopes
         self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
         # convert scopes iterable to string immediately on load
-        if not isinstance(self.requested_scopes, six.string_types):
+        if not isinstance(self.requested_scopes, str):
             self.requested_scopes = " ".join(self.requested_scopes)
 
         # store the remaining parameters directly, with no transformation
@@ -68,11 +66,11 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         self.state = state
 
         logger.debug("Starting Authorization Code Flow with params:")
-        logger.debug("auth_client.client_id={}".format(auth_client.client_id))
-        logger.debug("redirect_uri={}".format(redirect_uri))
-        logger.debug("refresh_tokens={}".format(refresh_tokens))
-        logger.debug("state={}".format(state))
-        logger.debug("requested_scopes={}".format(self.requested_scopes))
+        logger.debug(f"auth_client.client_id={auth_client.client_id}")
+        logger.debug(f"redirect_uri={redirect_uri}")
+        logger.debug(f"refresh_tokens={refresh_tokens}")
+        logger.debug(f"state={state}")
+        logger.debug(f"requested_scopes={self.requested_scopes}")
 
     def get_authorize_url(self, additional_params=None):
         """
@@ -92,10 +90,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         authorize_base_url = slash_join(
             self.auth_client.base_url, "/v2/oauth2/authorize"
         )
-        logger.debug(
-            "Building authorization URI. Base URL: {}".format(authorize_base_url)
-        )
-        logger.debug("additional_params={}".format(additional_params))
+        logger.debug(f"Building authorization URI. Base URL: {authorize_base_url}")
+        logger.debug(f"additional_params={additional_params}")
 
         params = {
             "client_id": self.client_id,
@@ -108,8 +104,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         if additional_params:
             params.update(additional_params)
 
-        params = urlencode(params)
-        return "{0}?{1}".format(authorize_base_url, params)
+        params = urllib.parse.urlencode(params)
+        return f"{authorize_base_url}?{params}"
 
     def exchange_code_for_tokens(self, auth_code):
         """
@@ -120,10 +116,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
         logger.debug(
-            (
-                "Performing Authorization Code auth_code exchange. "
-                "Sending client_id and client_secret"
-            )
+            "Performing Authorization Code auth_code exchange. "
+            "Sending client_id and client_secret"
         )
         return self.auth_client.oauth2_token(
             {

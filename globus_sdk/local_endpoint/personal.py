@@ -11,7 +11,7 @@ def _on_windows():
     return os.name == "nt"
 
 
-class LocalGlobusConnectPersonal(object):
+class LocalGlobusConnectPersonal:
     r"""
     A LocalGlobusConnectPersonal object represents the available SDK methods
     for inspecting and controlling a running Globus Connect Personal
@@ -60,7 +60,7 @@ class LocalGlobusConnectPersonal(object):
                     fname = os.path.expanduser("~/.globusonline/lta/client-id.txt")
                 with open(fname) as fp:
                     self._endpoint_id = fp.read().strip()
-            except IOError as e:
+            except OSError as e:
                 # no such file or directory
                 if e.errno == 2:
                     pass

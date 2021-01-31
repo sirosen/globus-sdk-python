@@ -1,9 +1,5 @@
-from __future__ import print_function, unicode_literals
-
 import collections
 import logging
-
-import six
 
 from globus_sdk import exc
 from globus_sdk.auth.token_response import OAuthTokenResponse
@@ -120,9 +116,7 @@ class AuthClient(BaseClient):
         """
 
         def _convert_listarg(val):
-            if isinstance(val, collections.Iterable) and not isinstance(
-                val, six.string_types
-            ):
+            if isinstance(val, collections.Iterable) and not isinstance(val, str):
                 return ",".join(safe_stringify(x) for x in val)
             else:
                 return safe_stringify(val)
@@ -141,14 +135,12 @@ class AuthClient(BaseClient):
         if ids:
             params["ids"] = _convert_listarg(ids)
 
-        self.logger.debug("params={}".format(params))
+        self.logger.debug(f"params={params}")
 
         if "usernames" in params and "ids" in params:
             self.logger.warning(
-                (
-                    "get_identities call with both usernames and "
-                    "identities set! Expected to result in errors"
-                )
+                "get_identities call with both usernames and "
+                "identities set! Expected to result in errors"
             )
 
         return self.get("/v2/api/identities", params=params)
@@ -166,19 +158,17 @@ class AuthClient(BaseClient):
         """
         if not self.current_oauth2_flow_manager:
             self.logger.error(
-                ("OutOfOrderOperations(" "get_authorize_url before start_flow)")
+                "OutOfOrderOperations(get_authorize_url before start_flow)"
             )
             raise exc.GlobusSDKUsageError(
-                (
-                    "Cannot get authorize URL until starting an OAuth2 flow. "
-                    "Call the oauth2_start_flow() method on this "
-                    "AuthClient to resolve"
-                )
+                "Cannot get authorize URL until starting an OAuth2 flow. "
+                "Call the oauth2_start_flow() method on this "
+                "AuthClient to resolve"
             )
         auth_url = self.current_oauth2_flow_manager.get_authorize_url(
             additional_params=additional_params
         )
-        self.logger.info("Got authorization URL: {}".format(auth_url))
+        self.logger.info(f"Got authorization URL: {auth_url}")
         return auth_url
 
     def oauth2_exchange_code_for_tokens(self, auth_code):
@@ -195,21 +185,15 @@ class AuthClient(BaseClient):
         :type auth_code: str
         """
         self.logger.info(
-            (
-                "Final Step of 3-legged OAuth2 Flows: "
-                "Exchanging authorization code for token(s)"
-            )
+            "Final Step of 3-legged OAuth2 Flows: "
+            "Exchanging authorization code for token(s)"
         )
         if not self.current_oauth2_flow_manager:
-            self.logger.error(
-                ("OutOfOrderOperations(" "exchange_code before start_flow)")
-            )
+            self.logger.error("OutOfOrderOperations(exchange_code before start_flow)")
             raise exc.GlobusSDKUsageError(
-                (
-                    "Cannot exchange auth code until starting an OAuth2 flow. "
-                    "Call the oauth2_start_flow() method on this "
-                    "AuthClient to resolve"
-                )
+                "Cannot exchange auth code until starting an OAuth2 flow. "
+                "Call the oauth2_start_flow() method on this "
+                "AuthClient to resolve"
             )
 
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(auth_code)
@@ -236,7 +220,7 @@ class AuthClient(BaseClient):
         :type additional_params: dict, optional
         """
         self.logger.info(
-            ("Executing token refresh; " "typically requires client credentials")
+            "Executing token refresh; typically requires client credentials"
         )
         form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
 

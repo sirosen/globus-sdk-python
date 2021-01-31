@@ -6,9 +6,9 @@ def test_by_resource_server_lookups(oauth_token_response):
 
     # things which should hold for all
     for n in (1, 2, 3):
-        name = "resource_server_{}".format(n)
+        name = f"resource_server_{n}"
         for attr in ("access_token", "refresh_token", "resource_server"):
-            assert by_rs[name][attr] == "{}_{}".format(attr, n)
+            assert by_rs[name][attr] == f"{attr}_{n}"
 
         assert "expires_in" not in by_rs[name]
         assert "expires_at_seconds" in by_rs[name]

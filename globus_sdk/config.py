@@ -31,14 +31,14 @@ def _get_lib_config_path():
         logger.debug("pkg_resources load of lib config success")
     except ImportError:
         logger.debug(
-            ("pkg_resources load of lib config failed, failing over " "to path joining")
+            "pkg_resources load of lib config failed, failing over to path joining"
         )
         pkg_path = os.path.dirname(__file__)
         path = os.path.join(pkg_path, fname)
     return path
 
 
-class GlobusConfigParser(object):
+class GlobusConfigParser:
     """
     Wraps a ConfigParser to do modified get()s and config file loading.
     """
@@ -63,11 +63,9 @@ class GlobusConfigParser(object):
             )
         except MissingSectionHeaderError:
             logger.error(
-                (
-                    "MissingSectionHeader means invalid config "
-                    "somewhere, and is often an indicator of a stale "
-                    "early form of the Globus SDK config"
-                )
+                "MissingSectionHeader means invalid config "
+                "somewhere, and is often an indicator of a stale "
+                "early form of the Globus SDK config"
             )
             raise GlobusError(
                 "Failed to parse your ~/.globus.cfg Your config file may be "
@@ -109,7 +107,7 @@ class GlobusConfigParser(object):
         # *first* for a value -- env values have higher precedence than config
         # files so that you can locally override the behavior of a command in a
         # given shell or subshell
-        env_option_name = "GLOBUS_SDK_{}".format(option.upper())
+        env_option_name = f"GLOBUS_SDK_{option.upper()}"
         value = None
         if check_env and env_option_name in os.environ:
             logger.debug(
@@ -151,9 +149,7 @@ _parser = None
 
 
 def get_service_url(environment, service):
-    logger.debug(
-        'Service URL Lookup for "{}" under env "{}"'.format(service, environment)
-    )
+    logger.debug(f'Service URL Lookup for "{service}" under env "{environment}"')
     p = _get_parser()
     option = service + "_service"
     # TODO: validate with urlparse?
@@ -166,7 +162,7 @@ def get_service_url(environment, service):
                 "correctly, or not set at all"
             ).format(service, environment)
         )
-    logger.debug('Service URL Lookup Result: "{}" is at "{}"'.format(service, url))
+    logger.debug(f'Service URL Lookup Result: "{service}" is at "{url}"')
     return url
 
 
@@ -181,7 +177,7 @@ def get_http_timeout(environment):
     )
     if value is None:
         value = 60
-    logger.debug("default http_timeout set to {}".format(value))
+    logger.debug(f"default http_timeout set to {value}")
     return value
 
 
@@ -196,7 +192,7 @@ def get_ssl_verify(environment):
     )
     if value is None:
         return True
-    logger.debug("ssl_verify set to {}".format(value))
+    logger.debug(f"ssl_verify set to {value}")
     return value
 
 
@@ -206,7 +202,7 @@ def _bool_cast(value):
         return True
     elif value in ("0", "no", "false", "off"):
         return False
-    logger.error('Value "{}" can\'t cast to bool'.format(value))
+    logger.error(f'Value "{value}" can\'t cast to bool')
     raise ValueError("Invalid config bool")
 
 
@@ -229,7 +225,5 @@ def get_globus_environ(inputenv=None):
     if env == "production":
         env = "default"
     if env != "default":
-        logger.info(
-            ("On lookup, non-default environment: " "globus_environment={}".format(env))
-        )
+        logger.info(f"On lookup, non-default environment: globus_environment={env}")
     return env

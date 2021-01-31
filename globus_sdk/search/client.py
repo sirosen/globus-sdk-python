@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 
 from globus_sdk import exc
@@ -68,7 +66,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        self.logger.info("SearchClient.get_index({})".format(index_id))
+        self.logger.info(f"SearchClient.get_index({index_id})")
         path = self.qjoin_path("v1/index", index_id)
         return self.get(path, params=params)
 
@@ -84,7 +82,7 @@ class SearchClient(BaseClient):
         limit=10,
         query_template=None,
         advanced=False,
-        **params
+        **params,
     ):
         """
         ``GET /v1/index/<index_id>/search``
@@ -113,7 +111,7 @@ class SearchClient(BaseClient):
             advanced=advanced,
         )
 
-        self.logger.info("SearchClient.search({}, ...)".format(index_id))
+        self.logger.info(f"SearchClient.search({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "search")
         return self.get(path, params=params)
 
@@ -158,7 +156,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        self.logger.info("SearchClient.post_search({}, ...)".format(index_id))
+        self.logger.info(f"SearchClient.post_search({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "search")
         return self.post(path, data)
 
@@ -220,7 +218,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        self.logger.info("SearchClient.ingest({}, ...)".format(index_id))
+        self.logger.info(f"SearchClient.ingest({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "ingest")
         return self.post(path, data)
 
@@ -258,7 +256,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        self.logger.info("SearchClient.delete_by_query({}, ...)".format(index_id))
+        self.logger.info(f"SearchClient.delete_by_query({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "delete_by_query")
         return self.post(path, data)
 
@@ -288,9 +286,7 @@ class SearchClient(BaseClient):
         index_id = safe_stringify(index_id)
         merge_params(params, subject=subject)
 
-        self.logger.info(
-            "SearchClient.get_subject({}, {}, ...)".format(index_id, subject)
-        )
+        self.logger.info(f"SearchClient.get_subject({index_id}, {subject}, ...)")
         path = self.qjoin_path("v1/index", index_id, "subject")
         return self.get(path, params=params)
 
@@ -316,9 +312,7 @@ class SearchClient(BaseClient):
         index_id = safe_stringify(index_id)
         merge_params(params, subject=subject)
 
-        self.logger.info(
-            "SearchClient.delete_subject({}, {}, ...)".format(index_id, subject)
-        )
+        self.logger.info(f"SearchClient.delete_subject({index_id}, {subject}, ...)")
         path = self.qjoin_path("v1/index", index_id, "subject")
         return self.delete(path, params=params)
 
@@ -402,7 +396,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        self.logger.info("SearchClient.create_entry({}, ...)".format(index_id))
+        self.logger.info(f"SearchClient.create_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.post(path, data)
 
@@ -432,7 +426,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        self.logger.info("SearchClient.update_entry({}, ...)".format(index_id))
+        self.logger.info(f"SearchClient.update_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.put(path, data)
 
@@ -489,7 +483,7 @@ class SearchClient(BaseClient):
         """
         index_id = safe_stringify(index_id)
         self.logger.info(
-            "SearchClient.get_query_template({}, {})".format(index_id, template_name)
+            f"SearchClient.get_query_template({index_id}, {template_name})"
         )
         path = self.qjoin_path("v1/index", index_id, "query_template", template_name)
         return self.get(path)
@@ -506,7 +500,7 @@ class SearchClient(BaseClient):
         in the API documentation for details.
         """
         index_id = safe_stringify(index_id)
-        self.logger.info("SearchClient.get_query_template_list({})".format(index_id))
+        self.logger.info(f"SearchClient.get_query_template_list({index_id})")
         path = self.qjoin_path("v1/index", index_id, "query_template")
         return self.get(path)
 
@@ -526,7 +520,7 @@ class SearchClient(BaseClient):
         >>> print(task["task_id"] + " | " + task['state'])
         """
         task_id = safe_stringify(task_id)
-        self.logger.info("SearchClient.get_task({})".format(task_id))
+        self.logger.info(f"SearchClient.get_task({task_id})")
         path = self.qjoin_path("v1/task", task_id)
         return self.get(path, params=params)
 
@@ -542,6 +536,6 @@ class SearchClient(BaseClient):
         >>>     print(task["task_id"] + " | " + task['state'])
         """
         index_id = safe_stringify(index_id)
-        self.logger.info("SearchClient.get_task_list({})".format(index_id))
+        self.logger.info(f"SearchClient.get_task_list({index_id})")
         path = self.qjoin_path("v1/task_list", index_id)
         return self.get(path, params=params)

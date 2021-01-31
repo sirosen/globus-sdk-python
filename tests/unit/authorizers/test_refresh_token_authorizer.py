@@ -1,12 +1,8 @@
+from unittest import mock
+
 import pytest
 
 from globus_sdk.authorizers import RefreshTokenAuthorizer
-
-try:
-    import mock
-except ImportError:
-    from unittest import mock
-
 
 REFRESH_TOKEN = "refresh_token_1"
 ACCESS_TOKEN = "access_token_1"

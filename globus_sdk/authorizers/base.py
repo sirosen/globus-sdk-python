@@ -1,10 +1,7 @@
 import abc
 
-import six
 
-
-@six.add_metaclass(abc.ABCMeta)
-class GlobusAuthorizer(object):
+class GlobusAuthorizer(metaclass=abc.ABCMeta):
     """
     A ``GlobusAuthorizer`` is a very simple object which generates valid
     Authorization headers.

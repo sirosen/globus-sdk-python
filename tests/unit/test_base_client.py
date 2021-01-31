@@ -3,7 +3,6 @@ import logging.handlers
 import uuid
 
 import pytest
-import six
 
 import globus_sdk
 from globus_sdk.base import BaseClient, merge_params, safe_stringify, slash_join
@@ -25,7 +24,7 @@ def base_client():
 ERROR_STATUS_CODES = (400, 404, 405, 409, 500, 503)
 
 
-class testObject(object):
+class testObject:
     """test obj for safe_stringify testing"""
 
     def __str__(self):
@@ -61,7 +60,7 @@ def test_set_app_name(base_client):
     base_client.set_app_name(app_name)
     # confirm results
     assert base_client.app_name == app_name
-    assert base_client._headers["User-Agent"] == "{0}/{1}".format(
+    assert base_client._headers["User-Agent"] == "{}/{}".format(
         base_client.BASE_USER_AGENT, app_name
     )
 
@@ -192,12 +191,12 @@ def test_merge_params():
     assert params == expected
 
 
-@pytest.mark.parametrize("value", ["1", str(1), b"1", u"1", 1, testObject()])
+@pytest.mark.parametrize("value", ["1", str(1), b"1", "1", 1, testObject()])
 def test_safe_stringify(value):
     """
     safe_stringifies strings, bytes, explicit unicode, an int, an object
     and confirms safe_stringify returns utf-8 encoding for all inputs
     """
     safe_value = safe_stringify(value)
-    assert safe_value == u"1"
-    assert type(safe_value) == six.text_type
+    assert safe_value == "1"
+    assert type(safe_value) == str

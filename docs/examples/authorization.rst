@@ -22,16 +22,16 @@ With the tokens in hand, it's just a simple matter of wrapping the tokens in
 
     from globus_sdk import AuthClient, TransferClient, AccessTokenAuthorizer
 
-    AUTH_ACCESS_TOKEN = '...'
-    TRANSFER_ACCESS_TOKEN = '...'
+    AUTH_ACCESS_TOKEN = "..."
+    TRANSFER_ACCESS_TOKEN = "..."
 
     # note that we don't provide the client ID in this case
     # if you're using an Access Token you can't do the OAuth2 flows
-    auth_client = AuthClient(
-        authorizer=AccessTokenAuthorizer(AUTH_ACCESS_TOKEN))
+    auth_client = AuthClient(authorizer=AccessTokenAuthorizer(AUTH_ACCESS_TOKEN))
 
     transfer_client = TransferClient(
-        authorizer=AccessTokenAuthorizer(TRANSFER_ACCESS_TOKEN))
+        authorizer=AccessTokenAuthorizer(TRANSFER_ACCESS_TOKEN)
+    )
 
 Refresh Token Authorization on AuthClient and TransferClient
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,26 +50,30 @@ for Globus Auth, so creating the authorizer is more complex this time.
 
 .. code-block:: python
 
-    from globus_sdk import (AuthClient, TransferClient, ConfidentialAppAuthClient,
-                            RefreshTokenAuthorizer)
+    from globus_sdk import (
+        AuthClient,
+        TransferClient,
+        ConfidentialAppAuthClient,
+        RefreshTokenAuthorizer,
+    )
 
     # for doing the refresh
-    CLIENT_ID = '...'
-    CLIENT_SECRET = '...'
+    CLIENT_ID = "..."
+    CLIENT_SECRET = "..."
 
     # the actual tokens
-    AUTH_REFRESH_TOKEN = '...'
-    TRANSFER_REFRESH_TOKEN = '...'
+    AUTH_REFRESH_TOKEN = "..."
+    TRANSFER_REFRESH_TOKEN = "..."
 
     # making the authorizer requires that we have an AuthClient which can talk
     # OAuth2 to Globus Auth
     internal_auth_client = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
 
     # now let's bake a couple of authorizers
-    auth_authorizer = RefreshTokenAuthorizer(AUTH_REFRESH_TOKEN,
-                                             internal_auth_client)
-    transfer_authorizer = RefreshTokenAuthorizer(TRANSFER_REFRESH_TOKEN,
-                                                 internal_auth_client)
+    auth_authorizer = RefreshTokenAuthorizer(AUTH_REFRESH_TOKEN, internal_auth_client)
+    transfer_authorizer = RefreshTokenAuthorizer(
+        TRANSFER_REFRESH_TOKEN, internal_auth_client
+    )
 
     # auth_client here is totally different from "internal_auth_client" above
     # the former is being used to request new tokens periodically, while this
@@ -96,8 +100,8 @@ By way of example:
 
     from globus_sdk import ConfidentialAppAuthClient
 
-    CLIENT_ID = '...'
-    CLIENT_SECRET = '...'
+    CLIENT_ID = "..."
+    CLIENT_SECRET = "..."
 
     client = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
 

@@ -30,7 +30,7 @@ SERVER_LIST_TEXT = """{
 def test_server_list(client):
     epid = "epid"
     register_api_route(
-        "transfer", "/endpoint/{}/server_list".format(epid), body=SERVER_LIST_TEXT
+        "transfer", f"/endpoint/{epid}/server_list", body=SERVER_LIST_TEXT
     )
 
     res = client.endpoint_server_list(epid)

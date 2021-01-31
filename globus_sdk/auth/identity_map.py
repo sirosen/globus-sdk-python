@@ -26,7 +26,7 @@ def split_ids_and_usernames(identity_ids):
     return ids, usernames
 
 
-class IdentityMap(object):
+class IdentityMap:
     r"""
     There's a common pattern of having a large batch of Globus Auth Identities which you
     want to inspect. For example, you may have a list of identity IDs fetched from
