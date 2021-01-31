@@ -1540,8 +1540,7 @@ class TransferClient(BaseClient):
         """
         endpoint_id = safe_stringify(endpoint_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "hosted_endpoint_list({})".format(endpoint_id)
+            f"TransferClient.endpoint_manager_hosted_endpoint_list({endpoint_id})"
         )
         path = self.qjoin_path(
             "endpoint_manager", "endpoint", endpoint_id, "hosted_endpoint_list"
@@ -1587,8 +1586,7 @@ class TransferClient(BaseClient):
         """
         endpoint_id = safe_stringify(endpoint_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "endpoint_acl_list({}, ...)".format(endpoint_id)
+            f"TransferClient.endpoint_manager_endpoint_acl_list({endpoint_id}, ...)"
         )
         path = self.qjoin_path(
             "endpoint_manager", "endpoint", endpoint_id, "access_list"
@@ -1706,8 +1704,7 @@ class TransferClient(BaseClient):
         """
         task_id = safe_stringify(task_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "task_event_list({}, ...)".format(task_id)
+            f"TransferClient.endpoint_manager_task_event_list({task_id}, ...)"
         )
         path = self.qjoin_path("endpoint_manager", "task", task_id, "event_list")
         return PaginatedResource(
@@ -1738,8 +1735,7 @@ class TransferClient(BaseClient):
         """
         task_id = safe_stringify(task_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "task_pause_info({}, ...)".format(task_id)
+            f"TransferClient.endpoint_manager_task_pause_info({task_id}, ...)"
         )
         path = self.qjoin_path("endpoint_manager", "task", task_id, "pause_info")
         return self.get(path, params=params)
@@ -1774,8 +1770,7 @@ class TransferClient(BaseClient):
         """
         task_id = safe_stringify(task_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_task_"
-            "successful_transfers({}, ...)".format(task_id)
+            f"TransferClient.endpoint_manager_task_successful_transfers({task_id}, ...)"
         )
 
         resource_path = self.qjoin_path(
@@ -1818,8 +1813,7 @@ class TransferClient(BaseClient):
         """
         task_id = safe_stringify(task_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_task_"
-            "skipped_errors({}, ...)".format(task_id)
+            f"TransferClient.endpoint_manager_task_skipped_errors({task_id}, ...)"
         )
 
         resource_path = self.qjoin_path(
@@ -1860,8 +1854,7 @@ class TransferClient(BaseClient):
         task_ids = [safe_stringify(i) for i in task_ids]
         message = safe_stringify(message)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "cancel_tasks({},{})".format(task_ids, message)
+            f"TransferClient.endpoint_manager_cancel_tasks({task_ids}, {message})"
         )
         json_body = {"message": safe_stringify(message), "task_id_list": task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_cancel")
@@ -1889,8 +1882,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "cancel_status({})".format(admin_cancel_id)
+            f"TransferClient.endpoint_manager_cancel_status({admin_cancel_id})"
         )
         path = self.qjoin_path("endpoint_manager", "admin_cancel", admin_cancel_id)
         return self.get(path, params=params)
@@ -1921,8 +1913,7 @@ class TransferClient(BaseClient):
         task_ids = [safe_stringify(i) for i in task_ids]
         message = safe_stringify(message)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "pause_tasks({},{})".format(task_ids, message)
+            f"TransferClient.endpoint_manager_pause_tasks({task_ids}, {message})"
         )
         json_body = {"message": safe_stringify(message), "task_id_list": task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_pause")
@@ -2044,8 +2035,7 @@ class TransferClient(BaseClient):
         """
         pause_rule_id = safe_stringify(pause_rule_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "get_pause_rule({})".format(pause_rule_id)
+            f"TransferClient.endpoint_manager_get_pause_rule({pause_rule_id})"
         )
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
         return self.get(path, params=params)
@@ -2080,8 +2070,7 @@ class TransferClient(BaseClient):
         """
         pause_rule_id = safe_stringify(pause_rule_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "update_pause_rule({})".format(pause_rule_id)
+            f"TransferClient.endpoint_manager_update_pause_rule({pause_rule_id})"
         )
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
         return self.put(path, data)
@@ -2110,8 +2099,7 @@ class TransferClient(BaseClient):
         """
         pause_rule_id = safe_stringify(pause_rule_id)
         self.logger.info(
-            "TransferClient.endpoint_manager_"
-            "delete_pause_rule({})".format(pause_rule_id)
+            f"TransferClient.endpoint_manager_delete_pause_rule({pause_rule_id})"
         )
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
         return self.delete(path, params=params)
