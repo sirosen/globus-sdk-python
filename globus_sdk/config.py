@@ -3,8 +3,7 @@ Load config files once per interpreter invocation.
 """
 import logging
 import os
-
-from six.moves.configparser import (
+from configparser import (
     ConfigParser,
     MissingSectionHeaderError,
     NoOptionError,
