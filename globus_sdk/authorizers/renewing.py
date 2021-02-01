@@ -126,9 +126,8 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         self.access_token_hash = sha256_string(self.access_token)
 
         logger.info(
-            ('RenewingAuthorizer.access_token updated to token with hash "{}"').format(
-                self.access_token_hash
-            )
+            "RenewingAuthorizer.access_token updated to "
+            f'token with hash "{self.access_token_hash}"'
         )
 
         if callable(self.on_refresh):
