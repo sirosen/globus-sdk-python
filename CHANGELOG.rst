@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+v2.0.0
+------
+
+* Remove support for python2 (`#396`_, `#397`_, `#398`_)
+
+.. _#398: https://github.com/globus/globus-sdk-python/pull/398
+.. _#397: https://github.com/globus/globus-sdk-python/pull/397
+.. _#396: https://github.com/globus/globus-sdk-python/pull/396
+
 v1.11.0
 -------
 
