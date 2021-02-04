@@ -238,7 +238,7 @@ ssl_verify = invalid
     "value, expected_result",
     [(x, True) for x in [str(True), "1", "YES", "true", "True", "ON"]]
     + [(x, False) for x in [str(False), "0", "NO", "false", "False", "OFF"]]
-    + [(x, ValueError) for x in ["invalid", "1.0", "0.0", "t", "f"]],
+    + [(x, ValueError) for x in ["invalid", "1.0", "0.0", "t", "f"]],  # type: ignore
 )
 def test_bool_cast(value, expected_result):
     """

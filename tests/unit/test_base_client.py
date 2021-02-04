@@ -146,7 +146,7 @@ def test_http_methods(method, allows_body, base_client):
 @pytest.mark.parametrize(
     "a, b",
     [(a, b) for a in ["a", "a/"] for b in ["b", "/b"]]
-    + [("a/b", c) for c in ["", None]],
+    + [("a/b", c) for c in ["", None]],  # type: ignore
 )
 def test_slash_join(a, b):
     """

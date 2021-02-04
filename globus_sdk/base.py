@@ -1,5 +1,6 @@
 import json
 import logging
+import typing
 import urllib.parse
 
 import requests
@@ -56,10 +57,10 @@ class BaseClient:
     """
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
-    error_class = exc.GlobusAPIError
-    default_response_class = GlobusHTTPResponse
+    error_class: typing.Type[exc.GlobusAPIError] = exc.GlobusAPIError
+    default_response_class: typing.Type[GlobusHTTPResponse] = GlobusHTTPResponse
     # a collection of authorizer types, or None to indicate "any"
-    allowed_authorizer_types = None
+    allowed_authorizer_types: typing.Optional[typing.List[typing.Type]] = None
 
     BASE_USER_AGENT = f"globus-sdk-py-{__version__}"
 
