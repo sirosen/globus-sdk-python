@@ -3,7 +3,7 @@ import os.path
 from setuptools import find_packages, setup
 
 # single source of truth for package version
-version_ns = {}
+version_ns = {}  # type: ignore
 with open(os.path.join("globus_sdk", "version.py")) as f:
     exec(f.read(), version_ns)
 
@@ -27,8 +27,8 @@ setup(
             "flake8>=3.0,<4.0",
             "isort>=5.6.4,<6.0",
             "black==20.8b1",
-            # flake-bugbear requires py3.6+
             "flake8-bugbear==20.11.1",
+            "mypy==0.800",
             # testing
             "pytest<5.0",
             "pytest-cov<3.0",
