@@ -12,18 +12,10 @@
 # read
 
 import subprocess
+import sysconfig
 
 import pytest
-
-try:
-    import sysconfig
-except ImportError:
-    sysconfig = None
-
-try:
-    from PyInstaller import __main__ as pyi_main
-except ImportError:
-    pyi_main = None
+from PyInstaller import __main__ as pyi_main
 
 
 def shared_libraries_are_available():
@@ -32,9 +24,6 @@ def shared_libraries_are_available():
     dynamically linked libs) is in use
     default to guessing that the shared libs are not available (be conservative)
     """
-    # if detection isn't possible because sysconfig isn't available (py2) then fail
-    if not sysconfig:
-        return False
     enable_shared = sysconfig.get_config_var("Py_ENABLE_SHARED")
     return enable_shared == 1
 
@@ -42,9 +31,6 @@ def shared_libraries_are_available():
 @pytest.mark.skipif(
     not shared_libraries_are_available(),
     reason="requires that python was built with --enable-shared",
-)
-@pytest.mark.skipif(
-    not pyi_main, reason="pyinstaller not available in test environment"
 )
 def test_pyinstaller_hook(tmp_path):
     appfile = tmp_path / "sample.py"
