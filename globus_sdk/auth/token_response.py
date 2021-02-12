@@ -162,27 +162,12 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         """
         return self._by_scopes
 
-    def decode_id_token(self, auth_client=None):
+    def decode_id_token(self):
         """
         A parsed ID Token (OIDC) as a dict.
-
-        :param auth_client: Deprecated parameter for providing the AuthClient used to
-            request this token back to the OAuthTokenResponse. The SDK now tracks this
-            internally, so it is no longer necessary.
-        :type auth_client: :class:`AuthClient <globus_sdk.AuthClient>`
         """
         logger.info('Decoding ID Token "{}"'.format(self["id_token"]))
-
-        # warn (not error) on older usage pattern, but still respect it
-        # FIXME: should be deprecated and removed in SDK v2
-        if auth_client:
-            logger.warning(
-                "Providing an auth_client to decode_id_token is no "
-                "longer required and may be deprecated in a future version "
-                "of the Globus SDK"
-            )
-        else:
-            auth_client = self._client
+        auth_client = self._client
 
         logger.debug("Fetch JWK Data: Start")
         oidc_conf = auth_client.get("/.well-known/openid-configuration")
