@@ -55,6 +55,10 @@ Enter the following pieces of information:
 
 and click "Create App".
 
+.. warning::
+
+    The **Native App** setting cannot be changed after a client is created.
+
 .. _tutorial_step2:
 
 Step 2: Get and Save Client ID
