@@ -11,3 +11,4 @@ Each of these pages contains an example of a piece of SDK functionality.
    examples/client_credentials
    examples/three_legged_oauth
    examples/advanced_transfer
+   examples/recursive_ls
