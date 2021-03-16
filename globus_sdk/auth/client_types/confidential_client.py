@@ -31,11 +31,6 @@ class ConfidentialAppAuthClient(AuthClient):
     .. automethodlist:: globus_sdk.ConfidentialAppAuthClient
     """
 
-    # checked by BaseClient to see what authorizers are allowed for this client
-    # subclass
-    # only allow basic auth -- anything else means you're misusing the client
-    allowed_authorizer_types = [BasicAuthorizer]
-
     def __init__(self, client_id, client_secret, **kwargs):
         if "authorizer" in kwargs:
             logger.error("ArgumentError(ConfidentialAppClient.authorizer)")
