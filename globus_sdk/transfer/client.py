@@ -2,11 +2,6 @@ import logging
 import time
 
 from globus_sdk import exc
-from globus_sdk.authorizers import (
-    AccessTokenAuthorizer,
-    ClientCredentialsAuthorizer,
-    RefreshTokenAuthorizer,
-)
 from globus_sdk.base import BaseClient, merge_params, safe_stringify
 from globus_sdk.transfer.paging import PaginatedResource
 from globus_sdk.transfer.response import (
@@ -52,12 +47,6 @@ class TransferClient(BaseClient):
 
     .. automethodlist:: globus_sdk.TransferClient
     """
-    # disallow basic auth
-    allowed_authorizer_types = [
-        AccessTokenAuthorizer,
-        RefreshTokenAuthorizer,
-        ClientCredentialsAuthorizer,
-    ]
     error_class = exc.TransferAPIError
     default_response_class = TransferResponse
 

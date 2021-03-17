@@ -1,11 +1,6 @@
 import logging
 
 from globus_sdk import exc
-from globus_sdk.authorizers import (
-    AccessTokenAuthorizer,
-    ClientCredentialsAuthorizer,
-    RefreshTokenAuthorizer,
-)
 from globus_sdk.base import BaseClient, merge_params, safe_stringify
 from globus_sdk.response import GlobusHTTPResponse
 
@@ -29,12 +24,6 @@ class SearchClient(BaseClient):
 
     .. automethodlist:: globus_sdk.SearchClient
     """
-    # disallow basic auth
-    allowed_authorizer_types = [
-        AccessTokenAuthorizer,
-        RefreshTokenAuthorizer,
-        ClientCredentialsAuthorizer,
-    ]
     error_class = exc.SearchAPIError
     default_response_class = GlobusHTTPResponse
 

@@ -25,10 +25,6 @@ class NativeAppAuthClient(AuthClient):
     .. automethodlist:: globus_sdk.NativeAppAuthClient
     """
 
-    # don't allow any authorizer to be used on a native app client
-    # it can't authorize it's calls, and shouldn't try to
-    allowed_authorizer_types = [NullAuthorizer]
-
     def __init__(self, client_id, **kwargs):
         if "authorizer" in kwargs:
             logger.error("ArgumentError(NativeAppClient.authorizer)")

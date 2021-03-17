@@ -59,8 +59,6 @@ class BaseClient:
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class: typing.Type[exc.GlobusAPIError] = exc.GlobusAPIError
     default_response_class: typing.Type[GlobusHTTPResponse] = GlobusHTTPResponse
-    # a collection of authorizer types, or None to indicate "any"
-    allowed_authorizer_types: typing.Optional[typing.List[typing.Type]] = None
 
     BASE_USER_AGENT = f"globus-sdk-py-{__version__}"
 
@@ -80,21 +78,6 @@ class BaseClient:
         self.logger.info(
             'Creating client of type {} for service "{}"'.format(type(self), service)
         )
-        # if restrictions have been placed by a child class on the allowed
-        # authorizer types, make sure we are not in violation of those
-        # constraints
-        if self.allowed_authorizer_types is not None and (
-            authorizer is not None
-            and type(authorizer) not in self.allowed_authorizer_types
-        ):
-            self.logger.error(
-                "{} doesn't support authorizer={}".format(type(self), type(authorizer))
-            )
-            raise exc.GlobusSDKUsageError(
-                (
-                    "{} can only take authorizers from {}, but you have provided {}"
-                ).format(type(self), self.allowed_authorizer_types, type(authorizer))
-            )
 
         # if an environment was passed, it will be used, but otherwise lookup
         # the env var -- and in the special case of `production` translate to
