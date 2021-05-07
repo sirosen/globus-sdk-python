@@ -1,12 +1,23 @@
 import abc
 import contextlib
 import os
-import typing
+from typing import Dict, Optional
 
 
 class StorageAdapter(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def store(self, token_response) -> None:
+        pass
+
+    @abc.abstractmethod
+    def get_token_data(self, resource_server: str) -> Optional[Dict]:
+        """
+        Lookup token data for a resource server
+
+        Either returns a dict with the access token, refresh token (optional), and
+        expiration time, or returns ``None``, indicating that there was no data for that
+        resource server.
+        """
         pass
 
     def on_refresh(self, token_response) -> None:
@@ -25,10 +36,6 @@ class FileAdapter(StorageAdapter, metaclass=abc.ABCMeta):
     """
 
     filename: str
-
-    @abc.abstractmethod
-    def read_as_dict(self) -> typing.Dict:
-        raise NotImplementedError
 
     def file_exists(self) -> bool:
         """
