@@ -107,7 +107,7 @@ class GlobusHTTPResponse(GlobusResponse):
         # response, this means we didn't get a JSON response. Rather than
         # letting the error bubble up, return None, as in "no data"
         # if the caller *really* wants the raw body of the response, they can
-        # always use text_body
+        # always use `text`
         except ValueError:
             logger.warning(
                 "GlobusHTTPResponse.data is null when body is not valid JSON"

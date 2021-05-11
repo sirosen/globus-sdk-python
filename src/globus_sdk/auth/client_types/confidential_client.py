@@ -207,4 +207,4 @@ class ConfidentialAppAuthClient(AuthClient):
         body = {"token": token}
         if include is not None:
             body["include"] = include
-        return self.post("/v2/oauth2/token/introspect", text_body=body)
+        return self.post("/v2/oauth2/token/introspect", data=body, encoding="form")

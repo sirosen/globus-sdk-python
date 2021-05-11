@@ -1,12 +1,11 @@
-import json
 import logging
 import typing
 import urllib.parse
 
-import requests
 
 from globus_sdk import config, exc, utils
 from globus_sdk.response import GlobusHTTPResponse
+from globus_sdk.transport import RequestsTransport
 from globus_sdk.version import __version__
 
 log = logging.getLogger(__name__)
@@ -86,18 +85,22 @@ class BaseClient:
             self.base_path,
         )
 
-        # setup the basics for wrapping a Requests Session
-        # including basics for internal header dict
-        self._session = requests.Session()
-        self._headers = {
-            "Accept": "application/json",
-            "User-Agent": self.BASE_USER_AGENT,
-        }
-
-        # verify SSL? Usually true
-        self._verify_ssl = config.get_ssl_verify()
         # HTTP connection timeout
-        self._http_timeout = config.get_http_timeout(http_timeout)
+        # this is passed verbatim to `requests`, and we therefore technically
+        # support a tuple for connect/read timeouts, but we don't need to
+        # advertise that... Just declare it as an float value
+        if http_timeout is None:
+            http_timeout = config.get_http_timeout(self.environment)
+        # handle -1 by passing None to requests
+        if http_timeout == -1:
+            http_timeout = None
+
+        self._transport = RequestsTransport(
+            self.BASE_USER_AGENT,
+            # verify SSL? Usually true
+            config.get_ssl_verify(),
+            http_timeout=config.get_http_timeout(http_timeout),
+        )
 
         # set application name if given
         self._app_name = None
@@ -134,27 +137,18 @@ class BaseClient:
         interacting with Globus Support.
         """
         self._app_name = value
-        self._headers["User-Agent"] = f"{self.BASE_USER_AGENT}/{value}"
+        self._transport.user_agent = f"{self.BASE_USER_AGENT}/{value}"
 
     def qjoin_path(self, *parts: str) -> str:
         return "/" + "/".join(urllib.parse.quote(part) for part in parts)
 
-    def get(self, path, params=None, headers=None, response_class=None, retry_401=True):
+    def get(
+        self, path, *, params=None, headers=None, response_class=None, retry_401=True
+    ):
         """
         Make a GET request to the specified path.
 
-        :param path: Path for the request, with or without leading slash
-        :type path: str
-        :param params: Parameters to be encoded as a query string
-        :type params: dict
-        :param headers: HTTP headers to add to the request
-        :type headers: dict
-        :param response_class: Class for response object, overrides the client's
-            ``default_response_class``
-        :type response_class: class
-        :param retry_401: Retry on 401 responses with fresh Authorization if
-            ``self.authorizer`` supports it
-        :type retry_401: bool
+        See :meth:`_request <._request>` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -172,33 +166,18 @@ class BaseClient:
     def post(
         self,
         path,
-        json_body=None,
+        *,
         params=None,
+        data=None,
         headers=None,
-        text_body=None,
+        encoding: typing.Optional[str] = None,
         response_class=None,
         retry_401=True,
     ):
         """
         Make a POST request to the specified path.
 
-        :param path: Path for the request, with or without leading slash
-        :type path: str
-        :param params: Parameters to be encoded as a query string
-        :type params: dict
-        :param headers: HTTP headers to add to the request
-        :type headers: dict
-        :param json_body: Data which will be JSON encoded as the body of the request
-        :type json_body: dict
-        :param text_body: Either a raw string that will serve as the request body, or a
-            dict which will be HTTP Form encoded
-        :type text_body: str or dict
-        :param response_class: Class for response object, overrides the client's
-            ``default_response_class``
-        :type response_class: class
-        :param retry_401: Retry on 401 responses with fresh Authorization if
-            ``self.authorizer`` supports it
-        :type retry_401: bool
+        See :meth:`_request <._request>` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -207,32 +186,21 @@ class BaseClient:
         return self._request(
             "POST",
             path,
-            json_body=json_body,
             params=params,
+            data=data,
             headers=headers,
-            text_body=text_body,
+            encoding=encoding,
             response_class=response_class,
             retry_401=retry_401,
         )
 
     def delete(
-        self, path, params=None, headers=None, response_class=None, retry_401=True
+        self, path, *, params=None, headers=None, response_class=None, retry_401=True
     ):
         """
         Make a DELETE request to the specified path.
 
-        :param path: Path for the request, with or without leading slash
-        :type path: str
-        :param params: Parameters to be encoded as a query string
-        :type params: dict
-        :param headers: HTTP headers to add to the request
-        :type headers: dict
-        :param response_class: Class for response object, overrides the client's
-            ``default_response_class``
-        :type response_class: class
-        :param retry_401: Retry on 401 responses with fresh Authorization if
-            ``self.authorizer`` supports it
-        :type retry_401: bool
+        See :meth:`_request <._request>` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -250,33 +218,18 @@ class BaseClient:
     def put(
         self,
         path,
-        json_body=None,
+        *,
         params=None,
+        data=None,
         headers=None,
-        text_body=None,
+        encoding: typing.Optional[str] = None,
         response_class=None,
         retry_401=True,
     ):
         """
         Make a PUT request to the specified path.
 
-        :param path: Path for the request, with or without leading slash
-        :type path: str
-        :param params: Parameters to be encoded as a query string
-        :type params: dict
-        :param headers: HTTP headers to add to the request
-        :type headers: dict
-        :param json_body: Data which will be JSON encoded as the body of the request
-        :type json_body: dict
-        :param text_body: Either a raw string that will serve as the request body, or a
-            dict which will be HTTP Form encoded
-        :type text_body: str or dict
-        :param response_class: Class for response object, overrides the client's
-            ``default_response_class``
-        :type response_class: class
-        :param retry_401: Retry on 401 responses with fresh Authorization if
-            ``self.authorizer`` supports it
-        :type retry_401: bool
+        See :meth:`_request <._request>` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -285,10 +238,10 @@ class BaseClient:
         return self._request(
             "PUT",
             path,
-            json_body=json_body,
             params=params,
+            data=data,
             headers=headers,
-            text_body=text_body,
+            encoding=encoding,
             response_class=response_class,
             retry_401=retry_401,
         )
@@ -296,33 +249,18 @@ class BaseClient:
     def patch(
         self,
         path,
-        json_body=None,
+        *,
         params=None,
+        data=None,
         headers=None,
-        text_body=None,
+        encoding: typing.Optional[str] = None,
         response_class=None,
         retry_401=True,
     ):
         """
         Make a PATCH request to the specified path.
 
-        :param path: Path for the request, with or without leading slash
-        :type path: str
-        :param params: Parameters to be encoded as a query string
-        :type params: dict
-        :param headers: HTTP headers to add to the request
-        :type headers: dict
-        :param json_body: Data which will be JSON encoded as the body of the request
-        :type json_body: dict
-        :param text_body: Either a raw string that will serve as the request body, or a
-            dict which will be HTTP Form encoded
-        :type text_body: str or dict
-        :param response_class: Class for response object, overrides the client's
-            ``default_response_class``
-        :type response_class: class
-        :param retry_401: Retry on 401 responses with fresh Authorization if
-            ``self.authorizer`` supports it
-        :type retry_401: bool
+        See :meth:`_request <._request>` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -331,10 +269,10 @@ class BaseClient:
         return self._request(
             "PATCH",
             path,
-            json_body=json_body,
             params=params,
+            data=data,
             headers=headers,
-            text_body=text_body,
+            encoding=encoding,
             response_class=response_class,
             retry_401=retry_401,
         )
@@ -343,10 +281,11 @@ class BaseClient:
         self,
         method,
         path,
+        *,
         params=None,
+        data=None,
         headers=None,
-        json_body=None,
-        text_body=None,
+        encoding: typing.Optional[str] = None,
         response_class=None,
         retry_401=True,
     ):
@@ -361,11 +300,13 @@ class BaseClient:
         :type params: dict
         :param headers: HTTP headers to add to the request
         :type headers: dict
-        :param json_body: Data which will be JSON encoded as the body of the request
-        :type json_body: dict
-        :param text_body: Either a raw string that will serve as the request body, or a
-            dict which will be HTTP Form encoded
-        :type text_body: str or dict
+        :param data: Data to send as the request body. May pass through encoding.
+        :type data: dict or string
+        :param encoding: A way to encode request data. "json", "form", and "text"
+            are all valid values. Custom encodings can be used only if they are
+            registered with the transport. By default, strings get "text" behavior and
+            all other objects get "json".
+        :type encoding: string
         :param response_class: Class for response object, overrides the client's
             ``default_response_class``
         :type response_class: class
@@ -376,17 +317,8 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        # copy
-        rheaders = dict(self._headers)
-        # expand
-        if headers is not None:
-            rheaders.update(headers)
-
-        if json_body is not None:
-            assert text_body is None
-            text_body = json.dumps(json_body)
-            # set appropriate content-type header
-            rheaders.update({"Content-Type": "application/json"})
+        # copy if present
+        rheaders = {**headers} if headers else {}
 
         # add Authorization header, or (if it's a NullAuthorizer) possibly
         # explicitly remove the Authorization header
@@ -406,25 +338,15 @@ class BaseClient:
             url = utils.slash_join(self.base_url, path)
         log.debug(f"request will hit URL:{url}")
 
-        # because a 401 can trigger retry, we need to wrap the retry-able thing
-        # in a method
-        def send_request():
-            try:
-                return self._session.request(
-                    method=method,
-                    url=url,
-                    headers=rheaders,
-                    params=params,
-                    data=text_body,
-                    verify=self._verify_ssl,
-                    timeout=self._http_timeout,
-                )
-            except requests.RequestException as e:
-                log.error("NetworkError on request")
-                raise exc.convert_request_exception(e)
-
         # initial request
-        r = send_request()
+        r = self._transport.request(
+            method=method,
+            url=url,
+            data=data,
+            params=params,
+            headers=rheaders,
+            encoding=encoding,
+        )
 
         log.debug(f"Request made to URL: {r.url}")
 
@@ -438,7 +360,14 @@ class BaseClient:
             if self.authorizer.handle_missing_authorization():
                 log.debug("request can be retried")
                 self.authorizer.set_authorization_header(rheaders)
-                r = send_request()
+                r = self._transport.request(
+                    method=method,
+                    url=url,
+                    data=data,
+                    params=params,
+                    headers=rheaders,
+                    encoding=encoding,
+                )
 
         if 200 <= r.status_code < 400:
             log.debug(f"request completed with response code: {r.status_code}")

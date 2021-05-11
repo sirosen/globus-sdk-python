@@ -69,7 +69,7 @@ def test_set_app_name(base_client):
     base_client.app_name = "SDK Test"
     # confirm results
     assert base_client.app_name == "SDK Test"
-    assert base_client._headers["User-Agent"] == "{}/{}".format(
+    assert base_client._transport.user_agent == "{}/{}".format(
         base_client.BASE_USER_AGENT, "SDK Test"
     )
 
@@ -116,15 +116,15 @@ def test_http_methods(method, allows_body, base_client):
 
     if allows_body:
         jsonbody = {"foo": "bar"}
-        res = resolved_method(path, json_body=jsonbody)
+        res = resolved_method(path, data=jsonbody)
         req = get_last_request()
 
         assert req.method == methodname
-        assert req.body == json.dumps(jsonbody)
+        assert req.body == json.dumps(jsonbody).encode("utf-8")
         assert "x" in res
         assert res["x"] == "y"
 
-        res = resolved_method(path, text_body="abc")
+        res = resolved_method(path, data="abc")
         req = get_last_request()
 
         assert req.method == methodname

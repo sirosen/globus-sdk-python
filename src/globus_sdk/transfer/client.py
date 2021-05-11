@@ -127,7 +127,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.update_endpoint({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s)
-        return typing.cast(TransferResponse, self.put(path, data, params=params))
+        return typing.cast(TransferResponse, self.put(path, data=data, params=params))
 
     def create_endpoint(self, data):
         """
@@ -167,7 +167,7 @@ class TransferClient(BaseClient):
             )
 
         log.info("TransferClient.create_endpoint(...)")
-        return self.post("endpoint", data)
+        return self.post("endpoint", data=data)
 
     def delete_endpoint(self, endpoint_id: ID_PARAM_TYPE) -> TransferResponse:
         """
@@ -390,7 +390,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "activate")
         return typing.cast(
             TransferResponse,
-            self.post(path, json_body=requirements_data, params=params),
+            self.post(path, data=requirements_data, params=params),
         )
 
     def endpoint_get_activation_requirements(
@@ -501,7 +501,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         log.info("TransferClient.create_shared_endpoint(...)")
-        return self.post("shared_endpoint", json_body=data)
+        return self.post("shared_endpoint", data=data)
 
     # Endpoint servers
 
@@ -1017,7 +1017,7 @@ class TransferClient(BaseClient):
         json_body = {"DATA_TYPE": "mkdir", "path": path}
         return typing.cast(
             TransferResponse,
-            self.post(resource_path, json_body=json_body, params=params),
+            self.post(resource_path, data=json_body, params=params),
         )
 
     def operation_rename(
@@ -1054,7 +1054,7 @@ class TransferClient(BaseClient):
         json_body = {"DATA_TYPE": "rename", "old_path": oldpath, "new_path": newpath}
         return typing.cast(
             TransferResponse,
-            self.post(resource_path, json_body=json_body, params=params),
+            self.post(resource_path, data=json_body, params=params),
         )
 
     def operation_symlink(
@@ -1091,14 +1091,13 @@ class TransferClient(BaseClient):
             )
         )
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "symlink")
-        json_body = {
+        data = {
             "DATA_TYPE": "symlink",
             "symlink_target": symlink_target,
             "path": path,
         }
         return typing.cast(
-            TransferResponse,
-            self.post(resource_path, json_body=json_body, params=params),
+            TransferResponse, self.post(resource_path, data=data, params=params)
         )
 
     #
@@ -1163,7 +1162,7 @@ class TransferClient(BaseClient):
         in the REST documentation for more details.
         """
         log.info("TransferClient.submit_transfer(...)")
-        return self.post("/transfer", data)
+        return self.post("/transfer", data=data)
 
     def submit_delete(self, data):
         """
@@ -1192,7 +1191,7 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         log.info("TransferClient.submit_delete(...)")
-        return self.post("/delete", data)
+        return self.post("/delete", data=data)
 
     #
     # Task inspection and management
@@ -2034,14 +2033,9 @@ class TransferClient(BaseClient):
         log.info(
             f"TransferClient.endpoint_manager_cancel_tasks({str_task_ids}, {message})"
         )
-        json_body = {
-            "message": utils.safe_stringify(message),
-            "task_id_list": str_task_ids,
-        }
+        data = {"message": utils.safe_stringify(message), "task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_cancel")
-        return typing.cast(
-            TransferResponse, self.post(path, json_body=json_body, params=params)
-        )
+        return typing.cast(TransferResponse, self.post(path, data=data, params=params))
 
     def endpoint_manager_cancel_status(self, admin_cancel_id, **params):
         """
@@ -2098,14 +2092,12 @@ class TransferClient(BaseClient):
         log.info(
             f"TransferClient.endpoint_manager_pause_tasks({str_task_ids}, {message})"
         )
-        json_body = {
+        data = {
             "message": utils.safe_stringify(message),
             "task_id_list": str_task_ids,
         }
         path = self.qjoin_path("endpoint_manager", "admin_pause")
-        return typing.cast(
-            TransferResponse, self.post(path, json_body=json_body, params=params)
-        )
+        return typing.cast(TransferResponse, self.post(path, data=data, params=params))
 
     def endpoint_manager_resume_tasks(
         self, task_ids: typing.Iterable[ID_PARAM_TYPE], **params
@@ -2132,11 +2124,9 @@ class TransferClient(BaseClient):
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
         log.info(f"TransferClient.endpoint_manager_resume_tasks({str_task_ids})")
-        json_body = {"task_id_list": str_task_ids}
+        data = {"task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_resume")
-        return typing.cast(
-            TransferResponse, self.post(path, json_body=json_body, params=params)
-        )
+        return typing.cast(TransferResponse, self.post(path, data=data, params=params))
 
     #
     # endpoint manager pause rule methods
