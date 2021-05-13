@@ -8,22 +8,35 @@ from globus_sdk.transport.encoders import (
     JSONRequestEncoder,
     RequestEncoder,
 )
-from globus_sdk.transport.retry_policy import RetryPolicy
+from globus_sdk.transport.retry import (
+    RetryContext,
+    RetryPolicy,
+    get_default_retry_policy,
+)
 
 
 class RequestsTransport:
+    # the retry policy may enforce a lower maximum, but this sets a hard cap to avoid
+    # potential infinite loop with a bad policy
+    max_retries: int = 20
     encoders: typing.Dict[str, RequestEncoder] = {
         "text": RequestEncoder(),
         "json": JSONRequestEncoder(),
         "form": FormRequestEncoder(),
     }
-    retry_policy = RetryPolicy()
 
-    def __init__(self, user_agent: str, verify_ssl=True, http_timeout=60):
+    def __init__(
+        self,
+        user_agent: str,
+        verify_ssl=True,
+        http_timeout=60,
+        retry_policy: typing.Optional[RetryPolicy] = None,
+    ):
         self._session = requests.Session()
         self._verify_ssl = verify_ssl
         self.user_agent = user_agent
         self.http_timeout = http_timeout
+        self.retry_policy = retry_policy if retry_policy else get_default_retry_policy()
 
     @property
     def _headers(self):
@@ -87,21 +100,20 @@ class RequestsTransport:
         """
         req = self._encode(method, url, params, data, headers, encoding)
         resp = None
-        for attempt in range(self.retry_policy.max_retries):
+        for attempt in range(self.max_retries):
+            ctx = RetryContext(attempt)
             try:
-                resp = self._session.send(
+                resp = ctx.response = self._session.send(
                     req.prepare(), timeout=self.http_timeout, verify=self._verify_ssl
                 )
             except requests.RequestException as err:
-                if not self.retry_policy.should_retry(attempt, err):
+                ctx.exception = err
+                if not self.retry_policy.should_retry(ctx):
                     raise exc.convert_request_exception(err)
             else:
-                if self.retry_policy.should_retry(attempt, resp):
+                if self.retry_policy.should_retry(ctx):
                     continue
                 return resp
         if not resp:
-            raise ValueError(
-                "Somehow, retries ended without a response. "
-                "Possibly a bad retry policy."
-            )
+            raise ValueError("Somehow, retries ended without a response")
         return resp
