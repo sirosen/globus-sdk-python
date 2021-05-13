@@ -58,7 +58,7 @@ class RetryAfterRetryChecker(RetryChecker):
             return None
 
     def should_retry(self, context):
-        if not context.response:
+        if context.response is None:
             return None
         if context.response.status_code in self.STATUS_CODES:
             retry_after = self._parse_retry_after(context.response)
@@ -72,7 +72,32 @@ class TransientErrorRetryChecker(RetryChecker):
     STATUS_CODES = (429, 500, 502, 503, 504)
 
     def should_retry(self, context):
-        if not context.response:
+        if context.response is None:
             return None
         if context.response.status_code in self.STATUS_CODES:
             return True
+
+
+class ExpiredAuthorizationRetryChecker(RetryChecker):
+    # HTTP status for services to indicate an expired token
+    STATUS_CODES = (401,)
+
+    def should_retry(self, context):
+        if context.response is None:
+            return None
+        if context.response.status_code not in self.STATUS_CODES:
+            return None
+        if context.authorizer is None:
+            return None
+        # the response code was a 401 and there's already been at least one reauth
+        # attempt
+        # this could be `False` instead, but that would mean that nobody else can add
+        # 401-retries even when reauth didn't work
+        if context.retry_state.get("has_done_reauth"):
+            return None
+
+        if not context.authorizer.handle_missing_authorization():
+            return None
+
+        context.retry_state["has_done_reauth"] = True
+        return True

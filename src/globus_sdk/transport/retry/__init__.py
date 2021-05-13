@@ -1,6 +1,7 @@
 from .context import RetryContext
 from .policy import ExponentialBackoffRetryPolicy, RetryPolicy
 from .retry_checker import (
+    ExpiredAuthorizationRetryChecker,
     MaxRetriesRetryChecker,
     RetryAfterRetryChecker,
     RetryChecker,
@@ -16,6 +17,7 @@ def get_default_retry_policy():
             RetryAfterRetryChecker(),
             StandardExceptionRetryChecker(),
             TransientErrorRetryChecker(),
+            ExpiredAuthorizationRetryChecker(),
         ]
     )
 

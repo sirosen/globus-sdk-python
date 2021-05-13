@@ -69,7 +69,7 @@ def test_set_app_name(base_client):
     base_client.app_name = "SDK Test"
     # confirm results
     assert base_client.app_name == "SDK Test"
-    assert base_client._transport.user_agent == "{}/{}".format(
+    assert base_client.transport.user_agent == "{}/{}".format(
         base_client.BASE_USER_AGENT, "SDK Test"
     )
 

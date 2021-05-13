@@ -3,6 +3,7 @@ import typing
 import requests
 
 from globus_sdk import exc
+from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.transport.encoders import (
     FormRequestEncoder,
     JSONRequestEncoder,
@@ -76,7 +77,8 @@ class RequestsTransport:
         data=None,
         headers=None,
         encoding: typing.Optional[str] = None,
-    ):
+        authorizer: typing.Optional[GlobusAuthorizer] = None,
+    ) -> requests.Response:
         """
         Send an HTTP request
 
@@ -98,10 +100,17 @@ class RequestsTransport:
 
         :return: ``requests.Response`` object
         """
+        resp: typing.Optional[requests.Response] = None
+        retry_state: typing.Dict = {}
         req = self._encode(method, url, params, data, headers, encoding)
-        resp = None
         for attempt in range(self.max_retries):
-            ctx = RetryContext(attempt)
+            # add Authorization header, or (if it's a NullAuthorizer) possibly
+            # explicitly remove the Authorization header
+            # done fresh for each request, to handle potential for refreshed credentials
+            if authorizer:
+                authorizer.set_authorization_header(req.headers)
+
+            ctx = RetryContext(attempt, authorizer=authorizer, retry_state=retry_state)
             try:
                 resp = ctx.response = self._session.send(
                     req.prepare(), timeout=self.http_timeout, verify=self._verify_ssl
@@ -111,9 +120,8 @@ class RequestsTransport:
                 if not self.retry_policy.should_retry(ctx):
                     raise exc.convert_request_exception(err)
             else:
-                if self.retry_policy.should_retry(ctx):
-                    continue
-                return resp
+                if not self.retry_policy.should_retry(ctx):
+                    return resp
         if not resp:
             raise ValueError("Somehow, retries ended without a response")
         return resp

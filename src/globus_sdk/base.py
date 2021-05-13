@@ -50,7 +50,7 @@ class BaseClient:
         base_url=None,
         authorizer=None,
         app_name=None,
-        http_timeout: typing.Optional[float] = None,
+        http_timeout: typing.Optional[float] = 60,
         *args,
         **kwargs,
     ):
@@ -76,6 +76,12 @@ class BaseClient:
         # logs the environment when it isn't `default`
         self.environment = config.get_environment_name(environment)
 
+        self.transport = RequestsTransport(
+            self.BASE_USER_AGENT,
+            config.get_ssl_verify(),
+            http_timeout=config.get_http_timeout(http_timeout),
+        )
+
         self.authorizer = authorizer
 
         self.base_url = utils.slash_join(
@@ -83,23 +89,6 @@ class BaseClient:
             if base_url is None
             else base_url,
             self.base_path,
-        )
-
-        # HTTP connection timeout
-        # this is passed verbatim to `requests`, and we therefore technically
-        # support a tuple for connect/read timeouts, but we don't need to
-        # advertise that... Just declare it as an float value
-        if http_timeout is None:
-            http_timeout = config.get_http_timeout(self.environment)
-        # handle -1 by passing None to requests
-        if http_timeout == -1:
-            http_timeout = None
-
-        self._transport = RequestsTransport(
-            self.BASE_USER_AGENT,
-            # verify SSL? Usually true
-            config.get_ssl_verify(),
-            http_timeout=config.get_http_timeout(http_timeout),
         )
 
         # set application name if given
@@ -128,23 +117,13 @@ class BaseClient:
 
     @app_name.setter
     def app_name(self, value):
-        """
-        Set an application name to send to Globus services as part of the User
-        Agent.
-
-        Application developers are encouraged to set an app name as a courtesy
-        to the Globus Team, and to potentially speed resolution of issues when
-        interacting with Globus Support.
-        """
         self._app_name = value
-        self._transport.user_agent = f"{self.BASE_USER_AGENT}/{value}"
+        self.transport.user_agent = f"{self.BASE_USER_AGENT}/{value}"
 
     def qjoin_path(self, *parts: str) -> str:
         return "/" + "/".join(urllib.parse.quote(part) for part in parts)
 
-    def get(
-        self, path, *, params=None, headers=None, response_class=None, retry_401=True
-    ):
+    def get(self, path, *, params=None, headers=None, response_class=None):
         """
         Make a GET request to the specified path.
 
@@ -160,7 +139,6 @@ class BaseClient:
             params=params,
             headers=headers,
             response_class=response_class,
-            retry_401=retry_401,
         )
 
     def post(
@@ -172,7 +150,6 @@ class BaseClient:
         headers=None,
         encoding: typing.Optional[str] = None,
         response_class=None,
-        retry_401=True,
     ):
         """
         Make a POST request to the specified path.
@@ -191,12 +168,9 @@ class BaseClient:
             headers=headers,
             encoding=encoding,
             response_class=response_class,
-            retry_401=retry_401,
         )
 
-    def delete(
-        self, path, *, params=None, headers=None, response_class=None, retry_401=True
-    ):
+    def delete(self, path, *, params=None, headers=None, response_class=None):
         """
         Make a DELETE request to the specified path.
 
@@ -212,7 +186,6 @@ class BaseClient:
             params=params,
             headers=headers,
             response_class=response_class,
-            retry_401=retry_401,
         )
 
     def put(
@@ -224,7 +197,6 @@ class BaseClient:
         headers=None,
         encoding: typing.Optional[str] = None,
         response_class=None,
-        retry_401=True,
     ):
         """
         Make a PUT request to the specified path.
@@ -243,7 +215,6 @@ class BaseClient:
             headers=headers,
             encoding=encoding,
             response_class=response_class,
-            retry_401=retry_401,
         )
 
     def patch(
@@ -255,7 +226,6 @@ class BaseClient:
         headers=None,
         encoding: typing.Optional[str] = None,
         response_class=None,
-        retry_401=True,
     ):
         """
         Make a PATCH request to the specified path.
@@ -274,7 +244,6 @@ class BaseClient:
             headers=headers,
             encoding=encoding,
             response_class=response_class,
-            retry_401=retry_401,
         )
 
     def _request(
@@ -287,7 +256,6 @@ class BaseClient:
         headers=None,
         encoding: typing.Optional[str] = None,
         response_class=None,
-        retry_401=True,
     ):
         """
         Send an HTTP request
@@ -310,25 +278,13 @@ class BaseClient:
         :param response_class: Class for response object, overrides the client's
             ``default_response_class``
         :type response_class: class
-        :param retry_401: Retry on 401 responses with fresh Authorization if
-            ``self.authorizer`` supports it
-        :type retry_401: bool
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        # copy if present
+        # prepare data...
+        # copy headers if present
         rheaders = {**headers} if headers else {}
-
-        # add Authorization header, or (if it's a NullAuthorizer) possibly
-        # explicitly remove the Authorization header
-        if self.authorizer is not None:
-            log.debug(
-                "request will have authorization of type {}".format(
-                    type(self.authorizer)
-                )
-            )
-            self.authorizer.set_authorization_header(rheaders)
 
         # if a client is asked to make a request against a full URL, not just the path
         # component, then do not resolve the path, simply pass it through as the URL
@@ -338,36 +294,18 @@ class BaseClient:
             url = utils.slash_join(self.base_url, path)
         log.debug(f"request will hit URL:{url}")
 
-        # initial request
-        r = self._transport.request(
+        # make the request
+        log.debug(f"request will hit URL:{url}")
+        r = self.transport.request(
             method=method,
             url=url,
             data=data,
             params=params,
             headers=rheaders,
             encoding=encoding,
+            authorizer=self.authorizer,
         )
-
         log.debug(f"Request made to URL: {r.url}")
-
-        # potential 401 retry handling
-        if r.status_code == 401 and retry_401 and self.authorizer is not None:
-            log.debug("request got 401, checking retry-capability")
-            # note that although handle_missing_authorization returns a T/F
-            # value, it may actually mutate the state of the authorizer and
-            # therefore change the value set by the `set_authorization_header`
-            # method
-            if self.authorizer.handle_missing_authorization():
-                log.debug("request can be retried")
-                self.authorizer.set_authorization_header(rheaders)
-                r = self._transport.request(
-                    method=method,
-                    url=url,
-                    data=data,
-                    params=params,
-                    headers=rheaders,
-                    encoding=encoding,
-                )
 
         if 200 <= r.status_code < 400:
             log.debug(f"request completed with response code: {r.status_code}")
