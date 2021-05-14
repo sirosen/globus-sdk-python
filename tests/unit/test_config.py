@@ -4,7 +4,6 @@ from unittest import mock
 import pytest
 
 import globus_sdk.config
-from globus_sdk.config.environments import EnvConfig, get_config_by_name
 
 
 def test_get_service_url():
@@ -107,23 +106,23 @@ def test_get_environment_name():
 
 
 def test_env_config_registration():
-    with mock.patch.dict(EnvConfig._registry):
+    with mock.patch.dict(globus_sdk.config.EnvConfig._registry):
         # should be None, we don't have an environment named 'moon'
-        assert get_config_by_name("moon") is None
+        assert globus_sdk.config.EnvConfig.get_by_name("moon") is None
 
         # now, create the moon
-        class MoonEnvConfig(EnvConfig):
+        class MoonEnvConfig(globus_sdk.config.EnvConfig):
             envname = "moon"
             domain = "apollo.globus.org"
 
         # a lookup by "moon" should now get this config object
-        assert get_config_by_name("moon") is MoonEnvConfig
+        assert globus_sdk.config.EnvConfig.get_by_name("moon") is MoonEnvConfig
 
 
 def test_service_url_overrides():
-    with mock.patch.dict(EnvConfig._registry):
+    with mock.patch.dict(globus_sdk.config.EnvConfig._registry):
 
-        class MarsEnvConfig(EnvConfig):
+        class MarsEnvConfig(globus_sdk.config.EnvConfig):
             envname = "mars"
             domain = "mars.globus.org"
             auth_url = "https://perseverance.mars.globus.org/"

@@ -40,16 +40,14 @@ class EnvConfig:
             return f"https://{service}.{cls.domain}/"
         return f"https://{service}.api.{cls.domain}/"
 
-
-# the main interfaces to this module
-#   get_config_by_name("test") -> TestEnvConfig
-def get_config_by_name(envname: str) -> typing.Optional[typing.Type[EnvConfig]]:
-    return EnvConfig._registry.get(envname)
+    @classmethod
+    def get_by_name(cls, envname: str) -> typing.Optional[typing.Type["EnvConfig"]]:
+        return cls._registry.get(envname)
 
 
 def get_service_url(environment, service):
     log.debug(f'Service URL Lookup for "{service}" under env "{environment}"')
-    conf = get_config_by_name(environment)
+    conf = EnvConfig.get_by_name(environment)
     if not conf:
         raise ValueError(f'Unrecognized environment "{environment}"')
     url = conf.get_service_url(service)
