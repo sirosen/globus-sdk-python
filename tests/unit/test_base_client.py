@@ -1,6 +1,8 @@
 import json
 import logging.handlers
+import os
 import uuid
+from unittest import mock
 
 import pytest
 
@@ -49,6 +51,29 @@ def test_client_log_adapter(base_client):
     assert expected_msg == out_msg
 
     memory_handler.close()
+
+
+def test_set_http_timeout(base_client):
+    with mock.patch.dict(os.environ):
+        # ensure not set
+        os.environ.pop("GLOBUS_SDK_HTTP_TIMEOUT", None)
+
+        client = BaseClient("foo")
+        assert client._http_timeout == 60.0
+
+        client = BaseClient("foo", http_timeout=None)
+        assert client._http_timeout == 60.0
+
+        client = BaseClient("foo", http_timeout=-1)
+        assert client._http_timeout is None
+
+        os.environ["GLOBUS_SDK_HTTP_TIMEOUT"] = "120"
+        client = BaseClient("foo")
+        assert client._http_timeout == 120.0
+
+        os.environ["GLOBUS_SDK_HTTP_TIMEOUT"] = "-1"
+        client = BaseClient("foo")
+        assert client._http_timeout is None
 
 
 def test_set_app_name(base_client):

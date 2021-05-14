@@ -66,7 +66,8 @@ def test_get_ssl_verify_with_explicit_value():
     "value, expected_result",
     [(x, 1.0) for x in ["1.0", "1", " 1", "1.0  "]]
     + [(x, 0.0) for x in ["0", "0.0"]]
-    + [("", None)]  # type: ignore
+    + [("", 60.0)]
+    + [("-1", None)]  # type: ignore
     + [(x, ValueError) for x in ["invalid", "no", "1.1.", "t", "f"]],  # type: ignore
 )
 def test_get_http_timeout(value, expected_result):

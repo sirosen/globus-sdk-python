@@ -49,7 +49,7 @@ class BaseClient:
         string, and may be useful when debugging issues with the Globus Team
     :type app_name: str
     :param http_timeout: Number of seconds to wait on HTTP connections. Default is 60.
-        A value of `None` indicates that no timeout should be used (requests can hang
+        A value of ``-1`` indicates that no timeout should be used (requests can hang
         indefinitely).
     :type http_timeout: float
 
