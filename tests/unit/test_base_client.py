@@ -7,7 +7,6 @@ import pytest
 
 import globus_sdk
 from globus_sdk.base import BaseClient
-from globus_sdk.transport import RetryPolicy
 from tests.common import get_last_request, register_api_route
 
 
@@ -17,15 +16,11 @@ def auth_client():
 
 
 @pytest.fixture
-def base_client():
-    class NoRetryPolicy(RetryPolicy):
-        def compute_delay(self, context, delay):
-            return 0
-
+def base_client(no_retry_policy):
     class CustomClient(BaseClient):
         base_path = "/v0.10/"
         service_name = "transfer"
-        retry_policy = NoRetryPolicy(checkers=[])
+        retry_policy = no_retry_policy
 
     return CustomClient()
 

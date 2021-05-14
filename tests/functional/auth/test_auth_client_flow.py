@@ -11,23 +11,29 @@ CLIENT_ID = "d0f1d9b0-bd81-4108-be74-ea981664453a"
 INVALID_GRANT_RESPONSE_BODY = '{"error":"invalid_grant"}'
 
 
-def test_oauth2_get_authorize_url_native():
+@pytest.fixture
+def client(no_retry_policy):
+    class CustomAuthClient(globus_sdk.AuthClient):
+        retry_policy = no_retry_policy
+
+    return CustomAuthClient(client_id=CLIENT_ID)
+
+
+def test_oauth2_get_authorize_url_native(client):
     """
     Starts an auth flow with a NativeAppFlowManager, gets the authorize url
     validates expected results with both default and specified parameters.
     """
-    ac = globus_sdk.AuthClient(client_id=CLIENT_ID)
-
     # default parameters for starting auth flow
-    flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(ac)
-    ac.current_oauth2_flow_manager = flow_manager
+    flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(client)
+    client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
-    url_res = ac.oauth2_get_authorize_url()
+    url_res = client.oauth2_get_authorize_url()
     expected_vals = [
-        ac.base_url + "v2/oauth2/authorize?",
-        "client_id=" + ac.client_id,
-        "redirect_uri=" + urllib.parse.quote_plus(ac.base_url + "v2/web/auth-code"),
+        client.base_url + "v2/oauth2/authorize?",
+        "client_id=" + client.client_id,
+        "redirect_uri=" + urllib.parse.quote_plus(client.base_url + "v2/web/auth-code"),
         "scope=" + urllib.parse.quote_plus(" ".join(DEFAULT_REQUESTED_SCOPES)),
         "state=" + "_default",
         "response_type=" + "code",
@@ -40,21 +46,21 @@ def test_oauth2_get_authorize_url_native():
 
     # starting flow with specified paramaters
     flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(
-        ac,
+        client,
         requested_scopes="scopes",
         redirect_uri="uri",
         state="state",
         verifier=("a" * 43),
         refresh_tokens=True,
     )
-    ac.current_oauth2_flow_manager = flow_manager
+    client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
-    url_res = ac.oauth2_get_authorize_url()
+    url_res = client.oauth2_get_authorize_url()
     verifier, remade_challenge = make_native_app_challenge("a" * 43)
     expected_vals = [
-        ac.base_url + "v2/oauth2/authorize?",
-        "client_id=" + ac.client_id,
+        client.base_url + "v2/oauth2/authorize?",
+        "client_id=" + client.client_id,
         "redirect_uri=" + "uri",
         "scope=" + "scopes",
         "state=" + "state",
@@ -67,23 +73,21 @@ def test_oauth2_get_authorize_url_native():
         assert val in url_res
 
 
-def test_oauth2_get_authorize_url_confidential():
+def test_oauth2_get_authorize_url_confidential(client):
     """
     Starts an auth flow with a AuthorizationCodeFlowManager, gets the
     authorize url, validates expected results with both default and specified
     parameters.
     """
-    ac = globus_sdk.AuthClient(client_id=CLIENT_ID)
-
     # default parameters for starting auth flow
-    flow_manager = globus_sdk.auth.GlobusAuthorizationCodeFlowManager(ac, "uri")
-    ac.current_oauth2_flow_manager = flow_manager
+    flow_manager = globus_sdk.auth.GlobusAuthorizationCodeFlowManager(client, "uri")
+    client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
-    url_res = ac.oauth2_get_authorize_url()
+    url_res = client.oauth2_get_authorize_url()
     expected_vals = [
-        ac.base_url + "v2/oauth2/authorize?",
-        "client_id=" + ac.client_id,
+        client.base_url + "v2/oauth2/authorize?",
+        "client_id=" + client.client_id,
         "redirect_uri=" + "uri",
         "scope=" + urllib.parse.quote_plus(" ".join(DEFAULT_REQUESTED_SCOPES)),
         "state=" + "_default",
@@ -96,19 +100,19 @@ def test_oauth2_get_authorize_url_confidential():
 
     # starting flow with specified paramaters
     flow_manager = globus_sdk.auth.GlobusAuthorizationCodeFlowManager(
-        ac,
+        client,
         requested_scopes="scopes",
         redirect_uri="uri",
         state="state",
         refresh_tokens=True,
     )
-    ac.current_oauth2_flow_manager = flow_manager
+    client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
-    url_res = ac.oauth2_get_authorize_url()
+    url_res = client.oauth2_get_authorize_url()
     expected_vals = [
-        ac.base_url + "v2/oauth2/authorize?",
-        "client_id=" + ac.client_id,
+        client.base_url + "v2/oauth2/authorize?",
+        "client_id=" + client.client_id,
         "redirect_uri=" + "uri",
         "scope=" + "scopes",
         "state=" + "state",
@@ -119,7 +123,7 @@ def test_oauth2_get_authorize_url_confidential():
         assert val in url_res
 
 
-def test_oauth2_exchange_code_for_tokens_native():
+def test_oauth2_exchange_code_for_tokens_native(client):
     """
     Starts a NativeAppFlowManager, Confirms invalid code raises 401
     Further testing cannot be done without user login credentials
@@ -132,17 +136,16 @@ def test_oauth2_exchange_code_for_tokens_native():
         status=401,
     )
 
-    ac = globus_sdk.AuthClient(client_id=CLIENT_ID)
-    flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(ac)
-    ac.current_oauth2_flow_manager = flow_manager
+    flow_manager = globus_sdk.auth.GlobusNativeAppFlowManager(client)
+    client.current_oauth2_flow_manager = flow_manager
 
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
-        ac.oauth2_exchange_code_for_tokens("invalid_code")
+        client.oauth2_exchange_code_for_tokens("invalid_code")
     assert excinfo.value.http_status == 401
     assert excinfo.value.code == "Error"
 
 
-def test_oauth2_exchange_code_for_tokens_confidential():
+def test_oauth2_exchange_code_for_tokens_confidential(client):
     """
     Starts an AuthorizationCodeFlowManager, Confirms bad code raises 401
     Further testing cannot be done without user login credentials
@@ -155,11 +158,10 @@ def test_oauth2_exchange_code_for_tokens_confidential():
         status=401,
     )
 
-    ac = globus_sdk.AuthClient(client_id=CLIENT_ID)
-    flow_manager = globus_sdk.auth.GlobusAuthorizationCodeFlowManager(ac, "uri")
-    ac.current_oauth2_flow_manager = flow_manager
+    flow_manager = globus_sdk.auth.GlobusAuthorizationCodeFlowManager(client, "uri")
+    client.current_oauth2_flow_manager = flow_manager
 
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
-        ac.oauth2_exchange_code_for_tokens("invalid_code")
+        client.oauth2_exchange_code_for_tokens("invalid_code")
     assert excinfo.value.http_status == 401
     assert excinfo.value.code == "Error"
