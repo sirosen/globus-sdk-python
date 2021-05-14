@@ -12,29 +12,9 @@ from configparser import (
 
 from globus_sdk.exc import GlobusError, GlobusSDKUsageError
 
+from .environments import get_config_by_name
+
 logger = logging.getLogger(__name__)
-
-
-def _get_lib_config_path():
-    """
-    Get the location of the default config file in globus_sdk
-    This could be made part of GlobusConfigParser, but it really doesn't handle
-    any class-specific state. Just a helper for getting the location of a file.
-    """
-    fname = "globus.cfg"
-    try:
-        logger.debug("Attempting pkg_resources load of lib config")
-        import pkg_resources
-
-        path = pkg_resources.resource_filename("globus_sdk", fname)
-        logger.debug("pkg_resources load of lib config success")
-    except ImportError:
-        logger.debug(
-            "pkg_resources load of lib config failed, failing over to path joining"
-        )
-        pkg_path = os.path.dirname(__file__)
-        path = os.path.join(pkg_path, fname)
-    return path
 
 
 class GlobusConfigParser:
@@ -55,7 +35,6 @@ class GlobusConfigParser:
         try:
             self._parser.read(
                 [
-                    _get_lib_config_path(),
                     "/etc/globus.cfg",
                     os.path.expanduser("~/.globus.cfg"),
                 ]
@@ -149,18 +128,10 @@ _parser = None
 
 def get_service_url(environment, service):
     logger.debug(f'Service URL Lookup for "{service}" under env "{environment}"')
-    p = _get_parser()
-    option = service + "_service"
-    # TODO: validate with urlparse?
-    url = p.get(option, environment=environment)
-    if url is None:
-        raise GlobusSDKUsageError(
-            (
-                'Failed to find a url for service "{}" in environment "{}". '
-                "Please double-check that GLOBUS_SDK_ENVIRONMENT is set "
-                "correctly, or not set at all"
-            ).format(service, environment)
-        )
+    conf = get_config_by_name(environment)
+    if not conf:
+        raise GlobusSDKUsageError(f'Unrecognized environment "{environment}"')
+    url = conf.get_service_url(service)
     logger.debug(f'Service URL Lookup Result: "{service}" is at "{url}"')
     return url
 
@@ -209,20 +180,18 @@ def get_globus_environ(inputenv=None):
     """
     Get the environment to look for in the config, as a string.
 
-    Typically just "default", but it can be overridden with
+    Typically just "production", but it can be overridden with
     `GLOBUS_SDK_ENVIRONMENT` in the shell environment. In that case, any client
     which does not explicitly specify its environment will use this value.
 
     :param inputenv: An environment which was passed, e.g. to a client
                      instantiation
     """
-    if inputenv is None:
-        env = os.environ.get("GLOBUS_SDK_ENVIRONMENT", "default")
-    else:
-        env = inputenv
-
-    if env == "production":
-        env = "default"
-    if env != "default":
+    env = (
+        inputenv
+        if inputenv is not None
+        else os.environ.get("GLOBUS_SDK_ENVIRONMENT", "production")
+    )
+    if env != "production":
         logger.info(f"On lookup, non-default environment: globus_environment={env}")
     return env

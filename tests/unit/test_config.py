@@ -1,12 +1,12 @@
 import io
 import os
-from configparser import ConfigParser
 from contextlib import contextmanager
 from unittest import mock
 
 import pytest
 
 import globus_sdk.config
+from globus_sdk.config.environments import EnvConfig, get_config_by_name
 
 
 @contextmanager
@@ -44,49 +44,6 @@ def custom_config(configdata):
     globus_sdk.config._parser = None
 
 
-@contextmanager
-def only_lib_config():
-    """
-    patch config to only load library data, ignores /etc/ and ~
-    """
-    # clear any existing parser
-    globus_sdk.config._parser = None
-
-    def loadconf(cfgparser):
-        cfgparser._parser.read([globus_sdk.config._get_lib_config_path()])
-
-    with mock.patch("globus_sdk.config.GlobusConfigParser._load_config", loadconf):
-        yield
-
-    # clear that temporary parser
-    globus_sdk.config._parser = None
-
-
-def test_get_lib_config():
-    """Test lib config file exists, is minimally well formed"""
-    path = globus_sdk.config._get_lib_config_path()
-
-    # name is "about right"
-    file_name = "globus.cfg"
-    assert path.endswith(file_name)
-
-    # ensure that it parses using configparser
-    parser = ConfigParser()
-    parser.read(path)
-
-    # and check that 'default' and 'preview' are populated
-    for env in ("default", "preview"):
-        section = f"environment {env}"
-        for key in (
-            "auth_service",
-            "nexus_service",
-            "transfer_service",
-            "search_service",
-        ):
-            opt = parser.get(section, key)
-            assert opt
-
-
 def test_verify_ssl_true():
     with custom_config("[environment default]\nssl_verify = true\n"):
         assert globus_sdk.config.get_ssl_verify("default")
@@ -101,15 +58,6 @@ def test_verify_ssl_invalid():
     with pytest.raises(ValueError):
         with custom_config("[environment default]\nssl_verify = invalidvalue\n"):
             assert not globus_sdk.config.get_ssl_verify("default")
-
-
-def test_init_loads():
-    """
-    ensure that initializing a config parser loads config
-    """
-    with only_lib_config():
-        conf = globus_sdk.config._get_parser()
-        assert conf._parser.items("general") is not None
 
 
 def test_conf_get():
@@ -183,11 +131,11 @@ transfer_service = https://transfer.api.preview.globus.org/
     )
     with custom_config(confio):
         assert (
-            globus_sdk.config.get_service_url("default", "auth")
+            globus_sdk.config.get_service_url("production", "auth")
             == "https://auth.globus.org/"
         )
         assert (
-            globus_sdk.config.get_service_url("default", "transfer")
+            globus_sdk.config.get_service_url("production", "transfer")
             == "https://transfer.api.globus.org/"
         )
         assert (
@@ -257,24 +205,43 @@ def test_get_globus_environ():
         os.environ["GLOBUS_SDK_ENVIRONMENT"] = "beta"
         assert globus_sdk.config.get_globus_environ() == "beta"
 
-        # clear that value, "default" should be returned
+        # clear that value, "production" should be returned
         del os.environ["GLOBUS_SDK_ENVIRONMENT"]
-        assert globus_sdk.config.get_globus_environ() == "default"
+        assert globus_sdk.config.get_globus_environ() == "production"
 
         # ensure that passing a value returns that value
         assert globus_sdk.config.get_globus_environ("beta") == "beta"
 
 
-def test_get_globus_environ_production():
-    """
-    Confirms that get_globus_environ translates "production" to "default",
-    including when special values are passed
-    """
-    # mock environ to ensure it gets reset
-    with mock.patch.dict(os.environ):
-        os.environ["GLOBUS_SDK_ENVIRONMENT"] = "production"
-        assert globus_sdk.config.get_globus_environ() == "default"
+def test_env_config_registration():
+    with mock.patch.dict(EnvConfig._registry):
+        # should be None, we don't have an environment named 'moon'
+        assert get_config_by_name("moon") is None
 
-        del os.environ["GLOBUS_SDK_ENVIRONMENT"]
-        # ensure that passing a value returns that value
-        assert globus_sdk.config.get_globus_environ("production") == "default"
+        # now, create the moon
+        class MoonEnvConfig(EnvConfig):
+            envname = "moon"
+            domain = "apollo.globus.org"
+
+        # a lookup by "moon" should now get this config object
+        assert get_config_by_name("moon") is MoonEnvConfig
+
+
+def test_service_url_overrides():
+    with mock.patch.dict(EnvConfig._registry):
+
+        class MarsEnvConfig(EnvConfig):
+            envname = "mars"
+            domain = "mars.globus.org"
+            auth_url = "https://perseverance.mars.globus.org/"
+
+        # this one was customized
+        assert (
+            MarsEnvConfig.get_service_url("auth")
+            == "https://perseverance.mars.globus.org/"
+        )
+        # but this one was not
+        assert (
+            MarsEnvConfig.get_service_url("search")
+            == "https://search.api.mars.globus.org/"
+        )
