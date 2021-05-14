@@ -5,8 +5,7 @@ import urllib.parse
 
 from globus_sdk import config, exc, utils
 from globus_sdk.response import GlobusHTTPResponse
-from globus_sdk.transport import RequestsTransport
-from globus_sdk.version import __version__
+from globus_sdk.transport import RequestsTransport, RetryPolicy
 
 log = logging.getLogger(__name__)
 
@@ -41,8 +40,11 @@ class BaseClient:
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class: typing.Type[exc.GlobusAPIError] = exc.GlobusAPIError
     default_response_class: typing.Type[GlobusHTTPResponse] = GlobusHTTPResponse
-
-    BASE_USER_AGENT = f"globus-sdk-py-{__version__}"
+    # the transport class defines how requests are actually sent, including the retry
+    # policy
+    transport_class: typing.Type = RequestsTransport
+    # retry policy for the client (None means default policy)
+    retry_policy: typing.Optional[RetryPolicy] = None
 
     def __init__(
         self,
@@ -50,7 +52,7 @@ class BaseClient:
         base_url=None,
         authorizer=None,
         app_name=None,
-        http_timeout: typing.Optional[float] = 60,
+        http_timeout: typing.Optional[float] = None,
         *args,
         **kwargs,
     ):
@@ -76,13 +78,15 @@ class BaseClient:
         # logs the environment when it isn't `default`
         self.environment = config.get_environment_name(environment)
 
-        self.transport = RequestsTransport(
-            self.BASE_USER_AGENT,
-            config.get_ssl_verify(),
+        self.transport = self.transport_class(
+            verify_ssl=config.get_ssl_verify(),
             http_timeout=config.get_http_timeout(http_timeout),
+            retry_policy=self.retry_policy,
         )
+        log.debug(f"initialized transport of type {type(self.transport)}")
 
-        self.authorizer = authorizer
+        if not self.service_name and not base_url:
+            raise ValueError("Either service_name or base_url must be set")
 
         self.base_url = utils.slash_join(
             config.get_service_url(self.environment, self.service_name)
@@ -90,6 +94,8 @@ class BaseClient:
             else base_url,
             self.base_path,
         )
+
+        self.authorizer = authorizer
 
         # set application name if given
         self._app_name = None
@@ -117,8 +123,7 @@ class BaseClient:
 
     @app_name.setter
     def app_name(self, value):
-        self._app_name = value
-        self.transport.user_agent = f"{self.BASE_USER_AGENT}/{value}"
+        self._app_name = self.transport.user_agent = value
 
     def qjoin_path(self, *parts: str) -> str:
         return "/" + "/".join(urllib.parse.quote(part) for part in parts)
@@ -127,13 +132,13 @@ class BaseClient:
         """
         Make a GET request to the specified path.
 
-        See :meth:`_request <._request>` for details on the various parameters.
+        See :py:meth:`~.BaseClient.request` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"GET to {path} with params {params}")
-        return self._request(
+        return self.request(
             "GET",
             path,
             params=params,
@@ -154,13 +159,13 @@ class BaseClient:
         """
         Make a POST request to the specified path.
 
-        See :meth:`_request <._request>` for details on the various parameters.
+        See :py:meth:`~.BaseClient.request` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"POST to {path} with params {params}")
-        return self._request(
+        return self.request(
             "POST",
             path,
             params=params,
@@ -174,13 +179,13 @@ class BaseClient:
         """
         Make a DELETE request to the specified path.
 
-        See :meth:`_request <._request>` for details on the various parameters.
+        See :py:meth:`~.BaseClient.request` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"DELETE to {path} with params {params}")
-        return self._request(
+        return self.request(
             "DELETE",
             path,
             params=params,
@@ -201,13 +206,13 @@ class BaseClient:
         """
         Make a PUT request to the specified path.
 
-        See :meth:`_request <._request>` for details on the various parameters.
+        See :py:meth:`~.BaseClient.request` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"PUT to {path} with params {params}")
-        return self._request(
+        return self.request(
             "PUT",
             path,
             params=params,
@@ -230,13 +235,13 @@ class BaseClient:
         """
         Make a PATCH request to the specified path.
 
-        See :meth:`_request <._request>` for details on the various parameters.
+        See :py:meth:`~.BaseClient.request` for details on the various parameters.
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"PATCH to {path} with params {params}")
-        return self._request(
+        return self.request(
             "PATCH",
             path,
             params=params,
@@ -246,7 +251,7 @@ class BaseClient:
             response_class=response_class,
         )
 
-    def _request(
+    def request(
         self,
         method,
         path,

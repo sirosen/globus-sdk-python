@@ -14,6 +14,7 @@ from globus_sdk.transport.retry import (
     RetryPolicy,
     get_default_retry_policy,
 )
+from globus_sdk.version import __version__
 
 
 class RequestsTransport:
@@ -26,18 +27,27 @@ class RequestsTransport:
         "form": FormRequestEncoder(),
     }
 
+    BASE_USER_AGENT = f"globus-sdk-py-{__version__}"
+
     def __init__(
         self,
-        user_agent: str,
-        verify_ssl=True,
-        http_timeout=60,
+        verify_ssl: typing.Optional[bool] = True,
+        http_timeout: typing.Optional[float] = 60,
         retry_policy: typing.Optional[RetryPolicy] = None,
     ):
-        self._session = requests.Session()
-        self._verify_ssl = verify_ssl
-        self.user_agent = user_agent
+        self.session = requests.Session()
+        self.verify_ssl = verify_ssl
         self.http_timeout = http_timeout
         self.retry_policy = retry_policy if retry_policy else get_default_retry_policy()
+        self._user_agent = self.BASE_USER_AGENT
+
+    @property
+    def user_agent(self):
+        return self._user_agent
+
+    @user_agent.setter
+    def user_agent(self, value):
+        self._user_agent = f"{self.BASE_USER_AGENT}/{value}"
 
     @property
     def _headers(self):
@@ -112,8 +122,8 @@ class RequestsTransport:
 
             ctx = RetryContext(attempt, authorizer=authorizer, retry_state=retry_state)
             try:
-                resp = ctx.response = self._session.send(
-                    req.prepare(), timeout=self.http_timeout, verify=self._verify_ssl
+                resp = ctx.response = self.session.send(
+                    req.prepare(), timeout=self.http_timeout, verify=self.verify_ssl
                 )
             except requests.RequestException as err:
                 ctx.exception = err

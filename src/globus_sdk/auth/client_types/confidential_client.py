@@ -37,7 +37,6 @@ class ConfidentialAppAuthClient(AuthClient):
                 "Cannot give a ConfidentialAppAuthClient an authorizer"
             )
         super().__init__(
-            self,
             client_id=client_id,
             authorizer=BasicAuthorizer(client_id, client_secret),
             **kwargs,

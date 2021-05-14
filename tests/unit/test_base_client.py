@@ -7,6 +7,7 @@ import pytest
 
 import globus_sdk
 from globus_sdk.base import BaseClient
+from globus_sdk.transport import RetryPolicy
 from tests.common import get_last_request, register_api_route
 
 
@@ -17,9 +18,14 @@ def auth_client():
 
 @pytest.fixture
 def base_client():
+    class NoRetryPolicy(RetryPolicy):
+        def compute_delay(self, context, delay):
+            return 0
+
     class CustomClient(BaseClient):
         base_path = "/v0.10/"
         service_name = "transfer"
+        retry_policy = NoRetryPolicy(checkers=[])
 
     return CustomClient()
 
@@ -44,21 +50,21 @@ def test_set_http_timeout(base_client):
         os.environ.pop("GLOBUS_SDK_HTTP_TIMEOUT", None)
 
         client = FooClient()
-        assert client._http_timeout == 60.0
+        assert client.transport.http_timeout == 60.0
 
         client = FooClient(http_timeout=None)
-        assert client._http_timeout == 60.0
+        assert client.transport.http_timeout == 60.0
 
         client = FooClient(http_timeout=-1)
-        assert client._http_timeout is None
+        assert client.transport.http_timeout is None
 
         os.environ["GLOBUS_SDK_HTTP_TIMEOUT"] = "120"
         client = FooClient()
-        assert client._http_timeout == 120.0
+        assert client.transport.http_timeout == 120.0
 
         os.environ["GLOBUS_SDK_HTTP_TIMEOUT"] = "-1"
         client = FooClient()
-        assert client._http_timeout is None
+        assert client.transport.http_timeout is None
 
 
 def test_set_app_name(base_client):
@@ -69,8 +75,9 @@ def test_set_app_name(base_client):
     base_client.app_name = "SDK Test"
     # confirm results
     assert base_client.app_name == "SDK Test"
-    assert base_client.transport.user_agent == "{}/{}".format(
-        base_client.BASE_USER_AGENT, "SDK Test"
+    assert (
+        base_client.transport.user_agent
+        == f"{base_client.transport.BASE_USER_AGENT}/SDK Test"
     )
 
 

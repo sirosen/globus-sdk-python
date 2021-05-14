@@ -27,9 +27,7 @@ class SearchClient(BaseClient):
     """
     error_class = exc.SearchAPIError
     default_response_class = GlobusHTTPResponse
-
-    def __init__(self, authorizer=None, **kwargs):
-        BaseClient.__init__(self, "search", authorizer=authorizer, **kwargs)
+    service_name = "search"
 
     #
     # Index Management

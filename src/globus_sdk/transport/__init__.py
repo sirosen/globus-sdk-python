@@ -1,3 +1,4 @@
-from globus_sdk.transport.requests import RequestsTransport
+from .requests import RequestsTransport
+from .retry import RetryPolicy
 
-__all__ = ("RequestsTransport",)
+__all__ = ("RequestsTransport", "RetryPolicy")
