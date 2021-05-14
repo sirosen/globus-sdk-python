@@ -5,6 +5,7 @@ and parsing values.
 import logging
 import os
 import typing
+from distutils.util import strtobool
 
 log = logging.getLogger(__name__)
 
@@ -34,13 +35,7 @@ def _load_var(varname: str, default, explicit_value=None, cast=None):
 def _bool_cast(value: typing.Any, default) -> bool:
     if isinstance(value, bool):
         return value
-    value = value.lower()
-    if value in ("1", "yes", "true", "on"):
-        return True
-    elif value in ("0", "no", "false", "off"):
-        return False
-    log.error(f'Value "{value}" can\'t cast to bool')
-    raise ValueError(f"Invalid config bool: {value}")
+    return strtobool(value.lower())
 
 
 def _optfloat_cast(value: typing.Any, default) -> typing.Optional[float]:

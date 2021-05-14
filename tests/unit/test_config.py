@@ -35,9 +35,9 @@ def test_get_service_url():
 
 @pytest.mark.parametrize(
     "value, expected_result",
-    [(x, True) for x in [str(True), "1", "YES", "true", "True", "ON"]]
-    + [(x, False) for x in [str(False), "0", "NO", "false", "False", "OFF"]]
-    + [(x, ValueError) for x in ["invalid", "1.0", "0.0", "t", "f"]],  # type: ignore
+    [(x, True) for x in [str(True), "1", "YES", "true", "t", "True", "ON"]]
+    + [(x, False) for x in [str(False), "0", "NO", "false", "f", "False", "OFF"]]
+    + [(x, ValueError) for x in ["invalid", "1.0", "0.0"]],  # type: ignore
 )
 def test_get_ssl_verify(value, expected_result):
     """
