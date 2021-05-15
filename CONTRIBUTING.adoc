@@ -3,85 +3,51 @@ Contributing to the Globus SDK
 
 First off, thank you so much for taking the time to contribute! :+1:
 
-Reporting Bugs & Requesting Features
-------------------------------------
+Bugs & Feature Requests
+-----------------------
 
-  - Check if there's a matching
-      https://github.com/globus/globus-sdk-python/issues[issue]
-      before opening a new issue or pull request
-  - When possible, provide a code sample to reproduce bugs
+Should be reported as
+https://github.com/globus/globus-sdk-python/issues[GitHub Issues]
+
+For a good bug report:
+
+  - Check if there's a matching issue before opening a new issue
+  - Provide a code sample to reproduce bugs
 
 Linting & Testing
 -----------------
 
 Testing the SDK requires https://tox.readthedocs.io/en/latest/[tox].
 
-Once you have `tox` installed, you can run testing or linting on the repo
-with `tox` or `tox -e lint`. These are wrapped for convenience as `make test`
-and `make lint` as well.
+Run tests with
 
-All code must pass `make lint test`, which runs linting and tests.
+    tox
 
-Optional, but recommended linting setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+And linting with
+
+    tox -e lint
+
+Optional, but recommended, linting setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For the best development experience, we recommend setting up linting and
-autofixing integrations with your editor and git. These settings are optional,
-but strongly recommended.
+autofixing integrations with your editor and git.
 
-Install pre-commit hooks
-++++++++++++++++++++++++
-
-This automatically formats and lints your staged changes when you commit.
-
-You must install https://pre-commit.com/[pre-commit] in order to use these
-hooks. Once you have the tool, just run
+The Globus SDK uses  https://pre-commit.com/[`pre-commit`] to automatically run linters and fixers.
+Install `pre-commit` and then run
 
     $ pre-commit install
 
-NOTE: If you need to bypass pre-commit hooks, you can commit with `--no-verify`
+to setup the hooks.
 
-Integrate Linters & Fixers with your Editor
-+++++++++++++++++++++++++++++++++++++++++++
+The configured linters and fixers can be seen in `.pre-commit-config.yaml`.
 
-All code is autoformatted with https://github.com/ambv/black[black] and
-https://github.com/timothycrosley/isort[isort], and checked with
-https://flake8.pycqa.org/[flake8].
-
-Many editors, including vim, emacs, Atom, and VS Code have plugins or
-extensions that allow them to automatically run `black` and `isort` whenever a
-file is saved, and show errors flagged by `flake8` in a separate pane, buffer,
-or sidebar.
-
-Configuring such editor integrations will save you time and energy, as your
-work will usually pass linting before you even run `make lint` or commit your
-changes.
-
-Expectations for Pull Requests
-------------------------------
-
-  - *Make sure it merges cleanly*. We may request that you rebase if your PR
-      has merge conflicts.
-  - *List any issues closed by the pull request*
-  - *Squash intermediate and fixup commits*. We recommend running
-    `git rebase --interactive` prior to submitting a pull request.
-  - Add new work to the "Unreleased" section of the changelog
-
-These are our guidelines for good commit messages:
-
-  - No lines over 72 characters
-  - No GitHub emoji -- use your words
-  - Reference issues and pull requests where appropriate
-  - Present tense and imperative mood
-
-Additional Recommendations
+Contributing Documentation
 --------------------------
 
-  - Try to use raw strings for docstrings -- ensures that ReST won't be
-      confused by characters like `\\`
-  - Use examples very liberally in documentation
-  - Show where you imported from within the SDK. Start at least one example with
-      `from globus_sdk.modulename import ClassName` on a page with docs for
-      `ClassName`
-  - Think very hard before adding a new dependency -- keep the dependencies of
-      `globus_sdk` as lightweight as possible
+Documentation for the SDK is built with https://www.sphinx-doc.org/[Sphinx] and
+docs are written as https://docutils.sourceforge.io/rst.html[reStructuredText]
+in the `docs/` directory.
+
+If you want to look at local documentation, run `tox -e docs` and the output
+will be in `docs/_build/dirhtml/`.
