@@ -1,6 +1,8 @@
 """
 Definition and loading of standard environment variables, plus a wrappers for loading
 and parsing values.
+
+This does not include service URL env vars (see environments.py for loading of those)
 """
 import logging
 import os

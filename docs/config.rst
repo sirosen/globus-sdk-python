@@ -32,4 +32,11 @@ verification turned on.
 
 ``GLOBUS_SDK_ENVIRONMENT``
     The name of the environment to use. Set ``GLOBUS_SDK_ENVIRONMENT="preview"``
-    to use the Globus Preview environment. (Primarily for internal use.)
+    to use the Globus Preview environment.
+
+``GLOBUS_SDK_SERVICE_URL_*``
+    Override the URL used for a given service. The suffix of this environment variable
+    must match the service name string used by the SDK in all caps (``SEARCH``,
+    ``TRANSFER``, etc). For example, set
+    ``GLOBUS_SDK_SERVICE_URL_TRANSFER="https://proxy-device.example.org/"`` to direct
+    the SDK to use a custom URL when contacting the Globus Transfer service.

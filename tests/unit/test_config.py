@@ -137,3 +137,25 @@ def test_service_url_overrides():
             MarsEnvConfig.get_service_url("search")
             == "https://search.api.mars.globus.org/"
         )
+
+
+def test_service_url_from_env_var():
+    with mock.patch.dict(os.environ):
+        os.environ["GLOBUS_SDK_SERVICE_URL_TRANSFER"] = "https://transfer.example.org/"
+        # environment setting gets ignored at this point -- only the override applies
+        assert (
+            globus_sdk.config.get_service_url("preview", "transfer")
+            == "https://transfer.example.org/"
+        )
+        assert (
+            globus_sdk.config.get_service_url("production", "transfer")
+            == "https://transfer.example.org/"
+        )
+        # also try with a made up service
+        os.environ[
+            "GLOBUS_SDK_SERVICE_URL_ION_CANNON"
+        ] = "https://ion-cannon.example.org/"
+        assert (
+            globus_sdk.config.get_service_url("production", "ion_cannon")
+            == "https://ion-cannon.example.org/"
+        )
