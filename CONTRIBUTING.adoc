@@ -51,3 +51,14 @@ in the `docs/` directory.
 
 If you want to look at local documentation, run `tox -e docs` and the output
 will be in `docs/_build/dirhtml/`.
+
+Code Guidelines
+---------------
+
+These are recommendations for contributors:
+
+  - Include tests for any new or changed functionality
+  - Use type annotations liberally
+  - If a docstring contains special characters like `\\`, consider using a raw
+    string to ensure it renders correctly
+  - New features should be documented via Sphinx
