@@ -7,10 +7,10 @@ from globus_sdk.transport import RetryPolicy
 @pytest.fixture
 def no_retry_policy():
     class NoRetryPolicy(RetryPolicy):
-        def compute_delay(self, context, delay):
-            return 0
+        def register_default_checks(self):
+            pass
 
-    return NoRetryPolicy(checkers=[])
+    return NoRetryPolicy()
 
 
 @pytest.fixture(autouse=True)

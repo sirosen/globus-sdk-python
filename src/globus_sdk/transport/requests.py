@@ -9,11 +9,7 @@ from globus_sdk.transport.encoders import (
     JSONRequestEncoder,
     RequestEncoder,
 )
-from globus_sdk.transport.retry import (
-    RetryContext,
-    RetryPolicy,
-    get_default_retry_policy,
-)
+from globus_sdk.transport.retry import RetryContext, RetryPolicy
 from globus_sdk.version import __version__
 
 
@@ -38,7 +34,7 @@ class RequestsTransport:
         self.session = requests.Session()
         self.verify_ssl = verify_ssl
         self.http_timeout = http_timeout
-        self.retry_policy = retry_policy if retry_policy else get_default_retry_policy()
+        self.retry_policy = retry_policy if retry_policy else RetryPolicy()
         self._user_agent = self.BASE_USER_AGENT
 
     @property
