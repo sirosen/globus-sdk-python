@@ -22,26 +22,26 @@ setup(
         # the dev extra is for SDK developers only
         "dev": [
             # drive testing with tox
-            "tox>=3.5.3,<4.0",
+            "tox<4",
             # linting
-            "flake8>=3.0,<4.0",
-            "isort>=5.6.4,<6.0",
-            "black==20.8b1",
-            "flake8-bugbear==20.11.1",
-            "mypy==0.800",
+            "flake8<4",
+            "isort<6",
+            "black==21.5b1",
+            "flake8-bugbear==21.4.3",
+            "mypy==0.812",
             # testing
-            "pytest<5.0",
-            "pytest-cov<3.0",
-            "pytest-xdist<2.0",
+            "pytest<7",
+            "pytest-cov<3",
+            "pytest-xdist<3",
             # mocking HTTP responses
-            "responses==0.12.1",
+            "responses==0.13.3",
             # pyinstaller is needed in order to test the pyinstaller hook
             "pyinstaller",
             # builds + uploads to pypi
-            "twine>=3,<4",
+            "twine<4",
             "wheel==0.36.2",
             # docs
-            "sphinx==3.4.3",
+            "sphinx<5",
             "sphinx-material==0.0.32",
         ]
     },
