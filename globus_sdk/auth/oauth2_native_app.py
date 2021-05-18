@@ -34,7 +34,7 @@ def make_native_app_challenge(verifier=None):
     if verifier:
         if not 43 <= len(verifier) <= 128:
             raise GlobusSDKUsageError(
-                "verifier must be 43-128 characters long: {}".format(len(verifier))
+                f"verifier must be 43-128 characters long: {len(verifier)}"
             )
         if bool(re.search(r"[^a-zA-Z0-9~_.-]", verifier)):
             raise GlobusSDKUsageError("verifier contained invalid characters")

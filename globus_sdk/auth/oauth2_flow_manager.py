@@ -30,7 +30,7 @@ class GlobusOAuthFlowManager:
         :rtype: ``string``
         """
         raise NotImplementedError(
-            "{} does not implement get_authorize_url()".format(type(self))
+            f"{type(self)} does not implement get_authorize_url()"
         )
 
     def exchange_code_for_tokens(self, auth_code):
@@ -50,5 +50,5 @@ class GlobusOAuthFlowManager:
         :rtype: :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         """
         raise NotImplementedError(
-            "{} does not implement exchange_code_for_tokens()".format(type(self))
+            f"{type(self)} does not implement exchange_code_for_tokens()"
         )

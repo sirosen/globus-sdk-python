@@ -55,7 +55,7 @@ def test_client_log_adapter(base_client):
     base_client.logger.info(in_msg)
     # confirm results
     out_msg = memory_handler.buffer[0].getMessage()
-    expected_msg = "[instance:{}] {}".format(id(base_client), in_msg)
+    expected_msg = f"[instance:{id(base_client)}] {in_msg}"
     assert expected_msg == out_msg
 
     memory_handler.close()
