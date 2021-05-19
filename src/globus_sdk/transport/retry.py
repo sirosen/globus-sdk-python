@@ -1,3 +1,4 @@
+import random
 import time
 import typing
 
@@ -43,9 +44,11 @@ def _parse_retry_after(response: requests.Response) -> typing.Optional[int]:
 
 
 def _exponential_backoff(ctx: RetryContext) -> float:
+    # respect any explicit backoff set on the context
     if ctx.backoff is not None:
         return ctx.backoff
-    return typing.cast(float, 0.5 * (2 ** ctx.attempt))
+    # expontential backoff with jitter
+    return typing.cast(float, (0.25 + 0.5 * random.random()) * (2 ** ctx.attempt))
 
 
 # type var useful for declaring RetryPolicy
