@@ -32,6 +32,7 @@ def shared_libraries_are_available():
     not shared_libraries_are_available(),
     reason="requires that python was built with --enable-shared",
 )
+@pytest.mark.filterwarnings("ignore:The 'warn' method is deprecated")
 def test_pyinstaller_hook(tmp_path):
     appfile = tmp_path / "sample.py"
     appfile.write_text(
