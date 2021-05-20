@@ -47,13 +47,10 @@ class TransferClient(BaseClient):
 
     .. automethodlist:: globus_sdk.TransferClient
     """
+    service_name = "transfer"
+    base_path = "/v0.10/"
     error_class = exc.TransferAPIError
     default_response_class = TransferResponse
-
-    def __init__(self, authorizer=None, **kwargs):
-        BaseClient.__init__(
-            self, "transfer", base_path="/v0.10/", authorizer=authorizer, **kwargs
-        )
 
     # Convenience methods, providing more pythonic access to common REST
     # resources

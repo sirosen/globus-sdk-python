@@ -30,9 +30,7 @@ class NativeAppAuthClient(AuthClient):
             logger.error("ArgumentError(NativeAppClient.authorizer)")
             raise GlobusSDKUsageError("Cannot give a NativeAppAuthClient an authorizer")
 
-        AuthClient.__init__(
-            self, client_id=client_id, authorizer=NullAuthorizer(), **kwargs
-        )
+        super().__init__(client_id=client_id, authorizer=NullAuthorizer(), **kwargs)
         self.logger.info(f"Finished initializing client, client_id={client_id}")
 
     def oauth2_start_flow(

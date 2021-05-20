@@ -10,7 +10,7 @@ class GlobusAuthorizer(metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def set_authorization_header(header_dict):
+    def set_authorization_header(self, header_dict):
         """
         Takes a dict of headers, and adds to it a mapping of
         ``{"Authorization": "..."}`` per this object's type of Authorization.
