@@ -55,10 +55,8 @@ class BaseClient:
 
     All other parameters are for internal use and should be ignored.
     """
-
     # service name is used to lookup a service URL from config
-    # it's not necessary to set this if you always explicitly pass a base_url
-    service_name: typing.Optional[str] = None
+    service_name: str = "_base"
     # path under the client base URL
     base_path: str = "/"
 
@@ -78,12 +76,22 @@ class BaseClient:
         *args,
         **kwargs,
     ):
-        self._init_logger_adapter()
-        if self.service_name:
-            self.logger.info(
-                f"Creating client of type {type(self)} for "
-                f'service "{self.service_name}"'
+        # explicitly check the `service_name` to ensure that it was set
+        #
+        # unfortunately, we can't rely on declaring BaseClient as an ABC because it
+        # doesn't have any abstract methods
+        #
+        # if we declarse `service_name` without a value, we get AttributeError on access
+        # instead of the (desired) TypeError when instantiating a BaseClient because
+        # it's abstract
+        if self.service_name == "_base":
+            raise NotImplementedError(
+                "Cannot instantiate clients which do not set a 'service_name'"
             )
+        self._init_logger_adapter()
+        self.logger.info(
+            f'Creating client of type {type(self)} for service "{self.service_name}"'
+        )
 
         # if an environment was passed, it will be used, but otherwise lookup
         # the env var -- and in the special case of `production` translate to
@@ -92,9 +100,6 @@ class BaseClient:
         self.environment = config.get_globus_environ(inputenv=environment)
 
         self.authorizer = authorizer
-
-        if not self.service_name and not base_url:
-            raise ValueError("Either service_name or base_url must be set")
 
         self.base_url = slash_join(
             config.get_service_url(self.environment, self.service_name)

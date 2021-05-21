@@ -35,6 +35,12 @@ class testObject:
         return "1"
 
 
+def test_cannot_instantiate_plain_base_client():
+    # attempting to instantiate a BaseClient errors
+    with pytest.raises(NotImplementedError):
+        BaseClient()
+
+
 def test_client_log_adapter(base_client):
     """
     Logs a test message with the base client's logger,
