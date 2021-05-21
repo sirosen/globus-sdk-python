@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from globus_sdk import client, response, utils
+from globus_sdk import client, paging, response, utils
 
 from .errors import SearchAPIError
 
@@ -27,6 +27,20 @@ class SearchClient(client.BaseClient):
     """
     error_class = SearchAPIError
     service_name = "search"
+
+    def __init__(self, authorizer=None, **kwargs):
+        super().__init__("search", authorizer=authorizer, **kwargs)
+        self.paginated = paging.PaginatorCollection(
+            {
+                paging.HasNextPaginator: {
+                    self.search: {
+                        "get_page_size": lambda x: x["count"],
+                        "max_total_results": 10000,
+                        "page_size": 100,
+                    }
+                }
+            }
+        )
 
     #
     # Index Management
