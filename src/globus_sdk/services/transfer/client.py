@@ -61,55 +61,50 @@ class TransferClient(client.BaseClient):
     base_path = "/v0.10/"
     error_class = TransferAPIError
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        self.paginated = paging.PaginatorCollection(
-            {
-                paging.HasNextPaginator: [
-                    (
-                        self.endpoint_search,
-                        {
-                            "get_page_size": _get_page_size,
-                            "max_total_results": 1000,
-                            "page_size": 100,
-                        },
-                    )
-                ],
-                paging.LimitOffsetTotalPaginator: [
-                    (
-                        self.task_list,
-                        {
-                            "get_page_size": _get_page_size,
-                            "max_results_per_call": 1000,
-                            "page_size": 1000,
-                        },
-                    ),
-                    (
-                        self.task_event_list,
-                        {
-                            "get_page_size": _get_page_size,
-                            "max_results_per_call": 1000,
-                            "page_size": 1000,
-                        },
-                    ),
-                    (
-                        self.endpoint_manager_task_event_list,
-                        {
-                            "get_page_size": _get_page_size,
-                            "max_results_per_call": 1000,
-                            "page_size": 1000,
-                        },
-                    ),
-                ],
-                paging.LastKeyPaginator: [(self.endpoint_manager_task_list, {})],
-                paging.MarkerPaginator: [
-                    (self.task_successful_transfers, {}),
-                    (self.task_skipped_errors, {}),
-                    (self.endpoint_manager_task_successful_transfers, {}),
-                ],
-            }
-        )
+    paging_spec = {
+        paging.HasNextPaginator: [
+            (
+                "endpoint_search",
+                {
+                    "get_page_size": _get_page_size,
+                    "max_total_results": 1000,
+                    "page_size": 100,
+                },
+            )
+        ],
+        paging.LimitOffsetTotalPaginator: [
+            (
+                "task_list",
+                {
+                    "get_page_size": _get_page_size,
+                    "max_results_per_call": 1000,
+                    "page_size": 1000,
+                },
+            ),
+            (
+                "task_event_list",
+                {
+                    "get_page_size": _get_page_size,
+                    "max_results_per_call": 1000,
+                    "page_size": 1000,
+                },
+            ),
+            (
+                "endpoint_manager_task_event_list",
+                {
+                    "get_page_size": _get_page_size,
+                    "max_results_per_call": 1000,
+                    "page_size": 1000,
+                },
+            ),
+        ],
+        paging.LastKeyPaginator: ["endpoint_manager_task_list"],
+        paging.MarkerPaginator: [
+            "task_successful_transfers",
+            "task_skipped_errors",
+            "endpoint_manager_task_successful_transfers",
+        ],
+    }
 
     # Convenience methods, providing more pythonic access to common REST
     # resources

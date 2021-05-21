@@ -3,18 +3,26 @@ import typing
 from .base import Paginator
 
 # a Paginated Method Spec is a dict which maps paginator classes to
-# callables paired with dicts of parameters for the paginator
+# method names paired with dicts of parameters for the paginator
+#
+# the parameter dict may also be omitted
 #
 # e.g.
 #    {
 #      MarkerPaginator: [
-#        (<some_method_which_can_use_marker_pagination>, {}),
-#        (<other_method_which_can_use_marker_pagination>, {"setting1": True}),
+#        ("foo", {}),
+#        ("bar", {"setting1": True}),
+#        "baz",
 #      ]
 #    }
 PaginatedMethodSpec = typing.Dict[
     typing.Type[Paginator],
-    typing.List[typing.Tuple[typing.Callable, typing.Dict[str, typing.Any]]],
+    typing.List[
+        typing.Union[
+            str,
+            typing.Tuple[typing.Union[str], typing.Dict[str, typing.Any]],
+        ]
+    ],
 ]
 
 
@@ -26,7 +34,7 @@ class PaginatorCollection:
 
     So
 
-    >>> pc = PaginatorCollection({Markerpaginator: [(client.foo, {})])  # build it
+    >>> pc = PaginatorCollection(client_object, {MarkerPaginator: ["foo"]})
     >>> paginator = pc.foo()  # returns a paginator
     >>> for page in paginator:  # a paginator is an iterable of pages (response objects)
     >>>     print(json.dumps(page.data))  # you can handle each response object in turn
@@ -35,20 +43,30 @@ class PaginatorCollection:
 
     That is, if `client` has two methods `foo` and `bar` which we want paginated,
 
-    >>> client.paginated = PaginatorCollection(client.foo, client.bar)
+    >>> client.paginated = PaginatorCollection(
+    >>>     client, {MarkerPaginator: ["foo", "bar"]}
+    >>> )
 
     and that will let us call
 
     >>> client.paginated.foo()
     >>> client.paginated.bar()
+
+    This is done automatically as part of client instantiation, and is never meant to be
+    run manually.
     """
 
-    def __init__(self, spec: PaginatedMethodSpec):
+    def __init__(self, has_methods: typing.Any, spec: PaginatedMethodSpec):
         self._paginator_map: typing.Dict[str, typing.Callable] = {}
 
         for paginator_class, methodlist in spec.items():
-            for bound_method, paginator_args in methodlist:
-                self._add_binding(paginator_class, paginator_args, bound_method)
+            for bindinginfo in methodlist:
+                if isinstance(bindinginfo, tuple):
+                    method, paginator_args = bindinginfo
+                else:
+                    method, paginator_args = bindinginfo, {}
+
+                self._add_binding(has_methods, paginator_class, paginator_args, method)
 
     # This needs to be a separate callable to work correctly as a closure over loop
     # variables
@@ -56,8 +74,8 @@ class PaginatorCollection:
     # If you try to dynamically define functions in __init__ without wrapping them like
     # this, then you run into trouble with the fact that the resulting functions will
     # point at <locals> which aren't resolved until call time
-    def _add_binding(self, paginator_class, paginator_args, bound_method):
-        methodname = bound_method.__name__
+    def _add_binding(self, has_methods, paginator_class, paginator_args, methodname):
+        bound_method = getattr(has_methods, methodname)
 
         def paginated_method(*args, **kwargs):
             return paginator_class(
