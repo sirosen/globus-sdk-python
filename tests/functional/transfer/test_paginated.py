@@ -50,7 +50,7 @@ MULTIPAGE_SEARCH_RESULTS = [
         "DATA": [
             {
                 "DATA_TYPE": "endpoint",
-                "display_name": "SDK Test Stub {}".format(x + 100),
+                "display_name": f"SDK Test Stub {x + 100}",
             }
             for x in range(100)
         ],
@@ -63,7 +63,7 @@ MULTIPAGE_SEARCH_RESULTS = [
         "DATA": [
             {
                 "DATA_TYPE": "endpoint",
-                "display_name": "SDK Test Stub {}".format(x + 200),
+                "display_name": f"SDK Test Stub {x + 200}",
             }
             for x in range(100)
         ],

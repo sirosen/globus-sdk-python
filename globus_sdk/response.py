@@ -44,7 +44,7 @@ class GlobusResponse:
         try:
             return data[key]
         except TypeError:
-            logger.error("Can't index into responses of type {}".format(type(self)))
+            logger.error(f"Can't index into responses of type {type(self)}")
             # re-raise with an altered message -- the issue is that whatever
             # type of GlobusResponse you're working with doesn't support
             # indexing
