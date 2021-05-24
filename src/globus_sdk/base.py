@@ -25,10 +25,8 @@ class BaseClient:
         semantics of client actions. It is just passed as part of the User-Agent
         string, and may be useful when debugging issues with the Globus Team
     :type app_name: str
-    :param http_timeout: Number of seconds to wait on HTTP connections. Default is 60.
-        A value of ``-1`` indicates that no timeout should be used (requests can hang
-        indefinitely).
-    :type http_timeout: float
+    :param transport_params: Options to pass to the transport for this client
+    :type transport_params: dict
 
     All other parameters are for internal use and should be ignored.
     """
@@ -52,9 +50,7 @@ class BaseClient:
         base_url=None,
         authorizer=None,
         app_name=None,
-        http_timeout: typing.Optional[float] = None,
-        *args,
-        **kwargs,
+        transport_params: typing.Optional[typing.Dict] = None,
     ):
         # explicitly check the `service_name` to ensure that it was set
         #
@@ -79,9 +75,7 @@ class BaseClient:
         self.environment = config.get_environment_name(environment)
 
         self.transport = self.transport_class(
-            verify_ssl=config.get_ssl_verify(),
-            http_timeout=config.get_http_timeout(http_timeout),
-            retry_policy=self.retry_policy,
+            retry_policy=self.retry_policy, **(transport_params or {})
         )
         log.debug(f"initialized transport of type {type(self.transport)}")
 

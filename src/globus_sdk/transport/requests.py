@@ -2,7 +2,7 @@ import typing
 
 import requests
 
-from globus_sdk import exc
+from globus_sdk import config, exc
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.transport.encoders import (
     FormRequestEncoder,
@@ -27,13 +27,13 @@ class RequestsTransport:
 
     def __init__(
         self,
-        verify_ssl: typing.Optional[bool] = True,
-        http_timeout: typing.Optional[float] = 60,
+        verify_ssl: typing.Optional[bool] = None,
+        http_timeout: typing.Optional[float] = None,
         retry_policy: typing.Optional[RetryPolicy] = None,
     ):
         self.session = requests.Session()
-        self.verify_ssl = verify_ssl
-        self.http_timeout = http_timeout
+        self.verify_ssl = config.get_ssl_verify(verify_ssl)
+        self.http_timeout = config.get_http_timeout(http_timeout)
         self.retry_policy = retry_policy if retry_policy else RetryPolicy()
         self._user_agent = self.BASE_USER_AGENT
 

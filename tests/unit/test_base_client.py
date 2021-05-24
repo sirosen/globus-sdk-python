@@ -47,10 +47,10 @@ def test_set_http_timeout(base_client):
         client = FooClient()
         assert client.transport.http_timeout == 60.0
 
-        client = FooClient(http_timeout=None)
+        client = FooClient(transport_params={"http_timeout": None})
         assert client.transport.http_timeout == 60.0
 
-        client = FooClient(http_timeout=-1)
+        client = FooClient(transport_params={"http_timeout": -1})
         assert client.transport.http_timeout is None
 
         os.environ["GLOBUS_SDK_HTTP_TIMEOUT"] = "120"
