@@ -37,8 +37,7 @@ class ConfidentialAppAuthClient(AuthClient):
             raise GlobusSDKUsageError(
                 "Cannot give a ConfidentialAppAuthClient an authorizer"
             )
-
-        AuthClient.__init__(
+        super().__init__(
             self,
             client_id=client_id,
             authorizer=BasicAuthorizer(client_id, client_secret),

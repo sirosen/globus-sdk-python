@@ -55,6 +55,10 @@ class BaseClient:
 
     All other parameters are for internal use and should be ignored.
     """
+    # service name is used to lookup a service URL from config
+    service_name: str = "_base"
+    # path under the client base URL
+    base_path: str = "/"
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class: typing.Type[exc.GlobusAPIError] = exc.GlobusAPIError
@@ -64,19 +68,29 @@ class BaseClient:
 
     def __init__(
         self,
-        service,
         environment=None,
         base_url=None,
-        base_path=None,
         authorizer=None,
         app_name=None,
         http_timeout=None,
         *args,
         **kwargs,
     ):
+        # explicitly check the `service_name` to ensure that it was set
+        #
+        # unfortunately, we can't rely on declaring BaseClient as an ABC because it
+        # doesn't have any abstract methods
+        #
+        # if we declarse `service_name` without a value, we get AttributeError on access
+        # instead of the (desired) TypeError when instantiating a BaseClient because
+        # it's abstract
+        if self.service_name == "_base":
+            raise NotImplementedError(
+                "Cannot instantiate clients which do not set a 'service_name'"
+            )
         self._init_logger_adapter()
         self.logger.info(
-            'Creating client of type {} for service "{}"'.format(type(self), service)
+            f'Creating client of type {type(self)} for service "{self.service_name}"'
         )
 
         # if an environment was passed, it will be used, but otherwise lookup
@@ -87,11 +101,12 @@ class BaseClient:
 
         self.authorizer = authorizer
 
-        if base_url is None:
-            self.base_url = config.get_service_url(self.environment, service)
-        else:
-            self.base_url = base_url
-        self.base_url = slash_join(self.base_url, base_path)
+        self.base_url = slash_join(
+            config.get_service_url(self.environment, self.service_name)
+            if base_url is None
+            else base_url,
+            self.base_path,
+        )
 
         # setup the basics for wrapping a Requests Session
         # including basics for internal header dict
@@ -115,9 +130,9 @@ class BaseClient:
             self._http_timeout = None
 
         # set application name if given
-        self.app_name = None
+        self._app_name = None
         if app_name is not None:
-            self.set_app_name(app_name)
+            self.app_name = app_name
 
     def _init_logger_adapter(self):
         """
@@ -156,7 +171,12 @@ class BaseClient:
         self.__dict__.update(d)
         self.logger.info("__setstate__() finished; client unpickled")
 
-    def set_app_name(self, app_name):
+    @property
+    def app_name(self):
+        return self._app_name
+
+    @app_name.setter
+    def app_name(self, value):
         """
         Set an application name to send to Globus services as part of the User
         Agent.
@@ -165,8 +185,8 @@ class BaseClient:
         to the Globus Team, and to potentially speed resolution of issues when
         interacting with Globus Support.
         """
-        self.app_name = app_name
-        self._headers["User-Agent"] = f"{self.BASE_USER_AGENT}/{app_name}"
+        self._app_name = value
+        self._headers["User-Agent"] = f"{self.BASE_USER_AGENT}/{value}"
 
     def qjoin_path(self, *parts):
         return "/" + "/".join(urllib.parse.quote(part) for part in parts)

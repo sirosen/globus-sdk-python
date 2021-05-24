@@ -16,7 +16,11 @@ def auth_client():
 
 @pytest.fixture
 def base_client():
-    return BaseClient("transfer", base_path="/v0.10/")
+    class CustomClient(BaseClient):
+        base_path = "/v0.10/"
+        service_name = "transfer"
+
+    return CustomClient()
 
 
 # not particularly special, just a handy array of codes which should raise
@@ -29,6 +33,12 @@ class testObject:
 
     def __str__(self):
         return "1"
+
+
+def test_cannot_instantiate_plain_base_client():
+    # attempting to instantiate a BaseClient errors
+    with pytest.raises(NotImplementedError):
+        BaseClient()
 
 
 def test_client_log_adapter(base_client):
@@ -56,12 +66,11 @@ def test_set_app_name(base_client):
     Sets app name, confirms results
     """
     # set app name
-    app_name = "SDK Test"
-    base_client.set_app_name(app_name)
+    base_client.app_name = "SDK Test"
     # confirm results
-    assert base_client.app_name == app_name
+    assert base_client.app_name == "SDK Test"
     assert base_client._headers["User-Agent"] == "{}/{}".format(
-        base_client.BASE_USER_AGENT, app_name
+        base_client.BASE_USER_AGENT, "SDK Test"
     )
 
 

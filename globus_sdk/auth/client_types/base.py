@@ -45,17 +45,16 @@ class AuthClient(BaseClient):
     .. automethodlist:: globus_sdk.AuthClient
     """
 
+    service_name = "auth"
     error_class = exc.AuthAPIError
 
-    def __init__(self, client_id=None, authorizer=None, **kwargs):
+    def __init__(self, client_id=None, **kwargs):
+        super().__init__(**kwargs)
         self.client_id = client_id
-
         # an AuthClient may contain a GlobusOAuth2FlowManager in order to
         # encapsulate the functionality of various different types of flow
         # managers
         self.current_oauth2_flow_manager = None
-
-        BaseClient.__init__(self, "auth", authorizer=authorizer, **kwargs)
 
     def get_identities(self, usernames=None, ids=None, provision=False, **params):
         r"""
