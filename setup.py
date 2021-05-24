@@ -17,7 +17,7 @@ setup(
     url="https://github.com/globus/globus-sdk-python",
     packages=find_packages(exclude=["tests", "tests.*"]),
     python_requires=">=3.6",
-    install_requires=["requests>=2.9.2,<3.0.0", "pyjwt[crypto]>=1.5.3,<2.0.0"],
+    install_requires=["requests>=2.9.2,<3.0.0", "pyjwt[crypto]>=2.0.0,<3.0.0"],
     extras_require={
         # the dev extra is for SDK developers only
         "dev": [

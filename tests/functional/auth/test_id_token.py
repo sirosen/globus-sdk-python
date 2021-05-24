@@ -105,24 +105,28 @@ def test_decode_id_token(token_response):
     )
     register_api_route("auth", "/jwk.json", method="GET", body=json.dumps(JWK))
 
-    decoded = token_response.decode_id_token()
+    decoded = token_response.decode_id_token(jwt_params={"verify_exp": False})
     assert decoded["preferred_username"] == "sirosen2@globusid.org"
 
 
 def test_decode_id_token_with_saved_oidc_config(token_response):
     register_api_route("auth", "/jwk.json", method="GET", body=json.dumps(JWK))
 
-    decoded = token_response.decode_id_token(openid_configuration=OIDC_CONFIG)
+    decoded = token_response.decode_id_token(
+        openid_configuration=OIDC_CONFIG, jwt_params={"verify_exp": False}
+    )
     assert decoded["preferred_username"] == "sirosen2@globusid.org"
 
 
 def test_decode_id_token_with_saved_oidc_config_and_jwk(token_response):
     decoded = token_response.decode_id_token(
-        openid_configuration=OIDC_CONFIG, jwk=JWK_PEM
+        openid_configuration=OIDC_CONFIG,
+        jwk=JWK_PEM,
+        jwt_params={"verify_exp": False},
     )
     assert decoded["preferred_username"] == "sirosen2@globusid.org"
 
 
 def test_invalid_decode_id_token_usage(token_response):
     with pytest.raises(globus_sdk.exc.GlobusSDKUsageError):
-        token_response.decode_id_token(jwk=JWK_PEM)
+        token_response.decode_id_token(jwk=JWK_PEM, jwt_params={"verify_exp": False})

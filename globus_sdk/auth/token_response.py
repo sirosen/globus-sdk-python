@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+import typing
 
 import jwt
 
@@ -162,7 +163,13 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         """
         return self._by_scopes
 
-    def decode_id_token(self, openid_configuration=None, jwk=None):
+    def decode_id_token(
+        self,
+        openid_configuration=None,
+        jwk=None,
+        jwt_params: typing.Optional[typing.Dict] = None,
+    ):
+
         """
         Parse the included ID Token (OIDC) as a dict and return it.
 
@@ -174,9 +181,14 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         :param jwk: The JWK as a cryptography public key object. When not provided, it
             will be fetched and parsed automatically.
         :type jwk: RSAPublicKey
+        :param jwt_params: An optional dict of parameters to pass to the jwt decode
+            step. These are passed verbatim to the jwt library.
+        :type jwt_params: dict
         """
         logger.info('Decoding ID Token "%s"', self["id_token"])
         auth_client = self._client
+
+        jwt_params = jwt_params or {}
 
         if not openid_configuration:
             if jwk:
@@ -199,6 +211,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
             jwk,
             algorithms=signing_algos,
             audience=auth_client.client_id,
+            options=jwt_params,
         )
         logger.debug("decode ID token finished successfully")
         return decoded
