@@ -14,6 +14,18 @@
     :alt: License
     :target: https://opensource.org/licenses/Apache-2.0
 
+..
+    This is the badge style used by the isort repo itself, so we'll use their
+    preferred colors
+
+.. image:: https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336
+    :alt: Import Style
+    :target: https://pycqa.github.io/isort/
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :alt: Code Style
+    :target: https://github.com/psf/black
+
 
 Globus SDK for Python
 =====================
