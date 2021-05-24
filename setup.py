@@ -35,8 +35,6 @@ setup(
             "pytest-xdist<3",
             # mocking HTTP responses
             "responses==0.13.3",
-            # pyinstaller is needed in order to test the pyinstaller hook
-            "pyinstaller",
             # builds + uploads to pypi
             "twine<4",
             "wheel==0.36.2",
@@ -44,9 +42,6 @@ setup(
             "sphinx<5",
             "sphinx-material==0.0.32",
         ]
-    },
-    entry_points={
-        "pyinstaller40": ["hook-dirs = globus_sdk._pyinstaller:get_hook_dirs"]
     },
     include_package_data=True,
     keywords=["globus", "file transfer"],
