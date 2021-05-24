@@ -32,3 +32,5 @@ def test_import_str(importstring):
     )
     status = proc.wait()
     assert status == 0, str(proc.communicate())
+    proc.stdout.close()
+    proc.stderr.close()
