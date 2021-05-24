@@ -49,7 +49,7 @@ class BaseClient:
         string, and may be useful when debugging issues with the Globus Team
     :type app_name: str
     :param http_timeout: Number of seconds to wait on HTTP connections. Default is 60.
-        A value of -1 indicates that no timeout should be used (requests can hang
+        A value of ``-1`` indicates that no timeout should be used (requests can hang
         indefinitely).
     :type http_timeout: float
 
@@ -72,7 +72,7 @@ class BaseClient:
         base_url=None,
         authorizer=None,
         app_name=None,
-        http_timeout=None,
+        http_timeout: typing.Optional[float] = None,
         *args,
         **kwargs,
     ):
@@ -97,7 +97,7 @@ class BaseClient:
         # the env var -- and in the special case of `production` translate to
         # `default`, regardless of the source of that value
         # logs the environment when it isn't `default`
-        self.environment = config.get_globus_environ(inputenv=environment)
+        self.environment = config.get_environment_name(environment)
 
         self.authorizer = authorizer
 
@@ -117,17 +117,9 @@ class BaseClient:
         }
 
         # verify SSL? Usually true
-        self._verify = config.get_ssl_verify(self.environment)
+        self._verify_ssl = config.get_ssl_verify()
         # HTTP connection timeout
-        # this is passed verbatim to `requests`, and we therefore technically
-        # support a tuple for connect/read timeouts, but we don't need to
-        # advertise that... Just declare it as an float value
-        if http_timeout is None:
-            http_timeout = config.get_http_timeout(self.environment)
-        self._http_timeout = http_timeout
-        # handle -1 by passing None to requests
-        if self._http_timeout == -1:
-            self._http_timeout = None
+        self._http_timeout = config.get_http_timeout(http_timeout)
 
         # set application name if given
         self._app_name = None
@@ -468,7 +460,7 @@ class BaseClient:
                     headers=rheaders,
                     params=params,
                     data=text_body,
-                    verify=self._verify,
+                    verify=self._verify_ssl,
                     timeout=self._http_timeout,
                 )
             except requests.RequestException as e:

@@ -1,49 +1,42 @@
 Globus SDK Configuration
 ========================
 
-There are three standard, canonical locations from which the Globus SDK will
-attempt to load configuration.
+The behaviors of the SDK can be controlled either through environment variables,
+or by passing parameters to clients and other objects.
 
-There are two config file locations:
+.. note::
 
-.. code-block:: shell
-
-    /etc/globus.cfg # system config, shared by all users
-    ~/.globus.cfg # personal config, specific to your user
-
-additionally, the shell environment variables loaded into Python's `os.environ`
-will be searched for configuration.
-
-The precedence rules are very simply
-
-#. Environment
-#. ``~/.globus.cfg``
-#. ``/etc/globus.cfg``
-
-Config Format
--------------
-
-Config files are INI formatted, so they take the general form
-
-.. code-block:: ini
-
-    [SectionName]
-    key1 = value1
-    key2 = value2
-
-
-At present, there are no configuration parameters which you should set in
-config files.
-
-The Globus CLI uses the ``[cli]`` section to store configuration information.
-
+    SDK v1.x and v2.x supported the use of `/etc/globus.cfg` and
+    `~/.globus.cfg` to set certain values. This feature was removed in v3.0 in
+    favor of new environment variables for setting these values.
 
 Environment Variables
 ---------------------
 
-``GLOBUS_SDK_ENVIRONMENT`` is a shell variable that can be used to point the
-SDK to an alternate set of Globus Servers.
+Each of these environment variables will be read automatically by the SDK.
 
-For example, if you have an integration with Globus you may be asked to test
-against a preview of upcoming changes. To point the SDK at the Preview environment
-``GLOBUS_SDK_ENVIRONMENT=preview`` can be used.
+Environment variables have lower precedence than explicit values set in
+the interpreter. If ``GLOBUS_SDK_VERIFY_SSL="false"`` is set and a client is
+created with ``verify_ssl=True``, the resulting client will have SSL
+verification turned on.
+
+``GLOBUS_SDK_VERIFY_SSL``
+    Used to disable SSL verification, typically to handle SSL-intercepting
+    firewalls. By default, all connections to servers are verified. Set
+    ``GLOBUS_SDK_VERIFY_SSL="false"`` to disable verification.
+
+``GLOBUS_SDK_HTTP_TIMEOUT``
+    Adjust the timeout when HTTP requests are made. By default, requests have a
+    60 second read timeout -- for slower responses, try setting
+    ``GLOBUS_SDK_HTTP_TIMEOUT=120``
+
+``GLOBUS_SDK_ENVIRONMENT``
+    The name of the environment to use. Set ``GLOBUS_SDK_ENVIRONMENT="preview"``
+    to use the Globus Preview environment.
+
+``GLOBUS_SDK_SERVICE_URL_*``
+    Override the URL used for a given service. The suffix of this environment variable
+    must match the service name string used by the SDK in all caps (``SEARCH``,
+    ``TRANSFER``, etc). For example, set
+    ``GLOBUS_SDK_SERVICE_URL_TRANSFER="https://proxy-device.example.org/"`` to direct
+    the SDK to use a custom URL when contacting the Globus Transfer service.
