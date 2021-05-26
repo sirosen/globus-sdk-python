@@ -5,9 +5,9 @@ import os
 import re
 import urllib.parse
 
+from globus_sdk import utils
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_flow_manager import GlobusOAuthFlowManager
-from globus_sdk.base import slash_join
 from globus_sdk.exc import GlobusSDKUsageError
 
 logger = logging.getLogger(__name__)
@@ -129,7 +129,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         # default to `/v2/web/auth-code` on whatever environment we're looking
         # at -- most typically it will be `https://auth.globus.org/`
         self.redirect_uri = redirect_uri or (
-            slash_join(auth_client.base_url, "/v2/web/auth-code")
+            utils.slash_join(auth_client.base_url, "/v2/web/auth-code")
         )
 
         # make a challenge and secret to keep
@@ -168,7 +168,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         either to your provided ``redirect_uri`` or to the default location,
         with the ``auth_code`` embedded in a query parameter.
         """
-        authorize_base_url = slash_join(
+        authorize_base_url = utils.slash_join(
             self.auth_client.base_url, "/v2/oauth2/authorize"
         )
         logger.debug(f"Building authorization URI. Base URL: {authorize_base_url}")

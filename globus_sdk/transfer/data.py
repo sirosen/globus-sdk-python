@@ -7,7 +7,7 @@ conversion.
 
 import logging
 
-from globus_sdk.base import safe_stringify
+from globus_sdk import utils
 
 logger = logging.getLogger(__name__)
 
@@ -147,8 +147,8 @@ class TransferData(dict):
         recursive_symlinks="ignore",
         **kwargs,
     ):
-        source_endpoint = safe_stringify(source_endpoint)
-        destination_endpoint = safe_stringify(destination_endpoint)
+        source_endpoint = utils.safe_stringify(source_endpoint)
+        destination_endpoint = utils.safe_stringify(destination_endpoint)
         logger.info("Creating a new TransferData object")
         self["DATA_TYPE"] = "transfer"
         self["submission_id"] = (
@@ -247,8 +247,8 @@ class TransferData(dict):
             external_checksum is given.
         :type checksum_algorithm: str, optional
         """
-        source_path = safe_stringify(source_path)
-        destination_path = safe_stringify(destination_path)
+        source_path = utils.safe_stringify(source_path)
+        destination_path = utils.safe_stringify(destination_path)
         item_data = {
             "DATA_TYPE": "transfer_item",
             "source_path": source_path,
@@ -282,8 +282,8 @@ class TransferData(dict):
         :param destination_path: Path to which the source symlink will be transfered
         :type destination_path: str
         """
-        source_path = safe_stringify(source_path)
-        destination_path = safe_stringify(destination_path)
+        source_path = utils.safe_stringify(source_path)
+        destination_path = utils.safe_stringify(destination_path)
         item_data = {
             "DATA_TYPE": "transfer_symlink_item",
             "source_path": source_path,
@@ -365,7 +365,7 @@ class DeleteData(dict):
         deadline=None,
         **kwargs,
     ):
-        endpoint = safe_stringify(endpoint)
+        endpoint = utils.safe_stringify(endpoint)
         logger.info("Creating a new DeleteData object")
         self["DATA_TYPE"] = "delete"
         self["submission_id"] = (
@@ -400,7 +400,7 @@ class DeleteData(dict):
         Appends a delete_item document to the DATA key of the delete
         document.
         """
-        path = safe_stringify(path)
+        path = utils.safe_stringify(path)
         item_data = {"DATA_TYPE": "delete_item", "path": path}
         item_data.update(params)
         logger.debug('DeleteData[{}].add_item: "{}"'.format(self["endpoint"], path))

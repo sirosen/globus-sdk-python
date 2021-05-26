@@ -1,7 +1,7 @@
 import logging
 
+from globus_sdk import utils
 from globus_sdk.authorizers.base import GlobusAuthorizer
-from globus_sdk.utils.string_hashing import sha256_string
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class AccessTokenAuthorizer(GlobusAuthorizer):
         self.access_token = access_token
         self.header_val = "Bearer %s" % access_token
 
-        self.access_token_hash = sha256_string(self.access_token)
+        self.access_token_hash = utils.sha256_string(self.access_token)
         logger.debug(f'Bearer token has hash "{self.access_token_hash}"')
 
     def set_authorization_header(self, header_dict):

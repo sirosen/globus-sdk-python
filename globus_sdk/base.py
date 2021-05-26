@@ -5,7 +5,7 @@ import urllib.parse
 
 import requests
 
-from globus_sdk import config, exc
+from globus_sdk import config, exc, utils
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.version import __version__
 
@@ -101,7 +101,7 @@ class BaseClient:
 
         self.authorizer = authorizer
 
-        self.base_url = slash_join(
+        self.base_url = utils.slash_join(
             config.get_service_url(self.environment, self.service_name)
             if base_url is None
             else base_url,
@@ -447,7 +447,7 @@ class BaseClient:
         if path.startswith("https://") or path.startswith("http://"):
             url = path
         else:
-            url = slash_join(self.base_url, path)
+            url = utils.slash_join(self.base_url, path)
         self.logger.debug(f"request will hit URL:{url}")
 
         # because a 401 can trigger retry, we need to wrap the retry-able thing
@@ -495,32 +495,3 @@ class BaseClient:
             f"request completed with (error) response code: {r.status_code}"
         )
         raise self.error_class(r)
-
-
-def slash_join(a, b):
-    """
-    Join a and b with a single slash, regardless of whether they already
-    contain a trailing/leading slash or neither.
-    """
-    if not b:  # "" or None, don't append a slash
-        return a
-    if a.endswith("/"):
-        if b.startswith("/"):
-            return a[:-1] + b
-        return a + b
-    if b.startswith("/"):
-        return a + b
-    return a + "/" + b
-
-
-def safe_stringify(value):
-    """
-    Converts incoming value to a unicode string. Convert bytes by decoding,
-    anything else has __str__ called.
-    Strings are checked to avoid duplications
-    """
-    if isinstance(value, str):
-        return value
-    if isinstance(value, bytes):
-        return value.decode("utf-8")
-    return str(value)

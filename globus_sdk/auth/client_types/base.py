@@ -4,10 +4,10 @@ import logging
 
 import jwt
 
-from globus_sdk import exc
+from globus_sdk import exc, utils
 from globus_sdk.auth.token_response import OAuthTokenResponse
 from globus_sdk.authorizers import NullAuthorizer
-from globus_sdk.base import BaseClient, safe_stringify
+from globus_sdk.base import BaseClient
 
 logger = logging.getLogger(__name__)
 
@@ -119,9 +119,9 @@ class AuthClient(BaseClient):
 
         def _convert_listarg(val):
             if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):
-                return ",".join(safe_stringify(x) for x in val)
+                return ",".join(utils.safe_stringify(x) for x in val)
             else:
-                return safe_stringify(val)
+                return utils.safe_stringify(val)
 
         self.logger.info("Looking up Globus Auth Identities")
 

@@ -7,7 +7,7 @@ from unittest import mock
 import pytest
 
 import globus_sdk
-from globus_sdk.base import BaseClient, safe_stringify, slash_join
+from globus_sdk.base import BaseClient
 from tests.common import get_last_request, register_api_route
 
 
@@ -28,13 +28,6 @@ def base_client():
 # not particularly special, just a handy array of codes which should raise
 # errors when encountered
 ERROR_STATUS_CODES = (400, 404, 405, 409, 500, 503)
-
-
-class testObject:
-    """test obj for safe_stringify testing"""
-
-    def __str__(self):
-        return "1"
 
 
 def test_cannot_instantiate_plain_base_client():
@@ -178,28 +171,3 @@ def test_http_methods(method, allows_body, base_client):
         assert excinfo.value.raw_json["x"] == "y"
         assert excinfo.value.code == "ErrorCode"
         assert excinfo.value.message == "foo"
-
-
-@pytest.mark.parametrize(
-    "a, b",
-    [(a, b) for a in ["a", "a/"] for b in ["b", "/b"]]
-    + [("a/b", c) for c in ["", None]],  # type: ignore
-)
-def test_slash_join(a, b):
-    """
-    slash_joins a's with and without trailing "/"
-    to b's with and without leading "/"
-    Confirms all have the same correct slash_join output
-    """
-    assert slash_join(a, b) == "a/b"
-
-
-@pytest.mark.parametrize("value", ["1", str(1), b"1", "1", 1, testObject()])
-def test_safe_stringify(value):
-    """
-    safe_stringifies strings, bytes, explicit unicode, an int, an object
-    and confirms safe_stringify returns utf-8 encoding for all inputs
-    """
-    safe_value = safe_stringify(value)
-    assert safe_value == "1"
-    assert type(safe_value) == str

@@ -1,3 +1,5 @@
+import pytest
+
 from globus_sdk import utils
 
 
@@ -20,3 +22,35 @@ def test_sha256string():
     expected_sha = "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
 
     assert utils.sha256_string(test_string) == expected_sha
+
+
+@pytest.mark.parametrize(
+    "a, b",
+    [(a, b) for a in ["a", "a/"] for b in ["b", "/b"]]
+    + [("a/b", c) for c in ["", None]],  # type: ignore
+)
+def test_slash_join(a, b):
+    """
+    slash_joins a's with and without trailing "/"
+    to b's with and without leading "/"
+    Confirms all have the same correct slash_join output
+    """
+    assert utils.slash_join(a, b) == "a/b"
+
+
+class testObject:
+    """test obj for safe_stringify testing"""
+
+    def __str__(self):
+        return "1"
+
+
+@pytest.mark.parametrize("value", ["1", b"1", 1, testObject()])
+def test_safe_stringify(value):
+    """
+    safe_stringifies strings, bytes, an int, an object
+    and confirms safe_stringify returns unicode string for all inputs
+    """
+    safe_value = utils.safe_stringify(value)
+    assert safe_value == "1"
+    assert type(safe_value) == str

@@ -1,8 +1,8 @@
 import logging
 import typing
 
-from globus_sdk import exc
-from globus_sdk.base import BaseClient, safe_stringify
+from globus_sdk import exc, utils
+from globus_sdk.base import BaseClient
 from globus_sdk.response import GlobusHTTPResponse
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/index_meta/>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         self.logger.info(f"SearchClient.get_index({index_id})")
         path = self.qjoin_path("v1/index", index_id)
         return self.get(path, params=params)
@@ -90,7 +90,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/search/#simple_get_query>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         params.update(
             {
                 "q": q,
@@ -144,7 +144,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/search/#complex_post_query>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         self.logger.info(f"SearchClient.post_search({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "search")
         return self.post(path, data)
@@ -206,7 +206,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/ingest/>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         self.logger.info(f"SearchClient.ingest({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "ingest")
         return self.post(path, data)
@@ -244,7 +244,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/subject_ops/#delete_by_query>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         self.logger.info(f"SearchClient.delete_by_query({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "delete_by_query")
         return self.post(path, data)
@@ -272,7 +272,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/subject_ops/#get_by_subject>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         params["subject"] = subject
         self.logger.info(f"SearchClient.get_subject({index_id}, {subject}, ...)")
         path = self.qjoin_path("v1/index", index_id, "subject")
@@ -297,7 +297,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/subject_ops/#delete_by_subject>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         params["subject"] = subject
 
         self.logger.info(f"SearchClient.delete_subject({index_id}, {subject}, ...)")
@@ -336,7 +336,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/entry_ops/#get_single_entry>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         params["subject"] = subject
         if entry_id is not None:
             params["entry_id"] = entry_id
@@ -387,7 +387,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/entry_ops/#create_single_entry>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         self.logger.info(f"SearchClient.create_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.post(path, data)
@@ -417,7 +417,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/entry_ops/#update_single_entry>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         self.logger.info(f"SearchClient.update_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.put(path, data)
@@ -450,7 +450,7 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/entry_ops/#delete_single_entry>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         params["subject"] = subject
         if entry_id is not None:
             params["entry_id"] = entry_id
@@ -477,7 +477,7 @@ class SearchClient(BaseClient):
         >>> assert task['index_id'] == known_index_id
         >>> print(task["task_id"] + " | " + task['state'])
         """
-        task_id = safe_stringify(task_id)
+        task_id = utils.safe_stringify(task_id)
         self.logger.info(f"SearchClient.get_task({task_id})")
         path = self.qjoin_path("v1/task", task_id)
         return self.get(path, params=params)
@@ -493,7 +493,7 @@ class SearchClient(BaseClient):
         >>> for task in task_list['tasks']:
         >>>     print(task["task_id"] + " | " + task['state'])
         """
-        index_id = safe_stringify(index_id)
+        index_id = utils.safe_stringify(index_id)
         self.logger.info(f"SearchClient.get_task_list({index_id})")
         path = self.qjoin_path("v1/task_list", index_id)
         return self.get(path, params=params)
