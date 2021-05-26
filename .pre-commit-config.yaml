@@ -38,3 +38,5 @@ repos:
   rev: v0.812
   hooks:
     - id: mypy
+      files: ^src/globus_sdk/
+      additional_dependencies: ["requests<3"]
