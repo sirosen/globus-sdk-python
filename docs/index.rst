@@ -29,14 +29,12 @@ Table of Contents
     :caption: Full Reference
     :maxdepth: 3
 
-    clients
-    clients/base
-    clients/auth
-    clients/transfer
-    clients/search
+    services
+    responses
     exceptions
     local_endpoints
     authorization
+    core
 
 .. toctree::
     :caption: Additional Info

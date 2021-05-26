@@ -13,7 +13,7 @@ These are a very simple class of generic objects which define a way of getting
 an up-to-date ``Authorization`` header, and trying to handle a 401 (if that
 header is expired).
 
-Whenever using the :ref:`Service Clients <clients>`, you should be passing in an
+Whenever using the :ref:`Service Clients <services>`, you should be passing in an
 authorizer when you create a new client unless otherwise specified.
 
 The type of authorizer you will use depends very much on your application, but
