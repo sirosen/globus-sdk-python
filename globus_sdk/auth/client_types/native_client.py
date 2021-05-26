@@ -5,7 +5,7 @@ from globus_sdk.auth.oauth2_native_app import GlobusNativeAppFlowManager
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.exc import GlobusSDKUsageError
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class NativeAppAuthClient(AuthClient):
@@ -27,11 +27,11 @@ class NativeAppAuthClient(AuthClient):
 
     def __init__(self, client_id, **kwargs):
         if "authorizer" in kwargs:
-            logger.error("ArgumentError(NativeAppClient.authorizer)")
+            log.error("ArgumentError(NativeAppClient.authorizer)")
             raise GlobusSDKUsageError("Cannot give a NativeAppAuthClient an authorizer")
 
         super().__init__(client_id=client_id, authorizer=NullAuthorizer(), **kwargs)
-        self.logger.info(f"Finished initializing client, client_id={client_id}")
+        log.info(f"Finished initializing client, client_id={client_id}")
 
     def oauth2_start_flow(
         self,
@@ -87,7 +87,7 @@ class NativeAppAuthClient(AuthClient):
         `The PKCE Security Protocol \
         <https://docs.globus.org/api/auth/developer-guide/#pkce>`_
         """
-        self.logger.info("Starting Native App Grant Flow")
+        log.info("Starting Native App Grant Flow")
         self.current_oauth2_flow_manager = GlobusNativeAppFlowManager(
             self,
             requested_scopes=requested_scopes,
@@ -106,7 +106,7 @@ class NativeAppAuthClient(AuthClient):
         It needs this specialization because it cannot authenticate the refresh
         grant call with client credentials, as is normal.
         """
-        self.logger.info("Executing token refresh without client credentials")
+        log.info("Executing token refresh without client credentials")
         form_data = {
             "refresh_token": refresh_token,
             "grant_type": "refresh_token",

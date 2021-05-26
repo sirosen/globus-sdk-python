@@ -9,28 +9,7 @@ from globus_sdk import config, exc, utils
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.version import __version__
 
-
-class ClientLogAdapter(logging.LoggerAdapter):
-    """
-    Stuff in the memory location of the client to make log records unambiguous.
-    """
-
-    def process(self, msg, kwargs):
-        return "[instance:{}] {}".format(id(self.extra["client"]), msg), kwargs
-
-    def warn(self, *args, **kwargs):
-        """
-        NOTE: although Logger.warn() is deprecated in python, we've now made
-        it part of the interface for clients. We should only remove this
-        carefully, as someone may be leveraging something like
-
-        >>> TransferClient.logger.warn(...)
-
-        even though that would be a bad idea. At the very least, removing it
-        should be a considered move, not just thrown in with warn() ->
-        warning() cleanup.
-        """
-        return self.warning(*args, **kwargs)
+log = logging.getLogger(__name__)
 
 
 class BaseClient:
@@ -88,8 +67,7 @@ class BaseClient:
             raise NotImplementedError(
                 "Cannot instantiate clients which do not set a 'service_name'"
             )
-        self._init_logger_adapter()
-        self.logger.info(
+        log.info(
             f'Creating client of type {type(self)} for service "{self.service_name}"'
         )
 
@@ -126,42 +104,20 @@ class BaseClient:
         if app_name is not None:
             self.app_name = app_name
 
-    def _init_logger_adapter(self):
-        """
-        Create & assign the self.logger LoggerAdapter
-        Used when initializing a new client, or unpickling.
-
-        Technically, this could result in a state change across a
-        pickle/unpickle -- file handles and other handlers could be detached,
-        etc.
-        However, that's better than a hard-fail on pickle.dump(s) calls.
-
-        Also, so long as loggers are attached at the module level -- as they
-        really ought to be -- everything will be fine.
-        """
-        # get the fully qualified name of the client class, so that it's a
-        # child of globus_sdk
-        self.logger = ClientLogAdapter(
-            logging.getLogger(self.__module__ + "." + self.__class__.__name__),
-            {"client": self},
-        )
-
     def __getstate__(self):
         """
         Render to a serializable dict for pickle.dump(s)
         """
-        self.logger.info("__getstate__() called; client being pickled")
+        log.info("__getstate__() called; client being pickled")
         d = dict(self.__dict__)  # copy
-        del d["logger"]
         return d
 
     def __setstate__(self, d):
         """
         Load from a serialized format, as in pickle.load(s)
         """
-        self._init_logger_adapter()
         self.__dict__.update(d)
-        self.logger.info("__setstate__() finished; client unpickled")
+        log.info("__setstate__() finished; client unpickled")
 
     @property
     def app_name(self):
@@ -203,7 +159,7 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug(f"GET to {path} with params {params}")
+        log.debug(f"GET to {path} with params {params}")
         return self._request(
             "GET",
             path,
@@ -247,7 +203,7 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug(f"POST to {path} with params {params}")
+        log.debug(f"POST to {path} with params {params}")
         return self._request(
             "POST",
             path,
@@ -281,7 +237,7 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug(f"DELETE to {path} with params {params}")
+        log.debug(f"DELETE to {path} with params {params}")
         return self._request(
             "DELETE",
             path,
@@ -325,7 +281,7 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug(f"PUT to {path} with params {params}")
+        log.debug(f"PUT to {path} with params {params}")
         return self._request(
             "PUT",
             path,
@@ -371,7 +327,7 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        self.logger.debug(f"PATCH to {path} with params {params}")
+        log.debug(f"PATCH to {path} with params {params}")
         return self._request(
             "PATCH",
             path,
@@ -435,7 +391,7 @@ class BaseClient:
         # add Authorization header, or (if it's a NullAuthorizer) possibly
         # explicitly remove the Authorization header
         if self.authorizer is not None:
-            self.logger.debug(
+            log.debug(
                 "request will have authorization of type {}".format(
                     type(self.authorizer)
                 )
@@ -448,7 +404,7 @@ class BaseClient:
             url = path
         else:
             url = utils.slash_join(self.base_url, path)
-        self.logger.debug(f"request will hit URL:{url}")
+        log.debug(f"request will hit URL:{url}")
 
         # because a 401 can trigger retry, we need to wrap the retry-able thing
         # in a method
@@ -464,34 +420,32 @@ class BaseClient:
                     timeout=self._http_timeout,
                 )
             except requests.RequestException as e:
-                self.logger.error("NetworkError on request")
+                log.error("NetworkError on request")
                 raise exc.convert_request_exception(e)
 
         # initial request
         r = send_request()
 
-        self.logger.debug(f"Request made to URL: {r.url}")
+        log.debug(f"Request made to URL: {r.url}")
 
         # potential 401 retry handling
         if r.status_code == 401 and retry_401 and self.authorizer is not None:
-            self.logger.debug("request got 401, checking retry-capability")
+            log.debug("request got 401, checking retry-capability")
             # note that although handle_missing_authorization returns a T/F
             # value, it may actually mutate the state of the authorizer and
             # therefore change the value set by the `set_authorization_header`
             # method
             if self.authorizer.handle_missing_authorization():
-                self.logger.debug("request can be retried")
+                log.debug("request can be retried")
                 self.authorizer.set_authorization_header(rheaders)
                 r = send_request()
 
         if 200 <= r.status_code < 400:
-            self.logger.debug(f"request completed with response code: {r.status_code}")
+            log.debug(f"request completed with response code: {r.status_code}")
             if response_class is None:
                 return self.default_response_class(r, client=self)
             else:
                 return response_class(r, client=self)
 
-        self.logger.debug(
-            f"request completed with (error) response code: {r.status_code}"
-        )
+        log.debug(f"request completed with (error) response code: {r.status_code}")
         raise self.error_class(r)

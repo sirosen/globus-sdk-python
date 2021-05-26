@@ -1,5 +1,4 @@
 import json
-import logging.handlers
 import os
 import uuid
 from unittest import mock
@@ -34,26 +33,6 @@ def test_cannot_instantiate_plain_base_client():
     # attempting to instantiate a BaseClient errors
     with pytest.raises(NotImplementedError):
         BaseClient()
-
-
-def test_client_log_adapter(base_client):
-    """
-    Logs a test message with the base client's logger,
-    Confirms the ClientLogAdapter marks the message with the client
-    """
-    # make a MemoryHandler for capturing the log in a buffer)
-    memory_handler = logging.handlers.MemoryHandler(1028)
-    base_client.logger.logger.addHandler(memory_handler)
-    base_client.logger.logger.setLevel("INFO")
-    # send the test message
-    in_msg = "Testing ClientLogAdapter"
-    base_client.logger.info(in_msg)
-    # confirm results
-    out_msg = memory_handler.buffer[0].getMessage()
-    expected_msg = f"[instance:{id(base_client)}] {in_msg}"
-    assert expected_msg == out_msg
-
-    memory_handler.close()
 
 
 def test_set_http_timeout(base_client):

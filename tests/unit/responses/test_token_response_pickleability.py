@@ -1,7 +1,4 @@
-import logging
-import os
 import pickle
-import tempfile
 
 import pytest
 
@@ -10,17 +7,9 @@ import globus_sdk
 
 @pytest.fixture
 def auth_client():
-    tmplog_handle, tmplog = tempfile.mkstemp()
-
     client = globus_sdk.AuthClient()
-    client.logger.logger.addHandler(logging.FileHandler(tmplog))
 
     yield client
-
-    try:
-        os.remove(tmplog)
-    except OSError:
-        pass
 
 
 @pytest.fixture
