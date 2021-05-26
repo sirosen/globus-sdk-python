@@ -136,7 +136,7 @@ class BaseClient:
         self._app_name = value
         self._headers["User-Agent"] = f"{self.BASE_USER_AGENT}/{value}"
 
-    def qjoin_path(self, *parts):
+    def qjoin_path(self, *parts: str) -> str:
         return "/" + "/".join(urllib.parse.quote(part) for part in parts)
 
     def get(self, path, params=None, headers=None, response_class=None, retry_401=True):

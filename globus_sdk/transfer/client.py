@@ -14,6 +14,8 @@ from globus_sdk.transfer.response import (
 
 log = logging.getLogger(__name__)
 
+ID_PARAM_TYPE = typing.Union[bytes, str, uuid.UUID]
+
 
 class TransferClient(BaseClient):
     r"""
@@ -61,7 +63,7 @@ class TransferClient(BaseClient):
     # Endpoint Management
     #
 
-    def get_endpoint(self, endpoint_id, **params):
+    def get_endpoint(self, endpoint_id: ID_PARAM_TYPE, **params) -> TransferResponse:
         """
         ``GET /endpoint/<endpoint_id>``
 
@@ -82,12 +84,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.get_endpoint({endpoint_id})")
-        path = self.qjoin_path("endpoint", endpoint_id)
-        return self.get(path, params=params)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.get_endpoint({endpoint_id_s})")
+        path = self.qjoin_path("endpoint", endpoint_id_s)
+        return typing.cast(TransferResponse, self.get(path, params=params))
 
-    def update_endpoint(self, endpoint_id, data, **params):
+    def update_endpoint(
+        self, endpoint_id: ID_PARAM_TYPE, data, **params
+    ) -> TransferResponse:
         """
         ``PUT /endpoint/<endpoint_id>``
 
@@ -120,10 +124,10 @@ class TransferClient(BaseClient):
         elif data.get("oauth_server"):
             data["myproxy_server"] = None
 
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.update_endpoint({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id)
-        return self.put(path, data, params=params)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.update_endpoint({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s)
+        return typing.cast(TransferResponse, self.put(path, data, params=params))
 
     def create_endpoint(self, data):
         """
@@ -165,7 +169,7 @@ class TransferClient(BaseClient):
         log.info("TransferClient.create_endpoint(...)")
         return self.post("endpoint", data)
 
-    def delete_endpoint(self, endpoint_id):
+    def delete_endpoint(self, endpoint_id: ID_PARAM_TYPE) -> TransferResponse:
         """
         ``DELETE /endpoint/<endpoint_id>``
 
@@ -184,10 +188,10 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_by_id>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.delete_endpoint({endpoint_id})")
-        path = self.qjoin_path("endpoint", endpoint_id)
-        return self.delete(path)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.delete_endpoint({endpoint_id_s})")
+        path = self.qjoin_path("endpoint", endpoint_id_s)
+        return typing.cast(TransferResponse, self.delete(path))
 
     def endpoint_search(
         self,
@@ -273,7 +277,9 @@ class TransferClient(BaseClient):
             max_total_results=1000,
         )
 
-    def endpoint_autoactivate(self, endpoint_id, **params):
+    def endpoint_autoactivate(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> TransferResponse:
         r"""
         ``POST /endpoint/<endpoint_id>/autoactivate``
 
@@ -333,12 +339,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.endpoint_autoactivate({endpoint_id})")
-        path = self.qjoin_path("endpoint", endpoint_id, "autoactivate")
-        return self.post(path, params=params)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.endpoint_autoactivate({endpoint_id_s})")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "autoactivate")
+        return typing.cast(TransferResponse, self.post(path, params=params))
 
-    def endpoint_deactivate(self, endpoint_id, **params):
+    def endpoint_deactivate(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/deactivate``
 
@@ -352,12 +360,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_activation/#deactivate_endpoint>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.endpoint_deactivate({endpoint_id})")
-        path = self.qjoin_path("endpoint", endpoint_id, "deactivate")
-        return self.post(path, params=params)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.endpoint_deactivate({endpoint_id_s})")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "deactivate")
+        return typing.cast(TransferResponse, self.post(path, params=params))
 
-    def endpoint_activate(self, endpoint_id, requirements_data, **params):
+    def endpoint_activate(
+        self, endpoint_id: ID_PARAM_TYPE, requirements_data, **params
+    ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/activate``
 
@@ -375,12 +385,17 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_activation/#activate_endpoint>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.endpoint_activate({endpoint_id})")
-        path = self.qjoin_path("endpoint", endpoint_id, "activate")
-        return self.post(path, json_body=requirements_data, params=params)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.endpoint_activate({endpoint_id_s})")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "activate")
+        return typing.cast(
+            TransferResponse,
+            self.post(path, json_body=requirements_data, params=params),
+        )
 
-    def endpoint_get_activation_requirements(self, endpoint_id, **params):
+    def endpoint_get_activation_requirements(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> ActivationRequirementsResponse:
         """
         ``GET /endpoint/<endpoint_id>/activation_requirements``
 
@@ -394,13 +409,18 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        path = self.qjoin_path("endpoint", endpoint_id, "activation_requirements")
-        return self.get(
-            path, params=params, response_class=ActivationRequirementsResponse
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        path = self.qjoin_path("endpoint", endpoint_id_s, "activation_requirements")
+        return typing.cast(
+            ActivationRequirementsResponse,
+            self.get(
+                path, params=params, response_class=ActivationRequirementsResponse
+            ),
         )
 
-    def my_effective_pause_rule_list(self, endpoint_id, **params):
+    def my_effective_pause_rule_list(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
 
@@ -414,14 +434,21 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_pause_rules>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.my_effective_pause_rule_list({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "my_effective_pause_rule_list")
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.my_effective_pause_rule_list({endpoint_id_s}, ...)")
+        path = self.qjoin_path(
+            "endpoint", endpoint_id_s, "my_effective_pause_rule_list"
+        )
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
     # Shared Endpoints
 
-    def my_shared_endpoint_list(self, endpoint_id, **params):
+    def my_shared_endpoint_list(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/my_shared_endpoint_list``
 
@@ -435,10 +462,13 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "my_shared_endpoint_list")
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "my_shared_endpoint_list")
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
     def create_shared_endpoint(self, data):
         """
@@ -475,7 +505,9 @@ class TransferClient(BaseClient):
 
     # Endpoint servers
 
-    def endpoint_server_list(self, endpoint_id, **params):
+    def endpoint_server_list(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/server_list``
 
@@ -489,12 +521,17 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.endpoint_server_list({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "server_list")
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.endpoint_server_list({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "server_list")
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
-    def get_endpoint_server(self, endpoint_id, server_id, **params):
+    def get_endpoint_server(
+        self, endpoint_id: ID_PARAM_TYPE, server_id, **params
+    ) -> TransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/server/<server_id>``
 
@@ -508,16 +545,16 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
-            "TransferClient.get_endpoint_server({}, {}, ...)".format(
-                endpoint_id, server_id
-            )
+            "TransferClient.get_endpoint_server(%s, %s, ...)", endpoint_id_s, server_id
         )
-        path = self.qjoin_path("endpoint", endpoint_id, "server", str(server_id))
-        return self.get(path, params=params)
+        path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
+        return typing.cast(TransferResponse, self.get(path, params=params))
 
-    def add_endpoint_server(self, endpoint_id, server_data):
+    def add_endpoint_server(
+        self, endpoint_id: ID_PARAM_TYPE, server_data
+    ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/server``
 
@@ -531,12 +568,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.add_endpoint_server({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "server")
-        return self.post(path, server_data)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.add_endpoint_server({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "server")
+        return typing.cast(TransferResponse, self.post(path, server_data))
 
-    def update_endpoint_server(self, endpoint_id, server_id, server_data):
+    def update_endpoint_server(
+        self, endpoint_id: ID_PARAM_TYPE, server_id, server_data
+    ) -> TransferResponse:
         """
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
 
@@ -550,16 +589,18 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
-            "TransferClient.update_endpoint_server({}, {}, ...)".format(
-                endpoint_id, server_id
-            )
+            "TransferClient.update_endpoint_server(%s, %s, ...)",
+            endpoint_id_s,
+            server_id,
         )
-        path = self.qjoin_path("endpoint", endpoint_id, "server", str(server_id))
-        return self.put(path, server_data)
+        path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
+        return typing.cast(TransferResponse, self.put(path, server_data))
 
-    def delete_endpoint_server(self, endpoint_id, server_id):
+    def delete_endpoint_server(
+        self, endpoint_id: ID_PARAM_TYPE, server_id
+    ) -> TransferResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
 
@@ -573,20 +614,20 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_server_by_id>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
-            "TransferClient.delete_endpoint_server({}, {})".format(
-                endpoint_id, server_id
-            )
+            "TransferClient.delete_endpoint_server(%s, %s)", endpoint_id_s, server_id
         )
-        path = self.qjoin_path("endpoint", endpoint_id, "server", str(server_id))
-        return self.delete(path)
+        path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
+        return typing.cast(TransferResponse, self.delete(path))
 
     #
     # Roles
     #
 
-    def endpoint_role_list(self, endpoint_id, **params):
+    def endpoint_role_list(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/role_list``
 
@@ -600,12 +641,17 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_roles/#role_list>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.endpoint_role_list({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "role_list")
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.endpoint_role_list({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "role_list")
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
-    def add_endpoint_role(self, endpoint_id, role_data):
+    def add_endpoint_role(
+        self, endpoint_id: ID_PARAM_TYPE, role_data
+    ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/role``
 
@@ -619,12 +665,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_roles/#create_role>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.add_endpoint_role({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "role")
-        return self.post(path, role_data)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.add_endpoint_role({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "role")
+        return typing.cast(TransferResponse, self.post(path, role_data))
 
-    def get_endpoint_role(self, endpoint_id, role_id, **params):
+    def get_endpoint_role(
+        self, endpoint_id: ID_PARAM_TYPE, role_id, **params
+    ) -> TransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/role/<role_id>``
 
@@ -638,12 +686,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_roles/#get_endpoint_role_by_id>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.get_endpoint_role({endpoint_id}, {role_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "role", role_id)
-        return self.get(path, params=params)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.get_endpoint_role({endpoint_id_s}, {role_id}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "role", role_id)
+        return typing.cast(TransferResponse, self.get(path, params=params))
 
-    def delete_endpoint_role(self, endpoint_id, role_id):
+    def delete_endpoint_role(
+        self, endpoint_id: ID_PARAM_TYPE, role_id
+    ) -> TransferResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/role/<role_id>``
 
@@ -657,16 +707,18 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_roles/#delete_endpoint_role_by_id>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.delete_endpoint_role({endpoint_id}, {role_id})")
-        path = self.qjoin_path("endpoint", endpoint_id, "role", role_id)
-        return self.delete(path)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.delete_endpoint_role({endpoint_id_s}, {role_id})")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "role", role_id)
+        return typing.cast(TransferResponse, self.delete(path))
 
     #
     # ACLs
     #
 
-    def endpoint_acl_list(self, endpoint_id, **params):
+    def endpoint_acl_list(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/access_list``
 
@@ -680,12 +732,17 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/acl/#rest_access_get_list>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.endpoint_acl_list({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "access_list")
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.endpoint_acl_list({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "access_list")
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
-    def get_endpoint_acl_rule(self, endpoint_id, rule_id, **params):
+    def get_endpoint_acl_rule(
+        self, endpoint_id: ID_PARAM_TYPE, rule_id, **params
+    ) -> TransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/access/<rule_id>``
 
@@ -699,16 +756,16 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/acl/#get_access_rule_by_id>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
-            "TransferClient.get_endpoint_acl_rule({}, {}, ...)".format(
-                endpoint_id, rule_id
-            )
+            "TransferClient.get_endpoint_acl_rule(%s, %s, ...)", endpoint_id_s, rule_id
         )
-        path = self.qjoin_path("endpoint", endpoint_id, "access", rule_id)
-        return self.get(path, params=params)
+        path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
+        return typing.cast(TransferResponse, self.get(path, params=params))
 
-    def add_endpoint_acl_rule(self, endpoint_id, rule_data):
+    def add_endpoint_acl_rule(
+        self, endpoint_id: ID_PARAM_TYPE, rule_data
+    ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/access``
 
@@ -742,12 +799,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/acl/#rest_access_create>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.add_endpoint_acl_rule({endpoint_id}, ...)")
-        path = self.qjoin_path("endpoint", endpoint_id, "access")
-        return self.post(path, rule_data)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.add_endpoint_acl_rule({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "access")
+        return typing.cast(TransferResponse, self.post(path, rule_data))
 
-    def update_endpoint_acl_rule(self, endpoint_id, rule_id, rule_data):
+    def update_endpoint_acl_rule(
+        self, endpoint_id: ID_PARAM_TYPE, rule_id, rule_data
+    ) -> TransferResponse:
         """
         ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
 
@@ -761,16 +820,18 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/acl/#update_access_rule>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
-            "TransferClient.update_endpoint_acl_rule({}, {}, ...)".format(
-                endpoint_id, rule_id
-            )
+            "TransferClient.update_endpoint_acl_rule(%s, %s, ...)",
+            endpoint_id_s,
+            rule_id,
         )
-        path = self.qjoin_path("endpoint", endpoint_id, "access", rule_id)
-        return self.put(path, rule_data)
+        path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
+        return typing.cast(TransferResponse, self.put(path, rule_data))
 
-    def delete_endpoint_acl_rule(self, endpoint_id, rule_id):
+    def delete_endpoint_acl_rule(
+        self, endpoint_id: ID_PARAM_TYPE, rule_id
+    ) -> TransferResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/access/<rule_id>``
 
@@ -784,14 +845,12 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/acl/#delete_access_rule>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
-            "TransferClient.delete_endpoint_acl_rule({}, {})".format(
-                endpoint_id, rule_id
-            )
+            "TransferClient.delete_endpoint_acl_rule(%s, %s)", endpoint_id_s, rule_id
         )
-        path = self.qjoin_path("endpoint", endpoint_id, "access", rule_id)
-        return self.delete(path)
+        path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
+        return typing.cast(TransferResponse, self.delete(path))
 
     #
     # Bookmarks
@@ -833,7 +892,7 @@ class TransferClient(BaseClient):
         log.info(f"TransferClient.create_bookmark({bookmark_data})")
         return self.post("bookmark", bookmark_data)
 
-    def get_bookmark(self, bookmark_id, **params):
+    def get_bookmark(self, bookmark_id: ID_PARAM_TYPE, **params) -> TransferResponse:
         """
         ``GET /bookmark/<bookmark_id>``
 
@@ -847,12 +906,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_bookmark_by_id>`_
         in the REST documentation for details.
         """
-        bookmark_id = utils.safe_stringify(bookmark_id)
-        log.info(f"TransferClient.get_bookmark({bookmark_id})")
-        path = self.qjoin_path("bookmark", bookmark_id)
-        return self.get(path, params=params)
+        bookmark_id_s = utils.safe_stringify(bookmark_id)
+        log.info(f"TransferClient.get_bookmark({bookmark_id_s})")
+        path = self.qjoin_path("bookmark", bookmark_id_s)
+        return typing.cast(TransferResponse, self.get(path, params=params))
 
-    def update_bookmark(self, bookmark_id, bookmark_data):
+    def update_bookmark(
+        self, bookmark_id: ID_PARAM_TYPE, bookmark_data
+    ) -> TransferResponse:
         """
         ``PUT /bookmark/<bookmark_id>``
 
@@ -866,11 +927,12 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_bookmarks/#update_bookmark>`_
         in the REST documentation for details.
         """
-        log.info(f"TransferClient.update_bookmark({bookmark_id})")
-        path = self.qjoin_path("bookmark", bookmark_id)
-        return self.put(path, bookmark_data)
+        bookmark_id_s = utils.safe_stringify(bookmark_id)
+        log.info(f"TransferClient.update_bookmark({bookmark_id_s})")
+        path = self.qjoin_path("bookmark", bookmark_id_s)
+        return typing.cast(TransferResponse, self.put(path, bookmark_data))
 
-    def delete_bookmark(self, bookmark_id):
+    def delete_bookmark(self, bookmark_id: ID_PARAM_TYPE) -> TransferResponse:
         """
         ``DELETE /bookmark/<bookmark_id>``
 
@@ -884,15 +946,18 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_bookmarks/#delete_bookmark_by_id>`_
         in the REST documentation for details.
         """
-        log.info(f"TransferClient.delete_bookmark({bookmark_id})")
-        path = self.qjoin_path("bookmark", bookmark_id)
-        return self.delete(path)
+        bookmark_id_s = utils.safe_stringify(bookmark_id)
+        log.info(f"TransferClient.delete_bookmark({bookmark_id_s})")
+        path = self.qjoin_path("bookmark", bookmark_id_s)
+        return typing.cast(TransferResponse, self.delete(path))
 
     #
     # Synchronous Filesys Operations
     #
 
-    def operation_ls(self, endpoint_id, **params):
+    def operation_ls(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         ``GET /operation/endpoint/<endpoint_id>/ls``
 
@@ -912,12 +977,17 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/file_operations/#list_directory_contents>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.operation_ls({endpoint_id}, {params})")
-        path = self.qjoin_path("operation/endpoint", endpoint_id, "ls")
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.operation_ls({endpoint_id_s}, {params})")
+        path = self.qjoin_path("operation/endpoint", endpoint_id_s, "ls")
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
-    def operation_mkdir(self, endpoint_id, path, **params):
+    def operation_mkdir(
+        self, endpoint_id: ID_PARAM_TYPE, path, **params
+    ) -> TransferResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
 
@@ -936,18 +1006,23 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/file_operations/#make_directory>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         path = utils.safe_stringify(path)
         log.info(
             "TransferClient.operation_mkdir({}, {}, {})".format(
-                endpoint_id, path, params
+                endpoint_id_s, path, params
             )
         )
-        resource_path = self.qjoin_path("operation/endpoint", endpoint_id, "mkdir")
+        resource_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "mkdir")
         json_body = {"DATA_TYPE": "mkdir", "path": path}
-        return self.post(resource_path, json_body=json_body, params=params)
+        return typing.cast(
+            TransferResponse,
+            self.post(resource_path, json_body=json_body, params=params),
+        )
 
-    def operation_rename(self, endpoint_id, oldpath, newpath, **params):
+    def operation_rename(
+        self, endpoint_id: ID_PARAM_TYPE, oldpath, newpath, **params
+    ) -> TransferResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/rename``
 
@@ -967,19 +1042,24 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/file_operations/#rename>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         oldpath = utils.safe_stringify(oldpath)
         newpath = utils.safe_stringify(newpath)
         log.info(
             "TransferClient.operation_rename({}, {}, {}, {})".format(
-                endpoint_id, oldpath, newpath, params
+                endpoint_id_s, oldpath, newpath, params
             )
         )
-        resource_path = self.qjoin_path("operation/endpoint", endpoint_id, "rename")
+        resource_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "rename")
         json_body = {"DATA_TYPE": "rename", "old_path": oldpath, "new_path": newpath}
-        return self.post(resource_path, json_body=json_body, params=params)
+        return typing.cast(
+            TransferResponse,
+            self.post(resource_path, json_body=json_body, params=params),
+        )
 
-    def operation_symlink(self, endpoint_id, symlink_target, path, **params):
+    def operation_symlink(
+        self, endpoint_id: ID_PARAM_TYPE, symlink_target, path, **params
+    ) -> TransferResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/symlink``
 
@@ -1002,21 +1082,24 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/file_operations/#symlink>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         symlink_target = utils.safe_stringify(symlink_target)
         path = utils.safe_stringify(path)
         log.info(
             "TransferClient.operation_symlink({}, {}, {}, {})".format(
-                endpoint_id, symlink_target, path, params
+                endpoint_id_s, symlink_target, path, params
             )
         )
-        resource_path = self.qjoin_path("operation/endpoint", endpoint_id, "symlink")
+        resource_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "symlink")
         json_body = {
             "DATA_TYPE": "symlink",
             "symlink_target": symlink_target,
             "path": path,
         }
-        return self.post(resource_path, json_body=json_body, params=params)
+        return typing.cast(
+            TransferResponse,
+            self.post(resource_path, json_body=json_body, params=params),
+        )
 
     #
     # Task Submission
@@ -1159,7 +1242,9 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_TOTAL,
         )
 
-    def task_event_list(self, task_id, num_results=10, **params):
+    def task_event_list(
+        self, task_id: ID_PARAM_TYPE, num_results=10, **params
+    ) -> PaginatedResource:
         r"""
         List events (for example, faults and errors) for a given Task.
 
@@ -1195,8 +1280,9 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/task/#get_event_list>`_
         in the REST documentation for details.
         """
-        log.info(f"TransferClient.task_event_list({task_id}, ...)")
-        path = self.qjoin_path("task", task_id, "event_list")
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.task_event_list({task_id_s}, ...)")
+        path = self.qjoin_path("task", task_id_s, "event_list")
         return PaginatedResource(
             self.get,
             path,
@@ -1206,7 +1292,7 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_TOTAL,
         )
 
-    def get_task(self, task_id, **params):
+    def get_task(self, task_id: ID_PARAM_TYPE, **params) -> TransferResponse:
         """
         ``GET /task/<task_id>``
 
@@ -1220,11 +1306,12 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/task/#get_task_by_id>`_
         in the REST documentation for details.
         """
-        log.info(f"TransferClient.get_task({task_id}, ...)")
-        resource_path = self.qjoin_path("task", task_id)
-        return self.get(resource_path, params=params)
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.get_task({task_id_s}, ...)")
+        resource_path = self.qjoin_path("task", task_id_s)
+        return typing.cast(TransferResponse, self.get(resource_path, params=params))
 
-    def update_task(self, task_id, data, **params):
+    def update_task(self, task_id: ID_PARAM_TYPE, data, **params) -> TransferResponse:
         """
         ``PUT /task/<task_id>``
 
@@ -1238,11 +1325,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/task/#update_task_by_id>`_
         in the REST documentation for details.
         """
-        log.info(f"TransferClient.update_task({task_id}, ...)")
-        resource_path = self.qjoin_path("task", task_id)
-        return self.put(resource_path, data, params=params)
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.update_task({task_id_s}, ...)")
+        resource_path = self.qjoin_path("task", task_id_s)
+        return typing.cast(
+            TransferResponse, self.put(resource_path, data, params=params)
+        )
 
-    def cancel_task(self, task_id):
+    def cancel_task(self, task_id: ID_PARAM_TYPE) -> TransferResponse:
         """
         ``POST /task/<task_id>/cancel``
 
@@ -1256,11 +1346,12 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/task/#cancel_task_by_id>`_
         in the REST documentation for details.
         """
-        log.info(f"TransferClient.cancel_task({task_id})")
-        resource_path = self.qjoin_path("task", task_id, "cancel")
-        return self.post(resource_path)
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.cancel_task({task_id_s})")
+        resource_path = self.qjoin_path("task", task_id_s, "cancel")
+        return typing.cast(TransferResponse, self.post(resource_path))
 
-    def task_wait(self, task_id, timeout=10, polling_interval=10):
+    def task_wait(self, task_id: ID_PARAM_TYPE, timeout=10, polling_interval=10):
         r"""
         Wait until a Task is complete or fails, with a time limit. If the task
         is "ACTIVE" after time runs out, returns ``False``. Otherwise returns
@@ -1303,9 +1394,10 @@ class TransferClient(BaseClient):
         >>>     print(".", end="")
         >>> print("\n{0} completed!".format(task_id))
         """
+        task_id_s = utils.safe_stringify(task_id)
         log.info(
             "TransferClient.task_wait({}, {}, {})".format(
-                task_id, timeout, polling_interval
+                task_id_s, timeout, polling_interval
             )
         )
 
@@ -1339,12 +1431,12 @@ class TransferClient(BaseClient):
         # while not timed_out(waited_time) because of the end condition
         while True:
             # get task, check if status != ACTIVE
-            task = self.get_task(task_id)
+            task = self.get_task(task_id_s)
             status = task["status"]
             if status != "ACTIVE":
                 log.debug(
                     "task_wait(task_id={}) terminated with status={}".format(
-                        task_id, status
+                        task_id_s, status
                     )
                 )
                 return True
@@ -1353,14 +1445,14 @@ class TransferClient(BaseClient):
             # don't sleep an extra polling_interval
             waited_time += polling_interval
             if timed_out(waited_time):
-                log.debug(f"task_wait(task_id={task_id}) timed out")
+                log.debug(f"task_wait(task_id={task_id_s}) timed out")
                 return False
 
-            log.debug(f"task_wait(task_id={task_id}) waiting {polling_interval}s")
+            log.debug(f"task_wait(task_id={task_id_s}) waiting {polling_interval}s")
             time.sleep(polling_interval)
         # unreachable -- end of task_wait
 
-    def task_pause_info(self, task_id, **params):
+    def task_pause_info(self, task_id: ID_PARAM_TYPE, **params) -> TransferResponse:
         """
         ``GET /task/<task_id>/pause_info``
 
@@ -1374,11 +1466,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/task/#get_task_pause_info>`_
         in the REST documentation for details.
         """
-        log.info(f"TransferClient.task_pause_info({task_id}, ...)")
-        resource_path = self.qjoin_path("task", task_id, "pause_info")
-        return self.get(resource_path, params=params)
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.task_pause_info({task_id_s}, ...)")
+        resource_path = self.qjoin_path("task", task_id_s, "pause_info")
+        return typing.cast(TransferResponse, self.get(resource_path, params=params))
 
-    def task_successful_transfers(self, task_id, num_results=100, **params):
+    def task_successful_transfers(
+        self, task_id: ID_PARAM_TYPE, num_results=100, **params
+    ) -> PaginatedResource:
         """
         Get the successful file transfers for a completed Task.
 
@@ -1421,9 +1516,9 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/task/#get_task_successful_transfers>`_
         in the REST documentation for details.
         """
-        log.info(f"TransferClient.task_successful_transfers({task_id}, ...)")
-
-        resource_path = self.qjoin_path("task", task_id, "successful_transfers")
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.task_successful_transfers({task_id_s}, ...)")
+        resource_path = self.qjoin_path("task", task_id_s, "successful_transfers")
         return PaginatedResource(
             self.get,
             resource_path,
@@ -1433,7 +1528,7 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_MARKER,
         )
 
-    def task_skipped_errors(self, task_id, num_results=100, **params):
+    def task_skipped_errors(self, task_id: ID_PARAM_TYPE, num_results=100, **params):
         """
         Get path and error information for all paths that were skipped due
         to skip_source_errors being set on a completed transfer Task.
@@ -1470,12 +1565,12 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/task/#get_task_skipped_errors>`_
         in the REST documentation for details.
         """
+        task_id_s = utils.safe_stringify(task_id)
         log.info(
-            "TransferClient."
-            "endpoint_manager_task_skipped_errors({}, ...)".format(task_id)
+            "TransferClient.endpoint_manager_task_skipped_errors(%s, ...)", task_id_s
         )
 
-        resource_path = self.qjoin_path("task", task_id, "skipped_errors")
+        resource_path = self.qjoin_path("task", task_id_s, "skipped_errors")
         return PaginatedResource(
             self.get,
             resource_path,
@@ -1507,7 +1602,9 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint_manager", "monitored_endpoints")
         return self.get(path, params=params, response_class=IterableTransferResponse)
 
-    def endpoint_manager_hosted_endpoint_list(self, endpoint_id, **params):
+    def endpoint_manager_hosted_endpoint_list(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         Get shared endpoints hosted on the given endpoint.
 
@@ -1521,14 +1618,21 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_hosted_endpoint_list>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.endpoint_manager_hosted_endpoint_list({endpoint_id})")
-        path = self.qjoin_path(
-            "endpoint_manager", "endpoint", endpoint_id, "hosted_endpoint_list"
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(
+            f"TransferClient.endpoint_manager_hosted_endpoint_list({endpoint_id_s})"
         )
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+        path = self.qjoin_path(
+            "endpoint_manager", "endpoint", endpoint_id_s, "hosted_endpoint_list"
+        )
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
-    def endpoint_manager_get_endpoint(self, endpoint_id, **params):
+    def endpoint_manager_get_endpoint(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> TransferResponse:
         """
         Get endpoint details as an admin.
 
@@ -1544,12 +1648,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#mc_get_endpoint>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-        log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id})")
-        path = self.qjoin_path("endpoint_manager", "endpoint", endpoint_id)
-        return self.get(path, params=params)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id_s})")
+        path = self.qjoin_path("endpoint_manager", "endpoint", endpoint_id_s)
+        return typing.cast(TransferResponse, self.get(path, params=params))
 
-    def endpoint_manager_acl_list(self, endpoint_id, **params):
+    def endpoint_manager_acl_list(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         Get a list of access control rules on specified endpoint as an admin.
 
@@ -1565,14 +1671,17 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_endpoint_access_list_as_admin>`_
         in the REST documentation for details.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
-            f"TransferClient.endpoint_manager_endpoint_acl_list({endpoint_id}, ...)"
+            f"TransferClient.endpoint_manager_endpoint_acl_list({endpoint_id_s}, ...)"
         )
         path = self.qjoin_path(
-            "endpoint_manager", "endpoint", endpoint_id, "access_list"
+            "endpoint_manager", "endpoint", endpoint_id_s, "access_list"
         )
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
     #
     # endpoint manager task methods
@@ -1716,7 +1825,7 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_LAST_KEY,
         )
 
-    def endpoint_manager_get_task(self, task_id, **params):
+    def endpoint_manager_get_task(self, task_id: ID_PARAM_TYPE, **params):
         """
         Get task info as an admin. Requires activity monitor effective role on
         the destination endpoint of the task.
@@ -1733,12 +1842,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task>`_
         in the REST documentation for details.
         """
-        task_id = utils.safe_stringify(task_id)
-        log.info(f"TransferClient.endpoint_manager_get_task({task_id}, ...)")
-        path = self.qjoin_path("endpoint_manager", "task", task_id)
-        return self.get(path, params=params)
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.endpoint_manager_get_task({task_id_s}, ...)")
+        path = self.qjoin_path("endpoint_manager", "task", task_id_s)
+        return typing.cast(TransferResponse, self.get(path, params=params))
 
-    def endpoint_manager_task_event_list(self, task_id, num_results=10, **params):
+    def endpoint_manager_task_event_list(
+        self, task_id: ID_PARAM_TYPE, num_results=10, **params
+    ) -> PaginatedResource:
         """
         List events (for example, faults and errors) for a given task as an
         admin. Requires activity monitor effective role on the destination
@@ -1766,9 +1877,9 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_events>`_
         in the REST documentation for details.
         """
-        task_id = utils.safe_stringify(task_id)
-        log.info(f"TransferClient.endpoint_manager_task_event_list({task_id}, ...)")
-        path = self.qjoin_path("endpoint_manager", "task", task_id, "event_list")
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.endpoint_manager_task_event_list({task_id_s}, ...)")
+        path = self.qjoin_path("endpoint_manager", "task", task_id_s, "event_list")
         return PaginatedResource(
             self.get,
             path,
@@ -1778,7 +1889,9 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_TOTAL,
         )
 
-    def endpoint_manager_task_pause_info(self, task_id, **params):
+    def endpoint_manager_task_pause_info(
+        self, task_id: ID_PARAM_TYPE, **params
+    ) -> TransferResponse:
         """
         Get details about why a task is paused as an admin. Requires activity
         monitor effective role on the destination endpoint of the task.
@@ -1795,14 +1908,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_pause_info_as_admin>`_
         in the REST documentation for details.
         """
-        task_id = utils.safe_stringify(task_id)
-        log.info(f"TransferClient.endpoint_manager_task_pause_info({task_id}, ...)")
-        path = self.qjoin_path("endpoint_manager", "task", task_id, "pause_info")
-        return self.get(path, params=params)
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(f"TransferClient.endpoint_manager_task_pause_info({task_id_s}, ...)")
+        path = self.qjoin_path("endpoint_manager", "task", task_id_s, "pause_info")
+        return typing.cast(TransferResponse, self.get(path, params=params))
 
     def endpoint_manager_task_successful_transfers(
-        self, task_id, num_results=100, **params
-    ):
+        self, task_id: ID_PARAM_TYPE, num_results=100, **params
+    ) -> PaginatedResource:
         """
         Get the successful file transfers for a completed Task as an admin.
 
@@ -1828,13 +1941,14 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_successful_transfers_as_admin>`_
         in the REST documentation for details.
         """
-        task_id = utils.safe_stringify(task_id)
+        task_id_s = utils.safe_stringify(task_id)
         log.info(
-            f"TransferClient.endpoint_manager_task_successful_transfers({task_id}, ...)"
+            "TransferClient.endpoint_manager_task_successful_transfers(%s, ...)",
+            task_id_s,
         )
 
         resource_path = self.qjoin_path(
-            "endpoint_manager", "task", task_id, "successful_transfers"
+            "endpoint_manager", "task", task_id_s, "successful_transfers"
         )
         return PaginatedResource(
             self.get,
@@ -1845,7 +1959,9 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_MARKER,
         )
 
-    def endpoint_manager_task_skipped_errors(self, task_id, num_results=100, **params):
+    def endpoint_manager_task_skipped_errors(
+        self, task_id: ID_PARAM_TYPE, num_results=100, **params
+    ) -> PaginatedResource:
         """
         Get skipped errors for a completed Task as an admin.
 
@@ -1871,11 +1987,13 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_skipped_errors_as_admin>`_
         in the REST documentation for details.
         """
-        task_id = utils.safe_stringify(task_id)
-        log.info(f"TransferClient.endpoint_manager_task_skipped_errors({task_id}, ...)")
+        task_id_s = utils.safe_stringify(task_id)
+        log.info(
+            f"TransferClient.endpoint_manager_task_skipped_errors({task_id_s}, ...)"
+        )
 
         resource_path = self.qjoin_path(
-            "endpoint_manager", "task", task_id, "skipped_errors"
+            "endpoint_manager", "task", task_id_s, "skipped_errors"
         )
         return PaginatedResource(
             self.get,
@@ -1886,7 +2004,9 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_MARKER,
         )
 
-    def endpoint_manager_cancel_tasks(self, task_ids, message, **params):
+    def endpoint_manager_cancel_tasks(
+        self, task_ids: typing.Iterable[ID_PARAM_TYPE], message, **params
+    ) -> TransferResponse:
         """
         Cancel a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
@@ -1909,12 +2029,19 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#admin_cancel>`_
         in the REST documentation for details.
         """
-        task_ids = [utils.safe_stringify(i) for i in task_ids]
+        str_task_ids = [utils.safe_stringify(i) for i in task_ids]
         message = utils.safe_stringify(message)
-        log.info(f"TransferClient.endpoint_manager_cancel_tasks({task_ids}, {message})")
-        json_body = {"message": utils.safe_stringify(message), "task_id_list": task_ids}
+        log.info(
+            f"TransferClient.endpoint_manager_cancel_tasks({str_task_ids}, {message})"
+        )
+        json_body = {
+            "message": utils.safe_stringify(message),
+            "task_id_list": str_task_ids,
+        }
         path = self.qjoin_path("endpoint_manager", "admin_cancel")
-        return self.post(path, json_body=json_body, params=params)
+        return typing.cast(
+            TransferResponse, self.post(path, json_body=json_body, params=params)
+        )
 
     def endpoint_manager_cancel_status(self, admin_cancel_id, **params):
         """
@@ -1941,7 +2068,9 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint_manager", "admin_cancel", admin_cancel_id)
         return self.get(path, params=params)
 
-    def endpoint_manager_pause_tasks(self, task_ids, message, **params):
+    def endpoint_manager_pause_tasks(
+        self, task_ids: typing.Iterable[ID_PARAM_TYPE], message, **params
+    ) -> TransferResponse:
         """
         Pause a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
@@ -1964,14 +2093,23 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#pause_tasks_as_admin>`_
         in the REST documentation for details.
         """
-        task_ids = [utils.safe_stringify(i) for i in task_ids]
+        str_task_ids = [utils.safe_stringify(i) for i in task_ids]
         message = utils.safe_stringify(message)
-        log.info(f"TransferClient.endpoint_manager_pause_tasks({task_ids}, {message})")
-        json_body = {"message": utils.safe_stringify(message), "task_id_list": task_ids}
+        log.info(
+            f"TransferClient.endpoint_manager_pause_tasks({str_task_ids}, {message})"
+        )
+        json_body = {
+            "message": utils.safe_stringify(message),
+            "task_id_list": str_task_ids,
+        }
         path = self.qjoin_path("endpoint_manager", "admin_pause")
-        return self.post(path, json_body=json_body, params=params)
+        return typing.cast(
+            TransferResponse, self.post(path, json_body=json_body, params=params)
+        )
 
-    def endpoint_manager_resume_tasks(self, task_ids, **params):
+    def endpoint_manager_resume_tasks(
+        self, task_ids: typing.Iterable[ID_PARAM_TYPE], **params
+    ) -> TransferResponse:
         """
         Resume a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
@@ -1992,19 +2130,21 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#resume_tasks_as_admin>`_
         in the REST documentation for details.
         """
-        task_ids = [utils.safe_stringify(i) for i in task_ids]
-        log.info(f"TransferClient.endpoint_manager_resume_tasks({task_ids})")
-        json_body = {"task_id_list": task_ids}
+        str_task_ids = [utils.safe_stringify(i) for i in task_ids]
+        log.info(f"TransferClient.endpoint_manager_resume_tasks({str_task_ids})")
+        json_body = {"task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_resume")
-        return self.post(path, json_body=json_body, params=params)
+        return typing.cast(
+            TransferResponse, self.post(path, json_body=json_body, params=params)
+        )
 
     #
     # endpoint manager pause rule methods
     #
 
     def endpoint_manager_pause_rule_list(
-        self, filter_endpoint: typing.Union[str, uuid.UUID, None] = None, **params
-    ):
+        self, filter_endpoint: typing.Optional[ID_PARAM_TYPE] = None, **params
+    ) -> IterableTransferResponse:
         """
         Get a list of pause rules on endpoints that the current user has the
         activity monitor effective role on.
@@ -2030,8 +2170,11 @@ class TransferClient(BaseClient):
         log.info("TransferClient.endpoint_manager_pause_rule_list(...)")
         path = self.qjoin_path("endpoint_manager", "pause_rule_list")
         if filter_endpoint is not None:
-            params["filter_endpoint"] = str(filter_endpoint)
-        return self.get(path, params=params, response_class=IterableTransferResponse)
+            params["filter_endpoint"] = utils.safe_stringify(filter_endpoint)
+        return typing.cast(
+            IterableTransferResponse,
+            self.get(path, params=params, response_class=IterableTransferResponse),
+        )
 
     def endpoint_manager_create_pause_rule(self, data):
         """
