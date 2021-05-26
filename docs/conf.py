@@ -49,7 +49,7 @@ html_theme_options = {
     "repo_url": "https://github.com/globus/globus-sdk-python/",
     "repo_name": "Globus SDK",
     # Visible levels of the global TOC; -1 means unlimited
-    "globaltoc_depth": 2,
+    "globaltoc_depth": 1,
     # If False, expand all TOC entries
     "globaltoc_collapse": False,
     # "hero" text (shown in the top banner)

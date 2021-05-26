@@ -12,11 +12,7 @@ log = logging.getLogger(__name__)
 
 class BaseClient:
     r"""
-    Simple client with error handling for Globus REST APIs. Implemented
-    as a wrapper around a ``requests.Session`` object, with a simplified
-    interface that does not directly expose anything from requests.
-
-    You should *never* try to directly instantiate a ``BaseClient``.
+    Abstract base class for clients with error handling for Globus APIs.
 
     :param authorizer: A ``GlobusAuthorizer`` which will generate Authorization headers
     :type authorizer: :class:`GlobusAuthorizer\
@@ -38,10 +34,10 @@ class BaseClient:
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class: typing.Type[exc.GlobusAPIError] = exc.GlobusAPIError
     default_response_class: typing.Type[GlobusHTTPResponse] = GlobusHTTPResponse
-    # the transport class defines how requests are actually sent, including the retry
-    # policy
+
+    #: the type of Transport which will be used, defaults to ``RequestsTransport``
     transport_class: typing.Type = RequestsTransport
-    # retry policy for the client (None means default policy)
+    #: retry policy for the client (None means the default policy will be used)
     retry_policy: typing.Optional[RetryPolicy] = None
 
     def __init__(

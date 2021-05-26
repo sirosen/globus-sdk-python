@@ -13,10 +13,12 @@ without needing to know Globus API endpoints or their various parameters.
 For example, you could use the ``TransferClient`` to list your task history
 very simply::
 
-    from globus_sdk import TransferClient
+    from globus_sdk import TransferClient, AccessTokenAuthorizer
 
-    # you must have transfer_token in your config for this to work
-    tc = TransferClient()
+    # you must have a valid transfer token for this to work
+    tc = TransferClient(
+        authorizer=AccessTokenAuthorizer("TRANSFER_TOKEN_STRING")
+    )
 
     print("My Last 25 Tasks:")
     # `filter` to get Delete Tasks (default is just Transfer Tasks)
@@ -35,6 +37,7 @@ client instance created per process.
 .. rubric:: Client Types
 
 :doc:`clients/base`
+    All clients have a common core defined by the Base Client.
     The Base Client provides methods which are accessible via any client
     object. These methods correspond directly to HTTP verbs and represent
     single HTTP requests.
@@ -69,11 +72,3 @@ client instance created per process.
 
     Additionally, there is a :class:`SearchQuery <globus_sdk.SearchQuery>`
     object which provides a chainable API for building query documents.
-
-.. toctree::
-   :caption: Table of Contents
-
-   clients/base
-   clients/transfer
-   clients/auth
-   clients/search

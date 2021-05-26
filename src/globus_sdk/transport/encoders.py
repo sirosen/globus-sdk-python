@@ -4,6 +4,9 @@ import requests
 class RequestEncoder:
     """
     A RequestEncoder takes input parameters and outputs a requests.Requests object.
+
+    The default encoder requires that the data is text and is a no-op. It can also be
+    referred to as the ``"text"`` encoder.
     """
 
     def encode(self, method, url, params, data, headers) -> requests.Request:
@@ -17,6 +20,11 @@ class RequestEncoder:
 
 
 class JSONRequestEncoder(RequestEncoder):
+    """
+    This encoder prepares the data as JSON. It also ensures that content-type is set, so
+    that APIs requiring a content-type of "application/json" are able to read the data.
+    """
+
     def encode(self, method, url, params, data, headers):
         if data is not None:
             headers = {"Content-Type": "application/json", **headers}
@@ -24,6 +32,11 @@ class JSONRequestEncoder(RequestEncoder):
 
 
 class FormRequestEncoder(RequestEncoder):
+    """
+    This encoder formats data as a form-encoded body. It requires that the input data is
+    a dict -- any other datatype will result in errors.
+    """
+
     def encode(self, method, url, params, data, headers):
         if not isinstance(data, dict):
             raise TypeError("FormRequestEncoder cannot encode non-dict data")

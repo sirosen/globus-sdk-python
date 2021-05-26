@@ -14,9 +14,32 @@ from globus_sdk.version import __version__
 
 
 class RequestsTransport:
+    """
+    The RequestsTransport handles HTTP request sending and retries.
+
+    It receives raw request information from a client class, and then performs the
+    following steps
+    - encode the data in a prepared request
+    - repeatedly send the request until no retry is requested by the retry policy
+    - return the last response or reraise the last exception
+
+    :param verify_ssl: Explicitly enable or disable SSL verification. This parameter
+        defaults to True, but can be set via the ``GLOBUS_SDK_VERIFY_SSL`` environment
+        variable. Any non-``None`` setting via this parameter takes precedence over the
+        environment variable.
+    :type verify_ssl: bool
+    :param http_timeout: Explicitly set an HTTP timeout value in seconds. This parameter
+        defaults to 60s but can be set via the ``GLOBUS_SDK_HTTP_TIMEOUT`` environment
+        variable. Any value set via this parameter takes precedence over the environment
+        variable.
+    :type http_timeout: int
+    """
+
     # the retry policy may enforce a lower maximum, but this sets a hard cap to avoid
     # potential infinite loop with a bad policy
     max_retries: int = 20
+
+    #: the encoders are a mapping of encoding names to encoder objects
     encoders: typing.Dict[str, RequestEncoder] = {
         "text": RequestEncoder(),
         "json": JSONRequestEncoder(),
