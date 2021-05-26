@@ -1,24 +1,8 @@
-from unittest import mock
-
 import pytest
 import requests
 import responses
 
 import globus_sdk
-
-
-@pytest.fixture(autouse=True)
-def mocksleep():
-    with mock.patch("time.sleep") as m:
-        yield m
-
-
-@pytest.fixture
-def client():
-    class CustomClient(globus_sdk.base.BaseClient):
-        service_name = "foo"
-
-    return CustomClient()
 
 
 @pytest.mark.parametrize("error_status", [500, 429, 502, 503, 504])
