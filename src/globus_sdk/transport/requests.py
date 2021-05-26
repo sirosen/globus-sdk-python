@@ -128,6 +128,6 @@ class RequestsTransport:
             else:
                 if not self.retry_policy.should_retry(ctx):
                     return resp
-        if not resp:
+        if resp is None:
             raise ValueError("Somehow, retries ended without a response")
         return resp

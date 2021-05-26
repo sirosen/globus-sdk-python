@@ -66,6 +66,42 @@ def test_retry_limit(client, mocksleep, num_errors, expect_err):
         assert mocksleep.call_count == num_errors
 
 
+def test_transport_retry_limit(client, mocksleep):
+    # this limit is a safety to protect against a bad policy causing infinite retries
+    client.transport.max_retries = 2
+
+    for _i in range(3):
+        responses.add(
+            responses.GET, "https://foo.api.globus.org/bar", status=500, body="Uh-oh!"
+        )
+    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+
+    with pytest.raises(globus_sdk.GlobusAPIError):
+        client.get("/bar")
+
+    assert mocksleep.call_count == 2
+
+
+def test_bad_max_retries_causes_error(client):
+    client.transport.max_retries = 0
+
+    with pytest.raises(ValueError):
+        client.get("/bar")
+
+
+def test_persistent_connection_error(client):
+    for _i in range(6):
+        responses.add(
+            responses.GET,
+            "https://foo.api.globus.org/bar",
+            body=requests.ConnectionError("foo-err"),
+        )
+    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+
+    with pytest.raises(globus_sdk.GlobusConnectionError):
+        client.get("/bar")
+
+
 def test_no_retry_401_no_authorizer(client):
     responses.add(
         responses.GET, "https://foo.api.globus.org/bar", status=401, body="Unauthorized"
