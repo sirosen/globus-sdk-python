@@ -28,7 +28,7 @@ class RetryContext:
         # state which may be accumulated over multiple retry/retry-checker invocations
         # this is passed forward through all checkers and should be maintained outside
         # of the context of any singular retry
-        self.retry_state: typing.Dict = retry_state or {}
+        self.retry_state = retry_state
         # the retry delay or "backoff" before retrying
         self.backoff: typing.Optional[float] = None
 
@@ -134,7 +134,7 @@ class RetryPolicy:
         self, ctx: RetryContext
     ) -> typing.Optional[bool]:
         # max retries exceeded? don't retry
-        return False if ctx.attempt > self.max_retries else None
+        return False if ctx.attempt >= self.max_retries else None
 
     def default_check_request_exception(
         self, ctx: RetryContext

@@ -1,4 +1,5 @@
+from .encoders import RequestEncoder
 from .requests import RequestsTransport
-from .retry import RetryPolicy
+from .retry import RetryContext, RetryPolicy
 
-__all__ = ("RequestsTransport", "RetryPolicy")
+__all__ = ("RequestsTransport", "RetryPolicy", "RetryContext", "RequestEncoder")
