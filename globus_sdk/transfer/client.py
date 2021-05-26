@@ -1,8 +1,10 @@
 import logging
 import time
+import typing
+import uuid
 
 from globus_sdk import exc
-from globus_sdk.base import BaseClient, merge_params, safe_stringify
+from globus_sdk.base import BaseClient, safe_stringify
 from globus_sdk.transfer.paging import PaginatedResource
 from globus_sdk.transfer.response import (
     ActivationRequirementsResponse,
@@ -188,7 +190,11 @@ class TransferClient(BaseClient):
         return self.delete(path)
 
     def endpoint_search(
-        self, filter_fulltext=None, filter_scope=None, num_results=25, **params
+        self,
+        filter_fulltext: typing.Optional[str] = None,
+        filter_scope: typing.Optional[str] = None,
+        num_results=25,
+        **params,
     ):
         r"""
         .. parsed-literal::
@@ -253,7 +259,10 @@ class TransferClient(BaseClient):
         <https://docs.globus.org/api/transfer/endpoint_search>`_.
         in the REST documentation for details.
         """
-        merge_params(params, filter_scope=filter_scope, filter_fulltext=filter_fulltext)
+        if filter_scope is not None:
+            params["filter_scope"] = filter_scope
+        if filter_fulltext is not None:
+            params["filter_fulltext"] = filter_fulltext
         self.logger.info(f"TransferClient.endpoint_search({params})")
         return PaginatedResource(
             self.get,
@@ -2019,7 +2028,9 @@ class TransferClient(BaseClient):
     # endpoint manager pause rule methods
     #
 
-    def endpoint_manager_pause_rule_list(self, filter_endpoint=None, **params):
+    def endpoint_manager_pause_rule_list(
+        self, filter_endpoint: typing.Union[str, uuid.UUID, None] = None, **params
+    ):
         """
         Get a list of pause rules on endpoints that the current user has the
         activity monitor effective role on.
@@ -2044,7 +2055,8 @@ class TransferClient(BaseClient):
         """
         self.logger.info("TransferClient.endpoint_manager_pause_rule_list(...)")
         path = self.qjoin_path("endpoint_manager", "pause_rule_list")
-        merge_params(params, filter_endpoint=filter_endpoint)
+        if filter_endpoint is not None:
+            params["filter_endpoint"] = str(filter_endpoint)
         return self.get(path, params=params, response_class=IterableTransferResponse)
 
     def endpoint_manager_create_pause_rule(self, data):

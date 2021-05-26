@@ -5,7 +5,6 @@ from globus_sdk.auth.oauth2_authorization_code import GlobusAuthorizationCodeFlo
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.token_response import OAuthDependentTokenResponse
 from globus_sdk.authorizers import BasicAuthorizer
-from globus_sdk.base import merge_params
 from globus_sdk.exc import GlobusSDKUsageError
 
 logger = logging.getLogger(__name__)
@@ -206,5 +205,6 @@ class ConfidentialAppAuthClient(AuthClient):
         """
         self.logger.info("Checking token validity (introspect)")
         body = {"token": token}
-        merge_params(body, include=include)
+        if include is not None:
+            body["include"] = include
         return self.post("/v2/oauth2/token/introspect", text_body=body)

@@ -513,49 +513,6 @@ def slash_join(a, b):
     return a + "/" + b
 
 
-def merge_params(base_params, **more_params):
-    """
-    Merge additional keyword arguments into a base dictionary of keyword
-    arguments. Only inserts additional kwargs which are not None.
-    This way, we can accept a bunch of named kwargs, a collector of additional
-    kwargs, and then put them together sensibly as arguments to another
-    function (typically BaseClient.get() or a variant thereof).
-
-    For example:
-
-    >>> def ep_search(self, filter_scope=None, filter_fulltext=None, **params):
-    >>>     # Yes, this is a side-effecting function, it doesn't return a new
-    >>>     # dict because it's way simpler to update in place
-    >>>     merge_params(
-    >>>         params, filter_scope=filter_scope,
-    >>>         filter_fulltext=filter_fulltext)
-    >>>     return self.get('endpoint_search', params=params)
-
-    this is a whole lot cleaner than the alternative form:
-
-    >>> def ep_search(self, filter_scope=None, filter_fulltext=None, **params):
-    >>>     if filter_scope is not None:
-    >>>         params['filter_scope'] = filter_scope
-    >>>     if filter_fulltext is not None:
-    >>>         params['filter_scope'] = filter_scope
-    >>>     return self.get('endpoint_search', params=params)
-
-    the second form exposes a couple of dangers that are obviated in the first
-    regarding correctness, like the possibility of doing
-
-    >>>     if filter_scope:
-    >>>         params['filter_scope'] = filter_scope
-
-    which is wrong (!) because filter_scope='' is a theoretically valid,
-    real argument we want to pass.
-    The first form will also prove shorter and easier to write for the most
-    part.
-    """
-    for param in more_params:
-        if more_params[param] is not None:
-            base_params[param] = more_params[param]
-
-
 def safe_stringify(value):
     """
     Converts incoming value to a unicode string. Convert bytes by decoding,

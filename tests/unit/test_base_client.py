@@ -7,7 +7,7 @@ from unittest import mock
 import pytest
 
 import globus_sdk
-from globus_sdk.base import BaseClient, merge_params, safe_stringify, slash_join
+from globus_sdk.base import BaseClient, safe_stringify, slash_join
 from tests.common import get_last_request, register_api_route
 
 
@@ -192,40 +192,6 @@ def test_slash_join(a, b):
     Confirms all have the same correct slash_join output
     """
     assert slash_join(a, b) == "a/b"
-
-
-def test_merge_params():
-    """
-    Merges a base parameter dict with other paramaters, validates results
-    Confirms works with explicit dictionaries and arguments
-    Confirms new parameters set to None are ignored
-    Confirms new parameters overwrite old ones (is this correct?)
-    """
-
-    # explicit dictionary merging
-    params = {"param1": "value1"}
-    extra = {"param2": "value2", "param3": "value3"}
-    merge_params(params, **extra)
-    expected = {"param1": "value1", "param2": "value2", "param3": "value3"}
-    assert params == expected
-
-    # arguments
-    params = {"param1": "value1"}
-    merge_params(params, param2="value2", param3="value3")
-    expected = {"param1": "value1", "param2": "value2", "param3": "value3"}
-    assert params == expected
-
-    # ignoring parameters set to none
-    params = {"param1": "value1"}
-    merge_params(params, param2=None, param3=None)
-    expected = {"param1": "value1"}
-    assert params == expected
-
-    # existing parameters
-    params = {"param": "value"}
-    merge_params(params, param="newValue")
-    expected = {"param": "newValue"}
-    assert params == expected
 
 
 @pytest.mark.parametrize("value", ["1", str(1), b"1", "1", 1, testObject()])
