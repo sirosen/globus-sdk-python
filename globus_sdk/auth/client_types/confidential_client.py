@@ -5,10 +5,9 @@ from globus_sdk.auth.oauth2_authorization_code import GlobusAuthorizationCodeFlo
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.token_response import OAuthDependentTokenResponse
 from globus_sdk.authorizers import BasicAuthorizer
-from globus_sdk.base import merge_params
 from globus_sdk.exc import GlobusSDKUsageError
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class ConfidentialAppAuthClient(AuthClient):
@@ -33,7 +32,7 @@ class ConfidentialAppAuthClient(AuthClient):
 
     def __init__(self, client_id, client_secret, **kwargs):
         if "authorizer" in kwargs:
-            logger.error("ArgumentError(ConfidentialAppClient.authorizer)")
+            log.error("ArgumentError(ConfidentialAppClient.authorizer)")
             raise GlobusSDKUsageError(
                 "Cannot give a ConfidentialAppAuthClient an authorizer"
             )
@@ -43,7 +42,7 @@ class ConfidentialAppAuthClient(AuthClient):
             authorizer=BasicAuthorizer(client_id, client_secret),
             **kwargs,
         )
-        self.logger.info(f"Finished initializing client, client_id={client_id}")
+        log.info(f"Finished initializing client, client_id={client_id}")
 
     def oauth2_client_credentials_tokens(self, requested_scopes=None):
         r"""
@@ -68,7 +67,7 @@ class ConfidentialAppAuthClient(AuthClient):
         ...     tokens.by_resource_server["transfer.api.globus.org"])
         >>> transfer_token = transfer_token_info["access_token"]
         """
-        self.logger.info("Fetching token(s) using client credentials")
+        log.info("Fetching token(s) using client credentials")
         requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
         # convert scopes iterable to string immediately on load
         if not isinstance(requested_scopes, str):
@@ -120,7 +119,7 @@ class ConfidentialAppAuthClient(AuthClient):
         `in the Globus Auth Specification \
         <https://docs.globus.org/api/auth/developer-guide/#obtaining-authorization>`_
         """
-        self.logger.info("Starting OAuth2 Authorization Code Grant Flow")
+        log.info("Starting OAuth2 Authorization Code Grant Flow")
         self.current_oauth2_flow_manager = GlobusAuthorizationCodeFlowManager(
             self,
             redirect_uri,
@@ -159,8 +158,8 @@ class ConfidentialAppAuthClient(AuthClient):
         :rtype: :class:`OAuthTokenResponse
                 <globus_sdk.auth.token_response.OAuthTokenResponse>`
         """
-        self.logger.info("Getting dependent tokens from access token")
-        self.logger.debug(f"additional_params={additional_params}")
+        log.info("Getting dependent tokens from access token")
+        log.debug(f"additional_params={additional_params}")
         form_data = {
             "grant_type": "urn:globus:auth:grant_type:dependent_token",
             "token": token,
@@ -204,7 +203,8 @@ class ConfidentialAppAuthClient(AuthClient):
         #token_introspection_post_v2_oauth2_token_introspect>`_
         in the API documentation for details.
         """
-        self.logger.info("Checking token validity (introspect)")
+        log.info("Checking token validity (introspect)")
         body = {"token": token}
-        merge_params(body, include=include)
+        if include is not None:
+            body["include"] = include
         return self.post("/v2/oauth2/token/introspect", text_body=body)

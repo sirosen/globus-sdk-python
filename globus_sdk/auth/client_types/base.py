@@ -4,12 +4,12 @@ import logging
 
 import jwt
 
-from globus_sdk import exc
+from globus_sdk import exc, utils
 from globus_sdk.auth.token_response import OAuthTokenResponse
 from globus_sdk.authorizers import NullAuthorizer
-from globus_sdk.base import BaseClient, safe_stringify
+from globus_sdk.base import BaseClient
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class AuthClient(BaseClient):
@@ -119,11 +119,11 @@ class AuthClient(BaseClient):
 
         def _convert_listarg(val):
             if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):
-                return ",".join(safe_stringify(x) for x in val)
+                return ",".join(utils.safe_stringify(x) for x in val)
             else:
-                return safe_stringify(val)
+                return utils.safe_stringify(val)
 
-        self.logger.info("Looking up Globus Auth Identities")
+        log.info("Looking up Globus Auth Identities")
 
         # if either of these params has a truthy value, stringify it safely,
         # letting us consume args whose `__str__` methods produce "the right
@@ -137,10 +137,10 @@ class AuthClient(BaseClient):
         if ids:
             params["ids"] = _convert_listarg(ids)
 
-        self.logger.debug(f"params={params}")
+        log.debug(f"params={params}")
 
         if "usernames" in params and "ids" in params:
-            self.logger.warning(
+            log.warning(
                 "get_identities call with both usernames and "
                 "identities set! Expected to result in errors"
             )
@@ -159,9 +159,7 @@ class AuthClient(BaseClient):
         :rtype: ``string``
         """
         if not self.current_oauth2_flow_manager:
-            self.logger.error(
-                "OutOfOrderOperations(get_authorize_url before start_flow)"
-            )
+            log.error("OutOfOrderOperations(get_authorize_url before start_flow)")
             raise exc.GlobusSDKUsageError(
                 "Cannot get authorize URL until starting an OAuth2 flow. "
                 "Call the oauth2_start_flow() method on this "
@@ -170,7 +168,7 @@ class AuthClient(BaseClient):
         auth_url = self.current_oauth2_flow_manager.get_authorize_url(
             additional_params=additional_params
         )
-        self.logger.info(f"Got authorization URL: {auth_url}")
+        log.info(f"Got authorization URL: {auth_url}")
         return auth_url
 
     def oauth2_exchange_code_for_tokens(self, auth_code):
@@ -186,12 +184,12 @@ class AuthClient(BaseClient):
             against Globus APIs.
         :type auth_code: str
         """
-        self.logger.info(
+        log.info(
             "Final Step of 3-legged OAuth2 Flows: "
             "Exchanging authorization code for token(s)"
         )
         if not self.current_oauth2_flow_manager:
-            self.logger.error("OutOfOrderOperations(exchange_code before start_flow)")
+            log.error("OutOfOrderOperations(exchange_code before start_flow)")
             raise exc.GlobusSDKUsageError(
                 "Cannot exchange auth code until starting an OAuth2 flow. "
                 "Call the oauth2_start_flow() method on this "
@@ -221,9 +219,7 @@ class AuthClient(BaseClient):
         :param additional_params: A dict of extra params to encode in the refresh call.
         :type additional_params: dict, optional
         """
-        self.logger.info(
-            "Executing token refresh; typically requires client credentials"
-        )
+        log.info("Executing token refresh; typically requires client credentials")
         form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
 
         if additional_params:
@@ -277,7 +273,7 @@ class AuthClient(BaseClient):
         >>>     tok = do_new_login()
         >>> # at this point, tok is expected to be a valid token
         """
-        self.logger.info("Validating token")
+        log.info("Validating token")
         body = {"token": token}
 
         # if this client has no way of authenticating itself but
@@ -286,7 +282,7 @@ class AuthClient(BaseClient):
             self.authorizer, NullAuthorizer
         )
         if no_authentication and self.client_id:
-            self.logger.debug("Validating token with unauthenticated client")
+            log.debug("Validating token with unauthenticated client")
             body.update({"client_id": self.client_id})
 
         if additional_params:
@@ -318,7 +314,7 @@ class AuthClient(BaseClient):
         >>> ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
         >>> ac.oauth2_revoke_token('<token_string>')
         """
-        self.logger.info("Revoking token")
+        log.info("Revoking token")
         body = {"token": token}
 
         # if this client has no way of authenticating itself but
@@ -327,7 +323,7 @@ class AuthClient(BaseClient):
             self.authorizer, NullAuthorizer
         )
         if no_authentication and self.client_id:
-            self.logger.debug("Revoking token with unauthenticated client")
+            log.debug("Revoking token with unauthenticated client")
             body.update({"client_id": self.client_id})
 
         if additional_params:
@@ -352,7 +348,7 @@ class AuthClient(BaseClient):
         :type response_class: class, optional
         :rtype: ``response_class``
         """
-        self.logger.info("Fetching new token from Globus Auth")
+        log.info("Fetching new token from Globus Auth")
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
         return self.post(
@@ -384,7 +380,7 @@ class AuthClient(BaseClient):
         #get_or_post_v2_oauth2_userinfo_resource>`_
         in the API documentation for details.
         """
-        self.logger.info("Looking up OIDC-style Userinfo from Globus Auth")
+        log.info("Looking up OIDC-style Userinfo from Globus Auth")
         return self.get("/v2/oauth2/userinfo")
 
     def get_openid_configuration(self):
@@ -392,7 +388,7 @@ class AuthClient(BaseClient):
         Fetch the OpenID Connect configuration data from the well-known URI for Globus
         Auth.
         """
-        self.logger.info("Fetching OIDC Config")
+        log.info("Fetching OIDC Config")
         return self.get("/.well-known/openid-configuration")
 
     def get_jwk(self, openid_configuration=None, as_pem=False):
@@ -407,22 +403,22 @@ class AuthClient(BaseClient):
         :param as_pem: Decode the JWK to an RSA PEM key, typically for JWT decoding
         :type as_pem: bool
         """
-        self.logger.info("Fetching JWK")
+        log.info("Fetching JWK")
         if not openid_configuration:
-            self.logger.debug("No OIDC Config provided, autofetching...")
+            log.debug("No OIDC Config provided, autofetching...")
             openid_configuration = self.get_openid_configuration()
 
         jwks_uri = openid_configuration["jwks_uri"]
-        self.logger.debug("jwks_uri=%s", jwks_uri)
+        log.debug("jwks_uri=%s", jwks_uri)
         jwk_data = self.get(jwks_uri).data
         if not as_pem:
-            self.logger.debug("returning jwk data where as_pem=False")
+            log.debug("returning jwk data where as_pem=False")
             return jwk_data
         else:
-            self.logger.debug("JWK as_pem=True requested, decoding...")
+            log.debug("JWK as_pem=True requested, decoding...")
             # decode from JWK to an RSA PEM key for JWT decoding
             jwk_as_pem = jwt.algorithms.RSAAlgorithm.from_jwk(
                 json.dumps(jwk_data["keys"][0])
             )
-            self.logger.debug("JWK PEM decoding finished successfully")
+            log.debug("JWK PEM decoding finished successfully")
             return jwk_as_pem

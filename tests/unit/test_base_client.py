@@ -1,5 +1,4 @@
 import json
-import logging.handlers
 import os
 import uuid
 from unittest import mock
@@ -7,7 +6,7 @@ from unittest import mock
 import pytest
 
 import globus_sdk
-from globus_sdk.base import BaseClient, merge_params, safe_stringify, slash_join
+from globus_sdk.base import BaseClient
 from tests.common import get_last_request, register_api_route
 
 
@@ -30,37 +29,10 @@ def base_client():
 ERROR_STATUS_CODES = (400, 404, 405, 409, 500, 503)
 
 
-class testObject:
-    """test obj for safe_stringify testing"""
-
-    def __str__(self):
-        return "1"
-
-
 def test_cannot_instantiate_plain_base_client():
     # attempting to instantiate a BaseClient errors
     with pytest.raises(NotImplementedError):
         BaseClient()
-
-
-def test_client_log_adapter(base_client):
-    """
-    Logs a test message with the base client's logger,
-    Confirms the ClientLogAdapter marks the message with the client
-    """
-    # make a MemoryHandler for capturing the log in a buffer)
-    memory_handler = logging.handlers.MemoryHandler(1028)
-    base_client.logger.logger.addHandler(memory_handler)
-    base_client.logger.logger.setLevel("INFO")
-    # send the test message
-    in_msg = "Testing ClientLogAdapter"
-    base_client.logger.info(in_msg)
-    # confirm results
-    out_msg = memory_handler.buffer[0].getMessage()
-    expected_msg = f"[instance:{id(base_client)}] {in_msg}"
-    assert expected_msg == out_msg
-
-    memory_handler.close()
 
 
 def test_set_http_timeout(base_client):
@@ -178,62 +150,3 @@ def test_http_methods(method, allows_body, base_client):
         assert excinfo.value.raw_json["x"] == "y"
         assert excinfo.value.code == "ErrorCode"
         assert excinfo.value.message == "foo"
-
-
-@pytest.mark.parametrize(
-    "a, b",
-    [(a, b) for a in ["a", "a/"] for b in ["b", "/b"]]
-    + [("a/b", c) for c in ["", None]],  # type: ignore
-)
-def test_slash_join(a, b):
-    """
-    slash_joins a's with and without trailing "/"
-    to b's with and without leading "/"
-    Confirms all have the same correct slash_join output
-    """
-    assert slash_join(a, b) == "a/b"
-
-
-def test_merge_params():
-    """
-    Merges a base parameter dict with other paramaters, validates results
-    Confirms works with explicit dictionaries and arguments
-    Confirms new parameters set to None are ignored
-    Confirms new parameters overwrite old ones (is this correct?)
-    """
-
-    # explicit dictionary merging
-    params = {"param1": "value1"}
-    extra = {"param2": "value2", "param3": "value3"}
-    merge_params(params, **extra)
-    expected = {"param1": "value1", "param2": "value2", "param3": "value3"}
-    assert params == expected
-
-    # arguments
-    params = {"param1": "value1"}
-    merge_params(params, param2="value2", param3="value3")
-    expected = {"param1": "value1", "param2": "value2", "param3": "value3"}
-    assert params == expected
-
-    # ignoring parameters set to none
-    params = {"param1": "value1"}
-    merge_params(params, param2=None, param3=None)
-    expected = {"param1": "value1"}
-    assert params == expected
-
-    # existing parameters
-    params = {"param": "value"}
-    merge_params(params, param="newValue")
-    expected = {"param": "newValue"}
-    assert params == expected
-
-
-@pytest.mark.parametrize("value", ["1", str(1), b"1", "1", 1, testObject()])
-def test_safe_stringify(value):
-    """
-    safe_stringifies strings, bytes, explicit unicode, an int, an object
-    and confirms safe_stringify returns utf-8 encoding for all inputs
-    """
-    safe_value = safe_stringify(value)
-    assert safe_value == "1"
-    assert type(safe_value) == str

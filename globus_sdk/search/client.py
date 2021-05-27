@@ -1,10 +1,11 @@
 import logging
+import typing
 
-from globus_sdk import exc
-from globus_sdk.base import BaseClient, merge_params, safe_stringify
+from globus_sdk import exc, utils
+from globus_sdk.base import BaseClient
 from globus_sdk.response import GlobusHTTPResponse
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class SearchClient(BaseClient):
@@ -54,8 +55,8 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/index_meta/>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        self.logger.info(f"SearchClient.get_index({index_id})")
+        index_id = utils.safe_stringify(index_id)
+        log.info(f"SearchClient.get_index({index_id})")
         path = self.qjoin_path("v1/index", index_id)
         return self.get(path, params=params)
 
@@ -66,11 +67,10 @@ class SearchClient(BaseClient):
     def search(
         self,
         index_id,
-        q,
-        offset=0,
-        limit=10,
-        query_template=None,
-        advanced=False,
+        q: str,
+        offset: int = 0,
+        limit: int = 10,
+        advanced: bool = False,
         **params,
     ):
         """
@@ -90,17 +90,17 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/search/#simple_get_query>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        merge_params(
-            params,
-            q=q,
-            offset=offset,
-            limit=limit,
-            query_template=query_template,
-            advanced=advanced,
+        index_id = utils.safe_stringify(index_id)
+        params.update(
+            {
+                "q": q,
+                "offset": offset,
+                "limit": limit,
+                "advanced": advanced,
+            }
         )
 
-        self.logger.info(f"SearchClient.search({index_id}, ...)")
+        log.info(f"SearchClient.search({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "search")
         return self.get(path, params=params)
 
@@ -144,8 +144,8 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/search/#complex_post_query>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        self.logger.info(f"SearchClient.post_search({index_id}, ...)")
+        index_id = utils.safe_stringify(index_id)
+        log.info(f"SearchClient.post_search({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "search")
         return self.post(path, data)
 
@@ -206,8 +206,8 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/ingest/>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        self.logger.info(f"SearchClient.ingest({index_id}, ...)")
+        index_id = utils.safe_stringify(index_id)
+        log.info(f"SearchClient.ingest({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "ingest")
         return self.post(path, data)
 
@@ -244,8 +244,8 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/subject_ops/#delete_by_query>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        self.logger.info(f"SearchClient.delete_by_query({index_id}, ...)")
+        index_id = utils.safe_stringify(index_id)
+        log.info(f"SearchClient.delete_by_query({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "delete_by_query")
         return self.post(path, data)
 
@@ -253,7 +253,7 @@ class SearchClient(BaseClient):
     # Subject Operations
     #
 
-    def get_subject(self, index_id, subject, **params):
+    def get_subject(self, index_id, subject: str, **params):
         """
         ``GET /v1/index/<index_id>/subject``
 
@@ -272,14 +272,13 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/subject_ops/#get_by_subject>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        merge_params(params, subject=subject)
-
-        self.logger.info(f"SearchClient.get_subject({index_id}, {subject}, ...)")
+        index_id = utils.safe_stringify(index_id)
+        params["subject"] = subject
+        log.info(f"SearchClient.get_subject({index_id}, {subject}, ...)")
         path = self.qjoin_path("v1/index", index_id, "subject")
         return self.get(path, params=params)
 
-    def delete_subject(self, index_id, subject, **params):
+    def delete_subject(self, index_id, subject: str, **params):
         """
         ``DELETE /v1/index/<index_id>/subject``
 
@@ -298,10 +297,10 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/subject_ops/#delete_by_subject>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        merge_params(params, subject=subject)
+        index_id = utils.safe_stringify(index_id)
+        params["subject"] = subject
 
-        self.logger.info(f"SearchClient.delete_subject({index_id}, {subject}, ...)")
+        log.info(f"SearchClient.delete_subject({index_id}, {subject}, ...)")
         path = self.qjoin_path("v1/index", index_id, "subject")
         return self.delete(path, params=params)
 
@@ -309,7 +308,9 @@ class SearchClient(BaseClient):
     # Entry Operations
     #
 
-    def get_entry(self, index_id, subject, entry_id=None, **params):
+    def get_entry(
+        self, index_id, subject: str, entry_id: typing.Optional[str] = None, **params
+    ):
         """
         ``GET /v1/index/<index_id>/entry``
 
@@ -335,10 +336,12 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/entry_ops/#get_single_entry>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        merge_params(params, subject=subject, entry_id=entry_id)
+        index_id = utils.safe_stringify(index_id)
+        params["subject"] = subject
+        if entry_id is not None:
+            params["entry_id"] = entry_id
 
-        self.logger.info(
+        log.info(
             "SearchClient.get_entry({}, {}, {}, ...)".format(
                 index_id, subject, entry_id
             )
@@ -384,8 +387,8 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/entry_ops/#create_single_entry>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        self.logger.info(f"SearchClient.create_entry({index_id}, ...)")
+        index_id = utils.safe_stringify(index_id)
+        log.info(f"SearchClient.create_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.post(path, data)
 
@@ -414,12 +417,14 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/entry_ops/#update_single_entry>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        self.logger.info(f"SearchClient.update_entry({index_id}, ...)")
+        index_id = utils.safe_stringify(index_id)
+        log.info(f"SearchClient.update_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.put(path, data)
 
-    def delete_entry(self, index_id, subject, entry_id=None, **params):
+    def delete_entry(
+        self, index_id, subject: str, entry_id: typing.Optional[str] = None, **params
+    ):
         """
         ``DELETE  /v1/index/<index_id>/entry``
 
@@ -445,53 +450,17 @@ class SearchClient(BaseClient):
         <https://docs.globus.org/api/search/entry_ops/#delete_single_entry>`_
         in the API documentation for details.
         """
-        index_id = safe_stringify(index_id)
-        merge_params(params, subject=subject, entry_id=entry_id)
-        self.logger.info(
+        index_id = utils.safe_stringify(index_id)
+        params["subject"] = subject
+        if entry_id is not None:
+            params["entry_id"] = entry_id
+        log.info(
             "SearchClient.delete_entry({}, {}, {}, ...)".format(
                 index_id, subject, entry_id
             )
         )
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.delete(path, params=params)
-
-    #
-    # Lookup Query Templates
-    #
-
-    def get_query_template(self, index_id, template_name):
-        """
-        ``GET /v1/index/<index_id>/query_template/<template_name>``
-
-        **External Documentation**
-
-        See
-        `Get Query Template \
-        <https://docs.globus.org/api/search/query_templates/#get_query_template>`_
-        in the API documentation for details.
-        """
-        index_id = safe_stringify(index_id)
-        self.logger.info(
-            f"SearchClient.get_query_template({index_id}, {template_name})"
-        )
-        path = self.qjoin_path("v1/index", index_id, "query_template", template_name)
-        return self.get(path)
-
-    def get_query_template_list(self, index_id):
-        """
-        ``GET /v1/index/<index_id>/query_template``
-
-        **External Documentation**
-
-        See
-        `Get Query Template List \
-        <https://docs.globus.org/api/search/query_templates/#get_query_template_list>`_
-        in the API documentation for details.
-        """
-        index_id = safe_stringify(index_id)
-        self.logger.info(f"SearchClient.get_query_template_list({index_id})")
-        path = self.qjoin_path("v1/index", index_id, "query_template")
-        return self.get(path)
 
     #
     # Task Management
@@ -508,8 +477,8 @@ class SearchClient(BaseClient):
         >>> assert task['index_id'] == known_index_id
         >>> print(task["task_id"] + " | " + task['state'])
         """
-        task_id = safe_stringify(task_id)
-        self.logger.info(f"SearchClient.get_task({task_id})")
+        task_id = utils.safe_stringify(task_id)
+        log.info(f"SearchClient.get_task({task_id})")
         path = self.qjoin_path("v1/task", task_id)
         return self.get(path, params=params)
 
@@ -524,7 +493,7 @@ class SearchClient(BaseClient):
         >>> for task in task_list['tasks']:
         >>>     print(task["task_id"] + " | " + task['state'])
         """
-        index_id = safe_stringify(index_id)
-        self.logger.info(f"SearchClient.get_task_list({index_id})")
+        index_id = utils.safe_stringify(index_id)
+        log.info(f"SearchClient.get_task_list({index_id})")
         path = self.qjoin_path("v1/task_list", index_id)
         return self.get(path, params=params)
