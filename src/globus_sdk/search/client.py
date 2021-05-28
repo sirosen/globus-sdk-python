@@ -1,14 +1,13 @@
 import logging
 from typing import Optional
 
-from globus_sdk import exc, utils
+from globus_sdk import exc, response, utils
 from globus_sdk.base import BaseClient
-from globus_sdk.response import GlobusHTTPResponse
 
 log = logging.getLogger(__name__)
 
 
-class SearchClient(BaseClient):
+class SearchClient(BaseClient[response.GlobusHTTPResponse]):
     r"""
     Client for the Globus Search API
 
@@ -26,14 +25,13 @@ class SearchClient(BaseClient):
     .. automethodlist:: globus_sdk.SearchClient
     """
     error_class = exc.SearchAPIError
-    default_response_class = GlobusHTTPResponse
     service_name = "search"
 
     #
     # Index Management
     #
 
-    def get_index(self, index_id, **params):
+    def get_index(self, index_id, **params) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/index/<index_id>``
 
