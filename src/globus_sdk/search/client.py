@@ -7,7 +7,7 @@ from globus_sdk.base import BaseClient
 log = logging.getLogger(__name__)
 
 
-class SearchClient(BaseClient[response.GlobusHTTPResponse]):
+class SearchClient(BaseClient):
     r"""
     Client for the Globus Search API
 

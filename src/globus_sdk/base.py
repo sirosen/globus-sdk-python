@@ -1,20 +1,19 @@
 import logging
-import sys
 import typing  # needed: https://github.com/PyCQA/pyflakes/issues/561
 import urllib.parse
-from typing import Dict, Generic, Optional, Type, TypeVar, cast
+from typing import Dict, Optional, Type, TypeVar
 
 from globus_sdk import config, exc, utils
+from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.transport import RequestsTransport, RetryPolicy
 
 log = logging.getLogger(__name__)
 
 Response_T = TypeVar("Response_T", bound=GlobusHTTPResponse)
-DefaultResponse_T = TypeVar("DefaultResponse_T", bound=GlobusHTTPResponse)
 
 
-class BaseClient(Generic[DefaultResponse_T]):
+class BaseClient:
     r"""
     Abstract base class for clients with error handling for Globus APIs.
 
@@ -45,10 +44,11 @@ class BaseClient(Generic[DefaultResponse_T]):
 
     def __init__(
         self,
-        environment=None,
-        base_url=None,
-        authorizer=None,
-        app_name=None,
+        *,
+        environment: Optional[str] = None,
+        base_url: Optional[str] = None,
+        authorizer: Optional[GlobusAuthorizer] = None,
+        app_name: Optional[str] = None,
         transport_params: Optional[Dict] = None,
     ):
         # explicitly check the `service_name` to ensure that it was set
@@ -111,48 +111,6 @@ class BaseClient(Generic[DefaultResponse_T]):
         log.info("__setstate__() finished; client unpickled")
 
     @property
-    def default_response_class(self) -> Type[DefaultResponse_T]:
-        # start with an assumption of GlobusHTTPResponse
-        deduced_type = GlobusHTTPResponse
-
-        # inspect __orig_class__ , as demonstrated by typing_inspect:
-        # https://github.com/ilevkivskyi/typing_inspect/blob/6dd6b38bc12bcbaf814fb0c69a801365b81e3611/typing_inspect.py#L556-L568
-        # for
-        #
-        #   class FooClient(BaseClient[T]): ...
-        #
-        # __orig_bases__ = (`BaseClient[T]`,) , so this expression gives `BaseClient[T]`
-        generic_bases = getattr(self, "__orig_bases__", ())
-        if generic_bases:
-            generic_base = generic_bases[0]
-
-            # if the unsubscripted variant of the class is `Generic`, that means that
-            # the class inherited from `BaseClient` without subscripting it, so skip
-            # further checks -- the deduced type should remain the default
-            # (GlobusHTTPResponse)
-            #
-            # note that on older pythons (py3.6 at least), `__origin__` may be
-            # `BaseClient` instead of `Generic` in this same scenario
-            #
-            # however, if the origin appears to be more interesting, inspect it
-            if generic_base.__origin__ is not Generic:
-                # extract the arguments to the generic type in a compatible way
-                #
-                # py3.8 introduces methods for inspecting generics,
-                # but for older pythons check __args__
-                if sys.version_info < (3, 8):
-                    class_args = generic_base.__args__
-                else:
-                    class_args = typing.get_args(generic_base)
-
-                # on newer pythons, `class_args` should always be populated in this
-                # scenario, but in py3.6 __args__ could be None when `BaseClient` isn't
-                # parametrized in the class definition
-                if class_args:
-                    deduced_type = class_args[0]
-        return cast(Type[DefaultResponse_T], deduced_type)
-
-    @property
     def app_name(self):
         return self._app_name
 
@@ -182,7 +140,7 @@ class BaseClient(Generic[DefaultResponse_T]):
         params: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         response_class: None = None,
-    ) -> DefaultResponse_T:
+    ) -> GlobusHTTPResponse:
         ...
 
     def get(self, path, *, params=None, headers=None, response_class=None):
@@ -226,7 +184,7 @@ class BaseClient(Generic[DefaultResponse_T]):
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
         response_class: None = None,
-    ) -> DefaultResponse_T:
+    ) -> GlobusHTTPResponse:
         ...
 
     def post(
@@ -277,7 +235,7 @@ class BaseClient(Generic[DefaultResponse_T]):
         params: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         response_class: None = None,
-    ) -> DefaultResponse_T:
+    ) -> GlobusHTTPResponse:
         ...
 
     def delete(self, path, *, params=None, headers=None, response_class=None):
@@ -321,7 +279,7 @@ class BaseClient(Generic[DefaultResponse_T]):
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
         response_class: None = None,
-    ) -> DefaultResponse_T:
+    ) -> GlobusHTTPResponse:
         ...
 
     def put(
@@ -376,7 +334,7 @@ class BaseClient(Generic[DefaultResponse_T]):
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
         response_class: None = None,
-    ) -> DefaultResponse_T:
+    ) -> GlobusHTTPResponse:
         ...
 
     def patch(
@@ -433,7 +391,7 @@ class BaseClient(Generic[DefaultResponse_T]):
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
         response_class: None = None,
-    ) -> DefaultResponse_T:
+    ) -> GlobusHTTPResponse:
         ...
 
     def request(
@@ -465,8 +423,8 @@ class BaseClient(Generic[DefaultResponse_T]):
             registered with the transport. By default, strings get "text" behavior and
             all other objects get "json".
         :type encoding: string
-        :param response_class: Class for response object, overrides the client's
-            ``default_response_class``
+        :param response_class: Class for response object, overrides the default_response
+            class
         :type response_class: class
 
         :return: :class:`GlobusHTTPResponse \
@@ -500,7 +458,7 @@ class BaseClient(Generic[DefaultResponse_T]):
         if 200 <= r.status_code < 400:
             log.debug(f"request completed with response code: {r.status_code}")
             if response_class is None:
-                return self.default_response_class(r, client=self)
+                return GlobusHTTPResponse(r, client=self)
             else:
                 return response_class(r, client=self)
 

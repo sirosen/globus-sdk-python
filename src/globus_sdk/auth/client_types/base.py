@@ -4,7 +4,7 @@ import logging
 
 import jwt
 
-from globus_sdk import exc, response, utils
+from globus_sdk import exc, utils
 from globus_sdk.auth.token_response import OAuthTokenResponse
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.base import BaseClient
@@ -12,7 +12,7 @@ from globus_sdk.base import BaseClient
 log = logging.getLogger(__name__)
 
 
-class AuthClient(BaseClient[response.GlobusHTTPResponse]):
+class AuthClient(BaseClient):
     """
     Client for the
     `Globus Auth API <https://docs.globus.org/api/auth/>`_

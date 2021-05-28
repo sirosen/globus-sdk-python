@@ -13,19 +13,19 @@ generally be used.
    :members:
    :member-order: bysource
    :show-inheritance:
-   :exclude-members: error_class, default_response_class
+   :exclude-members: error_class
 
 .. autoclass:: globus_sdk.NativeAppAuthClient
    :members:
    :member-order: bysource
    :show-inheritance:
-   :exclude-members: error_class, default_response_class
+   :exclude-members: error_class
 
 .. autoclass:: globus_sdk.ConfidentialAppAuthClient
    :members:
    :member-order: bysource
    :show-inheritance:
-   :exclude-members: error_class, default_response_class
+   :exclude-members: error_class
 
 Helper Objects
 --------------

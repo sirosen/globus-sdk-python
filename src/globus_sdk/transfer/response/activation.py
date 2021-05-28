@@ -1,9 +1,9 @@
 import time
 
-from globus_sdk.transfer.response.base import TransferResponse
+from globus_sdk.response import GlobusHTTPResponse
 
 
-class ActivationRequirementsResponse(TransferResponse):
+class ActivationRequirementsResponse(GlobusHTTPResponse):
     """
     Response class for Activation Requirements responses.
 
@@ -20,7 +20,7 @@ class ActivationRequirementsResponse(TransferResponse):
     """
 
     def __init__(self, *args, **kwargs):
-        TransferResponse.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # at initialization time, capture expires_in and convert to an absolute
         # timestamp -- otherwise, the time between receiving the response and
