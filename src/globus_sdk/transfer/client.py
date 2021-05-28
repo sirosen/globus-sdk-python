@@ -553,7 +553,7 @@ class TransferClient(BaseClient):
         return typing.cast(TransferResponse, self.get(path, params=params))
 
     def add_endpoint_server(
-        self, endpoint_id: ID_PARAM_TYPE, server_data
+        self, endpoint_id: ID_PARAM_TYPE, server_data: typing.Dict
     ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/server``
@@ -571,10 +571,10 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_server({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "server")
-        return typing.cast(TransferResponse, self.post(path, server_data))
+        return typing.cast(TransferResponse, self.post(path, data=server_data))
 
     def update_endpoint_server(
-        self, endpoint_id: ID_PARAM_TYPE, server_id, server_data
+        self, endpoint_id: ID_PARAM_TYPE, server_id, server_data: typing.Dict
     ) -> TransferResponse:
         """
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
@@ -596,7 +596,7 @@ class TransferClient(BaseClient):
             server_id,
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
-        return typing.cast(TransferResponse, self.put(path, server_data))
+        return typing.cast(TransferResponse, self.put(path, data=server_data))
 
     def delete_endpoint_server(
         self, endpoint_id: ID_PARAM_TYPE, server_id
@@ -650,7 +650,7 @@ class TransferClient(BaseClient):
         )
 
     def add_endpoint_role(
-        self, endpoint_id: ID_PARAM_TYPE, role_data
+        self, endpoint_id: ID_PARAM_TYPE, role_data: typing.Dict
     ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/role``
@@ -668,7 +668,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_role({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role")
-        return typing.cast(TransferResponse, self.post(path, role_data))
+        return typing.cast(TransferResponse, self.post(path, data=role_data))
 
     def get_endpoint_role(
         self, endpoint_id: ID_PARAM_TYPE, role_id, **params
@@ -764,7 +764,7 @@ class TransferClient(BaseClient):
         return typing.cast(TransferResponse, self.get(path, params=params))
 
     def add_endpoint_acl_rule(
-        self, endpoint_id: ID_PARAM_TYPE, rule_data
+        self, endpoint_id: ID_PARAM_TYPE, rule_data: typing.Dict
     ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/access``
@@ -802,10 +802,10 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_acl_rule({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "access")
-        return typing.cast(TransferResponse, self.post(path, rule_data))
+        return typing.cast(TransferResponse, self.post(path, data=rule_data))
 
     def update_endpoint_acl_rule(
-        self, endpoint_id: ID_PARAM_TYPE, rule_id, rule_data
+        self, endpoint_id: ID_PARAM_TYPE, rule_id, rule_data: typing.Dict
     ) -> TransferResponse:
         """
         ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
@@ -827,7 +827,7 @@ class TransferClient(BaseClient):
             rule_id,
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
-        return typing.cast(TransferResponse, self.put(path, rule_data))
+        return typing.cast(TransferResponse, self.put(path, data=rule_data))
 
     def delete_endpoint_acl_rule(
         self, endpoint_id: ID_PARAM_TYPE, rule_id
@@ -912,7 +912,7 @@ class TransferClient(BaseClient):
         return typing.cast(TransferResponse, self.get(path, params=params))
 
     def update_bookmark(
-        self, bookmark_id: ID_PARAM_TYPE, bookmark_data
+        self, bookmark_id: ID_PARAM_TYPE, bookmark_data: typing.Dict
     ) -> TransferResponse:
         """
         ``PUT /bookmark/<bookmark_id>``
@@ -930,7 +930,7 @@ class TransferClient(BaseClient):
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.update_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
-        return typing.cast(TransferResponse, self.put(path, bookmark_data))
+        return typing.cast(TransferResponse, self.put(path, data=bookmark_data))
 
     def delete_bookmark(self, bookmark_id: ID_PARAM_TYPE) -> TransferResponse:
         """
@@ -1310,7 +1310,9 @@ class TransferClient(BaseClient):
         resource_path = self.qjoin_path("task", task_id_s)
         return typing.cast(TransferResponse, self.get(resource_path, params=params))
 
-    def update_task(self, task_id: ID_PARAM_TYPE, data, **params) -> TransferResponse:
+    def update_task(
+        self, task_id: ID_PARAM_TYPE, data: typing.Dict, **params
+    ) -> TransferResponse:
         """
         ``PUT /task/<task_id>``
 
@@ -1328,7 +1330,7 @@ class TransferClient(BaseClient):
         log.info(f"TransferClient.update_task({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s)
         return typing.cast(
-            TransferResponse, self.put(resource_path, data, params=params)
+            TransferResponse, self.put(resource_path, data=data, params=params)
         )
 
     def cancel_task(self, task_id: ID_PARAM_TYPE) -> TransferResponse:

@@ -2,7 +2,6 @@ import logging
 import typing
 import urllib.parse
 
-
 from globus_sdk import config, exc, utils
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.transport import RequestsTransport, RetryPolicy
