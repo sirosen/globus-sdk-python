@@ -133,8 +133,7 @@ class RetryPolicy:
         This is always the minimum of the backoff (run on the context) and the
         ``max_sleep``.
         """
-        delay = self.backoff(ctx)
-        return min(delay, self.max_sleep)
+        return min(self.backoff(ctx), self.max_sleep)
 
     def should_retry(self, context: RetryContext) -> bool:
         """
