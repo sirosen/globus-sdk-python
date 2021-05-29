@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from globus_sdk.transport import RetryContext, RetryPolicy
+from globus_sdk.transport import RetryCheckResult, RetryContext, RetryPolicy
 
 
 @pytest.mark.parametrize("http_status", (429, 503))
@@ -57,4 +57,4 @@ def test_default_retry_check_noop_on_exception(checkname, mocksleep):
     policy = RetryPolicy()
     method = getattr(policy, checkname)
     ctx = RetryContext(1, retry_state={}, exception=Exception("foo"))
-    assert method(ctx) is None
+    assert method(ctx) is RetryCheckResult.no_decision

@@ -1,3 +1,4 @@
+import enum
 import random
 import time
 import typing
@@ -5,6 +6,15 @@ import typing
 import requests
 
 from globus_sdk.authorizers import GlobusAuthorizer
+
+
+class RetryCheckResult(enum.Enum):
+    # yes, retry the request
+    do_retry = enum.auto()
+    # no, do not retry the request
+    do_not_retry = enum.auto()
+    # "I don't know", ask other checks for an answer
+    no_decision = enum.auto()
 
 
 class RetryContext:
@@ -72,7 +82,7 @@ def _exponential_backoff(ctx: RetryContext) -> float:
 
 
 # type var useful for declaring RetryPolicy
-RetryCheck = typing.Callable[[RetryContext], typing.Optional[bool]]
+RetryCheck = typing.Callable[[RetryContext], RetryCheckResult]
 
 
 class RetryPolicy:
@@ -142,9 +152,9 @@ class RetryPolicy:
         """
         for check in self.checks:
             result = check(context)
-            if result is None:
+            if result is RetryCheckResult.no_decision:
                 continue
-            elif result is False:
+            elif result is RetryCheckResult.do_not_retry:
                 return False
             else:
                 time.sleep(self.compute_delay(context))
@@ -158,14 +168,10 @@ class RetryPolicy:
     def register_check(self, func: RetryCheck) -> RetryCheck:
         """
         A retry checker is a callable responsible for implementing
-        `check(RetryContext) -> Optional[bool]`
+        `check(RetryContext) -> RetryCheckResult`
 
         `check` should *not* perform any sleeps or delays.
         Multiple checks should be chainable, as part of a RetryPolicy.
-
-        `check() -> True` means "retry this request"
-        `check() -> False` means "do not retry"
-        `check() -> None` means "no determination, ask other retry checkers"
         """
         self.checks.append(func)
         return func
@@ -190,64 +196,64 @@ class RetryPolicy:
         self.register_check(self.default_check_transient_error)
         self.register_check(self.default_check_expired_authorization)
 
-    def default_check_max_retries_exceeded(
-        self, ctx: RetryContext
-    ) -> typing.Optional[bool]:
+    def default_check_max_retries_exceeded(self, ctx: RetryContext) -> RetryCheckResult:
         """check if the max retries for this policy have been exceeded"""
-        return False if ctx.attempt >= self.max_retries else None
+        return (
+            RetryCheckResult.do_not_retry
+            if ctx.attempt >= self.max_retries
+            else RetryCheckResult.no_decision
+        )
 
-    def default_check_request_exception(
-        self, ctx: RetryContext
-    ) -> typing.Optional[bool]:
+    def default_check_request_exception(self, ctx: RetryContext) -> RetryCheckResult:
         """check if a network error was encountered"""
-        if not ctx.exception:
-            return None
-        return isinstance(ctx.exception, requests.RequestException)
+        if ctx.exception and isinstance(ctx.exception, requests.RequestException):
+            return RetryCheckResult.do_retry
+        return RetryCheckResult.no_decision
 
-    def default_check_retry_after_header(
-        self, ctx: RetryContext
-    ) -> typing.Optional[bool]:
+    def default_check_retry_after_header(self, ctx: RetryContext) -> RetryCheckResult:
         """check for a retry-after header if the response had a matching status"""
         if (
             ctx.response is None
             or ctx.response.status_code not in self.RETRY_AFTER_STATUS_CODES
         ):
-            return None
+            return RetryCheckResult.no_decision
         retry_after = _parse_retry_after(ctx.response)
         if retry_after:
             ctx.backoff = float(retry_after)
-        return True
+        return RetryCheckResult.do_retry
 
-    def default_check_transient_error(self, ctx: RetryContext) -> typing.Optional[bool]:
+    def default_check_transient_error(self, ctx: RetryContext) -> RetryCheckResult:
         """check for transient error status codes which could be resolved by retrying
         the request"""
-        if (
-            ctx.response is None
-            or ctx.response.status_code not in self.TRANSIENT_ERROR_STATUS_CODES
+        if ctx.response is not None and (
+            ctx.response.status_code in self.TRANSIENT_ERROR_STATUS_CODES
         ):
-            return None
-        return True
+            return RetryCheckResult.do_retry
+        return RetryCheckResult.no_decision
 
     def default_check_expired_authorization(
         self, ctx: RetryContext
-    ) -> typing.Optional[bool]:
+    ) -> RetryCheckResult:
         """check for expired authorization, as represented by a 401 error when the
         authorizer supports handling for missing/invalid authorization"""
-        if ctx.response is None:
-            return None
-        if ctx.response.status_code not in self.EXPIRED_AUTHORIZATION_STATUS_CODES:
-            return None
-        if ctx.authorizer is None:
-            return None
+        if (  # is the current check applicable?
+            ctx.response is None
+            or ctx.response.status_code not in self.EXPIRED_AUTHORIZATION_STATUS_CODES
+            or ctx.authorizer is None
+        ):
+            return RetryCheckResult.no_decision
+
+        # if reauth has already been tried on the current request, other checks can do
+        # things, but do not do authorizer-driven retries
+        if ctx.retry_state.get("has_done_reauth"):
+            return RetryCheckResult.no_decision
+
         # the response code was a 401 and there's already been at least one reauth
         # attempt
-        # this could be `False` instead, but that would mean that nobody else can add
-        # 401-retries even when reauth didn't work
-        if ctx.retry_state.get("has_done_reauth"):
-            return None
-
+        # this could be `do_not_retry` instead, but that would mean that nobody else can
+        # add 401-retries even when reauth didn't work
         if not ctx.authorizer.handle_missing_authorization():
-            return None
+            return RetryCheckResult.no_decision
 
         ctx.retry_state["has_done_reauth"] = True
-        return True
+        return RetryCheckResult.do_retry
