@@ -34,8 +34,8 @@ def test_server_list(client):
     )
 
     res = client.endpoint_server_list(epid)
-    # it should still be a subclass of GlobusResponse
-    assert isinstance(res, globus_sdk.GlobusResponse)
+    # it should still be a subclass of GlobusHTTPResponse
+    assert isinstance(res, globus_sdk.GlobusHTTPResponse)
 
     # fetch top-level attrs
     assert res["DATA_TYPE"] == "endpoint_server_list"
