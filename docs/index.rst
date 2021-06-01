@@ -30,6 +30,10 @@ Table of Contents
     :maxdepth: 3
 
     clients
+    clients/base
+    clients/auth
+    clients/transfer
+    clients/search
     exceptions
     local_endpoints
     authorization

@@ -16,10 +16,11 @@ def auth_client():
 
 
 @pytest.fixture
-def base_client():
+def base_client(no_retry_policy):
     class CustomClient(BaseClient):
         base_path = "/v0.10/"
         service_name = "transfer"
+        retry_policy = no_retry_policy
 
     return CustomClient()
 
@@ -44,21 +45,21 @@ def test_set_http_timeout(base_client):
         os.environ.pop("GLOBUS_SDK_HTTP_TIMEOUT", None)
 
         client = FooClient()
-        assert client._http_timeout == 60.0
+        assert client.transport.http_timeout == 60.0
 
-        client = FooClient(http_timeout=None)
-        assert client._http_timeout == 60.0
+        client = FooClient(transport_params={"http_timeout": None})
+        assert client.transport.http_timeout == 60.0
 
-        client = FooClient(http_timeout=-1)
-        assert client._http_timeout is None
+        client = FooClient(transport_params={"http_timeout": -1})
+        assert client.transport.http_timeout is None
 
         os.environ["GLOBUS_SDK_HTTP_TIMEOUT"] = "120"
         client = FooClient()
-        assert client._http_timeout == 120.0
+        assert client.transport.http_timeout == 120.0
 
         os.environ["GLOBUS_SDK_HTTP_TIMEOUT"] = "-1"
         client = FooClient()
-        assert client._http_timeout is None
+        assert client.transport.http_timeout is None
 
 
 def test_set_app_name(base_client):
@@ -69,8 +70,9 @@ def test_set_app_name(base_client):
     base_client.app_name = "SDK Test"
     # confirm results
     assert base_client.app_name == "SDK Test"
-    assert base_client._headers["User-Agent"] == "{}/{}".format(
-        base_client.BASE_USER_AGENT, "SDK Test"
+    assert (
+        base_client.transport.user_agent
+        == f"{base_client.transport.BASE_USER_AGENT}/SDK Test"
     )
 
 
@@ -116,15 +118,15 @@ def test_http_methods(method, allows_body, base_client):
 
     if allows_body:
         jsonbody = {"foo": "bar"}
-        res = resolved_method(path, json_body=jsonbody)
+        res = resolved_method(path, data=jsonbody)
         req = get_last_request()
 
         assert req.method == methodname
-        assert req.body == json.dumps(jsonbody)
+        assert req.body == json.dumps(jsonbody).encode("utf-8")
         assert "x" in res
         assert res["x"] == "y"
 
-        res = resolved_method(path, text_body="abc")
+        res = resolved_method(path, data="abc")
         req = get_last_request()
 
         assert req.method == methodname

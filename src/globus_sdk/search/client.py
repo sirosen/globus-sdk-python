@@ -27,9 +27,7 @@ class SearchClient(BaseClient):
     """
     error_class = exc.SearchAPIError
     default_response_class = GlobusHTTPResponse
-
-    def __init__(self, authorizer=None, **kwargs):
-        BaseClient.__init__(self, "search", authorizer=authorizer, **kwargs)
+    service_name = "search"
 
     #
     # Index Management
@@ -147,7 +145,7 @@ class SearchClient(BaseClient):
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.post_search({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "search")
-        return self.post(path, data)
+        return self.post(path, data=data)
 
     #
     # Bulk data indexing
@@ -209,7 +207,7 @@ class SearchClient(BaseClient):
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.ingest({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "ingest")
-        return self.post(path, data)
+        return self.post(path, data=data)
 
     #
     # Bulk delete
@@ -247,7 +245,7 @@ class SearchClient(BaseClient):
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.delete_by_query({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "delete_by_query")
-        return self.post(path, data)
+        return self.post(path, data=data)
 
     #
     # Subject Operations
@@ -390,7 +388,7 @@ class SearchClient(BaseClient):
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.create_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
-        return self.post(path, data)
+        return self.post(path, data=data)
 
     def update_entry(self, index_id, data):
         """
@@ -420,7 +418,7 @@ class SearchClient(BaseClient):
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.update_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
-        return self.put(path, data)
+        return self.put(path, data=data)
 
     def delete_entry(
         self, index_id, subject: str, entry_id: typing.Optional[str] = None, **params

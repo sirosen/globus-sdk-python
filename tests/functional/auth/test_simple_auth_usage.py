@@ -84,8 +84,11 @@ def identities_multiple_response():
 
 
 @pytest.fixture
-def client():
-    return globus_sdk.AuthClient()
+def client(no_retry_policy):
+    class CustomAuthClient(globus_sdk.AuthClient):
+        retry_policy = no_retry_policy
+
+    return CustomAuthClient()
 
 
 def test_get_identities_unauthorized(client):

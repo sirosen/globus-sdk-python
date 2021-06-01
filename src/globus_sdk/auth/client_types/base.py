@@ -287,7 +287,7 @@ class AuthClient(BaseClient):
 
         if additional_params:
             body.update(additional_params)
-        return self.post("/v2/oauth2/token/validate", text_body=body)
+        return self.post("/v2/oauth2/token/validate", data=body, encoding="form")
 
     def oauth2_revoke_token(self, token, additional_params=None):
         """
@@ -328,7 +328,7 @@ class AuthClient(BaseClient):
 
         if additional_params:
             body.update(additional_params)
-        return self.post("/v2/oauth2/token/revoke", text_body=body)
+        return self.post("/v2/oauth2/token/revoke", data=body, encoding="form")
 
     def oauth2_token(self, form_data, response_class=OAuthTokenResponse):
         """
@@ -352,7 +352,10 @@ class AuthClient(BaseClient):
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
         return self.post(
-            "/v2/oauth2/token", response_class=response_class, text_body=form_data
+            "/v2/oauth2/token",
+            response_class=response_class,
+            data=form_data,
+            encoding="form",
         )
 
     def oauth2_userinfo(self):
