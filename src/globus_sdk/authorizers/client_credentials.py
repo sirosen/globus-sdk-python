@@ -1,8 +1,8 @@
 import logging
 
-from globus_sdk.authorizers.renewing import RenewingAuthorizer
+from .renewing import RenewingAuthorizer
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class ClientCredentialsAuthorizer(RenewingAuthorizer):
@@ -60,10 +60,9 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         expires_at=None,
         on_refresh=None,
     ):
-        logger.info(
-            "Setting up ClientCredentialsAuthorizer with confidential_client ="
-            " instance:{} and scopes = "
-            "{}".format(id(confidential_client), scopes)
+        log.info(
+            "Setting up ClientCredentialsAuthorizer with confidential_client="
+            f"[instance:{id(confidential_client)}] and scopes={scopes}"
         )
 
         # values for _get_token_data
@@ -90,7 +89,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
             raise ValueError(
                 "Attempting get new access token for client credentials "
                 "authorizer didn't return exactly one token. Ensure scopes "
-                "{} are for only one resource server.".format(self.scopes)
+                f"{self.scopes} are for only one resource server."
             )
 
         return next(iter(token_data))

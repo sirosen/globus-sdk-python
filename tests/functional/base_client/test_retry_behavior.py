@@ -125,8 +125,9 @@ def test_retry_with_authorizer(client):
     dummy_authz_calls = []
 
     class DummyAuthorizer(globus_sdk.authorizers.GlobusAuthorizer):
-        def set_authorization_header(self, headers):
+        def get_authorization_header(self):
             dummy_authz_calls.append("set_authz")
+            return "foo"
 
         def handle_missing_authorization(self):
             dummy_authz_calls.append("handle_missing")
@@ -156,8 +157,9 @@ def test_no_retry_with_authorizer_no_handler(client):
     dummy_authz_calls = []
 
     class DummyAuthorizer(globus_sdk.authorizers.GlobusAuthorizer):
-        def set_authorization_header(self, headers):
+        def get_authorization_header(self):
             dummy_authz_calls.append("set_authz")
+            return "foo"
 
         def handle_missing_authorization(self):
             dummy_authz_calls.append("handle_missing")
@@ -189,8 +191,9 @@ def test_retry_with_authorizer_persistent_401(client):
     dummy_authz_calls = []
 
     class DummyAuthorizer(globus_sdk.authorizers.GlobusAuthorizer):
-        def set_authorization_header(self, headers):
+        def get_authorization_header(self):
             dummy_authz_calls.append("set_authz")
+            return "foo"
 
         def handle_missing_authorization(self):
             dummy_authz_calls.append("handle_missing")

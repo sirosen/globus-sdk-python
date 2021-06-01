@@ -10,23 +10,11 @@ def authorizer():
     return AccessTokenAuthorizer(TOKEN)
 
 
-def test_set_authorization_header(authorizer):
+def test_get_authorization_header(authorizer):
     """
-    Sets authorization header in a test dictionary, confirms expected value
+    Get authorization header, confirms expected value
     """
-    header_dict = {}
-    authorizer.set_authorization_header(header_dict)
-    assert header_dict["Authorization"] == "Bearer " + TOKEN
-
-
-def test_set_authorization_header_existing(authorizer):
-    """
-    Confirms that an existing Authorization field is overwritten
-    """
-    header_dict = {"Header": "value", "Authorization": "previous_value"}
-    authorizer.set_authorization_header(header_dict)
-    assert header_dict["Authorization"] == "Bearer " + TOKEN
-    assert header_dict["Header"] == "value"
+    assert authorizer.get_authorization_header() == "Bearer " + TOKEN
 
 
 def test_handle_missing_authorization(authorizer):
