@@ -137,7 +137,11 @@ class RequestsTransport:
             # explicitly remove the Authorization header
             # done fresh for each request, to handle potential for refreshed credentials
             if authorizer:
-                authorizer.set_authorization_header(req.headers)
+                authz_header = authorizer.get_authorization_header()
+                if authz_header:
+                    req.headers["Authorization"] = authz_header
+                else:
+                    req.headers.pop("Authorization", None)  # remove any possible value
 
             ctx = RetryContext(attempt, authorizer=authorizer, retry_state=retry_state)
             try:

@@ -67,11 +67,11 @@ def test_multiple_resource_servers(authorizer, response):
 
 def test_conditional_refresh_token_update(authorizer, response):
     """
-    Call check_expiration_time (triggering a refresh)
+    Call ensure_valid_token (triggering a refresh)
     Confirm that the authorizer always udpates its access token and only updates
     refresh_token if one was present in the response
     """
-    authorizer.check_expiration_time()  # trigger refresh
+    authorizer.ensure_valid_token()  # trigger refresh
     token_data = response.by_resource_server["rs1"]
     if "refresh_token" in token_data:  # if present, confirm refresh token was updated
         assert authorizer.access_token == "access_token_2"

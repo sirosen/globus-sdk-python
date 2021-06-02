@@ -1,26 +1,12 @@
 from globus_sdk.authorizers import NullAuthorizer
 
 
-def test_set_authorization_header():
+def test_get_authorization_header():
     """
-    Sets authorization header in a test dictionary,
-    Confirms that nothing happens.
-    and any existing Authorization header is removed
+    Gets authorization header. Confirms None value.
     """
-    header_dict = {}
     authorizer = NullAuthorizer()
-    authorizer.set_authorization_header(header_dict)
-    assert header_dict == {}
-
-
-def test_set_authorization_header_existing():
-    """
-    Confirms that an existing Authorization field is removed
-    """
-    header_dict = {"Header": "value", "Authorization": "previous_value"}
-    authorizer = NullAuthorizer()
-    authorizer.set_authorization_header(header_dict)
-    assert header_dict == {"Header": "value"}
+    assert authorizer.get_authorization_header() is None
 
 
 def test_handle_missing_authorization():

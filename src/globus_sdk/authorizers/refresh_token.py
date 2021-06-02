@@ -1,15 +1,15 @@
 import logging
 
-from globus_sdk.authorizers.renewing import RenewingAuthorizer
+from .renewing import RenewingAuthorizer
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class RefreshTokenAuthorizer(RenewingAuthorizer):
     """
     Implements Authorization using a Refresh Token to periodically fetch
     renewed Access Tokens. It may be initialized with an Access Token, or it
-    will fetch one the first time that ``set_authorization_header()`` is
+    will fetch one the first time that ``get_authorization_header()`` is
     called.
 
     Example usage looks something like this:
@@ -55,9 +55,9 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         expires_at=None,
         on_refresh=None,
     ):
-        logger.info(
-            "Setting up RefreshTokenAuthorizer with auth_client = "
-            "instance: {}".format(id(auth_client))
+        log.info(
+            "Setting up RefreshTokenAuthorizer with auth_client="
+            f"[instance:{id(auth_client)}]"
         )
 
         # required for _get_token_data

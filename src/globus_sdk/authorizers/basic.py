@@ -1,12 +1,13 @@
 import logging
 
-from globus_sdk.authorizers.base import GlobusAuthorizer
 from globus_sdk.utils import safe_b64encode
 
-logger = logging.getLogger(__name__)
+from .base import StaticGlobusAuthorizer
+
+log = logging.getLogger(__name__)
 
 
-class BasicAuthorizer(GlobusAuthorizer):
+class BasicAuthorizer(StaticGlobusAuthorizer):
     """
     This Authorizer implements Basic Authentication.
     Given a "username" and "password", they are sent base64 encoded in the
@@ -18,26 +19,14 @@ class BasicAuthorizer(GlobusAuthorizer):
     :type password: str
     """
 
-    def __init__(self, username, password):
-        logger.info(
+    def __init__(self, username: str, password: str):
+        log.info(
             "Setting up a BasicAuthorizer. It will use an "
             "auth type of Basic and cannot handle 401s."
         )
-        logger.info(f"BasicAuthorizer.username = {username}")
+        log.info(f"BasicAuthorizer.username = {username}")
         self.username = username
         self.password = password
 
         to_b64 = f"{username}:{password}"
-        self.header_val = "Basic %s" % safe_b64encode(to_b64)
-
-    def set_authorization_header(self, header_dict):
-        """
-        Sets the ``Authorization`` header to
-        "Basic <base64 encoded username:password>"
-        """
-        logger.debug(
-            ("Setting Basic Authorization Header: " '"Basic <{}:SECRET>"').format(
-                self.username
-            )
-        )
-        header_dict["Authorization"] = self.header_val
+        self.header_val = f"Basic {safe_b64encode(to_b64)}"

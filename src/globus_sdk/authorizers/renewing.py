@@ -1,11 +1,13 @@
 import abc
 import logging
 import time
+from typing import Callable, Optional
 
-from globus_sdk import utils
-from globus_sdk.authorizers.base import GlobusAuthorizer
+from globus_sdk import exc, utils
 
-logger = logging.getLogger(__name__)
+from .base import GlobusAuthorizer
+
+log = logging.getLogger(__name__)
 # Provides a buffer for token expiration time to account for
 # possible delays or clock skew.
 EXPIRES_ADJUST_SECONDS = 60
@@ -43,45 +45,54 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
     :type on_refresh: callable, optiona
     """
 
-    def __init__(self, access_token=None, expires_at=None, on_refresh=None):
-        logger.info(
+    def __init__(
+        self,
+        access_token=None,
+        expires_at=None,
+        on_refresh: Optional[Callable] = None,
+    ):
+        self._access_token = None
+        self._access_token_hash = None
+
+        log.info(
             "Setting up a RenewingAuthorizer. It will use an "
             "auth type of Bearer and can handle 401s."
         )
-        if access_token is not None and expires_at is None:
-            logger.warning(
-                "Initializing a RenewingAuthorizer with an "
-                "access_token and no expires_at time means that this "
-                "access_token will be discarded. You should either pass "
-                "expires_at or not pass an access_token at all"
+
+        if (access_token is not None and expires_at is None) or (
+            access_token is None and expires_at is not None
+        ):
+            raise exc.GlobusSDKUsageError(
+                "A RenewingAuthorizer cannot be initialized with one of "
+                "access_token and expires_at. Either provide both or neither."
             )
-            # coerce to None for simplicity / consistency
-            access_token = None
 
         self.access_token = access_token
-        self.expires_at = None
+        self.expires_at = expires_at
         self.on_refresh = on_refresh
 
-        # check access_token too -- it's not clear what it would mean to set
-        # expiration without an access token
-        if expires_at is not None and self.access_token is not None:
-            self.access_token_hash = utils.sha256_string(self.access_token)
-            logger.info(
-                (
-                    "Got both expires_at and access_token. "
-                    "Will start by using "
-                    'RenewingAuthorizer.access_token with hash "{}"'
-                ).format(self.access_token_hash)
+        if self.access_token is not None:
+            log.info(
+                "RenewingAuthorizer will start by using access_token"
+                f'with hash "{self._access_token_hash}"'
             )
-            self._set_expiration_time(expires_at)
-
-        # if these were unspecified, fetch a new access token
-        if self.access_token is None and self.expires_at is None:
-            logger.info(
+        # if data were unspecified, fetch a new access token
+        else:
+            log.info(
                 "Creating RenewingAuthorizer without Access "
                 "Token. Fetching initial token now."
             )
             self._get_new_access_token()
+
+    @property
+    def access_token(self) -> Optional[str]:
+        return self._access_token
+
+    @access_token.setter
+    def access_token(self, value: Optional[str]):
+        self._access_token = value
+        if value:
+            self._access_token_hash = utils.sha256_string(value)
 
     @abc.abstractmethod
     def _get_token_response(self):
@@ -99,18 +110,6 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         returning one access token, and return a ValueError otherwise.
         """
 
-    def _set_expiration_time(self, expires_at):
-        """
-        Set the expiration time adjusting for potential network delays.
-        """
-        self.expires_at = expires_at - EXPIRES_ADJUST_SECONDS
-        logger.debug(
-            (
-                "Adjusted expiration time down to {} to account for "
-                "potential delays."
-            ).format(self.expires_at)
-        )
-
     def _get_new_access_token(self):
         """
         Given token data from _get_token_response and _extract_token_data,
@@ -121,63 +120,61 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         res = self._get_token_response()
         token_data = self._extract_token_data(res)
 
-        self._set_expiration_time(token_data["expires_at_seconds"])
+        self.expires_at = token_data["expires_at_seconds"]
         self.access_token = token_data["access_token"]
-        self.access_token_hash = utils.sha256_string(self.access_token)
 
-        logger.info(
+        log.info(
             "RenewingAuthorizer.access_token updated to "
-            f'token with hash "{self.access_token_hash}"'
+            f'token with hash "{self._access_token_hash}"'
         )
 
         if callable(self.on_refresh):
+            log.debug("will call on_refresh callback")
             self.on_refresh(res)
-            logger.debug("Invoked on_refresh callback")
+            log.debug("on_refresh callback finished")
 
-    def check_expiration_time(self):
+    def ensure_valid_token(self):
         """
-        Check if the expiration timer is done, and renew the token if it is.
+        Check that the authorizer has a valid token. Checks that the token is set and
+        that the expiration time is in the future.
 
-        This is called implicitly by ``set_authorization_header``, but you can
+        This is called implicitly by ``get_authorization_header``, but you can
         call it explicitly if you want to ensure that a token gets refreshed.
         This can be useful in order to get at a new, valid token via the
         ``on_refresh`` handler.
         """
-        logger.debug("RenewingAuthorizer checking expiration time")
-        if self.access_token is None or (
-            self.expires_at is None or time.time() > self.expires_at
-        ):
-            logger.debug(
-                "RenewingAuthorizer determined time has "
-                "expired. Fetching new Access Token"
-            )
-            self._get_new_access_token()
+        log.debug("RenewingAuthorizer checking expiration time")
+        if self.access_token is None:
+            log.debug("RenewingAuthorizer has no token")
         else:
-            logger.debug("RenewingAuthorizer determined time has not yet expired")
+            if (
+                self.expires_at is not None
+                and time.time() <= self.expires_at - EXPIRES_ADJUST_SECONDS
+            ):
+                log.debug("RenewingAuthorizer determined time has not yet expired")
+                return
+            else:
+                log.debug("RenewingAuthorizer has a token, but it is expired")
 
-    def set_authorization_header(self, header_dict):
-        """
-        Checks to see if a new access token is needed.
-        Once that's done, sets the ``Authorization`` header to
-        "Bearer <access_token>"
-        """
-        self.check_expiration_time()
-        logger.debug(
-            (
-                "Setting RefreshToken Authorization Header:"
-                'Bearer token has hash "{}"'
-            ).format(self.access_token_hash)
-        )
-        header_dict["Authorization"] = "Bearer %s" % self.access_token
+        log.debug("RenewingAuthorizer fetching new Access Token")
+        self._get_new_access_token()
 
-    def handle_missing_authorization(self, *args, **kwargs):
+    def get_authorization_header(self):
+        """
+        Check to see if a new token is needed and return "Bearer <access_token>"
+        """
+        self.ensure_valid_token()
+        log.debug(f'bearer token has hash "{self._access_token_hash}"')
+        return f"Bearer {self.access_token}"
+
+    def handle_missing_authorization(self):
         """
         The renewing authorizer can respond to a service 401 by immediately
         invalidating its current Access Token. When this happens, the next call
         to ``set_authorization_header()`` will result in a new Access Token
         being fetched.
         """
-        logger.debug(
+        log.debug(
             "RenewingAuthorizer seeing 401. Invalidating "
             "token and preparing for refresh."
         )
