@@ -5,7 +5,9 @@ All Globus SDK errors inherit from ``GlobusError``, and all SDK error classes
 are importable from ``globus_sdk``.
 
 You can therefore capture *all* errors thrown by the SDK by looking for
-``GlobusError``, as in::
+``GlobusError``, as in
+
+.. code-block:: python
 
     import logging
     from globus_sdk import TransferClient, GlobusError
@@ -21,11 +23,12 @@ You can therefore capture *all* errors thrown by the SDK by looking for
 In most cases, it's best to look for specific subclasses of ``GlobusError``.
 For example, to write code which is distinguishes between network failures and
 unexpected API conditions, you'll want to look for ``NetworkError`` and
-``GlobusAPIError``::
+``GlobusAPIError``
+
+.. code-block:: python
 
     import logging
-    from globus_sdk import (TransferClient,
-                            GlobusError, GlobusAPIError, NetworkError)
+    from globus_sdk import TransferClient, GlobusError, GlobusAPIError, NetworkError
 
     try:
         tc = TransferClient(...)
@@ -39,13 +42,14 @@ unexpected API conditions, you'll want to look for ``NetworkError`` and
     except GlobusAPIError as e:
         # Error response from the REST service, check the code and message for
         # details.
-        logging.error(("Got a Globus API Error\n"
-                       "Error Code: {}\n"
-                       "Error Message: {}").format(e.code, e.message))
+        logging.error(
+            "Got a Globus API Error\n"
+            f"Error Code: {e.code}\n"
+            f"Error Message: {e.message}"
+        )
         raise e
     except NetworkError:
-        logging.error(("Network Failure. "
-                       "Possibly a firewall or connectivity issue"))
+        logging.error("Network Failure. Possibly a firewall or connectivity issue")
         raise
     except GlobusError:
         logging.exception("Totally unexpected GlobusError!")

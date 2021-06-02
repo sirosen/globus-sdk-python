@@ -36,7 +36,7 @@ Abstract Base Class:
 ones expire or a 401 is received implement the RenewingAuthorizer class
 
 .. autoclass:: globus_sdk.authorizers.renewing.RenewingAuthorizer
-    :members: set_authorization_header, handle_missing_authorization
+    :members: get_authorization_header, handle_missing_authorization
     :member-order: bysource
     :show-inheritance:
 

@@ -27,20 +27,23 @@ Table of Contents
 
 .. toctree::
     :caption: Full Reference
-    :maxdepth: 3
+    :maxdepth: 2
 
-    services
-    responses
-    exceptions
+    services/index
     local_endpoints
     authorization
-    core
+    config
+    core/index
 
 .. toctree::
     :caption: Additional Info
     :maxdepth: 1
 
-    config
     versioning
-    examples
     license
+
+.. toctree::
+    :caption: Examples
+    :maxdepth: 1
+
+    examples/index

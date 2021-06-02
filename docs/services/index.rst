@@ -38,6 +38,6 @@ very simply::
     :caption: Service Clients
     :maxdepth: 1
 
-    services/auth
-    services/search
-    services/transfer
+    auth
+    search
+    transfer
