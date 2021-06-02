@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-import typing
+from typing import Dict, Optional
 
 import jwt
 
@@ -167,7 +167,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         self,
         openid_configuration=None,
         jwk=None,
-        jwt_params: typing.Optional[typing.Dict] = None,
+        jwt_params: Optional[Dict] = None,
     ):
 
         """

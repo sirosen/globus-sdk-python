@@ -1,7 +1,7 @@
 import enum
 import random
 import time
-import typing
+from typing import Callable, Dict, List, Optional, cast
 
 import requests
 
@@ -42,10 +42,10 @@ class RetryContext:
         self,
         attempt: int,
         *,
-        retry_state: typing.Dict,
-        response: typing.Optional[requests.Response] = None,
-        exception: typing.Optional[Exception] = None,
-        authorizer: typing.Optional[GlobusAuthorizer] = None,
+        retry_state: Dict,
+        response: Optional[requests.Response] = None,
+        exception: Optional[Exception] = None,
+        authorizer: Optional[GlobusAuthorizer] = None,
     ):
         # retry attempt number
         self.attempt = attempt
@@ -60,10 +60,10 @@ class RetryContext:
         # of the context of any singular retry
         self.retry_state = retry_state
         # the retry delay or "backoff" before retrying
-        self.backoff: typing.Optional[float] = None
+        self.backoff: Optional[float] = None
 
 
-def _parse_retry_after(response: requests.Response) -> typing.Optional[int]:
+def _parse_retry_after(response: requests.Response) -> Optional[int]:
     val = response.headers.get("Retry-After")
     if not val:
         return None
@@ -78,11 +78,11 @@ def _exponential_backoff(ctx: RetryContext) -> float:
     if ctx.backoff is not None:
         return ctx.backoff
     # expontential backoff with jitter
-    return typing.cast(float, (0.25 + 0.5 * random.random()) * (2 ** ctx.attempt))
+    return cast(float, (0.25 + 0.5 * random.random()) * (2 ** ctx.attempt))
 
 
 # type var useful for declaring RetryPolicy
-RetryCheck = typing.Callable[[RetryContext], RetryCheckResult]
+RetryCheck = Callable[[RetryContext], RetryCheckResult]
 
 
 class RetryPolicy:
@@ -124,8 +124,8 @@ class RetryPolicy:
     def __init__(
         self,
         *,
-        backoff: typing.Callable[[RetryContext], float] = _exponential_backoff,
-        checks: typing.Optional[typing.List[RetryCheck]] = None,
+        backoff: Callable[[RetryContext], float] = _exponential_backoff,
+        checks: Optional[List[RetryCheck]] = None,
         max_sleep: int = 10,
         max_retries: int = 5,
     ):

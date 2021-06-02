@@ -6,8 +6,8 @@ This does not include service URL env vars (see environments.py for loading of t
 """
 import logging
 import os
-import typing
 from distutils.util import strtobool
+from typing import Any, Optional, cast
 
 log = logging.getLogger(__name__)
 
@@ -34,38 +34,36 @@ def _load_var(varname: str, default, explicit_value=None, cast=None):
     return value
 
 
-def _bool_cast(value: typing.Any, default) -> bool:
+def _bool_cast(value: Any, default) -> bool:
     if isinstance(value, bool):
         return value
     return strtobool(value.lower())
 
 
-def _optfloat_cast(value: typing.Any, default) -> typing.Optional[float]:
+def _optfloat_cast(value: Any, default) -> Optional[float]:
     try:
         return float(value)
     except ValueError:
         pass
     if value == "":
-        return typing.cast(float, default)
+        return cast(float, default)
     log.error(f'Value "{value}" can\'t cast to optfloat')
     raise ValueError(f"Invalid config float: {value}")
 
 
-def get_environment_name(inputenv: typing.Optional[str] = None) -> str:
-    return typing.cast(
-        str, _load_var(ENVNAME_VAR, "production", explicit_value=inputenv)
-    )
+def get_environment_name(inputenv: Optional[str] = None) -> str:
+    return cast(str, _load_var(ENVNAME_VAR, "production", explicit_value=inputenv))
 
 
-def get_ssl_verify(value: typing.Optional[bool] = None) -> bool:
-    return typing.cast(
+def get_ssl_verify(value: Optional[bool] = None) -> bool:
+    return cast(
         bool, _load_var(SSL_VERIFY_VAR, True, explicit_value=value, cast=_bool_cast)
     )
 
 
-def get_http_timeout(value: typing.Optional[float] = None) -> typing.Optional[float]:
-    ret = typing.cast(
-        typing.Optional[float],
+def get_http_timeout(value: Optional[float] = None) -> Optional[float]:
+    ret = cast(
+        Optional[float],
         _load_var(HTTP_TIMEOUT_VAR, 60.0, explicit_value=value, cast=_optfloat_cast),
     )
     if ret == -1.0:

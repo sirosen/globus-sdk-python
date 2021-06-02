@@ -1,6 +1,6 @@
 import logging
-import typing
 import urllib.parse
+from typing import Dict, Optional, Type
 
 from globus_sdk import config, exc, utils
 from globus_sdk.response import GlobusHTTPResponse
@@ -31,13 +31,13 @@ class BaseClient:
     base_path: str = "/"
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
-    error_class: typing.Type[exc.GlobusAPIError] = exc.GlobusAPIError
-    default_response_class: typing.Type[GlobusHTTPResponse] = GlobusHTTPResponse
+    error_class: Type[exc.GlobusAPIError] = exc.GlobusAPIError
+    default_response_class: Type[GlobusHTTPResponse] = GlobusHTTPResponse
 
     #: the type of Transport which will be used, defaults to ``RequestsTransport``
-    transport_class: typing.Type = RequestsTransport
+    transport_class: Type = RequestsTransport
     #: retry policy for the client (None means the default policy will be used)
-    retry_policy: typing.Optional[RetryPolicy] = None
+    retry_policy: Optional[RetryPolicy] = None
 
     def __init__(
         self,
@@ -45,7 +45,7 @@ class BaseClient:
         base_url=None,
         authorizer=None,
         app_name=None,
-        transport_params: typing.Optional[typing.Dict] = None,
+        transport_params: Optional[Dict] = None,
     ):
         # explicitly check the `service_name` to ensure that it was set
         #
@@ -142,7 +142,7 @@ class BaseClient:
         params=None,
         data=None,
         headers=None,
-        encoding: typing.Optional[str] = None,
+        encoding: Optional[str] = None,
         response_class=None,
     ):
         """
@@ -189,7 +189,7 @@ class BaseClient:
         params=None,
         data=None,
         headers=None,
-        encoding: typing.Optional[str] = None,
+        encoding: Optional[str] = None,
         response_class=None,
     ):
         """
@@ -218,7 +218,7 @@ class BaseClient:
         params=None,
         data=None,
         headers=None,
-        encoding: typing.Optional[str] = None,
+        encoding: Optional[str] = None,
         response_class=None,
     ):
         """
@@ -248,7 +248,7 @@ class BaseClient:
         params=None,
         data=None,
         headers=None,
-        encoding: typing.Optional[str] = None,
+        encoding: Optional[str] = None,
         response_class=None,
     ):
         """

@@ -1,5 +1,5 @@
 import logging
-import typing
+from typing import Optional
 
 from globus_sdk import exc, utils
 from globus_sdk.base import BaseClient
@@ -307,7 +307,7 @@ class SearchClient(BaseClient):
     #
 
     def get_entry(
-        self, index_id, subject: str, entry_id: typing.Optional[str] = None, **params
+        self, index_id, subject: str, entry_id: Optional[str] = None, **params
     ):
         """
         ``GET /v1/index/<index_id>/entry``
@@ -421,7 +421,7 @@ class SearchClient(BaseClient):
         return self.put(path, data=data)
 
     def delete_entry(
-        self, index_id, subject: str, entry_id: typing.Optional[str] = None, **params
+        self, index_id, subject: str, entry_id: Optional[str] = None, **params
     ):
         """
         ``DELETE  /v1/index/<index_id>/entry``

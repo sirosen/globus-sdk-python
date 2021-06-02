@@ -1,6 +1,6 @@
 import logging
 import os
-import typing
+from typing import Dict, List, Optional, Type, cast
 
 log = logging.getLogger(__name__)
 # the format string for a service URL pulled out of the environment
@@ -12,10 +12,10 @@ _SERVICE_URL_VAR_FORMAT = "GLOBUS_SDK_SERVICE_URL_{}"
 class EnvConfig:
     envname: str
     domain: str
-    no_dotapi: typing.List[str] = ["auth"]
+    no_dotapi: List[str] = ["auth"]
 
     # this same dict is inherited (and therefore shared!) by all subclasses
-    _registry: typing.Dict[str, typing.Type["EnvConfig"]] = {}
+    _registry: Dict[str, Type["EnvConfig"]] = {}
 
     # this is an easier hook to use than metaclass definition -- register every subclass
     # in this dict automatically
@@ -36,7 +36,7 @@ class EnvConfig:
         # you can override any name with a config attribute
         service_url_attr = f"{service}_url"
         if hasattr(cls, service_url_attr):
-            return typing.cast(str, getattr(cls, service_url_attr))
+            return cast(str, getattr(cls, service_url_attr))
 
         # the typical pattern for a service hostname is X.api.Y
         # X=transfer, Y=preview.globus.org => transfer.api.preview.globus.org
@@ -46,7 +46,7 @@ class EnvConfig:
         return f"https://{service}.api.{cls.domain}/"
 
     @classmethod
-    def get_by_name(cls, envname: str) -> typing.Optional[typing.Type["EnvConfig"]]:
+    def get_by_name(cls, envname: str) -> Optional[Type["EnvConfig"]]:
         return cls._registry.get(envname)
 
 

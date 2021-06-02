@@ -1,7 +1,7 @@
 import logging
 import time
-import typing
 import uuid
+from typing import Dict, Iterable, Optional, Union, cast
 
 from globus_sdk import exc, utils
 from globus_sdk.base import BaseClient
@@ -14,7 +14,7 @@ from globus_sdk.transfer.response import (
 
 log = logging.getLogger(__name__)
 
-ID_PARAM_TYPE = typing.Union[bytes, str, uuid.UUID]
+ID_PARAM_TYPE = Union[bytes, str, uuid.UUID]
 
 
 class TransferClient(BaseClient):
@@ -87,7 +87,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s)
-        return typing.cast(TransferResponse, self.get(path, params=params))
+        return cast(TransferResponse, self.get(path, params=params))
 
     def update_endpoint(
         self, endpoint_id: ID_PARAM_TYPE, data, **params
@@ -127,7 +127,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.update_endpoint({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s)
-        return typing.cast(TransferResponse, self.put(path, data=data, params=params))
+        return cast(TransferResponse, self.put(path, data=data, params=params))
 
     def create_endpoint(self, data):
         """
@@ -191,12 +191,12 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s)
-        return typing.cast(TransferResponse, self.delete(path))
+        return cast(TransferResponse, self.delete(path))
 
     def endpoint_search(
         self,
-        filter_fulltext: typing.Optional[str] = None,
-        filter_scope: typing.Optional[str] = None,
+        filter_fulltext: Optional[str] = None,
+        filter_scope: Optional[str] = None,
         num_results=25,
         **params,
     ):
@@ -342,7 +342,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_autoactivate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "autoactivate")
-        return typing.cast(TransferResponse, self.post(path, params=params))
+        return cast(TransferResponse, self.post(path, params=params))
 
     def endpoint_deactivate(
         self, endpoint_id: ID_PARAM_TYPE, **params
@@ -363,7 +363,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_deactivate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "deactivate")
-        return typing.cast(TransferResponse, self.post(path, params=params))
+        return cast(TransferResponse, self.post(path, params=params))
 
     def endpoint_activate(
         self, endpoint_id: ID_PARAM_TYPE, requirements_data, **params
@@ -388,7 +388,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_activate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "activate")
-        return typing.cast(
+        return cast(
             TransferResponse,
             self.post(path, data=requirements_data, params=params),
         )
@@ -411,7 +411,7 @@ class TransferClient(BaseClient):
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         path = self.qjoin_path("endpoint", endpoint_id_s, "activation_requirements")
-        return typing.cast(
+        return cast(
             ActivationRequirementsResponse,
             self.get(
                 path, params=params, response_class=ActivationRequirementsResponse
@@ -439,7 +439,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path(
             "endpoint", endpoint_id_s, "my_effective_pause_rule_list"
         )
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )
@@ -465,7 +465,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "my_shared_endpoint_list")
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )
@@ -524,7 +524,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_server_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "server_list")
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )
@@ -550,10 +550,10 @@ class TransferClient(BaseClient):
             "TransferClient.get_endpoint_server(%s, %s, ...)", endpoint_id_s, server_id
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
-        return typing.cast(TransferResponse, self.get(path, params=params))
+        return cast(TransferResponse, self.get(path, params=params))
 
     def add_endpoint_server(
-        self, endpoint_id: ID_PARAM_TYPE, server_data: typing.Dict
+        self, endpoint_id: ID_PARAM_TYPE, server_data: Dict
     ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/server``
@@ -571,10 +571,10 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_server({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "server")
-        return typing.cast(TransferResponse, self.post(path, data=server_data))
+        return cast(TransferResponse, self.post(path, data=server_data))
 
     def update_endpoint_server(
-        self, endpoint_id: ID_PARAM_TYPE, server_id, server_data: typing.Dict
+        self, endpoint_id: ID_PARAM_TYPE, server_id, server_data: Dict
     ) -> TransferResponse:
         """
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
@@ -596,7 +596,7 @@ class TransferClient(BaseClient):
             server_id,
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
-        return typing.cast(TransferResponse, self.put(path, data=server_data))
+        return cast(TransferResponse, self.put(path, data=server_data))
 
     def delete_endpoint_server(
         self, endpoint_id: ID_PARAM_TYPE, server_id
@@ -619,7 +619,7 @@ class TransferClient(BaseClient):
             "TransferClient.delete_endpoint_server(%s, %s)", endpoint_id_s, server_id
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
-        return typing.cast(TransferResponse, self.delete(path))
+        return cast(TransferResponse, self.delete(path))
 
     #
     # Roles
@@ -644,13 +644,13 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_role_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role_list")
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )
 
     def add_endpoint_role(
-        self, endpoint_id: ID_PARAM_TYPE, role_data: typing.Dict
+        self, endpoint_id: ID_PARAM_TYPE, role_data: Dict
     ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/role``
@@ -668,7 +668,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_role({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role")
-        return typing.cast(TransferResponse, self.post(path, data=role_data))
+        return cast(TransferResponse, self.post(path, data=role_data))
 
     def get_endpoint_role(
         self, endpoint_id: ID_PARAM_TYPE, role_id, **params
@@ -689,7 +689,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint_role({endpoint_id_s}, {role_id}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role", role_id)
-        return typing.cast(TransferResponse, self.get(path, params=params))
+        return cast(TransferResponse, self.get(path, params=params))
 
     def delete_endpoint_role(
         self, endpoint_id: ID_PARAM_TYPE, role_id
@@ -710,7 +710,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint_role({endpoint_id_s}, {role_id})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role", role_id)
-        return typing.cast(TransferResponse, self.delete(path))
+        return cast(TransferResponse, self.delete(path))
 
     #
     # ACLs
@@ -735,7 +735,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_acl_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "access_list")
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )
@@ -761,10 +761,10 @@ class TransferClient(BaseClient):
             "TransferClient.get_endpoint_acl_rule(%s, %s, ...)", endpoint_id_s, rule_id
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
-        return typing.cast(TransferResponse, self.get(path, params=params))
+        return cast(TransferResponse, self.get(path, params=params))
 
     def add_endpoint_acl_rule(
-        self, endpoint_id: ID_PARAM_TYPE, rule_data: typing.Dict
+        self, endpoint_id: ID_PARAM_TYPE, rule_data: Dict
     ) -> TransferResponse:
         """
         ``POST /endpoint/<endpoint_id>/access``
@@ -802,10 +802,10 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_acl_rule({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "access")
-        return typing.cast(TransferResponse, self.post(path, data=rule_data))
+        return cast(TransferResponse, self.post(path, data=rule_data))
 
     def update_endpoint_acl_rule(
-        self, endpoint_id: ID_PARAM_TYPE, rule_id, rule_data: typing.Dict
+        self, endpoint_id: ID_PARAM_TYPE, rule_id, rule_data: Dict
     ) -> TransferResponse:
         """
         ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
@@ -827,7 +827,7 @@ class TransferClient(BaseClient):
             rule_id,
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
-        return typing.cast(TransferResponse, self.put(path, data=rule_data))
+        return cast(TransferResponse, self.put(path, data=rule_data))
 
     def delete_endpoint_acl_rule(
         self, endpoint_id: ID_PARAM_TYPE, rule_id
@@ -850,7 +850,7 @@ class TransferClient(BaseClient):
             "TransferClient.delete_endpoint_acl_rule(%s, %s)", endpoint_id_s, rule_id
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
-        return typing.cast(TransferResponse, self.delete(path))
+        return cast(TransferResponse, self.delete(path))
 
     #
     # Bookmarks
@@ -909,10 +909,10 @@ class TransferClient(BaseClient):
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.get_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
-        return typing.cast(TransferResponse, self.get(path, params=params))
+        return cast(TransferResponse, self.get(path, params=params))
 
     def update_bookmark(
-        self, bookmark_id: ID_PARAM_TYPE, bookmark_data: typing.Dict
+        self, bookmark_id: ID_PARAM_TYPE, bookmark_data: Dict
     ) -> TransferResponse:
         """
         ``PUT /bookmark/<bookmark_id>``
@@ -930,7 +930,7 @@ class TransferClient(BaseClient):
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.update_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
-        return typing.cast(TransferResponse, self.put(path, data=bookmark_data))
+        return cast(TransferResponse, self.put(path, data=bookmark_data))
 
     def delete_bookmark(self, bookmark_id: ID_PARAM_TYPE) -> TransferResponse:
         """
@@ -949,7 +949,7 @@ class TransferClient(BaseClient):
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.delete_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
-        return typing.cast(TransferResponse, self.delete(path))
+        return cast(TransferResponse, self.delete(path))
 
     #
     # Synchronous Filesys Operations
@@ -980,7 +980,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.operation_ls({endpoint_id_s}, {params})")
         path = self.qjoin_path("operation/endpoint", endpoint_id_s, "ls")
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )
@@ -1015,7 +1015,7 @@ class TransferClient(BaseClient):
         )
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "mkdir")
         json_body = {"DATA_TYPE": "mkdir", "path": path}
-        return typing.cast(
+        return cast(
             TransferResponse,
             self.post(resource_path, data=json_body, params=params),
         )
@@ -1052,7 +1052,7 @@ class TransferClient(BaseClient):
         )
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "rename")
         json_body = {"DATA_TYPE": "rename", "old_path": oldpath, "new_path": newpath}
-        return typing.cast(
+        return cast(
             TransferResponse,
             self.post(resource_path, data=json_body, params=params),
         )
@@ -1096,7 +1096,7 @@ class TransferClient(BaseClient):
             "symlink_target": symlink_target,
             "path": path,
         }
-        return typing.cast(
+        return cast(
             TransferResponse, self.post(resource_path, data=data, params=params)
         )
 
@@ -1308,10 +1308,10 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.get_task({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s)
-        return typing.cast(TransferResponse, self.get(resource_path, params=params))
+        return cast(TransferResponse, self.get(resource_path, params=params))
 
     def update_task(
-        self, task_id: ID_PARAM_TYPE, data: typing.Dict, **params
+        self, task_id: ID_PARAM_TYPE, data: Dict, **params
     ) -> TransferResponse:
         """
         ``PUT /task/<task_id>``
@@ -1329,9 +1329,7 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.update_task({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s)
-        return typing.cast(
-            TransferResponse, self.put(resource_path, data=data, params=params)
-        )
+        return cast(TransferResponse, self.put(resource_path, data=data, params=params))
 
     def cancel_task(self, task_id: ID_PARAM_TYPE) -> TransferResponse:
         """
@@ -1350,7 +1348,7 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.cancel_task({task_id_s})")
         resource_path = self.qjoin_path("task", task_id_s, "cancel")
-        return typing.cast(TransferResponse, self.post(resource_path))
+        return cast(TransferResponse, self.post(resource_path))
 
     def task_wait(self, task_id: ID_PARAM_TYPE, timeout=10, polling_interval=10):
         r"""
@@ -1470,7 +1468,7 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_pause_info({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s, "pause_info")
-        return typing.cast(TransferResponse, self.get(resource_path, params=params))
+        return cast(TransferResponse, self.get(resource_path, params=params))
 
     def task_successful_transfers(
         self, task_id: ID_PARAM_TYPE, num_results=100, **params
@@ -1626,7 +1624,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path(
             "endpoint_manager", "endpoint", endpoint_id_s, "hosted_endpoint_list"
         )
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )
@@ -1652,7 +1650,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint_manager", "endpoint", endpoint_id_s)
-        return typing.cast(TransferResponse, self.get(path, params=params))
+        return cast(TransferResponse, self.get(path, params=params))
 
     def endpoint_manager_acl_list(
         self, endpoint_id: ID_PARAM_TYPE, **params
@@ -1679,7 +1677,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path(
             "endpoint_manager", "endpoint", endpoint_id_s, "access_list"
         )
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )
@@ -1846,7 +1844,7 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_get_task({task_id_s}, ...)")
         path = self.qjoin_path("endpoint_manager", "task", task_id_s)
-        return typing.cast(TransferResponse, self.get(path, params=params))
+        return cast(TransferResponse, self.get(path, params=params))
 
     def endpoint_manager_task_event_list(
         self, task_id: ID_PARAM_TYPE, num_results=10, **params
@@ -1912,7 +1910,7 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_pause_info({task_id_s}, ...)")
         path = self.qjoin_path("endpoint_manager", "task", task_id_s, "pause_info")
-        return typing.cast(TransferResponse, self.get(path, params=params))
+        return cast(TransferResponse, self.get(path, params=params))
 
     def endpoint_manager_task_successful_transfers(
         self, task_id: ID_PARAM_TYPE, num_results=100, **params
@@ -2006,7 +2004,7 @@ class TransferClient(BaseClient):
         )
 
     def endpoint_manager_cancel_tasks(
-        self, task_ids: typing.Iterable[ID_PARAM_TYPE], message, **params
+        self, task_ids: Iterable[ID_PARAM_TYPE], message, **params
     ) -> TransferResponse:
         """
         Cancel a list of tasks as an admin. Requires activity manager effective
@@ -2037,7 +2035,7 @@ class TransferClient(BaseClient):
         )
         data = {"message": utils.safe_stringify(message), "task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_cancel")
-        return typing.cast(TransferResponse, self.post(path, data=data, params=params))
+        return cast(TransferResponse, self.post(path, data=data, params=params))
 
     def endpoint_manager_cancel_status(self, admin_cancel_id, **params):
         """
@@ -2065,7 +2063,7 @@ class TransferClient(BaseClient):
         return self.get(path, params=params)
 
     def endpoint_manager_pause_tasks(
-        self, task_ids: typing.Iterable[ID_PARAM_TYPE], message, **params
+        self, task_ids: Iterable[ID_PARAM_TYPE], message, **params
     ) -> TransferResponse:
         """
         Pause a list of tasks as an admin. Requires activity manager effective
@@ -2099,10 +2097,10 @@ class TransferClient(BaseClient):
             "task_id_list": str_task_ids,
         }
         path = self.qjoin_path("endpoint_manager", "admin_pause")
-        return typing.cast(TransferResponse, self.post(path, data=data, params=params))
+        return cast(TransferResponse, self.post(path, data=data, params=params))
 
     def endpoint_manager_resume_tasks(
-        self, task_ids: typing.Iterable[ID_PARAM_TYPE], **params
+        self, task_ids: Iterable[ID_PARAM_TYPE], **params
     ) -> TransferResponse:
         """
         Resume a list of tasks as an admin. Requires activity manager effective
@@ -2128,14 +2126,14 @@ class TransferClient(BaseClient):
         log.info(f"TransferClient.endpoint_manager_resume_tasks({str_task_ids})")
         data = {"task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_resume")
-        return typing.cast(TransferResponse, self.post(path, data=data, params=params))
+        return cast(TransferResponse, self.post(path, data=data, params=params))
 
     #
     # endpoint manager pause rule methods
     #
 
     def endpoint_manager_pause_rule_list(
-        self, filter_endpoint: typing.Optional[ID_PARAM_TYPE] = None, **params
+        self, filter_endpoint: Optional[ID_PARAM_TYPE] = None, **params
     ) -> IterableTransferResponse:
         """
         Get a list of pause rules on endpoints that the current user has the
@@ -2163,7 +2161,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint_manager", "pause_rule_list")
         if filter_endpoint is not None:
             params["filter_endpoint"] = utils.safe_stringify(filter_endpoint)
-        return typing.cast(
+        return cast(
             IterableTransferResponse,
             self.get(path, params=params, response_class=IterableTransferResponse),
         )

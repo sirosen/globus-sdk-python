@@ -1,4 +1,4 @@
-import typing
+from typing import Dict, List, Optional, Union
 
 import requests
 
@@ -40,7 +40,7 @@ class RequestsTransport:
     max_retries: int = 20
 
     #: the encoders are a mapping of encoding names to encoder objects
-    encoders: typing.Dict[str, RequestEncoder] = {
+    encoders: Dict[str, RequestEncoder] = {
         "text": RequestEncoder(),
         "json": JSONRequestEncoder(),
         "form": FormRequestEncoder(),
@@ -50,9 +50,9 @@ class RequestsTransport:
 
     def __init__(
         self,
-        verify_ssl: typing.Optional[bool] = None,
-        http_timeout: typing.Optional[float] = None,
-        retry_policy: typing.Optional[RetryPolicy] = None,
+        verify_ssl: Optional[bool] = None,
+        http_timeout: Optional[float] = None,
+        retry_policy: Optional[RetryPolicy] = None,
     ):
         self.session = requests.Session()
         self.verify_ssl = config.get_ssl_verify(verify_ssl)
@@ -76,10 +76,10 @@ class RequestsTransport:
         self,
         method: str,
         url: str,
-        params: typing.Optional[typing.Dict] = None,
-        data: typing.Union[typing.Dict, typing.List, str, None] = None,
-        headers: typing.Optional[typing.Dict[str, str]] = None,
-        encoding: typing.Optional[str] = None,
+        params: Optional[Dict] = None,
+        data: Union[Dict, List, str, None] = None,
+        headers: Optional[Dict[str, str]] = None,
+        encoding: Optional[str] = None,
     ):
         if not headers:
             headers = {}
@@ -105,8 +105,8 @@ class RequestsTransport:
         params=None,
         data=None,
         headers=None,
-        encoding: typing.Optional[str] = None,
-        authorizer: typing.Optional[GlobusAuthorizer] = None,
+        encoding: Optional[str] = None,
+        authorizer: Optional[GlobusAuthorizer] = None,
     ) -> requests.Response:
         """
         Send an HTTP request
@@ -129,8 +129,8 @@ class RequestsTransport:
 
         :return: ``requests.Response`` object
         """
-        resp: typing.Optional[requests.Response] = None
-        retry_state: typing.Dict = {}
+        resp: Optional[requests.Response] = None
+        retry_state: Dict = {}
         req = self._encode(method, url, params, data, headers, encoding)
         for attempt in range(self.max_retries):
             # add Authorization header, or (if it's a NullAuthorizer) possibly
