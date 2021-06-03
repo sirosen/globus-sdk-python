@@ -36,27 +36,11 @@ todo_include_todos = True
 
 # HTML Theme Options
 html_show_sourcelink = True
-html_sidebars = {
-    "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
-}
-html_theme = "sphinx_material"
+html_theme = "furo"
 html_theme_options = {
-    "nav_title": "Globus SDK",
-    # Set the color and the accent color
-    "color_primary": "#27518F",
-    "color_accent": "light-blue",
-    # Set the repo location to get a badge with stats
-    "repo_url": "https://github.com/globus/globus-sdk-python/",
-    "repo_name": "Globus SDK",
-    # Visible levels of the global TOC; -1 means unlimited
-    "globaltoc_depth": 1,
-    # If False, expand all TOC entries
-    "globaltoc_collapse": False,
-    # "hero" text (shown in the top banner)
-    "heroes": {
-        "index": "The Globus Standard Development Kit",
-        "clients": "Globus API Clients",
-    },
+    "light_css_variables": {
+        "color-brand-primary": "#27518F",
+    }
 }
 html_logo = "_static/logo.png"
 

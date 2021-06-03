@@ -27,22 +27,23 @@ Table of Contents
 
 .. toctree::
     :caption: Full Reference
-    :maxdepth: 3
+    :maxdepth: 2
 
-    clients
-    clients/base
-    clients/auth
-    clients/transfer
-    clients/search
-    exceptions
+    services/index
     local_endpoints
     authorization
+    config
+    core/index
 
 .. toctree::
     :caption: Additional Info
     :maxdepth: 1
 
-    config
     versioning
-    examples
     license
+
+.. toctree::
+    :caption: Examples
+    :maxdepth: 1
+
+    examples/index
