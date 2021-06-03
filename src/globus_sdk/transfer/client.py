@@ -1,15 +1,14 @@
 import logging
 import time
 import uuid
-from typing import Dict, Iterable, Optional, Union, cast
+from typing import Dict, Iterable, Optional, Union
 
-from globus_sdk import exc, utils
+from globus_sdk import exc, response, utils
 from globus_sdk.base import BaseClient
 from globus_sdk.transfer.paging import PaginatedResource
 from globus_sdk.transfer.response import (
     ActivationRequirementsResponse,
     IterableTransferResponse,
-    TransferResponse,
 )
 
 log = logging.getLogger(__name__)
@@ -25,13 +24,6 @@ class TransferClient(BaseClient):
     This class provides helper methods for most common resources in the
     REST API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
     from the base rest client that can be used to access any REST resource.
-
-    There are two types of helper methods: list methods which return an
-    iterator of :class:`GlobusResponse \
-    <globus_sdk.response.GlobusResponse>`
-    objects, and simple methods that return a single
-    :class:`TransferResponse <globus_sdk.transfer.response.TransferResponse>`
-    object.
 
     Some calls are paginated. If a call returns a :class:`PaginatedResource \
     <globus_sdk.transfer.paging.PaginatedResource>` object, the result is an
@@ -54,7 +46,6 @@ class TransferClient(BaseClient):
     service_name = "transfer"
     base_path = "/v0.10/"
     error_class = exc.TransferAPIError
-    default_response_class = TransferResponse
 
     # Convenience methods, providing more pythonic access to common REST
     # resources
@@ -63,7 +54,9 @@ class TransferClient(BaseClient):
     # Endpoint Management
     #
 
-    def get_endpoint(self, endpoint_id: ID_PARAM_TYPE, **params) -> TransferResponse:
+    def get_endpoint(
+        self, endpoint_id: ID_PARAM_TYPE, **params
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>``
 
@@ -87,11 +80,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s)
-        return cast(TransferResponse, self.get(path, params=params))
+        return self.get(path, params=params)
 
     def update_endpoint(
         self, endpoint_id: ID_PARAM_TYPE, data, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>``
 
@@ -127,9 +120,9 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.update_endpoint({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s)
-        return cast(TransferResponse, self.put(path, data=data, params=params))
+        return self.put(path, data=data, params=params)
 
-    def create_endpoint(self, data):
+    def create_endpoint(self, data) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>``
 
@@ -169,7 +162,9 @@ class TransferClient(BaseClient):
         log.info("TransferClient.create_endpoint(...)")
         return self.post("endpoint", data=data)
 
-    def delete_endpoint(self, endpoint_id: ID_PARAM_TYPE) -> TransferResponse:
+    def delete_endpoint(
+        self, endpoint_id: ID_PARAM_TYPE
+    ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>``
 
@@ -191,7 +186,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s)
-        return cast(TransferResponse, self.delete(path))
+        return self.delete(path)
 
     def endpoint_search(
         self,
@@ -199,7 +194,7 @@ class TransferClient(BaseClient):
         filter_scope: Optional[str] = None,
         num_results=25,
         **params,
-    ):
+    ) -> PaginatedResource:
         r"""
         .. parsed-literal::
 
@@ -279,7 +274,7 @@ class TransferClient(BaseClient):
 
     def endpoint_autoactivate(
         self, endpoint_id: ID_PARAM_TYPE, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         r"""
         ``POST /endpoint/<endpoint_id>/autoactivate``
 
@@ -342,11 +337,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_autoactivate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "autoactivate")
-        return cast(TransferResponse, self.post(path, params=params))
+        return self.post(path, params=params)
 
     def endpoint_deactivate(
         self, endpoint_id: ID_PARAM_TYPE, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/deactivate``
 
@@ -363,11 +358,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_deactivate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "deactivate")
-        return cast(TransferResponse, self.post(path, params=params))
+        return self.post(path, params=params)
 
     def endpoint_activate(
         self, endpoint_id: ID_PARAM_TYPE, requirements_data, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/activate``
 
@@ -388,10 +383,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_activate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "activate")
-        return cast(
-            TransferResponse,
-            self.post(path, data=requirements_data, params=params),
-        )
+        return self.post(path, data=requirements_data, params=params)
 
     def endpoint_get_activation_requirements(
         self, endpoint_id: ID_PARAM_TYPE, **params
@@ -411,11 +403,8 @@ class TransferClient(BaseClient):
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         path = self.qjoin_path("endpoint", endpoint_id_s, "activation_requirements")
-        return cast(
-            ActivationRequirementsResponse,
-            self.get(
-                path, params=params, response_class=ActivationRequirementsResponse
-            ),
+        return self.get(
+            path, params=params, response_class=ActivationRequirementsResponse
         )
 
     def my_effective_pause_rule_list(
@@ -439,10 +428,7 @@ class TransferClient(BaseClient):
         path = self.qjoin_path(
             "endpoint", endpoint_id_s, "my_effective_pause_rule_list"
         )
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
     # Shared Endpoints
 
@@ -465,10 +451,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "my_shared_endpoint_list")
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
     def create_shared_endpoint(self, data):
         """
@@ -524,14 +507,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_server_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "server_list")
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
     def get_endpoint_server(
         self, endpoint_id: ID_PARAM_TYPE, server_id, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/server/<server_id>``
 
@@ -550,11 +530,11 @@ class TransferClient(BaseClient):
             "TransferClient.get_endpoint_server(%s, %s, ...)", endpoint_id_s, server_id
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
-        return cast(TransferResponse, self.get(path, params=params))
+        return self.get(path, params=params)
 
     def add_endpoint_server(
         self, endpoint_id: ID_PARAM_TYPE, server_data: Dict
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/server``
 
@@ -571,11 +551,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_server({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "server")
-        return cast(TransferResponse, self.post(path, data=server_data))
+        return self.post(path, data=server_data)
 
     def update_endpoint_server(
         self, endpoint_id: ID_PARAM_TYPE, server_id, server_data: Dict
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
 
@@ -596,11 +576,11 @@ class TransferClient(BaseClient):
             server_id,
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
-        return cast(TransferResponse, self.put(path, data=server_data))
+        return self.put(path, data=server_data)
 
     def delete_endpoint_server(
         self, endpoint_id: ID_PARAM_TYPE, server_id
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
 
@@ -619,7 +599,7 @@ class TransferClient(BaseClient):
             "TransferClient.delete_endpoint_server(%s, %s)", endpoint_id_s, server_id
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
-        return cast(TransferResponse, self.delete(path))
+        return self.delete(path)
 
     #
     # Roles
@@ -644,14 +624,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_role_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role_list")
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
     def add_endpoint_role(
         self, endpoint_id: ID_PARAM_TYPE, role_data: Dict
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/role``
 
@@ -668,11 +645,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_role({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role")
-        return cast(TransferResponse, self.post(path, data=role_data))
+        return self.post(path, data=role_data)
 
     def get_endpoint_role(
         self, endpoint_id: ID_PARAM_TYPE, role_id, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/role/<role_id>``
 
@@ -689,11 +666,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint_role({endpoint_id_s}, {role_id}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role", role_id)
-        return cast(TransferResponse, self.get(path, params=params))
+        return self.get(path, params=params)
 
     def delete_endpoint_role(
         self, endpoint_id: ID_PARAM_TYPE, role_id
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/role/<role_id>``
 
@@ -710,7 +687,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint_role({endpoint_id_s}, {role_id})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role", role_id)
-        return cast(TransferResponse, self.delete(path))
+        return self.delete(path)
 
     #
     # ACLs
@@ -735,14 +712,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_acl_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "access_list")
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
     def get_endpoint_acl_rule(
         self, endpoint_id: ID_PARAM_TYPE, rule_id, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/access/<rule_id>``
 
@@ -761,11 +735,11 @@ class TransferClient(BaseClient):
             "TransferClient.get_endpoint_acl_rule(%s, %s, ...)", endpoint_id_s, rule_id
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
-        return cast(TransferResponse, self.get(path, params=params))
+        return self.get(path, params=params)
 
     def add_endpoint_acl_rule(
         self, endpoint_id: ID_PARAM_TYPE, rule_data: Dict
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/access``
 
@@ -802,11 +776,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_acl_rule({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "access")
-        return cast(TransferResponse, self.post(path, data=rule_data))
+        return self.post(path, data=rule_data)
 
     def update_endpoint_acl_rule(
         self, endpoint_id: ID_PARAM_TYPE, rule_id, rule_data: Dict
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
 
@@ -827,11 +801,11 @@ class TransferClient(BaseClient):
             rule_id,
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
-        return cast(TransferResponse, self.put(path, data=rule_data))
+        return self.put(path, data=rule_data)
 
     def delete_endpoint_acl_rule(
         self, endpoint_id: ID_PARAM_TYPE, rule_id
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/access/<rule_id>``
 
@@ -850,13 +824,13 @@ class TransferClient(BaseClient):
             "TransferClient.delete_endpoint_acl_rule(%s, %s)", endpoint_id_s, rule_id
         )
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
-        return cast(TransferResponse, self.delete(path))
+        return self.delete(path)
 
     #
     # Bookmarks
     #
 
-    def bookmark_list(self, **params):
+    def bookmark_list(self, **params) -> response.GlobusHTTPResponse:
         """
         ``GET /bookmark_list``
 
@@ -875,7 +849,7 @@ class TransferClient(BaseClient):
             "bookmark_list", params=params, response_class=IterableTransferResponse
         )
 
-    def create_bookmark(self, bookmark_data):
+    def create_bookmark(self, bookmark_data: Dict) -> response.GlobusHTTPResponse:
         """
         ``POST /bookmark``
 
@@ -890,9 +864,11 @@ class TransferClient(BaseClient):
         in the REST documentation for details.
         """
         log.info(f"TransferClient.create_bookmark({bookmark_data})")
-        return self.post("bookmark", bookmark_data)
+        return self.post("bookmark", data=bookmark_data)
 
-    def get_bookmark(self, bookmark_id: ID_PARAM_TYPE, **params) -> TransferResponse:
+    def get_bookmark(
+        self, bookmark_id: ID_PARAM_TYPE, **params
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /bookmark/<bookmark_id>``
 
@@ -909,11 +885,11 @@ class TransferClient(BaseClient):
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.get_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
-        return cast(TransferResponse, self.get(path, params=params))
+        return self.get(path, params=params)
 
     def update_bookmark(
         self, bookmark_id: ID_PARAM_TYPE, bookmark_data: Dict
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``PUT /bookmark/<bookmark_id>``
 
@@ -930,9 +906,11 @@ class TransferClient(BaseClient):
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.update_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
-        return cast(TransferResponse, self.put(path, data=bookmark_data))
+        return self.put(path, data=bookmark_data)
 
-    def delete_bookmark(self, bookmark_id: ID_PARAM_TYPE) -> TransferResponse:
+    def delete_bookmark(
+        self, bookmark_id: ID_PARAM_TYPE
+    ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /bookmark/<bookmark_id>``
 
@@ -949,7 +927,7 @@ class TransferClient(BaseClient):
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.delete_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
-        return cast(TransferResponse, self.delete(path))
+        return self.delete(path)
 
     #
     # Synchronous Filesys Operations
@@ -980,14 +958,11 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.operation_ls({endpoint_id_s}, {params})")
         path = self.qjoin_path("operation/endpoint", endpoint_id_s, "ls")
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
     def operation_mkdir(
         self, endpoint_id: ID_PARAM_TYPE, path, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
 
@@ -1015,14 +990,11 @@ class TransferClient(BaseClient):
         )
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "mkdir")
         json_body = {"DATA_TYPE": "mkdir", "path": path}
-        return cast(
-            TransferResponse,
-            self.post(resource_path, data=json_body, params=params),
-        )
+        return self.post(resource_path, data=json_body, params=params)
 
     def operation_rename(
         self, endpoint_id: ID_PARAM_TYPE, oldpath, newpath, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/rename``
 
@@ -1052,14 +1024,11 @@ class TransferClient(BaseClient):
         )
         resource_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "rename")
         json_body = {"DATA_TYPE": "rename", "old_path": oldpath, "new_path": newpath}
-        return cast(
-            TransferResponse,
-            self.post(resource_path, data=json_body, params=params),
-        )
+        return self.post(resource_path, data=json_body, params=params)
 
     def operation_symlink(
         self, endpoint_id: ID_PARAM_TYPE, symlink_target, path, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/symlink``
 
@@ -1096,15 +1065,13 @@ class TransferClient(BaseClient):
             "symlink_target": symlink_target,
             "path": path,
         }
-        return cast(
-            TransferResponse, self.post(resource_path, data=data, params=params)
-        )
+        return self.post(resource_path, data=data, params=params)
 
     #
     # Task Submission
     #
 
-    def get_submission_id(self, **params):
+    def get_submission_id(self, **params) -> response.GlobusHTTPResponse:
         """
         ``GET /submission_id``
 
@@ -1130,7 +1097,7 @@ class TransferClient(BaseClient):
         log.info(f"TransferClient.get_submission_id({params})")
         return self.get("submission_id", params=params)
 
-    def submit_transfer(self, data):
+    def submit_transfer(self, data) -> response.GlobusHTTPResponse:
         """
         ``POST /transfer``
 
@@ -1164,7 +1131,7 @@ class TransferClient(BaseClient):
         log.info("TransferClient.submit_transfer(...)")
         return self.post("/transfer", data=data)
 
-    def submit_delete(self, data):
+    def submit_delete(self, data) -> response.GlobusHTTPResponse:
         """
         ``POST /delete``
 
@@ -1197,7 +1164,7 @@ class TransferClient(BaseClient):
     # Task inspection and management
     #
 
-    def task_list(self, num_results=10, **params):
+    def task_list(self, num_results=10, **params) -> PaginatedResource:
         """
         Get an iterable of task documents owned by the current user.
 
@@ -1291,7 +1258,7 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_TOTAL,
         )
 
-    def get_task(self, task_id: ID_PARAM_TYPE, **params) -> TransferResponse:
+    def get_task(self, task_id: ID_PARAM_TYPE, **params) -> response.GlobusHTTPResponse:
         """
         ``GET /task/<task_id>``
 
@@ -1308,11 +1275,11 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.get_task({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s)
-        return cast(TransferResponse, self.get(resource_path, params=params))
+        return self.get(resource_path, params=params)
 
     def update_task(
         self, task_id: ID_PARAM_TYPE, data: Dict, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         ``PUT /task/<task_id>``
 
@@ -1329,9 +1296,9 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.update_task({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s)
-        return cast(TransferResponse, self.put(resource_path, data=data, params=params))
+        return self.put(resource_path, data=data, params=params)
 
-    def cancel_task(self, task_id: ID_PARAM_TYPE) -> TransferResponse:
+    def cancel_task(self, task_id: ID_PARAM_TYPE) -> response.GlobusHTTPResponse:
         """
         ``POST /task/<task_id>/cancel``
 
@@ -1348,9 +1315,11 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.cancel_task({task_id_s})")
         resource_path = self.qjoin_path("task", task_id_s, "cancel")
-        return cast(TransferResponse, self.post(resource_path))
+        return self.post(resource_path)
 
-    def task_wait(self, task_id: ID_PARAM_TYPE, timeout=10, polling_interval=10):
+    def task_wait(
+        self, task_id: ID_PARAM_TYPE, timeout=10, polling_interval=10
+    ) -> bool:
         r"""
         Wait until a Task is complete or fails, with a time limit. If the task
         is "ACTIVE" after time runs out, returns ``False``. Otherwise returns
@@ -1451,7 +1420,9 @@ class TransferClient(BaseClient):
             time.sleep(polling_interval)
         # unreachable -- end of task_wait
 
-    def task_pause_info(self, task_id: ID_PARAM_TYPE, **params) -> TransferResponse:
+    def task_pause_info(
+        self, task_id: ID_PARAM_TYPE, **params
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /task/<task_id>/pause_info``
 
@@ -1468,7 +1439,7 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_pause_info({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s, "pause_info")
-        return cast(TransferResponse, self.get(resource_path, params=params))
+        return self.get(resource_path, params=params)
 
     def task_successful_transfers(
         self, task_id: ID_PARAM_TYPE, num_results=100, **params
@@ -1527,7 +1498,9 @@ class TransferClient(BaseClient):
             paging_style=PaginatedResource.PAGING_STYLE_MARKER,
         )
 
-    def task_skipped_errors(self, task_id: ID_PARAM_TYPE, num_results=100, **params):
+    def task_skipped_errors(
+        self, task_id: ID_PARAM_TYPE, num_results=100, **params
+    ) -> PaginatedResource:
         """
         Get path and error information for all paths that were skipped due
         to skip_source_errors being set on a completed transfer Task.
@@ -1583,7 +1556,9 @@ class TransferClient(BaseClient):
     # advanced endpoint management (requires endpoint manager role)
     #
 
-    def endpoint_manager_monitored_endpoints(self, **params):
+    def endpoint_manager_monitored_endpoints(
+        self, **params
+    ) -> response.GlobusHTTPResponse:
         """
         Get endpoints the current user is a monitor or manager on.
 
@@ -1624,14 +1599,11 @@ class TransferClient(BaseClient):
         path = self.qjoin_path(
             "endpoint_manager", "endpoint", endpoint_id_s, "hosted_endpoint_list"
         )
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
     def endpoint_manager_get_endpoint(
         self, endpoint_id: ID_PARAM_TYPE, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         Get endpoint details as an admin.
 
@@ -1650,7 +1622,7 @@ class TransferClient(BaseClient):
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint_manager", "endpoint", endpoint_id_s)
-        return cast(TransferResponse, self.get(path, params=params))
+        return self.get(path, params=params)
 
     def endpoint_manager_acl_list(
         self, endpoint_id: ID_PARAM_TYPE, **params
@@ -1677,16 +1649,13 @@ class TransferClient(BaseClient):
         path = self.qjoin_path(
             "endpoint_manager", "endpoint", endpoint_id_s, "access_list"
         )
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
     #
     # endpoint manager task methods
     #
 
-    def endpoint_manager_task_list(self, num_results=10, **params):
+    def endpoint_manager_task_list(self, num_results=10, **params) -> PaginatedResource:
         r"""
         Get a list of tasks visible via ``activity_monitor`` role, as opposed
         to tasks owned by the current user.
@@ -1844,7 +1813,7 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_get_task({task_id_s}, ...)")
         path = self.qjoin_path("endpoint_manager", "task", task_id_s)
-        return cast(TransferResponse, self.get(path, params=params))
+        return self.get(path, params=params)
 
     def endpoint_manager_task_event_list(
         self, task_id: ID_PARAM_TYPE, num_results=10, **params
@@ -1890,7 +1859,7 @@ class TransferClient(BaseClient):
 
     def endpoint_manager_task_pause_info(
         self, task_id: ID_PARAM_TYPE, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         Get details about why a task is paused as an admin. Requires activity
         monitor effective role on the destination endpoint of the task.
@@ -1910,7 +1879,7 @@ class TransferClient(BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_pause_info({task_id_s}, ...)")
         path = self.qjoin_path("endpoint_manager", "task", task_id_s, "pause_info")
-        return cast(TransferResponse, self.get(path, params=params))
+        return self.get(path, params=params)
 
     def endpoint_manager_task_successful_transfers(
         self, task_id: ID_PARAM_TYPE, num_results=100, **params
@@ -2005,7 +1974,7 @@ class TransferClient(BaseClient):
 
     def endpoint_manager_cancel_tasks(
         self, task_ids: Iterable[ID_PARAM_TYPE], message, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         Cancel a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
@@ -2035,9 +2004,11 @@ class TransferClient(BaseClient):
         )
         data = {"message": utils.safe_stringify(message), "task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_cancel")
-        return cast(TransferResponse, self.post(path, data=data, params=params))
+        return self.post(path, data=data, params=params)
 
-    def endpoint_manager_cancel_status(self, admin_cancel_id, **params):
+    def endpoint_manager_cancel_status(
+        self, admin_cancel_id, **params
+    ) -> response.GlobusHTTPResponse:
         """
         Get the status of an an admin cancel (result of
         endpoint_manager_cancel_tasks).
@@ -2064,7 +2035,7 @@ class TransferClient(BaseClient):
 
     def endpoint_manager_pause_tasks(
         self, task_ids: Iterable[ID_PARAM_TYPE], message, **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         Pause a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
@@ -2097,11 +2068,11 @@ class TransferClient(BaseClient):
             "task_id_list": str_task_ids,
         }
         path = self.qjoin_path("endpoint_manager", "admin_pause")
-        return cast(TransferResponse, self.post(path, data=data, params=params))
+        return self.post(path, data=data, params=params)
 
     def endpoint_manager_resume_tasks(
         self, task_ids: Iterable[ID_PARAM_TYPE], **params
-    ) -> TransferResponse:
+    ) -> response.GlobusHTTPResponse:
         """
         Resume a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
@@ -2126,7 +2097,7 @@ class TransferClient(BaseClient):
         log.info(f"TransferClient.endpoint_manager_resume_tasks({str_task_ids})")
         data = {"task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_resume")
-        return cast(TransferResponse, self.post(path, data=data, params=params))
+        return self.post(path, data=data, params=params)
 
     #
     # endpoint manager pause rule methods
@@ -2161,12 +2132,9 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint_manager", "pause_rule_list")
         if filter_endpoint is not None:
             params["filter_endpoint"] = utils.safe_stringify(filter_endpoint)
-        return cast(
-            IterableTransferResponse,
-            self.get(path, params=params, response_class=IterableTransferResponse),
-        )
+        return self.get(path, params=params, response_class=IterableTransferResponse)
 
-    def endpoint_manager_create_pause_rule(self, data):
+    def endpoint_manager_create_pause_rule(self, data) -> response.GlobusHTTPResponse:
         """
         Create a new pause rule. Requires the activity manager effective role
         on the endpoint defined in the rule.
@@ -2198,9 +2166,11 @@ class TransferClient(BaseClient):
         """
         log.info("TransferClient.endpoint_manager_create_pause_rule(...)")
         path = self.qjoin_path("endpoint_manager", "pause_rule")
-        return self.post(path, data)
+        return self.post(path, data=data)
 
-    def endpoint_manager_get_pause_rule(self, pause_rule_id, **params):
+    def endpoint_manager_get_pause_rule(
+        self, pause_rule_id, **params
+    ) -> response.GlobusHTTPResponse:
         """
         Get an existing pause rule by ID. Requires the activity manager
         effective role on the endpoint defined in the rule.
@@ -2226,7 +2196,9 @@ class TransferClient(BaseClient):
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
         return self.get(path, params=params)
 
-    def endpoint_manager_update_pause_rule(self, pause_rule_id, data):
+    def endpoint_manager_update_pause_rule(
+        self, pause_rule_id, data
+    ) -> response.GlobusHTTPResponse:
         """
         Update an existing pause rule by ID. Requires the activity manager
         effective role on the endpoint defined in the rule.
@@ -2257,9 +2229,11 @@ class TransferClient(BaseClient):
         pause_rule_id = utils.safe_stringify(pause_rule_id)
         log.info(f"TransferClient.endpoint_manager_update_pause_rule({pause_rule_id})")
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
-        return self.put(path, data)
+        return self.put(path, data=data)
 
-    def endpoint_manager_delete_pause_rule(self, pause_rule_id, **params):
+    def endpoint_manager_delete_pause_rule(
+        self, pause_rule_id, **params
+    ) -> response.GlobusHTTPResponse:
         """
         Delete an existing pause rule by ID. Requires the user to see the
         "editible" field of the rule as True. Any tasks affected by this rule

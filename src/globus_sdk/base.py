@@ -1,12 +1,16 @@
 import logging
+import typing  # needed: https://github.com/PyCQA/pyflakes/issues/561
 import urllib.parse
-from typing import Dict, Optional, Type
+from typing import Dict, Optional, Type, TypeVar
 
 from globus_sdk import config, exc, utils
+from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.transport import RequestsTransport, RetryPolicy
 
 log = logging.getLogger(__name__)
+
+Response_T = TypeVar("Response_T", bound=GlobusHTTPResponse)
 
 
 class BaseClient:
@@ -32,7 +36,6 @@ class BaseClient:
 
     # Can be overridden by subclasses, but must be a subclass of GlobusError
     error_class: Type[exc.GlobusAPIError] = exc.GlobusAPIError
-    default_response_class: Type[GlobusHTTPResponse] = GlobusHTTPResponse
 
     #: the type of Transport which will be used, defaults to ``RequestsTransport``
     transport_class: Type = RequestsTransport
@@ -41,10 +44,11 @@ class BaseClient:
 
     def __init__(
         self,
-        environment=None,
-        base_url=None,
-        authorizer=None,
-        app_name=None,
+        *,
+        environment: Optional[str] = None,
+        base_url: Optional[str] = None,
+        authorizer: Optional[GlobusAuthorizer] = None,
+        app_name: Optional[str] = None,
         transport_params: Optional[Dict] = None,
     ):
         # explicitly check the `service_name` to ensure that it was set
@@ -117,6 +121,28 @@ class BaseClient:
     def qjoin_path(self, *parts: str) -> str:
         return "/" + "/".join(urllib.parse.quote(part) for part in parts)
 
+    @typing.overload
+    def get(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        response_class: Type[Response_T],
+    ) -> Response_T:
+        ...
+
+    @typing.overload
+    def get(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        response_class: None = None,
+    ) -> GlobusHTTPResponse:
+        ...
+
     def get(self, path, *, params=None, headers=None, response_class=None):
         """
         Make a GET request to the specified path.
@@ -134,6 +160,32 @@ class BaseClient:
             headers=headers,
             response_class=response_class,
         )
+
+    @typing.overload
+    def post(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+        response_class: Type[Response_T],
+    ) -> Response_T:
+        ...
+
+    @typing.overload
+    def post(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+        response_class: None = None,
+    ) -> GlobusHTTPResponse:
+        ...
 
     def post(
         self,
@@ -164,6 +216,28 @@ class BaseClient:
             response_class=response_class,
         )
 
+    @typing.overload
+    def delete(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        response_class: Type[Response_T],
+    ) -> Response_T:
+        ...
+
+    @typing.overload
+    def delete(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        response_class: None = None,
+    ) -> GlobusHTTPResponse:
+        ...
+
     def delete(self, path, *, params=None, headers=None, response_class=None):
         """
         Make a DELETE request to the specified path.
@@ -181,6 +255,32 @@ class BaseClient:
             headers=headers,
             response_class=response_class,
         )
+
+    @typing.overload
+    def put(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+        response_class: Type[Response_T],
+    ) -> Response_T:
+        ...
+
+    @typing.overload
+    def put(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+        response_class: None = None,
+    ) -> GlobusHTTPResponse:
+        ...
 
     def put(
         self,
@@ -211,6 +311,32 @@ class BaseClient:
             response_class=response_class,
         )
 
+    @typing.overload
+    def patch(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+        response_class: Type[Response_T],
+    ) -> Response_T:
+        ...
+
+    @typing.overload
+    def patch(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+        response_class: None = None,
+    ) -> GlobusHTTPResponse:
+        ...
+
     def patch(
         self,
         path,
@@ -239,6 +365,34 @@ class BaseClient:
             encoding=encoding,
             response_class=response_class,
         )
+
+    @typing.overload
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+        response_class: Type[Response_T],
+    ) -> Response_T:
+        ...
+
+    @typing.overload
+    def request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+        headers: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+        response_class: None = None,
+    ) -> GlobusHTTPResponse:
+        ...
 
     def request(
         self,
@@ -269,8 +423,8 @@ class BaseClient:
             registered with the transport. By default, strings get "text" behavior and
             all other objects get "json".
         :type encoding: string
-        :param response_class: Class for response object, overrides the client's
-            ``default_response_class``
+        :param response_class: Class for response object, overrides the default_response
+            class
         :type response_class: class
 
         :return: :class:`GlobusHTTPResponse \
@@ -304,7 +458,7 @@ class BaseClient:
         if 200 <= r.status_code < 400:
             log.debug(f"request completed with response code: {r.status_code}")
             if response_class is None:
-                return self.default_response_class(r, client=self)
+                return GlobusHTTPResponse(r, client=self)
             else:
                 return response_class(r, client=self)
 

@@ -8,7 +8,7 @@ Globus Search
    :members:
    :member-order: bysource
    :show-inheritance:
-   :exclude-members: error_class, default_response_class
+   :exclude-members: error_class
 
 Helper Objects
 --------------
