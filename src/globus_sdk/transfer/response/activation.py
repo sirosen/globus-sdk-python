@@ -1,4 +1,5 @@
 import time
+from typing import Optional, cast
 
 from globus_sdk.response import GlobusHTTPResponse
 
@@ -27,12 +28,12 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
         # querying its status will start to matter
         if self["expires_in"] == -1:
             # expires_in=-1 is the "infinite lifetime" case
-            self.expires_at = None
+            self.expires_at: Optional[int] = None
         else:
             self.expires_at = int(time.time() + self["expires_in"])
 
     @property
-    def supports_auto_activation(self):
+    def supports_auto_activation(self) -> bool:
         r"""
         Check if the document lists Auto-Activation as an available type of
         activation.
@@ -53,10 +54,10 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
 
         :rtype: ``bool``
         """
-        return self["auto_activation_supported"]
+        return cast(bool, self["auto_activation_supported"])
 
     @property
-    def supports_web_activation(self):
+    def supports_web_activation(self) -> bool:
         """
         Check if the document lists known types of activation that can be done
         through the web. If this returns ``False``, it means that the endpoint
@@ -91,7 +92,7 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
             )
         )
 
-    def active_until(self, time_seconds, relative_time=True):
+    def active_until(self, time_seconds: int, relative_time: bool = True) -> bool:
         """
         Check if the Endpoint will be active until some time in the future,
         given as an integer number of seconds.
@@ -144,11 +145,11 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
             return time_seconds < self.expires_at
 
     @property
-    def always_activated(self):
+    def always_activated(self) -> bool:
         """
         Returns True if the endpoint activation never expires
         (e.g. shared endpoints, globus connect personal endpoints).
 
         :rtype: ``bool``
         """
-        return self["expires_in"] == -1
+        return cast(int, self["expires_in"]) == -1
