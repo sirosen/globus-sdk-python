@@ -1,4 +1,4 @@
-SDK_VERSION=$(shell grep '^__version__' globus_sdk/version.py | cut -d '"' -f2)
+SDK_VERSION=$(shell grep '^__version__' src/globus_sdk/version.py | cut -d '"' -f2)
 
 # these are just tox invocations wrapped nicely for convenience
 .PHONY: lint test docs
