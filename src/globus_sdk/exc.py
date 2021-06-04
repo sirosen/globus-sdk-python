@@ -138,6 +138,10 @@ class GlobusAPIError(GlobusError):
         self.message = text
 
 
+class GroupsAPIError(GlobusAPIError):
+    """Error class for the Globus Groups Service."""
+
+
 class SearchAPIError(GlobusAPIError):
     """
     Error class for the Search API client. In addition to the

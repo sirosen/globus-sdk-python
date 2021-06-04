@@ -44,6 +44,7 @@ def register_api_route(
     base_url_map = {
         "auth": "https://auth.globus.org/",
         "nexus": "https://nexus.api.globusonline.org/",
+        "groups": "https://groups.api.globus.org/",
         "transfer": "https://transfer.api.globus.org/v0.10",
         "search": "https://search.api.globus.org/",
     }

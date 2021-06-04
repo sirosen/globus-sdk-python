@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+Unreleased
+----------
+
+* Add client for Globus Groups API, ``globus_sdk.GroupsClient``. Includes a
+  dedicated error class, ``globus_sdk.GroupsAPIError``
+
 v3.0.0a1
 --------
 

@@ -39,5 +39,6 @@ very simply::
     :maxdepth: 1
 
     auth
+    groups
     search
     transfer
