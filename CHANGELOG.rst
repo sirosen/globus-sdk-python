@@ -16,7 +16,7 @@ v3.0.0a1
   default when ``data`` is a dict.
 * By default, requests are retried automatically on potentially transient
   error codes (e.g. ``http_status=500``) and network errors with exponential
-   backoff
+  backoff
 * ``globus_sdk.BaseClient`` and its subclasses define ``retry_policy``
   and ``transport_class`` class attributes which can be used to customize the
   retry behavior used
