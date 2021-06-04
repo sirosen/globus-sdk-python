@@ -24,7 +24,8 @@ v3.0.0a1
 * The JWT dependency has been updated to ``pyjwt>=2,<3`` (`#416`_)
 * The config files in ``~/.globus.cfg`` and ``/etc/globus.cfg`` are no longer
   used. Configuration can now be done via environment variables (`#409`_)
-* Cleanup client class attrs (https://github.com/globus/globus-cli/pull/415[415])
+* ``BaseClient.app_name`` is a property with a custom setter, replacing
+  ``set_app_name`` (`#415`_)
 * ``OAuthTokenResponse.decode_id_token`` can now be provided a JWK and openid
   configuration as parameters. ``AuthClient`` implements methods for fetching
   these data, so that they can be fetched and stored outside of this call.
@@ -33,15 +34,16 @@ v3.0.0a1
 * Remove ``auth_client=...`` parameter to
   ``OAuthTokenResponse.decode_id_token`` (`#400`_)
 
-.. _#423: https://github.com/globus/globus-cli/pull/423
-.. _#422: https://github.com/globus/globus-cli/pull/422
-.. _#417: https://github.com/globus/globus-cli/pull/417
-.. _#420: https://github.com/globus/globus-cli/pull/420
-.. _#416: https://github.com/globus/globus-cli/pull/416
-.. _#409: https://github.com/globus/globus-cli/pull/409
-.. _#403: https://github.com/globus/globus-cli/pull/403
-.. _#407: https://github.com/globus/globus-cli/pull/407
-.. _#400: https://github.com/globus/globus-cli/pull/400
+.. _#423: https://github.com/globus/globus-sdk-python/pull/423
+.. _#422: https://github.com/globus/globus-sdk-python/pull/422
+.. _#417: https://github.com/globus/globus-sdk-python/pull/417
+.. _#420: https://github.com/globus/globus-sdk-python/pull/420
+.. _#416: https://github.com/globus/globus-sdk-python/pull/416
+.. _#415: https://github.com/globus/globus-sdk-python/pull/415
+.. _#409: https://github.com/globus/globus-sdk-python/pull/409
+.. _#403: https://github.com/globus/globus-sdk-python/pull/403
+.. _#407: https://github.com/globus/globus-sdk-python/pull/407
+.. _#400: https://github.com/globus/globus-sdk-python/pull/400
 
 v2.0.1
 ------
