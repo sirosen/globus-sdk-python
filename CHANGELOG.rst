@@ -1,6 +1,48 @@
 CHANGELOG
 =========
 
+v3.0.0a1
+--------
+
+* Update documentation site style and layout (`#423`_)
+* The interface for ``GlobusAuthorizer`` now defines
+  ``get_authorization_header`` instead of ``set_authorization_header``, and
+  additional keyword arguments are not allowed (`#422`_)
+* New Transport layer handles HTTP details, variable payload
+  encodings, and automatic request retries (`#417`_)
+* Instead of ``json_body=...`` and ``text_body=...``, use ``data=...``
+  combined with ``encoding="json"``, ``encoding="form"``, or
+  ``encoding="text"`` to format payload data. ``encoding="json"`` is the
+  default when ``data`` is a dict.
+* By default, requests are retried automatically on potentially transient
+  error codes (e.g. ``http_status=500``) and network errors with exponential
+   backoff
+* ``globus_sdk.BaseClient`` and its subclasses define ``retry_policy``
+  and ``transport_class`` class attributes which can be used to customize the
+  retry behavior used
+* ``globus-sdk`` now provides PEP561 typing data (`#420`_)
+* The JWT dependency has been updated to ``pyjwt>=2,<3`` (`#416`_)
+* The config files in ``~/.globus.cfg`` and ``/etc/globus.cfg`` are no longer
+  used. Configuration can now be done via environment variables (`#409`_)
+* Cleanup client class attrs (https://github.com/globus/globus-cli/pull/415[415])
+* ``OAuthTokenResponse.decode_id_token`` can now be provided a JWK and openid
+  configuration as parameters. ``AuthClient`` implements methods for fetching
+  these data, so that they can be fetched and stored outside of this call.
+  There is no automatic caching of these data. (`#403`_)
+* Remove ``allowed_authorizer_types`` restriction from ``BaseClient`` (`#407`_)
+* Remove ``auth_client=...`` parameter to
+  ``OAuthTokenResponse.decode_id_token`` (`#400`_)
+
+.. _#423: https://github.com/globus/globus-cli/pull/423
+.. _#422: https://github.com/globus/globus-cli/pull/422
+.. _#417: https://github.com/globus/globus-cli/pull/417
+.. _#420: https://github.com/globus/globus-cli/pull/420
+.. _#416: https://github.com/globus/globus-cli/pull/416
+.. _#409: https://github.com/globus/globus-cli/pull/409
+.. _#403: https://github.com/globus/globus-cli/pull/403
+.. _#407: https://github.com/globus/globus-cli/pull/407
+.. _#400: https://github.com/globus/globus-cli/pull/400
+
 v2.0.1
 ------
 
