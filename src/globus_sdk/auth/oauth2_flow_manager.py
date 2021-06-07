@@ -17,7 +17,7 @@ class GlobusOAuthFlowManager:
     implement our own set of Flow objects.
     """
 
-    def get_authorize_url(self):
+    def get_authorize_url(self) -> str:
         """
         This method consumes no arguments or keyword arguments, and produces a
         string URL for the Authorize Step of a 3-legged OAuth2 flow.
@@ -33,7 +33,7 @@ class GlobusOAuthFlowManager:
             f"{type(self)} does not implement get_authorize_url()"
         )
 
-    def exchange_code_for_tokens(self, auth_code):
+    def exchange_code_for_tokens(self, auth_code: str):
         """
         This method takes an auth_code and produces a response object
         containing one or more tokens.

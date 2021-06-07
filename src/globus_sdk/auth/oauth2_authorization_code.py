@@ -1,7 +1,9 @@
 import logging
 import urllib.parse
+from typing import Any, Dict, Optional, Sequence, Union
 
 from globus_sdk import utils
+from globus_sdk.auth.client_types.base import AuthClient
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_flow_manager import GlobusOAuthFlowManager
 
@@ -46,11 +48,11 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
 
     def __init__(
         self,
-        auth_client,
-        redirect_uri,
-        requested_scopes=None,
-        state="_default",
-        refresh_tokens=False,
+        auth_client: AuthClient,
+        redirect_uri: str,
+        requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        state: str = "_default",
+        refresh_tokens: bool = False,
     ):
         # default to the default requested scopes
         self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
@@ -72,7 +74,9 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         logger.debug(f"state={state}")
         logger.debug(f"requested_scopes={self.requested_scopes}")
 
-    def get_authorize_url(self, additional_params=None):
+    def get_authorize_url(
+        self, additional_params: Optional[Dict[str, Any]] = None
+    ) -> str:
         """
         Start a Authorization Code flow by getting the authorization URL to
         which users should be sent.
@@ -104,10 +108,10 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         if additional_params:
             params.update(additional_params)
 
-        params = urllib.parse.urlencode(params)
-        return f"{authorize_base_url}?{params}"
+        encoded_params = urllib.parse.urlencode(params)
+        return f"{authorize_base_url}?{encoded_params}"
 
-    def exchange_code_for_tokens(self, auth_code):
+    def exchange_code_for_tokens(self, auth_code: str):
         """
         The second step of the Authorization Code flow, exchange an
         authorization code for access tokens (and refresh tokens if specified)

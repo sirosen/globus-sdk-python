@@ -4,8 +4,10 @@ import logging
 import os
 import re
 import urllib.parse
+from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
 from globus_sdk import utils
+from globus_sdk.auth.client_types.base import AuthClient
 from globus_sdk.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from globus_sdk.auth.oauth2_flow_manager import GlobusOAuthFlowManager
 from globus_sdk.exc import GlobusSDKUsageError
@@ -13,7 +15,7 @@ from globus_sdk.exc import GlobusSDKUsageError
 logger = logging.getLogger(__name__)
 
 
-def make_native_app_challenge(verifier=None):
+def make_native_app_challenge(verifier: Optional[str] = None) -> Tuple[str, str]:
     """
     Produce a challenge and verifier for the Native App flow.
     The verifier is an unhashed secret, and the challenge is a hashed version
@@ -98,13 +100,13 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
 
     def __init__(
         self,
-        auth_client,
-        requested_scopes=None,
-        redirect_uri=None,
-        state="_default",
-        verifier=None,
-        refresh_tokens=False,
-        prefill_named_grant=None,
+        auth_client: AuthClient,
+        requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        redirect_uri: Optional[str] = None,
+        state: str = "_default",
+        verifier: Optional[str] = None,
+        refresh_tokens: bool = False,
+        prefill_named_grant: Optional[str] = None,
     ):
         self.auth_client = auth_client
 
@@ -153,7 +155,9 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         if prefill_named_grant is not None:
             logger.debug(f"prefill_named_grant={self.prefill_named_grant}")
 
-    def get_authorize_url(self, additional_params=None):
+    def get_authorize_url(
+        self, additional_params: Optional[Dict[str, Any]] = None
+    ) -> str:
         """
         Start a Native App flow by getting the authorization URL to which users
         should be sent.
@@ -189,10 +193,10 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         if additional_params:
             params.update(additional_params)
 
-        params = urllib.parse.urlencode(params)
-        return f"{authorize_base_url}?{params}"
+        encoded_params = urllib.parse.urlencode(params)
+        return f"{authorize_base_url}?{encoded_params}"
 
-    def exchange_code_for_tokens(self, auth_code):
+    def exchange_code_for_tokens(self, auth_code: str):
         """
         The second step of the Native App flow, exchange an authorization code
         for access tokens (and refresh tokens if specified).
