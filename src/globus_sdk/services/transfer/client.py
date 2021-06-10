@@ -3,20 +3,18 @@ import time
 import uuid
 from typing import Dict, Iterable, Optional, Union
 
-from globus_sdk import exc, response, utils
-from globus_sdk.base import BaseClient
-from globus_sdk.transfer.paging import PaginatedResource
-from globus_sdk.transfer.response import (
-    ActivationRequirementsResponse,
-    IterableTransferResponse,
-)
+from globus_sdk import client, exc, response, utils
+
+from .errors import TransferAPIError
+from .paging import PaginatedResource
+from .response import ActivationRequirementsResponse, IterableTransferResponse
 
 log = logging.getLogger(__name__)
 
 ID_PARAM_TYPE = Union[bytes, str, uuid.UUID]
 
 
-class TransferClient(BaseClient):
+class TransferClient(client.BaseClient):
     r"""
     Client for the
     `Globus Transfer API <https://docs.globus.org/api/transfer/>`_.
@@ -26,7 +24,7 @@ class TransferClient(BaseClient):
     from the base rest client that can be used to access any REST resource.
 
     Some calls are paginated. If a call returns a :class:`PaginatedResource \
-    <globus_sdk.transfer.paging.PaginatedResource>` object, the result is an
+    <globus_sdk.services.transfer.paging.PaginatedResource>` object, the result is an
     iterator which can only be walked *once*. If you need to do multiple passes
     over the result, call ``list()`` on the ``PaginatedResource`` or call the
     original method again to get fresh results.
@@ -45,7 +43,7 @@ class TransferClient(BaseClient):
     """
     service_name = "transfer"
     base_path = "/v0.10/"
-    error_class = exc.TransferAPIError
+    error_class = TransferAPIError
 
     # Convenience methods, providing more pythonic access to common REST
     # resources
@@ -61,7 +59,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -89,7 +87,7 @@ class TransferClient(BaseClient):
         ``PUT /endpoint/<endpoint_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -127,7 +125,7 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -169,7 +167,7 @@ class TransferClient(BaseClient):
         ``DELETE /endpoint/<endpoint_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -217,7 +215,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -279,7 +277,7 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/autoactivate``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         The following example will try to "auto" activate the endpoint
         using a credential available from another endpoint or sign in by
@@ -346,7 +344,7 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/deactivate``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -367,7 +365,7 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/activate``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         Consider using autoactivate and web activation instead, described
         in the example for
@@ -392,7 +390,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/activation_requirements``
 
         :rtype: :class:`ActivationRequirementsResponse
-                <globus_sdk.transfer.response.ActivationRequirementsResponse>`
+                <globus_sdk.services.transfer.response.ActivationRequirementsResponse>`
 
         **External Documentation**
 
@@ -412,7 +410,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
 
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -437,7 +435,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/my_shared_endpoint_list``
 
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -458,7 +456,7 @@ class TransferClient(BaseClient):
         :param data: A python dict representation of a ``shared_endpoint`` document
         :type data: dict
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -493,7 +491,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/server_list``
 
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -514,7 +512,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/server/<server_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -537,7 +535,7 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/server``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -558,7 +556,7 @@ class TransferClient(BaseClient):
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -583,7 +581,7 @@ class TransferClient(BaseClient):
         ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -610,7 +608,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/role_list``
 
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -631,7 +629,7 @@ class TransferClient(BaseClient):
         ``POST /endpoint/<endpoint_id>/role``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -652,7 +650,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/role/<role_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -673,7 +671,7 @@ class TransferClient(BaseClient):
         ``DELETE /endpoint/<endpoint_id>/role/<role_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -698,7 +696,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/access_list``
 
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -719,7 +717,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint/<endpoint_id>/access/<rule_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -746,7 +744,7 @@ class TransferClient(BaseClient):
         :param rule_data: A python dict representation of an ``access`` document
         :type rule_data: dict
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -783,7 +781,7 @@ class TransferClient(BaseClient):
         ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -808,7 +806,7 @@ class TransferClient(BaseClient):
         ``DELETE /endpoint/<endpoint_id>/access/<rule_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -833,7 +831,7 @@ class TransferClient(BaseClient):
         ``GET /bookmark_list``
 
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -850,7 +848,7 @@ class TransferClient(BaseClient):
         ``POST /bookmark``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -869,7 +867,7 @@ class TransferClient(BaseClient):
         ``GET /bookmark/<bookmark_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -890,7 +888,7 @@ class TransferClient(BaseClient):
         ``PUT /bookmark/<bookmark_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -911,7 +909,7 @@ class TransferClient(BaseClient):
         ``DELETE /bookmark/<bookmark_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -936,7 +934,7 @@ class TransferClient(BaseClient):
         ``GET /operation/endpoint/<endpoint_id>/ls``
 
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -963,7 +961,7 @@ class TransferClient(BaseClient):
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -995,7 +993,7 @@ class TransferClient(BaseClient):
         ``POST /operation/endpoint/<endpoint_id>/rename``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -1029,7 +1027,7 @@ class TransferClient(BaseClient):
         ``POST /operation/endpoint/<endpoint_id>/symlink``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         The ``path`` is the name of the symlink, and the ``symlink_target`` is
         the path referenced by the symlink.
@@ -1072,7 +1070,7 @@ class TransferClient(BaseClient):
         ``GET /submission_id``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         Submission IDs are required to submit tasks to the Transfer service
         via the :meth:`submit_transfer <.submit_transfer>` and
@@ -1098,7 +1096,7 @@ class TransferClient(BaseClient):
         ``POST /transfer``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -1132,7 +1130,7 @@ class TransferClient(BaseClient):
         ``POST /delete``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -1173,7 +1171,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -1221,7 +1219,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -1259,7 +1257,7 @@ class TransferClient(BaseClient):
         ``GET /task/<task_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -1280,7 +1278,7 @@ class TransferClient(BaseClient):
         ``PUT /task/<task_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -1299,7 +1297,7 @@ class TransferClient(BaseClient):
         ``POST /task/<task_id>/cancel``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -1423,7 +1421,7 @@ class TransferClient(BaseClient):
         ``GET /task/<task_id>/pause_info``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -1461,7 +1459,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -1512,7 +1510,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -1606,7 +1604,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint_manager/endpoint/<endpoint_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -1629,7 +1627,7 @@ class TransferClient(BaseClient):
         ``GET endpoint_manager/endpoint/<endpoint_id>/access_list``
 
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -1665,7 +1663,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -1797,7 +1795,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint_manager/task/<task_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -1830,7 +1828,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -1863,7 +1861,7 @@ class TransferClient(BaseClient):
         ``GET /endpoint_manager/task/<task_id>/pause_info``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -1894,7 +1892,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -1940,7 +1938,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
-                <globus_sdk.transfer.paging.PaginatedResource>`,
+                <globus_sdk.services.transfer.paging.PaginatedResource>`,
                 an iterable of :class:`GlobusResponse
                 <globus_sdk.response.GlobusResponse>`
 
@@ -1984,7 +1982,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -2016,7 +2014,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -2045,7 +2043,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -2080,7 +2078,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -2115,7 +2113,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -2138,7 +2136,7 @@ class TransferClient(BaseClient):
         ``POST /endpoint_manager/pause_rule``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -2178,7 +2176,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
@@ -2203,7 +2201,7 @@ class TransferClient(BaseClient):
         ``PUT /endpoint_manager/pause_rule/<pause_rule_id>``
 
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -2242,7 +2240,7 @@ class TransferClient(BaseClient):
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
         :rtype: :class:`TransferResponse
-                <globus_sdk.transfer.response.TransferResponse>`
+                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **External Documentation**
 
