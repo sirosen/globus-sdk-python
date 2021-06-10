@@ -28,7 +28,7 @@ from globus_sdk.exc import (
 )
 from globus_sdk.groups import GroupsClient
 from globus_sdk.local_endpoint import LocalGlobusConnectPersonal
-from globus_sdk.response import GlobusHTTPResponse, GlobusResponse
+from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.search import SearchClient, SearchQuery
 from globus_sdk.transfer import TransferClient
 from globus_sdk.transfer.data import DeleteData, TransferData
@@ -36,7 +36,6 @@ from globus_sdk.version import __version__
 
 __all__ = (
     "__version__",
-    "GlobusResponse",
     "GlobusHTTPResponse",
     "GlobusError",
     "GlobusSDKUsageError",

@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from typing import Dict, Optional
+from typing import TYPE_CHECKING, Dict, Optional, cast
 
 import jwt
 
@@ -9,6 +9,9 @@ from globus_sdk import exc
 from globus_sdk.response import GlobusHTTPResponse
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:  # pragma: no cover
+    from .client_types import AuthClient
 
 
 def _convert_token_info_dict(source_dict):
@@ -102,7 +105,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
     """
 
     def __init__(self, *args, **kwargs):
-        GlobusHTTPResponse.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._init_rs_dict()
         self._init_scopes_getter()
 
@@ -186,7 +189,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         :type jwt_params: dict
         """
         logger.info('Decoding ID Token "%s"', self["id_token"])
-        auth_client = self._client
+        auth_client = cast("AuthClient", self.client)
 
         jwt_params = jwt_params or {}
 

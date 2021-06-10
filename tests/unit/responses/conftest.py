@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 import globus_sdk
@@ -41,7 +43,7 @@ def make_oauth_token_response():
                     },
                 ],
             },
-            client=client,
+            client=client if client else mock.Mock(),
         )
 
     return f
