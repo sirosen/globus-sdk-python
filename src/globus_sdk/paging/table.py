@@ -26,15 +26,15 @@ PaginatedMethodSpec = typing.Dict[
 ]
 
 
-class PaginatorCollection:
+class PaginatorTable:
     """
-    A PaginatorCollection maps multiple methods of an SDK client to paginated variants.
+    A PaginatorTable maps multiple methods of an SDK client to paginated variants.
     Given a method, client.foo , the collection will gain a function attribute `foo`
     (name matching is automatic) which returns a Paginator.
 
     So
 
-    >>> pc = PaginatorCollection(client_object, {MarkerPaginator: ["foo"]})
+    >>> pc = PaginatorTable(client_object, {MarkerPaginator: ["foo"]})
     >>> paginator = pc.foo()  # returns a paginator
     >>> for page in paginator:  # a paginator is an iterable of pages (response objects)
     >>>     print(json.dumps(page.data))  # you can handle each response object in turn
@@ -43,7 +43,7 @@ class PaginatorCollection:
 
     That is, if `client` has two methods `foo` and `bar` which we want paginated,
 
-    >>> client.paginated = PaginatorCollection(
+    >>> client.paginated = PaginatorTable(
     >>>     client, {MarkerPaginator: ["foo", "bar"]}
     >>> )
 

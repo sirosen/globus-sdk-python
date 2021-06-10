@@ -4,7 +4,7 @@ from typing import Dict, Optional, Type
 
 from globus_sdk import config, exc, utils
 from globus_sdk.authorizers import GlobusAuthorizer
-from globus_sdk.paging import PaginatedMethodSpec, PaginatorCollection
+from globus_sdk.paging import PaginatedMethodSpec, PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.transport import RequestsTransport, RetryPolicy
 
@@ -101,7 +101,7 @@ class BaseClient:
 
     def _init_paging(self):
         paging_spec: PaginatedMethodSpec = self.paging_spec if self.paging_spec else {}
-        self.paginated = PaginatorCollection(self, paging_spec)
+        self.paginated = PaginatorTable(self, paging_spec)
 
     def __getstate__(self):
         """
