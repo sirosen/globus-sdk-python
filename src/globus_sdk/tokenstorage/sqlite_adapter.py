@@ -9,13 +9,13 @@ from globus_sdk.version import __version__
 
 class SQLiteAdapter(FileAdapter):
     """
-    :param dbname: the name of the DB file to write to and read from
+    :param dbname: The name of the DB file to write to and read from. If the string
+        ":memory:" is used, an in-memory database will be used instead.
     :param namespace: A "namespace" to use within the database. All operations will
-                      be performed indexed under this string, so that multiple distinct
-                      sets of tokens may be stored in the database. You might use
-                      usernames as the namespace to implement a multi-user system, or
-                      profile names to allow multiple Globus accounts to be used by a
-                      single user.
+        be performed indexed under this string, so that multiple distinct sets of tokens
+        may be stored in the database. You might use usernames as the namespace to
+        implement a multi-user system, or profile names to allow multiple Globus
+        accounts to be used by a single user.
 
     A storage adapter for storing tokens in sqlite databases.
 
