@@ -4,8 +4,8 @@ import globus_sdk
 
 
 @pytest.fixture
-def client(no_retry_policy):
+def client(no_retry_transport):
     class CustomTransferClient(globus_sdk.TransferClient):
-        retry_policy = no_retry_policy
+        transport_class = no_retry_transport
 
     return CustomTransferClient()

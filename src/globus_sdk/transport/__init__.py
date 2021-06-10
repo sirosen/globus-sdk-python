@@ -1,10 +1,9 @@
 from .encoders import FormRequestEncoder, JSONRequestEncoder, RequestEncoder
-from .requests import RequestsTransport
-from .retry import RetryCheckResult, RetryContext, RetryPolicy
+from .requests import RequestsTransport, RetryCheck, RetryCheckResult, RetryContext
 
 __all__ = (
     "RequestsTransport",
-    "RetryPolicy",
+    "RetryCheck",
     "RetryCheckResult",
     "RetryContext",
     "RequestEncoder",

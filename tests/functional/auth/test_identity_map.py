@@ -45,9 +45,9 @@ IDENTITIES_SINGLE_RESPONSE = """\
 
 
 @pytest.fixture
-def client(no_retry_policy):
+def client(no_retry_transport):
     class CustomAuthClient(globus_sdk.AuthClient):
-        retry_policy = no_retry_policy
+        transport_class = no_retry_transport
 
     return CustomAuthClient()
 

@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 import responses
 
-from globus_sdk.transport import RetryPolicy
+from globus_sdk.transport import RequestsTransport
 
 
 @pytest.fixture(autouse=True)
@@ -13,12 +13,11 @@ def mocksleep():
 
 
 @pytest.fixture
-def no_retry_policy():
-    class NoRetryPolicy(RetryPolicy):
-        def register_default_checks(self):
-            pass
+def no_retry_transport():
+    class NoRetryTransport(RequestsTransport):
+        DEFAULT_MAX_RETRIES = 0
 
-    return NoRetryPolicy()
+    return NoRetryTransport
 
 
 @pytest.fixture(autouse=True)

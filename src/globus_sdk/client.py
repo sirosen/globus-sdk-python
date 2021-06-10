@@ -6,7 +6,7 @@ from globus_sdk import config, exc, utils
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.paging import PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
-from globus_sdk.transport import RequestsTransport, RetryPolicy
+from globus_sdk.transport import RequestsTransport
 
 log = logging.getLogger(__name__)
 
@@ -37,8 +37,6 @@ class BaseClient:
 
     #: the type of Transport which will be used, defaults to ``RequestsTransport``
     transport_class: Type = RequestsTransport
-    #: retry policy for the client (None means the default policy will be used)
-    retry_policy: Optional[RetryPolicy] = None
 
     def __init__(
         self,
@@ -71,9 +69,7 @@ class BaseClient:
         # logs the environment when it isn't `default`
         self.environment = config.get_environment_name(environment)
 
-        self.transport = self.transport_class(
-            retry_policy=self.retry_policy, **(transport_params or {})
-        )
+        self.transport = self.transport_class(**(transport_params or {}))
         log.debug(f"initialized transport of type {type(self.transport)}")
 
         if not self.service_name and not base_url:

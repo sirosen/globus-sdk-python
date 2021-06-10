@@ -15,11 +15,11 @@ def auth_client():
 
 
 @pytest.fixture
-def base_client(no_retry_policy):
+def base_client(no_retry_transport):
     class CustomClient(globus_sdk.BaseClient):
         base_path = "/v0.10/"
         service_name = "transfer"
-        retry_policy = no_retry_policy
+        transport_class = no_retry_transport
 
     return CustomClient()
 
