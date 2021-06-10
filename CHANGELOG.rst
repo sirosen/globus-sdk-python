@@ -4,9 +4,17 @@ CHANGELOG
 Unreleased
 ----------
 
-* A new subpackage is available for public use, ``globus_sdk.tokenstorage``
+v3.0.0a2
+--------
+
+* Refactor response classes (`#425`_)
+* A new subpackage is available for public use,
+  ``globus_sdk.tokenstorage`` (`#405`_)
 * Add client for Globus Groups API, ``globus_sdk.GroupsClient``. Includes a
   dedicated error class, ``globus_sdk.GroupsAPIError``
+
+.. _#425: https://github.com/globus/globus-sdk-python/pull/425
+.. _#405: https://github.com/globus/globus-sdk-python/pull/405
 
 v3.0.0a1
 --------
