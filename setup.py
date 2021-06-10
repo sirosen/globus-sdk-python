@@ -17,6 +17,7 @@ DEV_REQUIREMENTS = [
     "responses==0.13.3",
     # docs
     "sphinx<5",
+    "sphinx-issues<2",
     "furo==2021.04.11b34",
 ]
 
