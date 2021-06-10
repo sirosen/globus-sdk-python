@@ -216,8 +216,8 @@ class TransferClient(client.BaseClient):
         :type params: dict
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **Examples**
 
@@ -1172,8 +1172,8 @@ class TransferClient(client.BaseClient):
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **Examples**
 
@@ -1220,8 +1220,8 @@ class TransferClient(client.BaseClient):
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **Examples**
 
@@ -1460,8 +1460,8 @@ class TransferClient(client.BaseClient):
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **Examples**
 
@@ -1511,8 +1511,8 @@ class TransferClient(client.BaseClient):
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **Examples**
 
@@ -1558,8 +1558,8 @@ class TransferClient(client.BaseClient):
 
         ``GET endpoint_manager/monitored_endpoints``
 
-        :rtype: iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+        :rtype: iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         See
         `Get monitored endpoints \
@@ -1578,8 +1578,8 @@ class TransferClient(client.BaseClient):
 
         ``GET /endpoint_manager/endpoint/<endpoint_id>/hosted_endpoint_list``
 
-        :rtype: iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+        :rtype: iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         See
         `Get hosted endpoint list \
@@ -1664,8 +1664,8 @@ class TransferClient(client.BaseClient):
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **Filters**
 
@@ -1829,8 +1829,8 @@ class TransferClient(client.BaseClient):
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **External Documentation**
 
@@ -1893,8 +1893,8 @@ class TransferClient(client.BaseClient):
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **External Documentation**
 
@@ -1939,8 +1939,8 @@ class TransferClient(client.BaseClient):
         :type params: dict, optional
         :rtype: :class:`PaginatedResource
                 <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
+                an iterable of :class:`GlobusHTTPResponse
+                <globus_sdk.response.GlobusHTTPResponse>`
 
         **External Documentation**
 

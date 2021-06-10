@@ -4,6 +4,7 @@ CHANGELOG
 Unreleased
 ----------
 
+* A new subpackage is available for public use, ``globus_sdk.tokenstorage``
 * Add client for Globus Groups API, ``globus_sdk.GroupsClient``. Includes a
   dedicated error class, ``globus_sdk.GroupsAPIError``
 

@@ -32,6 +32,7 @@ Table of Contents
     services/index
     local_endpoints
     authorization
+    tokenstorage
     config
     core/index
 
