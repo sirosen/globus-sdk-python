@@ -28,19 +28,6 @@ class SearchClient(client.BaseClient):
     error_class = SearchAPIError
     service_name = "search"
 
-    paging_spec = {
-        paging.HasNextPaginator: [
-            (
-                "search",
-                {
-                    "get_page_size": lambda x: x["count"],
-                    "max_total_results": 10000,
-                    "page_size": 100,
-                },
-            )
-        ]
-    }
-
     #
     # Index Management
     #
@@ -74,6 +61,12 @@ class SearchClient(client.BaseClient):
     # Search queries
     #
 
+    @paging.has_paginator(
+        paging.HasNextPaginator,
+        get_page_size=lambda x: x["count"],
+        max_total_results=10000,
+        page_size=100,
+    )
     def search(
         self,
         index_id,

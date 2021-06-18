@@ -1,92 +1,99 @@
-import typing
+from typing import Any, Callable, Dict, Type
 
 from .base import Paginator
 
-# a Paginated Method Spec is a dict which maps paginator classes to
-# method names paired with dicts of parameters for the paginator
-#
-# the parameter dict may also be omitted
-#
-# e.g.
-#    {
-#      MarkerPaginator: [
-#        ("foo", {}),
-#        ("bar", {"setting1": True}),
-#        "baz",
-#      ]
-#    }
-PaginatedMethodSpec = typing.Dict[
-    typing.Type[Paginator],
-    typing.List[
-        typing.Union[
-            str,
-            typing.Tuple[typing.Union[str], typing.Dict[str, typing.Any]],
-        ]
-    ],
-]
+
+def has_paginator(paginator_class: Type[Paginator], **paginator_params):
+    """
+    Mark a callable -- typically a client method -- as having pagination parameters.
+    Usage:
+
+    >>> class MyClient(BaseClient):
+    >>>     @has_paginator(MarkerPaginator)
+    >>>     def foo(...): ...
+
+    This will mark ``MyClient.foo`` as paginated with marker style pagination.
+    It will then be possible to get a paginator for ``MyClient.foo`` via
+
+    >>> c = MyClient(...)
+    >>> paginator = c.paginated.foo()
+    """
+
+    def decorate(func: Callable):
+        func._has_paginator = True  # type: ignore
+        func._paginator_class = paginator_class  # type: ignore
+        func._paginator_params = paginator_params  # type: ignore
+        return func
+
+    return decorate
 
 
 class PaginatorTable:
     """
     A PaginatorTable maps multiple methods of an SDK client to paginated variants.
-    Given a method, client.foo , the collection will gain a function attribute `foo`
-    (name matching is automatic) which returns a Paginator.
+    Given a method, client.foo annotated with the `has_paginator` decorator, the table
+    will gain a function attribute `foo` (name matching is automatic) which returns a
+    Paginator.
 
-    So
-
-    >>> pc = PaginatorTable(client_object, {MarkerPaginator: ["foo"]})
-    >>> paginator = pc.foo()  # returns a paginator
-    >>> for page in paginator:  # a paginator is an iterable of pages (response objects)
-    >>>     print(json.dumps(page.data))  # you can handle each response object in turn
-
-    The expected usage is to build a `paginated` attribute of a client.
-
-    That is, if `client` has two methods `foo` and `bar` which we want paginated,
-
-    >>> client.paginated = PaginatorTable(
-    >>>     client, {MarkerPaginator: ["foo", "bar"]}
-    >>> )
-
-    and that will let us call
+    Clients automatically build and attach paginator tables under the ``paginated``
+    attribute.
+    That is, if `client` has two methods `foo` and `bar` which are marked as paginated,
+    that will let us call
 
     >>> client.paginated.foo()
     >>> client.paginated.bar()
 
-    This is done automatically as part of client instantiation, and is never meant to be
-    run manually.
+    where ``client.paginated`` is a ``PaginatorTable``.
+
+    Paginators are iterables of response pages, so utlimate usage is like so:
+
+    >>> paginator = client.paginated.foo()  # returns a paginator
+    >>> for page in paginator:  # a paginator is an iterable of pages (response objects)
+    >>>     print(json.dumps(page.data))  # you can handle each response object in turn
+
+    A ``PaginatorTable`` is built automatically as part of client instantiation.
+    Creation of ``PaginatorTable`` objects is considered a private API.
     """
 
-    def __init__(self, has_methods: typing.Any, spec: PaginatedMethodSpec):
-        self._paginator_map: typing.Dict[str, typing.Callable] = {}
+    def __init__(self, client: Any):
+        self._client = client
+        # _bindings is a lazily loaded table of names -> callables which
+        # return paginators
+        self._bindings: Dict[str, Callable[..., Paginator]] = {}
 
-        for paginator_class, methodlist in spec.items():
-            for bindinginfo in methodlist:
-                if isinstance(bindinginfo, tuple):
-                    method, paginator_args = bindinginfo
-                else:
-                    method, paginator_args = bindinginfo, {}
-
-                self._add_binding(has_methods, paginator_class, paginator_args, method)
-
-    # This needs to be a separate callable to work correctly as a closure over loop
-    # variables
-    #
-    # If you try to dynamically define functions in __init__ without wrapping them like
-    # this, then you run into trouble with the fact that the resulting functions will
-    # point at <locals> which aren't resolved until call time
-    def _add_binding(self, has_methods, paginator_class, paginator_args, methodname):
-        bound_method = getattr(has_methods, methodname)
+    def _add_binding(self, methodname, bound_method):
+        paginator_class = bound_method._paginator_class
+        paginator_params = bound_method._paginator_params
 
         def paginated_method(*args, **kwargs):
             return paginator_class(
-                bound_method, client_args=args, client_kwargs=kwargs, **paginator_args
+                bound_method, client_args=args, client_kwargs=kwargs, **paginator_params
             )
 
-        self._paginator_map[methodname] = paginated_method
+        self._bindings[methodname] = paginated_method
 
     def __getattr__(self, attrname):
-        try:
-            return self._paginator_map[attrname]
-        except KeyError:
-            pass
-        raise AttributeError(f"No known paginator named '{attrname}'")
+        if attrname not in self._bindings:
+            # this could raise AttributeError -- in which case, let it!
+            method = getattr(self._client, attrname)
+            # not callable -> not a method; not marked paginated -> not relevant
+            if not callable(method) or not getattr(method, "_has_paginator", False):
+                raise AttributeError(f"'{attrname}' is not a paginated method")
+
+            self._add_binding(attrname, method)
+
+        return self._bindings[attrname]
+
+    # customize pickling methods to ensure that the object is pickle-safe
+
+    def __getstate__(self):
+        # when pickling, drop any bound methods
+        d = dict(self.__dict__)  # copy
+        d["_bindings"] = {}
+        return d
+
+    # custom __setstate__ to avoid an infinite loop on `getattr` before `_bindings` is
+    # populated
+    # see: https://docs.python.org/3/library/pickle.html#object.__setstate__
+    def __setstate__(self, d):
+        self.__dict__.update(d)

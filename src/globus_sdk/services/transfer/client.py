@@ -61,51 +61,6 @@ class TransferClient(client.BaseClient):
     base_path = "/v0.10/"
     error_class = TransferAPIError
 
-    paging_spec = {
-        paging.HasNextPaginator: [
-            (
-                "endpoint_search",
-                {
-                    "get_page_size": _get_page_size,
-                    "max_total_results": 1000,
-                    "page_size": 100,
-                },
-            )
-        ],
-        paging.LimitOffsetTotalPaginator: [
-            (
-                "task_list",
-                {
-                    "get_page_size": _get_page_size,
-                    "max_results_per_call": 1000,
-                    "page_size": 1000,
-                },
-            ),
-            (
-                "task_event_list",
-                {
-                    "get_page_size": _get_page_size,
-                    "max_results_per_call": 1000,
-                    "page_size": 1000,
-                },
-            ),
-            (
-                "endpoint_manager_task_event_list",
-                {
-                    "get_page_size": _get_page_size,
-                    "max_results_per_call": 1000,
-                    "page_size": 1000,
-                },
-            ),
-        ],
-        paging.LastKeyPaginator: ["endpoint_manager_task_list"],
-        paging.MarkerPaginator: [
-            "task_successful_transfers",
-            "task_skipped_errors",
-            "endpoint_manager_task_successful_transfers",
-        ],
-    }
-
     # Convenience methods, providing more pythonic access to common REST
     # resources
 
@@ -247,6 +202,12 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s)
         return self.delete(path)
 
+    @paging.has_paginator(
+        paging.HasNextPaginator,
+        get_page_size=_get_page_size,
+        max_total_results=1000,
+        page_size=100,
+    )
     def endpoint_search(
         self,
         filter_fulltext: Optional[str] = None,
@@ -1190,6 +1151,12 @@ class TransferClient(client.BaseClient):
     # Task inspection and management
     #
 
+    @paging.has_paginator(
+        paging.LimitOffsetTotalPaginator,
+        get_page_size=_get_page_size,
+        max_results_per_call=1000,
+        page_size=1000,
+    )
     def task_list(self, **params) -> IterableTransferResponse:
         """
         Get an iterable of task documents owned by the current user.
@@ -1221,6 +1188,12 @@ class TransferClient(client.BaseClient):
         log.info("TransferClient.task_list(...)")
         return IterableTransferResponse(self.get("task_list", params=params))
 
+    @paging.has_paginator(
+        paging.LimitOffsetTotalPaginator,
+        get_page_size=_get_page_size,
+        max_results_per_call=1000,
+        page_size=1000,
+    )
     def task_event_list(
         self, task_id: ID_PARAM_TYPE, **params
     ) -> IterableTransferResponse:
@@ -1441,6 +1414,7 @@ class TransferClient(client.BaseClient):
         resource_path = self.qjoin_path("task", task_id_s, "pause_info")
         return self.get(resource_path, params=params)
 
+    @paging.has_paginator(paging.MarkerPaginator)
     def task_successful_transfers(
         self, task_id: ID_PARAM_TYPE, **params
     ) -> IterableTransferResponse:
@@ -1485,6 +1459,7 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("task", task_id_s, "successful_transfers")
         return IterableTransferResponse(self.get(path, params=params))
 
+    @paging.has_paginator(paging.MarkerPaginator)
     def task_skipped_errors(
         self, task_id: ID_PARAM_TYPE, **params
     ) -> IterableTransferResponse:
@@ -1628,6 +1603,7 @@ class TransferClient(client.BaseClient):
     # endpoint manager task methods
     #
 
+    @paging.has_paginator(paging.LastKeyPaginator)
     def endpoint_manager_task_list(self, **params) -> IterableTransferResponse:
         r"""
         Get a list of tasks visible via ``activity_monitor`` role, as opposed
@@ -1776,6 +1752,12 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint_manager", "task", task_id_s)
         return self.get(path, params=params)
 
+    @paging.has_paginator(
+        paging.LimitOffsetTotalPaginator,
+        get_page_size=_get_page_size,
+        max_results_per_call=1000,
+        page_size=1000,
+    )
     def endpoint_manager_task_event_list(
         self, task_id: ID_PARAM_TYPE, **params
     ) -> IterableTransferResponse:
@@ -1829,6 +1811,7 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint_manager", "task", task_id_s, "pause_info")
         return self.get(path, params=params)
 
+    @paging.has_paginator(paging.MarkerPaginator)
     def endpoint_manager_task_successful_transfers(
         self, task_id: ID_PARAM_TYPE, **params
     ) -> IterableTransferResponse:
