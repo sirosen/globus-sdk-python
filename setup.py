@@ -3,23 +3,30 @@ import re
 
 from setuptools import find_packages, setup
 
-DEV_REQUIREMENTS = [
-    # lint
+MYPY_REQUIREMENTS = [
+    "mypy==0.902",
+    "types-docutils",
+    "types-jwt",
+    "types-requests",
+]
+LINT_REQUIREMENTS = [
     "flake8<4",
     "isort<6",
-    "black==21.5b1",
+    "black==21.6b0",
     "flake8-bugbear==21.4.3",
-    "mypy==0.812",
-    # tests
+] + MYPY_REQUIREMENTS
+TEST_REQUIREMENTS = [
     "pytest<7",
     "pytest-cov<3",
     "pytest-xdist<3",
     "responses==0.13.3",
-    # docs
+]
+DOC_REQUIREMENTS = [
     "sphinx<5",
     "sphinx-issues<2",
-    "furo==2021.04.11b34",
+    "furo==2021.06.18b36",
 ]
+DEV_REQUIREMENTS = TEST_REQUIREMENTS + LINT_REQUIREMENTS + DOC_REQUIREMENTS
 
 
 def parse_version():
