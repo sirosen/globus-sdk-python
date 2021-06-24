@@ -63,6 +63,7 @@ class SearchClient(client.BaseClient):
 
     @paging.has_paginator(
         paging.HasNextPaginator,
+        items_key="gmeta",
         get_page_size=lambda x: x["count"],
         max_total_results=10000,
         page_size=100,

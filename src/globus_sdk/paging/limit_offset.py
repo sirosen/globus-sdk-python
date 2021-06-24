@@ -5,17 +5,21 @@ class _LimitOffsetBasedPaginator(Paginator):
     def __init__(
         self,
         method,
+        *,
+        items_key=None,
         get_page_size,
         max_total_results,
         page_size,
         client_args,
         client_kwargs,
     ):
-        self.method = method
+        super().__init__(
+            method,
+            items_key=items_key,
+            client_args=client_args,
+            client_kwargs=client_kwargs,
+        )
         self.get_page_size = get_page_size
-        self.client_args = client_args
-        self.client_kwargs = client_kwargs
-
         self.max_total_results = max_total_results
         self.limit = page_size
         self.offset = 0
@@ -37,7 +41,7 @@ class _LimitOffsetBasedPaginator(Paginator):
 
 
 class HasNextPaginator(_LimitOffsetBasedPaginator):
-    def __iter__(self):
+    def pages(self):
         has_next_page = True
         while has_next_page:
             self._update_limit()
@@ -49,7 +53,7 @@ class HasNextPaginator(_LimitOffsetBasedPaginator):
 
 
 class LimitOffsetTotalPaginator(_LimitOffsetBasedPaginator):
-    def __iter__(self):
+    def pages(self):
         has_next_page = True
         while has_next_page:
             self._update_limit()

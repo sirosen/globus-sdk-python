@@ -9,30 +9,16 @@ class MarkerPaginator(Paginator):
     This is the default method for GCS pagination, so it's very simple.
     """
 
-    def __init__(self, method, client_args, client_kwargs):
-        """
-        **Parameters**
-
-        ``method``
-          A bound method of an SDK client, used to generate a paginated variant
-
-        ``client_args``
-          Arguments to the underlying method which are passed when the paginator is
-          instantiated. i.e. given ``client.paginated.foo(a, b, c=1)``, this will be
-          ``[a, b]``. The paginator will pass these arguments to *each* call of the
-          bound method as it pages.
-
-        ``client_kwargs``
-          Keyword arguments to the underlying method, like ``client_args`` above.
-          ``client.paginated.foo(a, b, c=1)`` will pass this as ``{"c": 1}``. As with
-          ``client_args``, it's passed to each paginated call.
-        """
-        self.method = method
+    def __init__(self, method, *, items_key=None, client_args, client_kwargs):
+        super().__init__(
+            method,
+            items_key=items_key,
+            client_args=client_args,
+            client_kwargs=client_kwargs,
+        )
         self.marker = None
-        self.client_args = client_args
-        self.client_kwargs = client_kwargs
 
-    def __iter__(self):
+    def pages(self):
         has_next_page = True
         while has_next_page:
             if self.marker:

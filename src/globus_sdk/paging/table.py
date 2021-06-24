@@ -1,9 +1,13 @@
-from typing import Any, Callable, Dict, Type
+from typing import Any, Callable, Dict, Optional, Type
 
 from .base import Paginator
 
 
-def has_paginator(paginator_class: Type[Paginator], **paginator_params):
+def has_paginator(
+    paginator_class: Type[Paginator],
+    items_key: Optional[str] = None,
+    **paginator_params,
+):
     """
     Mark a callable -- typically a client method -- as having pagination parameters.
     Usage:
@@ -22,6 +26,7 @@ def has_paginator(paginator_class: Type[Paginator], **paginator_params):
     def decorate(func: Callable):
         func._has_paginator = True  # type: ignore
         func._paginator_class = paginator_class  # type: ignore
+        func._paginator_items_key = items_key  # type: ignore
         func._paginator_params = paginator_params  # type: ignore
         return func
 
@@ -64,10 +69,15 @@ class PaginatorTable:
     def _add_binding(self, methodname, bound_method):
         paginator_class = bound_method._paginator_class
         paginator_params = bound_method._paginator_params
+        paginator_items_key = bound_method._paginator_items_key
 
         def paginated_method(*args, **kwargs):
             return paginator_class(
-                bound_method, client_args=args, client_kwargs=kwargs, **paginator_params
+                bound_method,
+                client_args=args,
+                client_kwargs=kwargs,
+                items_key=paginator_items_key,
+                **paginator_params,
             )
 
         self._bindings[methodname] = paginated_method

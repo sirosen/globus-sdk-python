@@ -1,5 +1,6 @@
 import json
 
+import pytest
 import responses
 
 from tests.common import register_api_route
@@ -87,7 +88,8 @@ def test_endpoint_search_one_page(client):
         assert res_obj["DATA_TYPE"] == "endpoint"
 
 
-def test_endpoint_search_multipage(client):
+@pytest.mark.parametrize("method", ("__iter__", "pages"))
+def test_endpoint_search_multipage(client, method):
     # add each page
     for page in MULTIPAGE_SEARCH_RESULTS:
         register_api_route("transfer", "/endpoint_search", json=page)
@@ -101,11 +103,20 @@ def test_endpoint_search_multipage(client):
     for page in MULTIPAGE_SEARCH_RESULTS:
         register_api_route("transfer", "/endpoint_search", json=page)
 
-    # paginated calls gets all pages
+    # setup the paginator and either point at `pages()` or directly at the paginator's
+    # `__iter__`
     paginator = client.paginated.endpoint_search("search_query")
+    if method == "pages":
+        iterator = paginator.pages()
+    elif method == "__iter__":
+        iterator = paginator
+    else:
+        raise NotImplementedError
+
+    # paginated calls gets all pages
     count_pages = 0
     count_objects = 0
-    for page in paginator:
+    for page in iterator:
         count_pages += 1
         assert page["DATA_TYPE"] == "endpoint_list"
         for res_obj in page:
@@ -113,4 +124,19 @@ def test_endpoint_search_multipage(client):
             assert res_obj["DATA_TYPE"] == "endpoint"
 
     assert count_pages == len(MULTIPAGE_SEARCH_RESULTS)
+    assert count_objects == sum(len(x["DATA"]) for x in MULTIPAGE_SEARCH_RESULTS)
+
+
+def test_endpoint_search_multipage_iter_items(client):
+    # add each page
+    for page in MULTIPAGE_SEARCH_RESULTS:
+        register_api_route("transfer", "/endpoint_search", json=page)
+
+    # paginator items() call gets an iterator of individual page items
+    paginator = client.paginated.endpoint_search("search_query")
+    count_objects = 0
+    for item in paginator.items():
+        count_objects += 1
+        assert item["DATA_TYPE"] == "endpoint"
+
     assert count_objects == sum(len(x["DATA"]) for x in MULTIPAGE_SEARCH_RESULTS)

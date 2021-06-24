@@ -2,13 +2,16 @@ from .base import Paginator
 
 
 class LastKeyPaginator(Paginator):
-    def __init__(self, method, client_args, client_kwargs):
-        self.method = method
+    def __init__(self, method, *, items_key=None, client_args, client_kwargs):
+        super().__init__(
+            method,
+            items_key=items_key,
+            client_args=client_args,
+            client_kwargs=client_kwargs,
+        )
         self.last_key = None
-        self.client_args = client_args
-        self.client_kwargs = client_kwargs
 
-    def __iter__(self):
+    def pages(self):
         has_next_page = True
         while has_next_page:
             if self.last_key:
