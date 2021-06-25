@@ -4,6 +4,7 @@ from typing import Dict, Optional, Type
 
 from globus_sdk import config, exc, utils
 from globus_sdk.authorizers import GlobusAuthorizer
+from globus_sdk.paging import PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.transport import RequestsTransport, RetryPolicy
 
@@ -92,20 +93,8 @@ class BaseClient:
         if app_name is not None:
             self.app_name = app_name
 
-    def __getstate__(self):
-        """
-        Render to a serializable dict for pickle.dump(s)
-        """
-        log.info("__getstate__() called; client being pickled")
-        d = dict(self.__dict__)  # copy
-        return d
-
-    def __setstate__(self, d):
-        """
-        Load from a serialized format, as in pickle.load(s)
-        """
-        self.__dict__.update(d)
-        log.info("__setstate__() finished; client unpickled")
+        # setup paginated methods
+        self.paginated = PaginatorTable(self)
 
     @property
     def app_name(self):

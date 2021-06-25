@@ -3,15 +3,18 @@ import time
 import uuid
 from typing import Dict, Iterable, Optional, Union
 
-from globus_sdk import client, exc, response, utils
+from globus_sdk import client, exc, paging, response, utils
 
 from .errors import TransferAPIError
-from .paging import PaginatedResource
 from .response import ActivationRequirementsResponse, IterableTransferResponse
 
 log = logging.getLogger(__name__)
 
 ID_PARAM_TYPE = Union[bytes, str, uuid.UUID]
+
+
+def _get_page_size(paged_result):
+    return len(paged_result["DATA"])
 
 
 class TransferClient(client.BaseClient):
@@ -23,12 +26,6 @@ class TransferClient(client.BaseClient):
     REST API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
     from the base rest client that can be used to access any REST resource.
 
-    Some calls are paginated. If a call returns a :class:`PaginatedResource \
-    <globus_sdk.services.transfer.paging.PaginatedResource>` object, the result is an
-    iterator which can only be walked *once*. If you need to do multiple passes
-    over the result, call ``list()`` on the ``PaginatedResource`` or call the
-    original method again to get fresh results.
-
     Detailed documentation is available in the official REST API
     documentation, which is linked to from the method documentation. Methods
     that allow arbitrary keyword arguments will pass the extra arguments as
@@ -38,6 +35,25 @@ class TransferClient(client.BaseClient):
                        Globus Transfer
     :type authorizer: :class:`GlobusAuthorizer\
                       <globus_sdk.authorizers.base.GlobusAuthorizer>`
+
+    **Paginated Calls**
+
+    Methods which support pagination can be called as paginated or unpaginated methods.
+    If the method name is ``TransferClient.foo``, the paginated version is
+    ``TransferClient.paginated.foo``.
+    Using ``TransferClient.endpoint_search`` as an example::
+
+        from globus_sdk import TransferClient
+        tc = TransferClient(...)
+
+        # this is the unpaginated version
+        for x in tc.endpoint_search("tutorial"):
+            print("Endpoint ID: {}".format(x["id"]))
+
+        # this is the paginated version
+        for page in tc.paginated.endpoint_search("testdata"):
+            for x in page:
+                print("Endpoint ID: {}".format(x["id"]))
 
     .. automethodlist:: globus_sdk.TransferClient
     """
@@ -186,13 +202,19 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s)
         return self.delete(path)
 
+    @paging.has_paginator(
+        paging.HasNextPaginator,
+        items_key="DATA",
+        get_page_size=_get_page_size,
+        max_total_results=1000,
+        page_size=100,
+    )
     def endpoint_search(
         self,
         filter_fulltext: Optional[str] = None,
         filter_scope: Optional[str] = None,
-        num_results=25,
         **params,
-    ) -> PaginatedResource:
+    ) -> IterableTransferResponse:
         r"""
         .. parsed-literal::
 
@@ -208,16 +230,10 @@ class TransferClient(client.BaseClient):
             found documented in the **External Documentation** below. Defaults to
             searching all endpoints (in which case ``filter_fulltext`` is required)
         :type filter_scope: str, optional
-        :param num_results: The number of search results to fetch from the service. May
-            be set to ``None`` to request the maximum allowable number of results.
-            [Default: ``25``]
-        :type num_results: int or None
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -232,23 +248,8 @@ class TransferClient(client.BaseClient):
         >>> for ep in tc.endpoint_search('foo', filter_scope='my-endpoints'):
         >>>     print('{0} has ID {1}'.format(ep['display_name'], ep['id']))
 
-        Search results are capped at a number of elements equal to the
-        ``num_results`` parameter.
-        If you want more than the default, 25, elements, do like so:
-
-        >>> for ep in tc.endpoint_search('String to search for!',
-        >>>                             num_results=120):
-        >>>     print(ep['display_name'])
-
         It is important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query.
-        You can request the maximum number of results either explicitly, with
-        ``num_results=1000``, or by stating that you want no limit by setting
-        it to ``None``:
-
-        >>> for ep in tc.endpoint_search('String to search for!',
-        >>>                             num_results=None):
-        >>>     print(ep['display_name'])
 
         **External Documentation**
 
@@ -261,14 +262,7 @@ class TransferClient(client.BaseClient):
         if filter_fulltext is not None:
             params["filter_fulltext"] = filter_fulltext
         log.info(f"TransferClient.endpoint_search({params})")
-        return PaginatedResource(
-            self.get,
-            "endpoint_search",
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=100,
-            max_total_results=1000,
-        )
+        return IterableTransferResponse(self.get("endpoint_search", params=params))
 
     def endpoint_autoactivate(
         self, endpoint_id: ID_PARAM_TYPE, **params
@@ -1158,29 +1152,30 @@ class TransferClient(client.BaseClient):
     # Task inspection and management
     #
 
-    def task_list(self, num_results=10, **params) -> PaginatedResource:
+    @paging.has_paginator(
+        paging.LimitOffsetTotalPaginator,
+        items_key="DATA",
+        get_page_size=_get_page_size,
+        max_results_per_call=1000,
+        page_size=1000,
+    )
+    def task_list(self, **params) -> IterableTransferResponse:
         """
         Get an iterable of task documents owned by the current user.
 
         ``GET /task_list``
 
-        :param num_results: The number of tasks to fetch from the service. May be set to
-            ``None`` to request the maximum allowable number of results.
-            [Default: ``10``]
-        :type num_results: int or none
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
-        Fetch the default number (10) of tasks and print some basic info:
+        Fetch 10 tasks and print some basic info:
 
         >>> tc = TransferClient(...)
-        >>> for task in tc.task_list():
+        >>> for task in tc.task_list(limit=10):
         >>>     print("Task({}): {} -> {}".format(
         >>>         task["task_id"], task["source_endpoint"],
         >>>         task["destination_endpoint"]))
@@ -1193,18 +1188,18 @@ class TransferClient(client.BaseClient):
         in the REST documentation for details.
         """
         log.info("TransferClient.task_list(...)")
-        return PaginatedResource(
-            self.get,
-            "task_list",
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_TOTAL,
-        )
+        return IterableTransferResponse(self.get("task_list", params=params))
 
+    @paging.has_paginator(
+        paging.LimitOffsetTotalPaginator,
+        items_key="DATA",
+        get_page_size=_get_page_size,
+        max_results_per_call=1000,
+        page_size=1000,
+    )
     def task_event_list(
-        self, task_id: ID_PARAM_TYPE, num_results=10, **params
-    ) -> PaginatedResource:
+        self, task_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         r"""
         List events (for example, faults and errors) for a given Task.
 
@@ -1212,24 +1207,18 @@ class TransferClient(client.BaseClient):
 
         :param task_id: The ID of the task to inspect.
         :type task_id: str
-        :param num_results: The number of events to fetch from the service. May be set
-            to ``None`` to request the maximum allowable number of results.
-            [Default: ``10``]
-        :type num_results: int or None
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
-        Fetch the default number (10) of events and print some basic info:
+        Fetch 10 events and print some basic info:
 
         >>> tc = TransferClient(...)
         >>> task_id = ...
-        >>> for event in tc.task_event_list(task_id):
+        >>> for event in tc.task_event_list(task_id, limit=10):
         >>>     print("Event on Task({}) at {}:\n{}".format(
         >>>         task_id, event["time"], event["description"])
 
@@ -1243,14 +1232,7 @@ class TransferClient(client.BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_event_list({task_id_s}, ...)")
         path = self.qjoin_path("task", task_id_s, "event_list")
-        return PaginatedResource(
-            self.get,
-            path,
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_TOTAL,
-        )
+        return IterableTransferResponse(self.get(path, params=params))
 
     def get_task(self, task_id: ID_PARAM_TYPE, **params) -> response.GlobusHTTPResponse:
         """
@@ -1435,9 +1417,10 @@ class TransferClient(client.BaseClient):
         resource_path = self.qjoin_path("task", task_id_s, "pause_info")
         return self.get(resource_path, params=params)
 
+    @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def task_successful_transfers(
-        self, task_id: ID_PARAM_TYPE, num_results=100, **params
-    ) -> PaginatedResource:
+        self, task_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         Get the successful file transfers for a completed Task.
 
@@ -1452,16 +1435,10 @@ class TransferClient(client.BaseClient):
 
         :param task_id: The ID of the task to inspect.
         :type task_id: str
-        :param num_results: The number of file transfer records to fetch from the
-            service. May be set to ``None`` to request the maximum allowable number of
-            results. [Default: ``100``]
-        :type num_results: int or None, optional
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -1482,19 +1459,13 @@ class TransferClient(client.BaseClient):
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_successful_transfers({task_id_s}, ...)")
-        resource_path = self.qjoin_path("task", task_id_s, "successful_transfers")
-        return PaginatedResource(
-            self.get,
-            resource_path,
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_MARKER,
-        )
+        path = self.qjoin_path("task", task_id_s, "successful_transfers")
+        return IterableTransferResponse(self.get(path, params=params))
 
+    @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def task_skipped_errors(
-        self, task_id: ID_PARAM_TYPE, num_results=100, **params
-    ) -> PaginatedResource:
+        self, task_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         Get path and error information for all paths that were skipped due
         to skip_source_errors being set on a completed transfer Task.
@@ -1503,16 +1474,10 @@ class TransferClient(client.BaseClient):
 
         :param task_id: The ID of the task to inspect.
         :type task_id: str
-        :param num_results: The number of file transfer records to fetch from the
-            service. May be set to ``None`` to request the maximum allowable number of
-            results. [Default: ``100``]
-        :type num_results: int or None, optional
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -1535,16 +1500,8 @@ class TransferClient(client.BaseClient):
         log.info(
             "TransferClient.endpoint_manager_task_skipped_errors(%s, ...)", task_id_s
         )
-
         resource_path = self.qjoin_path("task", task_id_s, "skipped_errors")
-        return PaginatedResource(
-            self.get,
-            resource_path,
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_MARKER,
-        )
+        return IterableTransferResponse(self.get(resource_path, params=params))
 
     #
     # advanced endpoint management (requires endpoint manager role)
@@ -1558,8 +1515,8 @@ class TransferClient(client.BaseClient):
 
         ``GET endpoint_manager/monitored_endpoints``
 
-        :rtype: iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
 
         See
         `Get monitored endpoints \
@@ -1578,8 +1535,8 @@ class TransferClient(client.BaseClient):
 
         ``GET /endpoint_manager/endpoint/<endpoint_id>/hosted_endpoint_list``
 
-        :rtype: iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: iterable of :class:`GlobusResponse
+                <globus_sdk.response.GlobusResponse>`
 
         See
         `Get hosted endpoint list \
@@ -1649,23 +1606,18 @@ class TransferClient(client.BaseClient):
     # endpoint manager task methods
     #
 
-    def endpoint_manager_task_list(self, num_results=10, **params) -> PaginatedResource:
+    @paging.has_paginator(paging.LastKeyPaginator, items_key="DATA")
+    def endpoint_manager_task_list(self, **params) -> IterableTransferResponse:
         r"""
         Get a list of tasks visible via ``activity_monitor`` role, as opposed
         to tasks owned by the current user.
 
         ``GET endpoint_manager/task_list``
 
-        :param num_results: The number of tasks to fetch from the service. May be set to
-            ``None`` to request the maximum allowable number of results.
-            [Default: ``10``]
-        :type num_results: int or None, optional
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Filters**
 
@@ -1750,7 +1702,7 @@ class TransferClient(client.BaseClient):
 
         **Examples**
 
-        Fetch the default number (10) of tasks and print some basic info:
+        Fetch some tasks and print some basic info:
 
         >>> tc = TransferClient(...)
         >>> for task in tc.endpoint_manager_task_list(filter_status="ACTIVE"):
@@ -1762,12 +1714,13 @@ class TransferClient(client.BaseClient):
         status:
 
         >>> tc = TransferClient(...)
-        >>> for task in tc.endpoint_manager_task_list(
-        >>>     num_results=None, filter_status="ACTIVE"
+        >>> for page in tc.paginated.endpoint_manager_task_list(
+        >>>     filter_status="ACTIVE"
         >>> ):
-        >>>     print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
-        >>>         task["task_id"], task["source_endpoint"],
-        >>>         task["destination_endpoint"], task["owner_string"]))
+        >>>     for task in page:
+        >>>         print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
+        >>>             task["task_id"], task["source_endpoint"],
+        >>>             task["destination_endpoint"), task["owner_string"])
 
         **External Documentation**
 
@@ -1778,14 +1731,7 @@ class TransferClient(client.BaseClient):
         """
         log.info("TransferClient.endpoint_manager_task_list(...)")
         path = self.qjoin_path("endpoint_manager", "task_list")
-        return PaginatedResource(
-            self.get,
-            path,
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_LAST_KEY,
-        )
+        return IterableTransferResponse(self.get(path, params=params))
 
     def endpoint_manager_get_task(self, task_id: ID_PARAM_TYPE, **params):
         """
@@ -1809,9 +1755,16 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint_manager", "task", task_id_s)
         return self.get(path, params=params)
 
+    @paging.has_paginator(
+        paging.LimitOffsetTotalPaginator,
+        items_key="DATA",
+        get_page_size=_get_page_size,
+        max_results_per_call=1000,
+        page_size=1000,
+    )
     def endpoint_manager_task_event_list(
-        self, task_id: ID_PARAM_TYPE, num_results=10, **params
-    ) -> PaginatedResource:
+        self, task_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         List events (for example, faults and errors) for a given task as an
         admin. Requires activity monitor effective role on the destination
@@ -1821,16 +1774,10 @@ class TransferClient(client.BaseClient):
 
         :param task_id: The ID of the task to inspect.
         :type task_id: str
-        :param num_results: The number of events to fetch from the service. May be set
-            to ``None`` to request the maximum allowable number of results.
-            [Default: ``10``]
-        :type num_results: int or None, optional
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -1842,14 +1789,7 @@ class TransferClient(client.BaseClient):
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_event_list({task_id_s}, ...)")
         path = self.qjoin_path("endpoint_manager", "task", task_id_s, "event_list")
-        return PaginatedResource(
-            self.get,
-            path,
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_TOTAL,
-        )
+        return IterableTransferResponse(self.get(path, params=params))
 
     def endpoint_manager_task_pause_info(
         self, task_id: ID_PARAM_TYPE, **params
@@ -1875,9 +1815,10 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint_manager", "task", task_id_s, "pause_info")
         return self.get(path, params=params)
 
+    @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def endpoint_manager_task_successful_transfers(
-        self, task_id: ID_PARAM_TYPE, num_results=100, **params
-    ) -> PaginatedResource:
+        self, task_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         Get the successful file transfers for a completed Task as an admin.
 
@@ -1885,16 +1826,10 @@ class TransferClient(client.BaseClient):
 
         :param task_id: The ID of the task to inspect.
         :type task_id: str
-        :param num_results: The number of file transfer records to fetch from the
-            service. May be set to ``None`` to request the maximum allowable number of
-            results. [Default: ``100``]
-        :type num_results: int or None, optional
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -1908,22 +1843,14 @@ class TransferClient(client.BaseClient):
             "TransferClient.endpoint_manager_task_successful_transfers(%s, ...)",
             task_id_s,
         )
-
-        resource_path = self.qjoin_path(
+        path = self.qjoin_path(
             "endpoint_manager", "task", task_id_s, "successful_transfers"
         )
-        return PaginatedResource(
-            self.get,
-            resource_path,
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_MARKER,
-        )
+        return IterableTransferResponse(self.get(path, params=params))
 
     def endpoint_manager_task_skipped_errors(
-        self, task_id: ID_PARAM_TYPE, num_results=100, **params
-    ) -> PaginatedResource:
+        self, task_id: ID_PARAM_TYPE, **params
+    ) -> IterableTransferResponse:
         """
         Get skipped errors for a completed Task as an admin.
 
@@ -1931,16 +1858,10 @@ class TransferClient(client.BaseClient):
 
         :param task_id: The ID of the task to inspect.
         :type task_id: str
-        :param num_results: The number of skipped error records to fetch from the
-            service. May be set to ``None`` to request the maximum allowable number of
-            results. [Default: ``100``]
-        :type num_results: int or None, optional
         :param params: Any additional parameters will be passed through as query params.
         :type params: dict, optional
-        :rtype: :class:`PaginatedResource
-                <globus_sdk.services.transfer.paging.PaginatedResource>`,
-                an iterable of :class:`GlobusHTTPResponse
-                <globus_sdk.response.GlobusHTTPResponse>`
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **External Documentation**
 
@@ -1953,18 +1874,8 @@ class TransferClient(client.BaseClient):
         log.info(
             f"TransferClient.endpoint_manager_task_skipped_errors({task_id_s}, ...)"
         )
-
-        resource_path = self.qjoin_path(
-            "endpoint_manager", "task", task_id_s, "skipped_errors"
-        )
-        return PaginatedResource(
-            self.get,
-            resource_path,
-            {"params": params},
-            num_results=num_results,
-            max_results_per_call=1000,
-            paging_style=PaginatedResource.PAGING_STYLE_MARKER,
-        )
+        path = self.qjoin_path("endpoint_manager", "task", task_id_s, "skipped_errors")
+        return IterableTransferResponse(self.get(path, params=params))
 
     def endpoint_manager_cancel_tasks(
         self, task_ids: Iterable[ID_PARAM_TYPE], message, **params
