@@ -4,6 +4,26 @@ CHANGELOG
 Unreleased
 ----------
 
+v3.0.0a3
+--------
+
+* Pagination has changed significantly. (:pr:`418`)
+
+** Methods which support pagination like ``TransferClient.endpoint_search`` no
+   longer return an iterable ``PaginatedResource`` type. Instead, these client
+   methods return ``GlobusHTTPResponse`` objects with a single page of results.
+
+** Paginated variants of these methods are available by renaming a call from
+   ``client.<method>`` to ``client.paginated.<method>``. So, for example, a
+   ``TransferClient`` now supports ``client.paginated.endpoint_search()``.
+   The arguments to this function are the same as the original method.
+
+** ``client.paginated.<method>`` calls return ``Paginator`` objects, which
+   support two types of iteration: by ``pages()`` and by ``items()``. To
+   replicate the same behavior as SDK v1.x and v2.x ``PaginatedResource``
+   types, use ``items()``, as in
+   ``client.paginated.endpoint_search("query").items()``
+
 v3.0.0a2
 --------
 
