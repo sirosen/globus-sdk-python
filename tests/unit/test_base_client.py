@@ -6,7 +6,6 @@ from unittest import mock
 import pytest
 
 import globus_sdk
-from globus_sdk.client import BaseClient
 from tests.common import get_last_request, register_api_route
 
 
@@ -17,7 +16,7 @@ def auth_client():
 
 @pytest.fixture
 def base_client(no_retry_policy):
-    class CustomClient(BaseClient):
+    class CustomClient(globus_sdk.BaseClient):
         base_path = "/v0.10/"
         service_name = "transfer"
         retry_policy = no_retry_policy
@@ -33,11 +32,11 @@ ERROR_STATUS_CODES = (400, 404, 405, 409, 500, 503)
 def test_cannot_instantiate_plain_base_client():
     # attempting to instantiate a BaseClient errors
     with pytest.raises(NotImplementedError):
-        BaseClient()
+        globus_sdk.BaseClient()
 
 
 def test_set_http_timeout(base_client):
-    class FooClient(BaseClient):
+    class FooClient(globus_sdk.BaseClient):
         service_name = "foo"
 
     with mock.patch.dict(os.environ):

@@ -1,13 +1,14 @@
 import logging
 
-from globus_sdk.authorizers import (
+from .authorizers import (
     AccessTokenAuthorizer,
     BasicAuthorizer,
     ClientCredentialsAuthorizer,
     NullAuthorizer,
     RefreshTokenAuthorizer,
 )
-from globus_sdk.exc import (
+from .client import BaseClient
+from .exc import (
     GlobusAPIError,
     GlobusConnectionError,
     GlobusConnectionTimeoutError,
@@ -16,9 +17,9 @@ from globus_sdk.exc import (
     GlobusTimeoutError,
     NetworkError,
 )
-from globus_sdk.local_endpoint import LocalGlobusConnectPersonal
-from globus_sdk.response import GlobusHTTPResponse
-from globus_sdk.services import (
+from .local_endpoint import LocalGlobusConnectPersonal
+from .response import GlobusHTTPResponse
+from .services import (
     AuthAPIError,
     AuthClient,
     ConfidentialAppAuthClient,
@@ -34,10 +35,11 @@ from globus_sdk.services import (
     TransferClient,
     TransferData,
 )
-from globus_sdk.version import __version__
+from .version import __version__
 
 __all__ = (
     "__version__",
+    "BaseClient",
     "GlobusHTTPResponse",
     "GlobusError",
     "GlobusSDKUsageError",
