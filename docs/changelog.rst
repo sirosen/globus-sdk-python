@@ -4,6 +4,14 @@ CHANGELOG
 Unreleased
 ----------
 
+v3.0.0a4
+--------
+
+* Fix several paginators which were broken in ``3.0.0a3`` (:pr:`431`)
+* Add ``BaseClient`` to the top-level exports of ``globus_sdk``, so it can now
+  be accessed under the name ``globus_sdk.BaseClient``
+* Autodocumentation of paginated methods (:pr:`432`)
+
 v3.0.0a3
 --------
 
