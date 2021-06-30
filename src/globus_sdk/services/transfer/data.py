@@ -6,7 +6,7 @@ conversion.
 """
 
 import logging
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from globus_sdk import utils
 
@@ -147,7 +147,7 @@ class TransferData(dict):
         skip_source_errors=False,
         fail_on_quota_errors=False,
         recursive_symlinks="ignore",
-        additional_fields: Optional[Dict[str, str]] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
     ):
         source_endpoint = utils.safe_stringify(source_endpoint)
         destination_endpoint = utils.safe_stringify(destination_endpoint)
@@ -214,7 +214,7 @@ class TransferData(dict):
         recursive=False,
         external_checksum=None,
         checksum_algorithm=None,
-        additional_fields: Optional[Dict[str, str]] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
     ):
         """
         Add a file or directory to be transfered. If the item is a symlink
