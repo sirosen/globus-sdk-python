@@ -76,16 +76,14 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         logger.debug(f"state={state}")
         logger.debug(f"requested_scopes={self.requested_scopes}")
 
-    def get_authorize_url(
-        self, additional_params: Optional[Dict[str, Any]] = None
-    ) -> str:
+    def get_authorize_url(self, query_params: Optional[Dict[str, Any]] = None) -> str:
         """
         Start a Authorization Code flow by getting the authorization URL to
         which users should be sent.
 
-        :param additional_params: Additional parameters to include in the authorize URL.
+        :param query_params: Additional parameters to include in the authorize URL.
             Primarily for internal use
-        :type additional_params: dict, optional
+        :type query_params: dict, optional
         :rtype: ``string``
 
         The returned URL string is encoded to be suitable to display to users
@@ -97,7 +95,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
             self.auth_client.base_url, "/v2/oauth2/authorize"
         )
         logger.debug(f"Building authorization URI. Base URL: {authorize_base_url}")
-        logger.debug(f"additional_params={additional_params}")
+        logger.debug(f"query_params={query_params}")
 
         params = {
             "client_id": self.client_id,
@@ -107,8 +105,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
             "response_type": "code",
             "access_type": (self.refresh_tokens and "offline") or "online",
         }
-        if additional_params:
-            params.update(additional_params)
+        if query_params:
+            params.update(query_params)
 
         encoded_params = urllib.parse.urlencode(params)
         return f"{authorize_base_url}?{encoded_params}"

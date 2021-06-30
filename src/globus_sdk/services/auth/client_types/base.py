@@ -1,7 +1,7 @@
 import collections.abc
 import json
 import logging
-from typing import Type, TypeVar, overload
+from typing import Dict, Optional, Type, TypeVar, overload
 
 import jwt
 
@@ -60,7 +60,13 @@ class AuthClient(client.BaseClient):
         # managers
         self.current_oauth2_flow_manager = None
 
-    def get_identities(self, usernames=None, ids=None, provision=False, **params):
+    def get_identities(
+        self,
+        usernames=None,
+        ids=None,
+        provision=False,
+        query_params: Optional[Dict[str, str]] = None,
+    ):
         r"""
         GET /v2/api/identities
 
@@ -129,37 +135,40 @@ class AuthClient(client.BaseClient):
 
         log.info("Looking up Globus Auth Identities")
 
+        if query_params is None:
+            query_params = {}
+
         # if either of these params has a truthy value, stringify it safely,
         # letting us consume args whose `__str__` methods produce "the right
         # thing"
         # most notably, lets `ids` take a single UUID object safely
         if usernames:
-            params["usernames"] = _convert_listarg(usernames)
-            params["provision"] = (
+            query_params["usernames"] = _convert_listarg(usernames)
+            query_params["provision"] = (
                 "false" if str(provision).lower() == "false" else "true"
             )
         if ids:
-            params["ids"] = _convert_listarg(ids)
+            query_params["ids"] = _convert_listarg(ids)
 
-        log.debug(f"params={params}")
+        log.debug(f"query_params={query_params}")
 
-        if "usernames" in params and "ids" in params:
+        if "usernames" in query_params and "ids" in query_params:
             log.warning(
                 "get_identities call with both usernames and "
                 "identities set! Expected to result in errors"
             )
 
-        return self.get("/v2/api/identities", params=params)
+        return self.get("/v2/api/identities", query_params=query_params)
 
-    def oauth2_get_authorize_url(self, additional_params=None):
+    def oauth2_get_authorize_url(self, query_params: Optional[Dict[str, str]] = None):
         """
         Get the authorization URL to which users should be sent.
         This method may only be called after ``oauth2_start_flow``
         has been called on this ``AuthClient``.
 
-        :param additional_params: Additional query parameters to include in the
+        :param query_params: Additional query parameters to include in the
             authorize URL. Primarily for internal use
-        :type additional_params: dict, optional
+        :type query_params: dict, optional
         :rtype: ``string``
         """
         if not self.current_oauth2_flow_manager:
@@ -170,7 +179,7 @@ class AuthClient(client.BaseClient):
                 "AuthClient to resolve"
             )
         auth_url = self.current_oauth2_flow_manager.get_authorize_url(
-            additional_params=additional_params
+            query_params=query_params
         )
         log.info(f"Got authorization URL: {auth_url}")
         return auth_url
@@ -201,7 +210,9 @@ class AuthClient(client.BaseClient):
 
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(auth_code)
 
-    def oauth2_refresh_token(self, refresh_token, additional_params=None):
+    def oauth2_refresh_token(
+        self, refresh_token, query_params: Optional[Dict[str, str]] = None
+    ):
         r"""
         Exchange a refresh token for a
         :class:`OAuthTokenResponse <.OAuthTokenResponse>`, containing
@@ -219,17 +230,19 @@ class AuthClient(client.BaseClient):
         :param refresh_token: A Globus Refresh Token as a string
         :type refresh_token: str
 
-        :param additional_params: A dict of extra params to encode in the refresh call.
-        :type additional_params: dict, optional
+        :param query_params: A dict of extra params to encode in the refresh call.
+        :type query_params: dict, optional
         """
         log.info("Executing token refresh; typically requires client credentials")
         form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
 
-        if additional_params:
-            form_data.update(additional_params)
+        if query_params:
+            form_data.update(query_params)
         return self.oauth2_token(form_data)
 
-    def oauth2_validate_token(self, token, additional_params=None):
+    def oauth2_validate_token(
+        self, token, query_params: Optional[Dict[str, str]] = None
+    ):
         """
         Validate a token. It can be an Access Token or a Refresh token.
 
@@ -248,9 +261,9 @@ class AuthClient(client.BaseClient):
         :param token: The token which should be validated. Can be a refresh token or an
             access token
         :type token: str
-        :param additional_params: Additional parameters to include in the validation
+        :param query_params: Additional parameters to include in the validation
             body. Primarily for internal use
-        :type additional_params: dict, optional
+        :type query_params: dict, optional
 
         **Examples**
 
@@ -288,11 +301,11 @@ class AuthClient(client.BaseClient):
             log.debug("Validating token with unauthenticated client")
             body.update({"client_id": self.client_id})
 
-        if additional_params:
-            body.update(additional_params)
+        if query_params:
+            body.update(query_params)
         return self.post("/v2/oauth2/token/validate", data=body, encoding="form")
 
-    def oauth2_revoke_token(self, token, additional_params=None):
+    def oauth2_revoke_token(self, token, query_params: Optional[Dict[str, str]] = None):
         """
         Revoke a token. It can be an Access Token or a Refresh token.
 
@@ -307,7 +320,7 @@ class AuthClient(client.BaseClient):
 
         :param token: The token which should be revoked
         :type token: str
-        :param additional_params: Additional parameters to include in the revocation
+        :param query_params: Additional parameters to include in the revocation
             body, which can help speed the revocation process. Primarily for internal
             use
 
@@ -329,8 +342,8 @@ class AuthClient(client.BaseClient):
             log.debug("Revoking token with unauthenticated client")
             body.update({"client_id": self.client_id})
 
-        if additional_params:
-            body.update(additional_params)
+        if query_params:
+            body.update(query_params)
         return self.post("/v2/oauth2/token/revoke", data=body, encoding="form")
 
     @overload

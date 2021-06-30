@@ -111,7 +111,7 @@ class BaseClient:
         self,
         path: str,
         *,
-        params: Optional[Dict] = None,
+        query_params: Optional[Dict[str, str]] = None,
         headers: Optional[Dict] = None,
     ) -> GlobusHTTPResponse:
         """
@@ -122,14 +122,14 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        log.debug(f"GET to {path} with params {params}")
-        return self.request("GET", path, params=params, headers=headers)
+        log.debug(f"GET to {path} with query_params {query_params}")
+        return self.request("GET", path, query_params=query_params, headers=headers)
 
     def post(
         self,
         path: str,
         *,
-        params: Optional[Dict] = None,
+        query_params: Optional[Dict[str, str]] = None,
         data: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
@@ -142,16 +142,21 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        log.debug(f"POST to {path} with params {params}")
+        log.debug(f"POST to {path} with query_params {query_params}")
         return self.request(
-            "POST", path, params=params, data=data, headers=headers, encoding=encoding
+            "POST",
+            path,
+            query_params=query_params,
+            data=data,
+            headers=headers,
+            encoding=encoding,
         )
 
     def delete(
         self,
         path: str,
         *,
-        params: Optional[Dict] = None,
+        query_params: Optional[Dict[str, str]] = None,
         headers: Optional[Dict] = None,
     ) -> GlobusHTTPResponse:
         """
@@ -162,14 +167,14 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        log.debug(f"DELETE to {path} with params {params}")
-        return self.request("DELETE", path, params=params, headers=headers)
+        log.debug(f"DELETE to {path} with query_params {query_params}")
+        return self.request("DELETE", path, query_params=query_params, headers=headers)
 
     def put(
         self,
         path: str,
         *,
-        params: Optional[Dict] = None,
+        query_params: Optional[Dict[str, str]] = None,
         data: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
@@ -182,16 +187,21 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        log.debug(f"PUT to {path} with params {params}")
+        log.debug(f"PUT to {path} with query_params {query_params}")
         return self.request(
-            "PUT", path, params=params, data=data, headers=headers, encoding=encoding
+            "PUT",
+            path,
+            query_params=query_params,
+            data=data,
+            headers=headers,
+            encoding=encoding,
         )
 
     def patch(
         self,
         path: str,
         *,
-        params: Optional[Dict] = None,
+        query_params: Optional[Dict[str, str]] = None,
         data: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
@@ -204,9 +214,14 @@ class BaseClient:
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
         """
-        log.debug(f"PATCH to {path} with params {params}")
+        log.debug(f"PATCH to {path} with query_params {query_params}")
         return self.request(
-            "PATCH", path, params=params, data=data, headers=headers, encoding=encoding
+            "PATCH",
+            path,
+            query_params=query_params,
+            data=data,
+            headers=headers,
+            encoding=encoding,
         )
 
     def request(
@@ -214,7 +229,7 @@ class BaseClient:
         method: str,
         path: str,
         *,
-        params: Optional[Dict] = None,
+        query_params: Optional[Dict[str, str]] = None,
         data: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
@@ -226,8 +241,8 @@ class BaseClient:
         :type method: str
         :param path: Path for the request, with or without leading slash
         :type path: str
-        :param params: Parameters to be encoded as a query string
-        :type params: dict
+        :param query_params: Parameters to be encoded as a query string
+        :type query_params: dict
         :param headers: HTTP headers to add to the request
         :type headers: dict
         :param data: Data to send as the request body. May pass through encoding.
@@ -259,7 +274,7 @@ class BaseClient:
             method=method,
             url=url,
             data=data,
-            params=params,
+            query_params=query_params,
             headers=rheaders,
             encoding=encoding,
             authorizer=self.authorizer,

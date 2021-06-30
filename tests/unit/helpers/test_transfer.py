@@ -48,7 +48,9 @@ def test_tranfer_init(transfer_data):
     # init with params
     label = "label"
     params = {"param1": "value1", "param2": "value2"}
-    param_tdata = transfer_data(label=label, sync_level="exists", **params)
+    param_tdata = transfer_data(
+        label=label, sync_level="exists", additional_fields=params
+    )
     assert param_tdata["label"] == label
     # sync_level of "exists" should be converted to 0
     assert param_tdata["sync_level"] == 0
@@ -134,7 +136,7 @@ def test_delete_init(delete_data):
     # init with params
     label = "label"
     params = {"param1": "value1", "param2": "value2"}
-    param_ddata = delete_data(label=label, recursive="True", **params)
+    param_ddata = delete_data(label=label, recursive="True", additional_fields=params)
     assert param_ddata["label"] == label
     assert param_ddata["recursive"] == "True"
     for par in params:

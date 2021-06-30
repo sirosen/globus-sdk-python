@@ -6,6 +6,7 @@ conversion.
 """
 
 import logging
+from typing import Dict, Optional
 
 from globus_sdk import utils
 
@@ -80,8 +81,9 @@ class TransferData(dict):
         task to fail.
         [default: ``False``]
     :type fail_on_quota_errors: bool, optional
-
-    Any additional parameters are fed into the dict being created verbatim.
+    :param additional_fields: additional fields to be added to the transfer
+        document. Mostly intended for internal use
+    :type additional_fields: dict, optional
 
     **Sync Levels**
 
@@ -145,7 +147,7 @@ class TransferData(dict):
         skip_source_errors=False,
         fail_on_quota_errors=False,
         recursive_symlinks="ignore",
-        **kwargs,
+        additional_fields: Optional[Dict[str, str]] = None,
     ):
         source_endpoint = utils.safe_stringify(source_endpoint)
         destination_endpoint = utils.safe_stringify(destination_endpoint)
@@ -197,13 +199,13 @@ class TransferData(dict):
 
         self["DATA"] = []
 
-        self.update(kwargs)
-        for option, value in kwargs.items():
-            logger.info(
-                "TransferData.{} = {} (option passed in via kwargs)".format(
-                    option, value
+        if additional_fields is not None:
+            self.update(additional_fields)
+            for option, value in additional_fields.items():
+                logger.info(
+                    "TransferData.{} = {} (option passed in via "
+                    "additional_fields)".format(option, value)
                 )
-            )
 
     def add_item(
         self,
@@ -212,7 +214,7 @@ class TransferData(dict):
         recursive=False,
         external_checksum=None,
         checksum_algorithm=None,
-        **params,
+        additional_fields: Optional[Dict[str, str]] = None,
     ):
         """
         Add a file or directory to be transfered. If the item is a symlink
@@ -257,7 +259,8 @@ class TransferData(dict):
             "external_checksum": external_checksum,
             "checksum_algorithm": checksum_algorithm,
         }
-        item_data.update(params)
+        if additional_fields is not None:
+            item_data.update(additional_fields)
 
         logger.debug(
             'TransferData[{}, {}].add_item: "{}"->"{}"'.format(
@@ -336,6 +339,9 @@ class DeleteData(dict):
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
     :type deadline: str or datetime, optional
+    :param additional_fields: additional fields to be added to the delete
+        document. Mostly intended for internal use
+    :type additional_fields: dict, optional
 
     **Examples**
 
@@ -363,7 +369,7 @@ class DeleteData(dict):
         submission_id=None,
         recursive=False,
         deadline=None,
-        **kwargs,
+        additional_fields: Optional[Dict[str, str]] = None,
     ):
         endpoint = utils.safe_stringify(endpoint)
         logger.info("Creating a new DeleteData object")
@@ -387,11 +393,14 @@ class DeleteData(dict):
 
         self["DATA"] = []
 
-        self.update(kwargs)
-        for option, value in kwargs.items():
-            logger.info(f"DeleteData.{option} = {value} (option passed in via kwargs)")
+        if additional_fields is not None:
+            self.update(additional_fields)
+            for option, value in additional_fields.items():
+                logger.info(
+                    f"DeleteData.{option} = {value} (option passed in via kwargs)"
+                )
 
-    def add_item(self, path, **params):
+    def add_item(self, path, additional_fields: Optional[Dict[str, str]] = None):
         """
         Add a file or directory or symlink to be deleted. If any of the paths
         are directories, ``recursive`` must be set True on the top level
@@ -402,6 +411,7 @@ class DeleteData(dict):
         """
         path = utils.safe_stringify(path)
         item_data = {"DATA_TYPE": "delete_item", "path": path}
-        item_data.update(params)
+        if additional_fields is not None:
+            item_data.update(additional_fields)
         logger.debug('DeleteData[{}].add_item: "{}"'.format(self["endpoint"], path))
         self["DATA"].append(item_data)
