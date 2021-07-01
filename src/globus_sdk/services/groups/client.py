@@ -20,6 +20,12 @@ class GroupMemberVisibility(str, Enum):
     managers = "managers"
 
 
+class GroupVisibility(str, Enum):
+
+    authenticated = "authenticated"
+    private = "private"
+
+
 class RequiredSignupFields(str, Enum):
     institution = "institution"
     current_project_name = "current_project_name"
@@ -199,7 +205,8 @@ class GroupsClient(client.BaseClient):
         self,
         group_id: str,
         is_high_assurance: bool,
-        group_visibility: GroupMemberVisibility,
+        group_visibility: GroupVisibility,
+        group_members_visibility: GroupMemberVisibility,
         join_requests: bool,
         signup_fields: Sequence[RequiredSignupFields],
         authentication_assurance_timeout: Optional[int] = None,
@@ -207,6 +214,7 @@ class GroupsClient(client.BaseClient):
         data = {
             "is_high_assurance": is_high_assurance,
             "group_visibility": str(group_visibility),
+            "group_members_visibility": str(group_members_visibility),
             "join_requests": join_requests,
             "signup_fields": [str(field) for field in signup_fields],
         }
