@@ -9,4 +9,5 @@ Underlying components of the Globus SDK.
     base_client
     transport
     responses
+    paging
     exceptions

@@ -36,6 +36,9 @@ def has_paginator(
         same arguments as normal, but prefix the method name with ``paginated``, as in
 
         >>> client.paginated.{func.__name__}(...)
+
+        For more information, see
+        :ref:`how to make paginated calls <making_paginated_calls>`.
         """
         return func
 
