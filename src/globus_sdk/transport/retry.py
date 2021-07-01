@@ -48,16 +48,18 @@ class RetryContext:
 
 
 class RetryCheckResult(enum.Enum):
-    # yes, retry the request
+    #: yes, retry the request
     do_retry = enum.auto()
-    # no, do not retry the request
+    #: no, do not retry the request
     do_not_retry = enum.auto()
-    # "I don't know", ask other checks for an answer
+    #: "I don't know", ask other checks for an answer
     no_decision = enum.auto()
 
 
 class RetryCheckFlags(enum.Flag):
+    #: no flags (default)
     NONE = enum.auto()
+    #: only run this check once per request
     RUN_ONCE = enum.auto()
 
 
