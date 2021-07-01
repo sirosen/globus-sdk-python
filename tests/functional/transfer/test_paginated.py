@@ -194,3 +194,68 @@ def test_endpoint_search_multipage_iter_items(client):
         assert item["DATA_TYPE"] == "endpoint"
 
     assert count_objects == sum(len(x["DATA"]) for x in MULTIPAGE_SEARCH_RESULTS)
+
+
+# multiple pages of results, very stubby
+SHARED_ENDPOINT_RESULTS = [
+    {
+        "next_token": "token1",
+        "shared_endpoints": [{"id": "abcd"} for x in range(1000)],
+    },
+    {
+        "next_token": "token2",
+        "shared_endpoints": [{"id": "abcd"} for x in range(1000)],
+    },
+    {
+        "next_token": None,
+        "shared_endpoints": [{"id": "abcd"} for x in range(100)],
+    },
+]
+
+
+def test_shared_endpoint_list_non_paginated(client):
+    # add each page
+    for page in SHARED_ENDPOINT_RESULTS:
+        register_api_route(
+            "transfer", "/endpoint/endpoint_id/shared_endpoint_list", json=page
+        )
+
+    # without calling the paginated version, we only get one page
+    res = client.get_shared_endpoint_list("endpoint_id")
+    assert len(list(res)) == 1000
+    for item in res:
+        assert "id" in item
+
+
+def test_shared_endpoint_list_iter_pages(client):
+    # add each page
+    for page in SHARED_ENDPOINT_RESULTS:
+        register_api_route(
+            "transfer", "/endpoint/endpoint_id/shared_endpoint_list", json=page
+        )
+
+    # paginator pages() call gets an iterator of pages
+    paginator = client.paginated.get_shared_endpoint_list("endpoint_id")
+    count = 0
+    for item in paginator.pages():
+        count += 1
+        assert "shared_endpoints" in item
+
+    assert count == 3
+
+
+def test_shared_endpoint_list_iter_items(client):
+    # add each page
+    for page in SHARED_ENDPOINT_RESULTS:
+        register_api_route(
+            "transfer", "/endpoint/endpoint_id/shared_endpoint_list", json=page
+        )
+
+    # paginator items() call gets an iterator of individual page items
+    paginator = client.paginated.get_shared_endpoint_list("endpoint_id")
+    count = 0
+    for item in paginator.items():
+        count += 1
+        assert "id" in item
+
+    assert count == 2100

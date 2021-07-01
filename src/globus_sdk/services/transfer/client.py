@@ -464,6 +464,52 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "my_shared_endpoint_list")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @paging.has_paginator(
+        paging.NextTokenPaginator,
+        items_key="shared_endpoints",
+    )
+    def get_shared_endpoint_list(
+        self,
+        endpoint_id: ID_PARAM_TYPE,
+        max_results: Optional[int] = None,
+        next_token: Optional[str] = None,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> IterableTransferResponse:
+        """
+        ``GET /endpoint/<endpoint_id>/shared_endpoint_list``
+
+        :param max_results: cap to the number of results
+        :type max_results: int, optional
+        :param next_token: token used for paging
+        :type next_token: str, optional
+        :param query_params: Any additional parameters will be passed through
+            as query params.
+        :type query_param: dict, optional
+
+
+        :rtype: :class:`IterableTransferResponse
+                <globus_sdk.services.transfer.response.IterableTransferResponse>`
+
+        **External Documentation**
+
+        See
+        `Get shared endpoint list \
+        <https://https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list2>`_
+        in the REST documentation for details.
+        """
+        endpoint_id_s = utils.safe_stringify(endpoint_id)
+        log.info(f"TransferClient.get_shared_endpoint_list({endpoint_id_s}, ...)")
+        path = self.qjoin_path("endpoint", endpoint_id_s, "shared_endpoint_list")
+        if query_params is None:
+            query_params = {}
+        if max_results is not None:
+            query_params["max_results"] = str(max_results)
+        if next_token is not None:
+            query_params["next_token"] = str(next_token)
+        return IterableTransferResponse(
+            self.get(path, query_params=query_params), iter_key="shared_endpoints"
+        )
+
     def create_shared_endpoint(self, data):
         """
         ``POST /shared_endpoint``

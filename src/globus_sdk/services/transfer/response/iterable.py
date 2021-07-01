@@ -5,8 +5,8 @@ class IterableTransferResponse(GlobusHTTPResponse):
     """
     Response class for non-paged list oriented resources. Allows top level
     fields to be accessed normally via standard item access, and also
-    provides a convenient way to iterate over the sub-item list in the
-    ``DATA`` key:
+    provides a convenient way to iterate over the sub-item list in a specified
+    key:
 
     >>> print("Path:", r["path"])
     >>> # Equivalent to: for item in r["DATA"]
@@ -14,5 +14,9 @@ class IterableTransferResponse(GlobusHTTPResponse):
     >>>     print(item["name"], item["type"])
     """
 
+    def __init__(self, *args, iter_key: str = "DATA", **kwargs):
+        self.iter_key = iter_key
+        super().__init__(*args, **kwargs)
+
     def __iter__(self):
-        return iter(self["DATA"])
+        return iter(self[self.iter_key])
