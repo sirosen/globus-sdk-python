@@ -1,3 +1,4 @@
+from globus_sdk.services.groups import client
 from tests.common import register_api_route_fixture_file
 
 
@@ -56,7 +57,7 @@ def test_get_group_policies(groups_client):
     register_api_route_fixture_file(
         "groups",
         "/v2/groups/d3974728-6458-11e4-b72d-123139141556/policies",
-        "group_policies.json",
+        "get_group_policies.json",
     )
     resp = groups_client.get_group_policies("d3974728-6458-11e4-b72d-123139141556")
     assert resp.http_status == 200
@@ -74,22 +75,17 @@ def test_set_group_policies(groups_client):
     register_api_route_fixture_file(
         "groups",
         "/v2/groups/d3974728-6458-11e4-b72d-123139141556/policies",
-        "group_policies.json",
+        "set_group_policies.json",
         method="PUT",
     )
-    data = {
-        "is_high_assurance": False,
-        "authentication_assurance_timeout": 28800,
-        "group_visibility": "private",
-        "group_members_visibility": "managers",
-        "join_requests": False,
-        "signup_fields": [],
-    }
-
     resp = groups_client.set_group_policies(
-        "d3974728-6458-11e4-b72d-123139141556", **data
+        "d3974728-6458-11e4-b72d-123139141556",
+        False,
+        client.GroupVisibility.private,
+        client.GroupMemberVisibility.managers,
+        False,
+        [client.RequiredSignupFields.address1],
+        28800,
     )
     assert resp.http_status == 200
-    assert resp.data == data
-
-
+    assert "address1" in resp.data["signup_fields"]

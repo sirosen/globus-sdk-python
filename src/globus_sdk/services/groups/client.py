@@ -7,26 +7,26 @@ from globus_sdk.scopes import GroupsScopes
 from .errors import GroupsAPIError
 
 
-class Role(str, Enum):
+class Role(Enum):
 
     member = "member"
     manager = "manager"
     admin = "admin"
 
 
-class GroupMemberVisibility(str, Enum):
+class GroupMemberVisibility(Enum):
 
     members = "members"
     managers = "managers"
 
 
-class GroupVisibility(str, Enum):
+class GroupVisibility(Enum):
 
     authenticated = "authenticated"
     private = "private"
 
 
-class RequiredSignupFields(str, Enum):
+class RequiredSignupFields(Enum):
     institution = "institution"
     current_project_name = "current_project_name"
     address = "address"
@@ -68,7 +68,7 @@ class BatchMembershipActions:
         Add a list of identities to a group with the given role.
         """
         self._payload.setdefault("add", []).extend(
-            {"identity_id": identity_id, "role": str(role)}
+            {"identity_id": identity_id, "role": role.value}
             for identity_id in identity_ids
         )
         return self
@@ -96,7 +96,7 @@ class BatchMembershipActions:
         Invite a list of identities to a group with the given role.
         """
         self._payload.setdefault("invite", []).extend(
-            {"identity_id": identity_id, "role": str(role)}
+            {"identity_id": identity_id, "role": role.value}
             for identity_id in identity_ids
         )
         return self
@@ -213,10 +213,10 @@ class GroupsClient(client.BaseClient):
     ):
         data = {
             "is_high_assurance": is_high_assurance,
-            "group_visibility": str(group_visibility),
+            "group_visibility": group_visibility.value,
             "group_members_visibility": str(group_members_visibility),
             "join_requests": join_requests,
-            "signup_fields": [str(field) for field in signup_fields],
+            "signup_fields": [field.value for field in signup_fields],
         }
         if authentication_assurance_timeout:
             data["authentication_assurance_timeout"] = authentication_assurance_timeout
