@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 
@@ -76,7 +76,7 @@ class RequestsTransport:
         self,
         method: str,
         url: str,
-        params: Optional[Dict] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         data: Union[Dict, List, str, None] = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
@@ -96,13 +96,13 @@ class RequestsTransport:
                 f"Unknown encoding '{encoding}' is not supported by this transport."
             )
 
-        return self.encoders[encoding].encode(method, url, params, data, headers)
+        return self.encoders[encoding].encode(method, url, query_params, data, headers)
 
     def request(
         self,
         method,
         url,
-        params=None,
+        query_params: Optional[Dict[str, Any]] = None,
         data=None,
         headers=None,
         encoding: Optional[str] = None,
@@ -115,8 +115,8 @@ class RequestsTransport:
         :type path: str
         :param method: HTTP request method, as an all caps string
         :type method: str
-        :param params: Parameters to be encoded as a query string
-        :type params: dict
+        :param query_params: Parameters to be encoded as a query string
+        :type query_params: dict, optional
         :param headers: HTTP headers to add to the request
         :type headers: dict
         :param data: Data to send as the request body. May pass through encoding.
@@ -131,7 +131,7 @@ class RequestsTransport:
         """
         resp: Optional[requests.Response] = None
         retry_state: Dict = {}
-        req = self._encode(method, url, params, data, headers, encoding)
+        req = self._encode(method, url, query_params, data, headers, encoding)
         for attempt in range(self.max_retries):
             # add Authorization header, or (if it's a NullAuthorizer) possibly
             # explicitly remove the Authorization header

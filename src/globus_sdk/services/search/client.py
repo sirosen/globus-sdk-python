@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from globus_sdk import client, paging, response, utils
 
@@ -32,7 +32,7 @@ class SearchClient(client.BaseClient):
     # Index Management
     #
 
-    def get_index(self, index_id, **params) -> response.GlobusHTTPResponse:
+    def get_index(self, index_id, query_params) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/index/<index_id>``
 
@@ -55,7 +55,7 @@ class SearchClient(client.BaseClient):
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.get_index({index_id})")
         path = self.qjoin_path("v1/index", index_id)
-        return self.get(path, params=params)
+        return self.get(path, query_params=query_params)
 
     #
     # Search queries
@@ -75,7 +75,7 @@ class SearchClient(client.BaseClient):
         offset: int = 0,
         limit: int = 10,
         advanced: bool = False,
-        **params,
+        query_params: Optional[Dict[str, Any]] = None,
     ):
         """
         ``GET /v1/index/<index_id>/search``
@@ -95,7 +95,9 @@ class SearchClient(client.BaseClient):
         in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
-        params.update(
+        if query_params is None:
+            query_params = {}
+        query_params.update(
             {
                 "q": q,
                 "offset": offset,
@@ -106,7 +108,7 @@ class SearchClient(client.BaseClient):
 
         log.info(f"SearchClient.search({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "search")
-        return self.get(path, params=params)
+        return self.get(path, query_params=query_params)
 
     def post_search(self, index_id, data):
         """
@@ -257,7 +259,9 @@ class SearchClient(client.BaseClient):
     # Subject Operations
     #
 
-    def get_subject(self, index_id, subject: str, **params):
+    def get_subject(
+        self, index_id, subject: str, query_params: Optional[Dict[str, Any]] = None
+    ):
         """
         ``GET /v1/index/<index_id>/subject``
 
@@ -277,12 +281,16 @@ class SearchClient(client.BaseClient):
         in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
-        params["subject"] = subject
+        if query_params is None:
+            query_params = {}
+        query_params["subject"] = subject
         log.info(f"SearchClient.get_subject({index_id}, {subject}, ...)")
         path = self.qjoin_path("v1/index", index_id, "subject")
-        return self.get(path, params=params)
+        return self.get(path, query_params=query_params)
 
-    def delete_subject(self, index_id, subject: str, **params):
+    def delete_subject(
+        self, index_id, subject: str, query_params: Optional[Dict[str, Any]] = None
+    ):
         """
         ``DELETE /v1/index/<index_id>/subject``
 
@@ -302,18 +310,24 @@ class SearchClient(client.BaseClient):
         in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
-        params["subject"] = subject
+        if query_params is None:
+            query_params = {}
+        query_params["subject"] = subject
 
         log.info(f"SearchClient.delete_subject({index_id}, {subject}, ...)")
         path = self.qjoin_path("v1/index", index_id, "subject")
-        return self.delete(path, params=params)
+        return self.delete(path, query_params=query_params)
 
     #
     # Entry Operations
     #
 
     def get_entry(
-        self, index_id, subject: str, entry_id: Optional[str] = None, **params
+        self,
+        index_id,
+        subject: str,
+        entry_id: Optional[str] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ):
         """
         ``GET /v1/index/<index_id>/entry``
@@ -341,9 +355,11 @@ class SearchClient(client.BaseClient):
         in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
-        params["subject"] = subject
+        if query_params is None:
+            query_params = {}
+        query_params["subject"] = subject
         if entry_id is not None:
-            params["entry_id"] = entry_id
+            query_params["entry_id"] = entry_id
 
         log.info(
             "SearchClient.get_entry({}, {}, {}, ...)".format(
@@ -351,7 +367,7 @@ class SearchClient(client.BaseClient):
             )
         )
         path = self.qjoin_path("v1/index", index_id, "entry")
-        return self.get(path, params=params)
+        return self.get(path, query_params=query_params)
 
     def create_entry(self, index_id, data):
         """
@@ -427,7 +443,11 @@ class SearchClient(client.BaseClient):
         return self.put(path, data=data)
 
     def delete_entry(
-        self, index_id, subject: str, entry_id: Optional[str] = None, **params
+        self,
+        index_id,
+        subject: str,
+        entry_id: Optional[str] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ):
         """
         ``DELETE  /v1/index/<index_id>/entry``
@@ -455,22 +475,24 @@ class SearchClient(client.BaseClient):
         in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
-        params["subject"] = subject
+        if query_params is None:
+            query_params = {}
+        query_params["subject"] = subject
         if entry_id is not None:
-            params["entry_id"] = entry_id
+            query_params["entry_id"] = entry_id
         log.info(
             "SearchClient.delete_entry({}, {}, {}, ...)".format(
                 index_id, subject, entry_id
             )
         )
         path = self.qjoin_path("v1/index", index_id, "entry")
-        return self.delete(path, params=params)
+        return self.delete(path, query_params=query_params)
 
     #
     # Task Management
     #
 
-    def get_task(self, task_id, **params):
+    def get_task(self, task_id, query_params: Optional[Dict[str, Any]] = None):
         """
         ``GET /v1/task/<task_id>``
 
@@ -484,9 +506,9 @@ class SearchClient(client.BaseClient):
         task_id = utils.safe_stringify(task_id)
         log.info(f"SearchClient.get_task({task_id})")
         path = self.qjoin_path("v1/task", task_id)
-        return self.get(path, params=params)
+        return self.get(path, query_params=query_params)
 
-    def get_task_list(self, index_id, **params):
+    def get_task_list(self, index_id, query_params: Optional[Dict[str, Any]] = None):
         """
         ``GET /v1/task_list/<index_id>``
 
@@ -500,4 +522,4 @@ class SearchClient(client.BaseClient):
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.get_task_list({index_id})")
         path = self.qjoin_path("v1/task_list", index_id)
-        return self.get(path, params=params)
+        return self.get(path, query_params=query_params)

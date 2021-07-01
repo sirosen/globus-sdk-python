@@ -93,7 +93,10 @@ def test_transfer_submit_success(client, transfer_data):
     )
 
     tdata = transfer_data(
-        label="mytask", sync_level="exists", deadline="2018-06-01", custom_param="foo"
+        label="mytask",
+        sync_level="exists",
+        deadline="2018-06-01",
+        additional_fields={"custom_param": "foo"},
     )
     assert tdata["custom_param"] == "foo"
     assert tdata["sync_level"] == 0
@@ -113,7 +116,9 @@ def test_delete_submit_success(client, delete_data):
         "transfer", "/delete", method="POST", body=DELETE_SUBMISSION_SUCCESS
     )
 
-    ddata = delete_data(label="mytask", deadline="2018-06-01", custom_param="foo")
+    ddata = delete_data(
+        label="mytask", deadline="2018-06-01", additional_fields={"custom_param": "foo"}
+    )
     assert ddata["custom_param"] == "foo"
 
     ddata.add_item("/path/to/foo")
