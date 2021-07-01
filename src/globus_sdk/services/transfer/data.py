@@ -203,8 +203,8 @@ class TransferData(dict):
             self.update(additional_fields)
             for option, value in additional_fields.items():
                 logger.info(
-                    "TransferData.{} = {} (option passed in via "
-                    "additional_fields)".format(option, value)
+                    f"TransferData.{option} = {value} (option passed "
+                    "in via additional_fields)"
                 )
 
     def add_item(
@@ -369,7 +369,7 @@ class DeleteData(dict):
         submission_id=None,
         recursive=False,
         deadline=None,
-        additional_fields: Optional[Dict[str, str]] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
     ):
         endpoint = utils.safe_stringify(endpoint)
         logger.info("Creating a new DeleteData object")
@@ -400,7 +400,7 @@ class DeleteData(dict):
                     f"DeleteData.{option} = {value} (option passed in via kwargs)"
                 )
 
-    def add_item(self, path, additional_fields: Optional[Dict[str, str]] = None):
+    def add_item(self, path, additional_fields: Optional[Dict[str, Any]] = None):
         """
         Add a file or directory or symlink to be deleted. If any of the paths
         are directories, ``recursive`` must be set True on the top level

@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from globus_sdk import client, paging, response, utils
 
@@ -75,7 +75,7 @@ class SearchClient(client.BaseClient):
         offset: int = 0,
         limit: int = 10,
         advanced: bool = False,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ):
         """
         ``GET /v1/index/<index_id>/search``
@@ -100,9 +100,9 @@ class SearchClient(client.BaseClient):
         query_params.update(
             {
                 "q": q,
-                "offset": str(offset),
-                "limit": str(limit),
-                "advanced": str(advanced),
+                "offset": offset,
+                "limit": limit,
+                "advanced": advanced,
             }
         )
 
@@ -260,7 +260,7 @@ class SearchClient(client.BaseClient):
     #
 
     def get_subject(
-        self, index_id, subject: str, query_params: Optional[Dict[str, str]] = None
+        self, index_id, subject: str, query_params: Optional[Dict[str, Any]] = None
     ):
         """
         ``GET /v1/index/<index_id>/subject``
@@ -289,7 +289,7 @@ class SearchClient(client.BaseClient):
         return self.get(path, query_params=query_params)
 
     def delete_subject(
-        self, index_id, subject: str, query_params: Optional[Dict[str, str]] = None
+        self, index_id, subject: str, query_params: Optional[Dict[str, Any]] = None
     ):
         """
         ``DELETE /v1/index/<index_id>/subject``
@@ -327,7 +327,7 @@ class SearchClient(client.BaseClient):
         index_id,
         subject: str,
         entry_id: Optional[str] = None,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ):
         """
         ``GET /v1/index/<index_id>/entry``
@@ -447,7 +447,7 @@ class SearchClient(client.BaseClient):
         index_id,
         subject: str,
         entry_id: Optional[str] = None,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ):
         """
         ``DELETE  /v1/index/<index_id>/entry``
@@ -492,7 +492,7 @@ class SearchClient(client.BaseClient):
     # Task Management
     #
 
-    def get_task(self, task_id, query_params: Optional[Dict[str, str]] = None):
+    def get_task(self, task_id, query_params: Optional[Dict[str, Any]] = None):
         """
         ``GET /v1/task/<task_id>``
 
@@ -508,7 +508,7 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/task", task_id)
         return self.get(path, query_params=query_params)
 
-    def get_task_list(self, index_id, query_params: Optional[Dict[str, str]] = None):
+    def get_task_list(self, index_id, query_params: Optional[Dict[str, Any]] = None):
         """
         ``GET /v1/task_list/<index_id>``
 

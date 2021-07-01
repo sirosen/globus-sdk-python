@@ -1,6 +1,6 @@
 import logging
 import urllib.parse
-from typing import Dict, Optional, Type
+from typing import Any, Dict, Optional, Type
 
 from globus_sdk import config, exc, utils
 from globus_sdk.authorizers import GlobusAuthorizer
@@ -111,7 +111,7 @@ class BaseClient:
         self,
         path: str,
         *,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict] = None,
     ) -> GlobusHTTPResponse:
         """
@@ -129,7 +129,7 @@ class BaseClient:
         self,
         path: str,
         *,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         data: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
@@ -156,7 +156,7 @@ class BaseClient:
         self,
         path: str,
         *,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict] = None,
     ) -> GlobusHTTPResponse:
         """
@@ -174,7 +174,7 @@ class BaseClient:
         self,
         path: str,
         *,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         data: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
@@ -201,7 +201,7 @@ class BaseClient:
         self,
         path: str,
         *,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         data: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
@@ -229,7 +229,7 @@ class BaseClient:
         method: str,
         path: str,
         *,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         data: Optional[Dict] = None,
         headers: Optional[Dict] = None,
         encoding: Optional[str] = None,
@@ -242,7 +242,7 @@ class BaseClient:
         :param path: Path for the request, with or without leading slash
         :type path: str
         :param query_params: Parameters to be encoded as a query string
-        :type query_params: dict
+        :type query_params: dict, optional
         :param headers: HTTP headers to add to the request
         :type headers: dict
         :param data: Data to send as the request body. May pass through encoding.

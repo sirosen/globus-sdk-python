@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 
@@ -76,7 +76,7 @@ class RequestsTransport:
         self,
         method: str,
         url: str,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         data: Union[Dict, List, str, None] = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
@@ -102,7 +102,7 @@ class RequestsTransport:
         self,
         method,
         url,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
         data=None,
         headers=None,
         encoding: Optional[str] = None,
@@ -116,7 +116,7 @@ class RequestsTransport:
         :param method: HTTP request method, as an all caps string
         :type method: str
         :param query_params: Parameters to be encoded as a query string
-        :type query_params: dict
+        :type query_params: dict, optional
         :param headers: HTTP headers to add to the request
         :type headers: dict
         :param data: Data to send as the request body. May pass through encoding.

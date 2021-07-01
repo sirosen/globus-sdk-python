@@ -1,7 +1,7 @@
 import collections.abc
 import json
 import logging
-from typing import Dict, Optional, Type, TypeVar, overload
+from typing import Any, Dict, Optional, Type, TypeVar, overload
 
 import jwt
 
@@ -65,7 +65,7 @@ class AuthClient(client.BaseClient):
         usernames=None,
         ids=None,
         provision=False,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ):
         r"""
         GET /v2/api/identities
@@ -160,7 +160,7 @@ class AuthClient(client.BaseClient):
 
         return self.get("/v2/api/identities", query_params=query_params)
 
-    def oauth2_get_authorize_url(self, query_params: Optional[Dict[str, str]] = None):
+    def oauth2_get_authorize_url(self, query_params: Optional[Dict[str, Any]] = None):
         """
         Get the authorization URL to which users should be sent.
         This method may only be called after ``oauth2_start_flow``
@@ -211,7 +211,7 @@ class AuthClient(client.BaseClient):
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(auth_code)
 
     def oauth2_refresh_token(
-        self, refresh_token, query_params: Optional[Dict[str, str]] = None
+        self, refresh_token, body_params: Optional[Dict[str, Any]] = None
     ):
         r"""
         Exchange a refresh token for a
@@ -230,18 +230,18 @@ class AuthClient(client.BaseClient):
         :param refresh_token: A Globus Refresh Token as a string
         :type refresh_token: str
 
-        :param query_params: A dict of extra params to encode in the refresh call.
-        :type query_params: dict, optional
+        :param body_params: A dict of extra params to encode in the refresh call.
+        :type body_params: dict, optional
         """
         log.info("Executing token refresh; typically requires client credentials")
         form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
 
-        if query_params:
-            form_data.update(query_params)
+        if body_params:
+            form_data.update(body_params)
         return self.oauth2_token(form_data)
 
     def oauth2_validate_token(
-        self, token, query_params: Optional[Dict[str, str]] = None
+        self, token, body_params: Optional[Dict[str, Any]] = None
     ):
         """
         Validate a token. It can be an Access Token or a Refresh token.
@@ -261,9 +261,9 @@ class AuthClient(client.BaseClient):
         :param token: The token which should be validated. Can be a refresh token or an
             access token
         :type token: str
-        :param query_params: Additional parameters to include in the validation
+        :param body_params: Additional parameters to include in the validation
             body. Primarily for internal use
-        :type query_params: dict, optional
+        :type body_params: dict, optional
 
         **Examples**
 
@@ -301,11 +301,11 @@ class AuthClient(client.BaseClient):
             log.debug("Validating token with unauthenticated client")
             body.update({"client_id": self.client_id})
 
-        if query_params:
-            body.update(query_params)
+        if body_params:
+            body.update(body_params)
         return self.post("/v2/oauth2/token/validate", data=body, encoding="form")
 
-    def oauth2_revoke_token(self, token, query_params: Optional[Dict[str, str]] = None):
+    def oauth2_revoke_token(self, token, body_params: Optional[Dict[str, Any]] = None):
         """
         Revoke a token. It can be an Access Token or a Refresh token.
 
@@ -320,9 +320,10 @@ class AuthClient(client.BaseClient):
 
         :param token: The token which should be revoked
         :type token: str
-        :param query_params: Additional parameters to include in the revocation
-            body, which can help speed the revocation process. Primarily for internal
-            use
+        :param body_params: Additional parameters to include in the revocation
+            body, which can help speed the revocation process. Primarily for
+            internal use
+        :type body_params: dict, optional
 
         **Examples**
 
@@ -342,8 +343,8 @@ class AuthClient(client.BaseClient):
             log.debug("Revoking token with unauthenticated client")
             body.update({"client_id": self.client_id})
 
-        if query_params:
-            body.update(query_params)
+        if body_params:
+            body.update(body_params)
         return self.post("/v2/oauth2/token/revoke", data=body, encoding="form")
 
     @overload

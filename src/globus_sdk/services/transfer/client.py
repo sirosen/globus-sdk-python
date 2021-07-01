@@ -1,7 +1,7 @@
 import logging
 import time
 import uuid
-from typing import Dict, Iterable, Optional, Union
+from typing import Any, Dict, Iterable, Optional, Union
 
 from globus_sdk import client, exc, paging, response, utils
 
@@ -69,7 +69,7 @@ class TransferClient(client.BaseClient):
     #
 
     def get_endpoint(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>``
@@ -100,7 +100,7 @@ class TransferClient(client.BaseClient):
         self,
         endpoint_id: ID_PARAM_TYPE,
         data,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>``
@@ -218,7 +218,7 @@ class TransferClient(client.BaseClient):
         filter_scope: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         r"""
         .. parsed-literal::
@@ -241,7 +241,7 @@ class TransferClient(client.BaseClient):
         :type offset: int, optional
         :param query_params: Any additional parameters will be passed through
             as query params.
-        :type query_params: dict
+        :type query_params: dict, optional
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.transfer.response.IterableTransferResponse>`
 
@@ -274,16 +274,16 @@ class TransferClient(client.BaseClient):
         if filter_fulltext is not None:
             query_params["filter_fulltext"] = filter_fulltext
         if limit is not None:
-            query_params["limit"] = str(limit)
+            query_params["limit"] = limit
         if offset is not None:
-            query_params["offset"] = str(offset)
+            query_params["offset"] = offset
         log.info(f"TransferClient.endpoint_search({query_params})")
         return IterableTransferResponse(
             self.get("endpoint_search", query_params=query_params)
         )
 
     def endpoint_autoactivate(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         r"""
         ``POST /endpoint/<endpoint_id>/autoactivate``
@@ -350,7 +350,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, query_params=query_params)
 
     def endpoint_deactivate(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/deactivate``
@@ -374,7 +374,7 @@ class TransferClient(client.BaseClient):
         self,
         endpoint_id: ID_PARAM_TYPE,
         requirements_data,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/activate``
@@ -399,7 +399,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=requirements_data, query_params=query_params)
 
     def endpoint_get_activation_requirements(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> ActivationRequirementsResponse:
         """
         ``GET /endpoint/<endpoint_id>/activation_requirements``
@@ -419,7 +419,7 @@ class TransferClient(client.BaseClient):
         return ActivationRequirementsResponse(self.get(path, query_params=query_params))
 
     def my_effective_pause_rule_list(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
@@ -444,7 +444,7 @@ class TransferClient(client.BaseClient):
     # Shared Endpoints
 
     def my_shared_endpoint_list(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/my_shared_endpoint_list``
@@ -500,7 +500,7 @@ class TransferClient(client.BaseClient):
     # Endpoint servers
 
     def endpoint_server_list(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/server_list``
@@ -524,7 +524,7 @@ class TransferClient(client.BaseClient):
         self,
         endpoint_id: ID_PARAM_TYPE,
         server_id,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/server/<server_id>``
@@ -620,7 +620,7 @@ class TransferClient(client.BaseClient):
     #
 
     def endpoint_role_list(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/role_list``
@@ -665,7 +665,7 @@ class TransferClient(client.BaseClient):
         self,
         endpoint_id: ID_PARAM_TYPE,
         role_id,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/role/<role_id>``
@@ -711,7 +711,7 @@ class TransferClient(client.BaseClient):
     #
 
     def endpoint_acl_list(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/access_list``
@@ -735,7 +735,7 @@ class TransferClient(client.BaseClient):
         self,
         endpoint_id: ID_PARAM_TYPE,
         rule_id,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/access/<rule_id>``
@@ -851,7 +851,7 @@ class TransferClient(client.BaseClient):
     #
 
     def bookmark_list(
-        self, query_params: Optional[Dict[str, str]] = None
+        self, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /bookmark_list``
@@ -889,7 +889,7 @@ class TransferClient(client.BaseClient):
         return self.post("bookmark", data=bookmark_data)
 
     def get_bookmark(
-        self, bookmark_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, bookmark_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /bookmark/<bookmark_id>``
@@ -956,7 +956,7 @@ class TransferClient(client.BaseClient):
     #
 
     def operation_ls(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /operation/endpoint/<endpoint_id>/ls``
@@ -986,7 +986,7 @@ class TransferClient(client.BaseClient):
         self,
         endpoint_id: ID_PARAM_TYPE,
         path,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
@@ -1022,7 +1022,7 @@ class TransferClient(client.BaseClient):
         endpoint_id: ID_PARAM_TYPE,
         oldpath,
         newpath,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/rename``
@@ -1060,7 +1060,7 @@ class TransferClient(client.BaseClient):
         endpoint_id: ID_PARAM_TYPE,
         symlink_target,
         path,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/symlink``
@@ -1105,7 +1105,7 @@ class TransferClient(client.BaseClient):
     #
 
     def get_submission_id(
-        self, query_params: Optional[Dict[str, str]] = None
+        self, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /submission_id``
@@ -1210,7 +1210,7 @@ class TransferClient(client.BaseClient):
         self,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
         Get an iterable of task documents owned by the current user.
@@ -1248,9 +1248,9 @@ class TransferClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         if limit is not None:
-            query_params["limit"] = str(limit)
+            query_params["limit"] = limit
         if offset is not None:
-            query_params["offset"] = str(offset)
+            query_params["offset"] = offset
         return IterableTransferResponse(
             self.get("task_list", query_params=query_params)
         )
@@ -1267,7 +1267,7 @@ class TransferClient(client.BaseClient):
         task_id: ID_PARAM_TYPE,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         r"""
         List events (for example, faults and errors) for a given Task.
@@ -1309,13 +1309,13 @@ class TransferClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         if limit is not None:
-            query_params["limit"] = str(limit)
+            query_params["limit"] = limit
         if offset is not None:
-            query_params["offset"] = str(offset)
+            query_params["offset"] = offset
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
     def get_task(
-        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /task/<task_id>``
@@ -1339,7 +1339,7 @@ class TransferClient(client.BaseClient):
         self,
         task_id: ID_PARAM_TYPE,
         data: Dict,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /task/<task_id>``
@@ -1482,7 +1482,7 @@ class TransferClient(client.BaseClient):
         # unreachable -- end of task_wait
 
     def task_pause_info(
-        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /task/<task_id>/pause_info``
@@ -1504,7 +1504,7 @@ class TransferClient(client.BaseClient):
 
     @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def task_successful_transfers(
-        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         Get the successful file transfers for a completed Task.
@@ -1550,7 +1550,7 @@ class TransferClient(client.BaseClient):
 
     @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def task_skipped_errors(
-        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         Get path and error information for all paths that were skipped due
@@ -1597,7 +1597,7 @@ class TransferClient(client.BaseClient):
     #
 
     def endpoint_manager_monitored_endpoints(
-        self, query_params: Optional[Dict[str, str]] = None
+        self, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         Get endpoints the current user is a monitor or manager on.
@@ -1617,7 +1617,7 @@ class TransferClient(client.BaseClient):
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
     def endpoint_manager_hosted_endpoint_list(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         Get shared endpoints hosted on the given endpoint.
@@ -1642,7 +1642,7 @@ class TransferClient(client.BaseClient):
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
     def endpoint_manager_get_endpoint(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get endpoint details as an admin.
@@ -1665,7 +1665,7 @@ class TransferClient(client.BaseClient):
         return self.get(path, query_params=query_params)
 
     def endpoint_manager_acl_list(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         Get a list of access control rules on specified endpoint as an admin.
@@ -1697,7 +1697,7 @@ class TransferClient(client.BaseClient):
 
     @paging.has_paginator(paging.LastKeyPaginator, items_key="DATA")
     def endpoint_manager_task_list(
-        self, query_params: Optional[Dict[str, str]] = None
+        self, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         r"""
         Get a list of tasks visible via ``activity_monitor`` role, as opposed
@@ -1826,7 +1826,7 @@ class TransferClient(client.BaseClient):
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
     def endpoint_manager_get_task(
-        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ):
         """
         Get task info as an admin. Requires activity monitor effective role on
@@ -1861,7 +1861,7 @@ class TransferClient(client.BaseClient):
         task_id: ID_PARAM_TYPE,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
         List events (for example, faults and errors) for a given task as an
@@ -1894,13 +1894,13 @@ class TransferClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         if limit is not None:
-            query_params["limit"] = str(limit)
+            query_params["limit"] = limit
         if offset is not None:
-            query_params["offset"] = str(offset)
+            query_params["offset"] = offset
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
     def endpoint_manager_task_pause_info(
-        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get details about why a task is paused as an admin. Requires activity
@@ -1925,7 +1925,7 @@ class TransferClient(client.BaseClient):
 
     @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def endpoint_manager_task_successful_transfers(
-        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         Get the successful file transfers for a completed Task as an admin.
@@ -1958,7 +1958,7 @@ class TransferClient(client.BaseClient):
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
     def endpoint_manager_task_skipped_errors(
-        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, str]] = None
+        self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         Get skipped errors for a completed Task as an admin.
@@ -1991,7 +1991,7 @@ class TransferClient(client.BaseClient):
         self,
         task_ids: Iterable[ID_PARAM_TYPE],
         message,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         Cancel a list of tasks as an admin. Requires activity manager effective
@@ -2026,7 +2026,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=data, query_params=query_params)
 
     def endpoint_manager_cancel_status(
-        self, admin_cancel_id, query_params: Optional[Dict[str, str]] = None
+        self, admin_cancel_id, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get the status of an an admin cancel (result of
@@ -2057,7 +2057,7 @@ class TransferClient(client.BaseClient):
         self,
         task_ids: Iterable[ID_PARAM_TYPE],
         message,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         Pause a list of tasks as an admin. Requires activity manager effective
@@ -2097,7 +2097,7 @@ class TransferClient(client.BaseClient):
     def endpoint_manager_resume_tasks(
         self,
         task_ids: Iterable[ID_PARAM_TYPE],
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         Resume a list of tasks as an admin. Requires activity manager effective
@@ -2133,7 +2133,7 @@ class TransferClient(client.BaseClient):
     def endpoint_manager_pause_rule_list(
         self,
         filter_endpoint: Optional[ID_PARAM_TYPE] = None,
-        query_params: Optional[Dict[str, str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
         Get a list of pause rules on endpoints that the current user has the
@@ -2201,7 +2201,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=data)
 
     def endpoint_manager_get_pause_rule(
-        self, pause_rule_id, query_params: Optional[Dict[str, str]] = None
+        self, pause_rule_id, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get an existing pause rule by ID. Requires the activity manager
@@ -2265,7 +2265,7 @@ class TransferClient(client.BaseClient):
         return self.put(path, data=data)
 
     def endpoint_manager_delete_pause_rule(
-        self, pause_rule_id, query_params: Optional[Dict[str, str]] = None
+        self, pause_rule_id, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Delete an existing pause rule by ID. Requires the user to see the
