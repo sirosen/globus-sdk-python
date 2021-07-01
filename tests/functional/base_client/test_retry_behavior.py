@@ -43,7 +43,7 @@ def test_retry_on_network_error(client, mocksleep):
     mocksleep.assert_called_once()
 
 
-@pytest.mark.parametrize("num_errors,expect_err", [(5, False), (6, True)])
+@pytest.mark.parametrize("num_errors,expect_err", [(5, False), (6, True), (7, True)])
 def test_retry_limit(client, mocksleep, num_errors, expect_err):
     # N errors followed by a success
     for _i in range(num_errors):
@@ -55,15 +55,14 @@ def test_retry_limit(client, mocksleep, num_errors, expect_err):
     if expect_err:
         with pytest.raises(globus_sdk.GlobusAPIError):
             client.get("/bar")
-
-        assert mocksleep.call_count < num_errors
     else:
         # no sign of an error in the client
         res = client.get("/bar")
         assert res.http_status == 200
         assert res["baz"] == 1
 
-        assert mocksleep.call_count == num_errors
+    # default num retries = 5
+    assert mocksleep.call_count == min(num_errors, 5)
 
 
 def test_transport_retry_limit(client, mocksleep):
@@ -83,7 +82,11 @@ def test_transport_retry_limit(client, mocksleep):
 
 
 def test_bad_max_retries_causes_error(client):
-    client.transport.max_retries = 0
+    # this test exploits the fact that we loop to (transport.max_retries + 1) in order
+    # to ensure that no requests are ever sent
+    # the transport should throw an error in this case, since it doesn't have a response
+    # value to return
+    client.transport.max_retries = -1
 
     with pytest.raises(ValueError):
         client.get("/bar")

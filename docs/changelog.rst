@@ -4,6 +4,11 @@ CHANGELOG
 Unreleased
 ----------
 
+* The interface for retry parameters has been simplified. ``RetryPolicy``
+  objects have been merged into the transport object, and retry parameters like
+  ``max_retries`` may now be supplied directly as ``transport_params``
+  (:pr:`430`)
+
 v3.0.0a4
 --------
 
