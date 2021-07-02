@@ -45,13 +45,14 @@ In the "Add..." menu for "SDK Tutorial Project", select "Add new app".
 Enter the following pieces of information:
 
 - **App Name**: "SDK Tutorial App"
+- **Native App**: Check this Box
 - **Scopes**: "openid", "profile", "email",
   "urn:globus:auth:scope:transfer.api.globus.org:all"
 - **Redirects**: https://auth.globus.org/v2/web/auth-code
-- **Required Identity Provider**: <Leave Unchecked>
+- **Required Identity**: <Leave Unchecked>
+- **Pre-select Identity Provider**: <Leave Unchecked>
 - **Privacy Policy**: <Leave Blank>
 - **Terms & Conditions**: <Leave Blank>
-- **Native App**: Check this Box
 
 and click "Create App".
 
