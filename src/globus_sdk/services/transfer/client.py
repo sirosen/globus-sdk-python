@@ -1,7 +1,7 @@
 import logging
 import time
 import uuid
-from typing import Any, Dict, Iterable, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from globus_sdk import client, exc, paging, response, utils
 
@@ -216,6 +216,9 @@ class TransferClient(client.BaseClient):
         self,
         filter_fulltext: Optional[str] = None,
         filter_scope: Optional[str] = None,
+        filter_owner_id: Optional[str] = None,
+        filter_host_endpoint: Optional[ID_PARAM_TYPE] = None,
+        filter_non_functional: Optional[bool] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         query_params: Optional[Dict[str, Any]] = None,
@@ -235,6 +238,17 @@ class TransferClient(client.BaseClient):
             found documented in the **External Documentation** below. Defaults to
             searching all endpoints (in which case ``filter_fulltext`` is required)
         :type filter_scope: str, optional
+        :param filter_owner_id: Limit search to endpoints owned by the specified Globus
+            Auth identity. Conflicts with scopes 'my-endpoints', 'my-gcp-endpoints', and
+            'shared-by-me'.
+        :type filter_owner_id: str, optional
+        :param filter_host_endpoint: Limit search to endpoints hosted by the specified
+            endpoint. May cause BadRequest or PermissionDenied errors if the endpoint ID
+            given is not valid for this operation.
+        :type filter_host_endpoint: str, optional
+        :param filter_non_functional: Limit search to endpoints which have the
+            'non_functional' flag set to True or False.
+        :type filter_non_functional: bool, optional
         :param limit: limit the number of results
         :type limit: int, optional
         :param offset: offset used in paging
@@ -273,6 +287,14 @@ class TransferClient(client.BaseClient):
             query_params["filter_scope"] = filter_scope
         if filter_fulltext is not None:
             query_params["filter_fulltext"] = filter_fulltext
+        if filter_owner_id is not None:
+            query_params["filter_owner_id"] = filter_owner_id
+        if filter_host_endpoint is not None:  # convert to str (may be UUID)
+            query_params["filter_host_endpoint"] = utils.safe_stringify(
+                filter_host_endpoint
+            )
+        if filter_non_functional is not None:  # convert to int (expect bool input)
+            query_params["filter_non_functional"] = 1 if filter_non_functional else 0
         if limit is not None:
             query_params["limit"] = limit
         if offset is not None:
@@ -283,7 +305,10 @@ class TransferClient(client.BaseClient):
         )
 
     def endpoint_autoactivate(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
+        self,
+        endpoint_id: ID_PARAM_TYPE,
+        if_expires_in: Optional[int] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         r"""
         ``POST /endpoint/<endpoint_id>/autoactivate``
@@ -345,6 +370,10 @@ class TransferClient(client.BaseClient):
         in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
+        if query_params is None:
+            query_params = {}
+        if if_expires_in is not None:
+            query_params["if_expires_in"] = if_expires_in
         log.info(f"TransferClient.endpoint_autoactivate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "autoactivate")
         return self.post(path, query_params=query_params)
@@ -1002,19 +1031,50 @@ class TransferClient(client.BaseClient):
     #
 
     def operation_ls(
-        self, endpoint_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
+        self,
+        endpoint_id: ID_PARAM_TYPE,
+        path: Optional[str] = None,
+        show_hidden: Optional[bool] = None,
+        orderby: Optional[Union[str, List[str]]] = None,
+        # note: filter is a soft keyword in python, so using this name is okay
+        filter: Optional[str] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
         ``GET /operation/endpoint/<endpoint_id>/ls``
 
+        :param path: Path to a directory on the endpoint to list
+        :type path: str, optional
+        :param show_hidden: Show hidden files (names beginning in dot).
+            Defaults to true.
+        :type show_hidden: bool, optional
+        :param orderby: One or more order-by options. Each option is
+            either a field name or a field name followed by a space and 'ASC' or 'DESC'
+            for ascending or descending.
+        :type orderby: str, optional
+        :param filter: Only return file documents that match these filter clauses. For
+            the filter syntax, see the **External Documentation** linked below.
+        :type filter: str, optional
         :rtype: :class:`IterableTransferResponse
                 <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
+        List with a path:
+
         >>> tc = globus_sdk.TransferClient(...)
         >>> for entry in tc.operation_ls(ep_id, path="/~/project1/"):
         >>>     print(entry["name"], entry["type"])
+
+        List with explicit ordering:
+
+        >>> tc = globus_sdk.TransferClient(...)
+        >>> for entry in tc.operation_ls(
+        >>>     ep_id,
+        >>>     path="/~/project1/",
+        >>>     orderby=["type", "name"]
+        >>> ):
+        >>>     print(entry["name DESC"], entry["type"])
 
         **External Documentation**
 
@@ -1024,9 +1084,24 @@ class TransferClient(client.BaseClient):
         in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
+
+        if query_params is None:
+            query_params = {}
+        if path is not None:
+            query_params["path"] = path
+        if show_hidden is not None:
+            query_params["show_hidden"] = 1 if show_hidden else 0
+        if orderby is not None:
+            if isinstance(orderby, str):
+                query_params["orderby"] = orderby
+            else:
+                query_params["orderby"] = ",".join(orderby)
+        if filter is not None:
+            query_params["filter"] = filter
+
         log.info(f"TransferClient.operation_ls({endpoint_id_s}, {query_params})")
-        path = self.qjoin_path("operation/endpoint", endpoint_id_s, "ls")
-        return IterableTransferResponse(self.get(path, query_params=query_params))
+        req_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "ls")
+        return IterableTransferResponse(self.get(req_path, query_params=query_params))
 
     def operation_mkdir(
         self,

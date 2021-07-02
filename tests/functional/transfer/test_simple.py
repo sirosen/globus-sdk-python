@@ -1,4 +1,5 @@
 import json
+import urllib.parse
 import uuid
 
 import pytest
@@ -120,3 +121,90 @@ def test_create_endpoint_invalid_activation_servers(client):
         client.create_endpoint(create_data)
 
     assert "either MyProxy or OAuth, not both" in str(excinfo.value)
+
+
+def test_operation_ls(client):
+    """
+    Does an `ls` on go#ep1, validate results, and check that the request parameters were
+    formatted and sent correctly.
+    """
+    # register get_endpoint mock data
+    register_api_route_fixture_file(
+        "transfer", f"/operation/endpoint/{GO_EP1_ID}/ls", "operation_ls_goep1.json"
+    )
+    ls_path = f"https://transfer.api.globus.org/v0.10/operation/endpoint/{GO_EP1_ID}/ls"
+
+    # load the tutorial endpoint ls doc
+    ls_doc = client.operation_ls(GO_EP1_ID)
+
+    # check that the result is an iterable of file and dir dict objects
+    count = 0
+    for x in ls_doc:
+        assert "DATA_TYPE" in x
+        assert x["DATA_TYPE"] in ("file", "dir")
+        count += 1
+    # not exact, just make sure the fixter wasn't empty
+    assert count > 3
+
+    req = get_last_request()
+    assert req.url == ls_path
+
+    # don't change the registered response
+    # the resulting data might be "wrong", but we're just checking request formatting
+
+    # orderby with a single str
+    client.operation_ls(GO_EP1_ID, orderby="name")
+    req = get_last_request()
+    parsed_qs = urllib.parse.parse_qs(urllib.parse.urlparse(req.url).query)
+    assert parsed_qs == {"orderby": ["name"]}
+
+    # orderby multiple strs
+    client.operation_ls(GO_EP1_ID, orderby=["size DESC", "name", "type"])
+    req = get_last_request()
+    parsed_qs = urllib.parse.parse_qs(urllib.parse.urlparse(req.url).query)
+    assert parsed_qs == {"orderby": ["size DESC,name,type"]}
+
+    # orderby + filter
+    client.operation_ls(GO_EP1_ID, orderby="name", filter="name:~*.png")
+    req = get_last_request()
+    parsed_qs = urllib.parse.parse_qs(urllib.parse.urlparse(req.url).query)
+    assert parsed_qs == {"orderby": ["name"], "filter": ["name:~*.png"]}
+
+
+def test_autoactivation(client):
+    """
+    Do `autoactivate` on go#ep1, validate results, and check that `if_expires_in` can be
+    passed correctly.
+    """
+    # register get_endpoint mock data
+    register_api_route_fixture_file(
+        "transfer",
+        f"/endpoint/{GO_EP1_ID}/autoactivate",
+        "activation_stub.json",
+        method="POST",
+    )
+
+    # load and check the activation doc
+    res = client.endpoint_autoactivate(GO_EP1_ID)
+    assert res["code"] == "AutoActivated.CachedCredential"
+
+    # check the formatted url for the request
+    req = get_last_request()
+    assert (
+        req.url
+        == f"https://transfer.api.globus.org/v0.10/endpoint/{GO_EP1_ID}/autoactivate"
+    )
+
+    register_api_route_fixture_file(
+        "transfer",
+        f"/endpoint/{GO_EP1_ID}/autoactivate",
+        "activation_already_activated_stub.json",
+        method="POST",
+        replace=True,
+    )
+    res = client.endpoint_autoactivate(GO_EP1_ID, if_expires_in=300)
+    assert res["code"] == "AlreadyActivated"
+
+    req = get_last_request()
+    parsed_qs = urllib.parse.parse_qs(urllib.parse.urlparse(req.url).query)
+    assert parsed_qs == {"if_expires_in": ["300"]}
