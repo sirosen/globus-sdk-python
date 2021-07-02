@@ -41,9 +41,7 @@ todo_include_todos = True
 html_show_sourcelink = True
 html_theme = "furo"
 html_theme_options = {
-    "announcement": (
-        "You are viewing documentation for an <b>alpha</b> version of the SDK."
-    ),
+    "announcement": "This is documentation for a <b>beta</b> version of the SDK.",
     "light_css_variables": {
         "color-brand-primary": "#27518F",
     },

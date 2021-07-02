@@ -5,9 +5,23 @@ CHANGELOG
 
 .. _changelog_version3:
 
+See :ref:`versioning` for our versioning policy.
+
+The :ref:`upgrading <upgrading>` doc is a good reference if you are upgrading
+to a major new version of the SDK.
+
 Unreleased
 ----------
 
+v3.0.0b1
+--------
+
+
+* Add support for ``TransferClient.get_shared_endpoint_list`` (:pr:`434`)
+* Passthrough parameters to SDK methods for query params and body params are no
+  longer accepted as extra keyword arguments. Instead, they must be passed
+  explicitly in a ``query_params``, ``body_params``, or ``additional_fields``
+  dictionary, depending on the context (:pr:`433`)
 * The interface for retry parameters has been simplified. ``RetryPolicy``
   objects have been merged into the transport object, and retry parameters like
   ``max_retries`` may now be supplied directly as ``transport_params``
