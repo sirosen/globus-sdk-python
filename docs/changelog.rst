@@ -1,5 +1,9 @@
+.. _changelog:
+
 CHANGELOG
 =========
+
+.. _changelog_version3:
 
 Unreleased
 ----------
@@ -79,10 +83,15 @@ v3.0.0a1
 * Remove ``auth_client=...`` parameter to
   ``OAuthTokenResponse.decode_id_token`` (:pr:`400`)
 
+.. _changelog_version2:
+
 v2.0.1
 ------
 
 * Remove support for python2 (:pr:`396`, :pr:`397`, :pr:`398`)
+
+.. note:: globus-sdk version 2.0.0 was yanked due to a release issue.
+          Version 2.0.1 is the first 2.x version.
 
 v1.11.0
 -------

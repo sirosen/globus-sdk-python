@@ -43,6 +43,7 @@ Table of Contents
     versioning
     license
     changelog
+    upgrading
 
 .. toctree::
     :caption: Examples

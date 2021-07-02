@@ -32,7 +32,8 @@ class BaseClient:
     # path under the client base URL
     base_path: str = "/"
 
-    # Can be overridden by subclasses, but must be a subclass of GlobusError
+    #: the class for errors raised by this client on HTTP 4xx and 5xx errors
+    #: this can be set in subclasses, but must always be a subclass of GlobusError
     error_class: Type[exc.GlobusAPIError] = exc.GlobusAPIError
 
     #: the type of Transport which will be used, defaults to ``RequestsTransport``

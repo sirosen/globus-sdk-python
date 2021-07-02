@@ -13,5 +13,5 @@ BaseClient
 ----------
 
 .. autoclass:: globus_sdk.BaseClient
-   :members: retry_policy, get, put, post, patch, delete, request
+   :members: get, put, post, patch, delete, request
    :member-order: bysource
