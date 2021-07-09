@@ -15,7 +15,9 @@ class TransferAPIError(exc.GlobusAPIError):
         super().__init__(r)
 
     def _get_args(self):
-        return (self.http_status, self.code, self.message, self.request_id)
+        args = super()._get_args()
+        args.append(self.request_id)
+        return args
 
     def _load_from_json(self, data):
         self.code = data["code"]

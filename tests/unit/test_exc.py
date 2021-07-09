@@ -6,10 +6,12 @@ import requests
 
 from globus_sdk import AuthAPIError, TransferAPIError, exc
 
-_TestResponse = namedtuple("_TestResponse", ("data", "r"))
+_TestResponse = namedtuple("_TestResponse", ("data", "r", "method", "url"))
 
 
-def _mk_response(data, status, headers=None, data_transform=None):
+def _mk_response(
+    data, status, method=None, url=None, headers=None, data_transform=None
+):
     resp = requests.Response()
 
     if data_transform:
@@ -21,7 +23,14 @@ def _mk_response(data, status, headers=None, data_transform=None):
         resp.headers.update(headers)
 
     resp.status_code = str(status)
-    return _TestResponse(data, resp)
+    method = method or "GET"
+    url = url or "default-example-url.bogus"
+    resp.url = url
+    resp.request = requests.Request(method=method, url=url, headers=headers)
+    return _TestResponse(data, resp, method, url)
+
+
+_DEFAULT_RESPONSE = _mk_response("{}", 200)
 
 
 def _mk_json_response(data, status):
@@ -96,27 +105,80 @@ def test_raw_text_works(json_response, text_response):
 
 def test_get_args(json_response, text_response, malformed_response):
     err = exc.GlobusAPIError(json_response.r)
-    assert err._get_args() == ("400", "Json Error", "json error message")
+    assert err._get_args() == [
+        json_response.method,
+        json_response.url,
+        None,
+        "400",
+        "Json Error",
+        "json error message",
+    ]
     err = exc.GlobusAPIError(text_response.r)
-    assert err._get_args() == ("401", "Error", "error message")
+    assert err._get_args() == [
+        text_response.method,
+        text_response.url,
+        None,
+        "401",
+        "Error",
+        "error message",
+    ]
     err = exc.GlobusAPIError(malformed_response.r)
-    assert err._get_args() == ("403", "Error", "{")
+    assert err._get_args() == [
+        text_response.method,
+        text_response.url,
+        None,
+        "403",
+        "Error",
+        "{",
+    ]
 
 
 def test_get_args_transfer(
     json_response, text_response, malformed_response, transfer_response
 ):
     err = TransferAPIError(transfer_response.r)
-    assert err._get_args() == ("404", "Transfer Error", "transfer error message", 123)
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "404",
+        "Transfer Error",
+        "transfer error message",
+        123,
+    ]
 
     # wrong format
     err = TransferAPIError(json_response.r)
-    assert err._get_args() == ("400", "Error", json.dumps(json_response.data), None)
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "400",
+        "Error",
+        json.dumps(json_response.data),
+        None,
+    ]
     # defaults for non-json
     err = TransferAPIError(text_response.r)
-    assert err._get_args() == ("401", "Error", "error message", None)
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "401",
+        "Error",
+        "error message",
+        None,
+    ]
     err = TransferAPIError(malformed_response.r)
-    assert err._get_args() == ("403", "Error", "{", None)
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "403",
+        "Error",
+        "{",
+        None,
+    ]
 
 
 def test_get_args_auth(
@@ -127,19 +189,54 @@ def test_get_args_auth(
     nested_auth_response,
 ):
     err = AuthAPIError(simple_auth_response.r)
-    assert err._get_args() == ("404", "Error", "simple auth error message")
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "404",
+        "Error",
+        "simple auth error message",
+    ]
     err = AuthAPIError(nested_auth_response.r)
-    assert err._get_args() == ("404", "Auth Error", "nested auth error message")
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "404",
+        "Auth Error",
+        "nested auth error message",
+    ]
 
     # wrong format, but similar/close
     err = AuthAPIError(json_response.r)
-    assert err._get_args() == ("400", "Json Error", "json error message")
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "400",
+        "Json Error",
+        "json error message",
+    ]
 
     # non-json
     err = AuthAPIError(text_response.r)
-    assert err._get_args() == ("401", "Error", "error message")
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "401",
+        "Error",
+        "error message",
+    ]
     err = AuthAPIError(malformed_response.r)
-    assert err._get_args() == ("403", "Error", "{")
+    assert err._get_args() == [
+        _DEFAULT_RESPONSE.method,
+        _DEFAULT_RESPONSE.url,
+        None,
+        "403",
+        "Error",
+        "{",
+    ]
 
 
 @pytest.mark.parametrize(

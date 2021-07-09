@@ -34,6 +34,8 @@ class GlobusAPIError(GlobusError):
                    suitable for display to end users.
     """
 
+    RECOGNIZED_AUTHZ_SCHEMES = ["bearer", "basic", "globus-goauthtoken"]
+
     def __init__(self, r, *args, **kw):
         self._underlying_response = r
         self.http_status = r.status_code
@@ -61,8 +63,7 @@ class GlobusAPIError(GlobusError):
             # fallback to using the entire body as the message for all
             # other types
             self._load_from_text(r.text)
-        args = self._get_args()
-        GlobusError.__init__(self, *args)
+        super().__init__(*self._get_args())
 
     @property
     def raw_json(self):
@@ -95,12 +96,32 @@ class GlobusAPIError(GlobusError):
         """
         return self._underlying_response.text
 
+    def _get_request_authorization_scheme(self):
+        try:
+            authz_h = self._underlying_response.request.headers["Authorization"]
+            try:
+                authz_scheme = authz_h.split()[0]
+                if authz_scheme.lower() in self.RECOGNIZED_AUTHZ_SCHEMES:
+                    return authz_scheme
+            except IndexError:
+                pass
+        except KeyError:
+            pass
+        return None
+
     def _get_args(self):
         """
         Get arguments to pass to the Exception base class. These args are
         displayed in stack traces.
         """
-        return (self.http_status, self.code, self.message)
+        return [
+            self._underlying_response.request.method,
+            self._underlying_response.url,
+            self._get_request_authorization_scheme(),
+            self.http_status,
+            self.code,
+            self.message,
+        ]
 
     def _load_from_json(self, data):
         """
