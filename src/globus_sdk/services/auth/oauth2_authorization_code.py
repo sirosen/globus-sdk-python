@@ -37,6 +37,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
     :param requested_scopes: The scopes on the token(s) being requested, as a
         space-separated string or iterable of strings. Defaults to
         ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
+        (that is, ``DEFAULT_REQUESTED_SCOPES`` from
+        ``globus_sdk.services.auth.oauth2_constants``)
     :type requested_scopes: str or iterable of str, optional
     :param state: This string allows an application to pass information back to itself
         in the course of the OAuth flow. Because the user will navigate away from the
