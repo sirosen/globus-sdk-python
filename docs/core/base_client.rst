@@ -13,5 +13,5 @@ BaseClient
 ----------
 
 .. autoclass:: globus_sdk.BaseClient
-   :members: get, put, post, patch, delete, request
+   :members: scopes, get, put, post, patch, delete, request
    :member-order: bysource

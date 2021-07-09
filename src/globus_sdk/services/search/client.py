@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from globus_sdk import client, paging, response, utils
+from globus_sdk.scopes import SearchScopes
 
 from .errors import SearchAPIError
 
@@ -27,6 +28,7 @@ class SearchClient(client.BaseClient):
     """
     error_class = SearchAPIError
     service_name = "search"
+    scopes = SearchScopes
 
     #
     # Index Management

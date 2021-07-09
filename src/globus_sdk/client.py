@@ -6,6 +6,7 @@ from globus_sdk import config, exc, utils
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.paging import PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
+from globus_sdk.scopes import ScopeBuilder
 from globus_sdk.transport import RequestsTransport
 
 log = logging.getLogger(__name__)
@@ -38,6 +39,9 @@ class BaseClient:
 
     #: the type of Transport which will be used, defaults to ``RequestsTransport``
     transport_class: Type = RequestsTransport
+
+    #: the scopes for this client may be present as a ``ScopeBuilder``
+    scopes: Optional[ScopeBuilder] = None
 
     def __init__(
         self,

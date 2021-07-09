@@ -30,6 +30,7 @@ Table of Contents
     :maxdepth: 2
 
     services/index
+    scopes
     local_endpoints
     authorization
     tokenstorage
