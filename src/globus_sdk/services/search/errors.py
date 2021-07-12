@@ -14,9 +14,6 @@ class SearchAPIError(exc.GlobusAPIError):
         self.error_data = None
         super().__init__(r)
 
-    def _get_args(self):
-        return (self.http_status, self.code, self.message)
-
     def _load_from_json(self, data):
         self.code = data["code"]
         self.message = data["message"]
