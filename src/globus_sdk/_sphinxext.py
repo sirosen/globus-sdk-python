@@ -125,7 +125,7 @@ class ListKnownScopes(AddContentDirective):
                 add_scopes = [x for x in arg.split("=")[1].split(",")]
             if arg.startswith("example_scope="):
                 example_scope = arg.split("=")[1]
-        known_scopes = _extract_known_scopes(sb_name) + add_scopes
+        known_scopes = add_scopes + _extract_known_scopes(sb_name)
         if example_scope is None:
             example_scope = known_scopes[0]
 
