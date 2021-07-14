@@ -4,6 +4,7 @@ import uuid
 from typing import Any, Dict, Iterable, List, Optional, Union
 
 from globus_sdk import client, exc, paging, response, utils
+from globus_sdk.scopes import TransferScopes
 
 from .errors import TransferAPIError
 from .response import ActivationRequirementsResponse, IterableTransferResponse
@@ -60,6 +61,7 @@ class TransferClient(client.BaseClient):
     service_name = "transfer"
     base_path = "/v0.10/"
     error_class = TransferAPIError
+    scopes = TransferScopes
 
     # Convenience methods, providing more pythonic access to common REST
     # resources

@@ -1,4 +1,5 @@
 from globus_sdk import client
+from globus_sdk.scopes import GroupsScopes
 
 from .errors import GroupsAPIError
 
@@ -13,3 +14,4 @@ class GroupsClient(client.BaseClient):
 
     error_class = GroupsAPIError
     service_name = "groups"
+    scopes = GroupsScopes

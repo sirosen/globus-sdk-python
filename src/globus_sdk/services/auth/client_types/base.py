@@ -7,6 +7,7 @@ import jwt
 
 from globus_sdk import client, exc, utils
 from globus_sdk.authorizers import NullAuthorizer
+from globus_sdk.scopes import AuthScopes
 
 from ..errors import AuthAPIError
 from ..token_response import OAuthTokenResponse
@@ -51,6 +52,7 @@ class AuthClient(client.BaseClient):
 
     service_name = "auth"
     error_class = AuthAPIError
+    scopes = AuthScopes
 
     def __init__(self, client_id=None, **kwargs):
         super().__init__(**kwargs)

@@ -15,6 +15,7 @@ class ScopeBuilder:
 
     def __init__(self, resource_server: str, known_scopes: Optional[List[str]] = None):
         self.resource_server = resource_server
+        self._known_scopes = known_scopes
         if known_scopes:
             for scope_name in known_scopes:
                 setattr(self, scope_name, self.urn_scope_string(scope_name))
@@ -29,7 +30,7 @@ class ScopeBuilder:
 
         **Examples**
 
-        >>> sb = scope_builder("transfer.api.globus.org")
+        >>> sb = ScopeBuilder("transfer.api.globus.org")
         >>> sb.urn_scope_string("transfer.api.globus.org", "all")
         "urn:globus:auth:scope:transfer.api.globus.org:all"
 
@@ -45,7 +46,7 @@ class ScopeBuilder:
 
         **Examples**
 
-        >>> sb = scope_builder("actions.globus.org")
+        >>> sb = ScopeBuilder("actions.globus.org")
         >>> sb.url_scope_string("actions.globus.org", "hello_world")
         "https://auth.globus.org/scopes/actions.globus.org/hello_world"
 
@@ -56,6 +57,15 @@ class ScopeBuilder:
 
 
 class GCSScopeBuilder(ScopeBuilder):
+    """
+    A ScopeBuilder with a named property for the GCS data_access scope.
+
+    **Examples**
+
+    >>> sb = GCSScopeBuilder("xyz")
+    >>> da_scope = sb.data_access_scope
+    """
+
     @property
     def data_access_scope(self) -> str:
         return self.url_scope_string("data_access")
@@ -77,6 +87,12 @@ AuthScopes = _AuthScopesBuilder(
         "view_identity_set",
     ],
 )
+"""Globus Auth scopes.
+
+.. listknownscopes:: globus_sdk.scopes.AuthScopes
+    add_scopes=openid,email,profile
+    example_scope=view_identity_set
+"""
 
 
 GroupsScopes = ScopeBuilder(
@@ -86,6 +102,10 @@ GroupsScopes = ScopeBuilder(
         "view_my_groups_and_memberships",
     ],
 )
+"""Groups scopes.
+
+.. listknownscopes:: globus_sdk.scopes.GroupsScopes
+"""
 
 
 NexusScopes = ScopeBuilder(
@@ -94,7 +114,10 @@ NexusScopes = ScopeBuilder(
         "groups",
     ],
 )
+"""Nexus scopes (internal use only).
 
+.. listknownscopes:: globus_sdk.scopes.NexusScopes
+"""
 
 SearchScopes = ScopeBuilder(
     "search.api.globus.org",
@@ -105,7 +128,10 @@ SearchScopes = ScopeBuilder(
         "search",
     ],
 )
+"""Globus Search scopes.
 
+.. listknownscopes:: globus_sdk.scopes.SearchScopes
+"""
 
 TransferScopes = ScopeBuilder(
     "transfer.api.globus.org",
@@ -115,3 +141,7 @@ TransferScopes = ScopeBuilder(
         "monitor_ongoing",
     ],
 )
+"""Globus Transfer scopes.
+
+.. listknownscopes:: globus_sdk.scopes.TransferScopes
+"""
