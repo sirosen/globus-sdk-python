@@ -18,6 +18,7 @@ def _mk_response(
         resp._content = data_transform(data).encode("utf-8")
     else:
         resp._content = data.encode("utf-8")
+    resp.encoding = "utf-8"
 
     if headers:
         resp.headers.update(headers)

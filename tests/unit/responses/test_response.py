@@ -10,10 +10,30 @@ from globus_sdk.response import GlobusHTTPResponse
 _TestResponse = namedtuple("_TestResponse", ("data", "r"))
 
 
+def _response(data=None, encoding="utf-8", headers=None):
+    r = requests.Response()
+
+    is_json = isinstance(data, (dict, list))
+
+    datastr = json.dumps(data) if is_json else data
+    if datastr is not None:
+        if isinstance(datastr, str):
+            r._content = datastr.encode("utf-8")
+            r.encoding = "utf-8"
+        else:
+            r._content = datastr
+            r.encoding = "ISO-8559-1"
+
+    if headers:
+        r.headers.update(headers)
+    elif is_json:
+        r.headers["Content-Type"] = "application/json"
+
+    return r
+
+
 def _mk_json_response(data):
-    json_response = requests.Response()
-    json_response._content = json.dumps(data).encode("utf-8")
-    json_response.headers["Content-Type"] = "application/json"
+    json_response = _response(data)
     return _TestResponse(data, GlobusHTTPResponse(json_response, client=mock.Mock()))
 
 
@@ -29,16 +49,14 @@ def list_response():
 
 @pytest.fixture
 def http_no_content_type_response():
-    res = requests.Response()
+    res = _response()
     assert "Content-Type" not in res.headers
     return _TestResponse(None, GlobusHTTPResponse(res, client=mock.Mock()))
 
 
 @pytest.fixture
 def malformed_http_response():
-    malformed_response = requests.Response()
-    malformed_response._content = b"{"
-    malformed_response.headers["Content-Type"] = "application/json"
+    malformed_response = _response(b"{", headers={"Content-Type": "application/json"})
     return _TestResponse(
         "{", GlobusHTTPResponse(malformed_response, client=mock.Mock())
     )
@@ -47,9 +65,9 @@ def malformed_http_response():
 @pytest.fixture
 def text_http_response():
     text_data = "text data"
-    text_response = requests.Response()
-    text_response._content = text_data.encode("utf-8")
-    text_response.headers["Content-Type"] = "text/plain"
+    text_response = _response(
+        text_data, encoding="utf-8", headers={"Content-Type": "text/plain"}
+    )
     return _TestResponse(
         text_data, GlobusHTTPResponse(text_response, client=mock.Mock())
     )
@@ -137,20 +155,14 @@ def test_no_content_type_header(http_no_content_type_response):
 
 
 def test_client_required_with_requests_response():
-    r = requests.Response()
-    r._content = json.dumps({"foo": 1}).encode("utf-8")
-    r.headers["Content-Type"] = "application/json"
-
+    r = _response({"foo": 1})
     GlobusHTTPResponse(r, client=mock.Mock())  # ok
     with pytest.raises(ValueError):
         GlobusHTTPResponse(r)  # not ok
 
 
 def test_client_forbidden_when_wrapping():
-    r = requests.Response()
-    r._content = json.dumps({"foo": 1}).encode("utf-8")
-    r.headers["Content-Type"] = "application/json"
-
+    r = _response({"foo": 1})
     to_wrap = GlobusHTTPResponse(r, client=mock.Mock())
 
     GlobusHTTPResponse(to_wrap)  # ok
@@ -159,8 +171,7 @@ def test_client_forbidden_when_wrapping():
 
 
 def test_value_error_indexing_on_non_json_data():
-    r = requests.Response()
-    r._content = b"foo: bar, baz: buzz"
+    r = _response(b"foo: bar, baz: buzz")
     res = GlobusHTTPResponse(r, client=mock.Mock())
 
     with pytest.raises(ValueError):
