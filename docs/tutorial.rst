@@ -187,7 +187,7 @@ about ``token_response`` to understand is
 
 Let's take a look at ``str(token_response.by_resource_server)``:
 
-.. code-block:: python-console
+.. code-block:: pycon
 
     >>> str(token_response.by_resource_server)
     {

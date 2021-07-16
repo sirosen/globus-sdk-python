@@ -13,6 +13,20 @@ to a major new version of the SDK.
 Unreleased
 ----------
 
+v3.0.0b2
+--------
+
+* Add scope constants and scope construction helpers. See new documentation on
+  :ref:`scopes and ScopeBuilders <scopes>` for details (:pr:`437`, :pr:`440`)
+* Improve the rendering of API exceptions in stack traces to include the
+  method, URI, and authorization scheme (if recognized) (:pr:`439`)
+* Payload helper objects (``TransferData``, ``DeleteData``, and ``SearchQuery``)
+  now inherit from a custom object, not ``dict``, but they are still dict-like in
+  behavior (:pr:`438`)
+* API Errors now have an attached ``info`` object with parsed error data where
+  applicable. See the :ref:`ErrorInfo documentation <error_info>` for details
+  (:pr:`441`)
+
 v3.0.0b1
 --------
 

@@ -97,6 +97,8 @@ Error Classes
    :members:
    :show-inheritance:
 
+.. _error_info:
+
 ErrorInfo
 ---------
 

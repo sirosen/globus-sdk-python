@@ -1,3 +1,5 @@
+.. _scopes:
+
 Scopes and ScopeBuilders
 ========================
 

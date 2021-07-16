@@ -525,7 +525,7 @@ class TransferClient(client.BaseClient):
         **External Documentation**
 
         See
-        `Get shared endpoint list \
+        `Get shared endpoint list (2) \
         <https://https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list2>`_
         in the REST documentation for details.
         """
