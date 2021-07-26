@@ -6,7 +6,7 @@ from requests import Response
 log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:  # pragma: no cover
-    from globus_sdk.base import BaseClient
+    from globus_sdk import BaseClient
 
 
 class GlobusHTTPResponse:
@@ -77,7 +77,7 @@ class GlobusHTTPResponse:
             self.content_type = self._response.headers.get("Content-Type")
 
     @property
-    def data(self):
+    def data(self) -> Any:
         return self._parsed_json
 
     @property
@@ -85,7 +85,7 @@ class GlobusHTTPResponse:
         """The raw response data as a string."""
         return self._text
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: Any = None) -> Any:
         """
         ``get`` is just an alias for ``data.get(key, default)``, but with the added
         check that if ``data`` is ``None``, it returns the default.
@@ -102,7 +102,7 @@ class GlobusHTTPResponse:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.data!r})"
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         # force evaluation of the data property outside of the upcoming
         # try-catch so that we don't accidentally catch TypeErrors thrown
         # during the getter function itself
@@ -121,7 +121,7 @@ class GlobusHTTPResponse:
             # class at large, or just a particular call's `data` property
             raise ValueError("This type of response data does not support indexing.")
 
-    def __contains__(self, item):
+    def __contains__(self, item: Any) -> bool:
         """
         ``x in response`` is an alias for ``x in response.data``
         """

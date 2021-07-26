@@ -1,13 +1,16 @@
-from typing import Any, Callable, Dict, Optional, Type
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Type
 
 from .base import Paginator
+
+if TYPE_CHECKING:
+    from globus_sdk.services.auth.client_types.base import AuthClient
 
 
 def has_paginator(
     paginator_class: Type[Paginator],
     items_key: Optional[str] = None,
-    **paginator_params,
-):
+    **paginator_params: Any,
+) -> Callable[[Callable], Callable]:
     """
     Mark a callable -- typically a client method -- as having pagination parameters.
     Usage:
@@ -23,7 +26,7 @@ def has_paginator(
     >>> paginator = c.paginated.foo()
     """
 
-    def decorate(func: Callable):
+    def decorate(func: Callable) -> Callable:
         func._has_paginator = True  # type: ignore
         func._paginator_class = paginator_class  # type: ignore
         func._paginator_items_key = items_key  # type: ignore
@@ -78,12 +81,12 @@ class PaginatorTable:
         # return paginators
         self._bindings: Dict[str, Callable[..., Paginator]] = {}
 
-    def _add_binding(self, methodname, bound_method):
-        paginator_class = bound_method._paginator_class
-        paginator_params = bound_method._paginator_params
-        paginator_items_key = bound_method._paginator_items_key
+    def _add_binding(self, methodname: str, bound_method: Callable) -> None:
+        paginator_class = bound_method._paginator_class  # type: ignore
+        paginator_params = bound_method._paginator_params  # type: ignore
+        paginator_items_key = bound_method._paginator_items_key  # type: ignore
 
-        def paginated_method(*args, **kwargs):
+        def paginated_method(*args: Any, **kwargs: Any):  # type: ignore
             return paginator_class(
                 bound_method,
                 client_args=args,
@@ -94,7 +97,7 @@ class PaginatorTable:
 
         self._bindings[methodname] = paginated_method
 
-    def __getattr__(self, attrname):
+    def __getattr__(self, attrname: str) -> Callable:
         if attrname not in self._bindings:
             # this could raise AttributeError -- in which case, let it!
             method = getattr(self._client, attrname)
@@ -108,7 +111,7 @@ class PaginatorTable:
 
     # customize pickling methods to ensure that the object is pickle-safe
 
-    def __getstate__(self):
+    def __getstate__(self) -> Dict[str, "AuthClient"]:
         # when pickling, drop any bound methods
         d = dict(self.__dict__)  # copy
         d["_bindings"] = {}
@@ -117,5 +120,5 @@ class PaginatorTable:
     # custom __setstate__ to avoid an infinite loop on `getattr` before `_bindings` is
     # populated
     # see: https://docs.python.org/3/library/pickle.html#object.__setstate__
-    def __setstate__(self, d):
+    def __setstate__(self, d: Dict[str, "AuthClient"]) -> None:
         self.__dict__.update(d)

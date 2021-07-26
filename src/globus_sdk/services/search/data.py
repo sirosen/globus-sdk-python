@@ -55,15 +55,16 @@ class SearchQuery(utils.PayloadWrapper):
         self["advanced"] = advanced
         return self
 
+    # TODO: type signature
     def add_facet(
         self,
         name,
         field_name,
-        type="terms",
+        type: str = "terms",
         size=None,
         date_interval=None,
         histogram_range=None,
-        **kwargs
+        **kwargs: Any
     ) -> "SearchQuery":
         self["facets"] = self.get("facets", [])
         facet = {"name": name, "field_name": field_name, "type": type}
@@ -78,8 +79,9 @@ class SearchQuery(utils.PayloadWrapper):
         self["facets"].append(facet)
         return self
 
+    # TODO: type signature
     def add_filter(
-        self, field_name, values, type="match_all", **kwargs
+        self, field_name: str, values, type: str = "match_all", **kwargs: Any
     ) -> "SearchQuery":
         self["filters"] = self.get("filters", [])
         new_filter = {"field_name": field_name, "values": values, "type": type}
@@ -87,14 +89,17 @@ class SearchQuery(utils.PayloadWrapper):
         self["filters"].append(new_filter)
         return self
 
-    def add_boost(self, field_name, factor, **kwargs) -> "SearchQuery":
+    # TODO: type signature
+    def add_boost(self, field_name: str, factor, **kwargs: Any) -> "SearchQuery":
         self["boosts"] = self.get("boosts", [])
         boost = {"field_name": field_name, "factor": factor}
         boost.update(kwargs)
         self["boosts"].append(boost)
         return self
 
-    def add_sort(self, field_name, order=None, **kwargs) -> "SearchQuery":
+    def add_sort(
+        self, field_name: str, order: Optional[str] = None, **kwargs: Any
+    ) -> "SearchQuery":
         self["sort"] = self.get("sort", [])
         sort = {"field_name": field_name}
         sort.update(kwargs)

@@ -1,7 +1,12 @@
+import datetime
 import logging
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from globus_sdk import utils
+from globus_sdk.types import ToStr
+
+if TYPE_CHECKING:
+    from ..client import TransferClient
 
 log = logging.getLogger(__name__)
 
@@ -66,14 +71,14 @@ class DeleteData(utils.PayloadWrapper):
 
     def __init__(
         self,
-        transfer_client,
-        endpoint,
-        label=None,
-        submission_id=None,
-        recursive=False,
-        deadline=None,
+        transfer_client: "TransferClient",
+        endpoint: str,
+        label: Optional[str] = None,
+        submission_id: Optional[str] = None,
+        recursive: bool = False,
+        deadline: Optional[Union[str, datetime.datetime]] = None,
         additional_fields: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> None:
         super().__init__()
         endpoint = utils.safe_stringify(endpoint)
         log.info("Creating a new DeleteData object")
@@ -102,7 +107,9 @@ class DeleteData(utils.PayloadWrapper):
             for option, value in additional_fields.items():
                 log.info(f"DeleteData.{option} = {value} (option passed in via kwargs)")
 
-    def add_item(self, path, additional_fields: Optional[Dict[str, Any]] = None):
+    def add_item(
+        self, path: ToStr, additional_fields: Optional[Dict[str, Any]] = None
+    ) -> None:
         """
         Add a file or directory or symlink to be deleted. If any of the paths
         are directories, ``recursive`` must be set True on the top level

@@ -1,4 +1,7 @@
+from typing import Any, Dict, Optional
+
 import requests
+from requests.models import Request
 
 
 class RequestEncoder:
@@ -9,7 +12,14 @@ class RequestEncoder:
     referred to as the ``"text"`` encoder.
     """
 
-    def encode(self, method, url, params, data, headers) -> requests.Request:
+    def encode(
+        self,
+        method: str,
+        url: str,
+        params: Optional[Dict[str, Any]],
+        data: Any,
+        headers: Dict[str, str],
+    ) -> Request:
         if not isinstance(data, (str, bytes)):
             raise TypeError(
                 "Cannot encode non-text in a text request. "
@@ -25,7 +35,14 @@ class JSONRequestEncoder(RequestEncoder):
     that APIs requiring a content-type of "application/json" are able to read the data.
     """
 
-    def encode(self, method, url, params, data, headers):
+    def encode(
+        self,
+        method: str,
+        url: str,
+        params: Optional[Dict[str, Any]],
+        data: Any,
+        headers: Dict[str, str],
+    ) -> Request:
         if data is not None:
             headers = {"Content-Type": "application/json", **headers}
         return requests.Request(method, url, json=data, params=params, headers=headers)
@@ -37,7 +54,14 @@ class FormRequestEncoder(RequestEncoder):
     a dict -- any other datatype will result in errors.
     """
 
-    def encode(self, method, url, params, data, headers):
+    def encode(
+        self,
+        method: str,
+        url: str,
+        params: Optional[Dict[str, Any]],
+        data: Any,
+        headers: Dict[str, str],
+    ) -> Request:
         if not isinstance(data, dict):
             raise TypeError("FormRequestEncoder cannot encode non-dict data")
         return requests.Request(method, url, data=data, params=params, headers=headers)

@@ -1,3 +1,5 @@
+from typing import Any
+
 import requests
 
 from .base import GlobusError
@@ -14,7 +16,7 @@ class NetworkError(GlobusError):
     to explain potentially confusing or inconsistent exceptions passed to us
     """
 
-    def __init__(self, msg, exc, *args, **kw):
+    def __init__(self, msg: str, exc: Exception, *args: Any, **kw: Any):
         super().__init__(msg)
         self.underlying_exception = exc
 
@@ -32,10 +34,12 @@ class GlobusConnectionError(NetworkError):
     """A connection error occured while making a REST request."""
 
 
-def convert_request_exception(exc):
+def convert_request_exception(exc: requests.RequestException) -> GlobusError:
     """Converts incoming requests.Exception to a Globus NetworkError"""
 
-    if isinstance(exc, requests.ConnectTimeout):
+    # TODO: why does this error?
+    # src/globus_sdk/exc/convert.py:40: error: Module has no attribute "ConnectTimeout"
+    if isinstance(exc, requests.ConnectTimeout):  # type: ignore
         return GlobusConnectionTimeoutError("ConnectTimeoutError on request", exc)
     if isinstance(exc, requests.Timeout):
         return GlobusTimeoutError("TimeoutError on request", exc)

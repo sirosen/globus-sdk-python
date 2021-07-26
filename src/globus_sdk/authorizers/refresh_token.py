@@ -1,4 +1,8 @@
 import logging
+from typing import Any, Callable, Dict, Optional
+
+from globus_sdk.services.auth import OAuthTokenResponse
+from globus_sdk.services.auth.client_types.base import AuthClient
 
 from .renewing import RenewingAuthorizer
 
@@ -50,11 +54,11 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
 
     def __init__(
         self,
-        refresh_token,
-        auth_client,
-        access_token=None,
-        expires_at=None,
-        on_refresh=None,
+        refresh_token: str,
+        auth_client: AuthClient,
+        access_token: Optional[str] = None,
+        expires_at: Optional[int] = None,
+        on_refresh: Optional[Callable] = None,
     ):
         log.info(
             "Setting up RefreshTokenAuthorizer with auth_client="
@@ -67,13 +71,13 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
 
         super().__init__(access_token, expires_at, on_refresh)
 
-    def _get_token_response(self):
+    def _get_token_response(self) -> OAuthTokenResponse:
         """
         Make a refresh token grant
         """
         return self.auth_client.oauth2_refresh_token(self.refresh_token)
 
-    def _extract_token_data(self, res):
+    def _extract_token_data(self, res: OAuthTokenResponse) -> Dict[str, Any]:
         """
         Get the tokens .by_resource_server,
         Ensure that only one token was gotten, and return that token.
@@ -81,14 +85,14 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         If the token_data includes a "refresh_token" field, update self.refresh_token to
         that value.
         """
-        token_data = res.by_resource_server.values()
-        if len(token_data) != 1:
+        token_data_list = list(res.by_resource_server.values())
+        if len(token_data_list) != 1:
             raise ValueError(
                 "Attempting refresh for refresh token authorizer "
                 "didn't return exactly one token. Possible service error."
             )
 
-        token_data = next(iter(token_data))
+        token_data = next(iter(token_data_list))
 
         # handle refresh_token being present
         # mandated by OAuth2: https://tools.ietf.org/html/rfc6749#section-6

@@ -1,3 +1,5 @@
+import requests
+
 from globus_sdk import exc
 
 
@@ -13,10 +15,10 @@ class SearchAPIError(exc.GlobusAPIError):
     # the Search API always and only returns 'message' for string messages
     MESSAGE_FIELDS = ["message"]
 
-    def __init__(self, r):
+    def __init__(self, r: requests.Response) -> None:
         self.error_data = None
         super().__init__(r)
 
-    def _load_from_json(self, data):
+    def _load_from_json(self, data: dict) -> None:
         super()._load_from_json(data)
         self.error_data = data.get("error_data")

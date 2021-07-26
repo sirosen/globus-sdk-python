@@ -1,7 +1,11 @@
+import datetime
 import logging
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from globus_sdk import utils
+
+if TYPE_CHECKING:
+    from ..client import TransferClient
 
 log = logging.getLogger(__name__)
 
@@ -127,21 +131,21 @@ class TransferData(utils.PayloadWrapper):
 
     def __init__(
         self,
-        transfer_client,
-        source_endpoint,
-        destination_endpoint,
-        label=None,
-        submission_id=None,
-        sync_level=None,
-        verify_checksum=False,
-        preserve_timestamp=False,
-        encrypt_data=False,
-        deadline=None,
-        skip_source_errors=False,
-        fail_on_quota_errors=False,
-        recursive_symlinks="ignore",
+        transfer_client: "TransferClient",
+        source_endpoint: str,
+        destination_endpoint: str,
+        label: Optional[str] = None,
+        submission_id: Optional[str] = None,
+        sync_level: Optional[str] = None,
+        verify_checksum: bool = False,
+        preserve_timestamp: bool = False,
+        encrypt_data: bool = False,
+        deadline: Optional[Union[datetime.datetime, str]] = None,
+        skip_source_errors: bool = False,
+        fail_on_quota_errors: bool = False,
+        recursive_symlinks: str = "ignore",
         additional_fields: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> None:
         super().__init__()
         source_endpoint = utils.safe_stringify(source_endpoint)
         destination_endpoint = utils.safe_stringify(destination_endpoint)
@@ -184,6 +188,7 @@ class TransferData(utils.PayloadWrapper):
         # garbage overnight
         if sync_level is not None:
             sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
+            # TODO: sync_level not allowed to be int?
             self["sync_level"] = sync_dict.get(sync_level, sync_level)
             log.info(
                 "TransferData.sync_level = {} ({})".format(
@@ -203,13 +208,13 @@ class TransferData(utils.PayloadWrapper):
 
     def add_item(
         self,
-        source_path,
-        destination_path,
-        recursive=False,
-        external_checksum=None,
-        checksum_algorithm=None,
+        source_path: str,
+        destination_path: str,
+        recursive: bool = False,
+        external_checksum: Optional[str] = None,
+        checksum_algorithm: Optional[str] = None,
         additional_fields: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> None:
         """
         Add a file or directory to be transfered. If the item is a symlink
         to a file or directory, the file or directory at the target of
@@ -266,7 +271,7 @@ class TransferData(utils.PayloadWrapper):
         )
         self["DATA"].append(item_data)
 
-    def add_symlink_item(self, source_path, destination_path):
+    def add_symlink_item(self, source_path: str, destination_path: str) -> None:
         """
         Add a symlink to be transfered as a symlink rather than as the
         target of the symlink.

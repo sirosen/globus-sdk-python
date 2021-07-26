@@ -1,9 +1,10 @@
 import json
 import logging
 import time
-from typing import TYPE_CHECKING, Dict, Optional, cast
+from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union, cast
 
 import jwt
+from cryptography.hazmat.backends.openssl.rsa import RSAPublicKey
 
 from globus_sdk import exc
 from globus_sdk.response import GlobusHTTPResponse
@@ -14,7 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .client_types import AuthClient
 
 
-def _convert_token_info_dict(source_dict):
+def _convert_token_info_dict(source_dict: GlobusHTTPResponse) -> Dict[str, Any]:
     """
     Extract a set of fields into a new dict for indexing by resource server.
     Allow for these fields to be `None` when absent:
@@ -42,17 +43,17 @@ class _ByScopesGetter:
     >>> tok = tokens.by_scopes['openid profile']['access_token']
     """
 
-    def __init__(self, scope_map):
+    def __init__(self, scope_map: Dict[str, Any]) -> None:
         self.scope_map = scope_map
 
-    def __str__(self):
+    def __str__(self) -> str:
         return json.dumps(self.scope_map)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         """iteration gets you every individual scope"""
         return iter(self.scope_map.keys())
 
-    def __getitem__(self, scopename):
+    def __getitem__(self, scopename: str) -> Dict[str, Union[str, int]]:
         if not isinstance(scopename, str):
             raise KeyError(f'by_scopes cannot contain non-string value "{scopename}"')
 
@@ -83,7 +84,7 @@ class _ByScopesGetter:
         # pop the only element in the set
         return toks.pop()
 
-    def __contains__(self, item):
+    def __contains__(self, item: str) -> bool:
         """
         contains is driven by checking against getitem
         that way, the definitions are always "in sync" if we update them in
@@ -104,19 +105,19 @@ class OAuthTokenResponse(GlobusHTTPResponse):
     3-legged OAuth flows.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._init_rs_dict()
         self._init_scopes_getter()
 
-    def _init_scopes_getter(self):
+    def _init_scopes_getter(self) -> None:
         scope_map = {}
         for _rs, tok_data in self._by_resource_server.items():
             for s in tok_data["scope"].split():
                 scope_map[s] = tok_data
         self._by_scopes = _ByScopesGetter(scope_map)
 
-    def _init_rs_dict(self):
+    def _init_rs_dict(self) -> None:
         # call the helper at the top level
         self._by_resource_server = {
             self["resource_server"]: _convert_token_info_dict(self)
@@ -132,7 +133,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         )
 
     @property
-    def by_resource_server(self):
+    def by_resource_server(self) -> Dict[str, dict]:
         """
         Representation of the token response in a ``dict`` indexed by resource
         server.
@@ -144,7 +145,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         return self._by_resource_server
 
     @property
-    def by_scopes(self):
+    def by_scopes(self) -> _ByScopesGetter:
         """
         Representation of the token response in a dict-like object indexed by
         scope name (or even space delimited scope names, so long as they match
@@ -168,10 +169,10 @@ class OAuthTokenResponse(GlobusHTTPResponse):
 
     def decode_id_token(
         self,
-        openid_configuration=None,
-        jwk=None,
+        openid_configuration: Optional[Dict[str, Any]] = None,
+        jwk: Optional[RSAPublicKey] = None,
         jwt_params: Optional[Dict] = None,
-    ):
+    ) -> Dict[str, Any]:
 
         """
         Parse the included ID Token (OIDC) as a dict and return it.
@@ -199,19 +200,22 @@ class OAuthTokenResponse(GlobusHTTPResponse):
                     "passing jwk without openid configuration is not allowed"
                 )
             logger.debug("No OIDC Config provided, autofetching...")
-            openid_configuration = auth_client.get_openid_configuration()
+            oidc_config: Union[
+                GlobusHTTPResponse, Dict[str, Any]
+            ] = auth_client.get_openid_configuration()
+        else:
+            oidc_config = openid_configuration
 
         if not jwk:
             logger.debug("No JWK provided, autofetching + decoding...")
-            jwk = auth_client.get_jwk(
-                openid_configuration=openid_configuration, as_pem=True
-            )
+            jwk = auth_client.get_jwk(openid_configuration=oidc_config, as_pem=True)
 
         logger.debug("final step: decode with JWK")
-        signing_algos = openid_configuration["id_token_signing_alg_values_supported"]
+        signing_algos = oidc_config["id_token_signing_alg_values_supported"]
         decoded = jwt.decode(
             self["id_token"],
-            jwk,
+            # REVIEW: expects str??
+            jwk,  # type: ignore
             algorithms=signing_algos,
             audience=auth_client.client_id,
             options=jwt_params,
@@ -219,7 +223,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         logger.debug("decode ID token finished successfully")
         return decoded
 
-    def __str__(self):
+    def __str__(self) -> str:
         # Make printing responses more convenient by only showing the
         # (typically important) token info
         return json.dumps(self.by_resource_server, indent=2)
@@ -233,7 +237,7 @@ class OAuthDependentTokenResponse(OAuthTokenResponse):
     <globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens>`
     """
 
-    def _init_rs_dict(self):
+    def _init_rs_dict(self) -> None:
         # call the helper on everything in the response array
         self._by_resource_server = {
             unprocessed_item["resource_server"]: _convert_token_info_dict(
@@ -242,7 +246,12 @@ class OAuthDependentTokenResponse(OAuthTokenResponse):
             for unprocessed_item in self.data
         }
 
-    def decode_id_token(self, auth_client):
+    def decode_id_token(
+        self,
+        openid_configuration: Optional[Dict[str, Any]] = None,
+        jwk: Optional[RSAPublicKey] = None,
+        jwt_params: Optional[Dict] = None,
+    ) -> Dict[str, Any]:
         # just in case
         raise NotImplementedError(
             "OAuthDependentTokenResponse.decode_id_token() is not and cannot "

@@ -5,6 +5,7 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 from globus_sdk import client, exc, paging, response, utils
 from globus_sdk.scopes import TransferScopes
+from globus_sdk.types import ToStr
 
 from .data import DeleteData, TransferData
 from .errors import TransferAPIError
@@ -12,10 +13,11 @@ from .response import ActivationRequirementsResponse, IterableTransferResponse
 
 log = logging.getLogger(__name__)
 
+# REVIEW: can this be ToStr?
 ID_PARAM_TYPE = Union[bytes, str, uuid.UUID]
 
 
-def _get_page_size(paged_result):
+def _get_page_size(paged_result: IterableTransferResponse) -> int:
     return len(paged_result["DATA"])
 
 
@@ -102,7 +104,7 @@ class TransferClient(client.BaseClient):
     def update_endpoint(
         self,
         endpoint_id: ID_PARAM_TYPE,
-        data,
+        data: dict,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -142,7 +144,7 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s)
         return self.put(path, data=data, query_params=query_params)
 
-    def create_endpoint(self, data) -> response.GlobusHTTPResponse:
+    def create_endpoint(self, data: dict) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>``
 
@@ -405,7 +407,7 @@ class TransferClient(client.BaseClient):
     def endpoint_activate(
         self,
         endpoint_id: ID_PARAM_TYPE,
-        requirements_data,
+        requirements_data: Optional[dict],
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -542,7 +544,9 @@ class TransferClient(client.BaseClient):
             self.get(path, query_params=query_params), iter_key="shared_endpoints"
         )
 
-    def create_shared_endpoint(self, data):
+    def create_shared_endpoint(
+        self, data: Optional[dict]
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /shared_endpoint``
 
@@ -601,7 +605,7 @@ class TransferClient(client.BaseClient):
     def get_endpoint_server(
         self,
         endpoint_id: ID_PARAM_TYPE,
-        server_id,
+        server_id: ToStr,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -646,7 +650,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=server_data)
 
     def update_endpoint_server(
-        self, endpoint_id: ID_PARAM_TYPE, server_id, server_data: Dict
+        self, endpoint_id: ID_PARAM_TYPE, server_id: ToStr, server_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
@@ -671,7 +675,7 @@ class TransferClient(client.BaseClient):
         return self.put(path, data=server_data)
 
     def delete_endpoint_server(
-        self, endpoint_id: ID_PARAM_TYPE, server_id
+        self, endpoint_id: ID_PARAM_TYPE, server_id: ToStr
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
@@ -739,10 +743,11 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "role")
         return self.post(path, data=role_data)
 
+    # REVIEW: why do we call str() on server ID above but not on role_id here?
     def get_endpoint_role(
         self,
         endpoint_id: ID_PARAM_TYPE,
-        role_id,
+        role_id: str,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -764,7 +769,7 @@ class TransferClient(client.BaseClient):
         return self.get(path, query_params=query_params)
 
     def delete_endpoint_role(
-        self, endpoint_id: ID_PARAM_TYPE, role_id
+        self, endpoint_id: ID_PARAM_TYPE, role_id: str
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/role/<role_id>``
@@ -812,7 +817,7 @@ class TransferClient(client.BaseClient):
     def get_endpoint_acl_rule(
         self,
         endpoint_id: ID_PARAM_TYPE,
-        rule_id,
+        rule_id: str,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -877,7 +882,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=rule_data)
 
     def update_endpoint_acl_rule(
-        self, endpoint_id: ID_PARAM_TYPE, rule_id, rule_data: Dict
+        self, endpoint_id: ID_PARAM_TYPE, rule_id: str, rule_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
@@ -902,7 +907,7 @@ class TransferClient(client.BaseClient):
         return self.put(path, data=rule_data)
 
     def delete_endpoint_acl_rule(
-        self, endpoint_id: ID_PARAM_TYPE, rule_id
+        self, endpoint_id: ID_PARAM_TYPE, rule_id: str
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/access/<rule_id>``
@@ -1109,7 +1114,7 @@ class TransferClient(client.BaseClient):
     def operation_mkdir(
         self,
         endpoint_id: ID_PARAM_TYPE,
-        path,
+        path: ToStr,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -1144,8 +1149,8 @@ class TransferClient(client.BaseClient):
     def operation_rename(
         self,
         endpoint_id: ID_PARAM_TYPE,
-        oldpath,
-        newpath,
+        oldpath: ToStr,
+        newpath: ToStr,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -1182,8 +1187,8 @@ class TransferClient(client.BaseClient):
     def operation_symlink(
         self,
         endpoint_id: ID_PARAM_TYPE,
-        symlink_target,
-        path,
+        symlink_target: ToStr,
+        path: ToStr,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -1507,7 +1512,7 @@ class TransferClient(client.BaseClient):
         return self.post(resource_path)
 
     def task_wait(
-        self, task_id: ID_PARAM_TYPE, timeout=10, polling_interval=10
+        self, task_id: ID_PARAM_TYPE, timeout: int = 10, polling_interval: int = 10
     ) -> bool:
         r"""
         Wait until a Task is complete or fails, with a time limit. If the task
@@ -1580,7 +1585,7 @@ class TransferClient(client.BaseClient):
         polling_interval = min(timeout, polling_interval)
 
         # helper for readability
-        def timed_out(waited_time):
+        def timed_out(waited_time: int) -> bool:
             return waited_time > timeout
 
         waited_time = 0
@@ -1955,7 +1960,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_get_task(
         self, task_id: ID_PARAM_TYPE, query_params: Optional[Dict[str, Any]] = None
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Get task info as an admin. Requires activity monitor effective role on
         the destination endpoint of the task.
@@ -2118,7 +2123,7 @@ class TransferClient(client.BaseClient):
     def endpoint_manager_cancel_tasks(
         self,
         task_ids: Iterable[ID_PARAM_TYPE],
-        message,
+        message: ToStr,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -2154,7 +2159,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=data, query_params=query_params)
 
     def endpoint_manager_cancel_status(
-        self, admin_cancel_id, query_params: Optional[Dict[str, Any]] = None
+        self, admin_cancel_id: ToStr, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get the status of an an admin cancel (result of
@@ -2177,6 +2182,8 @@ class TransferClient(client.BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_cancel_status_by_id>`_
         in the REST documentation for details.
         """
+        # REVIEW:
+        admin_cancel_id = utils.safe_stringify(admin_cancel_id)
         log.info(f"TransferClient.endpoint_manager_cancel_status({admin_cancel_id})")
         path = self.qjoin_path("endpoint_manager", "admin_cancel", admin_cancel_id)
         return self.get(path, query_params=query_params)
@@ -2184,7 +2191,7 @@ class TransferClient(client.BaseClient):
     def endpoint_manager_pause_tasks(
         self,
         task_ids: Iterable[ID_PARAM_TYPE],
-        message,
+        message: ToStr,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -2294,7 +2301,9 @@ class TransferClient(client.BaseClient):
             query_params["filter_endpoint"] = utils.safe_stringify(filter_endpoint)
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
-    def endpoint_manager_create_pause_rule(self, data) -> response.GlobusHTTPResponse:
+    def endpoint_manager_create_pause_rule(
+        self, data: Optional[dict]
+    ) -> response.GlobusHTTPResponse:
         """
         Create a new pause rule. Requires the activity manager effective role
         on the endpoint defined in the rule.
@@ -2329,7 +2338,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=data)
 
     def endpoint_manager_get_pause_rule(
-        self, pause_rule_id, query_params: Optional[Dict[str, Any]] = None
+        self, pause_rule_id: ToStr, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get an existing pause rule by ID. Requires the activity manager
@@ -2358,7 +2367,7 @@ class TransferClient(client.BaseClient):
         return self.get(path, query_params=query_params)
 
     def endpoint_manager_update_pause_rule(
-        self, pause_rule_id, data
+        self, pause_rule_id: ToStr, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
         """
         Update an existing pause rule by ID. Requires the activity manager
@@ -2393,7 +2402,7 @@ class TransferClient(client.BaseClient):
         return self.put(path, data=data)
 
     def endpoint_manager_delete_pause_rule(
-        self, pause_rule_id, query_params: Optional[Dict[str, Any]] = None
+        self, pause_rule_id: ToStr, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Delete an existing pause rule by ID. Requires the user to see the

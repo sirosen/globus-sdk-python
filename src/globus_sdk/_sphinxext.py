@@ -1,3 +1,4 @@
+# type: ignore
 """
 A Globus SDK Sphinx Extension for Autodoc of Class Methods
 

@@ -127,15 +127,15 @@ class RequestsTransport:
         self.register_default_retry_checks()
 
     @property
-    def user_agent(self):
+    def user_agent(self) -> str:
         return self._user_agent
 
     @user_agent.setter
-    def user_agent(self, value):
+    def user_agent(self, value: str) -> None:
         self._user_agent = f"{self.BASE_USER_AGENT}/{value}"
 
     @property
-    def _headers(self):
+    def _headers(self) -> Dict[str, str]:
         return {"Accept": "application/json", "User-Agent": self.user_agent}
 
     def _encode(
@@ -146,7 +146,7 @@ class RequestsTransport:
         data: Union[Dict, List, str, None] = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
-    ):
+    ) -> requests.Request:
         if not headers:
             headers = {}
         headers = {**self._headers, **headers}
@@ -164,7 +164,9 @@ class RequestsTransport:
 
         return self.encoders[encoding].encode(method, url, query_params, data, headers)
 
-    def _set_authz_header(self, authorizer, req):
+    def _set_authz_header(
+        self, authorizer: Optional[GlobusAuthorizer], req: requests.Request
+    ) -> None:
         if authorizer:
             authz_header = authorizer.get_authorization_header()
             if authz_header:
@@ -172,7 +174,7 @@ class RequestsTransport:
             else:
                 req.headers.pop("Authorization", None)  # remove any possible value
 
-    def _retry_sleep(self, ctx: RetryContext):
+    def _retry_sleep(self, ctx: RetryContext) -> None:
         """
         Given a retry context, compute the amount of time to sleep and sleep that much
         This is always the minimum of the backoff (run on the context) and the
@@ -182,11 +184,11 @@ class RequestsTransport:
 
     def request(
         self,
-        method,
-        url,
+        method: str,
+        url: str,
         query_params: Optional[Dict[str, Any]] = None,
-        data=None,
-        headers=None,
+        data: Optional[dict] = None,
+        headers: Optional[dict] = None,
         encoding: Optional[str] = None,
         authorizer: Optional[GlobusAuthorizer] = None,
     ) -> requests.Response:
@@ -254,7 +256,7 @@ class RequestsTransport:
         self.retry_checks.append(func)
         return func
 
-    def register_default_retry_checks(self):
+    def register_default_retry_checks(self) -> None:
         """
         This hook is called during transport initialization. By default, it registers
         the following hooks:

@@ -1,3 +1,7 @@
+from typing import Any, Callable, Dict, Iterator, List, Optional
+
+from globus_sdk.response import GlobusHTTPResponse
+
 from .base import Paginator
 
 
@@ -9,7 +13,14 @@ class MarkerPaginator(Paginator):
     This is the default method for GCS pagination, so it's very simple.
     """
 
-    def __init__(self, method, *, items_key=None, client_args, client_kwargs):
+    def __init__(
+        self,
+        method: Callable,
+        *,
+        items_key: Optional[str] = None,
+        client_args: List[Any],
+        client_kwargs: Dict[str, Any]
+    ):
         super().__init__(
             method,
             items_key=items_key,
@@ -18,7 +29,7 @@ class MarkerPaginator(Paginator):
         )
         self.marker = None
 
-    def pages(self):
+    def pages(self) -> Iterator[GlobusHTTPResponse]:
         has_next_page = True
         while has_next_page:
             if self.marker:

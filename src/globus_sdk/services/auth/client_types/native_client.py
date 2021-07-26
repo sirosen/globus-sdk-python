@@ -1,9 +1,11 @@
 import logging
+from typing import Any, Dict, Optional, Sequence, Union
 
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.exc import GlobusSDKUsageError
 
 from ..oauth2_native_app import GlobusNativeAppFlowManager
+from ..token_response import OAuthTokenResponse
 from .base import AuthClient
 
 log = logging.getLogger(__name__)
@@ -26,7 +28,7 @@ class NativeAppAuthClient(AuthClient):
     .. automethodlist:: globus_sdk.NativeAppAuthClient
     """
 
-    def __init__(self, client_id, **kwargs):
+    def __init__(self, client_id: str, **kwargs: Any) -> None:
         if "authorizer" in kwargs:
             log.error("ArgumentError(NativeAppClient.authorizer)")
             raise GlobusSDKUsageError("Cannot give a NativeAppAuthClient an authorizer")
@@ -36,13 +38,13 @@ class NativeAppAuthClient(AuthClient):
 
     def oauth2_start_flow(
         self,
-        requested_scopes=None,
-        redirect_uri=None,
-        state="_default",
-        verifier=None,
-        refresh_tokens=False,
-        prefill_named_grant=None,
-    ):
+        requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        redirect_uri: Optional[str] = None,
+        state: str = "_default",
+        verifier: Optional[str] = None,
+        refresh_tokens: bool = False,
+        prefill_named_grant: Optional[str] = None,
+    ) -> GlobusNativeAppFlowManager:
         """
         Starts a Native App OAuth2 flow.
 
@@ -99,7 +101,10 @@ class NativeAppAuthClient(AuthClient):
         )
         return self.current_oauth2_flow_manager
 
-    def oauth2_refresh_token(self, refresh_token):
+    # REVIEW: this method has to also include slot for body_params kwarg
+    def oauth2_refresh_token(
+        self, refresh_token: str, _: Optional[Dict[str, Any]] = None
+    ) -> OAuthTokenResponse:
         """
         ``NativeAppAuthClient`` specializes the refresh token grant to include
         its client ID as a parameter in the POST body.

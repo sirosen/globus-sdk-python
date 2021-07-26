@@ -72,7 +72,7 @@ class SimpleJSONFileAdapter(FileAdapter):
             }
         return self._handle_formats(data)
 
-    def store(self, token_response: OAuthTokenResponse):
+    def store(self, token_response: OAuthTokenResponse) -> None:
         """
         By default, ``self.on_refresh`` is just an alias for this function.
 

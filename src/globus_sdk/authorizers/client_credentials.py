@@ -1,4 +1,8 @@
 import logging
+from typing import Any, Callable, Dict, Optional
+
+# REVIEW: where exactly to import this from?
+from globus_sdk.services.auth import ConfidentialAppAuthClient, OAuthTokenResponse
 
 from .renewing import RenewingAuthorizer
 
@@ -55,11 +59,11 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
 
     def __init__(
         self,
-        confidential_client,
-        scopes,
-        access_token=None,
-        expires_at=None,
-        on_refresh=None,
+        confidential_client: ConfidentialAppAuthClient,
+        scopes: str,
+        access_token: Optional[str] = None,
+        expires_at: Optional[int] = None,
+        on_refresh: Optional[Callable] = None,
     ):
         log.info(
             "Setting up ClientCredentialsAuthorizer with confidential_client="
@@ -72,7 +76,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
 
         super().__init__(access_token, expires_at, on_refresh)
 
-    def _get_token_response(self):
+    def _get_token_response(self) -> OAuthTokenResponse:
         """
         Make a client credentials grant
         """
@@ -80,7 +84,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
             requested_scopes=self.scopes
         )
 
-    def _extract_token_data(self, res):
+    def _extract_token_data(self, res: OAuthTokenResponse) -> Dict[str, Any]:
         """
         Get the tokens .by_resource_server,
         Ensure that only one token was gotten, and return that token.

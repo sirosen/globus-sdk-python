@@ -1,3 +1,5 @@
+from typing import Any, Iterator, Mapping
+
 from globus_sdk.response import GlobusHTTPResponse
 
 
@@ -14,9 +16,9 @@ class IterableTransferResponse(GlobusHTTPResponse):
     >>>     print(item["name"], item["type"])
     """
 
-    def __init__(self, *args, iter_key: str = "DATA", **kwargs):
+    def __init__(self, *args: Any, iter_key: str = "DATA", **kwargs: Any) -> None:
         self.iter_key = iter_key
         super().__init__(*args, **kwargs)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Mapping]:
         return iter(self[self.iter_key])

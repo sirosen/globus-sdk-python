@@ -19,7 +19,7 @@ class BasicAuthorizer(StaticGlobusAuthorizer):
     :type password: str
     """
 
-    def __init__(self, username: str, password: str):
+    def __init__(self, username: str, password: str) -> None:
         log.info(
             "Setting up a BasicAuthorizer. It will use an "
             "auth type of Basic and cannot handle 401s."
