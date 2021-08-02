@@ -103,7 +103,7 @@ class NativeAppAuthClient(AuthClient):
 
     # REVIEW: this method has to also include slot for body_params kwarg
     def oauth2_refresh_token(
-        self, refresh_token: str, _: Optional[Dict[str, Any]] = None
+        self, refresh_token: str, body_params: Optional[Dict[str, Any]] = None
     ) -> OAuthTokenResponse:
         """
         ``NativeAppAuthClient`` specializes the refresh token grant to include

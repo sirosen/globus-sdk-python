@@ -1,7 +1,7 @@
 import collections.abc
 import json
 import logging
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union, overload
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union, cast, overload
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -486,7 +486,7 @@ class AuthClient(client.BaseClient):
             jwks_uri = openid_configuration["jwks_uri"]
         else:
             log.debug("No OIDC Config provided, autofetching...")
-            openid_configuration = self.get_openid_configuration()["jwks_uri"]
+            jwks_uri = self.get_openid_configuration()["jwks_uri"]
 
         log.debug("jwks_uri=%s", jwks_uri)
         jwk_data = self.get(jwks_uri).data
@@ -496,9 +496,10 @@ class AuthClient(client.BaseClient):
         else:
             log.debug("JWK as_pem=True requested, decoding...")
             # decode from JWK to an RSA PEM key for JWT decoding
-            jwk_as_pem = jwt.algorithms.RSAAlgorithm.from_jwk(
-                json.dumps(jwk_data["keys"][0])
+            jwk_as_pem: RSAPublicKey = cast(
+                RSAPublicKey,
+                jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk_data["keys"][0])),
             )
             log.debug("JWK PEM decoding finished successfully")
             # type-ignore because should never be private key
-            return jwk_as_pem  # type: ignore
+            return jwk_as_pem

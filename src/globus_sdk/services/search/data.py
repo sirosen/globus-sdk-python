@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from globus_sdk import utils
 
@@ -55,19 +55,18 @@ class SearchQuery(utils.PayloadWrapper):
         self["advanced"] = advanced
         return self
 
-    # TODO: type signature
     def add_facet(
         self,
-        name,
-        field_name,
+        name: str,
+        field_name: str,
         type: str = "terms",
-        size=None,
-        date_interval=None,
-        histogram_range=None,
+        size: Optional[int] = None,
+        date_interval: Optional[str] = None,
+        histogram_range: Optional[Tuple[Any, Any]] = None,
         **kwargs: Any
     ) -> "SearchQuery":
         self["facets"] = self.get("facets", [])
-        facet = {"name": name, "field_name": field_name, "type": type}
+        facet: Dict[str, Any] = {"name": name, "field_name": field_name, "type": type}
         facet.update(kwargs)
         if size is not None:
             facet["size"] = size

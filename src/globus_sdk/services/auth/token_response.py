@@ -214,8 +214,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         signing_algos = oidc_config["id_token_signing_alg_values_supported"]
         decoded = jwt.decode(
             self["id_token"],
-            # REVIEW: expects str??
-            jwk,  # type: ignore
+            key=jwk,
             algorithms=signing_algos,
             audience=auth_client.client_id,
             options=jwt_params,

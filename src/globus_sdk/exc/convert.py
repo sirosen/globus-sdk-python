@@ -37,9 +37,7 @@ class GlobusConnectionError(NetworkError):
 def convert_request_exception(exc: requests.RequestException) -> GlobusError:
     """Converts incoming requests.Exception to a Globus NetworkError"""
 
-    # TODO: why does this error?
-    # src/globus_sdk/exc/convert.py:40: error: Module has no attribute "ConnectTimeout"
-    if isinstance(exc, requests.ConnectTimeout):  # type: ignore
+    if isinstance(exc, requests.ConnectTimeout):
         return GlobusConnectionTimeoutError("ConnectTimeoutError on request", exc)
     if isinstance(exc, requests.Timeout):
         return GlobusTimeoutError("TimeoutError on request", exc)

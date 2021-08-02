@@ -1,9 +1,6 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional, Type
 
 from .base import Paginator
-
-if TYPE_CHECKING:
-    from globus_sdk.services.auth.client_types.base import AuthClient
 
 
 def has_paginator(
@@ -111,7 +108,7 @@ class PaginatorTable:
 
     # customize pickling methods to ensure that the object is pickle-safe
 
-    def __getstate__(self) -> Dict[str, "AuthClient"]:
+    def __getstate__(self) -> Dict[str, Any]:
         # when pickling, drop any bound methods
         d = dict(self.__dict__)  # copy
         d["_bindings"] = {}
@@ -120,5 +117,5 @@ class PaginatorTable:
     # custom __setstate__ to avoid an infinite loop on `getattr` before `_bindings` is
     # populated
     # see: https://docs.python.org/3/library/pickle.html#object.__setstate__
-    def __setstate__(self, d: Dict[str, "AuthClient"]) -> None:
+    def __setstate__(self, d: Dict[str, Any]) -> None:
         self.__dict__.update(d)

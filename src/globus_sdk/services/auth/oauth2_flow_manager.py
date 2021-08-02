@@ -36,7 +36,6 @@ class GlobusOAuthFlowManager(abc.ABC):
 
         :rtype: ``string``
         """
-        pass
 
     @abc.abstractmethod
     def exchange_code_for_tokens(self, auth_code: str) -> OAuthTokenResponse:
@@ -55,4 +54,3 @@ class GlobusOAuthFlowManager(abc.ABC):
 
         :rtype: :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         """
-        pass
