@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from globus_sdk import utils
 
@@ -63,11 +63,15 @@ class SearchQuery(utils.PayloadWrapper):
         size: Optional[int] = None,
         date_interval: Optional[str] = None,
         histogram_range: Optional[Tuple[Any, Any]] = None,
-        **kwargs: Any
+        additional_fields: Optional[Dict[str, Any]] = None,
     ) -> "SearchQuery":
         self["facets"] = self.get("facets", [])
-        facet: Dict[str, Any] = {"name": name, "field_name": field_name, "type": type}
-        facet.update(kwargs)
+        facet: Dict[str, Any] = {
+            "name": name,
+            "field_name": field_name,
+            "type": type,
+            **(additional_fields or {}),
+        }
         if size is not None:
             facet["size"] = size
         if date_interval is not None:
@@ -78,30 +82,46 @@ class SearchQuery(utils.PayloadWrapper):
         self["facets"].append(facet)
         return self
 
-    # TODO: type signature
     def add_filter(
-        self, field_name: str, values, type: str = "match_all", **kwargs: Any
+        self,
+        field_name: str,
+        values: List[str],
+        type: str = "match_all",
+        additional_fields: Optional[Dict[str, Any]] = None,
     ) -> "SearchQuery":
         self["filters"] = self.get("filters", [])
-        new_filter = {"field_name": field_name, "values": values, "type": type}
-        new_filter.update(kwargs)
+        new_filter = {
+            "field_name": field_name,
+            "values": values,
+            "type": type,
+            **(additional_fields or {}),
+        }
         self["filters"].append(new_filter)
         return self
 
-    # TODO: type signature
-    def add_boost(self, field_name: str, factor, **kwargs: Any) -> "SearchQuery":
+    def add_boost(
+        self,
+        field_name: str,
+        factor: Union[str, int, float],
+        additional_fields: Optional[Dict[str, Any]] = None,
+    ) -> "SearchQuery":
         self["boosts"] = self.get("boosts", [])
-        boost = {"field_name": field_name, "factor": factor}
-        boost.update(kwargs)
+        boost = {
+            "field_name": field_name,
+            "factor": factor,
+            **(additional_fields or {}),
+        }
         self["boosts"].append(boost)
         return self
 
     def add_sort(
-        self, field_name: str, order: Optional[str] = None, **kwargs: Any
+        self,
+        field_name: str,
+        order: Optional[str] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
     ) -> "SearchQuery":
         self["sort"] = self.get("sort", [])
-        sort = {"field_name": field_name}
-        sort.update(kwargs)
+        sort = {"field_name": field_name, **(additional_fields or {})}
         if order is not None:
             sort["order"] = order
         self["sort"].append(sort)

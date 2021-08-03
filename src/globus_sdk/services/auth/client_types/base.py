@@ -134,7 +134,7 @@ class AuthClient(client.BaseClient):
         in the API documentation for details.
         """
 
-        def _convert_listarg(val: Union[List[ToStr], ToStr]) -> str:
+        def _convert_listarg(val: Union[List[ToStr], ToStr, str]) -> str:
             if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):
                 return ",".join(utils.safe_stringify(x) for x in val)
             else:
@@ -492,7 +492,7 @@ class AuthClient(client.BaseClient):
         jwk_data = self.get(jwks_uri).data
         if not as_pem:
             log.debug("returning jwk data where as_pem=False")
-            return jwk_data
+            return cast(dict, jwk_data)
         else:
             log.debug("JWK as_pem=True requested, decoding...")
             # decode from JWK to an RSA PEM key for JWT decoding

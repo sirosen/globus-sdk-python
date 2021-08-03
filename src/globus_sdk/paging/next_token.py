@@ -28,7 +28,7 @@ class NextTokenPaginator(Paginator):
             client_args=client_args,
             client_kwargs=client_kwargs,
         )
-        self.next_token = None
+        self.next_token: Optional[str] = None
 
     def pages(self) -> Iterator[GlobusHTTPResponse]:
         has_next_page = True

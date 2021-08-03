@@ -20,7 +20,7 @@ class LastKeyPaginator(Paginator):
             client_args=client_args,
             client_kwargs=client_kwargs,
         )
-        self.last_key = None
+        self.last_key: Optional[str] = None
 
     def pages(self) -> Iterator[GlobusHTTPResponse]:
         has_next_page = True
