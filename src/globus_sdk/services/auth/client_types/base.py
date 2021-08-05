@@ -134,8 +134,12 @@ class AuthClient(client.BaseClient):
         in the API documentation for details.
         """
 
-        def _convert_listarg(val: Union[List[ToStr], ToStr, str]) -> str:
-            if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):
+        def _convert_listarg(val: Union[List[ToStr], ToStr]) -> str:
+            # type-ignore for the isinstance check, because mypy sees that based on the
+            # type of the argument, the second isinstance should be redundant. also
+            # have to ignore flake8 because black keeps these on the same line, and the
+            # comments make it too long.
+            if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):  # type: ignore # noqa: E501
                 return ",".join(utils.safe_stringify(x) for x in val)
             else:
                 return utils.safe_stringify(val)
@@ -244,10 +248,7 @@ class AuthClient(client.BaseClient):
         """
         log.info("Executing token refresh; typically requires client credentials")
         form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
-
-        if body_params:
-            form_data.update(body_params)
-        return self.oauth2_token(form_data)
+        return self.oauth2_token(form_data, body_params=body_params)
 
     def oauth2_validate_token(
         self, token: str, body_params: Optional[Dict[str, Any]] = None
@@ -360,19 +361,40 @@ class AuthClient(client.BaseClient):
 
     @overload
     def oauth2_token(
-        self, form_data: Union[dict, utils.PayloadWrapper], response_class: Type[T]
+        self, form_data: Union[dict, utils.PayloadWrapper]
+    ) -> OAuthTokenResponse:
+        ...
+
+    @overload
+    def oauth2_token(
+        self,
+        form_data: Union[dict, utils.PayloadWrapper],
+        *,
+        body_params: Optional[Dict[str, Any]],
+    ) -> OAuthTokenResponse:
+        ...
+
+    @overload
+    def oauth2_token(
+        self, form_data: Union[dict, utils.PayloadWrapper], *, response_class: Type[T]
     ) -> T:
         ...
 
     @overload
     def oauth2_token(
-        self, form_data: Union[dict, utils.PayloadWrapper]
-    ) -> OAuthTokenResponse:
+        self,
+        form_data: Union[dict, utils.PayloadWrapper],
+        *,
+        body_params: Optional[Dict[str, Any]],
+        response_class: Type[T],
+    ) -> T:
         ...
 
     def oauth2_token(
         self,
         form_data: Union[dict, utils.PayloadWrapper],
+        *,
+        body_params: Optional[Dict[str, Any]] = None,
         response_class: Union[Type[OAuthTokenResponse], Type[T]] = OAuthTokenResponse,
     ) -> Union[OAuthTokenResponse, T]:
         """
@@ -395,10 +417,13 @@ class AuthClient(client.BaseClient):
         log.info("Fetching new token from Globus Auth")
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
+        data = dict(form_data)
+        if body_params:
+            data.update(body_params)
         return response_class(
             self.post(
                 "/v2/oauth2/token",
-                data=form_data,
+                data=data,
                 encoding="form",
             )
         )  # type: ignore
@@ -492,7 +517,7 @@ class AuthClient(client.BaseClient):
         jwk_data = self.get(jwks_uri).data
         if not as_pem:
             log.debug("returning jwk data where as_pem=False")
-            return cast(dict, jwk_data)
+            return dict(jwk_data)
         else:
             log.debug("JWK as_pem=True requested, decoding...")
             # decode from JWK to an RSA PEM key for JWT decoding

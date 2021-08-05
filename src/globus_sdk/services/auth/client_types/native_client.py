@@ -101,7 +101,6 @@ class NativeAppAuthClient(AuthClient):
         )
         return self.current_oauth2_flow_manager
 
-    # REVIEW: this method has to also include slot for body_params kwarg
     def oauth2_refresh_token(
         self, refresh_token: str, body_params: Optional[Dict[str, Any]] = None
     ) -> OAuthTokenResponse:
@@ -117,5 +116,4 @@ class NativeAppAuthClient(AuthClient):
             "grant_type": "refresh_token",
             "client_id": self.client_id,
         }
-
-        return self.oauth2_token(form_data)
+        return self.oauth2_token(form_data, body_params=body_params)
