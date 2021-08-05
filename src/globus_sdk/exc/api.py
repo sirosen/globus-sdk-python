@@ -42,7 +42,7 @@ class GlobusAPIError(GlobusError):
         )
 
     @property
-    def raw_json(self) -> Union[dict, None]:
+    def raw_json(self) -> Optional[Dict[str, Any]]:
         """
         Get the verbatim error message received from a Globus API, interpreted
         as JSON data
@@ -54,7 +54,9 @@ class GlobusAPIError(GlobusError):
             return None
 
         try:
-            return r.json()
+            # technically, this could be a non-dict JSON type, like a list or string
+            # but in those cases the user can just cast -- the "normal" case is a dict
+            return cast(Dict[str, Any], r.json())
         except ValueError:
             log.error(
                 "Error body could not be JSON decoded! "
@@ -80,7 +82,7 @@ class GlobusAPIError(GlobusError):
         if self._info is None:
             rawjson = self.raw_json
             json_data = rawjson if isinstance(rawjson, dict) else None
-            self._info = ErrorInfoContainer(cast(Optional[Dict[str, Any]], json_data))
+            self._info = ErrorInfoContainer(json_data)
         return self._info
 
     def _get_request_authorization_scheme(self) -> Union[str, None]:

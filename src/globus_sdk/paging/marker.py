@@ -27,7 +27,7 @@ class MarkerPaginator(Paginator):
             client_args=client_args,
             client_kwargs=client_kwargs,
         )
-        self.marker = None
+        self.marker: Optional[str] = None
 
     def pages(self) -> Iterator[GlobusHTTPResponse]:
         has_next_page = True
