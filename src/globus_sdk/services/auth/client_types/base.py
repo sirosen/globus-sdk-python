@@ -1,7 +1,7 @@
 import collections.abc
 import json
 import logging
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union, cast, overload
+from typing import Any, Dict, Optional, Sequence, Type, TypeVar, Union, cast, overload
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -69,8 +69,8 @@ class AuthClient(client.BaseClient):
 
     def get_identities(
         self,
-        usernames: Optional[Union[List[ToStr], ToStr]] = None,
-        ids: Optional[Union[List[ToStr], ToStr]] = None,
+        usernames: Optional[Union[Sequence[ToStr], ToStr]] = None,
+        ids: Optional[Union[Sequence[ToStr], ToStr]] = None,
         provision: bool = False,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> GlobusHTTPResponse:
@@ -134,12 +134,8 @@ class AuthClient(client.BaseClient):
         in the API documentation for details.
         """
 
-        def _convert_listarg(val: Union[List[ToStr], ToStr]) -> str:
-            # type-ignore for the isinstance check, because mypy sees that based on the
-            # type of the argument, the second isinstance should be redundant. also
-            # have to ignore flake8 because black keeps these on the same line, and the
-            # comments make it too long.
-            if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):  # type: ignore # noqa: E501
+        def _convert_listarg(val: Union[Sequence[ToStr], ToStr]) -> str:
+            if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):
                 return ",".join(utils.safe_stringify(x) for x in val)
             else:
                 return utils.safe_stringify(val)

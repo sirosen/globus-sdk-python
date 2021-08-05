@@ -1,4 +1,5 @@
 import hashlib
+import uuid
 from base64 import b64encode
 from collections import UserDict
 from typing import Optional
@@ -36,7 +37,6 @@ def slash_join(a: str, b: Optional[str]) -> str:
     return a + "/" + b
 
 
-# REVIEW: bytes has a str method but that isn't how this converts bytes here.
 def safe_stringify(value: ToStr) -> str:
     """
     Converts incoming value to a unicode string. Convert bytes by decoding,
@@ -46,7 +46,11 @@ def safe_stringify(value: ToStr) -> str:
     if isinstance(value, str):
         return value
     if isinstance(value, bytes):
-        return value.decode("utf-8")
+        try:
+            return value.decode("utf-8")
+        except UnicodeDecodeError:
+            # this raises its own ValueError if value doesn't decode into a UUID
+            return str(uuid.UUID(bytes=value))
     return str(value)
 
 
