@@ -165,24 +165,22 @@ class GroupsClient(client.BaseClient):
     .. automethodlist:: globus_sdk.GroupsClient
     """
 
+    base_path = "/v2/"
     error_class = GroupsAPIError
     service_name = "groups"
     scopes = GroupsScopes
 
-    def __init__(self, **kwargs):
-        super().__init__(base_url="https://groups.api.globus.org/v2", **kwargs)
-
-    def get_my_groups(self, **params):
+    def get_my_groups(self, **query_params):
         """
         Return a list of groups your identity belongs to.
         """
-        return self.get("/groups/my_groups", params=params)
+        return self.get("/groups/my_groups", query_params=query_params)
 
-    def get_group(self, group_id: str, **params):
+    def get_group(self, group_id: str, **query_params):
         """
         Get details about a specific group
         """
-        return self.get(f"/groups/{group_id}", params=params)
+        return self.get(f"/groups/{group_id}", query_params=query_params)
 
     def delete_group(self, group_id: str):
         return self.delete(f"/groups/{group_id}")
