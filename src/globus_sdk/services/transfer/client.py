@@ -4,7 +4,7 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 from globus_sdk import client, exc, paging, response, utils
 from globus_sdk.scopes import TransferScopes
-from globus_sdk.types import ToStr, UUIDLike
+from globus_sdk.types import UUIDLike
 
 from .data import DeleteData, TransferData
 from .errors import TransferAPIError
@@ -599,7 +599,7 @@ class TransferClient(client.BaseClient):
     def get_endpoint_server(
         self,
         endpoint_id: UUIDLike,
-        server_id: ToStr,
+        server_id: UUIDLike,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -644,7 +644,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=server_data)
 
     def update_endpoint_server(
-        self, endpoint_id: UUIDLike, server_id: ToStr, server_data: Dict
+        self, endpoint_id: UUIDLike, server_id: UUIDLike, server_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
@@ -669,7 +669,7 @@ class TransferClient(client.BaseClient):
         return self.put(path, data=server_data)
 
     def delete_endpoint_server(
-        self, endpoint_id: UUIDLike, server_id: ToStr
+        self, endpoint_id: UUIDLike, server_id: UUIDLike
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
@@ -1106,7 +1106,7 @@ class TransferClient(client.BaseClient):
     def operation_mkdir(
         self,
         endpoint_id: UUIDLike,
-        path: ToStr,
+        path: str,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -1141,8 +1141,8 @@ class TransferClient(client.BaseClient):
     def operation_rename(
         self,
         endpoint_id: UUIDLike,
-        oldpath: ToStr,
-        newpath: ToStr,
+        oldpath: str,
+        newpath: str,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -1165,8 +1165,6 @@ class TransferClient(client.BaseClient):
         in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
-        oldpath = utils.safe_stringify(oldpath)
-        newpath = utils.safe_stringify(newpath)
         log.info(
             "TransferClient.operation_rename({}, {}, {}, {})".format(
                 endpoint_id_s, oldpath, newpath, query_params
@@ -1179,8 +1177,8 @@ class TransferClient(client.BaseClient):
     def operation_symlink(
         self,
         endpoint_id: UUIDLike,
-        symlink_target: ToStr,
-        path: ToStr,
+        symlink_target: str,
+        path: str,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -1206,8 +1204,6 @@ class TransferClient(client.BaseClient):
         in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
-        symlink_target = utils.safe_stringify(symlink_target)
-        path = utils.safe_stringify(path)
         log.info(
             "TransferClient.operation_symlink({}, {}, {}, {})".format(
                 endpoint_id_s, symlink_target, path, query_params
@@ -2115,7 +2111,7 @@ class TransferClient(client.BaseClient):
     def endpoint_manager_cancel_tasks(
         self,
         task_ids: Iterable[UUIDLike],
-        message: ToStr,
+        message: str,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -2142,16 +2138,15 @@ class TransferClient(client.BaseClient):
         in the REST documentation for details.
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
-        message = utils.safe_stringify(message)
         log.info(
             f"TransferClient.endpoint_manager_cancel_tasks({str_task_ids}, {message})"
         )
-        data = {"message": utils.safe_stringify(message), "task_id_list": str_task_ids}
+        data = {"message": message, "task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_cancel")
         return self.post(path, data=data, query_params=query_params)
 
     def endpoint_manager_cancel_status(
-        self, admin_cancel_id: ToStr, query_params: Optional[Dict[str, Any]] = None
+        self, admin_cancel_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get the status of an an admin cancel (result of
@@ -2174,7 +2169,6 @@ class TransferClient(client.BaseClient):
         <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_cancel_status_by_id>`_
         in the REST documentation for details.
         """
-        # REVIEW:
         admin_cancel_id = utils.safe_stringify(admin_cancel_id)
         log.info(f"TransferClient.endpoint_manager_cancel_status({admin_cancel_id})")
         path = self.qjoin_path("endpoint_manager", "admin_cancel", admin_cancel_id)
@@ -2183,7 +2177,7 @@ class TransferClient(client.BaseClient):
     def endpoint_manager_pause_tasks(
         self,
         task_ids: Iterable[UUIDLike],
-        message: ToStr,
+        message: str,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -2210,14 +2204,10 @@ class TransferClient(client.BaseClient):
         in the REST documentation for details.
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
-        message = utils.safe_stringify(message)
         log.info(
             f"TransferClient.endpoint_manager_pause_tasks({str_task_ids}, {message})"
         )
-        data = {
-            "message": utils.safe_stringify(message),
-            "task_id_list": str_task_ids,
-        }
+        data = {"message": message, "task_id_list": str_task_ids}
         path = self.qjoin_path("endpoint_manager", "admin_pause")
         return self.post(path, data=data, query_params=query_params)
 
@@ -2330,7 +2320,7 @@ class TransferClient(client.BaseClient):
         return self.post(path, data=data)
 
     def endpoint_manager_get_pause_rule(
-        self, pause_rule_id: ToStr, query_params: Optional[Dict[str, Any]] = None
+        self, pause_rule_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get an existing pause rule by ID. Requires the activity manager
@@ -2359,7 +2349,7 @@ class TransferClient(client.BaseClient):
         return self.get(path, query_params=query_params)
 
     def endpoint_manager_update_pause_rule(
-        self, pause_rule_id: ToStr, data: Optional[dict]
+        self, pause_rule_id: UUIDLike, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
         """
         Update an existing pause rule by ID. Requires the activity manager
@@ -2394,7 +2384,7 @@ class TransferClient(client.BaseClient):
         return self.put(path, data=data)
 
     def endpoint_manager_delete_pause_rule(
-        self, pause_rule_id: ToStr, query_params: Optional[Dict[str, Any]] = None
+        self, pause_rule_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Delete an existing pause rule by ID. Requires the user to see the

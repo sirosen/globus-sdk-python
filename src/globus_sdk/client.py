@@ -9,8 +9,6 @@ from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import ScopeBuilder
 from globus_sdk.transport import RequestsTransport
 
-from .types import ToStr
-
 log = logging.getLogger(__name__)
 
 
@@ -104,7 +102,7 @@ class BaseClient:
         return self._app_name
 
     @app_name.setter
-    def app_name(self, value: ToStr) -> None:
+    def app_name(self, value: str) -> None:
         self._app_name = self.transport.user_agent = value
 
     def qjoin_path(self, *parts: str) -> str:

@@ -3,7 +3,6 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from globus_sdk import utils
-from globus_sdk.types import ToStr
 
 if TYPE_CHECKING:
     from ..client import TransferClient
@@ -108,7 +107,7 @@ class DeleteData(utils.PayloadWrapper):
                 log.info(f"DeleteData.{option} = {value} (option passed in via kwargs)")
 
     def add_item(
-        self, path: ToStr, additional_fields: Optional[Dict[str, Any]] = None
+        self, path: str, additional_fields: Optional[Dict[str, Any]] = None
     ) -> None:
         """
         Add a file or directory or symlink to be deleted. If any of the paths

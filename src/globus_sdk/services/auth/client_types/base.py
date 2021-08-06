@@ -1,7 +1,18 @@
 import collections.abc
 import json
 import logging
-from typing import Any, Dict, Optional, Sequence, Type, TypeVar, Union, cast, overload
+from typing import (
+    Any,
+    AnyStr,
+    Dict,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -11,7 +22,7 @@ from globus_sdk import client, exc, utils
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import AuthScopes
-from globus_sdk.types import ToStr
+from globus_sdk.types import IntLike, UUIDLike
 
 from ..errors import AuthAPIError
 from ..oauth2_flow_manager import GlobusOAuthFlowManager
@@ -69,8 +80,8 @@ class AuthClient(client.BaseClient):
 
     def get_identities(
         self,
-        usernames: Optional[Union[Sequence[ToStr], ToStr]] = None,
-        ids: Optional[Union[Sequence[ToStr], ToStr]] = None,
+        usernames: Union[Sequence[AnyStr], AnyStr, None] = None,
+        ids: Union[Sequence[UUIDLike], UUIDLike, None] = None,
         provision: bool = False,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> GlobusHTTPResponse:
@@ -134,8 +145,12 @@ class AuthClient(client.BaseClient):
         in the API documentation for details.
         """
 
-        def _convert_listarg(val: Union[Sequence[ToStr], ToStr]) -> str:
-            if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):
+        def _convert_listarg(
+            val: Union[Sequence[Union[IntLike, UUIDLike]], Union[IntLike, UUIDLike]]
+        ) -> str:
+            if isinstance(val, collections.abc.Sequence) and not isinstance(
+                val, (bytes, str)
+            ):
                 return ",".join(utils.safe_stringify(x) for x in val)
             else:
                 return utils.safe_stringify(val)

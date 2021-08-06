@@ -1,10 +1,9 @@
 import hashlib
-import uuid
 from base64 import b64encode
 from collections import UserDict
-from typing import Optional
+from typing import Optional, Union
 
-from .types import ToStr
+from .types import IntLike, UUIDLike
 
 
 def sha256_string(s: str) -> str:
@@ -37,7 +36,7 @@ def slash_join(a: str, b: Optional[str]) -> str:
     return a + "/" + b
 
 
-def safe_stringify(value: ToStr) -> str:
+def safe_stringify(value: Union[IntLike, UUIDLike]) -> str:
     """
     Converts incoming value to a unicode string. Convert bytes by decoding,
     anything else has __str__ called.
@@ -49,8 +48,7 @@ def safe_stringify(value: ToStr) -> str:
         try:
             return value.decode("utf-8")
         except UnicodeDecodeError:
-            # this raises its own ValueError if value doesn't decode into a UUID
-            return str(uuid.UUID(bytes=value))
+            raise ValueError("couldn't decode bytes as utf-8: {value}")
     return str(value)
 
 

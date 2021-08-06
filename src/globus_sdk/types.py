@@ -3,5 +3,3 @@ from typing import Union
 
 IntLike = Union[int, str]
 UUIDLike = Union[uuid.UUID, str, bytes]
-
-ToStr = Union[IntLike, UUIDLike]
