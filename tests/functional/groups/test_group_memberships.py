@@ -67,17 +67,16 @@ def test_batch_action_payload():
             ]
         )
     )
-    payload = batch_action.to_dict()
 
-    assert "add" in payload
-    assert len(payload["add"]) == 2
-    assert all(member["role"] == "manager" for member in payload["add"])
+    assert "add" in batch_action
+    assert len(batch_action["add"]) == 2
+    assert all(member["role"] == "manager" for member in batch_action["add"])
 
-    assert "accept" in payload
-    assert len(payload["accept"]) == 1
+    assert "accept" in batch_action
+    assert len(batch_action["accept"]) == 1
 
-    assert "invite" in payload
-    assert len(payload["invite"]) == 2
+    assert "invite" in batch_action
+    assert len(batch_action["invite"]) == 2
 
-    assert "join" in payload
-    assert len(payload["invite"]) == 2
+    assert "join" in batch_action
+    assert len(batch_action["invite"]) == 2

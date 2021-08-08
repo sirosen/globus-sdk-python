@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional, Sequence
 
-from globus_sdk import client
+from globus_sdk import client, utils
 from globus_sdk.scopes import GroupsScopes
 
 from .errors import GroupsAPIError
@@ -41,7 +41,7 @@ class RequiredSignupFields(Enum):
     field_of_science = "field_of_science"
 
 
-class BatchMembershipActions:
+class BatchMembershipActions(utils.PayloadWrapper):
     """
     An object used to represent a batch action on memberships of a group.
     `Perform actions on group members
@@ -50,15 +50,12 @@ class BatchMembershipActions:
     .. automethodlist:: globus_sdk.GroupsClient
     """
 
-    def __init__(self):
-        self._payload: dict = {}
-
     def accept_invites(self, identity_ids: Sequence[str]):
         """
         Accept invites for identities.  The identities must belong to
         the identity set of authenticated user.
         """
-        self._payload.setdefault("accept", []).extend(
+        self.setdefault("accept", []).extend(
             {"identity_id": identity_id} for identity_id in identity_ids
         )
         return self
@@ -67,7 +64,7 @@ class BatchMembershipActions:
         """
         Add a list of identities to a group with the given role.
         """
-        self._payload.setdefault("add", []).extend(
+        self.setdefault("add", []).extend(
             {"identity_id": identity_id, "role": role.value}
             for identity_id in identity_ids
         )
@@ -77,7 +74,7 @@ class BatchMembershipActions:
         """
         Approve a list of identities with pending join requests.
         """
-        self._payload.setdefault("approve", []).extend(
+        self.setdefault("approve", []).extend(
             {"identity_id": identity_id} for identity_id in identity_ids
         )
         return self
@@ -86,7 +83,7 @@ class BatchMembershipActions:
         """
         Decline an invitation for a given set of identities.
         """
-        self._payload.setdefault("decline", []).extend(
+        self.setdefault("decline", []).extend(
             {"identity_id": identity_id} for identity_id in identity_ids
         )
         return self
@@ -95,7 +92,7 @@ class BatchMembershipActions:
         """
         Invite a list of identities to a group with the given role.
         """
-        self._payload.setdefault("invite", []).extend(
+        self.setdefault("invite", []).extend(
             {"identity_id": identity_id, "role": role.value}
             for identity_id in identity_ids
         )
@@ -106,7 +103,7 @@ class BatchMembershipActions:
         Join a group with the given identities.  The identities must be in the
         authenticated users identity set.
         """
-        self._payload.setdefault("join", []).extend(
+        self.setdefault("join", []).extend(
             {"identity_id": identity_id} for identity_id in identity_ids
         )
         return self
@@ -116,7 +113,7 @@ class BatchMembershipActions:
         Leave a group that one of the identities in the authenticated user's
         identity set is a member of.
         """
-        self._payload.setdefault("leave", []).extend(
+        self.setdefault("leave", []).extend(
             {"identity_id": identity_id} for identity_id in identity_ids
         )
         return self
@@ -125,7 +122,7 @@ class BatchMembershipActions:
         """
         Reject a members that have requested to join the group.
         """
-        self._payload.setdefault("reject", []).extend(
+        self.setdefault("reject", []).extend(
             {"identity_id": identity_id} for identity_id in identity_ids
         )
         return self
@@ -135,7 +132,7 @@ class BatchMembershipActions:
         Remove members from a group.  This must be done as an admin or manager
         of the group.
         """
-        self._payload.setdefault("remove", []).extend(
+        self.setdefault("remove", []).extend(
             {"identity_id": identity_id} for identity_id in identity_ids
         )
         return self
@@ -144,17 +141,11 @@ class BatchMembershipActions:
         """
         Request to join a group.
         """
-        self._payload.setdefault("request_join", []).extend(
+        self.setdefault("request_join", []).extend(
             {"identity_id": identity_id} for identity_id in identity_ids
         )
         return self
 
-    def to_dict(self) -> dict:
-        """
-        Return a dictionary representing the JSON payload to be posted to the
-        batch membership endpoint.
-        """
-        return self._payload
 
 
 class GroupsClient(client.BaseClient):
@@ -245,7 +236,7 @@ class GroupsClient(client.BaseClient):
         """
         Execute a batch of actions against several group memberships.
         """
-        return self.post(f"/groups/{group_id}", data=actions.to_dict())
+        return self.post(f"/groups/{group_id}", data=actions)
 
     def accept_invite(self, group_id: str, identity_id: str):
         """
