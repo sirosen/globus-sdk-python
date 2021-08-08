@@ -22,10 +22,12 @@ from .response import GlobusHTTPResponse
 from .services import (
     AuthAPIError,
     AuthClient,
+    BatchMembershipActions,
     ConfidentialAppAuthClient,
     DeleteData,
     GroupsAPIError,
     GroupsClient,
+    GroupsManager,
     IdentityMap,
     NativeAppAuthClient,
     SearchAPIError,
@@ -67,6 +69,8 @@ __all__ = (
     "SearchClient",
     "SearchQuery",
     "GroupsClient",
+    "BatchMembershipActions",
+    "GroupsManager",
     "LocalGlobusConnectPersonal",
 )
 

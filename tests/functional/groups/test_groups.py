@@ -40,7 +40,7 @@ def test_delete_group(groups_client):
     assert "Claptrap" in data["name"]
 
 
-def test_create_group(groups_client):
+def test_create_group(groups_manager):
     register_api_route_fixture_file(
         "groups",
         "/v2/groups",
@@ -48,9 +48,12 @@ def test_create_group(groups_client):
         method="POST",
     )
 
-    res = groups_client.create_group(name="Claptrap's Rough Riders")
+    res = groups_manager.create_group(
+        name="Claptrap's Rough Riders", description="No stairs allowed."
+    )
     assert res.http_status == 200
     assert "Claptrap" in res.data["name"]
+    assert "No stairs allowed." in res.data["description"]
 
 
 def test_get_group_policies(groups_client):
@@ -71,14 +74,14 @@ def test_get_group_policies(groups_client):
     }
 
 
-def test_set_group_policies(groups_client):
+def test_set_group_policies(groups_manager):
     register_api_route_fixture_file(
         "groups",
         "/v2/groups/d3974728-6458-11e4-b72d-123139141556/policies",
         "set_group_policies.json",
         method="PUT",
     )
-    resp = groups_client.set_group_policies(
+    resp = groups_manager.set_group_policies(
         "d3974728-6458-11e4-b72d-123139141556",
         False,
         client.GroupVisibility.private,

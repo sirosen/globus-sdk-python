@@ -2,7 +2,7 @@ from globus_sdk.services.groups import client
 from tests.common import register_api_route_fixture_file
 
 
-def test_approve_pending(groups_client):
+def test_approve_pending(groups_manager):
     register_api_route_fixture_file(
         "groups",
         "/v2/groups/d3974728-6458-11e4-b72d-123139141556",
@@ -10,7 +10,7 @@ def test_approve_pending(groups_client):
         method="POST",
     )
 
-    res = groups_client.approve_pending(
+    res = groups_manager.approve_pending(
         "d3974728-6458-11e4-b72d-123139141556", "ae332d86-d274-11e5-b885-b31714a110e9"
     )
     assert res.http_status == 200
@@ -21,7 +21,7 @@ def test_approve_pending(groups_client):
     assert data["approve"][0]["status"] == "active"
 
 
-def test_add_member(groups_client):
+def test_add_member(groups_manager):
     register_api_route_fixture_file(
         "groups",
         "/v2/groups/d3974728-6458-11e4-b72d-123139141556",
@@ -29,7 +29,7 @@ def test_add_member(groups_client):
         method="POST",
     )
 
-    res = groups_client.add_member(
+    res = groups_manager.add_member(
         "d3974728-6458-11e4-b72d-123139141556",
         "ae332d86-d274-11e5-b885-b31714a110e9",
         client.Role.admin,
