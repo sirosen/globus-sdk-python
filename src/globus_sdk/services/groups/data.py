@@ -42,7 +42,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
     <https://groups.api.globus.org/redoc#operation/group_membership_post_actions_v2_groups__group_id__post>`_.
     """
 
-    def accept_invites(self, identity_ids: Sequence[str]):
+    def accept_invites(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
         """
         Accept invites for identities.  The identities must belong to
         the identity set of authenticated user.
@@ -55,7 +55,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
 
     def add_members(
         self, identity_ids: Sequence[str], role: GroupRole = GroupRole.member
-    ):
+    ) -> "BatchMembershipActions":
         """
         Add a list of identities to a group with the given role.
         """
@@ -65,7 +65,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def approve_pending(self, identity_ids: Sequence[str]):
+    def approve_pending(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
         """
         Approve a list of identities with pending join requests.
         """
@@ -75,7 +75,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def decline_invites(self, identity_ids: Sequence[str]):
+    def decline_invites(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
         """
         Decline an invitation for a given set of identities.
         """
@@ -87,7 +87,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
 
     def invite_members(
         self, identity_ids: Sequence[str], role: GroupRole = GroupRole.member
-    ):
+    ) -> "BatchMembershipActions":
         """
         Invite a list of identities to a group with the given role.
         """
@@ -97,7 +97,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def join(self, identity_ids: Sequence[str]):
+    def join(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
         """
         Join a group with the given identities.  The identities must be in the
         authenticated users identity set.
@@ -108,7 +108,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def leave(self, identity_ids: Sequence[str]):
+    def leave(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
         """
         Leave a group that one of the identities in the authenticated user's
         identity set is a member of.
@@ -119,7 +119,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def reject_join_requests(self, identity_ids: Sequence[str]):
+    def reject_join_requests(
+        self, identity_ids: Sequence[str]
+    ) -> "BatchMembershipActions":
         """
         Reject a members that have requested to join the group.
         """
@@ -129,7 +131,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def remove_members(self, identity_ids: Sequence[str]):
+    def remove_members(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
         """
         Remove members from a group.  This must be done as an admin or manager
         of the group.
@@ -140,7 +142,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def request_join(self, identity_ids: Sequence[str]):
+    def request_join(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
         """
         Request to join a group.
         """

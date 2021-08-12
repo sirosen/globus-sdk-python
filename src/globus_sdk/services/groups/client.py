@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Union
 
-from globus_sdk import client
+from globus_sdk import client, response
 from globus_sdk.scopes import GroupsScopes
 
 from .data import BatchMembershipActions, GroupPolicies
@@ -24,7 +24,9 @@ class GroupsClient(client.BaseClient):
     service_name = "groups"
     scopes = GroupsScopes
 
-    def get_my_groups(self, query_params: Optional[Dict[str, Any]] = None):
+    def get_my_groups(
+        self, query_params: Optional[Dict[str, Any]] = None
+    ) -> response.GlobusHTTPResponse:
         """
         Return a list of groups your identity belongs to.
 
@@ -37,7 +39,9 @@ class GroupsClient(client.BaseClient):
         """
         return self.get("/groups/my_groups", query_params=query_params)
 
-    def get_group(self, group_id: str, query_params: Optional[Dict[str, Any]] = None):
+    def get_group(
+        self, group_id: str, query_params: Optional[Dict[str, Any]] = None
+    ) -> response.GlobusHTTPResponse:
         """
         Get details about a specific group
 
@@ -52,7 +56,7 @@ class GroupsClient(client.BaseClient):
 
     def delete_group(
         self, group_id: str, query_params: Optional[Dict[str, Any]] = None
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Delete a group.
 
@@ -67,7 +71,7 @@ class GroupsClient(client.BaseClient):
 
     def create_group(
         self, data: Dict[str, Any], query_params: Optional[Dict[str, Any]] = None
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Create a group.
 
@@ -82,7 +86,7 @@ class GroupsClient(client.BaseClient):
 
     def get_group_policies(
         self, group_id: str, query_params: Optional[Dict[str, Any]] = None
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Get policies for the given group
 
@@ -100,7 +104,7 @@ class GroupsClient(client.BaseClient):
         group_id: str,
         data: Union[Dict[str, Any], GroupPolicies],
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Set policies for the group.
 
@@ -115,7 +119,9 @@ class GroupsClient(client.BaseClient):
             f"/groups/{group_id}/policies", data=data, query_params=query_params
         )
 
-    def get_identity_preferences(self, query_params: Optional[Dict[str, Any]] = None):
+    def get_identity_preferences(
+        self, query_params: Optional[Dict[str, Any]] = None
+    ) -> response.GlobusHTTPResponse:
         """
         Get identity preferences.  Currently this only includes whether the
         user allows themselves to be added to groups.
@@ -133,7 +139,7 @@ class GroupsClient(client.BaseClient):
         self,
         data: Dict[str, Any],
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Set identity preferences.  Currently this only includes whether the
         user allows themselves to be added to groups.
@@ -151,7 +157,7 @@ class GroupsClient(client.BaseClient):
         self,
         group_id: str,
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Get membership fields for your identities.
 
@@ -171,7 +177,7 @@ class GroupsClient(client.BaseClient):
         group_id: str,
         data: Dict[Any, str],
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Get membership fields for your identities.
 
@@ -190,10 +196,10 @@ class GroupsClient(client.BaseClient):
 
     def batch_membership_action(
         self,
-        group_id,
+        group_id: str,
         actions: Union[Dict[str, Any], BatchMembershipActions],
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Execute a batch of actions against several group memberships.
 

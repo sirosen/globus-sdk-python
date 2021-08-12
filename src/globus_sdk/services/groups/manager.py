@@ -1,5 +1,7 @@
 from typing import Optional, Sequence
 
+from globus_sdk import response
+
 from .client import GroupsClient
 from .data import (
     BatchMembershipActions,
@@ -19,12 +21,12 @@ class GroupsManager:
     .. automethodlist:: globus_sdk.GroupsManager
     """
 
-    def __init__(self, client: Optional[GroupsClient] = None):
+    def __init__(self, client: Optional[GroupsClient] = None) -> None:
         self.client = client or GroupsClient()
 
     def create_group(
         self, name: str, description: str, parent_id: Optional[str] = None
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Create a group with the given name.  If a parent id is included, the
         group will be a subgroup of the given parent group.
@@ -41,7 +43,7 @@ class GroupsManager:
         join_requests: bool,
         signup_fields: Sequence[GroupRequiredSignupFields],
         authentication_assurance_timeout: Optional[int] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Set the group policies for the given group.
         """
@@ -55,7 +57,9 @@ class GroupsManager:
         )
         return self.client.set_group_policies(group_id, data=data)
 
-    def accept_invite(self, group_id: str, identity_id: str):
+    def accept_invite(
+        self, group_id: str, identity_id: str
+    ) -> response.GlobusHTTPResponse:
         """
         Accept invite for an identity.  The identity must belong to
         the identity set of the authenticated user.
@@ -65,21 +69,25 @@ class GroupsManager:
 
     def add_member(
         self, group_id: str, identity_id: str, role: GroupRole = GroupRole.member
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Add a list of identities to a group with the given role.
         """
         actions = BatchMembershipActions().add_members([identity_id], role)
         return self.client.batch_membership_action(group_id, actions)
 
-    def approve_pending(self, group_id: str, identity_id: str):
+    def approve_pending(
+        self, group_id: str, identity_id: str
+    ) -> response.GlobusHTTPResponse:
         """
         Approve a list of identities with pending join requests.
         """
         actions = BatchMembershipActions().approve_pending([identity_id])
         return self.client.batch_membership_action(group_id, actions)
 
-    def decline_invite(self, group_id: str, identity_id: str):
+    def decline_invite(
+        self, group_id: str, identity_id: str
+    ) -> response.GlobusHTTPResponse:
         """
         Decline an invitation for a given identity.
         """
@@ -88,14 +96,14 @@ class GroupsManager:
 
     def invite_member(
         self, group_id: str, identity_id: str, role: GroupRole = GroupRole.member
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         Invite an identity to a group with the given role.
         """
         actions = BatchMembershipActions().invite_members([identity_id], role)
         return self.client.batch_membership_action(group_id, actions)
 
-    def join(self, group_id: str, identity_id: str):
+    def join(self, group_id: str, identity_id: str) -> response.GlobusHTTPResponse:
         """
         Join a group with the given identity.  The identity must be in the
         authenticated users identity set.
@@ -103,7 +111,7 @@ class GroupsManager:
         actions = BatchMembershipActions().join([identity_id])
         return self.client.batch_membership_action(group_id, actions)
 
-    def leave(self, group_id: str, identity_id: str):
+    def leave(self, group_id: str, identity_id: str) -> response.GlobusHTTPResponse:
         """
         Leave a group that one of the identities in the authenticated user's
         identity set is a member of.
@@ -111,14 +119,18 @@ class GroupsManager:
         actions = BatchMembershipActions().leave([identity_id])
         return self.client.batch_membership_action(group_id, actions)
 
-    def reject_join_request(self, group_id: str, identity_id: str):
+    def reject_join_request(
+        self, group_id: str, identity_id: str
+    ) -> response.GlobusHTTPResponse:
         """
         Reject a member that has requested to join the group.
         """
         actions = BatchMembershipActions().reject_join_requests([identity_id])
         return self.client.batch_membership_action(group_id, actions)
 
-    def remove_member(self, group_id: str, identity_id: str):
+    def remove_member(
+        self, group_id: str, identity_id: str
+    ) -> response.GlobusHTTPResponse:
         """
         Remove members from a group.  This must be done as an admin or manager
         of the group.
@@ -126,7 +138,9 @@ class GroupsManager:
         actions = BatchMembershipActions().remove_members([identity_id])
         return self.client.batch_membership_action(group_id, actions)
 
-    def request_join(self, group_id: str, identity_id: str):
+    def request_join(
+        self, group_id: str, identity_id: str
+    ) -> response.GlobusHTTPResponse:
         """
         Request to join a group.
         """
