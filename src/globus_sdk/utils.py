@@ -1,22 +1,24 @@
 import hashlib
 from base64 import b64encode
 from collections import UserDict
+from typing import Optional, Union
+
+from .types import IntLike, UUIDLike
 
 
-def sha256_string(s):
+def sha256_string(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
-def safe_b64encode(s):
-    try:
+def safe_b64encode(s: Union[bytes, str]) -> str:
+    if isinstance(s, str):
         encoded = b64encode(s.encode("utf-8"))
-    except UnicodeDecodeError:
+    else:
         encoded = b64encode(s)
-
     return encoded.decode("utf-8")
 
 
-def slash_join(a, b):
+def slash_join(a: str, b: Optional[str]) -> str:
     """
     Join a and b with a single slash, regardless of whether they already
     contain a trailing/leading slash or neither.
@@ -32,7 +34,7 @@ def slash_join(a, b):
     return a + "/" + b
 
 
-def safe_stringify(value):
+def safe_stringify(value: Union[IntLike, UUIDLike]) -> str:
     """
     Converts incoming value to a unicode string. Convert bytes by decoding,
     anything else has __str__ called.

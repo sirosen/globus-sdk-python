@@ -1,17 +1,21 @@
+from typing import Any, Callable, Dict, Iterator, List, Optional
+
+from globus_sdk.response import GlobusHTTPResponse
+
 from .base import Paginator
 
 
 class _LimitOffsetBasedPaginator(Paginator):
     def __init__(
         self,
-        method,
+        method: Callable,
         *,
-        items_key=None,
-        get_page_size,
-        max_total_results,
-        page_size,
-        client_args,
-        client_kwargs,
+        items_key: Optional[str] = None,
+        get_page_size: Callable[[dict], int],
+        max_total_results: int,
+        page_size: int,
+        client_args: List[Any],
+        client_kwargs: Dict[str, Any],
     ):
         super().__init__(
             method,
@@ -24,7 +28,7 @@ class _LimitOffsetBasedPaginator(Paginator):
         self.limit = page_size
         self.offset = 0
 
-    def _update_limit(self):
+    def _update_limit(self) -> None:
         if (
             self.max_total_results is not None
             and self.offset + self.limit > self.max_total_results
@@ -32,7 +36,7 @@ class _LimitOffsetBasedPaginator(Paginator):
             self.limit = self.max_total_results - self.offset
         self.client_kwargs["limit"] = self.limit
 
-    def _update_and_check_offset(self, current_page):
+    def _update_and_check_offset(self, current_page: dict) -> bool:
         self.offset += self.get_page_size(current_page)
         self.client_kwargs["offset"] = self.offset
         return (
@@ -41,7 +45,7 @@ class _LimitOffsetBasedPaginator(Paginator):
 
 
 class HasNextPaginator(_LimitOffsetBasedPaginator):
-    def pages(self):
+    def pages(self) -> Iterator[GlobusHTTPResponse]:
         has_next_page = True
         while has_next_page:
             self._update_limit()
@@ -53,7 +57,7 @@ class HasNextPaginator(_LimitOffsetBasedPaginator):
 
 
 class LimitOffsetTotalPaginator(_LimitOffsetBasedPaginator):
-    def pages(self):
+    def pages(self) -> Iterator[GlobusHTTPResponse]:
         has_next_page = True
         while has_next_page:
             self._update_limit()

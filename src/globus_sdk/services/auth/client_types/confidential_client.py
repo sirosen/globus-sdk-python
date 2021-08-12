@@ -1,7 +1,9 @@
 import logging
+from typing import Any, Optional, Sequence, Union
 
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.exc import GlobusSDKUsageError
+from globus_sdk.response import GlobusHTTPResponse
 
 from ..oauth2_authorization_code import GlobusAuthorizationCodeFlowManager
 from ..oauth2_constants import DEFAULT_REQUESTED_SCOPES
@@ -31,7 +33,7 @@ class ConfidentialAppAuthClient(AuthClient):
     .. automethodlist:: globus_sdk.ConfidentialAppAuthClient
     """
 
-    def __init__(self, client_id, client_secret, **kwargs):
+    def __init__(self, client_id: str, client_secret: str, **kwargs: Any):
         if "authorizer" in kwargs:
             log.error("ArgumentError(ConfidentialAppClient.authorizer)")
             raise GlobusSDKUsageError(
@@ -45,7 +47,7 @@ class ConfidentialAppAuthClient(AuthClient):
         log.info(f"Finished initializing client, client_id={client_id}")
 
     def oauth2_client_credentials_tokens(
-        self, requested_scopes=None
+        self, requested_scopes: Optional[Union[str, Sequence[str]]] = None
     ) -> OAuthTokenResponse:
         r"""
         Perform an OAuth2 Client Credentials Grant to get access tokens which
@@ -56,7 +58,7 @@ class ConfidentialAppAuthClient(AuthClient):
 
         :param requested_scopes: Space-separated scope names being requested for the
             access token(s). Defaults to a set of commonly desired scopes for Globus.
-        :type requested_scopes: str, optional
+        :type requested_scopes: str or iterable of str, optional
         :rtype: :class:`OAuthTokenResponse <.OAuthTokenResponse>`
 
         For example, with a Client ID of "CID1001" and a Client Secret of
@@ -80,11 +82,11 @@ class ConfidentialAppAuthClient(AuthClient):
 
     def oauth2_start_flow(
         self,
-        redirect_uri,
-        requested_scopes=None,
-        state="_default",
-        refresh_tokens=False,
-    ):
+        redirect_uri: str,
+        requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        state: str = "_default",
+        refresh_tokens: bool = False,
+    ) -> GlobusAuthorizationCodeFlowManager:
         """
         Starts or resumes an Authorization Code OAuth2 flow.
 
@@ -131,7 +133,7 @@ class ConfidentialAppAuthClient(AuthClient):
         return self.current_oauth2_flow_manager
 
     def oauth2_get_dependent_tokens(
-        self, token, additional_params=None
+        self, token: str, additional_params: Optional[dict] = None
     ) -> OAuthDependentTokenResponse:
         """
         Does a `Dependent Token Grant
@@ -171,7 +173,9 @@ class ConfidentialAppAuthClient(AuthClient):
 
         return self.oauth2_token(form_data, response_class=OAuthDependentTokenResponse)
 
-    def oauth2_token_introspect(self, token, include=None):
+    def oauth2_token_introspect(
+        self, token: str, include: Optional[str] = None
+    ) -> GlobusHTTPResponse:
         """
         POST /v2/oauth2/token/introspect
 

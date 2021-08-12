@@ -63,7 +63,7 @@ class RetryCheckFlags(enum.Flag):
     RUN_ONCE = enum.auto()
 
 
-def set_retry_check_flags(flag: RetryCheckFlags):
+def set_retry_check_flags(flag: RetryCheckFlags) -> Callable[[Callable], Callable]:
     """
     A decorator for setting retry check flags on a retry check function.
     Usage:
@@ -72,8 +72,8 @@ def set_retry_check_flags(flag: RetryCheckFlags):
     >>> def foo(ctx): ...
     """
 
-    def decorator(func):
-        func._retry_check_flags = flag
+    def decorator(func: Callable) -> Callable:
+        func._retry_check_flags = flag  # type: ignore
         return func
 
     return decorator

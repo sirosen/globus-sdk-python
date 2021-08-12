@@ -1,5 +1,5 @@
 import time
-from typing import Optional, cast
+from typing import Any, Optional, cast
 
 from globus_sdk.response import GlobusHTTPResponse
 
@@ -20,7 +20,7 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
     in the API documentation for details.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
         # at initialization time, capture expires_in and convert to an absolute

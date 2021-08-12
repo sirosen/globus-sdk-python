@@ -1,15 +1,38 @@
 import collections.abc
 import json
 import logging
-from typing import Any, Dict, Optional, Type, TypeVar, overload
+import sys
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    AnyStr,
+    Dict,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 import jwt
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+
+if TYPE_CHECKING:
+    if sys.version_info >= (3, 8):
+        from typing import Literal
+    else:
+        from typing_extensions import Literal
 
 from globus_sdk import client, exc, utils
 from globus_sdk.authorizers import NullAuthorizer
+from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import AuthScopes
+from globus_sdk.types import IntLike, UUIDLike
 
 from ..errors import AuthAPIError
+from ..oauth2_flow_manager import GlobusOAuthFlowManager
 from ..token_response import OAuthTokenResponse
 
 log = logging.getLogger(__name__)
@@ -54,21 +77,21 @@ class AuthClient(client.BaseClient):
     error_class = AuthAPIError
     scopes = AuthScopes
 
-    def __init__(self, client_id=None, **kwargs):
+    def __init__(self, client_id: Optional[str] = None, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.client_id = client_id
         # an AuthClient may contain a GlobusOAuth2FlowManager in order to
         # encapsulate the functionality of various different types of flow
         # managers
-        self.current_oauth2_flow_manager = None
+        self.current_oauth2_flow_manager: Optional[GlobusOAuthFlowManager] = None
 
     def get_identities(
         self,
-        usernames=None,
-        ids=None,
-        provision=False,
+        usernames: Union[Sequence[AnyStr], AnyStr, None] = None,
+        ids: Union[Sequence[UUIDLike], UUIDLike, None] = None,
+        provision: bool = False,
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> GlobusHTTPResponse:
         r"""
         GET /v2/api/identities
 
@@ -129,8 +152,12 @@ class AuthClient(client.BaseClient):
         in the API documentation for details.
         """
 
-        def _convert_listarg(val):
-            if isinstance(val, collections.abc.Iterable) and not isinstance(val, str):
+        def _convert_listarg(
+            val: Union[Sequence[Union[IntLike, UUIDLike]], Union[IntLike, UUIDLike]]
+        ) -> str:
+            if isinstance(val, collections.abc.Sequence) and not isinstance(
+                val, (bytes, str)
+            ):
                 return ",".join(utils.safe_stringify(x) for x in val)
             else:
                 return utils.safe_stringify(val)
@@ -162,7 +189,9 @@ class AuthClient(client.BaseClient):
 
         return self.get("/v2/api/identities", query_params=query_params)
 
-    def oauth2_get_authorize_url(self, query_params: Optional[Dict[str, Any]] = None):
+    def oauth2_get_authorize_url(
+        self, query_params: Optional[Dict[str, Any]] = None
+    ) -> str:
         """
         Get the authorization URL to which users should be sent.
         This method may only be called after ``oauth2_start_flow``
@@ -186,7 +215,7 @@ class AuthClient(client.BaseClient):
         log.info(f"Got authorization URL: {auth_url}")
         return auth_url
 
-    def oauth2_exchange_code_for_tokens(self, auth_code):
+    def oauth2_exchange_code_for_tokens(self, auth_code: str) -> OAuthTokenResponse:
         """
         Exchange an authorization code for a token or tokens.
 
@@ -213,8 +242,8 @@ class AuthClient(client.BaseClient):
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(auth_code)
 
     def oauth2_refresh_token(
-        self, refresh_token, body_params: Optional[Dict[str, Any]] = None
-    ):
+        self, refresh_token: str, body_params: Optional[Dict[str, Any]] = None
+    ) -> OAuthTokenResponse:
         r"""
         Exchange a refresh token for a
         :class:`OAuthTokenResponse <.OAuthTokenResponse>`, containing
@@ -237,14 +266,11 @@ class AuthClient(client.BaseClient):
         """
         log.info("Executing token refresh; typically requires client credentials")
         form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
-
-        if body_params:
-            form_data.update(body_params)
-        return self.oauth2_token(form_data)
+        return self.oauth2_token(form_data, body_params=body_params)
 
     def oauth2_validate_token(
-        self, token, body_params: Optional[Dict[str, Any]] = None
-    ):
+        self, token: str, body_params: Optional[Dict[str, Any]] = None
+    ) -> GlobusHTTPResponse:
         """
         Validate a token. It can be an Access Token or a Refresh token.
 
@@ -307,7 +333,9 @@ class AuthClient(client.BaseClient):
             body.update(body_params)
         return self.post("/v2/oauth2/token/validate", data=body, encoding="form")
 
-    def oauth2_revoke_token(self, token, body_params: Optional[Dict[str, Any]] = None):
+    def oauth2_revoke_token(
+        self, token: str, body_params: Optional[Dict[str, Any]] = None
+    ) -> GlobusHTTPResponse:
         """
         Revoke a token. It can be an Access Token or a Refresh token.
 
@@ -350,14 +378,43 @@ class AuthClient(client.BaseClient):
         return self.post("/v2/oauth2/token/revoke", data=body, encoding="form")
 
     @overload
-    def oauth2_token(self, form_data, response_class: Type[T]) -> T:
+    def oauth2_token(
+        self, form_data: Union[dict, utils.PayloadWrapper]
+    ) -> OAuthTokenResponse:
         ...
 
     @overload
-    def oauth2_token(self, form_data) -> OAuthTokenResponse:
+    def oauth2_token(
+        self,
+        form_data: Union[dict, utils.PayloadWrapper],
+        *,
+        body_params: Optional[Dict[str, Any]],
+    ) -> OAuthTokenResponse:
         ...
 
-    def oauth2_token(self, form_data, response_class=OAuthTokenResponse):
+    @overload
+    def oauth2_token(
+        self, form_data: Union[dict, utils.PayloadWrapper], *, response_class: Type[T]
+    ) -> T:
+        ...
+
+    @overload
+    def oauth2_token(
+        self,
+        form_data: Union[dict, utils.PayloadWrapper],
+        *,
+        body_params: Optional[Dict[str, Any]],
+        response_class: Type[T],
+    ) -> T:
+        ...
+
+    def oauth2_token(
+        self,
+        form_data: Union[dict, utils.PayloadWrapper],
+        *,
+        body_params: Optional[Dict[str, Any]] = None,
+        response_class: Union[Type[OAuthTokenResponse], Type[T]] = OAuthTokenResponse,
+    ) -> Union[OAuthTokenResponse, T]:
         """
         This is the generic form of calling the OAuth2 Token endpoint.
         It takes ``form_data``, a dict which will be encoded in a form POST
@@ -378,15 +435,18 @@ class AuthClient(client.BaseClient):
         log.info("Fetching new token from Globus Auth")
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
+        data = dict(form_data)
+        if body_params:
+            data.update(body_params)
         return response_class(
             self.post(
                 "/v2/oauth2/token",
-                data=form_data,
+                data=data,
                 encoding="form",
             )
-        )
+        )  # type: ignore
 
-    def oauth2_userinfo(self):
+    def oauth2_userinfo(self) -> GlobusHTTPResponse:
         """
         Call the Userinfo endpoint of Globus Auth.
         Userinfo is specified as part of the OpenID Connect (OIDC) standard,
@@ -414,7 +474,7 @@ class AuthClient(client.BaseClient):
         log.info("Looking up OIDC-style Userinfo from Globus Auth")
         return self.get("/v2/oauth2/userinfo")
 
-    def get_openid_configuration(self):
+    def get_openid_configuration(self) -> GlobusHTTPResponse:
         """
         Fetch the OpenID Connect configuration data from the well-known URI for Globus
         Auth.
@@ -422,7 +482,37 @@ class AuthClient(client.BaseClient):
         log.info("Fetching OIDC Config")
         return self.get("/.well-known/openid-configuration")
 
-    def get_jwk(self, openid_configuration=None, as_pem=False):
+    @overload
+    def get_jwk(
+        self,
+        openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
+        as_pem: "Literal[True]",
+    ) -> RSAPublicKey:
+        ...
+
+    @overload
+    def get_jwk(
+        self,
+        openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
+        as_pem: "Literal[False]",
+    ) -> dict:
+        ...
+
+    @overload
+    def get_jwk(
+        self,
+        openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
+        as_pem: bool,
+    ) -> Union[RSAPublicKey, dict]:
+        ...
+
+    def get_jwk(
+        self,
+        openid_configuration: Optional[
+            Union[GlobusHTTPResponse, Dict[str, Any]]
+        ] = None,
+        as_pem: bool = False,
+    ) -> Union[RSAPublicKey, dict]:
         """
         Fetch the Globus Auth JWK.
 
@@ -435,21 +525,24 @@ class AuthClient(client.BaseClient):
         :type as_pem: bool
         """
         log.info("Fetching JWK")
-        if not openid_configuration:
+        if openid_configuration:
+            jwks_uri = openid_configuration["jwks_uri"]
+        else:
             log.debug("No OIDC Config provided, autofetching...")
-            openid_configuration = self.get_openid_configuration()
+            jwks_uri = self.get_openid_configuration()["jwks_uri"]
 
-        jwks_uri = openid_configuration["jwks_uri"]
         log.debug("jwks_uri=%s", jwks_uri)
         jwk_data = self.get(jwks_uri).data
         if not as_pem:
             log.debug("returning jwk data where as_pem=False")
-            return jwk_data
+            return dict(jwk_data)
         else:
             log.debug("JWK as_pem=True requested, decoding...")
             # decode from JWK to an RSA PEM key for JWT decoding
-            jwk_as_pem = jwt.algorithms.RSAAlgorithm.from_jwk(
-                json.dumps(jwk_data["keys"][0])
+            # cast here because this should never be private key
+            jwk_as_pem: RSAPublicKey = cast(
+                RSAPublicKey,
+                jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk_data["keys"][0])),
             )
             log.debug("JWK PEM decoding finished successfully")
             return jwk_as_pem

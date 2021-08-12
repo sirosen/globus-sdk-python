@@ -1,5 +1,7 @@
 import logging
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, List, Optional, Union, cast
+
+import requests
 
 from .base import GlobusError
 from .err_info import ErrorInfoContainer
@@ -22,7 +24,7 @@ class GlobusAPIError(GlobusError):
     MESSAGE_FIELDS = ["message", "detail"]
     RECOGNIZED_AUTHZ_SCHEMES = ["bearer", "basic", "globus-goauthtoken"]
 
-    def __init__(self, r, *args, **kw):
+    def __init__(self, r: requests.Response, *args: Any, **kw: Any):
         self.http_status = r.status_code
         # defaults, may be rewritten during parsing
         self.code = "Error"
@@ -40,7 +42,7 @@ class GlobusAPIError(GlobusError):
         )
 
     @property
-    def raw_json(self):
+    def raw_json(self) -> Optional[Dict[str, Any]]:
         """
         Get the verbatim error message received from a Globus API, interpreted
         as JSON data
@@ -52,7 +54,9 @@ class GlobusAPIError(GlobusError):
             return None
 
         try:
-            return r.json()
+            # technically, this could be a non-dict JSON type, like a list or string
+            # but in those cases the user can just cast -- the "normal" case is a dict
+            return cast(Dict[str, Any], r.json())
         except ValueError:
             log.error(
                 "Error body could not be JSON decoded! "
@@ -62,7 +66,7 @@ class GlobusAPIError(GlobusError):
             return None
 
     @property
-    def raw_text(self):
+    def raw_text(self) -> str:
         """
         Get the verbatim error message receved from a Globus API as a *string*
         """
@@ -78,10 +82,10 @@ class GlobusAPIError(GlobusError):
         if self._info is None:
             rawjson = self.raw_json
             json_data = rawjson if isinstance(rawjson, dict) else None
-            self._info = ErrorInfoContainer(cast(Optional[Dict[str, Any]], json_data))
+            self._info = ErrorInfoContainer(json_data)
         return self._info
 
-    def _get_request_authorization_scheme(self):
+    def _get_request_authorization_scheme(self) -> Union[str, None]:
         try:
             authz_h = self._underlying_response.request.headers["Authorization"]
             authz_scheme = authz_h.split()[0]
@@ -91,7 +95,7 @@ class GlobusAPIError(GlobusError):
             pass
         return None
 
-    def _get_args(self):
+    def _get_args(self) -> List[Any]:
         """
         Get arguments to pass to the Exception base class. These args are
         displayed in stack traces.
@@ -105,7 +109,7 @@ class GlobusAPIError(GlobusError):
             self.message,
         ]
 
-    def _parse_response(self):
+    def _parse_response(self) -> None:
         """
         This is an intermediate step between 'raw_json' (loading bare JSON data)
         and the "real" parsing method, '_load_from_json'
@@ -156,7 +160,7 @@ class GlobusAPIError(GlobusError):
             json_data = json_data["errors"][0]
         self._load_from_json(json_data)
 
-    def _load_from_json(self, data):
+    def _load_from_json(self, data: dict) -> None:
         # rewrite 'code' if present and correct type
         if isinstance(data.get("code"), str):
             self.code = data["code"]

@@ -1,7 +1,10 @@
 import uuid
+from typing import Any, Dict, Iterable, Optional, Set, Tuple
+
+from .client_types.base import AuthClient
 
 
-def is_username(val):
+def is_username(val: str) -> bool:
     """
     If the value parses as a UUID, then it's an ID, not a username.
     If it does not parse as such, then it must be a username.
@@ -13,7 +16,7 @@ def is_username(val):
         return True
 
 
-def split_ids_and_usernames(identity_ids):
+def split_ids_and_usernames(identity_ids: Iterable[str]) -> Tuple[Set[str], Set[str]]:
     ids = set()
     usernames = set()
 
@@ -124,7 +127,12 @@ class IdentityMap:
 
     _default_id_batch_size = 100
 
-    def __init__(self, auth_client, identity_ids=None, id_batch_size=None):
+    def __init__(
+        self,
+        auth_client: AuthClient,
+        identity_ids: Optional[Iterable[str]] = None,
+        id_batch_size: Optional[int] = None,
+    ):
         self.auth_client = auth_client
         self.id_batch_size = id_batch_size or self._default_id_batch_size
 
@@ -134,9 +142,9 @@ class IdentityMap:
         )
 
         # the cache is a dict mapping IDs and Usernames
-        self._cache = {}
+        self._cache: Dict[str, dict] = {}
 
-    def _fetch_batch_including(self, key):
+    def _fetch_batch_including(self, key: str) -> None:
         """
         Batch resolve identifiers (usernames or IDs), being sure to include the desired,
         named key. The key also determines which kind of batch will be built --
@@ -163,14 +171,15 @@ class IdentityMap:
             except KeyError:  # empty set, ignore
                 pass
 
-        response = self.auth_client.get_identities(
-            **(dict(usernames=batch) if is_username(key) else dict(ids=batch))
-        )
+        if is_username(key):
+            response = self.auth_client.get_identities(usernames=batch)
+        else:
+            response = self.auth_client.get_identities(ids=batch)
         for x in response["identities"]:
             self._cache[x["id"]] = x
             self._cache[x["username"]] = x
 
-    def add(self, identity_id):
+    def add(self, identity_id: str) -> bool:
         """
         Add a username or ID to the ``IdentityMap`` for batch lookups later.
 
@@ -194,7 +203,7 @@ class IdentityMap:
         self.unresolved_ids.add(identity_id)
         return True
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: Optional[Any] = None) -> Any:
         """
         A dict-like get() method which accepts a default value.
         """
@@ -203,7 +212,7 @@ class IdentityMap:
         except KeyError:
             return default
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         """
         ``IdentityMap`` supports dict-like lookups with ``map[key]``
         """
@@ -211,7 +220,7 @@ class IdentityMap:
             self._fetch_batch_including(key)
         return self._cache[key]
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: str) -> None:
         """
         ``IdentityMap`` supports ``del map[key]``. Note that this only removes lookup
         values from the cache and will not impact the set of unresolved/pending IDs.

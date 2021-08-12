@@ -1,4 +1,10 @@
-class GlobusOAuthFlowManager:
+import abc
+from typing import Any, Dict, Optional
+
+from .token_response import OAuthTokenResponse
+
+
+class GlobusOAuthFlowManager(abc.ABC):
     """
     An abstract class definition that defines the interface for the Flow
     Managers for Globus Auth.
@@ -17,7 +23,8 @@ class GlobusOAuthFlowManager:
     implement our own set of Flow objects.
     """
 
-    def get_authorize_url(self) -> str:
+    @abc.abstractmethod
+    def get_authorize_url(self, query_params: Optional[Dict[str, Any]] = None) -> str:
         """
         This method consumes no arguments or keyword arguments, and produces a
         string URL for the Authorize Step of a 3-legged OAuth2 flow.
@@ -29,11 +36,9 @@ class GlobusOAuthFlowManager:
 
         :rtype: ``string``
         """
-        raise NotImplementedError(
-            f"{type(self)} does not implement get_authorize_url()"
-        )
 
-    def exchange_code_for_tokens(self, auth_code: str):
+    @abc.abstractmethod
+    def exchange_code_for_tokens(self, auth_code: str) -> OAuthTokenResponse:
         """
         This method takes an auth_code and produces a response object
         containing one or more tokens.
@@ -49,6 +54,3 @@ class GlobusOAuthFlowManager:
 
         :rtype: :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         """
-        raise NotImplementedError(
-            f"{type(self)} does not implement exchange_code_for_tokens()"
-        )

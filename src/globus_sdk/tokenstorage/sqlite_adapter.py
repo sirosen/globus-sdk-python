@@ -34,10 +34,10 @@ class SQLiteAdapter(FileAdapter):
         self.namespace = namespace
         self._connection = self._init_and_connect()
 
-    def _is_memory_db(self):
+    def _is_memory_db(self) -> bool:
         return self.dbname == ":memory:"
 
-    def _init_and_connect(self):
+    def _init_and_connect(self) -> sqlite3.Connection:
         init_tables = self._is_memory_db() or not self.file_exists()
         if init_tables and not self._is_memory_db():  # real file needs to be created
             with self.user_only_umask():

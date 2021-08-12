@@ -1,9 +1,10 @@
 import abc
 import logging
 import time
-from typing import Callable, Optional
+from typing import Any, Callable, Dict, Optional
 
 from globus_sdk import exc, utils
+from globus_sdk.services.auth import OAuthTokenResponse
 
 from .base import GlobusAuthorizer
 
@@ -48,8 +49,8 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
 
     def __init__(
         self,
-        access_token=None,
-        expires_at=None,
+        access_token: Optional[str] = None,
+        expires_at: Optional[int] = None,
         on_refresh: Optional[Callable] = None,
     ):
         self._access_token = None
@@ -90,20 +91,21 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         return self._access_token
 
     @access_token.setter
-    def access_token(self, value: Optional[str]):
+    def access_token(self, value: Optional[str]) -> None:
         self._access_token = value
         if value:
             self._access_token_hash = utils.sha256_string(value)
 
     @abc.abstractmethod
-    def _get_token_response(self):
+    def _get_token_response(self) -> OAuthTokenResponse:
         """
         Using whatever method the specific authorizer implementing this class
         does, get a new token response.
         """
+        pass
 
     @abc.abstractmethod
-    def _extract_token_data(self, res):
+    def _extract_token_data(self, res: OAuthTokenResponse) -> Dict[str, Any]:
         """
         Given a token response object, get the first element of
         token_response.by_resource_server
@@ -111,7 +113,7 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         returning one access token, and return a ValueError otherwise.
         """
 
-    def _get_new_access_token(self):
+    def _get_new_access_token(self) -> None:
         """
         Given token data from _get_token_response and _extract_token_data,
         set the access token and expiration time, calculate the new token
@@ -134,7 +136,7 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
             self.on_refresh(res)
             log.debug("on_refresh callback finished")
 
-    def ensure_valid_token(self):
+    def ensure_valid_token(self) -> None:
         """
         Check that the authorizer has a valid token. Checks that the token is set and
         that the expiration time is in the future.
@@ -160,7 +162,7 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         log.debug("RenewingAuthorizer fetching new Access Token")
         self._get_new_access_token()
 
-    def get_authorization_header(self):
+    def get_authorization_header(self) -> str:
         """
         Check to see if a new token is needed and return "Bearer <access_token>"
         """
@@ -168,7 +170,7 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         log.debug(f'bearer token has hash "{self._access_token_hash}"')
         return f"Bearer {self.access_token}"
 
-    def handle_missing_authorization(self):
+    def handle_missing_authorization(self) -> bool:
         """
         The renewing authorizer can respond to a service 401 by immediately
         invalidating its current Access Token. When this happens, the next call

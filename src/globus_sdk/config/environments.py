@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Dict, List, Optional, Type, cast
+from typing import Any, Dict, List, Optional, Type, cast
 
 log = logging.getLogger(__name__)
 # the format string for a service URL pulled out of the environment
@@ -27,12 +27,12 @@ class EnvConfig:
     #           envname = "beta"
     #
     # and retrieve it with get_config_by_name("beta")
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
+    def __init_subclass__(cls, **kwargs: Any):
+        super().__init_subclass__(**kwargs)  # type: ignore
         cls._registry[cls.envname] = cls
 
     @classmethod
-    def get_service_url(cls, service) -> str:
+    def get_service_url(cls, service: str) -> str:
         # you can override any name with a config attribute
         service_url_attr = f"{service}_url"
         if hasattr(cls, service_url_attr):

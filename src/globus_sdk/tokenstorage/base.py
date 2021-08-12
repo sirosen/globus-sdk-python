@@ -1,7 +1,7 @@
 import abc
 import contextlib
 import os
-from typing import Dict, Optional
+from typing import Dict, Iterator, Optional
 
 from globus_sdk.services.auth import OAuthTokenResponse
 
@@ -46,7 +46,7 @@ class FileAdapter(StorageAdapter, metaclass=abc.ABCMeta):
         return os.path.exists(self.filename)
 
     @contextlib.contextmanager
-    def user_only_umask(self):
+    def user_only_umask(self) -> Iterator[None]:
         """
         a context manager to deny rwx to Group and World, x to User
 

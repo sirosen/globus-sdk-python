@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, Union
 
 from globus_sdk import client, paging, response, utils
 from globus_sdk.scopes import SearchScopes
+from globus_sdk.types import UUIDLike
 
 from .data import SearchQuery
 from .errors import SearchAPIError
@@ -35,7 +36,9 @@ class SearchClient(client.BaseClient):
     # Index Management
     #
 
-    def get_index(self, index_id, query_params) -> response.GlobusHTTPResponse:
+    def get_index(
+        self, index_id: UUIDLike, query_params: Optional[Dict[str, Any]]
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/index/<index_id>``
 
@@ -73,13 +76,13 @@ class SearchClient(client.BaseClient):
     )
     def search(
         self,
-        index_id,
+        index_id: UUIDLike,
         q: str,
         offset: int = 0,
         limit: int = 10,
         advanced: bool = False,
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/index/<index_id>/search``
 
@@ -113,7 +116,9 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/index", index_id, "search")
         return self.get(path, query_params=query_params)
 
-    def post_search(self, index_id, data: Union[Dict[str, Any], SearchQuery]):
+    def post_search(
+        self, index_id: UUIDLike, data: Union[Dict[str, Any], SearchQuery]
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /v1/index/<index_id>/search``
 
@@ -162,7 +167,9 @@ class SearchClient(client.BaseClient):
     # Bulk data indexing
     #
 
-    def ingest(self, index_id, data):
+    def ingest(
+        self, index_id: UUIDLike, data: Optional[dict]
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /v1/index/<index_id>/ingest``
 
@@ -224,7 +231,9 @@ class SearchClient(client.BaseClient):
     # Bulk delete
     #
 
-    def delete_by_query(self, index_id, data):
+    def delete_by_query(
+        self, index_id: UUIDLike, data: Optional[dict]
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /v1/index/<index_id>/delete_by_query``
 
@@ -263,8 +272,11 @@ class SearchClient(client.BaseClient):
     #
 
     def get_subject(
-        self, index_id, subject: str, query_params: Optional[Dict[str, Any]] = None
-    ):
+        self,
+        index_id: UUIDLike,
+        subject: str,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/index/<index_id>/subject``
 
@@ -292,8 +304,11 @@ class SearchClient(client.BaseClient):
         return self.get(path, query_params=query_params)
 
     def delete_subject(
-        self, index_id, subject: str, query_params: Optional[Dict[str, Any]] = None
-    ):
+        self,
+        index_id: UUIDLike,
+        subject: str,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /v1/index/<index_id>/subject``
 
@@ -327,11 +342,11 @@ class SearchClient(client.BaseClient):
 
     def get_entry(
         self,
-        index_id,
+        index_id: UUIDLike,
         subject: str,
         entry_id: Optional[str] = None,
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/index/<index_id>/entry``
 
@@ -372,7 +387,9 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.get(path, query_params=query_params)
 
-    def create_entry(self, index_id, data):
+    def create_entry(
+        self, index_id: UUIDLike, data: Optional[dict]
+    ) -> response.GlobusHTTPResponse:
         """
         ``POST /v1/index/<index_id>/entry``
 
@@ -415,7 +432,9 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.post(path, data=data)
 
-    def update_entry(self, index_id, data):
+    def update_entry(
+        self, index_id: UUIDLike, data: Optional[dict]
+    ) -> response.GlobusHTTPResponse:
         """
         ``PUT /v1/index/<index_id>/entry``
 
@@ -447,11 +466,11 @@ class SearchClient(client.BaseClient):
 
     def delete_entry(
         self,
-        index_id,
+        index_id: UUIDLike,
         subject: str,
         entry_id: Optional[str] = None,
         query_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> response.GlobusHTTPResponse:
         """
         ``DELETE  /v1/index/<index_id>/entry``
 
@@ -495,7 +514,9 @@ class SearchClient(client.BaseClient):
     # Task Management
     #
 
-    def get_task(self, task_id, query_params: Optional[Dict[str, Any]] = None):
+    def get_task(
+        self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/task/<task_id>``
 
@@ -511,7 +532,9 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/task", task_id)
         return self.get(path, query_params=query_params)
 
-    def get_task_list(self, index_id, query_params: Optional[Dict[str, Any]] = None):
+    def get_task_list(
+        self, index_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
+    ) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/task_list/<index_id>``
 

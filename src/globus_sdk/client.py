@@ -98,11 +98,11 @@ class BaseClient:
         self.paginated = PaginatorTable(self)
 
     @property
-    def app_name(self):
+    def app_name(self) -> Optional[str]:
         return self._app_name
 
     @app_name.setter
-    def app_name(self, value):
+    def app_name(self, value: str) -> None:
         self._app_name = self.transport.user_agent = value
 
     def qjoin_path(self, *parts: str) -> str:

@@ -80,7 +80,9 @@ def test_add_facet():
     }
 
     # unknown param
-    query.add_facet("facetname", "fieldname", nonexistentparam="value1")
+    query.add_facet(
+        "facetname", "fieldname", additional_fields={"nonexistentparam": "value1"}
+    )
     assert len(query["facets"]) == 4
     assert query["facets"][3] == {
         "type": "terms",
@@ -106,7 +108,12 @@ def test_add_filter():
     }
 
     # match_any + custom param
-    query.add_filter("f", [1, 2, 3], type="match_any", nonexistentparam="val1")
+    query.add_filter(
+        "f",
+        [1, 2, 3],
+        type="match_any",
+        additional_fields={"nonexistentparam": "val1"},
+    )
     assert len(query["filters"]) == 2
     assert query["filters"][1] == {
         "field_name": "f",
@@ -137,7 +144,7 @@ def test_add_boost():
     assert query["boosts"][0] == {"field_name": "f", "factor": 2}
 
     # custom param
-    query.add_boost("f", 1.1, nonexistentparam="value1")
+    query.add_boost("f", 1.1, additional_fields={"nonexistentparam": "value1"})
     assert len(query["boosts"]) == 2
     assert query["boosts"][1] == {
         "field_name": "f",
@@ -163,7 +170,7 @@ def test_add_sort():
     assert query["sort"][1] == {"field_name": "f", "order": "asc"}
 
     # custom param
-    query.add_sort("f", order="asc", nonexistentparam="value1")
+    query.add_sort("f", order="asc", additional_fields={"nonexistentparam": "value1"})
     assert len(query["sort"]) == 3
     assert query["sort"][2] == {
         "field_name": "f",

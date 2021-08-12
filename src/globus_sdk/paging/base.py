@@ -1,5 +1,5 @@
 import abc
-from typing import Iterable, Iterator
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional
 
 from globus_sdk.response import GlobusHTTPResponse
 
@@ -26,7 +26,14 @@ class Paginator(Iterable[GlobusHTTPResponse], metaclass=abc.ABCMeta):
     :type client_kwargs: dict
     """
 
-    def __init__(self, method, *, items_key=None, client_args, client_kwargs):
+    def __init__(
+        self,
+        method: Callable,
+        *,
+        items_key: Optional[str] = None,
+        client_args: List[Any],
+        client_kwargs: Dict[str, Any]
+    ):
         self.method = method
         self.items_key = items_key
         self.client_args = client_args

@@ -1,9 +1,10 @@
 import os
+from typing import Optional
 
 from globus_sdk.exc import GlobusSDKUsageError
 
 
-def _on_windows():
+def _on_windows() -> bool:
     """
     Per python docs, this is a safe, reliable way of checking the platform.
     sys.platform offers more detail -- more than we want, in this case.
@@ -21,11 +22,11 @@ class LocalGlobusConnectPersonal:
     for interacting with any Globus Service APIs.
     """
 
-    def __init__(self):
-        self._endpoint_id = None
+    def __init__(self) -> None:
+        self._endpoint_id: Optional[str] = None
 
     @property
-    def endpoint_id(self):
+    def endpoint_id(self) -> Optional[str]:
         """
         :type: string
 
@@ -66,11 +67,10 @@ class LocalGlobusConnectPersonal:
                     pass
                 else:
                     raise
-
         return self._endpoint_id
 
     @endpoint_id.deleter
-    def endpoint_id(self):
+    def endpoint_id(self) -> None:
         """
         Deleter for LocalGlobusConnectPersonal.endpoint_id
         """

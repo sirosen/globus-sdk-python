@@ -7,7 +7,7 @@ This does not include service URL env vars (see environments.py for loading of t
 import logging
 import os
 from distutils.util import strtobool
-from typing import Any, Optional, cast
+from typing import Any, Callable, Optional, cast
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,12 @@ HTTP_TIMEOUT_VAR = "GLOBUS_SDK_HTTP_TIMEOUT"
 SSL_VERIFY_VAR = "GLOBUS_SDK_VERIFY_SSL"
 
 
-def _load_var(varname: str, default, explicit_value=None, cast=None):
+def _load_var(
+    varname: str,
+    default: Any,
+    explicit_value: Optional[Any] = None,
+    cast: Optional[Callable] = None,
+) -> Any:
     # use the explicit value if given and non-None, otherwise, do an env lookup
     value = (
         explicit_value if explicit_value is not None else os.getenv(varname, default)
@@ -34,13 +39,13 @@ def _load_var(varname: str, default, explicit_value=None, cast=None):
     return value
 
 
-def _bool_cast(value: Any, default) -> bool:
+def _bool_cast(value: Any, default: Any) -> bool:
     if isinstance(value, bool):
         return value
     return strtobool(value.lower())
 
 
-def _optfloat_cast(value: Any, default) -> Optional[float]:
+def _optfloat_cast(value: Any, default: Any) -> Optional[float]:
     try:
         return float(value)
     except ValueError:

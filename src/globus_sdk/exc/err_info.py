@@ -9,10 +9,10 @@ class ErrorInfo:
 
     _has_data: bool
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self._has_data
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self:
             attrmap = ", ".join(
                 [f"{k}={v}" for k, v in self.__dict__.items() if not k.startswith("_")]
@@ -92,9 +92,9 @@ class ErrorInfoContainer:
     :ivar consent_required: A parsed ConsentRequiredInfo object
     """
 
-    def __init__(self, error_data: Optional[Dict[str, Any]]):
+    def __init__(self, error_data: Optional[Dict[str, Any]]) -> None:
         self.authorization_parameters = AuthorizationParameterInfo(error_data or {})
         self.consent_required = ConsentRequiredInfo(error_data or {})
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.authorization_parameters}|{self.consent_required}"
