@@ -169,7 +169,9 @@ class OAuthTokenResponse(GlobusHTTPResponse):
 
     def decode_id_token(
         self,
-        openid_configuration: Optional[Dict[str, Any]] = None,
+        openid_configuration: Optional[
+            Union[GlobusHTTPResponse, Dict[str, Any]]
+        ] = None,
         jwk: Optional[RSAPublicKey] = None,
         jwt_params: Optional[Dict] = None,
     ) -> Dict[str, Any]:
@@ -247,7 +249,9 @@ class OAuthDependentTokenResponse(OAuthTokenResponse):
 
     def decode_id_token(
         self,
-        openid_configuration: Optional[Dict[str, Any]] = None,
+        openid_configuration: Optional[
+            Union[GlobusHTTPResponse, Dict[str, Any]]
+        ] = None,
         jwk: Optional[RSAPublicKey] = None,
         jwt_params: Optional[Dict] = None,
     ) -> Dict[str, Any]:

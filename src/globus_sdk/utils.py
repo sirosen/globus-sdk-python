@@ -10,13 +10,11 @@ def sha256_string(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
-# REVIEW
-def safe_b64encode(s) -> str:  # type: ignore
-    try:
+def safe_b64encode(s: Union[bytes, str]) -> str:
+    if isinstance(s, str):
         encoded = b64encode(s.encode("utf-8"))
-    except UnicodeDecodeError:
+    else:
         encoded = b64encode(s)
-
     return encoded.decode("utf-8")
 
 
@@ -45,10 +43,7 @@ def safe_stringify(value: Union[IntLike, UUIDLike]) -> str:
     if isinstance(value, str):
         return value
     if isinstance(value, bytes):
-        try:
-            return value.decode("utf-8")
-        except UnicodeDecodeError:
-            raise ValueError("couldn't decode bytes as utf-8: {value}")
+        return value.decode("utf-8")
     return str(value)
 
 

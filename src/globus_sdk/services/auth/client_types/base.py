@@ -1,7 +1,9 @@
 import collections.abc
 import json
 import logging
+import sys
 from typing import (
+    TYPE_CHECKING,
     Any,
     AnyStr,
     Dict,
@@ -16,7 +18,12 @@ from typing import (
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-from typing_extensions import Literal
+
+if TYPE_CHECKING:
+    if sys.version_info >= (3, 8):
+        from typing import Literal
+    else:
+        from typing_extensions import Literal
 
 from globus_sdk import client, exc, utils
 from globus_sdk.authorizers import NullAuthorizer
@@ -479,7 +486,7 @@ class AuthClient(client.BaseClient):
     def get_jwk(
         self,
         openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
-        as_pem: Literal[True],
+        as_pem: "Literal[True]",
     ) -> RSAPublicKey:
         ...
 
@@ -487,7 +494,7 @@ class AuthClient(client.BaseClient):
     def get_jwk(
         self,
         openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
-        as_pem: Literal[False],
+        as_pem: "Literal[False]",
     ) -> dict:
         ...
 
@@ -532,10 +539,10 @@ class AuthClient(client.BaseClient):
         else:
             log.debug("JWK as_pem=True requested, decoding...")
             # decode from JWK to an RSA PEM key for JWT decoding
+            # cast here because this should never be private key
             jwk_as_pem: RSAPublicKey = cast(
                 RSAPublicKey,
                 jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk_data["keys"][0])),
             )
             log.debug("JWK PEM decoding finished successfully")
-            # type-ignore because should never be private key
             return jwk_as_pem

@@ -1,8 +1,7 @@
 import logging
 from typing import Any, Callable, Dict, Optional
 
-from globus_sdk.services.auth import OAuthTokenResponse
-from globus_sdk.services.auth.client_types.base import AuthClient
+from globus_sdk.services.auth import AuthClient, OAuthTokenResponse
 
 from .renewing import RenewingAuthorizer
 

@@ -26,7 +26,7 @@ class LocalGlobusConnectPersonal:
         self._endpoint_id: Optional[str] = None
 
     @property
-    def endpoint_id(self) -> str:
+    def endpoint_id(self) -> Optional[str]:
         """
         :type: string
 
@@ -67,9 +67,7 @@ class LocalGlobusConnectPersonal:
                     pass
                 else:
                     raise
-
-        # mypy not sophisticated enough to see this is not None
-        return self._endpoint_id  # type: ignore
+        return self._endpoint_id
 
     @endpoint_id.deleter
     def endpoint_id(self) -> None:

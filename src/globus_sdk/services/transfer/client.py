@@ -737,7 +737,6 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "role")
         return self.post(path, data=role_data)
 
-    # REVIEW: why do we call str() on server ID above but not on role_id here?
     def get_endpoint_role(
         self,
         endpoint_id: UUIDLike,

@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Callable, Dict, Optional
 
-# REVIEW: where exactly to import this from?
 from globus_sdk.services.auth import ConfidentialAppAuthClient, OAuthTokenResponse
 
 from .renewing import RenewingAuthorizer
