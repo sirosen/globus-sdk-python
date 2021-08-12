@@ -1,4 +1,4 @@
-.. module:: globus_sdk.groups
+.. module:: globus_sdk
 
 
 Globus Groups
@@ -31,18 +31,30 @@ These enums define values which can be passed to other helpers:
 .. autoclass:: GroupVisibility
     :members:
 
+Payload Types
+~~~~~~~~~~~~~
+
 A ``BatchMembershipActions`` defines how to formulate requests to add, remove, or modify
 memberships in a group. It can be used to formulate multiple operations to submit in a single
 request to the service.
 
-.. autoclass:: globus_sdk.BatchMembershipActions
+.. autoclass:: BatchMembershipActions
    :members:
+
+A ``GroupPolicies`` object defines the various policies which can be set on a
+group. It can be used with the ``GroupsClient`` or the ``GroupsManager``.
+
+.. autoclass:: GroupPolicies
+   :members:
+
+High-Level Client Wrappers
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``GroupsManager`` is a high-level helper which wraps a ``GroupsClient``. Many common
 operations which require assembling a ``BatchMembershipActions`` and submitting the
 result can be achieved with a single method-call on a ``GroupsManager``.
 
-.. autoclass:: globus_sdk.GroupsManager
+.. autoclass:: GroupsManager
    :members:
 
 Client Errors
@@ -50,6 +62,6 @@ Client Errors
 
 When an error occurs, a ``GroupsClient`` will raise this type of error:
 
-.. autoclass:: globus_sdk.GroupsAPIError
+.. autoclass:: GroupsAPIError
    :members:
    :show-inheritance:

@@ -1,4 +1,4 @@
-from globus_sdk.services.groups import client
+from globus_sdk import GroupMemberVisibility, GroupRequiredSignupFields, GroupVisibility
 from tests.common import register_api_route_fixture_file
 
 
@@ -84,10 +84,10 @@ def test_set_group_policies(groups_manager):
     resp = groups_manager.set_group_policies(
         "d3974728-6458-11e4-b72d-123139141556",
         False,
-        client.GroupVisibility.private,
-        client.GroupMemberVisibility.managers,
+        GroupVisibility.private,
+        GroupMemberVisibility.managers,
         False,
-        [client.RequiredSignupFields.address1],
+        [GroupRequiredSignupFields.address1],
         28800,
     )
     assert resp.http_status == 200

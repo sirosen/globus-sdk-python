@@ -2,6 +2,7 @@ from .client import GroupsClient
 from .data import (
     BatchMembershipActions,
     GroupMemberVisibility,
+    GroupPolicies,
     GroupRequiredSignupFields,
     GroupRole,
     GroupVisibility,
@@ -18,4 +19,5 @@ __all__ = (
     "GroupRequiredSignupFields",
     "GroupRole",
     "GroupVisibility",
+    "GroupPolicies",
 )

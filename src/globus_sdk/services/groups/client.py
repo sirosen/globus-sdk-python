@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Union
 from globus_sdk import client
 from globus_sdk.scopes import GroupsScopes
 
-from .data import BatchMembershipActions
+from .data import BatchMembershipActions, GroupPolicies
 from .errors import GroupsAPIError
 
 
@@ -98,7 +98,7 @@ class GroupsClient(client.BaseClient):
     def set_group_policies(
         self,
         group_id: str,
-        data: Dict[str, Any],
+        data: Union[Dict[str, Any], GroupPolicies],
         query_params: Optional[Dict[str, Any]] = None,
     ):
         """

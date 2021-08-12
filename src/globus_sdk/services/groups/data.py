@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Sequence
+from typing import Any, Optional, Sequence
 
 from globus_sdk import utils
 
@@ -40,8 +40,6 @@ class BatchMembershipActions(utils.PayloadWrapper):
     An object used to represent a batch action on memberships of a group.
     `Perform actions on group members
     <https://groups.api.globus.org/redoc#operation/group_membership_post_actions_v2_groups__group_id__post>`_.
-
-    .. automethodlist:: globus_sdk.BatchMembershipActions
     """
 
     def accept_invites(self, identity_ids: Sequence[str]):
@@ -50,7 +48,8 @@ class BatchMembershipActions(utils.PayloadWrapper):
         the identity set of authenticated user.
         """
         self.setdefault("accept", []).extend(
-            {"identity_id": identity_id} for identity_id in identity_ids
+            {"identity_id": identity_id}
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -62,7 +61,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         """
         self.setdefault("add", []).extend(
             {"identity_id": identity_id, "role": role.value}
-            for identity_id in identity_ids
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -71,7 +70,8 @@ class BatchMembershipActions(utils.PayloadWrapper):
         Approve a list of identities with pending join requests.
         """
         self.setdefault("approve", []).extend(
-            {"identity_id": identity_id} for identity_id in identity_ids
+            {"identity_id": identity_id}
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -80,7 +80,8 @@ class BatchMembershipActions(utils.PayloadWrapper):
         Decline an invitation for a given set of identities.
         """
         self.setdefault("decline", []).extend(
-            {"identity_id": identity_id} for identity_id in identity_ids
+            {"identity_id": identity_id}
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -92,7 +93,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         """
         self.setdefault("invite", []).extend(
             {"identity_id": identity_id, "role": role.value}
-            for identity_id in identity_ids
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -102,7 +103,8 @@ class BatchMembershipActions(utils.PayloadWrapper):
         authenticated users identity set.
         """
         self.setdefault("join", []).extend(
-            {"identity_id": identity_id} for identity_id in identity_ids
+            {"identity_id": identity_id}
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -112,7 +114,8 @@ class BatchMembershipActions(utils.PayloadWrapper):
         identity set is a member of.
         """
         self.setdefault("leave", []).extend(
-            {"identity_id": identity_id} for identity_id in identity_ids
+            {"identity_id": identity_id}
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -121,7 +124,8 @@ class BatchMembershipActions(utils.PayloadWrapper):
         Reject a members that have requested to join the group.
         """
         self.setdefault("reject", []).extend(
-            {"identity_id": identity_id} for identity_id in identity_ids
+            {"identity_id": identity_id}
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -131,7 +135,8 @@ class BatchMembershipActions(utils.PayloadWrapper):
         of the group.
         """
         self.setdefault("remove", []).extend(
-            {"identity_id": identity_id} for identity_id in identity_ids
+            {"identity_id": identity_id}
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -140,6 +145,39 @@ class BatchMembershipActions(utils.PayloadWrapper):
         Request to join a group.
         """
         self.setdefault("request_join", []).extend(
-            {"identity_id": identity_id} for identity_id in identity_ids
+            {"identity_id": identity_id}
+            for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
+
+
+class GroupPolicies(utils.PayloadWrapper):
+    """
+    An object used to represent the policy settings of a group.
+    This may be used to set or modify group settings.
+
+    See also:
+    `API documentation on setting the policies for the group. \
+    <https://groups.api.globus.org/redoc#operation/update_policies_v2_groups__group_id__policies_put>`_
+    """
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self.data[key] = utils.render_enums_for_api(value)
+
+    def __init__(
+        self,
+        is_high_assurance: bool,
+        group_visibility: GroupVisibility,
+        group_members_visibility: GroupMemberVisibility,
+        join_requests: bool,
+        signup_fields: Sequence[GroupRequiredSignupFields],
+        authentication_assurance_timeout: Optional[int] = None,
+    ):
+        super().__init__()
+        self["is_high_assurance"] = is_high_assurance
+        self["group_visiibility"] = group_visibility
+        self["group_members_visiibility"] = group_members_visibility
+        self["join_requests"] = join_requests
+        self["signup_fields"] = signup_fields
+        if authentication_assurance_timeout is not None:
+            self["authentication_assurance_timeout"] = authentication_assurance_timeout

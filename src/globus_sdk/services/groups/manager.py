@@ -4,6 +4,7 @@ from .client import GroupsClient
 from .data import (
     BatchMembershipActions,
     GroupMemberVisibility,
+    GroupPolicies,
     GroupRequiredSignupFields,
     GroupRole,
     GroupVisibility,
@@ -44,16 +45,14 @@ class GroupsManager:
         """
         Set the group policies for the given group.
         """
-        data = {
-            "is_high_assurance": is_high_assurance,
-            "group_visibility": group_visibility.value,
-            "group_members_visibility": str(group_members_visibility),
-            "join_requests": join_requests,
-            "signup_fields": [field.value for field in signup_fields],
-        }
-        if authentication_assurance_timeout:
-            data["authentication_assurance_timeout"] = authentication_assurance_timeout
-
+        data = GroupPolicies(
+            is_high_assurance=is_high_assurance,
+            group_visibility=group_visibility,
+            group_members_visibility=group_members_visibility,
+            join_requests=join_requests,
+            signup_fields=signup_fields,
+            authentication_assurance_timeout=authentication_assurance_timeout,
+        )
         return self.client.set_group_policies(group_id, data=data)
 
     def accept_invite(self, group_id: str, identity_id: str):

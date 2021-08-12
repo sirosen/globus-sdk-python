@@ -29,6 +29,7 @@ from .services.auth import (
 from .services.groups import (
     BatchMembershipActions,
     GroupMemberVisibility,
+    GroupPolicies,
     GroupRequiredSignupFields,
     GroupRole,
     GroupsAPIError,
@@ -76,6 +77,7 @@ __all__ = (
     "SearchQuery",
     "GroupsClient",
     "BatchMembershipActions",
+    "GroupPolicies",
     "GroupMemberVisibility",
     "GroupRequiredSignupFields",
     "GroupRole",
