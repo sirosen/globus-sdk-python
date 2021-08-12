@@ -19,18 +19,27 @@ from .exc import (
 )
 from .local_endpoint import LocalGlobusConnectPersonal
 from .response import GlobusHTTPResponse
-from .services import (
+from .services.auth import (
     AuthAPIError,
     AuthClient,
     ConfidentialAppAuthClient,
-    DeleteData,
-    GroupsAPIError,
-    GroupsClient,
     IdentityMap,
     NativeAppAuthClient,
-    SearchAPIError,
-    SearchClient,
-    SearchQuery,
+)
+from .services.groups import (
+    BatchMembershipActions,
+    GroupMemberVisibility,
+    GroupPolicies,
+    GroupRequiredSignupFields,
+    GroupRole,
+    GroupsAPIError,
+    GroupsClient,
+    GroupsManager,
+    GroupVisibility,
+)
+from .services.search import SearchAPIError, SearchClient, SearchQuery
+from .services.transfer import (
+    DeleteData,
     TransferAPIError,
     TransferClient,
     TransferData,
@@ -67,6 +76,13 @@ __all__ = (
     "SearchClient",
     "SearchQuery",
     "GroupsClient",
+    "BatchMembershipActions",
+    "GroupPolicies",
+    "GroupMemberVisibility",
+    "GroupRequiredSignupFields",
+    "GroupRole",
+    "GroupVisibility",
+    "GroupsManager",
     "LocalGlobusConnectPersonal",
 )
 
