@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Any, Optional, Sequence
 
 from globus_sdk import utils
+from globus_sdk.types import UUIDLike
 
 
 class GroupRole(Enum):
@@ -42,7 +43,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
     <https://groups.api.globus.org/redoc#operation/group_membership_post_actions_v2_groups__group_id__post>`_.
     """
 
-    def accept_invites(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
+    def accept_invites(
+        self, identity_ids: Sequence[UUIDLike]
+    ) -> "BatchMembershipActions":
         """
         Accept invites for identities.  The identities must belong to
         the identity set of authenticated user.
@@ -54,7 +57,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def add_members(
-        self, identity_ids: Sequence[str], role: GroupRole = GroupRole.member
+        self, identity_ids: Sequence[UUIDLike], role: GroupRole = GroupRole.member
     ) -> "BatchMembershipActions":
         """
         Add a list of identities to a group with the given role.
@@ -65,7 +68,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def approve_pending(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
+    def approve_pending(
+        self, identity_ids: Sequence[UUIDLike]
+    ) -> "BatchMembershipActions":
         """
         Approve a list of identities with pending join requests.
         """
@@ -75,7 +80,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def decline_invites(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
+    def decline_invites(
+        self, identity_ids: Sequence[UUIDLike]
+    ) -> "BatchMembershipActions":
         """
         Decline an invitation for a given set of identities.
         """
@@ -86,7 +93,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def invite_members(
-        self, identity_ids: Sequence[str], role: GroupRole = GroupRole.member
+        self, identity_ids: Sequence[UUIDLike], role: GroupRole = GroupRole.member
     ) -> "BatchMembershipActions":
         """
         Invite a list of identities to a group with the given role.
@@ -97,7 +104,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def join(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
+    def join(self, identity_ids: Sequence[UUIDLike]) -> "BatchMembershipActions":
         """
         Join a group with the given identities.  The identities must be in the
         authenticated users identity set.
@@ -108,7 +115,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def leave(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
+    def leave(self, identity_ids: Sequence[UUIDLike]) -> "BatchMembershipActions":
         """
         Leave a group that one of the identities in the authenticated user's
         identity set is a member of.
@@ -120,7 +127,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def reject_join_requests(
-        self, identity_ids: Sequence[str]
+        self, identity_ids: Sequence[UUIDLike]
     ) -> "BatchMembershipActions":
         """
         Reject a members that have requested to join the group.
@@ -131,7 +138,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def remove_members(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
+    def remove_members(
+        self, identity_ids: Sequence[UUIDLike]
+    ) -> "BatchMembershipActions":
         """
         Remove members from a group.  This must be done as an admin or manager
         of the group.
@@ -142,7 +151,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def request_join(self, identity_ids: Sequence[str]) -> "BatchMembershipActions":
+    def request_join(
+        self, identity_ids: Sequence[UUIDLike]
+    ) -> "BatchMembershipActions":
         """
         Request to join a group.
         """
