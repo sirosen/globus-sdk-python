@@ -1,8 +1,8 @@
 import logging
 from typing import Any, Dict, Optional, Sequence, Union
 
+from globus_sdk import exc, utils
 from globus_sdk.authorizers import NullAuthorizer
-from globus_sdk.exc import GlobusSDKUsageError
 
 from ..oauth2_native_app import GlobusNativeAppFlowManager
 from ..token_response import OAuthTokenResponse
@@ -31,11 +31,21 @@ class NativeAppAuthClient(AuthClient):
     def __init__(self, client_id: str, **kwargs: Any) -> None:
         if "authorizer" in kwargs:
             log.error("ArgumentError(NativeAppClient.authorizer)")
-            raise GlobusSDKUsageError("Cannot give a NativeAppAuthClient an authorizer")
+            raise exc.GlobusSDKUsageError(
+                "Cannot give a NativeAppAuthClient an authorizer"
+            )
 
         super().__init__(client_id=client_id, authorizer=NullAuthorizer(), **kwargs)
         log.info(f"Finished initializing client, client_id={client_id}")
 
+    @utils.doc_api_method(
+        "The PKCE Security Protocol",
+        "auth/developer-guide/#pkce",
+        external_format_str=(
+            "The Globus Auth specification for Native App grants details modifications "
+            "to the Authorization Code grant flow as `{message} <{base_url}/{link}>`_."
+        ),
+    )
     def oauth2_start_flow(
         self,
         requested_scopes: Optional[Union[str, Sequence[str]]] = None,
@@ -81,13 +91,6 @@ class NativeAppAuthClient(AuthClient):
 
         You can see an example of this flow :ref:`in the usage examples
         <examples_native_app_login>`
-
-        **External Documentation**
-
-        The Globus Auth specification for Native App grants details the
-        modifications to the Authorization Code grant flow as
-        `The PKCE Security Protocol \
-        <https://docs.globus.org/api/auth/developer-guide/#pkce>`_
         """
         log.info("Starting Native App Grant Flow")
         self.current_oauth2_flow_manager = GlobusNativeAppFlowManager(

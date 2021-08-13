@@ -3,9 +3,11 @@ import collections.abc
 import hashlib
 from base64 import b64encode
 from enum import Enum
-from typing import Any, Generator, Optional, Sequence, Union
+from typing import Any, Callable, Generator, Optional, Sequence, TypeVar, Union
 
 from .types import IntLike, UUIDLike
+
+T = TypeVar("T")
 
 
 def sha256_string(s: str) -> str:
@@ -34,6 +36,29 @@ def slash_join(a: str, b: Optional[str]) -> str:
     if b.startswith("/"):
         return a + b
     return a + "/" + b
+
+
+def doc_api_method(
+    external_message: str,
+    external_link: str,
+    *,
+    external_base_url: str = "https://docs.globus.org/api",
+    # we could override the format string if wanted (after the normal header)
+    external_format_str: str = (
+        "See `{message} <{base_url}/{link}>`_ in the API documentation for details."
+    ),
+) -> Callable[[Callable[..., T]], Callable[..., T]]:
+    def decorate(func: Callable[..., T]) -> Callable[..., T]:
+        func.__doc__ = f"""{func.__doc__}
+
+        **External Documentation**
+
+        """ + external_format_str.format(
+            message=external_message, base_url=external_base_url, link=external_link
+        )
+        return func
+
+    return decorate
 
 
 def safe_stringify(value: Union[IntLike, UUIDLike]) -> str:

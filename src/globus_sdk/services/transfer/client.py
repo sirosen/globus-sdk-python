@@ -69,14 +69,12 @@ class TransferClient(client.BaseClient):
     # Endpoint Management
     #
 
+    @utils.doc_api_method("Get Endpoint by ID", "transfer/endpoint/#get_endpoint_by_id")
     def get_endpoint(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -84,19 +82,15 @@ class TransferClient(client.BaseClient):
         >>> endpoint = tc.get_endpoint(endpoint_id)
         >>> print("Endpoint name:",
         >>>       endpoint["display_name"] or endpoint["canonical_name"])
-
-        **External Documentation**
-
-        See
-        `Get Endpoint by ID \
-        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_by_id>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Update Endpoint by ID", "transfer/endpoint/#update_endpoint_by_id"
+    )
     def update_endpoint(
         self,
         endpoint_id: UUIDLike,
@@ -106,22 +100,12 @@ class TransferClient(client.BaseClient):
         """
         ``PUT /endpoint/<endpoint_id>``
 
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
         **Examples**
 
         >>> tc = globus_sdk.TransferClient(...)
         >>> epup = dict(display_name="My New Endpoint Name",
         >>>             description="Better Description")
         >>> update_result = tc.update_endpoint(endpoint_id, epup)
-
-        **External Documentation**
-
-        See
-        `Update Endpoint by ID \
-        <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_by_id>`_
-        in the REST documentation for details.
         """
         if data.get("myproxy_server"):
             if data.get("oauth_server"):
@@ -140,12 +124,10 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s)
         return self.put(path, data=data, query_params=query_params)
 
+    @utils.doc_api_method("Create Endpoint", "transfer/endpoint/#create_endpoint")
     def create_endpoint(self, data: dict) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -162,13 +144,6 @@ class TransferClient(client.BaseClient):
         >>> }
         >>> create_result = tc.create_endpoint(ep_data)
         >>> endpoint_id = create_result["id"]
-
-        **External Documentation**
-
-        See
-        `Create endpoint \
-        <https://docs.globus.org/api/transfer/endpoint/#create_endpoint>`_
-        in the REST documentation for details.
         """
         if data.get("myproxy_server") and data.get("oauth_server"):
             raise exc.GlobusSDKUsageError(
@@ -180,30 +155,24 @@ class TransferClient(client.BaseClient):
         log.info("TransferClient.create_endpoint(...)")
         return self.post("endpoint", data=data)
 
+    @utils.doc_api_method(
+        "Delete Endpoint by ID", "transfer/endpoint/#delete_endpoint_by_id"
+    )
     def delete_endpoint(self, endpoint_id: UUIDLike) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
         >>> tc = globus_sdk.TransferClient(...)
         >>> delete_result = tc.delete_endpoint(endpoint_id)
-
-        **External Documentation**
-
-        See
-        `Delete endpoint by id \
-        <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_by_id>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s)
         return self.delete(path)
 
+    @utils.doc_api_method("Endpoint Search", "transfer/endpoint_search")
     @paging.has_paginator(
         paging.HasNextPaginator,
         items_key="DATA",
@@ -255,8 +224,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -273,12 +240,6 @@ class TransferClient(client.BaseClient):
 
         It is important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query.
-
-        **External Documentation**
-
-        For additional information, see `Endpoint Search
-        <https://docs.globus.org/api/transfer/endpoint_search>`_.
-        in the REST documentation for details.
         """
         if query_params is None:
             query_params = {}
@@ -303,6 +264,9 @@ class TransferClient(client.BaseClient):
             self.get("endpoint_search", query_params=query_params)
         )
 
+    @utils.doc_api_method(
+        "Autoactivate Endpoint", "transfer/endpoint_activation/#autoactivate_endpoint"
+    )
     def endpoint_autoactivate(
         self,
         endpoint_id: UUIDLike,
@@ -311,9 +275,6 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         r"""
         ``POST /endpoint/<endpoint_id>/autoactivate``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         The following example will try to "auto" activate the endpoint
         using a credential available from another endpoint or sign in by
@@ -360,13 +321,6 @@ class TransferClient(client.BaseClient):
         >>> elif r['code'] = 'AlreadyActivated':
         >>>     print('Endpoint({}) already active until at least {}'
         >>>           .format(ep_id, 3600))
-
-        **External Documentation**
-
-        See
-        `Autoactivate endpoint \
-        <https://docs.globus.org/api/transfer/endpoint_activation/#autoactivate_endpoint>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         if query_params is None:
@@ -377,27 +331,23 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "autoactivate")
         return self.post(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Deactive Endpoint", "transfer/endpoint_activation/#deactivate_endpoint"
+    )
     def endpoint_deactivate(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/deactivate``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Deactive endpoint \
-        <https://docs.globus.org/api/transfer/endpoint_activation/#deactivate_endpoint>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_deactivate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "deactivate")
         return self.post(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Activate Endpoint", "transfer/endpoint_activation/#activate_endpoint"
+    )
     def endpoint_activate(
         self,
         endpoint_id: UUIDLike,
@@ -407,60 +357,37 @@ class TransferClient(client.BaseClient):
         """
         ``POST /endpoint/<endpoint_id>/activate``
 
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
         Consider using autoactivate and web activation instead, described
-        in the example for
-        :meth:`~globus_sdk.TransferClient.endpoint_autoactivate`.
-
-        **External Documentation**
-
-        See
-        `Activate endpoint \
-        <https://docs.globus.org/api/transfer/endpoint_activation/#activate_endpoint>`_
-        in the REST documentation for details.
+        in the example for :meth:`~endpoint_autoactivate`.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_activate({endpoint_id_s})")
         path = self.qjoin_path("endpoint", endpoint_id_s, "activate")
         return self.post(path, data=requirements_data, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Get Activation Requirements",
+        "transfer/endpoint_activation/#get_activation_requirements",
+    )
     def endpoint_get_activation_requirements(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> ActivationRequirementsResponse:
         """
         ``GET /endpoint/<endpoint_id>/activation_requirements``
-
-        :rtype: :class:`ActivationRequirementsResponse
-                <globus_sdk.services.transfer.response.ActivationRequirementsResponse>`
-
-        **External Documentation**
-
-        See
-        `Get activation requirements \
-        <https://docs.globus.org/api/transfer/endpoint_activation/#get_activation_requirements>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         path = self.qjoin_path("endpoint", endpoint_id_s, "activation_requirements")
         return ActivationRequirementsResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get my effective endpoint pause rules",
+        "transfer/endpoint/#get_endpoint_pause_rules",
+    )
     def my_effective_pause_rule_list(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
-
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get my effective endpoint pause rules \
-        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_pause_rules>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.my_effective_pause_rule_list({endpoint_id_s}, ...)")
@@ -471,27 +398,23 @@ class TransferClient(client.BaseClient):
 
     # Shared Endpoints
 
+    @utils.doc_api_method(
+        "Get shared endpoint list", "transfer/endpoint/#get_shared_endpoint_list"
+    )
     def my_shared_endpoint_list(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/my_shared_endpoint_list``
-
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get shared endpoint list \
-        <https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "my_shared_endpoint_list")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get shared endpoint list (2)", "transfer/endpoint/#get_shared_endpoint_list2"
+    )
     @paging.has_paginator(
         paging.NextTokenPaginator,
         items_key="shared_endpoints",
@@ -513,17 +436,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_param: dict, optional
-
-
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get shared endpoint list (2) \
-        <https://https://docs.globus.org/api/transfer/endpoint/#get_shared_endpoint_list2>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_shared_endpoint_list({endpoint_id_s}, ...)")
@@ -538,6 +450,9 @@ class TransferClient(client.BaseClient):
             self.get(path, query_params=query_params), iter_key="shared_endpoints"
         )
 
+    @utils.doc_api_method(
+        "Create Shared Endpoint", "transfer/endpoint/#create_shared_endpoint"
+    )
     def create_shared_endpoint(
         self, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
@@ -546,8 +461,6 @@ class TransferClient(client.BaseClient):
 
         :param data: A python dict representation of a ``shared_endpoint`` document
         :type data: dict
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -562,40 +475,29 @@ class TransferClient(client.BaseClient):
         >>> }
         >>> create_result = tc.create_shared_endpoint(shared_ep_data)
         >>> endpoint_id = create_result["id"]
-
-        **External Documentation**
-
-        See
-        `Create shared endpoint \
-        <https://docs.globus.org/api/transfer/endpoint/#create_shared_endpoint>`_
-        in the REST documentation for details.
         """
         log.info("TransferClient.create_shared_endpoint(...)")
         return self.post("shared_endpoint", data=data)
 
     # Endpoint servers
 
+    @utils.doc_api_method(
+        "Get endpoint server list", "transfer/endpoint/#get_endpoint_server_list"
+    )
     def endpoint_server_list(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/server_list``
-
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get endpoint server list \
-        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_list>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_server_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "server_list")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get endpoint server by id", "transfer/endpoint/#get_endpoint_server_by_id"
+    )
     def get_endpoint_server(
         self,
         endpoint_id: UUIDLike,
@@ -604,16 +506,6 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/server/<server_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get endpoint server by id\
-        <https://docs.globus.org/api/transfer/endpoint/#get_endpoint_server_by_id>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -622,42 +514,29 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Add endpoint server", "transfer/endpoint/#add_endpoint_server"
+    )
     def add_endpoint_server(
         self, endpoint_id: UUIDLike, server_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/server``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Add endpoint server \
-        <https://docs.globus.org/api/transfer/endpoint/#add_endpoint_server>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_server({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "server")
         return self.post(path, data=server_data)
 
+    @utils.doc_api_method(
+        "Update endpoint server by ID",
+        "transfer/endpoint/#update_endpoint_server_by_id",
+    )
     def update_endpoint_server(
         self, endpoint_id: UUIDLike, server_id: UUIDLike, server_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Update endpoint server by id \
-        <https://docs.globus.org/api/transfer/endpoint/#update_endpoint_server_by_id>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -668,21 +547,15 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "server", str(server_id))
         return self.put(path, data=server_data)
 
+    @utils.doc_api_method(
+        "Delete endpoint server by ID",
+        "transfer/endpoint/#delete_endpoint_server_by_id",
+    )
     def delete_endpoint_server(
         self, endpoint_id: UUIDLike, server_id: UUIDLike
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Delete endpoint server by id \
-        <https://docs.globus.org/api/transfer/endpoint/#delete_endpoint_server_by_id>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -695,48 +568,37 @@ class TransferClient(client.BaseClient):
     # Roles
     #
 
+    @utils.doc_api_method(
+        "Get list of endpoint roles", "transfer/endpoint_roles/#role_list"
+    )
     def endpoint_role_list(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/role_list``
-
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get list of endpoint roles \
-        <https://docs.globus.org/api/transfer/endpoint_roles/#role_list>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_role_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role_list")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Create endpoint role", "transfer/endpoint_roles/#create_role"
+    )
     def add_endpoint_role(
         self, endpoint_id: UUIDLike, role_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/role``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Create endpoint role \
-        <https://docs.globus.org/api/transfer/endpoint_roles/#create_role>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_role({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role")
         return self.post(path, data=role_data)
 
+    @utils.doc_api_method(
+        "Get endpoint role by ID", "transfer/endpoint_roles/#get_endpoint_role_by_id"
+    )
     def get_endpoint_role(
         self,
         endpoint_id: UUIDLike,
@@ -745,37 +607,21 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/role/<role_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get endpoint role by id \
-        <https://docs.globus.org/api/transfer/endpoint_roles/#get_endpoint_role_by_id>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint_role({endpoint_id_s}, {role_id}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "role", role_id)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Delete endpoint role by ID",
+        "transfer/endpoint_roles/#delete_endpoint_role_by_id",
+    )
     def delete_endpoint_role(
         self, endpoint_id: UUIDLike, role_id: str
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/role/<role_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Delete endpoint role by id \
-        <https://docs.globus.org/api/transfer/endpoint_roles/#delete_endpoint_role_by_id>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint_role({endpoint_id_s}, {role_id})")
@@ -786,27 +632,23 @@ class TransferClient(client.BaseClient):
     # ACLs
     #
 
+    @utils.doc_api_method(
+        "Get list of access rules", "transfer/acl/#rest_access_get_list"
+    )
     def endpoint_acl_list(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/access_list``
-
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get list of access rules \
-        <https://docs.globus.org/api/transfer/acl/#rest_access_get_list>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_acl_list({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "access_list")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get access rule by ID", "transfer/acl/#get_access_rule_by_id"
+    )
     def get_endpoint_acl_rule(
         self,
         endpoint_id: UUIDLike,
@@ -815,16 +657,6 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/access/<rule_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get access rule by id \
-        <https://docs.globus.org/api/transfer/acl/#get_access_rule_by_id>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -833,6 +665,7 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method("Create access rule", "transfer/acl/#rest_access_create")
     def add_endpoint_acl_rule(
         self, endpoint_id: UUIDLike, rule_data: Dict
     ) -> response.GlobusHTTPResponse:
@@ -843,8 +676,6 @@ class TransferClient(client.BaseClient):
         :type endpoint_id: str
         :param rule_data: A python dict representation of an ``access`` document
         :type rule_data: dict
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -861,34 +692,18 @@ class TransferClient(client.BaseClient):
 
         Note that if this rule is being created on a shared endpoint
         the "path" field is relative to the "host_path" of the shared endpoint.
-
-        **External Documentation**
-
-        See
-        `Create access rule \
-        <https://docs.globus.org/api/transfer/acl/#rest_access_create>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_acl_rule({endpoint_id_s}, ...)")
         path = self.qjoin_path("endpoint", endpoint_id_s, "access")
         return self.post(path, data=rule_data)
 
+    @utils.doc_api_method("Update access rule", "transfer/acl/#update_access_rule")
     def update_endpoint_acl_rule(
         self, endpoint_id: UUIDLike, rule_id: str, rule_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Update access rule \
-        <https://docs.globus.org/api/transfer/acl/#update_access_rule>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -899,21 +714,12 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint", endpoint_id_s, "access", rule_id)
         return self.put(path, data=rule_data)
 
+    @utils.doc_api_method("Delete access rule", "transfer/acl/#delete_access_rule")
     def delete_endpoint_acl_rule(
         self, endpoint_id: UUIDLike, rule_id: str
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/access/<rule_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Delete access rule \
-        <https://docs.globus.org/api/transfer/acl/#delete_access_rule>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -926,99 +732,64 @@ class TransferClient(client.BaseClient):
     # Bookmarks
     #
 
+    @utils.doc_api_method(
+        "Get list of bookmarks", "transfer/endpoint_bookmarks/#get_list_of_bookmarks"
+    )
     def bookmark_list(
         self, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
         ``GET /bookmark_list``
-
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get list of bookmarks \
-        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_list_of_bookmarks>`_
-        in the REST documentation for details.
         """
         log.info(f"TransferClient.bookmark_list({query_params})")
         return IterableTransferResponse(
             self.get("bookmark_list", query_params=query_params)
         )
 
+    @utils.doc_api_method(
+        "Create bookmark", "transfer/endpoint_bookmarks/#create_bookmark"
+    )
     def create_bookmark(self, bookmark_data: Dict) -> response.GlobusHTTPResponse:
         """
         ``POST /bookmark``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Create bookmark \
-        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#create_bookmark>`_
-        in the REST documentation for details.
         """
         log.info(f"TransferClient.create_bookmark({bookmark_data})")
         return self.post("bookmark", data=bookmark_data)
 
+    @utils.doc_api_method(
+        "Get bookmark by ID", "transfer/endpoint_bookmarks/#get_bookmark_by_id"
+    )
     def get_bookmark(
         self, bookmark_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /bookmark/<bookmark_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get bookmark by id \
-        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#get_bookmark_by_id>`_
-        in the REST documentation for details.
         """
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.get_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Update bookmark", "transfer/endpoint_bookmarks/#update_bookmark"
+    )
     def update_bookmark(
         self, bookmark_id: UUIDLike, bookmark_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /bookmark/<bookmark_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Update bookmark \
-        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#update_bookmark>`_
-        in the REST documentation for details.
         """
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.update_bookmark({bookmark_id_s})")
         path = self.qjoin_path("bookmark", bookmark_id_s)
         return self.put(path, data=bookmark_data)
 
+    @utils.doc_api_method(
+        "Delete bookmark by ID", "transfer/endpoint_bookmarks/#delete_bookmark_by_id"
+    )
     def delete_bookmark(self, bookmark_id: UUIDLike) -> response.GlobusHTTPResponse:
         """
         ``DELETE /bookmark/<bookmark_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Delete bookmark by id\
-        <https://docs.globus.org/api/transfer/endpoint_bookmarks/#delete_bookmark_by_id>`_
-        in the REST documentation for details.
         """
         bookmark_id_s = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.delete_bookmark({bookmark_id_s})")
@@ -1029,6 +800,9 @@ class TransferClient(client.BaseClient):
     # Synchronous Filesys Operations
     #
 
+    @utils.doc_api_method(
+        "List Directory Contents", "transfer/file_operations/#list_directory_contents"
+    )
     def operation_ls(
         self,
         endpoint_id: UUIDLike,
@@ -1054,8 +828,6 @@ class TransferClient(client.BaseClient):
         :param filter: Only return file documents that match these filter clauses. For
             the filter syntax, see the **External Documentation** linked below.
         :type filter: str, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -1074,13 +846,6 @@ class TransferClient(client.BaseClient):
         >>>     orderby=["type", "name"]
         >>> ):
         >>>     print(entry["name DESC"], entry["type"])
-
-        **External Documentation**
-
-        See
-        `List Directory Contents \
-        <https://docs.globus.org/api/transfer/file_operations/#list_directory_contents>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
 
@@ -1102,6 +867,7 @@ class TransferClient(client.BaseClient):
         req_path = self.qjoin_path("operation/endpoint", endpoint_id_s, "ls")
         return IterableTransferResponse(self.get(req_path, query_params=query_params))
 
+    @utils.doc_api_method("Make Directory", "transfer/file_operations/#make_directory")
     def operation_mkdir(
         self,
         endpoint_id: UUIDLike,
@@ -1111,20 +877,10 @@ class TransferClient(client.BaseClient):
         """
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
 
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
         **Examples**
 
         >>> tc = globus_sdk.TransferClient(...)
         >>> tc.operation_mkdir(ep_id, path="/~/newdir/")
-
-        **External Documentation**
-
-        See
-        `Make Directory \
-        <https://docs.globus.org/api/transfer/file_operations/#make_directory>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         path = utils.safe_stringify(path)
@@ -1137,6 +893,7 @@ class TransferClient(client.BaseClient):
         json_body = {"DATA_TYPE": "mkdir", "path": path}
         return self.post(resource_path, data=json_body, query_params=query_params)
 
+    @utils.doc_api_method("Rename", "transfer/file_operations/#rename")
     def operation_rename(
         self,
         endpoint_id: UUIDLike,
@@ -1147,21 +904,11 @@ class TransferClient(client.BaseClient):
         """
         ``POST /operation/endpoint/<endpoint_id>/rename``
 
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
         **Examples**
 
         >>> tc = globus_sdk.TransferClient(...)
         >>> tc.operation_rename(ep_id, oldpath="/~/file1.txt",
         >>>                     newpath="/~/project1data.txt")
-
-        **External Documentation**
-
-        See
-        `Rename \
-        <https://docs.globus.org/api/transfer/file_operations/#rename>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -1173,6 +920,7 @@ class TransferClient(client.BaseClient):
         json_body = {"DATA_TYPE": "rename", "old_path": oldpath, "new_path": newpath}
         return self.post(resource_path, data=json_body, query_params=query_params)
 
+    @utils.doc_api_method("Symlink", "transfer/file_operations/#symlink")
     def operation_symlink(
         self,
         endpoint_id: UUIDLike,
@@ -1183,9 +931,6 @@ class TransferClient(client.BaseClient):
         """
         ``POST /operation/endpoint/<endpoint_id>/symlink``
 
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
         The ``path`` is the name of the symlink, and the ``symlink_target`` is
         the path referenced by the symlink.
 
@@ -1194,13 +939,6 @@ class TransferClient(client.BaseClient):
         >>> tc = globus_sdk.TransferClient(...)
         >>> tc.operation_symlink(ep_id, symlink_target="/~/file1.txt",
         >>>                      path="/~/link-to-file1.txt")
-
-        **External Documentation**
-
-        See
-        `Symlink \
-        <https://docs.globus.org/api/transfer/file_operations/#symlink>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -1220,14 +958,14 @@ class TransferClient(client.BaseClient):
     # Task Submission
     #
 
+    @utils.doc_api_method(
+        "Get a submission ID", "transfer/task_submit/#get_submission_id"
+    )
     def get_submission_id(
         self, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /submission_id``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         Submission IDs are required to submit tasks to the Transfer service
         via the :meth:`submit_transfer <.submit_transfer>` and
@@ -1237,25 +975,18 @@ class TransferClient(client.BaseClient):
         convenience classes :class:`TransferData <globus_sdk.TransferData>`
         and :class:`DeleteData <globus_sdk.DeleteData>` will call it
         automatically if they are not passed a ``submission_id`` explicitly.
-
-        **External Documentation**
-
-        See
-        `Get a submission id \
-        <https://docs.globus.org/api/transfer/task_submit/#get_submission_id>`_
-        in the REST documentation for more details.
         """
         log.info(f"TransferClient.get_submission_id({query_params})")
         return self.get("submission_id", query_params=query_params)
 
+    @utils.doc_api_method(
+        "Submit a transfer task", "transfer/task_submit/#submit_transfer_task"
+    )
     def submit_transfer(
         self, data: Union[Dict[str, Any], TransferData]
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /transfer``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -1273,25 +1004,18 @@ class TransferClient(client.BaseClient):
 
         The `data` parameter can be a normal Python dictionary, or
         a :class:`TransferData <globus_sdk.TransferData>` object.
-
-        **External Documentation**
-
-        See
-        `Submit a transfer task \
-        <https://docs.globus.org/api/transfer/task_submit/#submit_transfer_task>`_
-        in the REST documentation for more details.
         """
         log.info("TransferClient.submit_transfer(...)")
         return self.post("/transfer", data=data)
 
+    @utils.doc_api_method(
+        "Submit a delete task", "transfer/task_submit/#submit_delete_task"
+    )
     def submit_delete(
         self, data: Union[Dict[str, Any], DeleteData]
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /delete``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -1304,13 +1028,6 @@ class TransferClient(client.BaseClient):
 
         The `data` parameter can be a normal Python dictionary, or
         a :class:`DeleteData <globus_sdk.DeleteData>` object.
-
-        **External Documentation**
-
-        See
-        `Submit a delete task \
-        <https://docs.globus.org/api/transfer/task_submit/#submit_delete_task>`_
-        in the REST documentation for details.
         """
         log.info("TransferClient.submit_delete(...)")
         return self.post("/delete", data=data)
@@ -1319,6 +1036,7 @@ class TransferClient(client.BaseClient):
     # Task inspection and management
     #
 
+    @utils.doc_api_method("Task list", "transfer/task/#get_task_list")
     @paging.has_paginator(
         paging.LimitOffsetTotalPaginator,
         items_key="DATA",
@@ -1344,8 +1062,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -1356,13 +1072,6 @@ class TransferClient(client.BaseClient):
         >>>     print("Task({}): {} -> {}".format(
         >>>         task["task_id"], task["source_endpoint"],
         >>>         task["destination_endpoint"]))
-
-        **External Documentation**
-
-        See
-        `Task list \
-        <https://docs.globus.org/api/transfer/task/#get_task_list>`_
-        in the REST documentation for details.
         """
         log.info("TransferClient.task_list(...)")
         if query_params is None:
@@ -1375,6 +1084,7 @@ class TransferClient(client.BaseClient):
             self.get("task_list", query_params=query_params)
         )
 
+    @utils.doc_api_method("Get event list", "transfer/task/#get_event_list")
     @paging.has_paginator(
         paging.LimitOffsetTotalPaginator,
         items_key="DATA",
@@ -1403,8 +1113,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -1415,13 +1123,6 @@ class TransferClient(client.BaseClient):
         >>> for event in tc.task_event_list(task_id, limit=10):
         >>>     print("Event on Task({}) at {}:\n{}".format(
         >>>         task_id, event["time"], event["description"])
-
-        **External Documentation**
-
-        See
-        `Get event list \
-        <https://docs.globus.org/api/transfer/task/#get_event_list>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_event_list({task_id_s}, ...)")
@@ -1434,27 +1135,19 @@ class TransferClient(client.BaseClient):
             query_params["offset"] = offset
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method("Get task by ID", "transfer/task/#get_task_by_id")
     def get_task(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /task/<task_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get task by id \
-        <https://docs.globus.org/api/transfer/task/#get_task_by_id>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.get_task({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s)
         return self.get(resource_path, query_params=query_params)
 
+    @utils.doc_api_method("Update task by ID", "transfer/task/#update_task_by_id")
     def update_task(
         self,
         task_id: UUIDLike,
@@ -1463,35 +1156,16 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /task/<task_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Update task by id \
-        <https://docs.globus.org/api/transfer/task/#update_task_by_id>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.update_task({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s)
         return self.put(resource_path, data=data, query_params=query_params)
 
+    @utils.doc_api_method("Cancel task by ID", "transfer/task/#cancel_task_by_id")
     def cancel_task(self, task_id: UUIDLike) -> response.GlobusHTTPResponse:
         """
         ``POST /task/<task_id>/cancel``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Cancel task by id \
-        <https://docs.globus.org/api/transfer/task/#cancel_task_by_id>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.cancel_task({task_id_s})")
@@ -1601,27 +1275,21 @@ class TransferClient(client.BaseClient):
             time.sleep(polling_interval)
         # unreachable -- end of task_wait
 
+    @utils.doc_api_method("Get task pause info", "transfer/task/#get_task_pause_info")
     def task_pause_info(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /task/<task_id>/pause_info``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get task pause info \
-        <https://docs.globus.org/api/transfer/task/#get_task_pause_info>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_pause_info({task_id_s}, ...)")
         resource_path = self.qjoin_path("task", task_id_s, "pause_info")
         return self.get(resource_path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Get Task Successful Transfer", "transfer/task/#get_task_successful_transfers"
+    )
     @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def task_successful_transfers(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
@@ -1643,8 +1311,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -1655,19 +1321,15 @@ class TransferClient(client.BaseClient):
         >>> for info in tc.task_successful_transfers(task_id):
         >>>     print("{} -> {}".format(
         >>>         info["source_path"], info["destination_path"]))
-
-        **External Documentation**
-
-        See
-        `Get Task Successful Transfers\
-        <https://docs.globus.org/api/transfer/task/#get_task_successful_transfers>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_successful_transfers({task_id_s}, ...)")
         path = self.qjoin_path("task", task_id_s, "successful_transfers")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get Task Skipped Errors", "transfer/task/#get_task_skipped_errors"
+    )
     @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def task_skipped_errors(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
@@ -1683,8 +1345,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Examples**
 
@@ -1695,13 +1355,6 @@ class TransferClient(client.BaseClient):
         >>> for info in tc.task_skipped_errors(task_id):
         >>>     print("{} -> {}".format(
         >>>         info["error_code"], info["source_path"]))
-
-        **External Documentation**
-
-        See
-        `Get Task Skipped Errors\
-        <https://docs.globus.org/api/transfer/task/#get_task_skipped_errors>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(
@@ -1716,6 +1369,10 @@ class TransferClient(client.BaseClient):
     # advanced endpoint management (requires endpoint manager role)
     #
 
+    @utils.doc_api_method(
+        "Get monitored endpoints",
+        "transfer/advanced_endpoint_management/#get_monitored_endpoints",
+    )
     def endpoint_manager_monitored_endpoints(
         self, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
@@ -1723,19 +1380,15 @@ class TransferClient(client.BaseClient):
         Get endpoints the current user is a monitor or manager on.
 
         ``GET endpoint_manager/monitored_endpoints``
-
-        :rtype: iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
-
-        See
-        `Get monitored endpoints \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_monitored_endpoints>`_
-        in the REST documentation for details.
         """
         log.info(f"TransferClient.endpoint_manager_monitored_endpoints({query_params})")
         path = self.qjoin_path("endpoint_manager", "monitored_endpoints")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get hosted endpoint list",
+        "transfer/advanced_endpoint_management/#get_hosted_endpoint_list",
+    )
     def endpoint_manager_hosted_endpoint_list(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
@@ -1743,14 +1396,6 @@ class TransferClient(client.BaseClient):
         Get shared endpoints hosted on the given endpoint.
 
         ``GET /endpoint_manager/endpoint/<endpoint_id>/hosted_endpoint_list``
-
-        :rtype: iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
-
-        See
-        `Get hosted endpoint list \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_hosted_endpoint_list>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -1761,6 +1406,10 @@ class TransferClient(client.BaseClient):
         )
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get endpoint as admin",
+        "transfer/advanced_endpoint_management/#mc_get_endpoint",
+    )
     def endpoint_manager_get_endpoint(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
@@ -1768,22 +1417,16 @@ class TransferClient(client.BaseClient):
         Get endpoint details as an admin.
 
         ``GET /endpoint_manager/endpoint/<endpoint_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get endpoint as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#mc_get_endpoint>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id_s})")
         path = self.qjoin_path("endpoint_manager", "endpoint", endpoint_id_s)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Get endpoint access list as admin",
+        "transfer/advanced_endpoint_management/#get_endpoint_access_list_as_admin",
+    )
     def endpoint_manager_acl_list(
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
@@ -1791,16 +1434,6 @@ class TransferClient(client.BaseClient):
         Get a list of access control rules on specified endpoint as an admin.
 
         ``GET endpoint_manager/endpoint/<endpoint_id>/access_list``
-
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get endpoint access list as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_endpoint_access_list_as_admin>`_
-        in the REST documentation for details.
         """
         endpoint_id_s = utils.safe_stringify(endpoint_id)
         log.info(
@@ -1815,6 +1448,10 @@ class TransferClient(client.BaseClient):
     # endpoint manager task methods
     #
 
+    @utils.doc_api_method(
+        "Advanced Endpoint Management: Get tasks",
+        "transfer/advanced_endpoint_management/#get_tasks",
+    )
     @paging.has_paginator(paging.LastKeyPaginator, items_key="DATA")
     def endpoint_manager_task_list(
         self, query_params: Optional[Dict[str, Any]] = None
@@ -1828,8 +1465,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
 
         **Filters**
 
@@ -1933,18 +1568,14 @@ class TransferClient(client.BaseClient):
         >>>         print("Task({}): {} -> {}\n  was submitted by\n  {}".format(
         >>>             task["task_id"], task["source_endpoint"],
         >>>             task["destination_endpoint"), task["owner_string"])
-
-        **External Documentation**
-
-        See
-        `Advanced Endpoint Management: Get tasks \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_tasks>`_
-        in the REST documentation for details.
         """
         log.info("TransferClient.endpoint_manager_task_list(...)")
         path = self.qjoin_path("endpoint_manager", "task_list")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get task as admin", "transfer/advanced_endpoint_management/#get_task"
+    )
     def endpoint_manager_get_task(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
@@ -1953,22 +1584,16 @@ class TransferClient(client.BaseClient):
         the destination endpoint of the task.
 
         ``GET /endpoint_manager/task/<task_id>``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get task as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_get_task({task_id_s}, ...)")
         path = self.qjoin_path("endpoint_manager", "task", task_id_s)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Get task events as admin",
+        "transfer/advanced_endpoint_management/#get_task_events",
+    )
     @paging.has_paginator(
         paging.LimitOffsetTotalPaginator,
         items_key="DATA",
@@ -1998,15 +1623,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get task events as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_events>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_event_list({task_id_s}, ...)")
@@ -2019,6 +1635,10 @@ class TransferClient(client.BaseClient):
             query_params["offset"] = offset
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get task pause info as admin",
+        "transfer/advanced_endpoint_management/#get_task_pause_info_as_admin",
+    )
     def endpoint_manager_task_pause_info(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
@@ -2027,22 +1647,16 @@ class TransferClient(client.BaseClient):
         monitor effective role on the destination endpoint of the task.
 
         ``GET /endpoint_manager/task/<task_id>/pause_info``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get task pause info as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_pause_info_as_admin>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_pause_info({task_id_s}, ...)")
         path = self.qjoin_path("endpoint_manager", "task", task_id_s, "pause_info")
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Get task successful transfers as admi",
+        "transfer/advanced_endpoint_management/#get_task_successful_transfers_as_admin",
+    )
     @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
     def endpoint_manager_task_successful_transfers(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
@@ -2057,15 +1671,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get task successful transfers as admin\
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_successful_transfers_as_admin>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(
@@ -2077,6 +1682,10 @@ class TransferClient(client.BaseClient):
         )
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Get task skipped errors as admin",
+        "transfer/advanced_endpoint_management/#get_task_skipped_errors_as_admin",
+    )
     def endpoint_manager_task_skipped_errors(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
@@ -2090,15 +1699,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get task skipped errors as admin\
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_task_skipped_errors_as_admin>`_
-        in the REST documentation for details.
         """
         task_id_s = utils.safe_stringify(task_id)
         log.info(
@@ -2107,6 +1707,9 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint_manager", "task", task_id_s, "skipped_errors")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Cancel tasks as admin", "transfer/advanced_endpoint_management/#admin_cancel"
+    )
     def endpoint_manager_cancel_tasks(
         self,
         task_ids: Iterable[UUIDLike],
@@ -2126,15 +1729,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Cancel tasks as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#admin_cancel>`_
-        in the REST documentation for details.
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
         log.info(
@@ -2144,6 +1738,10 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint_manager", "admin_cancel")
         return self.post(path, data=data, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Get cancel status by ID",
+        "transfer/advanced_endpoint_management/#get_cancel_status_by_id",
+    )
     def endpoint_manager_cancel_status(
         self, admin_cancel_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
@@ -2158,21 +1756,16 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get cancel status by id \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_cancel_status_by_id>`_
-        in the REST documentation for details.
         """
         admin_cancel_id = utils.safe_stringify(admin_cancel_id)
         log.info(f"TransferClient.endpoint_manager_cancel_status({admin_cancel_id})")
         path = self.qjoin_path("endpoint_manager", "admin_cancel", admin_cancel_id)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Pause tasks as admin",
+        "transfer/advanced_endpoint_management/#pause_tasks_as_admin",
+    )
     def endpoint_manager_pause_tasks(
         self,
         task_ids: Iterable[UUIDLike],
@@ -2192,15 +1785,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Pause tasks as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#pause_tasks_as_admin>`_
-        in the REST documentation for details.
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
         log.info(
@@ -2210,6 +1794,10 @@ class TransferClient(client.BaseClient):
         path = self.qjoin_path("endpoint_manager", "admin_pause")
         return self.post(path, data=data, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Resume tasks as admin",
+        "transfer/advanced_endpoint_management/#resume_tasks_as_admin",
+    )
     def endpoint_manager_resume_tasks(
         self,
         task_ids: Iterable[UUIDLike],
@@ -2226,15 +1814,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Resume tasks as admin \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#resume_tasks_as_admin>`_
-        in the REST documentation for details.
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
         log.info(f"TransferClient.endpoint_manager_resume_tasks({str_task_ids})")
@@ -2246,6 +1825,9 @@ class TransferClient(client.BaseClient):
     # endpoint manager pause rule methods
     #
 
+    @utils.doc_api_method(
+        "Get pause rules", "transfer/advanced_endpoint_management/#get_pause_rules"
+    )
     def endpoint_manager_pause_rule_list(
         self,
         filter_endpoint: Optional[UUIDLike] = None,
@@ -2264,15 +1846,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`IterableTransferResponse
-                <globus_sdk.services.transfer.response.IterableTransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get pause rules \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_pause_rules>`_
-        in the REST documentation for details.
         """
         log.info("TransferClient.endpoint_manager_pause_rule_list(...)")
         path = self.qjoin_path("endpoint_manager", "pause_rule_list")
@@ -2282,6 +1855,9 @@ class TransferClient(client.BaseClient):
             query_params["filter_endpoint"] = utils.safe_stringify(filter_endpoint)
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
+    @utils.doc_api_method(
+        "Create pause rule", "transfer/advanced_endpoint_management/#create_pause_rule"
+    )
     def endpoint_manager_create_pause_rule(
         self, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
@@ -2290,9 +1866,6 @@ class TransferClient(client.BaseClient):
         on the endpoint defined in the rule.
 
         ``POST /endpoint_manager/pause_rule``
-
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
 
         **Examples**
 
@@ -2306,18 +1879,14 @@ class TransferClient(client.BaseClient):
         >>> }
         >>> create_result = tc.endpoint_manager_create_pause_rule(ep_data)
         >>> rule_id = create_result["id"]
-
-        **External Documentation**
-
-        See
-        `Create pause rule \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#create_pause_rule>`_
-        in the REST documentation for details.
         """
         log.info("TransferClient.endpoint_manager_create_pause_rule(...)")
         path = self.qjoin_path("endpoint_manager", "pause_rule")
         return self.post(path, data=data)
 
+    @utils.doc_api_method(
+        "Get pause rule", "transfer/advanced_endpoint_management/#get_pause_rule"
+    )
     def endpoint_manager_get_pause_rule(
         self, pause_rule_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
@@ -2332,21 +1901,15 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Get pause rule \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#get_pause_rule>`_
-        in the REST documentation for details.
         """
         pause_rule_id = utils.safe_stringify(pause_rule_id)
         log.info(f"TransferClient.endpoint_manager_get_pause_rule({pause_rule_id})")
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method(
+        "Update pause rule", "transfer/advanced_endpoint_management/#update_pause_rule"
+    )
     def endpoint_manager_update_pause_rule(
         self, pause_rule_id: UUIDLike, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
@@ -2357,9 +1920,6 @@ class TransferClient(client.BaseClient):
 
         ``PUT /endpoint_manager/pause_rule/<pause_rule_id>``
 
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
         **Examples**
 
         >>> tc = globus_sdk.TransferClient(...)
@@ -2369,19 +1929,15 @@ class TransferClient(client.BaseClient):
         >>>   "pause_task_transfer_read": False
         >>> }
         >>> update_result = tc.endpoint_manager_update_pause_rule(ep_data)
-
-        **External Documentation**
-
-        See
-        `Update pause rule \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#update_pause_rule>`_
-        in the REST documentation for details.
         """
         pause_rule_id = utils.safe_stringify(pause_rule_id)
         log.info(f"TransferClient.endpoint_manager_update_pause_rule({pause_rule_id})")
         path = self.qjoin_path("endpoint_manager", "pause_rule", pause_rule_id)
         return self.put(path, data=data)
 
+    @utils.doc_api_method(
+        "Delete pause rule", "transfer/advanced_endpoint_management/#delete_pause_rule"
+    )
     def endpoint_manager_delete_pause_rule(
         self, pause_rule_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
@@ -2397,15 +1953,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
-        :rtype: :class:`TransferResponse
-                <globus_sdk.services.transfer.response.TransferResponse>`
-
-        **External Documentation**
-
-        See
-        `Delete pause rule \
-        <https://docs.globus.org/api/transfer/advanced_endpoint_management/#delete_pause_rule>`_
-        in the REST documentation for details.
         """
         pause_rule_id = utils.safe_stringify(pause_rule_id)
         log.info(f"TransferClient.endpoint_manager_delete_pause_rule({pause_rule_id})")

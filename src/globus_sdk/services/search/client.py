@@ -36,6 +36,7 @@ class SearchClient(client.BaseClient):
     # Index Management
     #
 
+    @utils.doc_api_method("Get Index Metadata", "search/reference/index_show/")
     def get_index(
         self, index_id: UUIDLike, query_params: Optional[Dict[str, Any]]
     ) -> response.GlobusHTTPResponse:
@@ -50,13 +51,6 @@ class SearchClient(client.BaseClient):
         >>> print(index["display_name"],
         >>>       "(" + index_id + "):",
         >>>       index["description"])
-
-        **External Documentation**
-
-        See
-        `Get Index Metadata \
-        <https://docs.globus.org/api/search/index_meta/>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.get_index({index_id})")
@@ -67,6 +61,7 @@ class SearchClient(client.BaseClient):
     # Search queries
     #
 
+    @utils.doc_api_method("GET Search Query", "search/reference/get_query/")
     @paging.has_paginator(
         paging.HasNextPaginator,
         items_key="gmeta",
@@ -92,13 +87,6 @@ class SearchClient(client.BaseClient):
         >>> result = sc.search(index_id, 'query string')
         >>> advanced_result = sc.search(index_id, 'author: "Ada Lovelace"',
         >>>                             advanced=True)
-
-        **External Documentation**
-
-        See
-        `GET Search Query \
-        <https://docs.globus.org/api/search/search/#simple_get_query>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         if query_params is None:
@@ -116,6 +104,7 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/index", index_id, "search")
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method("POST Search Query", "search/reference/post_query")
     def post_search(
         self, index_id: UUIDLike, data: Union[Dict[str, Any], SearchQuery]
     ) -> response.GlobusHTTPResponse:
@@ -150,13 +139,6 @@ class SearchClient(client.BaseClient):
         >>>   ]
         >>> }
         >>> search_result = sc.post_search(index_id, query_data)
-
-        **External Documentation**
-
-        See
-        `POST Search Query \
-        <https://docs.globus.org/api/search/search/#complex_post_query>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.post_search({index_id}, ...)")
@@ -167,6 +149,7 @@ class SearchClient(client.BaseClient):
     # Bulk data indexing
     #
 
+    @utils.doc_api_method("Ingest", "search/reference/ingest")
     def ingest(
         self, index_id: UUIDLike, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
@@ -214,13 +197,6 @@ class SearchClient(client.BaseClient):
         >>>   }
         >>> }
         >>> sc.ingest(index_id, ingest_data)
-
-        **External Documentation**
-
-        See
-        `Ingest \
-        <https://docs.globus.org/api/search/ingest/>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.ingest({index_id}, ...)")
@@ -231,6 +207,7 @@ class SearchClient(client.BaseClient):
     # Bulk delete
     #
 
+    @utils.doc_api_method("Delete By Query", "search/reference/delete_by_query")
     def delete_by_query(
         self, index_id: UUIDLike, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
@@ -254,13 +231,6 @@ class SearchClient(client.BaseClient):
         >>>   ]
         >>> }
         >>> sc.delete_by_query(index_id, query_data)
-
-        **External Documentation**
-
-        See
-        `Delete By Query \
-        <https://docs.globus.org/api/search/subject_ops/#delete_by_query>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.delete_by_query({index_id}, ...)")
@@ -271,6 +241,7 @@ class SearchClient(client.BaseClient):
     # Subject Operations
     #
 
+    @utils.doc_api_method("Get Subject", "search/reference/get_subject")
     def get_subject(
         self,
         index_id: UUIDLike,
@@ -287,13 +258,6 @@ class SearchClient(client.BaseClient):
 
         >>> sc = globus_sdk.SearchClient(...)
         >>> subject_data = sc.get_subject(index_id, 'http://example.com/abc')
-
-        **External Documentation**
-
-        See
-        `Get Subject \
-        <https://docs.globus.org/api/search/subject_ops/#get_by_subject>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         if query_params is None:
@@ -303,6 +267,7 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/index", index_id, "subject")
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method("Delete Subject", "search/reference/delete_subject")
     def delete_subject(
         self,
         index_id: UUIDLike,
@@ -319,13 +284,6 @@ class SearchClient(client.BaseClient):
 
         >>> sc = globus_sdk.SearchClient(...)
         >>> subject_data = sc.get_subject(index_id, 'http://example.com/abc')
-
-        **External Documentation**
-
-        See
-        `Delete Subject \
-        <https://docs.globus.org/api/search/subject_ops/#delete_by_subject>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         if query_params is None:
@@ -340,6 +298,7 @@ class SearchClient(client.BaseClient):
     # Entry Operations
     #
 
+    @utils.doc_api_method("Get Entry", "search/reference/get_entry")
     def get_entry(
         self,
         index_id: UUIDLike,
@@ -364,13 +323,6 @@ class SearchClient(client.BaseClient):
         >>> sc = globus_sdk.SearchClient(...)
         >>> entry_data = sc.get_entry(index_id, 'http://example.com/foo/bar',
         >>>                           entry_id='foo/bar')
-
-        **External Documentation**
-
-        See
-        `Get Entry \
-        <https://docs.globus.org/api/search/entry_ops/#get_single_entry>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         if query_params is None:
@@ -387,6 +339,7 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method("Create Entry", "search/reference/create_or_update_entry")
     def create_entry(
         self, index_id: UUIDLike, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
@@ -419,19 +372,13 @@ class SearchClient(client.BaseClient):
         >>>         "foo/bar": "some val"
         >>>     }
         >>> })
-
-        **External Documentation**
-
-        See
-        `Create Entry \
-        <https://docs.globus.org/api/search/entry_ops/#create_single_entry>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.create_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.post(path, data=data)
 
+    @utils.doc_api_method("Update Entry", "search/reference/create_or_update_entry")
     def update_entry(
         self, index_id: UUIDLike, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
@@ -451,19 +398,13 @@ class SearchClient(client.BaseClient):
         >>>         "foo/bar": "some val"
         >>>     }
         >>> })
-
-        **External Documentation**
-
-        See
-        `Update Entry \
-        <https://docs.globus.org/api/search/entry_ops/#update_single_entry>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.update_entry({index_id}, ...)")
         path = self.qjoin_path("v1/index", index_id, "entry")
         return self.put(path, data=data)
 
+    @utils.doc_api_method("Delete Entry", "search/reference/delete_entry")
     def delete_entry(
         self,
         index_id: UUIDLike,
@@ -488,13 +429,6 @@ class SearchClient(client.BaseClient):
         >>> sc = globus_sdk.SearchClient(...)
         >>> sc.delete_entry(index_id, "https://example.com/foo/bar",
         >>>                 entry_id="foo/bar")
-
-        **External Documentation**
-
-        See
-        `Delete Entry \
-        <https://docs.globus.org/api/search/entry_ops/#delete_single_entry>`_
-        in the API documentation for details.
         """
         index_id = utils.safe_stringify(index_id)
         if query_params is None:
@@ -514,6 +448,7 @@ class SearchClient(client.BaseClient):
     # Task Management
     #
 
+    @utils.doc_api_method("Get Task", "search/reference/get_task")
     def get_task(
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
@@ -532,6 +467,7 @@ class SearchClient(client.BaseClient):
         path = self.qjoin_path("v1/task", task_id)
         return self.get(path, query_params=query_params)
 
+    @utils.doc_api_method("Task List", "search/reference/task_list")
     def get_task_list(
         self, index_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:

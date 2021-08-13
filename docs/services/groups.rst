@@ -21,15 +21,19 @@ These enums define values which can be passed to other helpers:
 
 .. autoclass:: GroupMemberVisibility
     :members:
+    :undoc-members:
 
 .. autoclass:: GroupRequiredSignupFields
     :members:
+    :undoc-members:
 
 .. autoclass:: GroupRole
     :members:
+    :undoc-members:
 
 .. autoclass:: GroupVisibility
     :members:
+    :undoc-members:
 
 Payload Types
 ~~~~~~~~~~~~~

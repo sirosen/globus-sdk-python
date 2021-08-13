@@ -1,8 +1,8 @@
 import logging
 from typing import Any, Optional, Sequence, Union
 
+from globus_sdk import exc, utils
 from globus_sdk.authorizers import BasicAuthorizer
-from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.response import GlobusHTTPResponse
 
 from ..oauth2_authorization_code import GlobusAuthorizationCodeFlowManager
@@ -36,7 +36,7 @@ class ConfidentialAppAuthClient(AuthClient):
     def __init__(self, client_id: str, client_secret: str, **kwargs: Any):
         if "authorizer" in kwargs:
             log.error("ArgumentError(ConfidentialAppClient.authorizer)")
-            raise GlobusSDKUsageError(
+            raise exc.GlobusSDKUsageError(
                 "Cannot give a ConfidentialAppAuthClient an authorizer"
             )
         super().__init__(
@@ -80,6 +80,14 @@ class ConfidentialAppAuthClient(AuthClient):
             {"grant_type": "client_credentials", "scope": requested_scopes}
         )
 
+    @utils.doc_api_method(
+        "in the Globus Auth Specification",
+        "auth/developer-guide/#obtaining-authorization",
+        external_format_str=(
+            "The Authorization Code Grant flow is described "
+            "`{message} <{base_url}/{link}>`_."
+        ),
+    )
     def oauth2_start_flow(
         self,
         redirect_uri: str,
@@ -115,12 +123,6 @@ class ConfidentialAppAuthClient(AuthClient):
 
         You can see an example of this flow :ref:`in the usage examples
         <examples_three_legged_oauth_login>`
-
-        **External Documentation**
-
-        The Authorization Code Grant flow is described
-        `in the Globus Auth Specification \
-        <https://docs.globus.org/api/auth/developer-guide/#obtaining-authorization>`_
         """
         log.info("Starting OAuth2 Authorization Code Grant Flow")
         self.current_oauth2_flow_manager = GlobusAuthorizationCodeFlowManager(
@@ -173,6 +175,10 @@ class ConfidentialAppAuthClient(AuthClient):
 
         return self.oauth2_token(form_data, response_class=OAuthDependentTokenResponse)
 
+    @utils.doc_api_method(
+        "Token Introspection",
+        "auth/reference/#token_introspection_post_v2_oauth2_token_introspect",
+    )
     def oauth2_token_introspect(
         self, token: str, include: Optional[str] = None
     ) -> GlobusHTTPResponse:
@@ -200,14 +206,6 @@ class ConfidentialAppAuthClient(AuthClient):
         :param include: A value for the ``include`` parameter in the request body.
             Default is to omit the parameter.
         :type include: str, optional
-
-        **External Documentation**
-
-        See
-        `Token Introspection \
-        <https://docs.globus.org/api/auth/reference/\
-        #token_introspection_post_v2_oauth2_token_introspect>`_
-        in the API documentation for details.
         """
         log.info("Checking token validity (introspect)")
         body = {"token": token}

@@ -85,6 +85,9 @@ class AuthClient(client.BaseClient):
         # managers
         self.current_oauth2_flow_manager: Optional[GlobusOAuthFlowManager] = None
 
+    @utils.doc_api_method(
+        "Identities Resources", "auth/reference/#v2_api_identities_resources"
+    )
     def get_identities(
         self,
         usernames: Union[Sequence[AnyStr], AnyStr, None] = None,
@@ -141,15 +144,6 @@ class AuthClient(client.BaseClient):
         >>>     ids=["46bd0f56-e24f-11e5-a510-131bef46955c",
         >>>          "168edc3d-c6ba-478c-9cf8-541ff5ebdc1c"])
         ...
-
-
-        **External Documentation**
-
-        See
-        `Identities Resources \
-        <https://docs.globus.org/api/auth/reference/
-        #v2_api_identities_resources>`_
-        in the API documentation for details.
         """
 
         def _convert_listarg(
@@ -446,6 +440,9 @@ class AuthClient(client.BaseClient):
             )
         )  # type: ignore
 
+    @utils.doc_api_method(
+        "Userinfo", "auth/reference/#get_or_post_v2_oauth2_userinfo_resource"
+    )
     def oauth2_userinfo(self) -> GlobusHTTPResponse:
         """
         Call the Userinfo endpoint of Globus Auth.
@@ -462,14 +459,6 @@ class AuthClient(client.BaseClient):
         >>> info = ac.oauth2_userinfo()
         >>> print('Effective Identity "{}" has Full Name "{}" and Email "{}"'
         >>>       .format(info["sub"], info["name"], info["email"]))
-
-        **External Documentation**
-
-        See
-        `Userinfo \
-        <https://docs.globus.org/api/auth/reference/
-        #get_or_post_v2_oauth2_userinfo_resource>`_
-        in the API documentation for details.
         """
         log.info("Looking up OIDC-style Userinfo from Globus Auth")
         return self.get("/v2/oauth2/userinfo")
