@@ -13,6 +13,17 @@ to a major new version of the SDK.
 Unreleased
 ----------
 
+v3.0.0b3
+--------
+
+* Flesh out the ``GroupsClient`` and add helpers for interacting with the
+  Globus Groups service, including enumerated constants, payload builders, and
+  a high-level client for doing non-batch operations called the
+  ``GroupsManager`` (:pr:`435`, :pr:`443`)
+* globus-sdk now provides much more complete type annotations coverage,
+  allowing type checkers like ``mypy`` to catch a much wider range of usage
+  errors (:pr:`442`)
+
 v3.0.0b2
 --------
 
