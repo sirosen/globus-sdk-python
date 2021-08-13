@@ -79,15 +79,15 @@ def safe_strseq_iter(value: Sequence) -> Generator[str, None, None]:
     Given a Sequence (typically of strings), produce an iterator over it of strings.
     This is a passthrough with two caveats:
     - if the value is a solitary string, yield only that value
-    - aany value in the sequence which is not a string will be passed through
+    - any value in the sequence which is not a string will be passed through
       safe_stringify
 
     This helps handle cases where a string is passed to a function expecting a sequence
     of strings, as well as cases where a sequence of UUID objects is accepted for a list
     of IDs, or something similar.
     """
-    if isinstance(value, str):
-        yield value
+    if isinstance(value, (str, bytes)):
+        yield safe_stringify(value)
     else:
         for x in value:
             yield safe_stringify(x)

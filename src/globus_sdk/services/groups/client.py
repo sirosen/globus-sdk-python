@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
 from globus_sdk import client, response, utils
 from globus_sdk.scopes import GroupsScopes
+from globus_sdk.types import UUIDLike
 
 from .data import BatchMembershipActions, GroupPolicies
 from .errors import GroupsAPIError
@@ -55,20 +56,22 @@ class GroupsClient(client.BaseClient):
 
     @_groupdoc("Get Group", "get_group_v2_groups__group_id__get")
     def get_group(
-        self, group_id: str, query_params: Optional[Dict[str, Any]] = None
+        self, group_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get details about a specific group
         """
+        group_id = utils.safe_stringify(group_id)
         return self.get(f"/groups/{group_id}", query_params=query_params)
 
     @_groupdoc("Delete a group", "delete_group_v2_groups__group_id__delete")
     def delete_group(
-        self, group_id: str, query_params: Optional[Dict[str, Any]] = None
+        self, group_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Delete a group.
         """
+        group_id = utils.safe_stringify(group_id)
         return self.delete(f"/groups/{group_id}", query_params=query_params)
 
     @_groupdoc("Create a group", "create_group_v2_groups_post")
@@ -85,11 +88,12 @@ class GroupsClient(client.BaseClient):
         "get_policies_v2_groups__group_id__policies_get",
     )
     def get_group_policies(
-        self, group_id: str, query_params: Optional[Dict[str, Any]] = None
+        self, group_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get policies for the given group
         """
+        group_id = utils.safe_stringify(group_id)
         return self.get(f"/groups/{group_id}/policies", query_params=query_params)
 
     @_groupdoc(
@@ -98,13 +102,14 @@ class GroupsClient(client.BaseClient):
     )
     def set_group_policies(
         self,
-        group_id: str,
+        group_id: UUIDLike,
         data: Union[Dict[str, Any], GroupPolicies],
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         Set policies for the group.
         """
+        group_id = utils.safe_stringify(group_id)
         return self.put(
             f"/groups/{group_id}/policies", data=data, query_params=query_params
         )
@@ -143,12 +148,13 @@ class GroupsClient(client.BaseClient):
     )
     def get_membership_fields(
         self,
-        group_id: str,
+        group_id: UUIDLike,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         Get membership fields for your identities.
         """
+        group_id = utils.safe_stringify(group_id)
         return self.get(
             f"/groups/{group_id}/membership_fields", query_params=query_params
         )
@@ -159,13 +165,14 @@ class GroupsClient(client.BaseClient):
     )
     def set_membership_fields(
         self,
-        group_id: str,
+        group_id: UUIDLike,
         data: Dict[Any, str],
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         Get membership fields for your identities.
         """
+        group_id = utils.safe_stringify(group_id)
         return self.put(
             f"/groups/{group_id}/membership_fields",
             data=data,
@@ -178,11 +185,12 @@ class GroupsClient(client.BaseClient):
     )
     def batch_membership_action(
         self,
-        group_id: str,
+        group_id: UUIDLike,
         actions: Union[Dict[str, Any], BatchMembershipActions],
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         Execute a batch of actions against several group memberships.
         """
+        group_id = utils.safe_stringify(group_id)
         return self.post(f"/groups/{group_id}", data=actions, query_params=query_params)
