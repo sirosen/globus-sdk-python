@@ -32,8 +32,8 @@ from globus_sdk.scopes import AuthScopes
 from globus_sdk.types import IntLike, UUIDLike
 
 from ..errors import AuthAPIError
-from ..oauth2_flow_manager import GlobusOAuthFlowManager
-from ..token_response import OAuthTokenResponse
+from ..flow_managers import GlobusOAuthFlowManager
+from ..response import OAuthTokenResponse
 
 log = logging.getLogger(__name__)
 

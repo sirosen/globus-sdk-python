@@ -1,7 +1,7 @@
 import abc
 from typing import Any, Dict, Optional
 
-from .token_response import OAuthTokenResponse
+from ..response import OAuthTokenResponse
 
 
 class GlobusOAuthFlowManager(abc.ABC):

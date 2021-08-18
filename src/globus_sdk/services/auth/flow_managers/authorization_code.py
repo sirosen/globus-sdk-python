@@ -1,13 +1,15 @@
 import logging
 import urllib.parse
-from typing import Any, Dict, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Union
 
 from globus_sdk import utils
 
-from .client_types.base import AuthClient
-from .oauth2_constants import DEFAULT_REQUESTED_SCOPES
-from .oauth2_flow_manager import GlobusOAuthFlowManager
-from .token_response import OAuthTokenResponse
+from ..oauth2_constants import DEFAULT_REQUESTED_SCOPES
+from ..response import OAuthTokenResponse
+from .base import GlobusOAuthFlowManager
+
+if TYPE_CHECKING:
+    from ..client import AuthClient
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +54,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
 
     def __init__(
         self,
-        auth_client: AuthClient,
+        auth_client: "AuthClient",
         redirect_uri: str,
         requested_scopes: Optional[Union[str, Sequence[str]]] = None,
         state: str = "_default",

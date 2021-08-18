@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Dict, Iterable, Optional, Set, Tuple
 
-from .client_types.base import AuthClient
+from .client import AuthClient
 
 
 def is_username(val: str) -> bool:

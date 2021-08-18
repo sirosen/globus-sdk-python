@@ -4,15 +4,17 @@ import logging
 import os
 import re
 import urllib.parse
-from typing import Any, Dict, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 from globus_sdk import utils
 from globus_sdk.exc import GlobusSDKUsageError
 
-from .client_types.base import AuthClient
-from .oauth2_constants import DEFAULT_REQUESTED_SCOPES
-from .oauth2_flow_manager import GlobusOAuthFlowManager
-from .token_response import OAuthTokenResponse
+from ..oauth2_constants import DEFAULT_REQUESTED_SCOPES
+from ..response import OAuthTokenResponse
+from .base import GlobusOAuthFlowManager
+
+if TYPE_CHECKING:
+    from ..client import AuthClient
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +104,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
 
     def __init__(
         self,
-        auth_client: AuthClient,
+        auth_client: "AuthClient",
         requested_scopes: Optional[Union[str, Sequence[str]]] = None,
         redirect_uri: Optional[str] = None,
         state: str = "_default",
