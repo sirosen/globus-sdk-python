@@ -47,6 +47,7 @@ def register_api_route(
         "groups": "https://groups.api.globus.org/",
         "transfer": "https://transfer.api.globus.org/v0.10",
         "search": "https://search.api.globus.org/",
+        "gcs": "https://abc.xyz.data.globus.org/api/",
     }
     assert service in base_url_map
     base_url = base_url_map.get(service)

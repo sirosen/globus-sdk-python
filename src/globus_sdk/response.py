@@ -1,5 +1,6 @@
+import json
 import logging
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Iterator, Mapping, Optional, Union, cast
 
 from requests import Response
 
@@ -97,7 +98,9 @@ class GlobusHTTPResponse:
         return self.data.get(key, default)
 
     def __str__(self) -> str:
-        return repr(self)
+        """The default __str__ for a response assumes that the data is valid
+        JSON-dump-able."""
+        return json.dumps(self.data, indent=2, separators=(",", ": "))
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.data!r})"
@@ -128,3 +131,13 @@ class GlobusHTTPResponse:
         if self.data is None:
             return False
         return item in self.data
+
+
+class IterOnIterKeyMixin:
+    """This mixin adds an __iter__ method on an 'iter_key' class or instance variable.
+    The assumption is that iter produces dicts or dict-like mappings."""
+
+    iter_key: str
+
+    def __iter__(self) -> Iterator[Mapping]:
+        return iter(cast(Mapping, self)[self.iter_key])

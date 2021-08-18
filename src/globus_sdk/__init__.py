@@ -26,6 +26,7 @@ from .services.auth import (
     IdentityMap,
     NativeAppAuthClient,
 )
+from .services.gcs import GCSAPIError, GCSClient
 from .services.groups import (
     BatchMembershipActions,
     GroupMemberVisibility,
@@ -83,6 +84,8 @@ __all__ = (
     "GroupRole",
     "GroupVisibility",
     "GroupsManager",
+    "GCSClient",
+    "GCSAPIError",
     "LocalGlobusConnectPersonal",
 )
 
