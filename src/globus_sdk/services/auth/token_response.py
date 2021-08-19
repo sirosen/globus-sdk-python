@@ -11,7 +11,7 @@ from globus_sdk.response import GlobusHTTPResponse
 
 logger = logging.getLogger(__name__)
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .client_types import AuthClient
 
 
