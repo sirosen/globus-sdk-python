@@ -1,9 +1,7 @@
-from typing import Any
-
-from globus_sdk.response import GlobusHTTPResponse, IterOnIterKeyMixin
+from globus_sdk.response import IterableResponse
 
 
-class IterableTransferResponse(GlobusHTTPResponse, IterOnIterKeyMixin):
+class IterableTransferResponse(IterableResponse):
     """
     Response class for non-paged list oriented resources. Allows top level
     fields to be accessed normally via standard item access, and also
@@ -16,6 +14,4 @@ class IterableTransferResponse(GlobusHTTPResponse, IterOnIterKeyMixin):
     >>>     print(item["name"], item["type"])
     """
 
-    def __init__(self, *args: Any, iter_key: str = "DATA", **kwargs: Any) -> None:
-        self.iter_key = iter_key
-        super().__init__(*args, **kwargs)
+    default_iter_key = "DATA"

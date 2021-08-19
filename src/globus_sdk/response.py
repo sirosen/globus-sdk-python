@@ -1,6 +1,15 @@
 import json
 import logging
-from typing import TYPE_CHECKING, Any, Iterator, Mapping, Optional, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Iterator,
+    Mapping,
+    Optional,
+    Union,
+    cast,
+)
 
 from requests import Response
 
@@ -100,10 +109,12 @@ class GlobusHTTPResponse:
     def __str__(self) -> str:
         """The default __str__ for a response assumes that the data is valid
         JSON-dump-able."""
-        return json.dumps(self.data, indent=2, separators=(",", ": "))
+        if self.data is not None:
+            return json.dumps(self.data, indent=2, separators=(",", ": "))
+        return self.text
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.data!r})"
+        return f"{self.__class__.__name__}({self.text})"
 
     def __getitem__(self, key: str) -> Any:
         # force evaluation of the data property outside of the upcoming
@@ -133,11 +144,28 @@ class GlobusHTTPResponse:
         return item in self.data
 
 
-class IterOnIterKeyMixin:
-    """This mixin adds an __iter__ method on an 'iter_key' class or instance variable.
+class IterableResponse(GlobusHTTPResponse):
+    """This response class adds an __iter__ method on an 'iter_key' variable.
     The assumption is that iter produces dicts or dict-like mappings."""
 
+    default_iter_key: ClassVar[str]
     iter_key: str
+
+    def __init__(
+        self,
+        response: Union[Response, "GlobusHTTPResponse"],
+        client: Optional["BaseClient"] = None,
+        *,
+        iter_key: Optional[str] = None,
+    ) -> None:
+        if not hasattr(self, "default_iter_key"):
+            raise TypeError(
+                "Cannot instantiate an iterable response from a class "
+                "which does not define a default iteration key."
+            )
+        iter_key = iter_key if iter_key is not None else self.default_iter_key
+        self.iter_key = iter_key
+        super().__init__(response, client)
 
     def __iter__(self) -> Iterator[Mapping]:
         return iter(cast(Mapping, self)[self.iter_key])

@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 import requests
 
-from globus_sdk.response import GlobusHTTPResponse
+from globus_sdk.response import GlobusHTTPResponse, IterableResponse
 
 _TestResponse = namedtuple("_TestResponse", ("data", "r"))
 
@@ -176,3 +176,9 @@ def test_value_error_indexing_on_non_json_data():
 
     with pytest.raises(ValueError):
         res["foo"]
+
+
+def test_cannot_construct_base_iterable_response():
+    r = _response(b"foo: bar, baz: buzz")
+    with pytest.raises(TypeError):
+        IterableResponse(r, client=mock.Mock())
