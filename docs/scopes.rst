@@ -83,7 +83,11 @@ ScopeBuilder Types and Constants
     :members:
     :show-inheritance:
 
-.. autoclass:: globus_sdk.scopes.GCSScopeBuilder
+.. autoclass:: globus_sdk.scopes.GCSEndpointScopeBuilder
+    :members:
+    :show-inheritance:
+
+.. autoclass:: globus_sdk.scopes.GCSCollectionScopeBuilder
     :members:
     :show-inheritance:
 
