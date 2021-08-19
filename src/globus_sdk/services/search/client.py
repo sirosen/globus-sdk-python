@@ -38,7 +38,7 @@ class SearchClient(client.BaseClient):
 
     @utils.doc_api_method("Get Index Metadata", "search/reference/index_show/")
     def get_index(
-        self, index_id: UUIDLike, query_params: Optional[Dict[str, Any]]
+        self, index_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /v1/index/<index_id>``

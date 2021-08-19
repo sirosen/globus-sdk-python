@@ -10,3 +10,7 @@ To customize client methods with additional detail, the SDK uses subclasses of
 .. autoclass:: globus_sdk.response.GlobusHTTPResponse
    :members:
    :show-inheritance:
+
+.. autoclass:: globus_sdk.response.IterOnIterKeyMixin
+   :members:
+   :show-inheritance:
