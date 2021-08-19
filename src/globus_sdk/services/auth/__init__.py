@@ -1,9 +1,11 @@
-from .client_types import AuthClient, ConfidentialAppAuthClient, NativeAppAuthClient
+from .client import AuthClient, ConfidentialAppAuthClient, NativeAppAuthClient
 from .errors import AuthAPIError
+from .flow_managers import (
+    GlobusAuthorizationCodeFlowManager,
+    GlobusNativeAppFlowManager,
+)
 from .identity_map import IdentityMap
-from .oauth2_authorization_code import GlobusAuthorizationCodeFlowManager
-from .oauth2_native_app import GlobusNativeAppFlowManager
-from .token_response import OAuthDependentTokenResponse, OAuthTokenResponse
+from .response import OAuthDependentTokenResponse, OAuthTokenResponse
 
 __all__ = [
     "AuthClient",

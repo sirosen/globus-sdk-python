@@ -12,7 +12,7 @@ from globus_sdk.response import GlobusHTTPResponse
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from .client_types import AuthClient
+    from .client import AuthClient
 
 
 def _convert_token_info_dict(source_dict: GlobusHTTPResponse) -> Dict[str, Any]:

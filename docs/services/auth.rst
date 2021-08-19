@@ -46,11 +46,11 @@ batching, and other functionality.
 Auth Responses
 --------------
 
-.. autoclass:: globus_sdk.services.auth.token_response.OAuthTokenResponse
+.. autoclass:: globus_sdk.OAuthTokenResponse
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.services.auth.token_response.OAuthDependentTokenResponse
+.. autoclass:: globus_sdk.OAuthDependentTokenResponse
    :members:
    :show-inheritance:
 
@@ -79,6 +79,6 @@ authentication method you are using and methods which act upon those parameters.
 Abstract Flow Manager
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: globus_sdk.services.auth.oauth2_flow_manager.GlobusOAuthFlowManager
+.. autoclass:: globus_sdk.services.auth.flow_managers.GlobusOAuthFlowManager
    :members:
    :show-inheritance:

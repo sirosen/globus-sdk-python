@@ -5,9 +5,9 @@ from globus_sdk import exc, utils
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 
-from ..oauth2_authorization_code import GlobusAuthorizationCodeFlowManager
+from ..flow_managers import GlobusAuthorizationCodeFlowManager
 from ..oauth2_constants import DEFAULT_REQUESTED_SCOPES
-from ..token_response import OAuthDependentTokenResponse, OAuthTokenResponse
+from ..response import OAuthDependentTokenResponse, OAuthTokenResponse
 from .base import AuthClient
 
 log = logging.getLogger(__name__)

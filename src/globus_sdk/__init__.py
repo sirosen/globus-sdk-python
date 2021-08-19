@@ -25,6 +25,8 @@ from .services.auth import (
     ConfidentialAppAuthClient,
     IdentityMap,
     NativeAppAuthClient,
+    OAuthDependentTokenResponse,
+    OAuthTokenResponse,
 )
 from .services.gcs import GCSAPIError, GCSClient
 from .services.groups import (
@@ -70,6 +72,8 @@ __all__ = (
     "AuthClient",
     "NativeAppAuthClient",
     "ConfidentialAppAuthClient",
+    "OAuthDependentTokenResponse",
+    "OAuthTokenResponse",
     "IdentityMap",
     "TransferClient",
     "TransferData",

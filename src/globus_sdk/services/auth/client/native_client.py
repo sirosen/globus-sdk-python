@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional, Sequence, Union
 from globus_sdk import exc, utils
 from globus_sdk.authorizers import NullAuthorizer
 
-from ..oauth2_native_app import GlobusNativeAppFlowManager
-from ..token_response import OAuthTokenResponse
+from ..flow_managers import GlobusNativeAppFlowManager
+from ..response import OAuthTokenResponse
 from .base import AuthClient
 
 log = logging.getLogger(__name__)

@@ -3,8 +3,8 @@ import urllib.parse
 import pytest
 
 import globus_sdk
+from globus_sdk.services.auth.flow_managers.native_app import make_native_app_challenge
 from globus_sdk.services.auth.oauth2_constants import DEFAULT_REQUESTED_SCOPES
-from globus_sdk.services.auth.oauth2_native_app import make_native_app_challenge
 from tests.common import register_api_route
 
 CLIENT_ID = "d0f1d9b0-bd81-4108-be74-ea981664453a"
