@@ -1,0 +1,10 @@
+{
+  "DATA_TYPE": "collection#1.0.0",
+  "public": true,
+  "id": "{collection_id}",
+  "display_name": "Happy Fun Collection Name",
+  "identity_id": "e926d510-cb98-11e5-a6ac-0b0216052512",
+  "collection_type": "mapped",
+  "storage_gateway_id": "{storage_gateway_id}",
+  "connector_id": "145812c8-decc-41f1-83cf-bb2a85a2a70b"
+}

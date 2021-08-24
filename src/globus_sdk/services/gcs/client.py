@@ -1,11 +1,12 @@
 import uuid
-from typing import Any, Callable, Dict, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, Optional, Sequence, TypeVar, Union
 
 from globus_sdk import client, scopes, utils
 from globus_sdk.authorizers import GlobusAuthorizer
+from globus_sdk.types import UUIDLike
 
 from .errors import GCSAPIError
-from .response import IterableGCSResponse
+from .response import IterableGCSResponse, SingletonGCSResponse
 
 RT = TypeVar("RT")
 
@@ -101,16 +102,45 @@ class GCSClient(client.BaseClient):
     def get_collection_list(
         self,
         *,
-        include: Optional[str] = None,
+        include: Union[str, Sequence[str], None] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableGCSResponse:
         """
         ``GET /collections``
+
+        :param include: Names of additional documents to include in the response
+        :type include: str or sequence of str, optional
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
 
         List the Collections on an Endpoint
         """
         if query_params is None:
             query_params = {}
         if include is not None:
-            query_params["include"] = include
+            if isinstance(include, str):
+                include = [include]
+            query_params["include"] = ",".join(include)
         return IterableGCSResponse(self.get("collections", query_params=query_params))
+
+    @_gcsdoc("Get Collection", "openapi_Collections/#getCollection")
+    def get_collection(
+        self,
+        collection_id: UUIDLike,
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> SingletonGCSResponse:
+        """
+        ``GET /collections/{collection_id}``
+
+        :param collection_id: The ID of the collection to lookup
+        :type collection_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+
+        Lookup a Collection on an Endpoint
+        """
+        collection_id = utils.safe_stringify(collection_id)
+        return SingletonGCSResponse(
+            self.get(f"/collections/{collection_id}", query_params=query_params)
+        )
