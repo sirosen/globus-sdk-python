@@ -1,19 +1,36 @@
 #!/usr/bin/env python3
 
+import datetime
+
 import globus_sdk
+
+# running `tox -e docs -- -n` will pick up "nitpick" warning which we convert to build
+# errors with `-W`
+# load ignores from file
+nitpick_ignore = []
+nitpick_ignore_regex = []
+with open("nitpick_ignore.txt") as fp:
+    for line in fp:
+        line = line.strip()
+        if line == "" or line.startswith("#"):
+            continue
+        if line.startswith("re: "):
+            nitpick_ignore_regex.append(tuple(line.split()[1:]))
+        else:
+            nitpick_ignore.append(tuple(line.split()))
+
 
 # sphinx extensions (minimally, we want autodoc and viewcode to build the site)
 # plus, we have our own custom extension in the SDK to include
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx_issues",
     "globus_sdk._sphinxext",
 ]
 
 project = "globus-sdk-python"
-copyright = "2016, Globus"
+copyright = f"2016-{datetime.datetime.today().strftime('%Y')}, Globus"
 author = "Globus Team"
 # The short X.Y version.
 version = globus_sdk.__version__
@@ -32,9 +49,6 @@ language = "en"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = ["_build"]
-
-# If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = True
 
 
 # HTML Theme Options

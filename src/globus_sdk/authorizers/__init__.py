@@ -3,6 +3,7 @@ from .base import GlobusAuthorizer, NullAuthorizer, StaticGlobusAuthorizer
 from .basic import BasicAuthorizer
 from .client_credentials import ClientCredentialsAuthorizer
 from .refresh_token import RefreshTokenAuthorizer
+from .renewing import RenewingAuthorizer
 
 __all__ = [
     "GlobusAuthorizer",
@@ -12,4 +13,5 @@ __all__ = [
     "AccessTokenAuthorizer",
     "RefreshTokenAuthorizer",
     "ClientCredentialsAuthorizer",
+    "RenewingAuthorizer",
 ]

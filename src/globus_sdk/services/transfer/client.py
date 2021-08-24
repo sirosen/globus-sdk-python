@@ -1717,7 +1717,7 @@ class TransferClient(client.BaseClient):
         ``POST /endpoint_manager/admin_cancel``
 
         :param task_ids: List of task ids to cancel.
-        :type task_ids: iterable of str
+        :type task_ids: iterable of str or UUID
         :param message: Message given to all users who's tasks have been canceled.
         :type message: str
         :param query_params: Any additional parameters will be passed through
@@ -1773,7 +1773,7 @@ class TransferClient(client.BaseClient):
         ``POST /endpoint_manager/admin_pause``
 
         :param task_ids: List of task ids to pause.
-        :type task_ids: iterable of str
+        :type task_ids: iterable of str or UUID
         :param message: Message given to all users who's tasks have been paused.
         :type message: str
         :param query_params: Any additional parameters will be passed through
@@ -1804,7 +1804,7 @@ class TransferClient(client.BaseClient):
         ``POST /endpoint_manager/admin_resume``
 
         :param task_ids: List of task ids to resume.
-        :type task_ids: iterable of str
+        :type task_ids: iterable of str or UUID
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional

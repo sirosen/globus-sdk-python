@@ -247,12 +247,12 @@ class BaseClient:
         :param headers: HTTP headers to add to the request
         :type headers: dict
         :param data: Data to send as the request body. May pass through encoding.
-        :type data: dict or string
+        :type data: dict or str
         :param encoding: A way to encode request data. "json", "form", and "text"
             are all valid values. Custom encodings can be used only if they are
             registered with the transport. By default, strings get "text" behavior and
             all other objects get "json".
-        :type encoding: string
+        :type encoding: str
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object

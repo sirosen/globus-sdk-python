@@ -29,13 +29,13 @@ class AuthorizationParameterInfo(ErrorInfo):
     'authorization_parameters' data.
 
     :ivar session_message: A message from the server
-    :vartype session_message: optional str
+    :vartype session_message: str, optional
     :ivar session_required_identities: A list of identity IDs as strings which are being
         requested by the server
-    :vartype session_required_identities: optional list of str
+    :vartype session_required_identities: list of str, optional
     :ivar session_required_single_domain: A list of domains which are being requested by
         the server ("single domain" because the user should choose one)
-    :vartype session_required_single_domain: optional list of str
+    :vartype session_required_single_domain: list of str, optional
 
     **Examples**
 
@@ -70,7 +70,7 @@ class ConsentRequiredInfo(ErrorInfo):
     test as truthy if the error was marked as a ConsentRequired error.
 
     :ivar required_scopes: A list of scopes requested by the server
-    :vartype required_scopes: optional list of str
+    :vartype required_scopes: list of str, optional
     """
 
     def __init__(self, error_data: Dict[str, Any]):

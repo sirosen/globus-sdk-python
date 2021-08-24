@@ -113,6 +113,11 @@ class PayloadWrapper(collections.UserDict):
     """
     A class for defining helper objects which wrap some kind of "payload" dict.
     Typical for helper objects which formulate a request payload, e.g. as JSON.
+
+    Payload types inheriting from this class can be passed directly to the client
+    ``post()``, ``put()``, and ``patch()`` methods instead of a dict. These methods will
+    recognize a ``PayloadWrapper`` and convert it to a dict for serialization with the
+    requested encoder (e.g. as a JSON request body).
     """
 
     # note: this class doesn't actually define any methods, properties, or attributes

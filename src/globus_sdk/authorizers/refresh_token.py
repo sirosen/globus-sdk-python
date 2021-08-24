@@ -41,8 +41,7 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
     :type expires_at: int, optional
     :param on_refresh: A callback which is triggered any time this authorizer fetches a
         new access_token. The ``on_refresh`` callable is invoked on the
-        :class:`OAuthTokenResponse \
-        <globus_sdk.services.auth.token_response.OAuthTokenResponse>`
+        :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         object resulting from the token being refreshed. It should take only one
         argument, the token response object.
         This is useful for implementing storage for Access Tokens, as the

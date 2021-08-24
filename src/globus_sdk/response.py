@@ -16,7 +16,7 @@ from requests import Response
 log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from globus_sdk import BaseClient
+    import globus_sdk
 
 
 class GlobusHTTPResponse:
@@ -43,7 +43,7 @@ class GlobusHTTPResponse:
     def __init__(
         self,
         response: Union[Response, "GlobusHTTPResponse"],
-        client: Optional["BaseClient"] = None,
+        client: Optional["globus_sdk.BaseClient"] = None,
     ):
         # init on a GlobusHTTPResponse: we are wrapping this data
         # the _response is None
@@ -52,7 +52,7 @@ class GlobusHTTPResponse:
                 raise ValueError("Redundant client with wrapped response")
             self._wrapped: Optional[GlobusHTTPResponse] = response
             self._response: Optional[Response] = None
-            self.client: "BaseClient" = self._wrapped.client
+            self.client: "globus_sdk.BaseClient" = self._wrapped.client
 
             # copy attributes off of '_wrapped'
             self._parsed_json: Any = self._wrapped._parsed_json
@@ -154,7 +154,7 @@ class IterableResponse(GlobusHTTPResponse):
     def __init__(
         self,
         response: Union[Response, "GlobusHTTPResponse"],
-        client: Optional["BaseClient"] = None,
+        client: Optional["globus_sdk.BaseClient"] = None,
         *,
         iter_key: Optional[str] = None,
     ) -> None:
