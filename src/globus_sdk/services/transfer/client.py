@@ -76,6 +76,12 @@ class TransferClient(client.BaseClient):
         """
         ``GET /endpoint/<endpoint_id>``
 
+        :param endpoint_id: ID of endpoint to lookup
+        :type endpoint_id: str or UUID
+        :param query_params: Any additional parameters will be passed through
+            as query params.
+        :type query_params: dict, optional
+
         **Examples**
 
         >>> tc = globus_sdk.TransferClient(...)
@@ -99,6 +105,14 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>``
+
+        :param endpoint_id: ID of endpoint to lookup
+        :type endpoint_id: str or UUID
+        :param data: A partial endpoint document with fields to update
+        :type data: dict
+        :param query_params: Any additional parameters will be passed through
+            as query params.
+        :type query_params: dict, optional
 
         **Examples**
 
@@ -128,6 +142,9 @@ class TransferClient(client.BaseClient):
     def create_endpoint(self, data: dict) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>``
+
+        :param data: An endpoint document with fields for the new endpoint
+        :type data: dict
 
         **Examples**
 
@@ -161,6 +178,9 @@ class TransferClient(client.BaseClient):
     def delete_endpoint(self, endpoint_id: UUIDLike) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>``
+
+        :param endpoint_id: ID of endpoint to delete
+        :type endpoint_id: str or UUID
 
         **Examples**
 
@@ -276,6 +296,16 @@ class TransferClient(client.BaseClient):
         r"""
         ``POST /endpoint/<endpoint_id>/autoactivate``
 
+        :param endpoint_id: The ID of the endpoint to autoactivate
+        :type endpoint_id: str or UUID
+        :param if_expires_in: A number of seconds. Autoactivation will only be attempted
+            if the current activation expires within this timeframe. Otherwise,
+            autoactivation will succeed with a code of 'AlreadyActivated'
+        :type if_expires_in: int, optional
+        :param query_params: Any additional parameters will be passed through
+            as query params.
+        :type query_params: dict, optional
+
         The following example will try to "auto" activate the endpoint
         using a credential available from another endpoint or sign in by
         the user with the same identity provider, but only if the
@@ -288,11 +318,11 @@ class TransferClient(client.BaseClient):
         >>> tc = globus_sdk.TransferClient(...)
         >>> r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
         >>> while (r["code"] == "AutoActivationFailed"):
-        >>>     print("Endpoint requires manual activation, please open "
-        >>>           "the following URL in a browser to activate the "
-        >>>           "endpoint:")
-        >>>     print("https://app.globus.org/file-manager?origin_id=%s"
-        >>>           % ep_id)
+        >>>     print(
+        >>>         "Endpoint requires manual activation, please open "
+        >>>         "the following URL in a browser to activate the endpoint:"
+        >>>         f"https://app.globus.org/file-manager?origin_id={ep_id}"
+        >>>     )
         >>>     input("Press ENTER after activating the endpoint:")
         >>>     r = tc.endpoint_autoactivate(ep_id, if_expires_in=3600)
 
@@ -339,6 +369,12 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/deactivate``
+
+        :param endpoint_id: The ID of the endpoint to deactivate
+        :type endpoint_id: str or UUID
+        :param query_params: Any additional parameters will be passed through
+            as query params.
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_deactivate({endpoint_id})")
@@ -357,6 +393,16 @@ class TransferClient(client.BaseClient):
         """
         ``POST /endpoint/<endpoint_id>/activate``
 
+        :param endpoint_id: The ID of the endpoint to activate
+        :type endpoint_id: str or UUID
+        :pram requirements_data: Filled in activation requirements data, as can be
+            fetched from :meth:`~endpoint_get_activation_requirements`. Only the fields
+            for the activation type being used need to be filled in.
+        :type requirements_data: dict
+        :param query_params: Any additional parameters will be passed through
+            as query params.
+        :type query_params: dict, optional
+
         Consider using autoactivate and web activation instead, described
         in the example for :meth:`~endpoint_autoactivate`.
         """
@@ -374,6 +420,13 @@ class TransferClient(client.BaseClient):
     ) -> ActivationRequirementsResponse:
         """
         ``GET /endpoint/<endpoint_id>/activation_requirements``
+
+        :param endpoint_id: The ID of the endpoint whose activation requirements data is
+            being looked up
+        :type endpoint_id: str or UUID
+        :param query_params: Any additional parameters will be passed through
+            as query params.
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         path = self.qjoin_path("endpoint", endpoint_id, "activation_requirements")
