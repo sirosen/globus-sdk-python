@@ -49,6 +49,7 @@ class NativeAppAuthClient(AuthClient):
     def oauth2_start_flow(
         self,
         requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        *,
         redirect_uri: Optional[str] = None,
         state: str = "_default",
         verifier: Optional[str] = None,
@@ -105,7 +106,7 @@ class NativeAppAuthClient(AuthClient):
         return self.current_oauth2_flow_manager
 
     def oauth2_refresh_token(
-        self, refresh_token: str, body_params: Optional[Dict[str, Any]] = None
+        self, refresh_token: str, *, body_params: Optional[Dict[str, Any]] = None
     ) -> OAuthTokenResponse:
         """
         ``NativeAppAuthClient`` specializes the refresh token grant to include

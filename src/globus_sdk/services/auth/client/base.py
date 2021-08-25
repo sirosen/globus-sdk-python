@@ -90,6 +90,7 @@ class AuthClient(client.BaseClient):
     )
     def get_identities(
         self,
+        *,
         usernames: Union[Sequence[AnyStr], AnyStr, None] = None,
         ids: Union[Sequence[UUIDLike], UUIDLike, None] = None,
         provision: bool = False,
@@ -184,7 +185,7 @@ class AuthClient(client.BaseClient):
         return self.get("/v2/api/identities", query_params=query_params)
 
     def oauth2_get_authorize_url(
-        self, query_params: Optional[Dict[str, Any]] = None
+        self, *, query_params: Optional[Dict[str, Any]] = None
     ) -> str:
         """
         Get the authorization URL to which users should be sent.
@@ -236,7 +237,7 @@ class AuthClient(client.BaseClient):
         return self.current_oauth2_flow_manager.exchange_code_for_tokens(auth_code)
 
     def oauth2_refresh_token(
-        self, refresh_token: str, body_params: Optional[Dict[str, Any]] = None
+        self, refresh_token: str, *, body_params: Optional[Dict[str, Any]] = None
     ) -> OAuthTokenResponse:
         r"""
         Exchange a refresh token for a
@@ -263,7 +264,7 @@ class AuthClient(client.BaseClient):
         return self.oauth2_token(form_data, body_params=body_params)
 
     def oauth2_validate_token(
-        self, token: str, body_params: Optional[Dict[str, Any]] = None
+        self, token: str, *, body_params: Optional[Dict[str, Any]] = None
     ) -> GlobusHTTPResponse:
         """
         Validate a token. It can be an Access Token or a Refresh token.
@@ -328,7 +329,7 @@ class AuthClient(client.BaseClient):
         return self.post("/v2/oauth2/token/validate", data=body, encoding="form")
 
     def oauth2_revoke_token(
-        self, token: str, body_params: Optional[Dict[str, Any]] = None
+        self, token: str, *, body_params: Optional[Dict[str, Any]] = None
     ) -> GlobusHTTPResponse:
         """
         Revoke a token. It can be an Access Token or a Refresh token.
@@ -475,6 +476,7 @@ class AuthClient(client.BaseClient):
     def get_jwk(
         self,
         openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
+        *,
         as_pem: "Literal[True]",
     ) -> RSAPublicKey:
         ...
@@ -483,16 +485,9 @@ class AuthClient(client.BaseClient):
     def get_jwk(
         self,
         openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
+        *,
         as_pem: "Literal[False]",
     ) -> dict:
-        ...
-
-    @overload
-    def get_jwk(
-        self,
-        openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
-        as_pem: bool,
-    ) -> Union[RSAPublicKey, dict]:
         ...
 
     def get_jwk(
@@ -500,6 +495,7 @@ class AuthClient(client.BaseClient):
         openid_configuration: Optional[
             Union[GlobusHTTPResponse, Dict[str, Any]]
         ] = None,
+        *,
         as_pem: bool = False,
     ) -> Union[RSAPublicKey, dict]:
         """

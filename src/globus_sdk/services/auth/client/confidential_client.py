@@ -92,6 +92,7 @@ class ConfidentialAppAuthClient(AuthClient):
         self,
         redirect_uri: str,
         requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        *,
         state: str = "_default",
         refresh_tokens: bool = False,
     ) -> GlobusAuthorizationCodeFlowManager:
@@ -135,7 +136,7 @@ class ConfidentialAppAuthClient(AuthClient):
         return self.current_oauth2_flow_manager
 
     def oauth2_get_dependent_tokens(
-        self, token: str, additional_params: Optional[dict] = None
+        self, token: str, *, additional_params: Optional[dict] = None
     ) -> OAuthDependentTokenResponse:
         """
         Does a `Dependent Token Grant
@@ -180,7 +181,7 @@ class ConfidentialAppAuthClient(AuthClient):
         "auth/reference/#token_introspection_post_v2_oauth2_token_introspect",
     )
     def oauth2_token_introspect(
-        self, token: str, include: Optional[str] = None
+        self, token: str, *, include: Optional[str] = None
     ) -> GlobusHTTPResponse:
         """
         POST /v2/oauth2/token/introspect

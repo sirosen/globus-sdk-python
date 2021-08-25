@@ -14,7 +14,7 @@ class ScopeBuilder:
     """
 
     def __init__(
-        self, resource_server: str, known_scopes: Optional[List[str]] = None
+        self, resource_server: str, *, known_scopes: Optional[List[str]] = None
     ) -> None:
         self.resource_server = resource_server
         self._known_scopes = known_scopes

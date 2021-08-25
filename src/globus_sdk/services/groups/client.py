@@ -47,7 +47,7 @@ class GroupsClient(client.BaseClient):
         "get_my_groups_and_memberships_v2_groups_my_groups_get",
     )
     def get_my_groups(
-        self, query_params: Optional[Dict[str, Any]] = None
+        self, *, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Return a list of groups your identity belongs to.
@@ -56,7 +56,7 @@ class GroupsClient(client.BaseClient):
 
     @_groupdoc("Get Group", "get_group_v2_groups__group_id__get")
     def get_group(
-        self, group_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
+        self, group_id: UUIDLike, *, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get details about a specific group
@@ -66,7 +66,7 @@ class GroupsClient(client.BaseClient):
 
     @_groupdoc("Delete a group", "delete_group_v2_groups__group_id__delete")
     def delete_group(
-        self, group_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
+        self, group_id: UUIDLike, *, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Delete a group.
@@ -76,7 +76,7 @@ class GroupsClient(client.BaseClient):
 
     @_groupdoc("Create a group", "create_group_v2_groups_post")
     def create_group(
-        self, data: Dict[str, Any], query_params: Optional[Dict[str, Any]] = None
+        self, data: Dict[str, Any], *, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Create a group.
@@ -88,7 +88,7 @@ class GroupsClient(client.BaseClient):
         "get_policies_v2_groups__group_id__policies_get",
     )
     def get_group_policies(
-        self, group_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
+        self, group_id: UUIDLike, *, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get policies for the given group
@@ -104,6 +104,7 @@ class GroupsClient(client.BaseClient):
         self,
         group_id: UUIDLike,
         data: Union[Dict[str, Any], GroupPolicies],
+        *,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -119,7 +120,7 @@ class GroupsClient(client.BaseClient):
         "get_identity_set_preferences_v2_preferences_get",
     )
     def get_identity_preferences(
-        self, query_params: Optional[Dict[str, Any]] = None
+        self, *, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
         Get identity preferences.  Currently this only includes whether the
@@ -134,6 +135,7 @@ class GroupsClient(client.BaseClient):
     def set_identity_preferences(
         self,
         data: Dict[str, Any],
+        *,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -149,6 +151,7 @@ class GroupsClient(client.BaseClient):
     def get_membership_fields(
         self,
         group_id: UUIDLike,
+        *,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -167,6 +170,7 @@ class GroupsClient(client.BaseClient):
         self,
         group_id: UUIDLike,
         data: Dict[Any, str],
+        *,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -187,6 +191,7 @@ class GroupsClient(client.BaseClient):
         self,
         group_id: UUIDLike,
         actions: Union[Dict[str, Any], BatchMembershipActions],
+        *,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """

@@ -22,6 +22,7 @@ class SearchQuery(utils.PayloadWrapper):
     def __init__(
         self,
         q: Optional[str] = None,
+        *,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         advanced: Optional[bool] = None,
@@ -59,6 +60,7 @@ class SearchQuery(utils.PayloadWrapper):
         self,
         name: str,
         field_name: str,
+        *,
         type: str = "terms",
         size: Optional[int] = None,
         date_interval: Optional[str] = None,
@@ -86,6 +88,7 @@ class SearchQuery(utils.PayloadWrapper):
         self,
         field_name: str,
         values: List[str],
+        *,
         type: str = "match_all",
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> "SearchQuery":
@@ -103,6 +106,7 @@ class SearchQuery(utils.PayloadWrapper):
         self,
         field_name: str,
         factor: Union[str, int, float],
+        *,
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> "SearchQuery":
         self["boosts"] = self.get("boosts", [])
@@ -117,6 +121,7 @@ class SearchQuery(utils.PayloadWrapper):
     def add_sort(
         self,
         field_name: str,
+        *,
         order: Optional[str] = None,
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> "SearchQuery":

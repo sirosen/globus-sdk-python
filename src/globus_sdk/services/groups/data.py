@@ -57,7 +57,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def add_members(
-        self, identity_ids: Sequence[UUIDLike], role: GroupRole = GroupRole.member
+        self, identity_ids: Sequence[UUIDLike], *, role: GroupRole = GroupRole.member
     ) -> "BatchMembershipActions":
         """
         Add a list of identities to a group with the given role.
@@ -93,7 +93,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def invite_members(
-        self, identity_ids: Sequence[UUIDLike], role: GroupRole = GroupRole.member
+        self, identity_ids: Sequence[UUIDLike], *, role: GroupRole = GroupRole.member
     ) -> "BatchMembershipActions":
         """
         Invite a list of identities to a group with the given role.
@@ -179,6 +179,7 @@ class GroupPolicies(utils.PayloadWrapper):
 
     def __init__(
         self,
+        *,
         is_high_assurance: bool,
         group_visibility: GroupVisibility,
         group_members_visibility: GroupMemberVisibility,

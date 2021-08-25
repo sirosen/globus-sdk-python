@@ -54,6 +54,7 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         self,
         refresh_token: str,
         auth_client: AuthClient,
+        *,
         access_token: Optional[str] = None,
         expires_at: Optional[int] = None,
         on_refresh: Optional[Callable] = None,

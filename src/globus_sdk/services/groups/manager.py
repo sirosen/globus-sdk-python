@@ -26,7 +26,7 @@ class GroupsManager:
         self.client = client or GroupsClient()
 
     def create_group(
-        self, name: str, description: str, parent_id: Optional[UUIDLike] = None
+        self, name: str, description: str, *, parent_id: Optional[UUIDLike] = None
     ) -> response.GlobusHTTPResponse:
         """
         Create a group with the given name.  If a parent id is included, the
@@ -44,6 +44,7 @@ class GroupsManager:
     def set_group_policies(
         self,
         group_id: UUIDLike,
+        *,
         is_high_assurance: bool,
         group_visibility: GroupVisibility,
         group_members_visibility: GroupMemberVisibility,
@@ -78,12 +79,13 @@ class GroupsManager:
         self,
         group_id: UUIDLike,
         identity_id: UUIDLike,
+        *,
         role: GroupRole = GroupRole.member,
     ) -> response.GlobusHTTPResponse:
         """
         Add a list of identities to a group with the given role.
         """
-        actions = BatchMembershipActions().add_members([identity_id], role)
+        actions = BatchMembershipActions().add_members([identity_id], role=role)
         return self.client.batch_membership_action(group_id, actions)
 
     def approve_pending(
@@ -108,12 +110,13 @@ class GroupsManager:
         self,
         group_id: UUIDLike,
         identity_id: UUIDLike,
+        *,
         role: GroupRole = GroupRole.member,
     ) -> response.GlobusHTTPResponse:
         """
         Invite an identity to a group with the given role.
         """
-        actions = BatchMembershipActions().invite_members([identity_id], role)
+        actions = BatchMembershipActions().invite_members([identity_id], role=role)
         return self.client.batch_membership_action(group_id, actions)
 
     def join(

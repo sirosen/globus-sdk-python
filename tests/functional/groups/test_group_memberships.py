@@ -32,7 +32,7 @@ def test_add_member(groups_manager):
     res = groups_manager.add_member(
         "d3974728-6458-11e4-b72d-123139141556",
         "ae332d86-d274-11e5-b885-b31714a110e9",
-        GroupRole.admin,
+        role=GroupRole.admin,
     )
     assert res.http_status == 200
 
@@ -52,7 +52,7 @@ def test_batch_action_payload():
                 "788e8a5e-da7f-11eb-9782-97fc8494b14e",
                 "79c411f0-da7f-11eb-a0e4-a3451dad6f05",
             ],
-            GroupRole.manager,
+            role=GroupRole.manager,
         )
         .invite_members(
             [

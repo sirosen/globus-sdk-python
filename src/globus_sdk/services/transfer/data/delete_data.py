@@ -72,6 +72,7 @@ class DeleteData(utils.PayloadWrapper):
         self,
         transfer_client: "globus_sdk.TransferClient",
         endpoint: str,
+        *,
         label: Optional[str] = None,
         submission_id: Optional[str] = None,
         recursive: bool = False,
@@ -107,7 +108,7 @@ class DeleteData(utils.PayloadWrapper):
                 log.info(f"DeleteData.{option} = {value} (option passed in via kwargs)")
 
     def add_item(
-        self, path: str, additional_fields: Optional[Dict[str, Any]] = None
+        self, path: str, *, additional_fields: Optional[Dict[str, Any]] = None
     ) -> None:
         """
         Add a file or directory or symlink to be deleted. If any of the paths
