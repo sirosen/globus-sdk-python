@@ -46,7 +46,7 @@ def test_add_member(groups_manager):
 def test_batch_action_payload():
     batch_action = (
         BatchMembershipActions()
-        .accept_invites(["ae332d86-d274-11e5-b885-b31714a110e9"])
+        .accept_invites("ae332d86-d274-11e5-b885-b31714a110e9")
         .add_members(
             [
                 "788e8a5e-da7f-11eb-9782-97fc8494b14e",
