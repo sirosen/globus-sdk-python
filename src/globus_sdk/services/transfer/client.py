@@ -965,6 +965,9 @@ class TransferClient(client.BaseClient):
         """
         ``GET /submission_id``
 
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+
         Submission IDs are required to submit tasks to the Transfer service
         via the :meth:`submit_transfer <.submit_transfer>` and
         :meth:`submit_delete <.submit_delete>` methods.
@@ -985,6 +988,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /transfer``
+
+        :param data: A transfer task document listing files and directories, and setting
+            various options. See :class:`TransferData <globus_sdk.TransferData>` for
+            details
+        :type data: dict or TransferData
 
         **Examples**
 
@@ -1014,6 +1022,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /delete``
+
+        :param data: A delete task document listing files and directories, and setting
+            various options. See :class:`DeleteData <globus_sdk.DeleteData>` for
+            details
+        :type data: dict or DeleteData
 
         **Examples**
 
@@ -1049,16 +1062,15 @@ class TransferClient(client.BaseClient):
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
-        Get an iterable of task documents owned by the current user.
-
         ``GET /task_list``
+
+        Get an iterable of task documents owned by the current user.
 
         :param limit: limit the number of results
         :type limit: int, optional
         :param offset: offset used in paging
         :type offset: int, optional
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
 
         **Examples**
@@ -1098,18 +1110,17 @@ class TransferClient(client.BaseClient):
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         r"""
-        List events (for example, faults and errors) for a given Task.
-
         ``GET /task/<task_id>/event_list``
 
-        :param task_id: The ID of the task to inspect.
-        :type task_id: str
+        List events (for example, faults and errors) for a given Task.
+
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
         :param limit: limit the number of results
         :type limit: int, optional
         :param offset: offset used in paging
         :type offset: int, optional
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
 
         **Examples**
@@ -1139,6 +1150,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /task/<task_id>``
+
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.get_task({task_id}, ...)")
@@ -1149,11 +1165,21 @@ class TransferClient(client.BaseClient):
     def update_task(
         self,
         task_id: UUIDLike,
-        data: Dict,
+        data: Dict[str, Any],
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /task/<task_id>``
+
+        Modify a task. Only tasks which are still running can be modified, and only the
+        ``label`` and ``deadline`` fields can be updated.
+
+        :param task_id: The ID of the task to modify
+        :type task_id: str or UUID
+        :param data: A partial task document with fields to update
+        :type data: dict
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.update_task({task_id}, ...)")
@@ -1164,6 +1190,11 @@ class TransferClient(client.BaseClient):
     def cancel_task(self, task_id: UUIDLike) -> response.GlobusHTTPResponse:
         """
         ``POST /task/<task_id>/cancel``
+
+        Cancel a task which is still running.
+
+        :param task_id: The ID of the task to cancel
+        :type task_id: str or UUID
         """
         task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.cancel_task({task_id})")
@@ -1179,7 +1210,7 @@ class TransferClient(client.BaseClient):
         ``True``.
 
         :param task_id: ID of the Task to wait on for completion
-        :type task_id: str
+        :type task_id: str or UUID
         :param timeout: Number of seconds to wait in total. Minimum 1. [Default: ``10``]
         :type timeout: int, optional
         :param polling_interval: Number of seconds between queries to Globus about the
@@ -1279,6 +1310,13 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /task/<task_id>/pause_info``
+
+        Get info about why a task is paused or about to be paused.
+
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_pause_info({task_id}, ...)")
@@ -1293,6 +1331,8 @@ class TransferClient(client.BaseClient):
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
+        ``GET /task/<task_id>/successful_transfers``
+
         Get the successful file transfers for a completed Task.
 
         .. note::
@@ -1302,12 +1342,9 @@ class TransferClient(client.BaseClient):
             part of a sync transfer, or files which were skipped due to
             skip_source_errors being set on the task.
 
-        ``GET /task/<task_id>/successful_transfers``
-
-        :param task_id: The ID of the task to inspect.
-        :type task_id: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
 
         **Examples**
@@ -1333,15 +1370,14 @@ class TransferClient(client.BaseClient):
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
+        ``GET /task/<task_id>/skipped_errors``
+
         Get path and error information for all paths that were skipped due
         to skip_source_errors being set on a completed transfer Task.
 
-        ``GET /task/<task_id>/skipped_errors``
-
-        :param task_id: The ID of the task to inspect.
-        :type task_id: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
 
         **Examples**
