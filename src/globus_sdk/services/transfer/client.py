@@ -1355,9 +1355,7 @@ class TransferClient(client.BaseClient):
         >>>         info["error_code"], info["source_path"]))
         """
         task_id = utils.safe_stringify(task_id)
-        log.info(
-            "TransferClient.endpoint_manager_task_skipped_errors(%s, ...)", task_id
-        )
+        log.info("TransferClient.task_skipped_errors(%s, ...)", task_id)
         resource_path = self.qjoin_path("task", task_id, "skipped_errors")
         return IterableTransferResponse(
             self.get(resource_path, query_params=query_params)
@@ -1375,9 +1373,12 @@ class TransferClient(client.BaseClient):
         self, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
+        ``GET endpoint_manager/monitored_endpoints``
+
         Get endpoints the current user is a monitor or manager on.
 
-        ``GET endpoint_manager/monitored_endpoints``
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         log.info(f"TransferClient.endpoint_manager_monitored_endpoints({query_params})")
         path = self.qjoin_path("endpoint_manager", "monitored_endpoints")
@@ -1391,9 +1392,14 @@ class TransferClient(client.BaseClient):
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
+        ``GET /endpoint_manager/endpoint/<endpoint_id>/hosted_endpoint_list``
+
         Get shared endpoints hosted on the given endpoint.
 
-        ``GET /endpoint_manager/endpoint/<endpoint_id>/hosted_endpoint_list``
+        :param endpoint_id: The ID of the host endpoint
+        :type endpoint_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_manager_hosted_endpoint_list({endpoint_id})")
@@ -1410,9 +1416,14 @@ class TransferClient(client.BaseClient):
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
+        ``GET /endpoint_manager/endpoint/<endpoint_id>``
+
         Get endpoint details as an admin.
 
-        ``GET /endpoint_manager/endpoint/<endpoint_id>``
+        :param endpoint_id: The ID of the endpoint
+        :type endpoint_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id})")
@@ -1427,9 +1438,14 @@ class TransferClient(client.BaseClient):
         self, endpoint_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
+        ``GET endpoint_manager/endpoint/<endpoint_id>/access_list``
+
         Get a list of access control rules on specified endpoint as an admin.
 
-        ``GET endpoint_manager/endpoint/<endpoint_id>/access_list``
+        :param endpoint_id: The ID of the endpoint
+        :type endpoint_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
