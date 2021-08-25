@@ -1,16 +1,21 @@
 import logging
 import time
-from typing import Any, Dict, Iterable, List, Optional, Union
+import uuid
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from globus_sdk import client, exc, paging, response, utils
 from globus_sdk.scopes import TransferScopes
-from globus_sdk.types import UUIDLike
+from globus_sdk.types import DateLike, UUIDLike
 
 from .data import DeleteData, TransferData
 from .errors import TransferAPIError
 from .response import ActivationRequirementsResponse, IterableTransferResponse
 
 log = logging.getLogger(__name__)
+
+
+def _datelike_to_str(x: DateLike) -> str:
+    return x if isinstance(x, str) else x.isoformat(timespec="seconds")
 
 
 def _get_page_size(paged_result: IterableTransferResponse) -> int:
@@ -1450,98 +1455,85 @@ class TransferClient(client.BaseClient):
     )
     @paging.has_paginator(paging.LastKeyPaginator, items_key="DATA")
     def endpoint_manager_task_list(
-        self, query_params: Optional[Dict[str, Any]] = None
+        self,
+        *,
+        filter_status: Union[None, str, Sequence[str]] = None,
+        filter_task_id: Union[None, UUIDLike, Sequence[UUIDLike]] = None,
+        filter_owner_id: Optional[UUIDLike] = None,
+        filter_endpoint: Optional[UUIDLike] = None,
+        filter_is_paused: Optional[bool] = None,
+        filter_completion_time: Union[None, str, Tuple[DateLike, DateLike]] = None,
+        filter_min_faults: Optional[int] = None,
+        filter_local_user: Optional[str] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         r"""
+        ``GET endpoint_manager/task_list``
+
         Get a list of tasks visible via ``activity_monitor`` role, as opposed
         to tasks owned by the current user.
 
-        ``GET endpoint_manager/task_list``
+        For any query that doesn’t specify a ``filter_status`` that is a subset of
+        ``("ACTIVE", "INACTIVE")``, at least one of ``filter_task_id`` or
+        ``filter_endpoint`` is required.
 
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param filter_status: Return only tasks with any of the specified statuses
+            Note that in-progress tasks will have status ``"ACTIVE"`` or ``"INACTIVE"``,
+            and completed tasks will have status ``"SUCCEEDED"`` or ``"FAILED"``.
+        :type filter_status: str or sequence of str, optional
+        :param filter_task_id: Return only tasks with any of the specified ids. If any
+            of the specified tasks do not involve an endpoint the user has an
+            appropriate role for, a ``PermissionDenied`` error will be returned. This
+            filter can't be combined with any other filter.  If another filter is
+            passed, a ``BadRequest`` will be returned. (limit: 50 task IDs)
+        :type filter_task_id: str, UUID, or sequence of str or UUID, optional
+        :param filter_owner_id: A Globus Auth identity id. Limit results to tasks
+            submitted by the specified identity, or linked to the specified identity,
+            at submit time.  Returns ``UserNotFound`` if the identity does not exist or
+            has never used the Globus Transfer service. If no tasks were submitted by
+            this user to an endpoint the current user has an appropriate role on, an
+            empty result set will be returned. Unless filtering for running tasks (i.e.
+            ``filter_status`` is a subset of ``("ACTIVE", "INACTIVE")``,
+            ``filter_endpoint`` is required when using ``filter_owner_id``.
+        :type filter_owner_id: str or UUID, optional
+        :param filter_endpoint: Single endpoint id. Return only tasks with a matching
+            source or destination endpoint or matching source or destination host
+            endpoint.
+        :type filter_endpoint: str or UUID, optional
+        :param filter_is_paused: Return only tasks with the specified ``is_paused``
+            value. Requires that ``filter_status`` is also passed and contains a subset
+            of ``"ACTIVE"`` and ``"INACTIVE"``. Completed tasks always have
+            ``is_paused`` equal to ``False`` and filtering on their paused state is not
+            useful and not supported.  Note that pausing is an async operation, and
+            after a pause rule is inserted it will take time before the ``is_paused``
+            flag is set on all affected tasks. Tasks paused by id will have the
+            ``is_paused`` flag set immediately.
+        :type filter_is_paused: bool, optional
+        :param filter_completion_time: Start and end date-times separated by a comma, or
+            provided as a tuple of strings or datetime objects.  Returns only completed
+            tasks with ``completion_time`` in the specified range. Date strings should
+            be specified in one of the following ISO 8601 formats:
+            ``YYYY-MM-DDTHH:MM:SS``, ``YYYY-MM-DDTHH:MM:SS+/-HH:MM``, or
+            ``YYYY-MM-DDTHH:MM:SSZ``. If no timezone is specified, UTC is assumed. A
+            space can be used between the date and time instead of ``T``. A blank string
+            may be used for either the start or end (but not both) to indicate no limit
+            on that side. If the end date is blank, the filter will also include all
+            active tasks, since they will complete some time in the future.
+        :type filter_completion_time: str, tuple of str, or tuple of datetime, optional
+        :param filter_min_faults:  Minimum number of cumulative faults, inclusive.
+            Return only tasks with ``faults >= N``, where ``N`` is the filter value.
+            Use ``filter_min_faults=1`` to find all tasks with at least one fault.
+            Note that many errors are not fatal and the task may still be successful
+            even if ``faults >= 1``.
+        :type filter_min_faults: int, optional
+        :param filter_local_user: A valid username for the target system running the
+            endpoint, as a utf8 encoded string. Requires that ``filter_endpoint`` is
+            also set. Return only tasks that have successfully fetched the local user
+            from the endpoint, and match the values of ``filter_endpoint`` and
+            ``filter_local_user`` on the source or on the destination.
+        :type filter_local_user: str, optional
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
-
-        **Filters**
-
-        The following filters are supported (passed as keyword arguments in
-        ``query_params``). For any query that doesn’t specify a filter_status
-        that is a subset of ("ACTIVE", "INACTIVE"), at least one of
-        filter_task_id or filter_endpoint is required.
-
-        ====================== ================ ========================
-        Query Parameter        Filter Type      Description
-        ====================== ================ ========================
-        filter_status          equality list    |filter_status|
-        filter_task_id         equality list    |filter_task_id|
-        filter_owner_id        equality         |filter_owner_id|
-        filter_endpoint        equality         |filter_endpoint|
-        filter_is_paused       boolean equality |filter_is_paused|
-        filter_completion_time datetime range   |filter_completion_time|
-        filter_min_faults      int              |filter_min_faults|
-        filter_local_user      equality         |filter_local_user|
-        ====================== ================ ========================
-
-        .. |filter_status| replace::
-           Comma separated list of task statuses.  Return only tasks with any of the
-           specified statuses. Note that in-progress tasks will have status "ACTIVE" or
-           "INACTIVE", and completed tasks will have status "SUCCEEDED" or "FAILED".
-
-        .. |filter_task_id| replace::
-           Comma separated list of task_ids, limit 50. Return only tasks with any of
-           the specified ids. If any of the specified tasks do not involve an endpoint
-           the user has an appropriate role for, a ``PermissionDenied`` error will be
-           returned. This filter can't be combined with any other filter.  If another
-           filter is passed, a ``BadRequest`` will be returned.
-
-        .. |filter_owner_id| replace::
-           A Globus Auth identity id. Limit results to tasks submitted by the specified
-           identity, or linked to the specified identity, at submit time.  Returns
-           ``UserNotFound`` if the identity does not exist or has never used the Globus
-           Transfer service. If no tasks were submitted by this user to an endpoint the
-           current user has an appropriate role on, an empty result set will be
-           returned. Unless filtering for running tasks (i.e. ``filter_status`` is a
-           subset of ("ACTIVE", "INACTIVE"), ``filter_endpoint`` is required when using
-           ``filter_owner_id``.
-
-        .. |filter_endpoint| replace::
-           Single endpoint id or canonical name. Using canonical name is deprecated.
-           Return only tasks with a matching source or destination endpoint or matching
-           source or destination host endpoint.
-
-        .. |filter_is_paused| replace::
-           Return only tasks with the specified ``is_paused`` value. Requires that
-           ``filter_status`` is also passed and contains a subset of "ACTIVE" and
-           "INACTIVE". Completed tasks always have ``is_paused`` equal to "false" and
-           filtering on their paused state is not useful and not supported.  Note that
-           pausing is an async operation, and after a pause rule is inserted it will
-           take time before the is_paused flag is set on all affected tasks. Tasks
-           paused by id will have the ``is_paused`` flag set immediately.
-
-        .. |filter_completion_time| replace::
-           Start and end date-times separated by a comma. Each datetime should be
-           specified as a string in ISO 8601 format: ``YYYY-MM-DDTHH:MM:SS``, where the
-           "T" separating date and time is literal, with optional \+/-HH:MM for
-           timezone.  If no timezone is specified, UTC is assumed, or a trailing "Z" can
-           be specified to make UTC explicit. A space can be used between the date and
-           time instead of a space.  A blank string may be used for either the start or
-           end (but not both) to indicate no limit on that side.  Returns only complete
-           tasks with ``completion_time`` in the specified range. If the end date is
-           blank, it will also include all active tasks, since they will complete some
-           time in the future.
-
-        .. |filter_min_faults| replace::
-           Minimum number of cumulative faults, inclusive.  Return only tasks with
-           ``faults >= N``, where N is the filter value.  Use ``filter_min_faults=1`` to
-           find all tasks with at least one fault.  Note that many errors are not fatal
-           and the task may still be successful even if ``faults >= 1``.
-
-        .. |filter_local_user| replace::
-           A valid username for the target system running the endpoint, as a utf8
-           encoded string. Requires that ``filter_endpoint`` is also set. Return only
-           tasks that have successfully fetched the local user from the endpoint, and
-           match the values of ``filter_endpoint`` and ``filter_local_user`` on the
-           source or on the destination.
 
         **Examples**
 
@@ -1566,6 +1558,37 @@ class TransferClient(client.BaseClient):
         >>>             task["destination_endpoint"), task["owner_string"])
         """
         log.info("TransferClient.endpoint_manager_task_list(...)")
+        if query_params is None:
+            query_params = {}
+        if filter_status is not None:
+            if isinstance(filter_status, str):
+                query_params["filter_status"] = filter_status
+            else:
+                query_params["filter_status"] = ",".join(filter_status)
+        if filter_task_id is not None:
+            if isinstance(filter_task_id, (uuid.UUID, str, bytes)):
+                query_params["filter_task_id"] = utils.safe_stringify(filter_task_id)
+            else:
+                query_params["filter_task_id"] = ",".join(
+                    [utils.safe_stringify(tid) for tid in filter_task_id]
+                )
+        if filter_owner_id is not None:
+            query_params["filter_owner_id"] = utils.safe_stringify(filter_owner_id)
+        if filter_endpoint is not None:
+            query_params["filter_endpoint"] = utils.safe_stringify(filter_endpoint)
+        if filter_is_paused is not None:
+            query_params["filter_is_paused"] = filter_is_paused
+        if filter_completion_time is not None:
+            if isinstance(filter_completion_time, str):
+                query_params["filter_completion_time"] = filter_completion_time
+            else:
+                start_t, end_t = filter_completion_time
+                start_t, end_t = _datelike_to_str(start_t), _datelike_to_str(end_t)
+                query_params["filter_completion_time"] = f"{start_t},{end_t}"
+        if filter_min_faults is not None:
+            query_params["filter_min_faults"] = filter_min_faults
+        if filter_local_user is not None:
+            query_params["filter_local_user"] = filter_local_user
         path = self.qjoin_path("endpoint_manager", "task_list")
         return IterableTransferResponse(self.get(path, query_params=query_params))
 
