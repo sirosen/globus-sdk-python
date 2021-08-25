@@ -188,8 +188,8 @@ class GroupPolicies(utils.PayloadWrapper):
     ):
         super().__init__()
         self["is_high_assurance"] = is_high_assurance
-        self["group_visiibility"] = group_visibility
-        self["group_members_visiibility"] = group_members_visibility
+        self["group_visibility"] = group_visibility
+        self["group_members_visibility"] = group_members_visibility
         self["join_requests"] = join_requests
         self["signup_fields"] = signup_fields
         if authentication_assurance_timeout is not None:
