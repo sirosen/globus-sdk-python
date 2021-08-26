@@ -659,6 +659,9 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/role_list``
+
+        :param endpoint_id: The endpoint whose roles are being listed
+        :type endpoint_id: str or UUID
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_role_list({endpoint_id}, ...)")
@@ -673,6 +676,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/role``
+
+        :param endpoint_id: The endpoint on which the role is being added
+        :type endpoint_id: str or UUID
+        :param role_data: A role document for the new role
+        :type role_data: dict
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_role({endpoint_id}, ...)")
@@ -690,6 +698,13 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/role/<role_id>``
+
+        :param endpoint_id: The endpoint on which the role applies
+        :type endpoint_id: str or UUID
+        :param role_id: The ID of the role
+        :type role_id: str
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint_role({endpoint_id}, {role_id}, ...)")
@@ -705,6 +720,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/role/<role_id>``
+
+        :param endpoint_id: The endpoint on which the role applies
+        :type endpoint_id: str or UUID
+        :param role_id: The ID of the role to delete
+        :type role_id: str
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint_role({endpoint_id}, {role_id})")
@@ -723,6 +743,11 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/access_list``
+
+        :param endpoint_id: The endpoint whose ACLs are being listed
+        :type endpoint_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_acl_list({endpoint_id}, ...)")
@@ -740,6 +765,13 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/access/<rule_id>``
+
+        :param endpoint_id: The endpoint on which the access rule applies
+        :type endpoint_id: str or UUID
+        :param rule_id: The ID of the rule to fetch
+        :type rule_id: str
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
@@ -787,6 +819,13 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/access/<rule_id>``
+
+        :param endpoint_id: The endpoint on which the access rule applies
+        :type endpoint_id: str or UUID
+        :param rule_id: The ID of the access rule to modify
+        :type rule_id: str
+        :param rule_data: A partial ``access`` document containing fields to update
+        :type rule_data: dict
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
@@ -803,6 +842,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/access/<rule_id>``
+
+        :param endpoint_id: The endpoint on which the access rule applies
+        :type endpoint_id: str or UUID
+        :param rule_id: The ID of the access rule to remove
+        :type rule_id: str
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
