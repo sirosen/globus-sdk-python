@@ -1838,10 +1838,15 @@ class TransferClient(client.BaseClient):
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
+        ``GET /endpoint_manager/task/<task_id>``
+
         Get task info as an admin. Requires activity monitor effective role on
         the destination endpoint of the task.
 
-        ``GET /endpoint_manager/task/<task_id>``
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_get_task({task_id}, ...)")
@@ -1867,19 +1872,18 @@ class TransferClient(client.BaseClient):
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
+        ``GET /task/<task_id>/event_list``
+
         List events (for example, faults and errors) for a given task as an
         admin. Requires activity monitor effective role on the destination
         endpoint of the task.
 
-        ``GET /task/<task_id>/event_list``
-
-        :param task_id: The ID of the task to inspect.
-        :type task_id: str
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
         :param limit: limit the number of results
         :type limit: int, optional
         :param offset: offset used in paging
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         task_id = utils.safe_stringify(task_id)
@@ -1901,10 +1905,15 @@ class TransferClient(client.BaseClient):
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
+        ``GET /endpoint_manager/task/<task_id>/pause_info``
+
         Get details about why a task is paused as an admin. Requires activity
         monitor effective role on the destination endpoint of the task.
 
-        ``GET /endpoint_manager/task/<task_id>/pause_info``
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_pause_info({task_id}, ...)")
@@ -1920,14 +1929,13 @@ class TransferClient(client.BaseClient):
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
-        Get the successful file transfers for a completed Task as an admin.
-
         ``GET /endpoint_manager/task/<task_id>/successful_transfers``
 
-        :param task_id: The ID of the task to inspect.
-        :type task_id: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        Get the successful file transfers for a completed Task as an admin.
+
+        :param task_id: The ID of the task to inspect
+        :type task_id: str or UUID
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         task_id = utils.safe_stringify(task_id)
@@ -1948,14 +1956,13 @@ class TransferClient(client.BaseClient):
         self, task_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> IterableTransferResponse:
         """
-        Get skipped errors for a completed Task as an admin.
-
         ``GET /endpoint_manager/task/<task_id>/skipped_errors``
 
-        :param task_id: The ID of the task to inspect.
+        Get skipped errors for a completed Task as an admin.
+
+        :param task_id: The ID of the task to inspect
         :type task_id: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         task_id = utils.safe_stringify(task_id)
@@ -1973,17 +1980,16 @@ class TransferClient(client.BaseClient):
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
+        ``POST /endpoint_manager/admin_cancel``
+
         Cancel a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
 
-        ``POST /endpoint_manager/admin_cancel``
-
-        :param task_ids: List of task ids to cancel.
+        :param task_ids: List of task ids to cancel
         :type task_ids: iterable of str or UUID
-        :param message: Message given to all users who's tasks have been canceled.
+        :param message: Message given to all users whose tasks have been canceled
         :type message: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
@@ -2002,15 +2008,14 @@ class TransferClient(client.BaseClient):
         self, admin_cancel_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
+        ``GET /endpoint_manager/admin_cancel/<admin_cancel_id>``
+
         Get the status of an an admin cancel (result of
         endpoint_manager_cancel_tasks).
 
-        ``GET /endpoint_manager/admin_cancel/<admin_cancel_id>``
-
-        :param admin_cancel_id: The ID of the the cancel job to inspect.
-        :type admin_cancel_id: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param admin_cancel_id: The ID of the the cancel job to inspect
+        :type admin_cancel_id: str or UUID
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         admin_cancel_id = utils.safe_stringify(admin_cancel_id)
@@ -2029,17 +2034,16 @@ class TransferClient(client.BaseClient):
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
+        ``POST /endpoint_manager/admin_pause``
+
         Pause a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
 
-        ``POST /endpoint_manager/admin_pause``
-
-        :param task_ids: List of task ids to pause.
+        :param task_ids: List of task ids to pause
         :type task_ids: iterable of str or UUID
-        :param message: Message given to all users who's tasks have been paused.
+        :param message: Message given to all users whose tasks have been paused
         :type message: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
@@ -2060,15 +2064,14 @@ class TransferClient(client.BaseClient):
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
+        ``POST /endpoint_manager/admin_resume``
+
         Resume a list of tasks as an admin. Requires activity manager effective
         role on the task(s) source or destination endpoint(s).
 
-        ``POST /endpoint_manager/admin_resume``
-
-        :param task_ids: List of task ids to resume.
+        :param task_ids: List of task ids to resume
         :type task_ids: iterable of str or UUID
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         str_task_ids = [utils.safe_stringify(i) for i in task_ids]
@@ -2090,17 +2093,16 @@ class TransferClient(client.BaseClient):
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
+        ``GET /endpoint_manager/pause_rule_list``
+
         Get a list of pause rules on endpoints that the current user has the
         activity monitor effective role on.
-
-        ``GET /endpoint_manager/pause_rule_list``
 
         :param filter_endpoint: An endpoint ID. Limit results to rules on endpoints
             hosted by this endpoint. Must be activity monitor on this endpoint, not just
             the hosted endpoints.
         :type filter_endpoint: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         log.info("TransferClient.endpoint_manager_pause_rule_list(...)")
@@ -2118,10 +2120,13 @@ class TransferClient(client.BaseClient):
         self, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
         """
+        ``POST /endpoint_manager/pause_rule``
+
         Create a new pause rule. Requires the activity manager effective role
         on the endpoint defined in the rule.
 
-        ``POST /endpoint_manager/pause_rule``
+        :param data: A pause rule document describing the rule to create
+        :type data: dict
 
         **Examples**
 
@@ -2147,15 +2152,14 @@ class TransferClient(client.BaseClient):
         self, pause_rule_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
+        ``GET /endpoint_manager/pause_rule/<pause_rule_id>``
+
         Get an existing pause rule by ID. Requires the activity manager
         effective role on the endpoint defined in the rule.
 
-        ``GET /endpoint_manager/pause_rule/<pause_rule_id>``
-
-        :param pause_rule_id: ID of pause rule to get.
+        :param pause_rule_id: ID of pause rule to get
         :type pause_rule_id: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         pause_rule_id = utils.safe_stringify(pause_rule_id)
@@ -2170,11 +2174,16 @@ class TransferClient(client.BaseClient):
         self, pause_rule_id: UUIDLike, data: Optional[dict]
     ) -> response.GlobusHTTPResponse:
         """
+        ``PUT /endpoint_manager/pause_rule/<pause_rule_id>``
+
         Update an existing pause rule by ID. Requires the activity manager
         effective role on the endpoint defined in the rule.
         Note that non update-able fields in data will be ignored.
 
-        ``PUT /endpoint_manager/pause_rule/<pause_rule_id>``
+        :param pause_rule_id: The ID of the pause rule to update
+        :type pause_rule_id: str
+        :param data: A partial pause rule document with fields to update
+        :type data: dict
 
         **Examples**
 
@@ -2198,16 +2207,15 @@ class TransferClient(client.BaseClient):
         self, pause_rule_id: UUIDLike, query_params: Optional[Dict[str, Any]] = None
     ) -> response.GlobusHTTPResponse:
         """
+        ``DELETE /endpoint_manager/pause_rule/<pause_rule_id>``
+
         Delete an existing pause rule by ID. Requires the user to see the
         "editible" field of the rule as True. Any tasks affected by this rule
         will no longer be once it is deleted.
 
-        ``DELETE /endpoint_manager/pause_rule/<pause_rule_id>``
-
-        :param pause_rule_id: The ID of the pause rule to delete.
+        :param pause_rule_id: The ID of the pause rule to delete
         :type pause_rule_id: str
-        :param query_params: Any additional parameters will be passed through
-            as query params.
+        :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         pause_rule_id = utils.safe_stringify(pause_rule_id)
