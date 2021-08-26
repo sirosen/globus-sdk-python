@@ -58,18 +58,37 @@ class ScopeBuilder:
         return f"https://auth.globus.org/scopes/{self.resource_server}/{scope_name}"
 
 
-class GCSScopeBuilder(ScopeBuilder):
+class GCSEndpointScopeBuilder(ScopeBuilder):
     """
-    A ScopeBuilder with a named property for the GCS data_access scope.
+    A ScopeBuilder with a named property for the GCS manage_collections scope.
+    "manage_collections" is a scope on GCS Endpoints. The resource_server string should
+    be the GCS Endpoint ID.
 
     **Examples**
 
-    >>> sb = GCSScopeBuilder("xyz")
-    >>> da_scope = sb.data_access_scope
+    >>> sb = GCSEndpointScopeBuilder("xyz")
+    >>> mc_scope = sb.manage_collections
     """
 
     @property
-    def data_access_scope(self) -> str:
+    def manage_collections(self) -> str:
+        return self.urn_scope_string("manage_collections")
+
+
+class GCSCollectionScopeBuilder(ScopeBuilder):
+    """
+    A ScopeBuilder with a named property for the GCS data_access scope.
+    "data_access" is a scope on GCS Collections. The resource_server string should
+    be the GCS Collection ID.
+
+    **Examples**
+
+    >>> sb = GCSCollectionScopeBuilder("xyz")
+    >>> da_scope = sb.data_access
+    """
+
+    @property
+    def data_access(self) -> str:
         return self.url_scope_string("data_access")
 
 

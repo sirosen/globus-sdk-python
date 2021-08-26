@@ -1,6 +1,7 @@
-from typing import Any, Callable, Dict, Optional, TypeVar
+import uuid
+from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
-from globus_sdk import client, utils
+from globus_sdk import client, scopes, utils
 from globus_sdk.authorizers import GlobusAuthorizer
 
 from .errors import GCSAPIError
@@ -65,6 +66,36 @@ class GCSClient(client.BaseClient):
             app_name=app_name,
             transport_params=transport_params,
         )
+
+    @staticmethod
+    def get_gcs_endpoint_scopes(
+        endpoint_id: Union[uuid.UUID, str]
+    ) -> scopes.GCSEndpointScopeBuilder:
+        """Given a GCS Endpoint ID, this helper constructs an object containing the
+        scopes for that Endpoint.
+
+        :param endpoint_id: The ID of the Endpoint
+        :type endpoint_id: UUID or str
+
+        See documentation for :class:`globus_sdk.scopes.GCSEndpointScopeBuilder` for
+        more information.
+        """
+        return scopes.GCSEndpointScopeBuilder(str(endpoint_id))
+
+    @staticmethod
+    def get_gcs_collection_scopes(
+        collection_id: Union[uuid.UUID, str]
+    ) -> scopes.GCSCollectionScopeBuilder:
+        """Given a GCS Collection ID, this helper constructs an object containing the
+        scopes for that Collection.
+
+        :param collection_id: The ID of the Collection
+        :type collection_id: UUID or str
+
+        See documentation for :class:`globus_sdk.scopes.GCSCollectionScopeBuilder` for
+        more information.
+        """
+        return scopes.GCSCollectionScopeBuilder(str(collection_id))
 
     @_gcsdoc("List Collections", "openapi_Collections/#ListCollections")
     def get_collection_list(
