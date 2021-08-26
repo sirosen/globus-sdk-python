@@ -446,6 +446,12 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/my_effective_pause_rule_list``
+
+        :param endpoint_id: the endpoint on which the current user's effective pause
+            rules are fetched
+        :type endpoint_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.my_effective_pause_rule_list({endpoint_id}, ...)")
@@ -462,6 +468,14 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/my_shared_endpoint_list``
+
+        :param endpoint_id: the host endpoint whose shares are listed
+        :type endpoint_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+
+        Get a list of shared endpoints for which the user has ``administrator`` or
+        ``access_manager`` on a given host endpoint.
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id}, ...)")
@@ -485,6 +499,8 @@ class TransferClient(client.BaseClient):
         """
         ``GET /endpoint/<endpoint_id>/shared_endpoint_list``
 
+        :param endpoint_id: the host endpoint whose shares are listed
+        :type endpoint_id: str or UUID
         :param max_results: cap to the number of results
         :type max_results: int, optional
         :param next_token: token used for paging
@@ -492,6 +508,8 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_param: dict, optional
+
+        Get a list of all shared endpoints on a given host endpoint.
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_shared_endpoint_list({endpoint_id}, ...)")
