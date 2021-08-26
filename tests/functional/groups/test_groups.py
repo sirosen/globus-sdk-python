@@ -90,12 +90,12 @@ def test_set_group_policies(groups_manager):
     )
     resp = groups_manager.set_group_policies(
         "d3974728-6458-11e4-b72d-123139141556",
-        False,
-        GroupVisibility.private,
-        GroupMemberVisibility.managers,
-        False,
-        [GroupRequiredSignupFields.address1],
-        28800,
+        is_high_assurance=False,
+        group_visibility=GroupVisibility.private,
+        group_members_visibility=GroupMemberVisibility.managers,
+        join_requests=False,
+        signup_fields=[GroupRequiredSignupFields.address1],
+        authentication_assurance_timeout=28800,
     )
     assert resp.http_status == 200
     assert "address1" in resp.data["signup_fields"]
@@ -116,12 +116,12 @@ def test_set_group_policies_explicit_payload(groups_client):
     )
     # same payload as the above test, but formulated without GroupsManager
     payload = GroupPolicies(
-        False,
-        GroupVisibility.private,
-        GroupMemberVisibility.managers,
-        False,
-        [GroupRequiredSignupFields.address1],
-        28800,
+        is_high_assurance=False,
+        group_visibility=GroupVisibility.private,
+        group_members_visibility=GroupMemberVisibility.managers,
+        join_requests=False,
+        signup_fields=[GroupRequiredSignupFields.address1],
+        authentication_assurance_timeout=28800,
     )
     # set a string in the payload directly
     # this will pass through GroupPolicies.__setitem__

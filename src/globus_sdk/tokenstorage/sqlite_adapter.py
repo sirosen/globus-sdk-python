@@ -29,7 +29,7 @@ class SQLiteAdapter(FileAdapter):
     insufficient, you should encode that in your choice of ``namespace`` values.
     """
 
-    def __init__(self, dbname: str, namespace: str = "DEFAULT"):
+    def __init__(self, dbname: str, *, namespace: str = "DEFAULT"):
         self.filename = self.dbname = dbname
         self.namespace = namespace
         self._connection = self._init_and_connect()

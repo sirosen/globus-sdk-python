@@ -59,6 +59,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         self,
         confidential_client: ConfidentialAppAuthClient,
         scopes: str,
+        *,
         access_token: Optional[str] = None,
         expires_at: Optional[int] = None,
         on_refresh: Optional[Callable] = None,

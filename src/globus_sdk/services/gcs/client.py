@@ -100,6 +100,7 @@ class GCSClient(client.BaseClient):
     @_gcsdoc("List Collections", "openapi_Collections/#ListCollections")
     def get_collection_list(
         self,
+        *,
         include: Optional[str] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableGCSResponse:

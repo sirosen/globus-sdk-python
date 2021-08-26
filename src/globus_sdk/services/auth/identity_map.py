@@ -131,6 +131,7 @@ class IdentityMap:
         self,
         auth_client: AuthClient,
         identity_ids: Optional[Iterable[str]] = None,
+        *,
         id_batch_size: Optional[int] = None,
     ):
         self.auth_client = auth_client
