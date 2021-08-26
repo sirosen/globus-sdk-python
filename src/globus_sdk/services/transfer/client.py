@@ -4,7 +4,7 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 from globus_sdk import client, exc, paging, response, utils
 from globus_sdk.scopes import TransferScopes
-from globus_sdk.types import UUIDLike
+from globus_sdk.types import IntLike, UUIDLike
 
 from .data import DeleteData, TransferData
 from .errors import TransferAPIError
@@ -487,6 +487,9 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         ``GET /endpoint/<endpoint_id>/server_list``
+
+        :param endpoint_id: The endpoint whose servers are being listed
+        :type endpoint_id: str or UUID
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_server_list({endpoint_id}, ...)")
@@ -499,11 +502,18 @@ class TransferClient(client.BaseClient):
     def get_endpoint_server(
         self,
         endpoint_id: UUIDLike,
-        server_id: UUIDLike,
+        server_id: IntLike,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /endpoint/<endpoint_id>/server/<server_id>``
+
+        :param endpoint_id: The endpoint under which the server is registered
+        :type endpoint_id: str or UUID
+        :param server_id: The ID of the server
+        :type server_id: str or int
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
@@ -520,6 +530,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /endpoint/<endpoint_id>/server``
+
+        :param endpoint_id: The endpoint under which the server is being registered
+        :type endpoint_id: str or UUID
+        :param server_data: Fields for the new server, as a server document
+        :type server_data: dict
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_server({endpoint_id}, ...)")
@@ -531,10 +546,17 @@ class TransferClient(client.BaseClient):
         "transfer/endpoint/#update_endpoint_server_by_id",
     )
     def update_endpoint_server(
-        self, endpoint_id: UUIDLike, server_id: UUIDLike, server_data: Dict
+        self, endpoint_id: UUIDLike, server_id: IntLike, server_data: Dict
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /endpoint/<endpoint_id>/server/<server_id>``
+
+        :param endpoint_id: The endpoint under which the server is registered
+        :type endpoint_id: str or UUID
+        :param server_id: The ID of the server to update
+        :type server_id: str or int
+        :param server_data: Fields on the server to update, as a partial server document
+        :type server_data: dict
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
@@ -550,10 +572,15 @@ class TransferClient(client.BaseClient):
         "transfer/endpoint/#delete_endpoint_server_by_id",
     )
     def delete_endpoint_server(
-        self, endpoint_id: UUIDLike, server_id: UUIDLike
+        self, endpoint_id: UUIDLike, server_id: IntLike
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /endpoint/<endpoint_id>/server/<server_id>``
+
+        :param endpoint_id: The endpoint under which the server is registered
+        :type endpoint_id: str or UUID
+        :param server_id: The ID of the server to delete
+        :type server_id: str or int
         """
         endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
