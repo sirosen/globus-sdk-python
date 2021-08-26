@@ -823,6 +823,9 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         ``GET /bookmark_list``
+
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         log.info(f"TransferClient.bookmark_list({query_params})")
         return IterableTransferResponse(
@@ -835,6 +838,9 @@ class TransferClient(client.BaseClient):
     def create_bookmark(self, bookmark_data: Dict) -> response.GlobusHTTPResponse:
         """
         ``POST /bookmark``
+
+        :param bookmark_data: A bookmark document for the bookmark to create
+        :type bookmark_data: dict
         """
         log.info(f"TransferClient.create_bookmark({bookmark_data})")
         return self.post("bookmark", data=bookmark_data)
@@ -847,6 +853,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``GET /bookmark/<bookmark_id>``
+
+        :param bookmark_id: The ID of the bookmark to lookup
+        :type bookmark_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         bookmark_id = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.get_bookmark({bookmark_id})")
@@ -861,6 +872,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``PUT /bookmark/<bookmark_id>``
+
+        :param bookmark_id: The ID of the bookmark to modify
+        :type bookmark_id: str or UUID
+        :param bookmark_data: A parital bookmark document with fields to update
+        :type bookmark_data: dict
         """
         bookmark_id = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.update_bookmark({bookmark_id})")
@@ -873,6 +889,9 @@ class TransferClient(client.BaseClient):
     def delete_bookmark(self, bookmark_id: UUIDLike) -> response.GlobusHTTPResponse:
         """
         ``DELETE /bookmark/<bookmark_id>``
+
+        :param bookmark_id: The ID of the bookmark to delete
+        :type bookmark_id: str or UUID
         """
         bookmark_id = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.delete_bookmark({bookmark_id})")
@@ -899,6 +918,8 @@ class TransferClient(client.BaseClient):
         """
         ``GET /operation/endpoint/<endpoint_id>/ls``
 
+        :param endpoint_id: The ID of the endpoint on which to do a dir listing
+        :type endpoint_id: str or UUID
         :param path: Path to a directory on the endpoint to list
         :type path: str, optional
         :param show_hidden: Show hidden files (names beginning in dot).
@@ -911,6 +932,8 @@ class TransferClient(client.BaseClient):
         :param filter: Only return file documents that match these filter clauses. For
             the filter syntax, see the **External Documentation** linked below.
         :type filter: str, optional
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
 
         **Examples**
 
@@ -960,6 +983,13 @@ class TransferClient(client.BaseClient):
         """
         ``POST /operation/endpoint/<endpoint_id>/mkdir``
 
+        :param endpoint_id: The ID of the endpoint on which to create a directory
+        :type endpoint_id: str or UUID
+        :param path: Path to the new directory to create
+        :type path: str
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+
         **Examples**
 
         >>> tc = globus_sdk.TransferClient(...)
@@ -986,6 +1016,15 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /operation/endpoint/<endpoint_id>/rename``
+
+        :param endpoint_id: The ID of the endpoint on which to rename a file
+        :type endpoint_id: str or UUID
+        :param oldpath: Path to the old filename
+        :type oldpath: str
+        :param newpath: Path to the new filename
+        :type newpath: str
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
 
         **Examples**
 
@@ -1014,8 +1053,14 @@ class TransferClient(client.BaseClient):
         """
         ``POST /operation/endpoint/<endpoint_id>/symlink``
 
-        The ``path`` is the name of the symlink, and the ``symlink_target`` is
-        the path referenced by the symlink.
+        :param endpoint_id: The ID of the endpoint on which to create a symlink
+        :type endpoint_id: str or UUID
+        :param symlink_target: The path referenced by the new symlink
+        :type symlink_target: str
+        :param path: The name of (path to) the new symlink
+        :type path: str
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
 
         **Examples**
 
