@@ -62,25 +62,25 @@ class RequestsTransport:
         defaults to True, but can be set via the ``GLOBUS_SDK_VERIFY_SSL`` environment
         variable. Any non-``None`` setting via this parameter takes precedence over the
         environment variable.
-    :type verify_ssl: bool
+    :type verify_ssl: bool, optional
     :param http_timeout: Explicitly set an HTTP timeout value in seconds. This parameter
         defaults to 60s but can be set via the ``GLOBUS_SDK_HTTP_TIMEOUT`` environment
         variable. Any value set via this parameter takes precedence over the environment
         variable.
-    :type http_timeout: int
+    :type http_timeout: int, optional
     :param retry_backoff: A function which determines how long to sleep between calls
         based on the RetryContext. Defaults to expontential backoff with jitter based on
         the context ``attempt`` number.
-    :type retry_backoff: callable
+    :type retry_backoff: callable, optional
     :param retry_checks: A list of initial retry checks. Any hooks registered,
         including the default hooks, will run after these checks.
-    :type retry_checks: list of callables
+    :type retry_checks: list of callable, optional
     :param max_sleep: The maximum sleep time between retries (in seconds). If the
         computed sleep time or the backoff requested by a retry check exceeds this
         value, this amount of time will be used instead
-    :type max_sleep: int
+    :type max_sleep: int, optional
     :param max_retries: The maximum number of retries allowed by this transport
-    :type max_retries: int
+    :type max_retries: int, optional
     """
 
     #: default maximum number of retries
@@ -204,12 +204,12 @@ class RequestsTransport:
         :param headers: HTTP headers to add to the request
         :type headers: dict
         :param data: Data to send as the request body. May pass through encoding.
-        :type data: dict or string
+        :type data: dict or str
         :param encoding: A way to encode request data. "json", "form", and "text"
             are all valid values. Custom encodings can be used only if they are
             registered with the transport. By default, strings get "text" behavior and
             all other objects get "json".
-        :type encoding: string
+        :type encoding: str
 
         :return: ``requests.Response`` object
         """

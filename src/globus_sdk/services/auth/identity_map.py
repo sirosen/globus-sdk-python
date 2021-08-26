@@ -116,7 +116,7 @@ class IdentityMap:
     :param identity_ids: A list or other iterable of usernames or identity IDs (potentially
         mixed together) which will be used to seed the ``IdentityMap`` 's tracking of
         unresolved Identities.
-    :type identity_ids: iterable of str
+    :type identity_ids: iterable of str, optional
     :param id_batch_size: A non-default batch size to use when communicating with Globus
         Auth. Leaving this set to the default is strongly recommended.
     :type id_batch_size: int, optional

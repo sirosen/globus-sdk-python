@@ -28,15 +28,23 @@ The Authorizer Interface
 We define the interface for ``GlobusAuthorizer`` objects in terms of an
 Abstract Base Class:
 
-.. autoclass:: globus_sdk.authorizers.base.GlobusAuthorizer
+.. autoclass:: globus_sdk.authorizers.GlobusAuthorizer
     :members:
     :member-order: bysource
 
 ``GlobusAuthorizer`` objects that fetch new access tokens when their existing
 ones expire or a 401 is received implement the RenewingAuthorizer class
 
-.. autoclass:: globus_sdk.authorizers.renewing.RenewingAuthorizer
+.. autoclass:: globus_sdk.authorizers.RenewingAuthorizer
     :members: get_authorization_header, handle_missing_authorization
+    :member-order: bysource
+    :show-inheritance:
+
+``GlobusAuthorizer`` objects which have a static authorization header are all
+implemented using the static authorizer class:
+
+.. autoclass:: globus_sdk.authorizers.StaticGlobusAuthorizer
+    :members:
     :member-order: bysource
     :show-inheritance:
 

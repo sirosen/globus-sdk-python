@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 from globus_sdk import utils
 
 if TYPE_CHECKING:
-    from ..client import TransferClient
+    import globus_sdk
 
 log = logging.getLogger(__name__)
 
@@ -78,6 +78,11 @@ class TransferData(utils.PayloadWrapper):
         task to fail.
         [default: ``False``]
     :type fail_on_quota_errors: bool, optional
+    :param delete_destination_extra: Delete files, directories, and symlinks on the
+        destination endpoint which don’t exist on the source endpoint or are a
+        different type. Only applies for recursive directory transfers.
+        [default: ``False``]
+    :param delete_destination_extra: bool, optional
     :param additional_fields: additional fields to be added to the transfer
         document. Mostly intended for internal use
     :type additional_fields: dict, optional
@@ -131,7 +136,7 @@ class TransferData(utils.PayloadWrapper):
 
     def __init__(
         self,
-        transfer_client: "TransferClient",
+        transfer_client: "globus_sdk.TransferClient",
         source_endpoint: str,
         destination_endpoint: str,
         label: Optional[str] = None,
@@ -144,6 +149,7 @@ class TransferData(utils.PayloadWrapper):
         skip_source_errors: bool = False,
         fail_on_quota_errors: bool = False,
         recursive_symlinks: str = "ignore",
+        delete_destination_extra: bool = False,
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__()
@@ -154,31 +160,19 @@ class TransferData(utils.PayloadWrapper):
         self["submission_id"] = (
             submission_id or transfer_client.get_submission_id()["value"]
         )
-        log.info("TransferData.submission_id = {}".format(self["submission_id"]))
         self["source_endpoint"] = source_endpoint
-        log.info(f"TransferData.source_endpoint = {source_endpoint}")
         self["destination_endpoint"] = destination_endpoint
-        log.info(f"TransferData.destination_endpoint = {destination_endpoint}")
         self["verify_checksum"] = verify_checksum
-        log.info(f"TransferData.verify_checksum = {verify_checksum}")
         self["preserve_timestamp"] = preserve_timestamp
-        log.info(f"TransferData.preserve_timestamp = {preserve_timestamp}")
         self["encrypt_data"] = encrypt_data
-        log.info(f"TransferData.encrypt_data = {encrypt_data}")
         self["recursive_symlinks"] = recursive_symlinks
-        log.info(f"TransferData.recursive_symlinks = {recursive_symlinks}")
         self["skip_source_errors"] = skip_source_errors
-        log.info(f"TransferData.skip_source_errors = {skip_source_errors}")
         self["fail_on_quota_errors"] = fail_on_quota_errors
-        log.info(f"TransferData.fail_on_quota_errors = {fail_on_quota_errors}")
-
+        self["delete_destination_extra"] = delete_destination_extra
         if label is not None:
             self["label"] = label
-            log.debug(f"TransferData.label = {label}")
-
         if deadline is not None:
             self["deadline"] = str(deadline)
-            log.debug(f"TransferData.deadline = {deadline}")
 
         # map the sync_level (if it's a nice string) to one of the known int
         # values
@@ -190,13 +184,11 @@ class TransferData(utils.PayloadWrapper):
             sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
             # TODO: sync_level not allowed to be int?
             self["sync_level"] = sync_dict.get(sync_level, sync_level)
-            log.info(
-                "TransferData.sync_level = {} ({})".format(
-                    self["sync_level"], sync_level
-                )
-            )
 
         self["DATA"] = []
+
+        for k, v in self.items():
+            log.info("TransferData.%s = %s", k, v)
 
         if additional_fields is not None:
             self.update(additional_fields)

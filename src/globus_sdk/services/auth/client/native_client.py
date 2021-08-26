@@ -67,7 +67,7 @@ class NativeAppAuthClient(AuthClient):
         :param requested_scopes: The scopes on the token(s) being requested, as a
             space-separated string or iterable of strings. Defaults to
             ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-        :type requested_scopes: str or iterable of str, optional
+        :type requested_scopes: str or sequence of str, optional
         :param redirect_uri: The page that users should be directed to after
             authenticating at the authorize URL. Defaults to
             'https://auth.globus.org/v2/web/auth-code', which displays the resulting
