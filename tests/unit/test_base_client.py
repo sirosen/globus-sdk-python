@@ -75,15 +75,6 @@ def test_set_app_name(base_client):
     )
 
 
-def test_qjoin_path(base_client):
-    """
-    Calls qjoin on parts to form a path, confirms results
-    """
-    parts = ["SDK", "Test", "Path", "Items"]
-    path = base_client.qjoin_path(*parts)
-    assert path == "/SDK/Test/Path/Items"
-
-
 @pytest.mark.parametrize(
     "method, allows_body",
     [("get", False), ("delete", False), ("post", True), ("put", True), ("patch", True)],
@@ -99,12 +90,8 @@ def test_http_methods(method, allows_body, base_client):
     """
     methodname = method.upper()
     resolved_method = getattr(base_client, method)
-    register_api_route(
-        "transfer", "/madeuppath/objectname", method=methodname, json={"x": "y"}
-    )
-
-    # client should be able to compose the path itself
-    path = base_client.qjoin_path("madeuppath", "objectname")
+    path = "/madeuppath/objectname"
+    register_api_route("transfer", path, method=methodname, json={"x": "y"})
 
     # request with no body
     res = resolved_method(path)
@@ -151,3 +138,11 @@ def test_http_methods(method, allows_body, base_client):
         assert excinfo.value.raw_json["x"] == "y"
         assert excinfo.value.code == "ErrorCode"
         assert excinfo.value.message == "foo"
+
+
+def test_handle_url_unsafe_chars(base_client):
+    # make sure this path (escaped) and the request path (unescaped) match
+    register_api_route("transfer", "/foo/foo%20bar", json={"x": "y"})
+    res = base_client.get("foo/foo bar")
+    assert "x" in res
+    assert res["x"] == "y"

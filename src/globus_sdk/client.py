@@ -105,9 +105,6 @@ class BaseClient:
     def app_name(self, value: str) -> None:
         self._app_name = self.transport.user_agent = value
 
-    def qjoin_path(self, *parts: str) -> str:
-        return "/" + "/".join(urllib.parse.quote(part) for part in parts)
-
     def get(
         self,
         path: str,
@@ -266,7 +263,7 @@ class BaseClient:
         if path.startswith("https://") or path.startswith("http://"):
             url = path
         else:
-            url = utils.slash_join(self.base_url, path)
+            url = utils.slash_join(self.base_url, urllib.parse.quote(path))
         log.debug(f"request will hit URL:{url}")
 
         # make the request

@@ -54,8 +54,7 @@ class SearchClient(client.BaseClient):
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.get_index({index_id})")
-        path = self.qjoin_path("v1/index", index_id)
-        return self.get(path, query_params=query_params)
+        return self.get(f"/v1/index/{index_id}", query_params=query_params)
 
     #
     # Search queries
@@ -102,8 +101,7 @@ class SearchClient(client.BaseClient):
         )
 
         log.info(f"SearchClient.search({index_id}, ...)")
-        path = self.qjoin_path("v1/index", index_id, "search")
-        return self.get(path, query_params=query_params)
+        return self.get(f"/v1/index/{index_id}/search", query_params=query_params)
 
     @utils.doc_api_method("POST Search Query", "search/reference/post_query")
     def post_search(
@@ -143,8 +141,7 @@ class SearchClient(client.BaseClient):
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.post_search({index_id}, ...)")
-        path = self.qjoin_path("v1/index", index_id, "search")
-        return self.post(path, data=data)
+        return self.post(f"v1/index/{index_id}/search", data=data)
 
     #
     # Bulk data indexing
@@ -201,8 +198,7 @@ class SearchClient(client.BaseClient):
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.ingest({index_id}, ...)")
-        path = self.qjoin_path("v1/index", index_id, "ingest")
-        return self.post(path, data=data)
+        return self.post(f"/v1/index/{index_id}/ingest", data=data)
 
     #
     # Bulk delete
@@ -235,8 +231,7 @@ class SearchClient(client.BaseClient):
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.delete_by_query({index_id}, ...)")
-        path = self.qjoin_path("v1/index", index_id, "delete_by_query")
-        return self.post(path, data=data)
+        return self.post(f"/v1/index/{index_id}/delete_by_query", data=data)
 
     #
     # Subject Operations
@@ -266,8 +261,7 @@ class SearchClient(client.BaseClient):
             query_params = {}
         query_params["subject"] = subject
         log.info(f"SearchClient.get_subject({index_id}, {subject}, ...)")
-        path = self.qjoin_path("v1/index", index_id, "subject")
-        return self.get(path, query_params=query_params)
+        return self.get(f"/v1/index/{index_id}/subject", query_params=query_params)
 
     @utils.doc_api_method("Delete Subject", "search/reference/delete_subject")
     def delete_subject(
@@ -294,8 +288,7 @@ class SearchClient(client.BaseClient):
         query_params["subject"] = subject
 
         log.info(f"SearchClient.delete_subject({index_id}, {subject}, ...)")
-        path = self.qjoin_path("v1/index", index_id, "subject")
-        return self.delete(path, query_params=query_params)
+        return self.delete(f"/v1/index/{index_id}/subject", query_params=query_params)
 
     #
     # Entry Operations
@@ -340,8 +333,7 @@ class SearchClient(client.BaseClient):
                 index_id, subject, entry_id
             )
         )
-        path = self.qjoin_path("v1/index", index_id, "entry")
-        return self.get(path, query_params=query_params)
+        return self.get(f"/v1/index/{index_id}/entry", query_params=query_params)
 
     @utils.doc_api_method("Create Entry", "search/reference/create_or_update_entry")
     def create_entry(
@@ -379,8 +371,7 @@ class SearchClient(client.BaseClient):
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.create_entry({index_id}, ...)")
-        path = self.qjoin_path("v1/index", index_id, "entry")
-        return self.post(path, data=data)
+        return self.post(f"/v1/index/{index_id}/entry", data=data)
 
     @utils.doc_api_method("Update Entry", "search/reference/create_or_update_entry")
     def update_entry(
@@ -405,8 +396,7 @@ class SearchClient(client.BaseClient):
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.update_entry({index_id}, ...)")
-        path = self.qjoin_path("v1/index", index_id, "entry")
-        return self.put(path, data=data)
+        return self.put(f"/v1/index/{index_id}/entry", data=data)
 
     @utils.doc_api_method("Delete Entry", "search/reference/delete_entry")
     def delete_entry(
@@ -446,8 +436,7 @@ class SearchClient(client.BaseClient):
                 index_id, subject, entry_id
             )
         )
-        path = self.qjoin_path("v1/index", index_id, "entry")
-        return self.delete(path, query_params=query_params)
+        return self.delete(f"/v1/index/{index_id}/entry", query_params=query_params)
 
     #
     # Task Management
@@ -469,8 +458,7 @@ class SearchClient(client.BaseClient):
         """
         task_id = utils.safe_stringify(task_id)
         log.info(f"SearchClient.get_task({task_id})")
-        path = self.qjoin_path("v1/task", task_id)
-        return self.get(path, query_params=query_params)
+        return self.get(f"/v1/task/{task_id}", query_params=query_params)
 
     @utils.doc_api_method("Task List", "search/reference/task_list")
     def get_task_list(
@@ -488,5 +476,4 @@ class SearchClient(client.BaseClient):
         """
         index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.get_task_list({index_id})")
-        path = self.qjoin_path("v1/task_list", index_id)
-        return self.get(path, query_params=query_params)
+        return self.get(f"/v1/task_list/{index_id}", query_params=query_params)
