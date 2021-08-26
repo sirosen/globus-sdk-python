@@ -11,3 +11,8 @@ Underlying components of the Globus SDK.
     responses
     paging
     exceptions
+
+.. toctree::
+    :hidden:
+
+    utils

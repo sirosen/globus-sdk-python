@@ -14,7 +14,7 @@ from ..response import OAuthTokenResponse
 from .base import GlobusOAuthFlowManager
 
 if TYPE_CHECKING:
-    from ..client import AuthClient
+    import globus_sdk
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
     :param requested_scopes: The scopes on the token(s) being requested, as a
         space-separated string or iterable of strings. Defaults to
         ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-    :type requested_scopes: str or iterable of str, optional
+    :type requested_scopes: str or sequence of str, optional
     :param redirect_uri: The page that users should be directed to after authenticating
         at the authorize URL. Defaults to 'https://auth.globus.org/v2/web/auth-code',
         which displays the resulting ``auth_code`` for users to copy-paste back into
@@ -104,7 +104,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
 
     def __init__(
         self,
-        auth_client: "AuthClient",
+        auth_client: "globus_sdk.AuthClient",
         requested_scopes: Optional[Union[str, Sequence[str]]] = None,
         redirect_uri: Optional[str] = None,
         state: str = "_default",

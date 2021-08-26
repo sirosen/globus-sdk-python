@@ -9,7 +9,7 @@ from ..response import OAuthTokenResponse
 from .base import GlobusOAuthFlowManager
 
 if TYPE_CHECKING:
-    from ..client import AuthClient
+    import globus_sdk
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
         (that is, ``DEFAULT_REQUESTED_SCOPES`` from
         ``globus_sdk.services.auth.oauth2_constants``)
-    :type requested_scopes: str or iterable of str, optional
+    :type requested_scopes: str or sequence of str, optional
     :param state: This string allows an application to pass information back to itself
         in the course of the OAuth flow. Because the user will navigate away from the
         application to complete the flow, this parameter lets the app pass an arbitrary
@@ -54,7 +54,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
 
     def __init__(
         self,
-        auth_client: "AuthClient",
+        auth_client: "globus_sdk.AuthClient",
         redirect_uri: str,
         requested_scopes: Optional[Union[str, Sequence[str]]] = None,
         state: str = "_default",

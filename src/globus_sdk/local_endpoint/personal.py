@@ -28,7 +28,7 @@ class LocalGlobusConnectPersonal:
     @property
     def endpoint_id(self) -> Optional[str]:
         """
-        :type: string
+        :type: str
 
         The endpoint ID of the local Globus Connect Personal endpoint
         installation.

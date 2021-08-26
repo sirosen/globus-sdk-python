@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 from globus_sdk import utils
 
 if TYPE_CHECKING:
-    from ..client import TransferClient
+    import globus_sdk
 
 log = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class DeleteData(utils.PayloadWrapper):
 
     def __init__(
         self,
-        transfer_client: "TransferClient",
+        transfer_client: "globus_sdk.TransferClient",
         endpoint: str,
         label: Optional[str] = None,
         submission_id: Optional[str] = None,
