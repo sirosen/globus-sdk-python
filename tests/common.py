@@ -187,7 +187,9 @@ def make_response(
     want to directly create the response.
     """
     r = PickleableMockResponse(status, headers=headers, json_body=json_body, text=text)
-    http_res = globus_sdk.GlobusHTTPResponse(r, client=client)
+    http_res = globus_sdk.GlobusHTTPResponse(
+        r, client=client if client is not None else mock.Mock()
+    )
     if response_class is not None:
         return response_class(http_res)
     return http_res

@@ -1,7 +1,7 @@
 import pytest
 
 from globus_sdk import GCSAPIError
-from tests.common import register_api_route_fixture_file
+from tests.common import get_last_request, register_api_route_fixture_file
 
 
 def test_get_collection_list(client):
@@ -18,6 +18,29 @@ def test_get_collection_list(client):
         assert "display_name" in item
 
 
+def test_get_collection_list_include_param(client):
+    register_api_route_fixture_file("gcs", "/collections", "collection_list.json")
+
+    client.get_collection_list()
+    req = get_last_request()
+    assert "include" not in req.params
+
+    client.get_collection_list(include="foo")
+    req = get_last_request()
+    assert "include" in req.params
+    assert req.params["include"] == "foo"
+
+    client.get_collection_list(include="foo,bar")
+    req = get_last_request()
+    assert "include" in req.params
+    assert req.params["include"] == "foo,bar"
+
+    client.get_collection_list(include=("foo", "bar"))
+    req = get_last_request()
+    assert "include" in req.params
+    assert req.params["include"] == "foo,bar"
+
+
 def test_error_parsing_forbidden(client):
     register_api_route_fixture_file(
         "gcs", "/collections", "forbidden_error_data.json", status=403
@@ -30,3 +53,72 @@ def test_error_parsing_forbidden(client):
     assert err.detail_data_type is None
     assert err.message.startswith("Could not list collections")
     assert err.code == "permission_denied"
+
+
+def test_get_collection(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/normal.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "collection#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.full_data
+    assert "data" in res.full_data
+    assert res.full_data["detail"] == "success"
+    assert "detail" not in res.data
+    assert res["display_name"] == "Happy Fun Collection Name"
+
+
+def test_get_collection_flat(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/unexpectedly_flat.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "collection#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "collection#1.0.0"
+    assert "detail" not in res.full_data
+    assert "data" not in res.full_data
+    assert res["display_name"] == "Happy Fun Collection Name"
+
+
+def test_get_collection_bad_version(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/bad_version.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "result#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.full_data
+    assert "data" in res.full_data
+    assert res.full_data["detail"] == "success"
+    assert "detail" in res.data
+    assert "foo" not in res.data
+    for x in res.full_data["data"]:
+        assert "foo" in x
+
+
+def test_get_collection_includes_sideloaded_data(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/includes_other.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "collection#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.full_data
+    assert "data" in res.full_data
+    assert res.full_data["detail"] == "success"
+    assert "detail" not in res.data
+    assert res["display_name"] == "Happy Fun Collection Name"
+
+
+def test_get_collection_invalid_datatype_type(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/invalid_datatype_type.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "result#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.full_data
+    assert "detail" in res.data
+    assert "data" in res.full_data
+    assert res.full_data["detail"] == "success"
