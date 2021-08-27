@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Optional, Sequence, Union
+from typing import Any, Dict, Iterable, Optional, Union
 
 from globus_sdk import exc, utils
 from globus_sdk.authorizers import NullAuthorizer
@@ -48,7 +48,7 @@ class NativeAppAuthClient(AuthClient):
     )
     def oauth2_start_flow(
         self,
-        requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        requested_scopes: Optional[Union[str, Iterable[str]]] = None,
         *,
         redirect_uri: Optional[str] = None,
         state: str = "_default",
@@ -68,7 +68,7 @@ class NativeAppAuthClient(AuthClient):
         :param requested_scopes: The scopes on the token(s) being requested, as a
             space-separated string or iterable of strings. Defaults to
             ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-        :type requested_scopes: str or sequence of str, optional
+        :type requested_scopes: str or iterable of str, optional
         :param redirect_uri: The page that users should be directed to after
             authenticating at the authorize URL. Defaults to
             'https://auth.globus.org/v2/web/auth-code', which displays the resulting

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Optional, Sequence
+from typing import Any, Iterable, Optional
 
 from globus_sdk import utils
 from globus_sdk.types import UUIDLike
@@ -44,7 +44,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
     """
 
     def accept_invites(
-        self, identity_ids: Sequence[UUIDLike]
+        self, identity_ids: Iterable[UUIDLike]
     ) -> "BatchMembershipActions":
         """
         Accept invites for identities.  The identities must belong to
@@ -57,7 +57,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def add_members(
-        self, identity_ids: Sequence[UUIDLike], *, role: GroupRole = GroupRole.member
+        self, identity_ids: Iterable[UUIDLike], *, role: GroupRole = GroupRole.member
     ) -> "BatchMembershipActions":
         """
         Add a list of identities to a group with the given role.
@@ -69,7 +69,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def approve_pending(
-        self, identity_ids: Sequence[UUIDLike]
+        self, identity_ids: Iterable[UUIDLike]
     ) -> "BatchMembershipActions":
         """
         Approve a list of identities with pending join requests.
@@ -81,7 +81,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def decline_invites(
-        self, identity_ids: Sequence[UUIDLike]
+        self, identity_ids: Iterable[UUIDLike]
     ) -> "BatchMembershipActions":
         """
         Decline an invitation for a given set of identities.
@@ -93,7 +93,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def invite_members(
-        self, identity_ids: Sequence[UUIDLike], *, role: GroupRole = GroupRole.member
+        self, identity_ids: Iterable[UUIDLike], *, role: GroupRole = GroupRole.member
     ) -> "BatchMembershipActions":
         """
         Invite a list of identities to a group with the given role.
@@ -104,7 +104,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def join(self, identity_ids: Sequence[UUIDLike]) -> "BatchMembershipActions":
+    def join(self, identity_ids: Iterable[UUIDLike]) -> "BatchMembershipActions":
         """
         Join a group with the given identities.  The identities must be in the
         authenticated users identity set.
@@ -115,7 +115,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         )
         return self
 
-    def leave(self, identity_ids: Sequence[UUIDLike]) -> "BatchMembershipActions":
+    def leave(self, identity_ids: Iterable[UUIDLike]) -> "BatchMembershipActions":
         """
         Leave a group that one of the identities in the authenticated user's
         identity set is a member of.
@@ -127,7 +127,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def reject_join_requests(
-        self, identity_ids: Sequence[UUIDLike]
+        self, identity_ids: Iterable[UUIDLike]
     ) -> "BatchMembershipActions":
         """
         Reject a members that have requested to join the group.
@@ -139,7 +139,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def remove_members(
-        self, identity_ids: Sequence[UUIDLike]
+        self, identity_ids: Iterable[UUIDLike]
     ) -> "BatchMembershipActions":
         """
         Remove members from a group.  This must be done as an admin or manager
@@ -152,7 +152,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         return self
 
     def request_join(
-        self, identity_ids: Sequence[UUIDLike]
+        self, identity_ids: Iterable[UUIDLike]
     ) -> "BatchMembershipActions":
         """
         Request to join a group.
@@ -184,7 +184,7 @@ class GroupPolicies(utils.PayloadWrapper):
         group_visibility: GroupVisibility,
         group_members_visibility: GroupMemberVisibility,
         join_requests: bool,
-        signup_fields: Sequence[GroupRequiredSignupFields],
+        signup_fields: Iterable[GroupRequiredSignupFields],
         authentication_assurance_timeout: Optional[int] = None,
     ):
         super().__init__()

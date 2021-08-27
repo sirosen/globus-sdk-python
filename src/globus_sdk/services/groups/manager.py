@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Iterable, Optional
 
 from globus_sdk import response, utils
 from globus_sdk.types import UUIDLike
@@ -49,7 +49,7 @@ class GroupsManager:
         group_visibility: GroupVisibility,
         group_members_visibility: GroupMemberVisibility,
         join_requests: bool,
-        signup_fields: Sequence[GroupRequiredSignupFields],
+        signup_fields: Iterable[GroupRequiredSignupFields],
         authentication_assurance_timeout: Optional[int] = None,
     ) -> response.GlobusHTTPResponse:
         """

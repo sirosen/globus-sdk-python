@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional, Sequence, Union
+from typing import Any, Iterable, Optional, Union
 
 from globus_sdk import exc, utils
 from globus_sdk.authorizers import BasicAuthorizer
@@ -47,7 +47,7 @@ class ConfidentialAppAuthClient(AuthClient):
         log.info(f"Finished initializing client, client_id={client_id}")
 
     def oauth2_client_credentials_tokens(
-        self, requested_scopes: Optional[Union[str, Sequence[str]]] = None
+        self, requested_scopes: Optional[Union[str, Iterable[str]]] = None
     ) -> OAuthTokenResponse:
         r"""
         Perform an OAuth2 Client Credentials Grant to get access tokens which
@@ -58,7 +58,7 @@ class ConfidentialAppAuthClient(AuthClient):
 
         :param requested_scopes: Space-separated scope names being requested for the
             access token(s). Defaults to a set of commonly desired scopes for Globus.
-        :type requested_scopes: str or sequence of str, optional
+        :type requested_scopes: str or iterable of str, optional
         :rtype: :class:`OAuthTokenResponse <.OAuthTokenResponse>`
 
         For example, with a Client ID of "CID1001" and a Client Secret of
@@ -91,7 +91,7 @@ class ConfidentialAppAuthClient(AuthClient):
     def oauth2_start_flow(
         self,
         redirect_uri: str,
-        requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        requested_scopes: Optional[Union[str, Iterable[str]]] = None,
         *,
         state: str = "_default",
         refresh_tokens: bool = False,
@@ -110,7 +110,7 @@ class ConfidentialAppAuthClient(AuthClient):
         :param requested_scopes: The scopes on the token(s) being requested, as a
             space-separated string or an iterable of strings. Defaults to
             ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-        :type requested_scopes: str or sequence of str, optional
+        :type requested_scopes: str or iterable of str, optional
         :param state: This string allows an application to pass information back to
             itself in the course of the OAuth flow. Because the user will navigate away
             from the application to complete the flow, this parameter lets the app pass
