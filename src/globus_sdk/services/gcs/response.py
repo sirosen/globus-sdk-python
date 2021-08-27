@@ -24,9 +24,7 @@ def _default_unpacking_match(pattern: str) -> Callable[[dict], bool]:
     compiled_pattern = re.compile(pattern)
 
     def match_func(data: dict) -> bool:
-        if "DATA_TYPE" not in data:
-            return False
-        if not isinstance(data["DATA_TYPE"], str):
+        if not ("DATA_TYPE" in data and isinstance(data["DATA_TYPE"], str)):
             return False
         return bool(compiled_pattern.fullmatch(data["DATA_TYPE"]))
 
