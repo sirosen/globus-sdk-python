@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Callable, Dict, Optional, Sequence, TypeVar, Union
 
-from globus_sdk import client, scopes, utils
+from globus_sdk import client, response, scopes, utils
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.types import UUIDLike
 
@@ -145,3 +145,20 @@ class GCSClient(client.BaseClient):
             self.get(f"/collections/{collection_id}", query_params=query_params),
             r"collection#1\.\d+\.\d+",
         )
+
+    def delete_collection(
+        self,
+        collection_id: UUIDLike,
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``DELETE /collections/{collection_id}``
+
+        :param collection_id: The ID of the collection to delete
+        :type collection_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+        """
+        collection_id = utils.safe_stringify(collection_id)
+        return self.delete(f"/collections/{collection_id}", query_params=query_params)
