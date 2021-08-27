@@ -56,25 +56,69 @@ def test_error_parsing_forbidden(client):
 
 
 def test_get_collection(client):
-    # test on "correct" collection data, but also on a single dict response when a
-    # singleton array is expected
-    # in both cases, the endpoint data should be present
-    # but in the "unexpectedly flat" case, the detail will be absent (because there is
-    # no such field) and the expected shape method will return False
-
     register_api_route_fixture_file(
-        "gcs", "/collections/COLLECTION_ID_1", "get_collection.json"
+        "gcs", "/collections/COLLECTION_ID", "get_collection/normal.json"
     )
-    register_api_route_fixture_file(
-        "gcs", "/collections/COLLECTION_ID_2", "get_collection_unexpectedly_flat.json"
-    )
-
-    res = client.get_collection("COLLECTION_ID_1")
-    assert res.data_has_expected_shape()
-    assert res.original_data["detail"] == "success"
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "collection#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.full_data
+    assert "data" in res.full_data
+    assert res.full_data["detail"] == "success"
+    assert "detail" not in res.data
     assert res["display_name"] == "Happy Fun Collection Name"
 
-    res = client.get_collection("COLLECTION_ID_2")
-    assert not res.data_has_expected_shape()
-    assert "detail" not in res.original_data
+
+def test_get_collection_flat(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/unexpectedly_flat.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "collection#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "collection#1.0.0"
+    assert "detail" not in res.full_data
+    assert "data" not in res.full_data
     assert res["display_name"] == "Happy Fun Collection Name"
+
+
+def test_get_collection_bad_version(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/bad_version.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "result#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.full_data
+    assert "data" in res.full_data
+    assert res.full_data["detail"] == "success"
+    assert "detail" in res.data
+    assert "foo" not in res.data
+    for x in res.full_data["data"]:
+        assert "foo" in x
+
+
+def test_get_collection_includes_sideloaded_data(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/includes_other.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "collection#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.full_data
+    assert "data" in res.full_data
+    assert res.full_data["detail"] == "success"
+    assert "detail" not in res.data
+    assert res["display_name"] == "Happy Fun Collection Name"
+
+
+def test_get_collection_invalid_datatype_type(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "get_collection/invalid_datatype_type.json"
+    )
+    res = client.get_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "result#1.0.0"
+    assert res.full_data["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.full_data
+    assert "detail" in res.data
+    assert "data" in res.full_data
+    assert res.full_data["detail"] == "success"

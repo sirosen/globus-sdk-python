@@ -6,7 +6,7 @@ from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.types import UUIDLike
 
 from .errors import GCSAPIError
-from .response import IterableGCSResponse, SingletonGCSResponse
+from .response import IterableGCSResponse, UnpackingGCSResponse
 
 RT = TypeVar("RT")
 
@@ -129,7 +129,7 @@ class GCSClient(client.BaseClient):
         collection_id: UUIDLike,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-    ) -> SingletonGCSResponse:
+    ) -> UnpackingGCSResponse:
         """
         ``GET /collections/{collection_id}``
 
@@ -141,6 +141,7 @@ class GCSClient(client.BaseClient):
         Lookup a Collection on an Endpoint
         """
         collection_id = utils.safe_stringify(collection_id)
-        return SingletonGCSResponse(
-            self.get(f"/collections/{collection_id}", query_params=query_params)
+        return UnpackingGCSResponse(
+            self.get(f"/collections/{collection_id}", query_params=query_params),
+            r"collection#1\.\d+\.\d+",
         )
