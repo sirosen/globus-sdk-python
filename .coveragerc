@@ -13,3 +13,5 @@ exclude_lines =
     if __name__ == .__main__.:
     # don't check coverage on type checking conditionals
     if TYPE_CHECKING:
+    # skip overloads
+    @overload
