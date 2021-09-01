@@ -249,23 +249,29 @@ def test_get_owner_info_no_auth_data(local_gcp, write_gridmap, auth_client):
 
 def test_get_owner_info_gridmap_permission_denied(local_gcp, mocked_confdir):
     fpath = os.path.join(mocked_confdir, "gridmap")
-    with open(fpath, "w"):  # "touch"
-        pass
-    os.chmod(fpath, 0o000)
+    if not _IS_WINDOWS:
+        with open(fpath, "w"):  # "touch"
+            pass
+        os.chmod(fpath, 0o000)
+    else:
+        # on windows, trying to read a directory gets a permission error
+        # this is just an easy way for tests to simulate bad permissions
+        os.makedirs(fpath)
 
-    with pytest.raises(OSError) as excinfo:
+    with pytest.raises(PermissionError):
         local_gcp.get_owner_info()
-    # permission denied
-    assert excinfo.value.errno == 13
 
 
 def test_get_endpoint_id_permission_denied(local_gcp, mocked_confdir):
     fpath = os.path.join(mocked_confdir, "client-id.txt")
-    with open(fpath, "w"):  # "touch"
-        pass
-    os.chmod(fpath, 0o000)
+    if not _IS_WINDOWS:
+        with open(fpath, "w"):  # "touch"
+            pass
+        os.chmod(fpath, 0o000)
+    else:
+        # on windows, trying to read a directory gets a permission error
+        # this is just an easy way for tests to simulate bad permissions
+        os.makedirs(fpath)
 
-    with pytest.raises(OSError) as excinfo:
+    with pytest.raises(PermissionError):
         local_gcp.endpoint_id
-    # permission denied
-    assert excinfo.value.errno == 13
