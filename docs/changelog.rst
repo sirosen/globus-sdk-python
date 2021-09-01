@@ -13,6 +13,30 @@ to a major new version of the SDK.
 Unreleased
 ----------
 
+v3.0.0b4
+--------
+
+* Minor fix to wheel builds: do not declare wheels as universal (:pr:`444`)
+* Add a new ``GCSClient`` class for interacting with GCS Manager APIs
+  (:pr:`447`)
+* Rename ``GCSScopeBuilder`` to ``GCSCollectionScopeBuilder`` and add
+  ``GCSEndpointScopeBuilder``. The ``GCSClient`` includes helpers for
+  instantiating these scope builders (:pr:`448`)
+* ``GCSClient`` supports ``get_collection`` and ``delete_collection``.
+  ``get_collection`` uses a new ``UnpackingGCSResponse`` response type (:pr:`451`,
+  :pr:`464`)
+* Remove ``BaseClient.qjoin_path`` (:pr:`452`)
+* Enforce keyword-only arguments for most SDK-provied APIs (:pr:`453`)
+* Fix annotations for ``server_id`` on ``TransferClient`` methods (:pr:`455`)
+* Add ``delete_destination_extra`` param to ``TransferData`` (:pr:`456`)
+* Ensure all ``TransferClient`` method parameters are documented (:pr:`449`,
+  :pr:`454`, :pr:`457`, :pr:`458`, :pr:`459`, :pr:`461`, :pr:`462`)
+* ``TransferClient.endpoint_manager_task_list`` now takes filters as named
+  keyword arguments, not only in ``query_params`` (:pr:`460`)
+* Fix ``visibility`` typo in ``GroupsClient`` (:pr:`463`)
+* All type annotations for ``Sequence`` which could be relaxed to ``Iterable``
+  have been updated (:pr:`465`)
+
 v3.0.0b3
 --------
 
