@@ -122,3 +122,13 @@ def test_get_collection_invalid_datatype_type(client):
     assert "detail" in res.data
     assert "data" in res.full_data
     assert res.full_data["detail"] == "success"
+
+
+def test_delete_collection(client):
+    register_api_route_fixture_file(
+        "gcs", "/collections/COLLECTION_ID", "empty_success.json", method="DELETE"
+    )
+    res = client.delete_collection("COLLECTION_ID")
+    assert res["DATA_TYPE"] == "result#1.0.0"
+    assert "detail" in res.data
+    assert res.data["detail"] == "success"
