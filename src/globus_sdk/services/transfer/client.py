@@ -368,7 +368,7 @@ class TransferClient(client.BaseClient):
         )
 
     @utils.doc_api_method(
-        "Deactive Endpoint", "transfer/endpoint_activation/#deactivate_endpoint"
+        "Deactivate Endpoint", "transfer/endpoint_activation/#deactivate_endpoint"
     )
     def endpoint_deactivate(
         self, endpoint_id: UUIDLike, *, query_params: Optional[Dict[str, Any]] = None
@@ -960,7 +960,7 @@ class TransferClient(client.BaseClient):
 
         :param bookmark_id: The ID of the bookmark to modify
         :type bookmark_id: str or UUID
-        :param bookmark_data: A parital bookmark document with fields to update
+        :param bookmark_data: A partial bookmark document with fields to update
         :type bookmark_data: dict
         """
         bookmark_id = utils.safe_stringify(bookmark_id)
@@ -1752,7 +1752,7 @@ class TransferClient(client.BaseClient):
         Get a list of tasks visible via ``activity_monitor`` role, as opposed
         to tasks owned by the current user.
 
-        For any query that doesn’t specify a ``filter_status`` that is a subset of
+        For any query that doesn't specify a ``filter_status`` that is a subset of
         ``("ACTIVE", "INACTIVE")``, at least one of ``filter_task_id`` or
         ``filter_endpoint`` is required.
 
@@ -1966,7 +1966,7 @@ class TransferClient(client.BaseClient):
         )
 
     @utils.doc_api_method(
-        "Get task successful transfers as admi",
+        "Get task successful transfers as admin",
         "transfer/advanced_endpoint_management/#get_task_successful_transfers_as_admin",
     )
     @paging.has_paginator(paging.MarkerPaginator, items_key="DATA")
@@ -2273,7 +2273,7 @@ class TransferClient(client.BaseClient):
         ``DELETE /endpoint_manager/pause_rule/<pause_rule_id>``
 
         Delete an existing pause rule by ID. Requires the user to see the
-        "editible" field of the rule as True. Any tasks affected by this rule
+        "editable" field of the rule as True. Any tasks affected by this rule
         will no longer be once it is deleted.
 
         :param pause_rule_id: The ID of the pause rule to delete

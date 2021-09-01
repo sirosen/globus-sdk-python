@@ -27,7 +27,7 @@ class GlobusHTTPResponse:
     be used instead.
 
     The most common response data is a JSON dictionary. To make
-    handling this type of response as seemless as possible, the
+    handling this type of response as seamless as possible, the
     ``GlobusHTTPResponse`` object implements the immutable mapping protocol for
     dict-style access. This is just an alias for access to the underlying data.
 

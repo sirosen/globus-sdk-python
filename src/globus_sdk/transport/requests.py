@@ -37,7 +37,7 @@ def _exponential_backoff(ctx: RetryContext) -> float:
     # respect any explicit backoff set on the context
     if ctx.backoff is not None:
         return ctx.backoff
-    # expontential backoff with jitter
+    # exponential backoff with jitter
     return cast(float, (0.25 + 0.5 * random.random()) * (2 ** ctx.attempt))
 
 
@@ -69,7 +69,7 @@ class RequestsTransport:
         variable.
     :type http_timeout: int, optional
     :param retry_backoff: A function which determines how long to sleep between calls
-        based on the RetryContext. Defaults to expontential backoff with jitter based on
+        based on the RetryContext. Defaults to exponential backoff with jitter based on
         the context ``attempt`` number.
     :type retry_backoff: callable, optional
     :param retry_checks: A list of initial retry checks. Any hooks registered,

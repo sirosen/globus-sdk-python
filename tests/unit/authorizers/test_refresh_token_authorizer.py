@@ -68,7 +68,7 @@ def test_multiple_resource_servers(authorizer, response):
 def test_conditional_refresh_token_update(authorizer, response):
     """
     Call ensure_valid_token (triggering a refresh)
-    Confirm that the authorizer always udpates its access token and only updates
+    Confirm that the authorizer always updates its access token and only updates
     refresh_token if one was present in the response
     """
     authorizer.ensure_valid_token()  # trigger refresh

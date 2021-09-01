@@ -68,7 +68,7 @@ class GlobusAPIError(GlobusError):
     @property
     def raw_text(self) -> str:
         """
-        Get the verbatim error message receved from a Globus API as a *string*
+        Get the verbatim error message received from a Globus API as a *string*
         """
         return self._underlying_response.text
 

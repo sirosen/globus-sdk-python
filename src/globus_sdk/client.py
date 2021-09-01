@@ -57,7 +57,7 @@ class BaseClient:
         # unfortunately, we can't rely on declaring BaseClient as an ABC because it
         # doesn't have any abstract methods
         #
-        # if we declarse `service_name` without a value, we get AttributeError on access
+        # if we declare `service_name` without a value, we get AttributeError on access
         # instead of the (desired) TypeError when instantiating a BaseClient because
         # it's abstract
         if self.service_name == "_base":

@@ -71,7 +71,7 @@ Assuming you want to do so into a fresh virtualenv:
 
 You'll also want a shared function for loading the SDK ``AuthClient`` which
 represents your application, as you'll need it in a couple of places. Create
-it, along with the defintiion for your Flask app, in ``example_app.py``:
+it, along with the definition for your Flask app, in ``example_app.py``:
 
 .. code-block:: python
 

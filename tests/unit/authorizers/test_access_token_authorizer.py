@@ -19,6 +19,6 @@ def test_get_authorization_header(authorizer):
 
 def test_handle_missing_authorization(authorizer):
     """
-    Confirms that AccessTokenAuthorizer doesnt handle missing authorization
+    Confirms that AccessTokenAuthorizer doesn't handle missing authorization
     """
     assert not authorizer.handle_missing_authorization()

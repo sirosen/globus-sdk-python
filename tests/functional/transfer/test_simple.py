@@ -143,7 +143,7 @@ def test_operation_ls(client):
         assert "DATA_TYPE" in x
         assert x["DATA_TYPE"] in ("file", "dir")
         count += 1
-    # not exact, just make sure the fixter wasn't empty
+    # not exact, just make sure the fixture wasn't empty
     assert count > 3
 
     req = get_last_request()

@@ -265,7 +265,7 @@ Let's assume you want to do this with the ``globus_sdk.TransferClient``.
 
     # let's get stuff for the Globus Transfer service
     globus_transfer_data = token_response.by_resource_server["transfer.api.globus.org"]
-    # the refresh token and access token, often abbr. as RT and AT
+    # the refresh token and access token, often abbreviated as RT and AT
     transfer_rt = globus_transfer_data["refresh_token"]
     transfer_at = globus_transfer_data["access_token"]
     expires_at_s = globus_transfer_data["expires_at_seconds"]

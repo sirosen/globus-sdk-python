@@ -70,7 +70,7 @@ For example:
 Adapter Types
 -------------
 
-``globus_sdk.tokenstorage`` provides base clases for building your own storage
+``globus_sdk.tokenstorage`` provides base classes for building your own storage
 adapters, and two complete adapters.
 
 The ``SimpleJSONFileAdapter`` is good for the "simplest possible" storage, using a

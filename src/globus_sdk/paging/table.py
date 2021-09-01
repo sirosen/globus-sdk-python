@@ -62,7 +62,7 @@ class PaginatorTable:
 
     where ``client.paginated`` is a ``PaginatorTable``.
 
-    Paginators are iterables of response pages, so utlimate usage is like so:
+    Paginators are iterables of response pages, so ultimate usage is like so:
 
     >>> paginator = client.paginated.foo()  # returns a paginator
     >>> for page in paginator:  # a paginator is an iterable of pages (response objects)

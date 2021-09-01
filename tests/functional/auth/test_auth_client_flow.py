@@ -44,7 +44,7 @@ def test_oauth2_get_authorize_url_native(client):
     for val in expected_vals:
         assert val in url_res
 
-    # starting flow with specified paramaters
+    # starting flow with specified parameters
     flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(
         client,
         requested_scopes="scopes",
@@ -100,7 +100,7 @@ def test_oauth2_get_authorize_url_confidential(client):
     for val in expected_vals:
         assert val in url_res
 
-    # starting flow with specified paramaters
+    # starting flow with specified parameters
     flow_manager = globus_sdk.services.auth.GlobusAuthorizationCodeFlowManager(
         client,
         requested_scopes="scopes",

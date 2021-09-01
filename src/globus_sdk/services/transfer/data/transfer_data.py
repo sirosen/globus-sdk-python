@@ -108,7 +108,7 @@ class TransferData(utils.PayloadWrapper):
                             the file. If destination file size does not match the
                             source, do the transfer.
     ``2``, ``mtime``        Determine whether or not to transfer based on modification
-                            times. If source has a newer modififed time than the
+                            times. If source has a newer modified time than the
                             destination, do the transfer.
     ``3``, ``checksum``     Determine whether or not to transfer based on checksums of
                             file contents. If source and destination contents differ, as
@@ -210,9 +210,9 @@ class TransferData(utils.PayloadWrapper):
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> None:
         """
-        Add a file or directory to be transfered. If the item is a symlink
+        Add a file or directory to be transferred. If the item is a symlink
         to a file or directory, the file or directory at the target of
-        the symlink will be transfered.
+        the symlink will be transferred.
 
         Appends a transfer_item document to the DATA key of the transfer
         document.
@@ -225,10 +225,10 @@ class TransferData(utils.PayloadWrapper):
             <https://docs.globus.org/api/transfer/task_submit/#submit_transfer_task>`_
             for more details.
 
-        :param source_path: Path to the source directory or file to be transfered
+        :param source_path: Path to the source directory or file to be transferred
         :type source_path: str
         :param destination_path: Path to the source directory or file will be
-            transfered to
+            transferred to
         :type destination_path: str
         :param recursive: Set to True if the target at source path is a directory
         :type recursive: bool
@@ -267,7 +267,7 @@ class TransferData(utils.PayloadWrapper):
 
     def add_symlink_item(self, source_path: str, destination_path: str) -> None:
         """
-        Add a symlink to be transfered as a symlink rather than as the
+        Add a symlink to be transferred as a symlink rather than as the
         target of the symlink.
 
         Appends a transfer_symlink_item document to the DATA key of the
@@ -275,7 +275,7 @@ class TransferData(utils.PayloadWrapper):
 
         :param source_path: Path to the source symlink
         :type source_path: str
-        :param destination_path: Path to which the source symlink will be transfered
+        :param destination_path: Path to which the source symlink will be transferred
         :type destination_path: str
         """
         source_path = utils.safe_stringify(source_path)
