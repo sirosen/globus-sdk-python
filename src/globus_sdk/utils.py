@@ -3,7 +3,7 @@ import collections.abc
 import hashlib
 from base64 import b64encode
 from enum import Enum
-from typing import Any, Callable, Generator, Optional, Sequence, TypeVar, Union
+from typing import Any, Callable, Generator, Iterable, Optional, TypeVar, Union
 
 from .types import IntLike, UUIDLike
 
@@ -74,17 +74,17 @@ def safe_stringify(value: Union[IntLike, UUIDLike]) -> str:
     return str(value)
 
 
-def safe_strseq_iter(value: Sequence) -> Generator[str, None, None]:
+def safe_strseq_iter(value: Iterable) -> Generator[str, None, None]:
     """
-    Given a Sequence (typically of strings), produce an iterator over it of strings.
+    Given an Iterable (typically of strings), produce an iterator over it of strings.
     This is a passthrough with two caveats:
     - if the value is a solitary string, yield only that value
-    - any value in the sequence which is not a string will be passed through
+    - any value in the iterable which is not a string will be passed through
       safe_stringify
 
-    This helps handle cases where a string is passed to a function expecting a sequence
-    of strings, as well as cases where a sequence of UUID objects is accepted for a list
-    of IDs, or something similar.
+    This helps handle cases where a string is passed to a function expecting an iterable
+    of strings, as well as cases where an iterable of UUID objects is accepted for a
+    list of IDs, or something similar.
     """
     if isinstance(value, (str, bytes)):
         yield safe_stringify(value)
@@ -97,14 +97,14 @@ def render_enums_for_api(value: Any) -> Any:
     """
     Convert enum values to their underlying value.
 
-    If a value is a sequence type, it will be converted to a list and the values will
+    If a value is an iterable type, it will be converted to a list and the values will
     also be converted if they are enum values.
     """
-    # special-case: handle str and bytes because these types are technically sequence
+    # special-case: handle str and bytes because these types are technically iterable
     # types (of bytes or str values) which could trip someone up
     if isinstance(value, (str, bytes)):
         return value
-    if isinstance(value, collections.abc.Sequence):
+    if isinstance(value, collections.abc.Iterable):
         return [render_enums_for_api(x) for x in value]
     return value.value if isinstance(value, Enum) else value
 

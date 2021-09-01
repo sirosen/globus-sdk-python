@@ -1,6 +1,6 @@
 import logging
 import urllib.parse
-from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional, Union
 
 from globus_sdk import utils
 
@@ -41,7 +41,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
         (that is, ``DEFAULT_REQUESTED_SCOPES`` from
         ``globus_sdk.services.auth.oauth2_constants``)
-    :type requested_scopes: str or sequence of str, optional
+    :type requested_scopes: str or iterable of str, optional
     :param state: This string allows an application to pass information back to itself
         in the course of the OAuth flow. Because the user will navigate away from the
         application to complete the flow, this parameter lets the app pass an arbitrary
@@ -56,7 +56,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         self,
         auth_client: "globus_sdk.AuthClient",
         redirect_uri: str,
-        requested_scopes: Optional[Union[str, Sequence[str]]] = None,
+        requested_scopes: Optional[Union[str, Iterable[str]]] = None,
         state: str = "_default",
         refresh_tokens: bool = False,
     ):

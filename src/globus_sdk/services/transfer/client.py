@@ -1,7 +1,7 @@
 import logging
 import time
 import uuid
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from globus_sdk import client, exc, paging, response, utils
 from globus_sdk.scopes import TransferScopes
@@ -1736,8 +1736,8 @@ class TransferClient(client.BaseClient):
     def endpoint_manager_task_list(
         self,
         *,
-        filter_status: Union[None, str, Sequence[str]] = None,
-        filter_task_id: Union[None, UUIDLike, Sequence[UUIDLike]] = None,
+        filter_status: Union[None, str, Iterable[str]] = None,
+        filter_task_id: Union[None, UUIDLike, Iterable[UUIDLike]] = None,
         filter_owner_id: Optional[UUIDLike] = None,
         filter_endpoint: Optional[UUIDLike] = None,
         filter_is_paused: Optional[bool] = None,
@@ -1759,13 +1759,13 @@ class TransferClient(client.BaseClient):
         :param filter_status: Return only tasks with any of the specified statuses
             Note that in-progress tasks will have status ``"ACTIVE"`` or ``"INACTIVE"``,
             and completed tasks will have status ``"SUCCEEDED"`` or ``"FAILED"``.
-        :type filter_status: str or sequence of str, optional
+        :type filter_status: str or iterable of str, optional
         :param filter_task_id: Return only tasks with any of the specified ids. If any
             of the specified tasks do not involve an endpoint the user has an
             appropriate role for, a ``PermissionDenied`` error will be returned. This
             filter can't be combined with any other filter.  If another filter is
             passed, a ``BadRequest`` will be returned. (limit: 50 task IDs)
-        :type filter_task_id: str, UUID, or sequence of str or UUID, optional
+        :type filter_task_id: str, UUID, or iterable of str or UUID, optional
         :param filter_owner_id: A Globus Auth identity id. Limit results to tasks
             submitted by the specified identity, or linked to the specified identity,
             at submit time.  Returns ``UserNotFound`` if the identity does not exist or

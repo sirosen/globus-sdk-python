@@ -7,8 +7,8 @@ from typing import (
     Any,
     AnyStr,
     Dict,
+    Iterable,
     Optional,
-    Sequence,
     Type,
     TypeVar,
     Union,
@@ -91,8 +91,8 @@ class AuthClient(client.BaseClient):
     def get_identities(
         self,
         *,
-        usernames: Union[Sequence[AnyStr], AnyStr, None] = None,
-        ids: Union[Sequence[UUIDLike], UUIDLike, None] = None,
+        usernames: Union[Iterable[AnyStr], AnyStr, None] = None,
+        ids: Union[Iterable[UUIDLike], UUIDLike, None] = None,
         provision: bool = False,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> GlobusHTTPResponse:
@@ -148,9 +148,9 @@ class AuthClient(client.BaseClient):
         """
 
         def _convert_listarg(
-            val: Union[Sequence[Union[IntLike, UUIDLike]], Union[IntLike, UUIDLike]]
+            val: Union[Iterable[Union[IntLike, UUIDLike]], Union[IntLike, UUIDLike]]
         ) -> str:
-            if isinstance(val, collections.abc.Sequence) and not isinstance(
+            if isinstance(val, collections.abc.Iterable) and not isinstance(
                 val, (bytes, str)
             ):
                 return ",".join(utils.safe_stringify(x) for x in val)

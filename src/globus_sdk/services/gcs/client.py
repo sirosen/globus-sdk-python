@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Callable, Dict, Optional, Sequence, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, Optional, TypeVar, Union
 
 from globus_sdk import client, scopes, utils
 from globus_sdk.authorizers import GlobusAuthorizer
@@ -102,14 +102,14 @@ class GCSClient(client.BaseClient):
     def get_collection_list(
         self,
         *,
-        include: Union[str, Sequence[str], None] = None,
+        include: Union[str, Iterable[str], None] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableGCSResponse:
         """
         ``GET /collections``
 
         :param include: Names of additional documents to include in the response
-        :type include: str or sequence of str, optional
+        :type include: str or iterable of str, optional
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
 
