@@ -111,6 +111,12 @@ class LocalGlobusConnectPersonal:
         In either case, the result may be ``None`` if the data is missing or cannot be
         parsed.
 
+        .. note::
+
+            The data returned by this method is not checked for accuracy. It is
+            possible for a user to modify the files used by GCP to list a different
+            user.
+
         :param auth_client: An AuthClient to use to lookup the full identity information
             for the GCP owner
         :type auth_client: globus_sdk.AuthClient
@@ -189,6 +195,11 @@ class LocalGlobusConnectPersonal:
 
         This value is loaded whenever it is first accessed, but saved after
         that.
+
+        .. note::
+
+            This attribute is not checked for accuracy. It is possible for a user to
+            modify the files used by GCP to list a different ``endpoint_id``.
 
         Usage:
 
