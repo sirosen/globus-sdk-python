@@ -21,7 +21,10 @@ Globus Connect Personal
 Globus Connect Personal endpoints belonging to the current user may be accessed
 via instances of the following class:
 
-
 .. autoclass:: globus_sdk.LocalGlobusConnectPersonal
+   :members:
+   :member-order: bysource
+
+.. autoclass:: globus_sdk.GlobusConnectPersonalOwnerInfo
    :members:
    :member-order: bysource

@@ -101,7 +101,11 @@ def test_get_owner_info(local_gcp, write_gridmap, auth_client):
     write_gridmap(
         '"/C=US/O=Globus Consortium/OU=Globus Connect User/CN=sirosen" sirosen\n'
     )
-    assert local_gcp.get_owner_info() == ("sirosen@globusid.org", False)
+    info = local_gcp.get_owner_info()
+    assert isinstance(info, globus_sdk.GlobusConnectPersonalOwnerInfo)
+    assert info.username == "sirosen@globusid.org"
+    assert info.id is None
+    assert str(info) == "GlobusConnectPersonalOwnerInfo(username=sirosen@globusid.org)"
 
     register_api_route(
         "auth",
@@ -130,7 +134,10 @@ def test_get_owner_info_b32_mode(local_gcp, write_gridmap, auth_client):
     write_gridmap(
         f'"/C=US/O=Globus Consortium/OU=Globus Connect User/CN={BASE32_ID}" sirosen\n'
     )
-    assert local_gcp.get_owner_info() == ("ae341a98-d274-11e5-b888-dbae3a8ba545", True)
+    info = local_gcp.get_owner_info()
+    assert isinstance(info, globus_sdk.GlobusConnectPersonalOwnerInfo)
+    assert info.username is None
+    assert info.id == "ae341a98-d274-11e5-b888-dbae3a8ba545"
 
     register_api_route(
         "auth",
@@ -173,7 +180,9 @@ def test_get_owner_info_b32_mode_invalid_data(
     write_gridmap(
         f'"/C=US/O=Globus Consortium/OU=Globus Connect User/CN={cn}" sirosen\n'
     )
-    assert local_gcp.get_owner_info() == (f"{cn}@globusid.org", False)
+    info = local_gcp.get_owner_info()
+    assert isinstance(info, globus_sdk.GlobusConnectPersonalOwnerInfo)
+    assert info.username == f"{cn}@globusid.org"
 
 
 @pytest.mark.parametrize(
@@ -211,7 +220,9 @@ def test_get_owner_info_multiline_data(local_gcp, write_gridmap, auth_client):
         )
         + "\n"
     )
-    assert local_gcp.get_owner_info() == ("sirosen@globusid.org", False)
+    info = local_gcp.get_owner_info()
+    assert isinstance(info, globus_sdk.GlobusConnectPersonalOwnerInfo)
+    assert info.username == "sirosen@globusid.org"
 
     register_api_route(
         "auth",
@@ -240,7 +251,9 @@ def test_get_owner_info_no_auth_data(local_gcp, write_gridmap, auth_client):
     write_gridmap(
         '"/C=US/O=Globus Consortium/OU=Globus Connect User/CN=sirosen" sirosen\n'
     )
-    assert local_gcp.get_owner_info() == ("sirosen@globusid.org", False)
+    info = local_gcp.get_owner_info()
+    assert isinstance(info, globus_sdk.GlobusConnectPersonalOwnerInfo)
+    assert info.username == "sirosen@globusid.org"
 
     register_api_route("auth", "/v2/api/identities", json={"identities": []})
     data = local_gcp.get_owner_info(auth_client)

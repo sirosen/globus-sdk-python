@@ -1,3 +1,6 @@
-from globus_sdk.local_endpoint.personal import LocalGlobusConnectPersonal
+from .personal import GlobusConnectPersonalOwnerInfo, LocalGlobusConnectPersonal
 
-__all__ = ("LocalGlobusConnectPersonal",)
+__all__ = (
+    "GlobusConnectPersonalOwnerInfo",
+    "LocalGlobusConnectPersonal",
+)

@@ -1,40 +1,12 @@
-import base64
 import os
-import shlex
-import uuid
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union, cast, overload
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union, cast, overload
 
 from globus_sdk.exc import GlobusSDKUsageError
 
+from .owner_info import GlobusConnectPersonalOwnerInfo
+
 if TYPE_CHECKING:
     import globus_sdk
-
-
-_GRIDMAP_DN_START = '"/C=US/O=Globus Consortium/OU=Globus Connect User/CN='
-
-
-class _B32DecodeError(ValueError):
-    """custom exception type"""
-
-
-def _b32decode(v: str) -> str:
-    # should start with "u_"
-    if not v.startswith("u_"):
-        raise _B32DecodeError("should start with 'u_'")
-    v = v[2:]
-    # wrong length
-    if len(v) != 26:
-        raise _B32DecodeError("wrong length")
-
-    # append padding and uppercase so that b32decode will work
-    v = v.upper() + (6 * "=")
-
-    # try to decode
-    try:
-        return str(uuid.UUID(bytes=base64.b32decode(v)))
-    # if it fails, then it can't be a b32-encoded identity
-    except ValueError:
-        raise _B32DecodeError("decode and load as UUID failed")
 
 
 def _on_windows() -> bool:
@@ -82,11 +54,13 @@ class LocalGlobusConnectPersonal:
         self._local_data_dir
 
     @overload
-    def get_owner_info(self) -> Optional[Tuple[str, bool]]:
+    def get_owner_info(self) -> Optional["globus_sdk.GlobusConnectPersonalOwnerInfo"]:
         ...
 
     @overload
-    def get_owner_info(self, auth_client: None) -> Optional[Tuple[str, bool]]:
+    def get_owner_info(
+        self, auth_client: None
+    ) -> Optional["globus_sdk.GlobusConnectPersonalOwnerInfo"]:
         ...
 
     @overload
@@ -97,16 +71,16 @@ class LocalGlobusConnectPersonal:
 
     def get_owner_info(
         self, auth_client: Optional["globus_sdk.AuthClient"] = None
-    ) -> Union[None, Tuple[str, bool], Dict[str, Any]]:
+    ) -> Union[None, "globus_sdk.GlobusConnectPersonalOwnerInfo", Dict[str, Any]]:
         """
-        Look up the local GCP information.
-        This method may return a username or a user ID. For that reason, the result is a
-        tuple: (user, is_id).
+        Look up the local GCP information, returning a
+        :class:`GlobusConnectPersonalOwnerInfo` object. The result may have an ``id`` or
+        ``username`` set (depending on the underlying data).
 
         If you pass an AuthClient, this method will return a dict from the Get
-        Identities API instead of the tuple. This can fail (e.g. with network errors if
-        there is no connectivity), so passing this value should be coupled with
-        additional error handling.
+        Identities API instead of the info object. This can fail (e.g. with network
+        errors if there is no connectivity), so passing this value should be coupled
+        with additional error handling.
 
         In either case, the result may be ``None`` if the data is missing or cannot be
         parsed.
@@ -128,57 +102,44 @@ class LocalGlobusConnectPersonal:
         >>> from globus_sdk import LocalGlobusConnectPersonal
         >>> local_gcp = LocalGlobusConnectPersonal()
         >>> local_gcp.get_owner_info()
-        ('foo@globusid.org', False)
+        GlobusConnectPersonalOwnerInfo(username='foo@globusid.org')
 
         or you may get back an ID:
 
         >>> local_gcp = LocalGlobusConnectPersonal()
         >>> local_gcp.get_owner_info()
-        ('7deda7cc-077b-11ec-a137-67523ecffd4b', True)
+        GlobusConnectPersonalOwnerInfo(id='7deda7cc-077b-11ec-a137-67523ecffd4b')
+
+        Check the result easily by looking to see if these values are ``None``:
+
+        >>> local_gcp = LocalGlobusConnectPersonal()
+        >>> info = local_gcp.get_owner_info()
+        >>> has_username = info.username is not None
         """
         self._ensure_local_data_dir()
 
         fname = os.path.join(self._local_data_dir, "gridmap")
         try:
-            # extract the first line which looks like a gridmap CN for GCP
-            # all other lines will be ignored to accommodate cases where users have
-            # modified their gridmap files in various ways (which GCP may or may not
-            # support)
-            data = None
-            with open(fname) as fp:
-                for line in fp:
-                    if line.startswith(_GRIDMAP_DN_START):
-                        data = line.strip()
-                        break
+            # read file data into an owner info object
+            try:
+                owner_info = GlobusConnectPersonalOwnerInfo._from_file(fname)
+            except ValueError:  # may ValueError on invalid DN data
+                return None
         except OSError as e:
             # no such file or directory
             if e.errno == 2:
                 return None
             raise
 
-        # a gridmap CN line was not found
-        if not data:
-            return None
-
-        lineinfo = shlex.split(data)
-        if len(lineinfo) != 2:
-            return None
-
-        dn, _local_username = lineinfo
-        username_or_id = dn.split("=", 4)[-1]
-
-        try:
-            user, is_id = _b32decode(username_or_id), True
-        except _B32DecodeError:
-            user, is_id = f"{username_or_id}@globusid.org", False
-
         if auth_client is None:
-            return (user, is_id)
+            return owner_info
 
-        if is_id:
-            res = auth_client.get_identities(ids=user)
-        else:
-            res = auth_client.get_identities(usernames=user)
+        if owner_info.id is not None:
+            res = auth_client.get_identities(ids=owner_info.id)
+        elif owner_info.username is not None:
+            res = auth_client.get_identities(usernames=owner_info.username)
+        else:  # pragma: no cover
+            raise ValueError("Something went wrong. Could not parse owner info.")
 
         try:  # could get no data back in theory, if the identity isn't visible
             return cast(Dict[str, Any], res["identities"][0])
