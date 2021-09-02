@@ -1910,6 +1910,7 @@ class TransferClient(client.BaseClient):
         *,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        filter_is_error: Optional[bool] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
@@ -1924,6 +1925,10 @@ class TransferClient(client.BaseClient):
         :param limit: limit the number of results
         :type limit: int, optional
         :param offset: offset used in paging
+        :param filter_is_error: Return only events that are errors. A value of ``False``
+            (returning only non-errors) is not supported. By default all events are
+            returned.
+        :type filter_is_error: bool, optional
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
@@ -1935,6 +1940,8 @@ class TransferClient(client.BaseClient):
             query_params["limit"] = limit
         if offset is not None:
             query_params["offset"] = offset
+        if filter_is_error is not None:
+            query_params["filter_is_error"] = 1 if filter_is_error else 0
         return IterableTransferResponse(
             self.get(
                 f"endpoint_manager/task/{task_id}/event_list", query_params=query_params
