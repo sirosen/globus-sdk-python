@@ -17,7 +17,7 @@ from .exc import (
     GlobusTimeoutError,
     NetworkError,
 )
-from .local_endpoint import LocalGlobusConnectPersonal
+from .local_endpoint import GlobusConnectPersonalOwnerInfo, LocalGlobusConnectPersonal
 from .response import GlobusHTTPResponse
 from .services.auth import (
     AuthAPIError,
@@ -90,6 +90,7 @@ __all__ = (
     "GroupsManager",
     "GCSClient",
     "GCSAPIError",
+    "GlobusConnectPersonalOwnerInfo",
     "LocalGlobusConnectPersonal",
 )
 
