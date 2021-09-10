@@ -21,6 +21,13 @@ The primary interface for the GCS Manager API is the ``GCSClient`` class.
    :show-inheritance:
    :exclude-members: error_class
 
+Helper Objects
+--------------
+
+.. automodule:: globus_sdk.services.gcs.data
+   :members:
+   :show-inheritance:
+
 Client Errors
 -------------
 

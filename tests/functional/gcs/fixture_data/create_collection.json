@@ -1,0 +1,59 @@
+{
+  "code": "success",
+  "data": [
+    {
+      "id": "18d367d5-45cf-4724-a53e-5a685e45c942",
+      "manager_url": "https://gcs.data.globus.org/",
+      "domain_name": "i-f3c83.123.globus.org",
+      "high_assurance": true,
+      "https_url": "https://i-f3c83.123.globus.org",
+      "tlsftp_url": "tlsftp://i-f3c83.123.globus.org",
+      "collection_type": "mapped",
+      "display_name": "Project Foo Research Data",
+      "connector_id": "c8b7ab5c-595c-43c9-8e43-9e8a3debfe4c",
+      "identity_id": "c8b7ab5c-595c-43c9-8e43-9e8a3debfe4c",
+      "storage_gateway_id": "fc1f3ba0-1fa4-42b2-8bb3-53983774fa5f",
+      "root_path": "/",
+      "collection_base_path": "/",
+      "default_directory": "/projects",
+      "public": true,
+      "force_encryption": false,
+      "disable_verify": false,
+      "organization": "University of Example",
+      "department": "Data Science",
+      "keywords": [
+        "Project Foo",
+        "Data Intensive Science"
+      ],
+      "description": "Information related to the \"Foo\" project.",
+      "contact_email": "project-foo@example.edu",
+      "contact_info": "+1 (555) 555-1234",
+      "info_link": "https://project-foo.example.edu/info",
+      "authentication_timeout_mins": 30,
+      "policies": {
+        "DATA_TYPE": "blackpearl_collection_policies#1.0.0"
+      },
+      "DATA_TYPE": "collection#1.0.0",
+      "allow_guest_collections": true,
+      "sharing_restrict_paths": {
+        "DATA_TYPE": "path_restrictions#1.0.0",
+        "read": [
+          "/public"
+        ],
+        "read_write": [
+          "/home",
+          "/projects"
+        ],
+        "none": [
+          "/private"
+        ]
+      }
+    }
+  ],
+  "DATA_TYPE": "result#1.0.0",
+  "http_response_code": 200,
+  "detail": null,
+  "message": "Operation successful",
+  "has_next_page": false,
+  "marker": "string"
+}

@@ -5,6 +5,7 @@ from globus_sdk import client, response, scopes, utils
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.types import UUIDLike
 
+from .data import CollectionDocument
 from .errors import GCSAPIError
 from .response import IterableGCSResponse, UnpackingGCSResponse
 
@@ -146,6 +147,60 @@ class GCSClient(client.BaseClient):
             r"collection#1\.\d+\.\d+",
         )
 
+    @_gcsdoc("Create Collection", "openapi_Collections/#createCollection")
+    def create_collection(
+        self,
+        collection_data: Union[Dict[str, Any], CollectionDocument],
+    ) -> UnpackingGCSResponse:
+        """
+        ``POST /collections``
+
+        Create a collection. This is used to create either a mapped or a guest
+        collection. When created, a ``collection:administrator`` role for that
+        collection will be created using the caller’s identity.
+
+        In order to create a guest collection, the caller must have an identity that
+        matches the Storage Gateway policies.
+
+        In order to create a mapped collection, the caller must have an
+        ``endpoint:administrator`` or ``endpoint:owner`` role.
+
+        :param collection_data: The collection document for the new collection
+        :type collection_data: dict or CollectionDocument
+        """
+        return UnpackingGCSResponse(
+            self.post("/collections", data=collection_data), r"collection#1\.\d+\.\d+"
+        )
+
+    @_gcsdoc("Update Collection", "openapi_Collections/#patchCollection")
+    def update_collection(
+        self,
+        collection_id: UUIDLike,
+        collection_data: Union[Dict[str, Any], CollectionDocument],
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> UnpackingGCSResponse:
+        """
+        ``PATCH /collections/{collection_id}``
+
+        :param collection_id: The ID of the collection to update
+        :type collection_id: str or UUID
+        :param collection_data: The collection document for the modified collection
+        :type collection_data: dict or CollectionDocument
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+        """
+        collection_id = utils.safe_stringify(collection_id)
+        return UnpackingGCSResponse(
+            self.patch(
+                f"/collections/{collection_id}",
+                data=collection_data,
+                query_params=query_params,
+            ),
+            r"collection#1\.\d+\.\d+",
+        )
+
+    @_gcsdoc("Delete Collection", "openapi_Collections/#deleteCollection")
     def delete_collection(
         self,
         collection_id: UUIDLike,
