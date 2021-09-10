@@ -1,7 +1,8 @@
-import re
 from typing import Any, Callable, Optional, Union
 
 from globus_sdk.response import GlobusHTTPResponse, IterableResponse
+
+from ._datatype_version_spec import DatatypeVersionRange
 
 
 class IterableGCSResponse(IterableResponse):
@@ -20,13 +21,14 @@ class IterableGCSResponse(IterableResponse):
     default_iter_key = "data"
 
 
-def _default_unpacking_match(pattern: str) -> Callable[[dict], bool]:
-    compiled_pattern = re.compile(pattern)
+def _default_unpacking_match(spec: str) -> Callable[[dict], bool]:
+    parsed_spec = DatatypeVersionRange(spec)
 
     def match_func(data: dict) -> bool:
         if not ("DATA_TYPE" in data and isinstance(data["DATA_TYPE"], str)):
             return False
-        return bool(compiled_pattern.fullmatch(data["DATA_TYPE"]))
+
+        return parsed_spec.matches(data["DATA_TYPE"])
 
     return match_func
 
@@ -42,8 +44,9 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
     If the expected datatype is not found in the array, or the array is missing, the
     ``data`` will be the full response data (identical to ``full_data``).
 
-    :param match: Either a string which will be used for regex matching against the data
-        array's `DATA_TYPE` keys, or an arbitrary callable which does the matching
+    :param match: Either a string containing a DATA_TYPE version specification, or an
+        arbitrary callable which does the matching. Version specs are of the form
+        ``collection>=1,<2`` and support ``>``, ``<``, ``==``, ``>=``, ``<=``
     :type match: str or callable
     """
 
