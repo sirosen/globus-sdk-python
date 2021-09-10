@@ -28,7 +28,13 @@ from .services.auth import (
     OAuthDependentTokenResponse,
     OAuthTokenResponse,
 )
-from .services.gcs import GCSAPIError, GCSClient
+from .services.gcs import (
+    CollectionDocument,
+    GCSAPIError,
+    GCSClient,
+    GuestCollectionDocument,
+    MappedCollectionDocument,
+)
 from .services.groups import (
     BatchMembershipActions,
     GroupMemberVisibility,
@@ -89,6 +95,9 @@ __all__ = (
     "GroupVisibility",
     "GroupsManager",
     "GCSClient",
+    "CollectionDocument",
+    "GuestCollectionDocument",
+    "MappedCollectionDocument",
     "GCSAPIError",
     "GlobusConnectPersonalOwnerInfo",
     "LocalGlobusConnectPersonal",

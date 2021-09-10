@@ -25,7 +25,7 @@ py:class datetime
 py:class GlobusHTTPResponse
 
 # "list of ...", "sequence of ..."
-re: py:class (sequence|iterable|list)\sof\s\w+
+re: py:class (sequence|iterable|list|tuple)\sof\s\w+
 # type vars in SDK modules
 re: py:class globus_sdk\..*\.(T|RT)
 
