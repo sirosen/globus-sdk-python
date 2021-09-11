@@ -25,33 +25,46 @@ class LocalGlobusConnectPersonal:
 
     These objects do *not* inherit from BaseClient and do not provide methods
     for interacting with any Globus Service APIs.
+
+    :param config_dir: Path to a non-default configuration directory. On Linux, this is
+        the same as the value passed to Globus Connect Personal's `-dir` flag
+        (i.e. the default value is ``~/.globusonline``).
+    :type config_dir: str, optional
     """
 
-    def __init__(self) -> None:
+    def __init__(self, *, config_dir: Optional[str] = None) -> None:
+        self._config_dir = config_dir
         self._endpoint_id: Optional[str] = None
-        self._cached_local_data_dir: Optional[str] = None
 
-    # because fetching the local data dir can error, defer finding it into a property
-    # with caching behavior
+    def _detect_config_dir(self) -> str:
+        if _on_windows():
+            appdata = os.getenv("LOCALAPPDATA")
+            if appdata is None:
+                raise GlobusSDKUsageError(
+                    "LOCALAPPDATA not detected in Windows environment. "
+                    "Either ensure this variable is set or pass an explicit "
+                    "config_dir to LocalGlobusConnectPersonal"
+                )
+            return os.path.join(appdata, "Globus Connect")
+        return os.path.expanduser("~/.globusonline")
+
+    @property
+    def config_dir(self) -> str:
+        """
+        The ``config_dir`` for this endpoint.
+
+        If no directory was given during initialization, this will be computed
+        based on the current platform and environment.
+        """
+        if not self._config_dir:
+            self._config_dir = self._detect_config_dir()
+        return self._config_dir
+
     @property
     def _local_data_dir(self) -> str:
-        if self._cached_local_data_dir is None:
-            if _on_windows():
-                appdata = os.getenv("LOCALAPPDATA")
-                if appdata is None:
-                    raise GlobusSDKUsageError(
-                        "LOCALAPPDATA not detected in Windows environment"
-                    )
-                self._cached_local_data_dir = os.path.join(appdata, "Globus Connect")
-            else:
-                self._cached_local_data_dir = os.path.expanduser("~/.globusonline/lta")
-
-        return self._cached_local_data_dir
-
-    def _ensure_local_data_dir(self) -> None:
-        # force property evaluation to catch any errors
-        # this wrapper is just an "imperative looking" way of doing this
-        self._local_data_dir
+        return (
+            self.config_dir if _on_windows() else os.path.join(self.config_dir, "lta")
+        )
 
     @overload
     def get_owner_info(self) -> Optional["globus_sdk.GlobusConnectPersonalOwnerInfo"]:
@@ -116,8 +129,6 @@ class LocalGlobusConnectPersonal:
         >>> info = local_gcp.get_owner_info()
         >>> has_username = info.username is not None
         """
-        self._ensure_local_data_dir()
-
         fname = os.path.join(self._local_data_dir, "gridmap")
         try:
             # read file data into an owner info object
@@ -175,8 +186,6 @@ class LocalGlobusConnectPersonal:
         with ``del local_ep.endpoint_id``
         """
         if self._endpoint_id is None:
-            self._ensure_local_data_dir()
-
             fname = os.path.join(self._local_data_dir, "client-id.txt")
             try:
                 with open(fname) as fp:
