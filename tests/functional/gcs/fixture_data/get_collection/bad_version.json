@@ -5,11 +5,11 @@
   "http_response_code": 200,
   "data": [
     {
-      "DATA_TYPE": "collection#99.145.10",
+      "DATA_TYPE": "collection99.145.10",
       "foo": 1
     },
     {
-      "DATA_TYPE": "collection#2.0.0-rc3",
+      "DATA_TYPE": "collection",
       "foo": 2
     }
   ]

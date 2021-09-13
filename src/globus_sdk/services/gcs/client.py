@@ -143,7 +143,7 @@ class GCSClient(client.BaseClient):
         """
         return UnpackingGCSResponse(
             self.get(f"/collections/{collection_id}", query_params=query_params),
-            "collection>=1,<2",
+            "collection",
         )
 
     @_gcsdoc("Create Collection", "openapi_Collections/#createCollection")
@@ -168,8 +168,7 @@ class GCSClient(client.BaseClient):
         :type collection_data: dict or CollectionDocument
         """
         return UnpackingGCSResponse(
-            self.post("/collections", data=collection_data),
-            "collection>=1,<2",
+            self.post("/collections", data=collection_data), "collection"
         )
 
     @_gcsdoc("Update Collection", "openapi_Collections/#patchCollection")
@@ -196,7 +195,7 @@ class GCSClient(client.BaseClient):
                 data=collection_data,
                 query_params=query_params,
             ),
-            "collection>=1,<2",
+            "collection",
         )
 
     @_gcsdoc("Delete Collection", "openapi_Collections/#deleteCollection")

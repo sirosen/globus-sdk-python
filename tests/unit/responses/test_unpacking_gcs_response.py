@@ -23,69 +23,24 @@ def test_unpacking_response_with_callback():
     assert resp["foo"] == "bar"
 
 
-@pytest.mark.parametrize(
-    "badspec",
-    [
-        "foo",
-        "foo>1.0.0.0",
-        "foo<1.0.0.0",
-        "foo==1.0.0.0",
-        "foo>1,>2",
-        "foo<1,>2",
-        "foo=1",
-        "foo>2,<1",
-        "foo>=1,<=1",
-    ],
-)
-def test_unpacking_response_rejects_invalid_spec(badspec):
-    base_resp = make_response(json_body={"data": [{"x": 1, "y": 2}]})
-
-    with pytest.raises(ValueError):
-        UnpackingGCSResponse(base_resp, badspec)
-
-
-@pytest.mark.parametrize(
-    "spec, datatype",
-    [
-        ["foo>=1,<2", "foo#1.2.1"],
-        ["foo>1", "foo#1.0.1"],
-        ["foo>=1", "foo#1.0.1"],
-        ["foo>=1", "foo#1.0.0"],
-        ["foo==1", "foo#1.0.0"],
-        ["foo<=1", "foo#1.0.0"],
-        ["foo<=1", "foo#0.0.1"],
-        ["foo<1", "foo#0.0.1"],
-    ],
-)
-def test_unpacking_response_matches_datatype_version(spec, datatype):
+@pytest.mark.parametrize("datatype", ["foo#1.0.1", "foo#1", "foo#0.0.1", "foo#2.0.0.1"])
+def test_unpacking_response_matches_datatype(datatype):
     base_resp = make_response(json_body={"data": [{"x": 1, "DATA_TYPE": datatype}]})
-    resp = UnpackingGCSResponse(base_resp, spec)
+    resp = UnpackingGCSResponse(base_resp, "foo")
     assert "x" in resp
+    # using some other spec will not match
+    resp_bar = UnpackingGCSResponse(base_resp, "bar")
+    assert "x" not in resp_bar
 
 
-@pytest.mark.parametrize(
-    "spec, datatype",
-    [
-        ["foo>=1,<2", "foo#2.2.1"],
-        ["foo>=1,<2", "foo#0.2.1"],
-        ["foo>1", "foo#1.0.0"],
-        ["foo>1", "foo#0.0.1"],
-        ["foo==1", "foo#1.1.0"],
-        ["foo<2", "foo#2.0.0"],
-        ["foo<1", "foo#1.0.1"],
-    ],
-)
-def test_unpacking_response_does_not_match_datatype_version(spec, datatype):
-    base_resp = make_response(json_body={"data": [{"x": 1, "DATA_TYPE": datatype}]})
-    resp = UnpackingGCSResponse(base_resp, spec)
-    assert "x" not in resp
+def test_unpacking_response_invalid_spec():
+    base_resp = make_response(json_body={"data": [{"x": 1, "DATA_TYPE": "foo#1.0.0"}]})
+    with pytest.raises(ValueError):
+        UnpackingGCSResponse(base_resp, "foo 1.0")
 
 
-@pytest.mark.parametrize(
-    "datatype",
-    ["foo#1.0.1.0", "foo", "foo#a.b.c"],
-)
-def test_unpacking_response_does_not_match_bad_datatype_version(datatype):
-    base_resp = make_response(json_body={"data": [{"x": 1, "DATA_TYPE": datatype}]})
-    resp = UnpackingGCSResponse(base_resp, "foo>0")
+def test_unpacking_response_invalid_datatype():
+    # we'll never return a match if the DATA_TYPE doesn't appear to be valid
+    base_resp = make_response(json_body={"data": [{"x": 1, "DATA_TYPE": "foo"}]})
+    resp = UnpackingGCSResponse(base_resp, "foo")
     assert "x" not in resp
