@@ -13,6 +13,13 @@ to a major new version of the SDK.
 Unreleased
 ----------
 
+* Add ``filter_is_error`` parameter to advanced task list (:pr:`467`)
+* Add a ``LocalGlobusConnectPersonal.get_owner_info()`` for looking up local
+  user information from gridmap (:pr:`466`)
+* Add support for GCS collection create and update. This includes new data
+  helpers, ``MappedCollectionDcoument`` and ``GuestCollectionDocument`` (:pr:`468`)
+* Remove support for `bytes` values for fields consuming UUIDs (:pr:`471`)
+
 v3.0.0b4
 --------
 
