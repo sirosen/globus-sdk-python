@@ -20,17 +20,6 @@ class IterableGCSResponse(IterableResponse):
     default_iter_key = "data"
 
 
-def _default_unpacking_match(pattern: str) -> Callable[[dict], bool]:
-    compiled_pattern = re.compile(pattern)
-
-    def match_func(data: dict) -> bool:
-        if not ("DATA_TYPE" in data and isinstance(data["DATA_TYPE"], str)):
-            return False
-        return bool(compiled_pattern.fullmatch(data["DATA_TYPE"]))
-
-    return match_func
-
-
 class UnpackingGCSResponse(GlobusHTTPResponse):
     """
     An "unpacking" response looks for a "data" array in the response data, which is
@@ -42,10 +31,24 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
     If the expected datatype is not found in the array, or the array is missing, the
     ``data`` will be the full response data (identical to ``full_data``).
 
-    :param match: Either a string which will be used for regex matching against the data
-        array's `DATA_TYPE` keys, or an arbitrary callable which does the matching
+    :param match: Either a string containing a DATA_TYPE prefix, or an arbitrary
+        callable which does the matching
     :type match: str or callable
     """
+
+    def _default_unpacking_match(self, spec: str) -> Callable[[dict], bool]:
+        if not re.fullmatch(r"\w+", spec):
+            raise ValueError("Invalid UnpackingGCSResponse specification.")
+
+        def match_func(data: dict) -> bool:
+            if not ("DATA_TYPE" in data and isinstance(data["DATA_TYPE"], str)):
+                return False
+            if "#" not in data["DATA_TYPE"]:
+                return False
+            name, _version = data["DATA_TYPE"].split("#", 1)
+            return name == spec
+
+        return match_func
 
     def __init__(
         self,
@@ -57,7 +60,7 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
         if callable(match):
             self._match_func = match
         else:
-            self._match_func = _default_unpacking_match(match)
+            self._match_func = self._default_unpacking_match(match)
 
         self._unpacked_data: Optional[dict] = None
         self._did_unpack = False
