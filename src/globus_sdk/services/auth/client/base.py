@@ -5,7 +5,6 @@ import sys
 from typing import (
     TYPE_CHECKING,
     Any,
-    AnyStr,
     Dict,
     Iterable,
     Optional,
@@ -91,7 +90,7 @@ class AuthClient(client.BaseClient):
     def get_identities(
         self,
         *,
-        usernames: Union[Iterable[AnyStr], AnyStr, None] = None,
+        usernames: Union[Iterable[str], str, None] = None,
         ids: Union[Iterable[UUIDLike], UUIDLike, None] = None,
         provision: bool = False,
         query_params: Optional[Dict[str, Any]] = None,
@@ -150,12 +149,9 @@ class AuthClient(client.BaseClient):
         def _convert_listarg(
             val: Union[Iterable[Union[IntLike, UUIDLike]], Union[IntLike, UUIDLike]]
         ) -> str:
-            if isinstance(val, collections.abc.Iterable) and not isinstance(
-                val, (bytes, str)
-            ):
-                return ",".join(utils.safe_stringify(x) for x in val)
-            else:
-                return utils.safe_stringify(val)
+            if isinstance(val, collections.abc.Iterable):
+                return ",".join(utils.safe_strseq_iter(val))
+            return str(val)
 
         log.info("Looking up Globus Auth Identities")
 

@@ -141,7 +141,6 @@ class GCSClient(client.BaseClient):
 
         Lookup a Collection on an Endpoint
         """
-        collection_id = utils.safe_stringify(collection_id)
         return UnpackingGCSResponse(
             self.get(f"/collections/{collection_id}", query_params=query_params),
             r"collection#1\.\d+\.\d+",
@@ -190,7 +189,6 @@ class GCSClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        collection_id = utils.safe_stringify(collection_id)
         return UnpackingGCSResponse(
             self.patch(
                 f"/collections/{collection_id}",
@@ -215,5 +213,4 @@ class GCSClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        collection_id = utils.safe_stringify(collection_id)
         return self.delete(f"/collections/{collection_id}", query_params=query_params)

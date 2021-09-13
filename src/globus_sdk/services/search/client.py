@@ -52,7 +52,6 @@ class SearchClient(client.BaseClient):
         >>>       "(" + index_id + "):",
         >>>       index["description"])
         """
-        index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.get_index({index_id})")
         return self.get(f"/v1/index/{index_id}", query_params=query_params)
 
@@ -88,7 +87,6 @@ class SearchClient(client.BaseClient):
         >>> advanced_result = sc.search(index_id, 'author: "Ada Lovelace"',
         >>>                             advanced=True)
         """
-        index_id = utils.safe_stringify(index_id)
         if query_params is None:
             query_params = {}
         query_params.update(
@@ -139,7 +137,6 @@ class SearchClient(client.BaseClient):
         >>> }
         >>> search_result = sc.post_search(index_id, query_data)
         """
-        index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.post_search({index_id}, ...)")
         return self.post(f"v1/index/{index_id}/search", data=data)
 
@@ -196,7 +193,6 @@ class SearchClient(client.BaseClient):
         >>> }
         >>> sc.ingest(index_id, ingest_data)
         """
-        index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.ingest({index_id}, ...)")
         return self.post(f"/v1/index/{index_id}/ingest", data=data)
 
@@ -229,7 +225,6 @@ class SearchClient(client.BaseClient):
         >>> }
         >>> sc.delete_by_query(index_id, query_data)
         """
-        index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.delete_by_query({index_id}, ...)")
         return self.post(f"/v1/index/{index_id}/delete_by_query", data=data)
 
@@ -256,7 +251,6 @@ class SearchClient(client.BaseClient):
         >>> sc = globus_sdk.SearchClient(...)
         >>> subject_data = sc.get_subject(index_id, 'http://example.com/abc')
         """
-        index_id = utils.safe_stringify(index_id)
         if query_params is None:
             query_params = {}
         query_params["subject"] = subject
@@ -282,7 +276,6 @@ class SearchClient(client.BaseClient):
         >>> sc = globus_sdk.SearchClient(...)
         >>> subject_data = sc.get_subject(index_id, 'http://example.com/abc')
         """
-        index_id = utils.safe_stringify(index_id)
         if query_params is None:
             query_params = {}
         query_params["subject"] = subject
@@ -321,7 +314,6 @@ class SearchClient(client.BaseClient):
         >>> entry_data = sc.get_entry(index_id, 'http://example.com/foo/bar',
         >>>                           entry_id='foo/bar')
         """
-        index_id = utils.safe_stringify(index_id)
         if query_params is None:
             query_params = {}
         query_params["subject"] = subject
@@ -369,7 +361,6 @@ class SearchClient(client.BaseClient):
         >>>     }
         >>> })
         """
-        index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.create_entry({index_id}, ...)")
         return self.post(f"/v1/index/{index_id}/entry", data=data)
 
@@ -394,7 +385,6 @@ class SearchClient(client.BaseClient):
         >>>     }
         >>> })
         """
-        index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.update_entry({index_id}, ...)")
         return self.put(f"/v1/index/{index_id}/entry", data=data)
 
@@ -425,7 +415,6 @@ class SearchClient(client.BaseClient):
         >>> sc.delete_entry(index_id, "https://example.com/foo/bar",
         >>>                 entry_id="foo/bar")
         """
-        index_id = utils.safe_stringify(index_id)
         if query_params is None:
             query_params = {}
         query_params["subject"] = subject
@@ -456,7 +445,6 @@ class SearchClient(client.BaseClient):
         >>> assert task['index_id'] == known_index_id
         >>> print(task["task_id"] + " | " + task['state'])
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"SearchClient.get_task({task_id})")
         return self.get(f"/v1/task/{task_id}", query_params=query_params)
 
@@ -474,6 +462,5 @@ class SearchClient(client.BaseClient):
         >>> for task in task_list['tasks']:
         >>>     print(task["task_id"] + " | " + task['state'])
         """
-        index_id = utils.safe_stringify(index_id)
         log.info(f"SearchClient.get_task_list({index_id})")
         return self.get(f"/v1/task_list/{index_id}", query_params=query_params)
