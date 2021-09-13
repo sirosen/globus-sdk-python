@@ -3,6 +3,7 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from globus_sdk import utils
+from globus_sdk.types import UUIDLike
 
 if TYPE_CHECKING:
     import globus_sdk
@@ -29,13 +30,13 @@ class DeleteData(utils.PayloadWrapper):
         to submit the deletion.
     :type transfer_client: :class:`TransferClient <globus_sdk.TransferClient>`
     :param endpoint: The endpoint ID which is targeted by this deletion Task
-    :type endpoint: str
+    :type endpoint: str or UUID
     :param label: A string label for the Task
     :type label: str, optional
     :param submission_id: A submission ID value fetched via
         :meth:`get_submission_id <globus_sdk.TransferClient.get_submission_id>`.
         Defaults to using ``transfer_client.get_submission_id``
-    :type submission_id: str, optional
+    :type submission_id: str or UUID, optional
     :param recursive: Recursively delete subdirectories on the target endpoint
       [default: ``False``]
     :type recursive: bool
@@ -71,41 +72,42 @@ class DeleteData(utils.PayloadWrapper):
     def __init__(
         self,
         transfer_client: "globus_sdk.TransferClient",
-        endpoint: str,
+        endpoint: UUIDLike,
         *,
         label: Optional[str] = None,
-        submission_id: Optional[str] = None,
+        submission_id: Optional[UUIDLike] = None,
         recursive: bool = False,
         deadline: Optional[Union[str, datetime.datetime]] = None,
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__()
-        endpoint = utils.safe_stringify(endpoint)
-        log.info("Creating a new DeleteData object")
         self["DATA_TYPE"] = "delete"
         self["submission_id"] = (
-            submission_id or transfer_client.get_submission_id()["value"]
+            str(submission_id)
+            if submission_id is not None
+            else transfer_client.get_submission_id()["value"]
         )
-        log.info("DeleteData.submission_id = {}".format(self["submission_id"]))
-        self["endpoint"] = endpoint
-        log.info(f"DeleteData.endpoint = {endpoint}")
+        self["endpoint"] = str(endpoint)
         self["recursive"] = recursive
-        log.info(f"DeleteData.recursive = {recursive}")
 
         if label is not None:
             self["label"] = label
-            log.debug(f"DeleteData.label = {label}")
 
         if deadline is not None:
             self["deadline"] = str(deadline)
-            log.debug(f"DeleteData.deadline = {deadline}")
 
         self["DATA"] = []
+
+        for k, v in self.items():
+            log.info("DeleteData.%s = %s", k, v)
 
         if additional_fields is not None:
             self.update(additional_fields)
             for option, value in additional_fields.items():
-                log.info(f"DeleteData.{option} = {value} (option passed in via kwargs)")
+                log.info(
+                    f"DeleteData.{option} = {value} (option passed "
+                    "in via additional_fields)"
+                )
 
     def add_item(
         self, path: str, *, additional_fields: Optional[Dict[str, Any]] = None
@@ -118,7 +120,6 @@ class DeleteData(utils.PayloadWrapper):
         Appends a delete_item document to the DATA key of the delete
         document.
         """
-        path = utils.safe_stringify(path)
         item_data = {"DATA_TYPE": "delete_item", "path": path}
         if additional_fields is not None:
             item_data.update(additional_fields)

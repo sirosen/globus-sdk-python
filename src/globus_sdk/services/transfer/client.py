@@ -94,7 +94,6 @@ class TransferClient(client.BaseClient):
         >>> print("Endpoint name:",
         >>>       endpoint["display_name"] or endpoint["canonical_name"])
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint({endpoint_id})")
         return self.get(f"endpoint/{endpoint_id}", query_params=query_params)
 
@@ -138,7 +137,6 @@ class TransferClient(client.BaseClient):
         elif data.get("oauth_server"):
             data["myproxy_server"] = None
 
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.update_endpoint({endpoint_id}, ...)")
         return self.put(f"endpoint/{endpoint_id}", data=data, query_params=query_params)
 
@@ -191,7 +189,6 @@ class TransferClient(client.BaseClient):
         >>> tc = globus_sdk.TransferClient(...)
         >>> delete_result = tc.delete_endpoint(endpoint_id)
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint({endpoint_id})")
         return self.delete(f"endpoint/{endpoint_id}")
 
@@ -274,9 +271,7 @@ class TransferClient(client.BaseClient):
         if filter_owner_id is not None:
             query_params["filter_owner_id"] = filter_owner_id
         if filter_host_endpoint is not None:  # convert to str (may be UUID)
-            query_params["filter_host_endpoint"] = utils.safe_stringify(
-                filter_host_endpoint
-            )
+            query_params["filter_host_endpoint"] = str(filter_host_endpoint)
         if filter_non_functional is not None:  # convert to int (expect bool input)
             query_params["filter_non_functional"] = 1 if filter_non_functional else 0
         if limit is not None:
@@ -357,7 +352,6 @@ class TransferClient(client.BaseClient):
         >>>     print('Endpoint({}) already active until at least {}'
         >>>           .format(ep_id, 3600))
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         if query_params is None:
             query_params = {}
         if if_expires_in is not None:
@@ -382,7 +376,6 @@ class TransferClient(client.BaseClient):
             as query params.
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_deactivate({endpoint_id})")
         return self.post(
             f"endpoint/{endpoint_id}/deactivate", query_params=query_params
@@ -414,7 +407,6 @@ class TransferClient(client.BaseClient):
         Consider using autoactivate and web activation instead, described
         in the example for :meth:`~endpoint_autoactivate`.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_activate({endpoint_id})")
         return self.post(
             f"endpoint/{endpoint_id}/activate",
@@ -439,7 +431,6 @@ class TransferClient(client.BaseClient):
             as query params.
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         return ActivationRequirementsResponse(
             self.get(
                 f"endpoint/{endpoint_id}/activation_requirements",
@@ -463,7 +454,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.my_effective_pause_rule_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(
@@ -491,7 +481,6 @@ class TransferClient(client.BaseClient):
         Get a list of shared endpoints for which the user has ``administrator`` or
         ``access_manager`` on a given host endpoint.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(
@@ -527,7 +516,6 @@ class TransferClient(client.BaseClient):
 
         Get a list of all shared endpoints on a given host endpoint.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_shared_endpoint_list({endpoint_id}, ...)")
         if query_params is None:
             query_params = {}
@@ -586,7 +574,6 @@ class TransferClient(client.BaseClient):
         :param endpoint_id: The endpoint whose servers are being listed
         :type endpoint_id: str or UUID
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_server_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(f"endpoint/{endpoint_id}/server_list", query_params=query_params)
@@ -612,12 +599,11 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.get_endpoint_server(%s, %s, ...)", endpoint_id, server_id
         )
         return self.get(
-            f"endpoint/{endpoint_id}/server/{str(server_id)}", query_params=query_params
+            f"endpoint/{endpoint_id}/server/{server_id}", query_params=query_params
         )
 
     @utils.doc_api_method(
@@ -634,7 +620,6 @@ class TransferClient(client.BaseClient):
         :param server_data: Fields for the new server, as a server document
         :type server_data: dict
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_server({endpoint_id}, ...)")
         return self.post(f"endpoint/{endpoint_id}/server", data=server_data)
 
@@ -655,15 +640,12 @@ class TransferClient(client.BaseClient):
         :param server_data: Fields on the server to update, as a partial server document
         :type server_data: dict
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.update_endpoint_server(%s, %s, ...)",
             endpoint_id,
             server_id,
         )
-        return self.put(
-            f"endpoint/{endpoint_id}/server/{str(server_id)}", data=server_data
-        )
+        return self.put(f"endpoint/{endpoint_id}/server/{server_id}", data=server_data)
 
     @utils.doc_api_method(
         "Delete endpoint server by ID",
@@ -680,11 +662,10 @@ class TransferClient(client.BaseClient):
         :param server_id: The ID of the server to delete
         :type server_id: str or int
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.delete_endpoint_server(%s, %s)", endpoint_id, server_id
         )
-        return self.delete(f"endpoint/{endpoint_id}/server/{str(server_id)}")
+        return self.delete(f"endpoint/{endpoint_id}/server/{server_id}")
 
     #
     # Roles
@@ -702,7 +683,6 @@ class TransferClient(client.BaseClient):
         :param endpoint_id: The endpoint whose roles are being listed
         :type endpoint_id: str or UUID
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_role_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(f"endpoint/{endpoint_id}/role_list", query_params=query_params)
@@ -722,7 +702,6 @@ class TransferClient(client.BaseClient):
         :param role_data: A role document for the new role
         :type role_data: dict
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_role({endpoint_id}, ...)")
         return self.post(f"endpoint/{endpoint_id}/role", data=role_data)
 
@@ -746,7 +725,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.get_endpoint_role({endpoint_id}, {role_id}, ...)")
         return self.get(
             f"endpoint/{endpoint_id}/role/{role_id}", query_params=query_params
@@ -767,7 +745,6 @@ class TransferClient(client.BaseClient):
         :param role_id: The ID of the role to delete
         :type role_id: str
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.delete_endpoint_role({endpoint_id}, {role_id})")
         return self.delete(f"endpoint/{endpoint_id}/role/{role_id}")
 
@@ -789,7 +766,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_acl_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(f"endpoint/{endpoint_id}/access_list", query_params=query_params)
@@ -815,7 +791,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.get_endpoint_acl_rule(%s, %s, ...)", endpoint_id, rule_id
         )
@@ -851,7 +826,6 @@ class TransferClient(client.BaseClient):
         Note that if this rule is being created on a shared endpoint
         the "path" field is relative to the "host_path" of the shared endpoint.
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.add_endpoint_acl_rule({endpoint_id}, ...)")
         return self.post(f"endpoint/{endpoint_id}/access", data=rule_data)
 
@@ -869,7 +843,6 @@ class TransferClient(client.BaseClient):
         :param rule_data: A partial ``access`` document containing fields to update
         :type rule_data: dict
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.update_endpoint_acl_rule(%s, %s, ...)",
             endpoint_id,
@@ -889,7 +862,6 @@ class TransferClient(client.BaseClient):
         :param rule_id: The ID of the access rule to remove
         :type rule_id: str
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.delete_endpoint_acl_rule(%s, %s)", endpoint_id, rule_id
         )
@@ -945,7 +917,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        bookmark_id = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.get_bookmark({bookmark_id})")
         return self.get(f"bookmark/{bookmark_id}", query_params=query_params)
 
@@ -963,7 +934,6 @@ class TransferClient(client.BaseClient):
         :param bookmark_data: A partial bookmark document with fields to update
         :type bookmark_data: dict
         """
-        bookmark_id = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.update_bookmark({bookmark_id})")
         return self.put(f"bookmark/{bookmark_id}", data=bookmark_data)
 
@@ -977,7 +947,6 @@ class TransferClient(client.BaseClient):
         :param bookmark_id: The ID of the bookmark to delete
         :type bookmark_id: str or UUID
         """
-        bookmark_id = utils.safe_stringify(bookmark_id)
         log.info(f"TransferClient.delete_bookmark({bookmark_id})")
         return self.delete(f"bookmark/{bookmark_id}")
 
@@ -1037,8 +1006,6 @@ class TransferClient(client.BaseClient):
         >>> ):
         >>>     print(entry["name DESC"], entry["type"])
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
-
         if query_params is None:
             query_params = {}
         if path is not None:
@@ -1081,7 +1048,6 @@ class TransferClient(client.BaseClient):
         >>> tc = globus_sdk.TransferClient(...)
         >>> tc.operation_mkdir(ep_id, path="/~/newdir/")
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.operation_mkdir({}, {}, {})".format(
                 endpoint_id, path, query_params
@@ -1121,7 +1087,6 @@ class TransferClient(client.BaseClient):
         >>> tc.operation_rename(ep_id, oldpath="/~/file1.txt",
         >>>                     newpath="/~/project1data.txt")
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.operation_rename({}, {}, {}, {})".format(
                 endpoint_id, oldpath, newpath, query_params
@@ -1161,7 +1126,6 @@ class TransferClient(client.BaseClient):
         >>> tc.operation_symlink(ep_id, symlink_target="/~/file1.txt",
         >>>                      path="/~/link-to-file1.txt")
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             "TransferClient.operation_symlink({}, {}, {}, {})".format(
                 endpoint_id, symlink_target, path, query_params
@@ -1361,7 +1325,6 @@ class TransferClient(client.BaseClient):
         >>>     print("Event on Task({}) at {}:\n{}".format(
         >>>         task_id, event["time"], event["description"])
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_event_list({task_id}, ...)")
         if query_params is None:
             query_params = {}
@@ -1385,7 +1348,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.get_task({task_id}, ...)")
         return self.get(f"task/{task_id}", query_params=query_params)
 
@@ -1410,7 +1372,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.update_task({task_id}, ...)")
         return self.put(f"task/{task_id}", data=data, query_params=query_params)
 
@@ -1424,7 +1385,6 @@ class TransferClient(client.BaseClient):
         :param task_id: The ID of the task to cancel
         :type task_id: str or UUID
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.cancel_task({task_id})")
         return self.post(f"task/{task_id}/cancel")
 
@@ -1473,11 +1433,8 @@ class TransferClient(client.BaseClient):
         >>>     print(".", end="")
         >>> print("\n{0} completed!".format(task_id))
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(
-            "TransferClient.task_wait({}, {}, {})".format(
-                task_id, timeout, polling_interval
-            )
+            "TransferClient.task_wait(%s, %s, %s)", task_id, timeout, polling_interval
         )
 
         # check valid args
@@ -1545,7 +1502,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_pause_info({task_id}, ...)")
         return self.get(f"task/{task_id}/pause_info", query_params=query_params)
 
@@ -1583,7 +1539,6 @@ class TransferClient(client.BaseClient):
         >>>     print("{} -> {}".format(
         >>>         info["source_path"], info["destination_path"]))
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.task_successful_transfers({task_id}, ...)")
         return IterableTransferResponse(
             self.get(f"task/{task_id}/successful_transfers", query_params=query_params)
@@ -1617,7 +1572,6 @@ class TransferClient(client.BaseClient):
         >>>     print("{} -> {}".format(
         >>>         info["error_code"], info["source_path"]))
         """
-        task_id = utils.safe_stringify(task_id)
         log.info("TransferClient.task_skipped_errors(%s, ...)", task_id)
         return IterableTransferResponse(
             self.get(f"task/{task_id}/skipped_errors", query_params=query_params)
@@ -1664,7 +1618,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_manager_hosted_endpoint_list({endpoint_id})")
         return IterableTransferResponse(
             self.get(
@@ -1690,7 +1643,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id})")
         return self.get(
             f"endpoint_manager/endpoint/{endpoint_id}", query_params=query_params
@@ -1713,7 +1665,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        endpoint_id = utils.safe_stringify(endpoint_id)
         log.info(
             f"TransferClient.endpoint_manager_endpoint_acl_list({endpoint_id}, ...)"
         )
@@ -1845,16 +1796,16 @@ class TransferClient(client.BaseClient):
             else:
                 query_params["filter_status"] = ",".join(filter_status)
         if filter_task_id is not None:
-            if isinstance(filter_task_id, (uuid.UUID, str, bytes)):
-                query_params["filter_task_id"] = utils.safe_stringify(filter_task_id)
+            if isinstance(filter_task_id, (uuid.UUID, str)):
+                query_params["filter_task_id"] = str(filter_task_id)
             else:
                 query_params["filter_task_id"] = ",".join(
-                    [utils.safe_stringify(tid) for tid in filter_task_id]
+                    [str(tid) for tid in filter_task_id]
                 )
         if filter_owner_id is not None:
-            query_params["filter_owner_id"] = utils.safe_stringify(filter_owner_id)
+            query_params["filter_owner_id"] = str(filter_owner_id)
         if filter_endpoint is not None:
-            query_params["filter_endpoint"] = utils.safe_stringify(filter_endpoint)
+            query_params["filter_endpoint"] = str(filter_endpoint)
         if filter_is_paused is not None:
             query_params["filter_is_paused"] = filter_is_paused
         if filter_completion_time is not None:
@@ -1889,7 +1840,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_get_task({task_id}, ...)")
         return self.get(f"endpoint_manager/task/{task_id}", query_params=query_params)
 
@@ -1932,7 +1882,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_event_list({task_id}, ...)")
         if query_params is None:
             query_params = {}
@@ -1966,7 +1915,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_pause_info({task_id}, ...)")
         return self.get(
             f"endpoint_manager/task/{task_id}/pause_info", query_params=query_params
@@ -1990,7 +1938,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(
             "TransferClient.endpoint_manager_task_successful_transfers(%s, ...)",
             task_id,
@@ -2019,7 +1966,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        task_id = utils.safe_stringify(task_id)
         log.info(f"TransferClient.endpoint_manager_task_skipped_errors({task_id}, ...)")
         return IterableTransferResponse(
             self.get(
@@ -2051,7 +1997,7 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        str_task_ids = [utils.safe_stringify(i) for i in task_ids]
+        str_task_ids = [str(i) for i in task_ids]
         log.info(
             f"TransferClient.endpoint_manager_cancel_tasks({str_task_ids}, {message})"
         )
@@ -2081,7 +2027,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        admin_cancel_id = utils.safe_stringify(admin_cancel_id)
         log.info(f"TransferClient.endpoint_manager_cancel_status({admin_cancel_id})")
         return self.get(
             f"endpoint_manager/admin_cancel/{admin_cancel_id}",
@@ -2112,7 +2057,7 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        str_task_ids = [utils.safe_stringify(i) for i in task_ids]
+        str_task_ids = [str(i) for i in task_ids]
         log.info(
             f"TransferClient.endpoint_manager_pause_tasks({str_task_ids}, {message})"
         )
@@ -2142,7 +2087,7 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        str_task_ids = [utils.safe_stringify(i) for i in task_ids]
+        str_task_ids = [str(i) for i in task_ids]
         log.info(f"TransferClient.endpoint_manager_resume_tasks({str_task_ids})")
         data = {"task_id_list": str_task_ids}
         return self.post(
@@ -2179,7 +2124,7 @@ class TransferClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         if filter_endpoint is not None:
-            query_params["filter_endpoint"] = utils.safe_stringify(filter_endpoint)
+            query_params["filter_endpoint"] = str(filter_endpoint)
         return IterableTransferResponse(
             self.get("endpoint_manager/pause_rule_list", query_params=query_params)
         )
@@ -2232,7 +2177,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        pause_rule_id = utils.safe_stringify(pause_rule_id)
         log.info(f"TransferClient.endpoint_manager_get_pause_rule({pause_rule_id})")
         return self.get(
             f"endpoint_manager/pause_rule/{pause_rule_id}", query_params=query_params
@@ -2266,7 +2210,6 @@ class TransferClient(client.BaseClient):
         >>> }
         >>> update_result = tc.endpoint_manager_update_pause_rule(ep_data)
         """
-        pause_rule_id = utils.safe_stringify(pause_rule_id)
         log.info(f"TransferClient.endpoint_manager_update_pause_rule({pause_rule_id})")
         return self.put(f"endpoint_manager/pause_rule/{pause_rule_id}", data=data)
 
@@ -2288,7 +2231,6 @@ class TransferClient(client.BaseClient):
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        pause_rule_id = utils.safe_stringify(pause_rule_id)
         log.info(f"TransferClient.endpoint_manager_delete_pause_rule({pause_rule_id})")
         return self.delete(
             f"endpoint_manager/pause_rule/{pause_rule_id}", query_params=query_params

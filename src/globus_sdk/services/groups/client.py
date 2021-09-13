@@ -61,7 +61,6 @@ class GroupsClient(client.BaseClient):
         """
         Get details about a specific group
         """
-        group_id = utils.safe_stringify(group_id)
         return self.get(f"/groups/{group_id}", query_params=query_params)
 
     @_groupdoc("Delete a group", "delete_group_v2_groups__group_id__delete")
@@ -71,7 +70,6 @@ class GroupsClient(client.BaseClient):
         """
         Delete a group.
         """
-        group_id = utils.safe_stringify(group_id)
         return self.delete(f"/groups/{group_id}", query_params=query_params)
 
     @_groupdoc("Create a group", "create_group_v2_groups_post")
@@ -93,7 +91,6 @@ class GroupsClient(client.BaseClient):
         """
         Get policies for the given group
         """
-        group_id = utils.safe_stringify(group_id)
         return self.get(f"/groups/{group_id}/policies", query_params=query_params)
 
     @_groupdoc(
@@ -110,7 +107,6 @@ class GroupsClient(client.BaseClient):
         """
         Set policies for the group.
         """
-        group_id = utils.safe_stringify(group_id)
         return self.put(
             f"/groups/{group_id}/policies", data=data, query_params=query_params
         )
@@ -157,7 +153,6 @@ class GroupsClient(client.BaseClient):
         """
         Get membership fields for your identities.
         """
-        group_id = utils.safe_stringify(group_id)
         return self.get(
             f"/groups/{group_id}/membership_fields", query_params=query_params
         )
@@ -176,7 +171,6 @@ class GroupsClient(client.BaseClient):
         """
         Get membership fields for your identities.
         """
-        group_id = utils.safe_stringify(group_id)
         return self.put(
             f"/groups/{group_id}/membership_fields",
             data=data,
@@ -197,5 +191,4 @@ class GroupsClient(client.BaseClient):
         """
         Execute a batch of actions against several group memberships.
         """
-        group_id = utils.safe_stringify(group_id)
         return self.post(f"/groups/{group_id}", data=actions, query_params=query_params)

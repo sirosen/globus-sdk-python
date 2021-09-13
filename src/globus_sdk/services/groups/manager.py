@@ -1,6 +1,6 @@
 from typing import Iterable, Optional
 
-from globus_sdk import response, utils
+from globus_sdk import response
 from globus_sdk.types import UUIDLike
 
 from .client import GroupsClient
@@ -35,9 +35,7 @@ class GroupsManager:
         data = {
             "name": name,
             "description": description,
-            "parent_id": utils.safe_stringify(parent_id)
-            if parent_id is not None
-            else None,
+            "parent_id": str(parent_id) if parent_id is not None else None,
         }
         return self.client.create_group(data=data)
 

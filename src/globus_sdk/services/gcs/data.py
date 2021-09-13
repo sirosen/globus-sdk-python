@@ -198,7 +198,7 @@ class CollectionDocument(utils.PayloadWrapper, abc.ABC):
 
     def _set_optstrs(self, **kwargs: Any) -> None:
         for k, v in kwargs.items():
-            self._set_value(k, v, callback=utils.safe_stringify)
+            self._set_value(k, v, callback=str)
 
     def _set_optstrlists(self, **kwargs: Optional[Iterable]) -> None:
         for k, v in kwargs.items():

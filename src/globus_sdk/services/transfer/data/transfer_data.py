@@ -3,6 +3,7 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 
 from globus_sdk import utils
+from globus_sdk.types import UUIDLike
 
 if TYPE_CHECKING:
     import globus_sdk
@@ -29,15 +30,15 @@ class TransferData(utils.PayloadWrapper):
         to submit the transfer.
     :type transfer_client: :class:`TransferClient <globus_sdk.TransferClient>`
     :param source_endpoint: The endpoint ID of the source endpoint
-    :type source_endpoint: str
+    :type source_endpoint: str or UUID
     :param destination_endpoint: The endpoint ID of the destination endpoint
-    :type destination_endpoint: str
+    :type destination_endpoint: str or UUID
     :param label: A string label for the Task
     :type label: str, optional
     :param submission_id: A submission ID value fetched via :meth:`get_submission_id \
         <globus_sdk.TransferClient.get_submission_id>`. Defaults to using
         ``transfer_client.get_submission_id``
-    :type submission_id: str, optional
+    :type submission_id: str or UUID, optional
     :param sync_level: The method used to compare items between the source and
         destination. One of  ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"``
         See the section below on sync-level for an explanation of values.
@@ -137,11 +138,11 @@ class TransferData(utils.PayloadWrapper):
     def __init__(
         self,
         transfer_client: "globus_sdk.TransferClient",
-        source_endpoint: str,
-        destination_endpoint: str,
+        source_endpoint: UUIDLike,
+        destination_endpoint: UUIDLike,
         *,
         label: Optional[str] = None,
-        submission_id: Optional[str] = None,
+        submission_id: Optional[UUIDLike] = None,
         sync_level: Optional[str] = None,
         verify_checksum: bool = False,
         preserve_timestamp: bool = False,
@@ -154,15 +155,13 @@ class TransferData(utils.PayloadWrapper):
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__()
-        source_endpoint = utils.safe_stringify(source_endpoint)
-        destination_endpoint = utils.safe_stringify(destination_endpoint)
         log.info("Creating a new TransferData object")
         self["DATA_TYPE"] = "transfer"
         self["submission_id"] = (
             submission_id or transfer_client.get_submission_id()["value"]
         )
-        self["source_endpoint"] = source_endpoint
-        self["destination_endpoint"] = destination_endpoint
+        self["source_endpoint"] = str(source_endpoint)
+        self["destination_endpoint"] = str(destination_endpoint)
         self["verify_checksum"] = verify_checksum
         self["preserve_timestamp"] = preserve_timestamp
         self["encrypt_data"] = encrypt_data
@@ -242,8 +241,6 @@ class TransferData(utils.PayloadWrapper):
             external_checksum is given.
         :type checksum_algorithm: str, optional
         """
-        source_path = utils.safe_stringify(source_path)
-        destination_path = utils.safe_stringify(destination_path)
         item_data = {
             "DATA_TYPE": "transfer_item",
             "source_path": source_path,
@@ -278,8 +275,6 @@ class TransferData(utils.PayloadWrapper):
         :param destination_path: Path to which the source symlink will be transferred
         :type destination_path: str
         """
-        source_path = utils.safe_stringify(source_path)
-        destination_path = utils.safe_stringify(destination_path)
         item_data = {
             "DATA_TYPE": "transfer_symlink_item",
             "source_path": source_path,

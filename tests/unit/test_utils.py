@@ -38,24 +38,6 @@ def test_slash_join(a, b):
     assert utils.slash_join(a, b) == "a/b"
 
 
-class testObject:
-    """test obj for safe_stringify testing"""
-
-    def __str__(self):
-        return "1"
-
-
-@pytest.mark.parametrize("value", ["1", b"1", 1, testObject()])
-def test_safe_stringify(value):
-    """
-    safe_stringifies strings, bytes, an int, an object
-    and confirms safe_stringify returns unicode string for all inputs
-    """
-    safe_value = utils.safe_stringify(value)
-    assert safe_value == "1"
-    assert type(safe_value) == str
-
-
 def test_payload_wrapper_methods():
     # just make sure that PayloadWrapper acts like a dict...
     data = utils.PayloadWrapper()
