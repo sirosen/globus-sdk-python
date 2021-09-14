@@ -36,7 +36,7 @@ from ..response import OAuthTokenResponse
 
 log = logging.getLogger(__name__)
 
-T = TypeVar("T")
+RT = TypeVar("RT", bound=GlobusHTTPResponse)
 
 
 class AuthClient(client.BaseClient):
@@ -385,8 +385,8 @@ class AuthClient(client.BaseClient):
 
     @overload
     def oauth2_token(
-        self, form_data: Union[dict, utils.PayloadWrapper], *, response_class: Type[T]
-    ) -> T:
+        self, form_data: Union[dict, utils.PayloadWrapper], *, response_class: Type[RT]
+    ) -> RT:
         ...
 
     @overload
@@ -395,8 +395,8 @@ class AuthClient(client.BaseClient):
         form_data: Union[dict, utils.PayloadWrapper],
         *,
         body_params: Optional[Dict[str, Any]],
-        response_class: Type[T],
-    ) -> T:
+        response_class: Type[RT],
+    ) -> RT:
         ...
 
     def oauth2_token(
@@ -404,8 +404,8 @@ class AuthClient(client.BaseClient):
         form_data: Union[dict, utils.PayloadWrapper],
         *,
         body_params: Optional[Dict[str, Any]] = None,
-        response_class: Union[Type[OAuthTokenResponse], Type[T]] = OAuthTokenResponse,
-    ) -> Union[OAuthTokenResponse, T]:
+        response_class: Union[Type[OAuthTokenResponse], Type[RT]] = OAuthTokenResponse,
+    ) -> Union[OAuthTokenResponse, RT]:
         """
         This is the generic form of calling the OAuth2 Token endpoint.
         It takes ``form_data``, a dict which will be encoded in a form POST
@@ -435,7 +435,7 @@ class AuthClient(client.BaseClient):
                 data=data,
                 encoding="form",
             )
-        )  # type: ignore
+        )
 
     @utils.doc_api_method(
         "Userinfo", "auth/reference/#get_or_post_v2_oauth2_userinfo_resource"
