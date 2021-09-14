@@ -100,7 +100,7 @@ Change:
 Import BaseClient from globus_sdk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may be using the globus-sdk `BaseClient` object to implement a custom
+You may be using the globus-sdk ``BaseClient`` object to implement a custom
 client or for type annotations.
 
 Change:
@@ -237,7 +237,7 @@ In version 2, `GlobusHTTPResponse` inherited from a base class,
 `GlobusResponse`. In version 3, the distinction has been eliminated and
 responses are only `GlobusHTTPResponse`.
 
-This may appear in contexts where you type annotate or use `isinstance` checks
+This may appear in contexts where you type annotate or use ``isinstance`` checks
 to check the type of an object.
 
 Change:
@@ -326,4 +326,4 @@ should be necessary.
 Version 2 removed support for python2 but made no other changes.
 
 Simply ensure that you are running python 3.6 or later and update version
-specifications to `globus_sdk>=2,<3`.
+specifications to ``globus_sdk>=2,<3``.

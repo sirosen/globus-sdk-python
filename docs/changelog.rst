@@ -18,7 +18,7 @@ Unreleased
   user information from gridmap (:pr:`466`)
 * Add support for GCS collection create and update. This includes new data
   helpers, ``MappedCollectionDcoument`` and ``GuestCollectionDocument`` (:pr:`468`)
-* Remove support for `bytes` values for fields consuming UUIDs (:pr:`471`)
+* Remove support for ``bytes`` values for fields consuming UUIDs (:pr:`471`)
 * Add support for specifying ``config_dir`` to ``LocalGlobusConnectPersonal`` (:pr:`470`)
 
 v3.0.0b4
@@ -168,8 +168,8 @@ v1.11.0
 -------
 
 * Add support for task skipped errors via
-  `TransferClient.task_skipped_errors` and
-  `TransferClient.endpoint_manager_task_skipped_errors` (:pr:`393`)
+  ``TransferClient.task_skipped_errors`` and
+  ``TransferClient.endpoint_manager_task_skipped_errors`` (:pr:`393`)
 * Internal maintenance (:pr:`389`, :pr:`390`, :pr:`391`, :pr:`392`)
 
 v1.10.0
@@ -180,35 +180,35 @@ v1.10.0
 v1.9.1
 ------
 
-* Fix `GlobusHTTPResponse` to handle responses with no `Content-Type` header (:pr:`375`)
+* Fix ``GlobusHTTPResponse`` to handle responses with no ``Content-Type`` header (:pr:`375`)
 
 v1.9.0
 ------
 
-* Add `globus_sdk.IdentityMap`, a mapping-like object for Auth ID lookups (:pr:`367`)
+* Add ``globus_sdk.IdentityMap``, a mapping-like object for Auth ID lookups (:pr:`367`)
 * Minor documentation and build improvements (:pr:`369`, :pr:`362`)
-* Don't append trailing slashes when no path is given to a low-level client method like `get()` (:pr:`364`)
-* Add `external_checksum` and `checksum_algorithm` to `TransferData.add_item()` named arguments (:pr:`365`)
+* Don't append trailing slashes when no path is given to a low-level client method like ``get()`` (:pr:`364`)
+* Add ``external_checksum`` and ``checksum_algorithm`` to ``TransferData.add_item()`` named arguments (:pr:`365`)
 
 v1.8.0
 ------
 
 * Add a property to paginated results which shows if more results are available (:pr:`346`)
 * Update docs to state that Globus SDK uses semver (:pr:`357`)
-* Fix `RefreshTokenAuthorizer` to handle a new `refresh_token` being sent back by Auth (:pr:`359`)
+* Fix ``RefreshTokenAuthorizer`` to handle a new ``refresh_token`` being sent back by Auth (:pr:`359`)
 * Fix typo in endpoint_search log message (:pr:`355`)
 * Fix Globus Web App activation links in docs (:pr:`356`)
 
 v1.7.1
 ------
 
-* Allow arbitrary keyword args to `TransferData.add_item()` and `DeleteData.add_item()`, which passthrough to the item bodies (:pr:`339`)
+* Allow arbitrary keyword args to ``TransferData.add_item()`` and ``DeleteData.add_item()``, which passthrough to the item bodies (:pr:`339`)
 * Minor internal improvements (:pr:`342`, :pr:`343`)
 
 v1.7.0
 ------
 
-* Add `get_task` and `get_task_list` to `SearchClient` (:pr:`335`, :pr:`336`)
+* Add ``get_task`` and ``get_task_list`` to ``SearchClient`` (:pr:`335`, :pr:`336`)
 * Internal maintenance and testing improvements (:pr:`331`, :pr:`334`, :pr:`333`)
 
 v1.6.1
@@ -239,14 +239,14 @@ v1.5.0
 v1.4.1
 ------
 
-* Send `Content-Type: application/json` on requests with JSON request bodies (:pr:`266`)
+* Send ``Content-Type: application/json`` on requests with JSON request bodies (:pr:`266`)
 * Support connection timeouts. Default timeout of 60 seconds (:pr:`264`)
 
 v1.4.0
 ------
 
 * Access token response data by way of scope name (:pr:`261`)
-* Make `cryptography` a strict requirement, globus-sdk[jwt] is no longer necessary (:pr:`257`, :pr:`260`)
+* Make ``cryptography`` a strict requirement, globus-sdk[jwt] is no longer necessary (:pr:`257`, :pr:`260`)
 * Simplify OAuthTokenResponse.decode_id_token to not require the client as an argument (:pr:`255`)
 * Add (beta) SearchClient class (:pr:`259`)
 
@@ -254,14 +254,14 @@ v1.3.0
 ------
 
 * Improve error message when installation onto python2.6 is attempted (:pr:`245`)
-* Raise errors on client instantiation when `GLOBUS_SDK_ENVIRONMENT` appears to be invalid, support `GLOBUS_SDK_ENVIRONMENT=preview` (:pr:`247`)
+* Raise errors on client instantiation when ``GLOBUS_SDK_ENVIRONMENT`` appears to be invalid, support ``GLOBUS_SDK_ENVIRONMENT=preview`` (:pr:`247`)
 
 v1.2.2
 ------
 
-* Allow client classes to accept `base_url` as an argument to `_init__()` (:pr:`241`)
+* Allow client classes to accept ``base_url`` as an argument to ``_init__()`` (:pr:`241`)
 * Fix packaging to not include testsuite (:pr:`232`)
-* Improve docs on `TransferClient` helper classes (:pr:`231`, :pr:`233`)
+* Improve docs on ``TransferClient`` helper classes (:pr:`231`, :pr:`233`)
 
 v1.2.1
 ------
@@ -279,14 +279,14 @@ v1.2.0
 v1.1.1
 ------
 
-* Use correct paging style when making `endpoint_manager_task_list` calls (:pr:`210`)
+* Use correct paging style when making ``endpoint_manager_task_list`` calls (:pr:`210`)
 
 v1.1.0
 ------
 
 * Add endpoint_manager methods to TransferClient (:pr:`191`, :pr:`199`, :pr:`200`, :pr:`201`, :pr:`203`)
 * Change "identities_set" to "identity_set" for token introspection (:pr:`163`)
-* Fix docs references to `oauth2_start_flow_*` (:pr:`190`)
+* Fix docs references to ``oauth2_start_flow_*`` (:pr:`190`)
 * Support iterable requested_scopes everywhere (:pr:`185`)
 * Add python 3.6 to supported platforms (:pr:`180`)
 * Remove "Beta" from docs (:pr:`179`)
@@ -296,38 +296,38 @@ v1.1.0
 v1.0.0
 ------
 
-* Adds `AuthAPIError` with more flexible error payload handling (:pr:`175`)
+* Adds ``AuthAPIError`` with more flexible error payload handling (:pr:`175`)
 
 v0.7.2
 ------
 
-* Add `AuthClient.validate_token` (:pr:`172`)
-* Bugfix for `on_refresh` users of `RefreshTokenAuthorizer` and `ClientCredentialsAuthorizer` (:pr:`173`)
+* Add ``AuthClient.validate_token`` (:pr:`172`)
+* Bugfix for ``on_refresh`` users of ``RefreshTokenAuthorizer`` and ``ClientCredentialsAuthorizer`` (:pr:`173`)
 
 v0.7.1
 ------
 
-* Remove deprecated `oauth2_start_flow_*` methods (:pr:`170`)
-* Add the `ClientCredentialsAuthorizer` (:pr:`164`)
-* Add `jwt` extra install target. `pip install "globus_sdk[jwt]"` installs `python-jose` (:pr:`169`)
+* Remove deprecated ``oauth2_start_flow_*`` methods (:pr:`170`)
+* Add the ``ClientCredentialsAuthorizer`` (:pr:`164`)
+* Add ``jwt`` extra install target. ``pip install "globus_sdk[jwt]"`` installs ``python-jose`` (:pr:`169`)
 
 v0.7.0
 ------
 
-* Make `OAuthTokenResponse.decode_id_token()` respect `ssl_verify=no` configuration (:pr:`161`)
-* Remove all properties of `OAuthTokenResponse` other than `by_resource_server` (:pr:`162`)
+* Make ``OAuthTokenResponse.decode_id_token()`` respect ``ssl_verify=no`` configuration (:pr:`161`)
+* Remove all properties of ``OAuthTokenResponse`` other than ``by_resource_server`` (:pr:`162`)
 
 v0.6.0
 ------
 
-* Opt out of the Globus Auth behavior where a `GET` of an identity username will provision that identity (:pr:`145`)
+* Opt out of the Globus Auth behavior where a ``GET`` of an identity username will provision that identity (:pr:`145`)
 * Fixup OAuth2 PKCE to be spec-compliant (:pr:`154`)
-* Wrap some `requests` network-related errors in custom exceptions (:pr:`155`)
-* Add `deadline` support to `TransferData` and `DeleteData` (:pr:`159`)
+* Wrap some ``requests`` network-related errors in custom exceptions (:pr:`155`)
+* Add ``deadline`` support to ``TransferData`` and ``DeleteData`` (:pr:`159`)
 
 v0.5.1
 ------
 
-* Add support for the `prefill_named_grant` option to the Native App authorization flow (:pr:`143`)
+* Add support for the ``prefill_named_grant`` option to the Native App authorization flow (:pr:`143`)
 * Unicode string improvements (:pr:`129`)
 * Better handle unexpected error payloads (:pr:`135`)

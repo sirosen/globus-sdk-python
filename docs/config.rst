@@ -8,8 +8,8 @@ or by passing parameters to clients and other objects.
 
 .. note::
 
-    SDK v1.x and v2.x supported the use of `/etc/globus.cfg` and
-    `~/.globus.cfg` to set certain values. This feature was removed in v3.0 in
+    SDK v1.x and v2.x supported the use of ``/etc/globus.cfg`` and
+    ``~/.globus.cfg`` to set certain values. This feature was removed in v3.0 in
     favor of new environment variables for setting these values.
 
 Environment Variables
