@@ -12,11 +12,17 @@ _IS_WINDOWS = os.name == "nt"
 BASE32_ID = "u_vy2bvggsoqi6loei3oxdvc5fiu"
 
 
-def _compute_confdir(homedir):
+def _compute_confdir(homedir, alt=False):
+    if alt:
+        return os.path.join(homedir, "alt-conf-dir/lta")
     if _IS_WINDOWS:
         return os.path.join(homedir, "Globus Connect")
     else:
         return os.path.join(homedir, ".globusonline/lta")
+
+
+def normalize_config_dir_argument(config_dir):
+    return config_dir if _IS_WINDOWS else os.path.dirname(config_dir)
 
 
 @pytest.fixture(autouse=True)
@@ -28,7 +34,10 @@ def mocked_homedir(monkeypatch):
 
     try:
         confdir = _compute_confdir(tempdir)
+        altconfdir = _compute_confdir(tempdir, alt=True)
         os.makedirs(confdir)
+        os.makedirs(altconfdir)
+
         if _IS_WINDOWS:
             monkeypatch.setitem(os.environ, "LOCALAPPDATA", tempdir)
         else:
@@ -45,9 +54,16 @@ def mocked_confdir(mocked_homedir):
 
 
 @pytest.fixture
-def write_gcp_id_file(mocked_confdir):
-    def _func_fixture(epid):
-        fpath = os.path.join(mocked_confdir, "client-id.txt")
+def mocked_alternate_confdir(mocked_homedir):
+    return _compute_confdir(mocked_homedir, alt=True)
+
+
+@pytest.fixture
+def write_gcp_id_file(mocked_confdir, mocked_alternate_confdir):
+    def _func_fixture(epid, alternate=False):
+        fpath = os.path.join(
+            mocked_alternate_confdir if alternate else mocked_confdir, "client-id.txt"
+        )
         with open(fpath, "w") as f:
             f.write(epid)
             f.write("\n")
@@ -57,8 +73,10 @@ def write_gcp_id_file(mocked_confdir):
 
 @pytest.fixture
 def write_gridmap(mocked_confdir):
-    def _func_fixture(data):
-        fpath = os.path.join(mocked_confdir, "gridmap")
+    def _func_fixture(data, alternate=False):
+        fpath = os.path.join(
+            mocked_alternate_confdir if alternate else mocked_confdir, "gridmap"
+        )
         with open(fpath, "w") as f:
             f.write(data)
 
@@ -92,9 +110,27 @@ def test_localep_load_id(local_gcp, write_gcp_id_file):
     assert local_gcp.endpoint_id == "xyz"
 
 
-def test_load_id_no_confdir(local_gcp, mocked_confdir):
+def test_localep_load_id_alternate_conf_dir(
+    mocked_alternate_confdir, write_gcp_id_file
+):
+    gcp = globus_sdk.LocalGlobusConnectPersonal(
+        config_dir=normalize_config_dir_argument(mocked_alternate_confdir)
+    )
+    assert gcp.endpoint_id is None
+    write_gcp_id_file("foobar", alternate=True)
+    assert gcp.endpoint_id == "foobar"
+    write_gcp_id_file("xyz", alternate=True)
+    assert gcp.endpoint_id == "foobar"
+    del gcp.endpoint_id
+    assert gcp.endpoint_id == "xyz"
+
+
+def test_load_id_no_confdir(local_gcp, mocked_confdir, mocked_alternate_confdir):
     shutil.rmtree(mocked_confdir)
+    shutil.rmtree(mocked_alternate_confdir)
+    alt_gcp = globus_sdk.LocalGlobusConnectPersonal(config_dir=mocked_alternate_confdir)
     assert local_gcp.endpoint_id is None
+    assert alt_gcp.endpoint_id is None
 
 
 def test_get_owner_info(local_gcp, write_gridmap, auth_client):
