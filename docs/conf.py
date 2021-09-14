@@ -29,7 +29,7 @@ extensions = [
     "globus_sdk._sphinxext",
 ]
 
-project = "globus-sdk-python"
+project = "globus-sdk"
 copyright = f"2016-{datetime.datetime.today().strftime('%Y')}, Globus"
 author = "Globus Team"
 # The short X.Y version.
@@ -54,8 +54,8 @@ exclude_patterns = ["_build"]
 # HTML Theme Options
 html_show_sourcelink = True
 html_theme = "furo"
+html_title = "globus-sdk v3"
 html_theme_options = {
-    "announcement": "This is documentation for a <b>beta</b> version of the SDK.",
     "light_css_variables": {
         "color-brand-primary": "#27518F",
     },
@@ -64,6 +64,7 @@ html_logo = "_static/logo.png"
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "friendly"
+pygments_dark_style = "monokai"  # this is a furo-specific option
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "globus-sdk-pythondoc"
+htmlhelp_basename = "globus-sdk-doc"

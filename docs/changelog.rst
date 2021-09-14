@@ -13,6 +13,9 @@ to a major new version of the SDK.
 Unreleased
 ----------
 
+v3.0.0
+------
+
 * Add ``filter_is_error`` parameter to advanced task list (:pr:`467`)
 * Add a ``LocalGlobusConnectPersonal.get_owner_info()`` for looking up local
   user information from gridmap (:pr:`466`)
