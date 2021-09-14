@@ -26,7 +26,7 @@ TEST_REQUIREMENTS = [
 DOC_REQUIREMENTS = [
     "sphinx<5",
     "sphinx-issues<2",
-    "furo==2021.06.18b36",
+    "furo==2021.09.08",
 ]
 DEV_REQUIREMENTS = TEST_REQUIREMENTS + LINT_REQUIREMENTS + DOC_REQUIREMENTS
 

@@ -19,6 +19,7 @@ Unreleased
 * Add support for GCS collection create and update. This includes new data
   helpers, ``MappedCollectionDcoument`` and ``GuestCollectionDocument`` (:pr:`468`)
 * Remove support for `bytes` values for fields consuming UUIDs (:pr:`471`)
+* Add support for specifying ``config_dir`` to ``LocalGlobusConnectPersonal`` (:pr:`470`)
 
 v3.0.0b4
 --------
