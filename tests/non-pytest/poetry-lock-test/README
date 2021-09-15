@@ -1,0 +1,9 @@
+Ensure that `poetry install` of the SDK works correctly.
+
+This means that `poetry` can parse the version specifiers for all dependencies,
+including dev extras, correctly.
+
+Inspired by #474
+( https://github.com/globus/globus-sdk-python/pull/474 )
+
+This can be run via the tox package checks. Try `tox -e poetry-check`
