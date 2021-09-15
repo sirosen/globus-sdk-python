@@ -8,7 +8,7 @@ MYPY_REQUIREMENTS = [
     "types-docutils",
     "types-jwt",
     "types-requests",
-    "typing-extensions; python_version<'3,8'",
+    "typing-extensions",
 ]
 LINT_REQUIREMENTS = [
     "flake8<4",
@@ -21,7 +21,6 @@ TEST_REQUIREMENTS = [
     "pytest-cov<3",
     "pytest-xdist<3",
     "responses==0.13.3",
-    "typing-extensions; python_version<'3,8'",
 ]
 DOC_REQUIREMENTS = [
     "sphinx<5",
