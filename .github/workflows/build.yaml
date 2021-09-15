@@ -39,3 +39,9 @@ jobs:
         # docs are only ever built on a linux 3.9 box (readthedocs)
         if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' }}
         run: python -m tox -e docs
+      - name: Check package metadata
+        # only on linux py3.9 for faster runs
+        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' }}
+        run: |
+          python -m tox -e twine-check
+          python -m tox -e poetry-check
