@@ -1,5 +1,5 @@
 import enum
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, cast
 
 import requests
 
@@ -63,6 +63,11 @@ class RetryCheckFlags(enum.Flag):
     RUN_ONCE = enum.auto()
 
 
+# stub for mypy
+class _RetryCheckFunc:
+    _retry_check_flags: RetryCheckFlags
+
+
 def set_retry_check_flags(flag: RetryCheckFlags) -> Callable[[Callable], Callable]:
     """
     A decorator for setting retry check flags on a retry check function.
@@ -73,7 +78,8 @@ def set_retry_check_flags(flag: RetryCheckFlags) -> Callable[[Callable], Callabl
     """
 
     def decorator(func: Callable) -> Callable:
-        func._retry_check_flags = flag  # type: ignore
+        as_check = cast(_RetryCheckFunc, func)
+        as_check._retry_check_flags = flag
         return func
 
     return decorator

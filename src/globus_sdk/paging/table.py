@@ -1,6 +1,14 @@
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional, Type, cast
 
 from .base import Paginator
+
+
+# stub for mypy
+class _PaginatedFunc:
+    _has_paginator: bool
+    _paginator_class: Type[Paginator]
+    _paginator_items_key: Optional[str]
+    _paginator_params: Dict[str, Any]
 
 
 def has_paginator(
@@ -24,10 +32,12 @@ def has_paginator(
     """
 
     def decorate(func: Callable) -> Callable:
-        func._has_paginator = True  # type: ignore
-        func._paginator_class = paginator_class  # type: ignore
-        func._paginator_items_key = items_key  # type: ignore
-        func._paginator_params = paginator_params  # type: ignore
+        as_paginated = cast(_PaginatedFunc, func)
+        as_paginated._has_paginator = True
+        as_paginated._paginator_class = paginator_class
+        as_paginated._paginator_items_key = items_key
+        as_paginated._paginator_params = paginator_params
+
         func.__doc__ = f"""{func.__doc__}
 
         **Paginated Usage**
