@@ -13,6 +13,14 @@ to a major new version of the SDK.
 Unreleased
 ----------
 
+v3.0.1
+------
+
+* `ScopeBuilder` objects now define the type of `__getattr__` for `mypy` to
+  know that dynamic attributes are strings (:pr:`472`)
+* Fix type remaining ignore usages in globus-sdk (:pr:`473`)
+* Fix malformed PEP508 `python_version` bound in dev dependencies (:pr:`474`)
+
 v3.0.0
 ------
 
