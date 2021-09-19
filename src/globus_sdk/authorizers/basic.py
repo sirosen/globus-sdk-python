@@ -1,6 +1,6 @@
 import logging
 
-from globus_sdk.utils import safe_b64encode
+from globus_sdk import utils
 
 from .base import StaticGlobusAuthorizer
 
@@ -29,4 +29,4 @@ class BasicAuthorizer(StaticGlobusAuthorizer):
         self.password = password
 
         to_b64 = f"{username}:{password}"
-        self.header_val = f"Basic {safe_b64encode(to_b64)}"
+        self.header_val = f"Basic {utils.b64str(to_b64)}"

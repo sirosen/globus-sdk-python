@@ -3,7 +3,7 @@ import collections.abc
 import hashlib
 from base64 import b64encode
 from enum import Enum
-from typing import Any, Callable, Generator, Iterable, Optional, TypeVar, Union
+from typing import Any, Callable, Generator, Iterable, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -12,12 +12,8 @@ def sha256_string(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
-def safe_b64encode(s: Union[bytes, str]) -> str:
-    if isinstance(s, str):
-        encoded = b64encode(s.encode("utf-8"))
-    else:
-        encoded = b64encode(s)
-    return encoded.decode("utf-8")
+def b64str(s: str) -> str:
+    return b64encode(s.encode("utf-8")).decode("utf-8")
 
 
 def slash_join(a: str, b: Optional[str]) -> str:
