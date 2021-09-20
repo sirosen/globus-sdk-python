@@ -16,10 +16,10 @@ Unreleased
 v3.0.1
 ------
 
-* `ScopeBuilder` objects now define the type of `__getattr__` for `mypy` to
+* ``ScopeBuilder`` objects now define the type of ``__getattr__`` for ``mypy`` to
   know that dynamic attributes are strings (:pr:`472`)
-* Fix type remaining ignore usages in globus-sdk (:pr:`473`)
-* Fix malformed PEP508 `python_version` bound in dev dependencies (:pr:`474`)
+* Fix remaining ``type: ignore`` usages in globus-sdk (:pr:`473`)
+* Fix malformed PEP508 ``python_version`` bound in dev dependencies (:pr:`474`)
 
 v3.0.0
 ------
@@ -45,6 +45,8 @@ v3.0.0b4
   ``get_collection`` uses a new ``UnpackingGCSResponse`` response type (:pr:`451`,
   :pr:`464`)
 * Remove ``BaseClient.qjoin_path`` (:pr:`452`)
+* The ``additional_params`` parameter to ``AuthClient.oauth2_get_authorize_url``
+  has been renamed to ``query_params`` for consistency with other methods (:pr:`453`)
 * Enforce keyword-only arguments for most SDK-provied APIs (:pr:`453`)
 * Fix annotations for ``server_id`` on ``TransferClient`` methods (:pr:`455`)
 * Add ``delete_destination_extra`` param to ``TransferData`` (:pr:`456`)
