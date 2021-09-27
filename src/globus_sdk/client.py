@@ -264,10 +264,9 @@ class BaseClient:
             url = path
         else:
             url = utils.slash_join(self.base_url, urllib.parse.quote(path))
-        log.debug(f"request will hit URL:{url}")
 
         # make the request
-        log.debug(f"request will hit URL:{url}")
+        log.debug("request will hit URL: %s", url)
         r = self.transport.request(
             method=method,
             url=url,
@@ -277,7 +276,7 @@ class BaseClient:
             encoding=encoding,
             authorizer=self.authorizer,
         )
-        log.debug(f"Request made to URL: {r.url}")
+        log.debug("request made to URL: %s", r.url)
 
         if 200 <= r.status_code < 400:
             log.debug(f"request completed with response code: {r.status_code}")
