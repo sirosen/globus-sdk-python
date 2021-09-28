@@ -39,7 +39,7 @@ Globus SDK client objects define paginated variants of methods. The normal
 method is said to be "unpaginated", and returns a single page of results.
 The paginated variant, prefixed with ``paginated.``, returns a paginated.
 
-For example, :py:class:`~globus_sdk.TransferClient` has a paginated method,
+For example, :class:`globus_sdk.TransferClient` has a paginated method,
 :py:meth:`~globus_sdk.TransferClient.endpoint_search`. Once you have
 a client object, calls to the unpaginated method are done like so:
 
@@ -87,7 +87,7 @@ If your use-case is satisfied with ``items()``, then stick with ``items()``!
 than the individual items.
 
 For example,
-`~globus_sdk.TransferClient.endpoint_search <TransferClient.endpoint_search>`
+:meth:`TransferClient.endpoint_search <globus_sdk.TransferClient.endpoint_search>`
 returns the total number of results for the search as a field on each page.
 
 Most use-cases can be solved with ``items()``, and ``pages()`` will be
