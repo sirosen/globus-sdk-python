@@ -1,3 +1,4 @@
+import logging
 import random
 import time
 from typing import Any, Callable, Dict, List, Optional, Union, cast
@@ -21,6 +22,8 @@ from .retry import (
     RetryContext,
     set_retry_check_flags,
 )
+
+log = logging.getLogger(__name__)
 
 
 def _parse_retry_after(response: requests.Response) -> Optional[int]:
@@ -180,7 +183,9 @@ class RequestsTransport:
         This is always the minimum of the backoff (run on the context) and the
         ``max_sleep``.
         """
-        time.sleep(min(self.retry_backoff(ctx), self.max_sleep))
+        sleep_period = min(self.retry_backoff(ctx), self.max_sleep)
+        log.info("request retry_sleep(%s) [max=%s]", sleep_period, self.max_sleep)
+        time.sleep(sleep_period)
 
     def request(
         self,
@@ -213,10 +218,13 @@ class RequestsTransport:
 
         :return: ``requests.Response`` object
         """
+        log.debug("starting request for %s", url)
         resp: Optional[requests.Response] = None
         req = self._encode(method, url, query_params, data, headers, encoding)
         checker = RetryCheckRunner(self.retry_checks)
+        log.debug("transport request state initialized")
         for attempt in range(self.max_retries + 1):
+            log.debug("transport request retry cycle. attempt=%d", attempt)
             # add Authorization header, or (if it's a NullAuthorizer) possibly
             # explicitly remove the Authorization header
             # done fresh for each request, to handle potential for refreshed credentials
@@ -224,22 +232,31 @@ class RequestsTransport:
 
             ctx = RetryContext(attempt, authorizer=authorizer)
             try:
+                log.debug("request about to send")
                 resp = ctx.response = self.session.send(
                     req.prepare(), timeout=self.http_timeout, verify=self.verify_ssl
                 )
             except requests.RequestException as err:
+                log.debug("request hit error (RequestException)")
                 ctx.exception = err
                 if attempt >= self.max_retries or not checker.should_retry(ctx):
+                    log.warning("request done (fail, error)")
                     raise exc.convert_request_exception(err)
+                log.debug("request may retry (should-retry=true)")
             else:
+                log.debug("request success, still check should-retry")
                 if not checker.should_retry(ctx):
+                    log.info("request done (success)")
                     return resp
+                log.debug("request may retry, will check attempts")
 
             # the request will be retried, so sleep...
             if attempt < self.max_retries:
+                log.debug("under attempt limit, will sleep")
                 self._retry_sleep(ctx)
         if resp is None:
             raise ValueError("Somehow, retries ended without a response")
+        log.warning("request reached max retries, done (fail, response)")
         return resp
 
     # decorator which lets you add a check to a retry policy

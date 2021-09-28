@@ -1,9 +1,12 @@
 import enum
+import logging
 from typing import Callable, Dict, List, Optional, cast
 
 import requests
 
 from globus_sdk.authorizers import GlobusAuthorizer
+
+log = logging.getLogger(__name__)
 
 
 class RetryContext:
@@ -130,6 +133,9 @@ class RetryCheckRunner:
                     self._check_data[check]["has_run"] = True
 
             result = check(context)
+            log.debug(  # try to get name but don't fail if it's not a function...
+                "ran retry check (%s) => %s", getattr(check, "__name__", check), result
+            )
             if result is RetryCheckResult.no_decision:
                 continue
             elif result is RetryCheckResult.do_not_retry:
