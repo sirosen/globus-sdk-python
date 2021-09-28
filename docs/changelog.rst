@@ -13,16 +13,16 @@ to a major new version of the SDK.
 Unreleased
 ----------
 
-v3.0.1
-------
+v3.0.1 (2021-09-15)
+-------------------
 
 * ``ScopeBuilder`` objects now define the type of ``__getattr__`` for ``mypy`` to
   know that dynamic attributes are strings (:pr:`472`)
 * Fix remaining ``type: ignore`` usages in globus-sdk (:pr:`473`)
 * Fix malformed PEP508 ``python_version`` bound in dev dependencies (:pr:`474`)
 
-v3.0.0
-------
+v3.0.0 (2021-09-14)
+-------------------
 
 * Add ``filter_is_error`` parameter to advanced task list (:pr:`467`)
 * Add a ``LocalGlobusConnectPersonal.get_owner_info()`` for looking up local
@@ -32,8 +32,8 @@ v3.0.0
 * Remove support for ``bytes`` values for fields consuming UUIDs (:pr:`471`)
 * Add support for specifying ``config_dir`` to ``LocalGlobusConnectPersonal`` (:pr:`470`)
 
-v3.0.0b4
---------
+v3.0.0b4 (2021-09-01)
+---------------------
 
 * Minor fix to wheel builds: do not declare wheels as universal (:pr:`444`)
 * Add a new ``GCSClient`` class for interacting with GCS Manager APIs
@@ -58,8 +58,8 @@ v3.0.0b4
 * All type annotations for ``Sequence`` which could be relaxed to ``Iterable``
   have been updated (:pr:`465`)
 
-v3.0.0b3
---------
+v3.0.0b3 (2021-08-13)
+---------------------
 
 * Flesh out the ``GroupsClient`` and add helpers for interacting with the
   Globus Groups service, including enumerated constants, payload builders, and
@@ -69,8 +69,8 @@ v3.0.0b3
   allowing type checkers like ``mypy`` to catch a much wider range of usage
   errors (:pr:`442`)
 
-v3.0.0b2
---------
+v3.0.0b2 (2021-07-16)
+---------------------
 
 * Add scope constants and scope construction helpers. See new documentation on
   :ref:`scopes and ScopeBuilders <scopes>` for details (:pr:`437`, :pr:`440`)
@@ -83,9 +83,8 @@ v3.0.0b2
   applicable. See the :ref:`ErrorInfo documentation <error_info>` for details
   (:pr:`441`)
 
-v3.0.0b1
---------
-
+v3.0.0b1 (2021-07-02)
+---------------------
 
 * Add support for ``TransferClient.get_shared_endpoint_list`` (:pr:`434`)
 * Passthrough parameters to SDK methods for query params and body params are no
@@ -97,16 +96,16 @@ v3.0.0b1
   ``max_retries`` may now be supplied directly as ``transport_params``
   (:pr:`430`)
 
-v3.0.0a4
---------
+v3.0.0a4 (2021-06-28)
+---------------------
 
 * Fix several paginators which were broken in ``3.0.0a3`` (:pr:`431`)
 * Add ``BaseClient`` to the top-level exports of ``globus_sdk``, so it can now
   be accessed under the name ``globus_sdk.BaseClient``
 * Autodocumentation of paginated methods (:pr:`432`)
 
-v3.0.0a3
---------
+v3.0.0a3 (2021-06-25)
+---------------------
 
 * Pagination has changed significantly. (:pr:`418`)
 
@@ -125,8 +124,8 @@ v3.0.0a3
    types, use ``items()``, as in
    ``client.paginated.endpoint_search("query").items()``
 
-v3.0.0a2
---------
+v3.0.0a2 (2021-06-10)
+---------------------
 
 * Refactor response classes (:pr:`425`)
 * A new subpackage is available for public use,
@@ -134,8 +133,8 @@ v3.0.0a2
 * Add client for Globus Groups API, ``globus_sdk.GroupsClient``. Includes a
   dedicated error class, ``globus_sdk.GroupsAPIError``
 
-v3.0.0a1
---------
+v3.0.0a1 (2021-06-04)
+---------------------
 
 * Update documentation site style and layout (:pr:`423`)
 * The interface for ``GlobusAuthorizer`` now defines
@@ -169,42 +168,42 @@ v3.0.0a1
 
 .. _changelog_version2:
 
-v2.0.1
-------
+v2.0.1 (2021-02-02)
+-------------------
 
 * Remove support for python2 (:pr:`396`, :pr:`397`, :pr:`398`)
 
 .. note:: globus-sdk version 2.0.0 was yanked due to a release issue.
           Version 2.0.1 is the first 2.x version.
 
-v1.11.0
--------
+v1.11.0 (2021-01-29)
+--------------------
 
 * Add support for task skipped errors via
   ``TransferClient.task_skipped_errors`` and
   ``TransferClient.endpoint_manager_task_skipped_errors`` (:pr:`393`)
 * Internal maintenance (:pr:`389`, :pr:`390`, :pr:`391`, :pr:`392`)
 
-v1.10.0
--------
+v1.10.0 (2020-12-18)
+--------------------
 
 * Add support for pyinstaller installation of globus-sdk (:pr:`387`)
 
-v1.9.1
-------
+v1.9.1 (2020-08-27)
+-------------------
 
 * Fix ``GlobusHTTPResponse`` to handle responses with no ``Content-Type`` header (:pr:`375`)
 
-v1.9.0
-------
+v1.9.0 (2020-03-05)
+-------------------
 
 * Add ``globus_sdk.IdentityMap``, a mapping-like object for Auth ID lookups (:pr:`367`)
 * Minor documentation and build improvements (:pr:`369`, :pr:`362`)
 * Don't append trailing slashes when no path is given to a low-level client method like ``get()`` (:pr:`364`)
 * Add ``external_checksum`` and ``checksum_algorithm`` to ``TransferData.add_item()`` named arguments (:pr:`365`)
 
-v1.8.0
-------
+v1.8.0 (2019-07-11)
+-------------------
 
 * Add a property to paginated results which shows if more results are available (:pr:`346`)
 * Update docs to state that Globus SDK uses semver (:pr:`357`)
@@ -212,26 +211,26 @@ v1.8.0
 * Fix typo in endpoint_search log message (:pr:`355`)
 * Fix Globus Web App activation links in docs (:pr:`356`)
 
-v1.7.1
-------
+v1.7.1 (2019-02-21)
+-------------------
 
 * Allow arbitrary keyword args to ``TransferData.add_item()`` and ``DeleteData.add_item()``, which passthrough to the item bodies (:pr:`339`)
 * Minor internal improvements (:pr:`342`, :pr:`343`)
 
-v1.7.0
-------
+v1.7.0 (2018-12-18)
+-------------------
 
 * Add ``get_task`` and ``get_task_list`` to ``SearchClient`` (:pr:`335`, :pr:`336`)
 * Internal maintenance and testing improvements (:pr:`331`, :pr:`334`, :pr:`333`)
 
-v1.6.1
-------
+v1.6.1 (2018-10-30)
+-------------------
 
 * Replace egg distribution format with wheels (:pr:`314`)
 * Internal maintenance
 
-v1.6.0
-------
+v1.6.0 (2018-08-29)
+-------------------
 
 * Correct handling of environment="production" as an argument to client construction (:pr:`307`)
 * RenewingAuthorizer and its subclasses now expose the check_expiration_time method (:pr:`309`)
@@ -243,59 +242,59 @@ v1.6.0
 * Malformed SDK usage may now raise GlobusSDKUsageError instead of ValueError. GlobusSDKUsageError inherits from ValueError (:pr:`281`)
 * Numerous documentation improvements (:pr:`279`, :pr:`294`, :pr:`296`, :pr:`297`)
 
-v1.5.0
-------
+v1.5.0 (2018-02-09)
+-------------------
 
 * Add support for retrieving a local Globus Connect Personal endpoint's UUID (:pr:`276`)
 * Fix bug in search client parameter handling (:pr:`274`)
 
-v1.4.1
-------
+v1.4.1 (2017-12-20)
+-------------------
 
 * Send ``Content-Type: application/json`` on requests with JSON request bodies (:pr:`266`)
 * Support connection timeouts. Default timeout of 60 seconds (:pr:`264`)
 
-v1.4.0
-------
+v1.4.0 (2017-12-13)
+-------------------
 
 * Access token response data by way of scope name (:pr:`261`)
 * Make ``cryptography`` a strict requirement, globus-sdk[jwt] is no longer necessary (:pr:`257`, :pr:`260`)
 * Simplify OAuthTokenResponse.decode_id_token to not require the client as an argument (:pr:`255`)
 * Add (beta) SearchClient class (:pr:`259`)
 
-v1.3.0
-------
+v1.3.0 (2017-11-20)
+-------------------
 
 * Improve error message when installation onto python2.6 is attempted (:pr:`245`)
 * Raise errors on client instantiation when ``GLOBUS_SDK_ENVIRONMENT`` appears to be invalid, support ``GLOBUS_SDK_ENVIRONMENT=preview`` (:pr:`247`)
 
-v1.2.2
-------
+v1.2.2 (2017-11-01)
+-------------------
 
 * Allow client classes to accept ``base_url`` as an argument to ``_init__()`` (:pr:`241`)
 * Fix packaging to not include testsuite (:pr:`232`)
 * Improve docs on ``TransferClient`` helper classes (:pr:`231`, :pr:`233`)
 
-v1.2.1
-------
+v1.2.1 (2017-09-29)
+-------------------
 
 * Use PyJWT instead of python-jose for JWT support (:pr:`227`)
 
-v1.2.0
-------
+v1.2.0 (2017-08-18)
+-------------------
 
 * Add Transfer symlink support (:pr:`218`)
 * Better handle UTF-8 inputs (:pr:`208`)
 * Fix endpoint manager resume (:pr:`224`)
 * Doc Updates & Minor Improvements
 
-v1.1.1
-------
+v1.1.1 (2017-05-19)
+-------------------
 
 * Use correct paging style when making ``endpoint_manager_task_list`` calls (:pr:`210`)
 
-v1.1.0
-------
+v1.1.0 (2017-05-01)
+-------------------
 
 * Add endpoint_manager methods to TransferClient (:pr:`191`, :pr:`199`, :pr:`200`, :pr:`201`, :pr:`203`)
 * Change "identities_set" to "identity_set" for token introspection (:pr:`163`)
@@ -306,40 +305,40 @@ v1.1.0
 * Update dev status classifier to 5, prod (:pr:`178`)
 * Numerous improvements to testsuite
 
-v1.0.0
-------
+v1.0.0 (2017-04-10)
+-------------------
 
 * Adds ``AuthAPIError`` with more flexible error payload handling (:pr:`175`)
 
-v0.7.2
-------
+v0.7.2 (2017-04-05)
+-------------------
 
 * Add ``AuthClient.validate_token`` (:pr:`172`)
 * Bugfix for ``on_refresh`` users of ``RefreshTokenAuthorizer`` and ``ClientCredentialsAuthorizer`` (:pr:`173`)
 
-v0.7.1
-------
+v0.7.1 (2017-04-03)
+-------------------
 
 * Remove deprecated ``oauth2_start_flow_*`` methods (:pr:`170`)
 * Add the ``ClientCredentialsAuthorizer`` (:pr:`164`)
 * Add ``jwt`` extra install target. ``pip install "globus_sdk[jwt]"`` installs ``python-jose`` (:pr:`169`)
 
-v0.7.0
-------
+v0.7.0 (2017-03-30)
+-------------------
 
 * Make ``OAuthTokenResponse.decode_id_token()`` respect ``ssl_verify=no`` configuration (:pr:`161`)
 * Remove all properties of ``OAuthTokenResponse`` other than ``by_resource_server`` (:pr:`162`)
 
-v0.6.0
-------
+v0.6.0 (2017-03-21)
+-------------------
 
 * Opt out of the Globus Auth behavior where a ``GET`` of an identity username will provision that identity (:pr:`145`)
 * Fixup OAuth2 PKCE to be spec-compliant (:pr:`154`)
 * Wrap some ``requests`` network-related errors in custom exceptions (:pr:`155`)
 * Add ``deadline`` support to ``TransferData`` and ``DeleteData`` (:pr:`159`)
 
-v0.5.1
-------
+v0.5.1 (2017-02-25)
+-------------------
 
 * Add support for the ``prefill_named_grant`` option to the Native App authorization flow (:pr:`143`)
 * Unicode string improvements (:pr:`129`)
