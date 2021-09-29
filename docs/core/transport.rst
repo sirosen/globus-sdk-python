@@ -11,7 +11,7 @@ Transport
 ~~~~~~~~~
 
 .. autoclass:: globus_sdk.transport.RequestsTransport
-   :members: request
+   :members:
    :member-order: bysource
 
 Retries
