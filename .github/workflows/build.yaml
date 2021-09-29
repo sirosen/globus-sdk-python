@@ -35,6 +35,10 @@ jobs:
         run: python -m tox -e lint
       - name: Run Tests
         run: python -m tox -e py -- --cov-report="term-missing:skip-covered"
+      - name: Mindeps Test
+        # mindeps runs on py36, as "the oldest everything"
+        if: ${{ matrix.python-version == '3.6' && matrix.os == 'ubuntu-latest' }}
+        run: python -m tox -e py-mindeps
       - name: Ensure docs build
         # docs are only ever built on a linux 3.9 box (readthedocs)
         if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' }}

@@ -62,7 +62,13 @@ setup(
     package_dir={"": "src"},
     package_data={"globus_sdk": ["py.typed"]},
     python_requires=">=3.6",
-    install_requires=["requests>=2.9.2,<3.0.0", "pyjwt[crypto]>=2.0.0,<3.0.0"],
+    install_requires=[
+        "requests>=2.19.1,<3.0.0",
+        "pyjwt[crypto]>=2.0.0,<3.0.0",
+        # cryptography 3.4.0 is known-bugged, see:
+        #   https://github.com/pyca/cryptography/issues/5756
+        "cryptography>=2.0,<3.7,!=3.4.0",
+    ],
     extras_require={"dev": DEV_REQUIREMENTS},
     keywords=["globus"],
     classifiers=[
