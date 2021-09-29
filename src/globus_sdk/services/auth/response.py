@@ -4,7 +4,7 @@ import time
 from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union, cast
 
 import jwt
-from cryptography.hazmat.backends.openssl.rsa import RSAPublicKey
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 from globus_sdk import exc
 from globus_sdk.response import GlobusHTTPResponse
