@@ -13,6 +13,13 @@ to a major new version of the SDK.
 Unreleased
 ----------
 
+v3.0.2 (2021-09-29)
+-------------------
+
+* Update the minimum dependency versions to lower bounds which are verified to
+  work with the testsuite (:pr:`482`)
+* Produce more debug logging when SDK logs are enabled (:pr:`480`)
+
 v3.0.1 (2021-09-15)
 -------------------
 
