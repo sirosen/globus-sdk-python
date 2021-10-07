@@ -10,8 +10,7 @@ See :ref:`versioning` for our versioning policy.
 The :ref:`upgrading <upgrading>` doc is a good reference if you are upgrading
 to a major new version of the SDK.
 
-Unreleased
-----------
+.. scriv-insert-here
 
 v3.0.2 (2021-09-29)
 -------------------
