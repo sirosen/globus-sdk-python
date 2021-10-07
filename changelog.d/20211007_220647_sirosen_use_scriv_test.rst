@@ -7,4 +7,4 @@
 .. fill this in with links to the PR (if appropriate) or remove it.
 ..
 
-* foo (:pr:`NUMBER`)
+* foo (:pr:`2`)
