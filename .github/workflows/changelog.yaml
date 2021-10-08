@@ -20,27 +20,3 @@ jobs:
             echo "No news files seen"
             exit 1
           fi
-  update_pr_number:
-    needs: check_has_news_in_changelog_dir
-    if: ${{ success() && ! contains(github.event.pull_request.labels.*.name, 'no-news-is-good-news') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:  # explicitly checkout the PR head so that push can work
-          ref: ${{ github.head_ref }}
-      - uses: actions/setup-python@v2
-      - name: update any PR numbers in change fragments
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-        run: |
-          python ./changelog.d/update-pr-refs.py
-          if [ "$(git status --porcelain)" = "" ]; then
-            echo "no changes"
-          else
-            git add changelog.d/
-            git \
-              -c user.name="GitHub Actions Bot" \
-              -c user.email="git@github.com" \
-              commit -m '(actions) update PR reference'
-            git push origin
-          fi
