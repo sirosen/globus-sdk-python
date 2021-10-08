@@ -1,0 +1,27 @@
+name: changelog
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update_pr_numbers_in_change_fragments:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - name: update any PR numbers in change fragments
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          python ./changelog.d/update-pr-refs.py
+          if [ "$(git status --porcelain)" = "" ]; then
+            echo "no changes"
+          else
+            git add changelog.d/
+            git \
+              -c user.name="GitHub Actions" \
+              -c user.email="git@github.com" \
+              commit -m '(actions) update PR references'
+            git push origin
+          fi
