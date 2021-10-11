@@ -43,7 +43,7 @@ def update_file(fname: str, pr_num: t.Optional[str]) -> None:
         content = content.replace(":pr:`NUMBER`", f":pr:`{pr_num}`")
     else:
         content = content.replace("(:pr:`NUMBER`)", "")
-        content = "\n".join([line.rstrip() for line in content.splitlines()])
+        content = "\n".join([line.rstrip() for line in content.splitlines()]) + "\n"
 
     with open(fname, "w") as f:
         f.write(content)
