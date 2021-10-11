@@ -9,15 +9,13 @@ from .data import CollectionDocument
 from .errors import GCSAPIError
 from .response import IterableGCSResponse, UnpackingGCSResponse
 
-RT = TypeVar("RT")
+C = TypeVar("C", bound=Callable)
 
 
-def _gcsdoc(
-    message: str, link: str
-) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
+def _gcsdoc(message: str, link: str) -> Callable[[C], C]:
     # do not use functools.partial because it doesn't preserve type information
     # see: https://github.com/python/mypy/issues/1484
-    def partial(func: Callable) -> Callable:
+    def partial(func: C) -> C:
         return utils.doc_api_method(
             message,
             link,

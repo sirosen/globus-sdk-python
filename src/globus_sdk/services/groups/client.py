@@ -7,15 +7,13 @@ from globus_sdk.types import UUIDLike
 from .data import BatchMembershipActions, GroupPolicies
 from .errors import GroupsAPIError
 
-RT = TypeVar("RT")
+C = TypeVar("C", bound=Callable)
 
 
-def _groupdoc(
-    message: str, link: str
-) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
+def _groupdoc(message: str, link: str) -> Callable[[C], C]:
     # do not use functools.partial because it doesn't preserve type information
     # see: https://github.com/python/mypy/issues/1484
-    def partial(func: Callable) -> Callable:
+    def partial(func: C) -> C:
         return utils.doc_api_method(
             message,
             link,

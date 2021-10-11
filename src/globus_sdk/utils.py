@@ -5,7 +5,7 @@ from base64 import b64encode
 from enum import Enum
 from typing import Any, Callable, Generator, Iterable, Optional, TypeVar
 
-T = TypeVar("T")
+C = TypeVar("C", bound=Callable)
 
 
 def sha256_string(s: str) -> str:
@@ -41,8 +41,8 @@ def doc_api_method(
     external_format_str: str = (
         "See `{message} <{base_url}/{link}>`_ in the API documentation for details."
     ),
-) -> Callable[[Callable[..., T]], Callable[..., T]]:
-    def decorate(func: Callable[..., T]) -> Callable[..., T]:
+) -> Callable[[C], C]:
+    def decorate(func: C) -> C:
         func.__doc__ = f"""{func.__doc__}
 
         **External Documentation**

@@ -1,6 +1,8 @@
-from typing import Any, Callable, Dict, Optional, Type, cast
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast
 
 from .base import Paginator
+
+C = TypeVar("C", bound=Callable)
 
 
 # stub for mypy
@@ -31,7 +33,7 @@ def has_paginator(
     >>> paginator = c.paginated.foo()
     """
 
-    def decorate(func: Callable) -> Callable:
+    def decorate(func: C) -> C:
         as_paginated = cast(_PaginatedFunc, func)
         as_paginated._has_paginator = True
         as_paginated._paginator_class = paginator_class
