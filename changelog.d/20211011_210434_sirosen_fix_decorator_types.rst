@@ -8,4 +8,4 @@
 ..
 
 * Fix several internal decorators which were destroying type information about
-  decorated functions. Type signatures of many methods are therefore corrected (:pr:`NUMBER`)
+  decorated functions. Type signatures of many methods are therefore corrected (:pr:`485`)
