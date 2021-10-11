@@ -12,6 +12,12 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.0.3 (2021-10-11)
+===================
+
+* Fix several internal decorators which were destroying type information about
+  decorated functions. Type signatures of many methods are therefore corrected (:pr:`485`)
+
 v3.0.2 (2021-09-29)
 -------------------
 
