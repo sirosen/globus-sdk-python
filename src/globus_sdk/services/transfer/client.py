@@ -13,9 +13,23 @@ from .response import ActivationRequirementsResponse, IterableTransferResponse
 
 log = logging.getLogger(__name__)
 
+TransferFilterDict = Dict[str, Union[str, List[str]]]
+
 
 def _datelike_to_str(x: DateLike) -> str:
     return x if isinstance(x, str) else x.isoformat(timespec="seconds")
+
+
+def _format_filter_value(x: Union[str, List[str]]) -> str:
+    if isinstance(x, str):
+        return x
+    return ",".join(x)
+
+
+def _format_filter(x: Union[str, TransferFilterDict]) -> str:
+    if isinstance(x, str):
+        return x
+    return "/".join(f"{k}:{_format_filter_value(v)}" for k, v in x.items())
 
 
 def _get_page_size(paged_result: IterableTransferResponse) -> int:
@@ -40,6 +54,25 @@ class TransferClient(client.BaseClient):
                        Globus Transfer
     :type authorizer: :class:`GlobusAuthorizer\
                       <globus_sdk.authorizers.base.GlobusAuthorizer>`
+
+    .. _transfer_filter_formatting:
+
+    **Filter Formatting**
+
+    Several methods of ``TransferClient`` take a ``filter`` parameter which can be a
+    string or dict. When the filter given is a string, it is not modified. When it is a
+    dict, it is formatted according to the following rules.
+
+    - each (key, value) pair in the dict is a clause in the resulting filter string
+    - clauses are each formatted to ``key:value``
+    - when the value is a list, it is comma-separated, as in ``key:value1,value2``
+    - clauses are separated with slashes, as in ``key1:value1/key2:value2``
+
+    The corresponding external API documentation describes, in detail, the supported
+    filter clauses for each method which uses the ``filter`` parameter.
+    Generally, speaking, filter clauses documented as ``string list`` can be passed as
+    lists to a filter dict, while string, date, and numeric filters should be passed as
+    strings.
 
     **Paginated Calls**
 
@@ -965,7 +998,7 @@ class TransferClient(client.BaseClient):
         show_hidden: Optional[bool] = None,
         orderby: Optional[Union[str, List[str]]] = None,
         # note: filter is a soft keyword in python, so using this name is okay
-        filter: Optional[str] = None,
+        filter: Union[str, TransferFilterDict, None] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
@@ -982,9 +1015,11 @@ class TransferClient(client.BaseClient):
             either a field name or a field name followed by a space and 'ASC' or 'DESC'
             for ascending or descending.
         :type orderby: str, optional
-        :param filter: Only return file documents that match these filter clauses. For
-            the filter syntax, see the **External Documentation** linked below.
-        :type filter: str, optional
+        :param filter: Only return file documents which match these filter clauses. For
+            the filter syntax, see the **External Documentation** linked below. If a
+            dict is supplied as the filter, it is formatted as a set of filter clauses.
+            See :ref:`filter formatting <transfer_filter_formatting>` for details.
+        :type filter: str or dict, optional
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
 
@@ -1005,6 +1040,17 @@ class TransferClient(client.BaseClient):
         >>>     orderby=["type", "name"]
         >>> ):
         >>>     print(entry["name DESC"], entry["type"])
+
+        List filtering to files modified before January 1, 2021. Note the use of an
+        empty "start date" for the filter:
+
+        >>> tc = globus_sdk.TransferClient(...)
+        >>> for entry in tc.operation_ls(
+        >>>     ep_id,
+        >>>     path="/~/project1/",
+        >>>     filter={"last_modified": ["", "2021-01-01"]},
+        >>> ):
+        >>>     print(entry["name"], entry["type"])
         """
         if query_params is None:
             query_params = {}
@@ -1018,7 +1064,7 @@ class TransferClient(client.BaseClient):
             else:
                 query_params["orderby"] = ",".join(orderby)
         if filter is not None:
-            query_params["filter"] = filter
+            query_params["filter"] = _format_filter(filter)
 
         log.info(f"TransferClient.operation_ls({endpoint_id}, {query_params})")
         return IterableTransferResponse(
@@ -1250,6 +1296,7 @@ class TransferClient(client.BaseClient):
         *,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        filter: Union[str, TransferFilterDict, None] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
         """
@@ -1261,6 +1308,11 @@ class TransferClient(client.BaseClient):
         :type limit: int, optional
         :param offset: offset used in paging
         :type offset: int, optional
+        :param filter: Only return task documents which match these filter clauses. For
+            the filter syntax, see the **External Documentation** linked below. If a
+            dict is supplied as the filter, it is formatted as a set of filter clauses.
+            See :ref:`filter formatting <transfer_filter_formatting>` for details.
+        :type filter: str or dict, optional
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
 
@@ -1270,9 +1322,30 @@ class TransferClient(client.BaseClient):
 
         >>> tc = TransferClient(...)
         >>> for task in tc.task_list(limit=10):
-        >>>     print("Task({}): {} -> {}".format(
-        >>>         task["task_id"], task["source_endpoint"],
-        >>>         task["destination_endpoint"]))
+        >>>     print(
+        >>>         "Task({}): {} -> {}".format(
+        >>>             task["task_id"],
+        >>>             task["source_endpoint"],
+        >>>             task["destination_endpoint"]
+        >>>         )
+        >>>     )
+
+        Fetch 3 *specific* tasks using a ``task_id`` filter:
+
+        >>> tc = TransferClient(...)
+        >>> task_ids = [
+        >>>     "acb4b581-b3f3-403a-a42a-9da97aaa9961",
+        >>>     "39447a3c-e002-401a-b95c-f48b69b4c60a",
+        >>>     "02330d3a-987b-4abb-97ed-6a22f8fa365e",
+        >>> ]
+        >>> for task in tc.task_list(filter={"task_id": task_ids}):
+        >>>     print(
+        >>>         "Task({}): {} -> {}".format(
+        >>>             task["task_id"],
+        >>>             task["source_endpoint"],
+        >>>             task["destination_endpoint"]
+        >>>         )
+        >>>     )
         """
         log.info("TransferClient.task_list(...)")
         if query_params is None:
@@ -1281,6 +1354,8 @@ class TransferClient(client.BaseClient):
             query_params["limit"] = limit
         if offset is not None:
             query_params["offset"] = offset
+        if filter is not None:
+            query_params["filter"] = _format_filter(filter)
         return IterableTransferResponse(
             self.get("task_list", query_params=query_params)
         )
