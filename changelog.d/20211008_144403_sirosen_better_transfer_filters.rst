@@ -8,8 +8,8 @@
 .. if you like.)
 ..
 
-* Add ``filter`` as a supported parameter to ``TransferClient.task_list`` (:pr:`NUMBER`)
+* Add ``filter`` as a supported parameter to ``TransferClient.task_list`` (:pr:`484`)
 * The ``filter`` parameter to ``TransferClient.task_list`` and
   ``TransferClient.operation_ls`` can now be passed as a ``Dict[str, str | List[str]]``.
   Documentation on the ``TransferClient`` explains how this will be formatted,
-  and is linked from the param docs for ``filter`` on each method (:pr:`NUMBER`)
+  and is linked from the param docs for ``filter`` on each method (:pr:`484`)
