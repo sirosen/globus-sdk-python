@@ -67,7 +67,16 @@ setup(
         "pyjwt[crypto]>=2.0.0,<3.0.0",
         # cryptography 3.4.0 is known-bugged, see:
         #   https://github.com/pyca/cryptography/issues/5756
-        "cryptography>=2.0,<3.7,!=3.4.0",
+        #
+        # pyjwt requires cryptography>=3.3.1,
+        # so there's no point in setting a lower bound than that
+        #
+        # as of 2021-10-13, we have removed the upper-bound, on the grounds that
+        # - we actively test on the latest versions
+        # - cryptography has a strong API stability policy that makes most releases
+        #   non-breaking for our usages
+        # - other packages /consumers can specify stricter bounds if necessary
+        "cryptography>=3.3.1,!=3.4.0",
     ],
     extras_require={"dev": DEV_REQUIREMENTS},
     keywords=["globus"],
