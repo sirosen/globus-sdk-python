@@ -12,6 +12,19 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.1.0 (2021-10-13)
+===================
+
+* Add ``filter`` as a supported parameter to ``TransferClient.task_list`` (:pr:`484`)
+* The ``filter`` parameter to ``TransferClient.task_list`` and
+  ``TransferClient.operation_ls`` can now be passed as a ``Dict[str, str | List[str]]``.
+  Documentation on the ``TransferClient`` explains how this will be formatted,
+  and is linked from the param docs for ``filter`` on each method (:pr:`484`)
+* Adjust package metadata for `cryptography` dependency, specifying
+  `cryptography>=3.3.1` and no upper bound. This is meant to help mitigate
+  issues in which an older `cryptography` version is installed gets used in
+  spite of it being incompatible with `pyjwt[crypto]>=2.0` (:pr:`486`)
+
 v3.0.3 (2021-10-11)
 ===================
 
