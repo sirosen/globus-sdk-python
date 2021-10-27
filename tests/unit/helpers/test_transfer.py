@@ -156,3 +156,44 @@ def test_delete_add_item(delete_data):
     data = ddata["DATA"][0]
     assert data["DATA_TYPE"] == "delete_item"
     assert data["path"] == path
+
+
+def test_delete_iter_items(delete_data):
+    ddata = delete_data()
+    # add item
+    ddata.add_item("abc/")
+    ddata.add_item("def/")
+
+    # order preserved, well-formed
+    as_list = list(ddata.iter_items())
+    assert len(as_list) == 2
+
+    def check_item(x, path):
+        assert isinstance(x, dict)
+        assert x.get("DATA_TYPE") == "delete_item"
+        assert x.get("path") == path
+
+    check_item(as_list[0], "abc/")
+    check_item(as_list[1], "def/")
+
+
+def test_transfer_iter_items(transfer_data):
+    tdata = transfer_data()
+    tdata.add_item("source/abc.txt", "dest/abc.txt")
+    tdata.add_item("source/def/", "dest/def/", recursive=True)
+
+    # order preserved, well-formed
+    as_list = list(tdata.iter_items())
+    assert len(as_list) == 2
+
+    def check_item(x, src, dst, params=None):
+        params = params or {}
+        assert isinstance(x, dict)
+        assert x.get("DATA_TYPE") == "transfer_item"
+        assert x.get("source_path") == src
+        assert x.get("destination_path") == dst
+        for k, v in params.items():
+            assert x.get(k) == v
+
+    check_item(as_list[0], "source/abc.txt", "dest/abc.txt")
+    check_item(as_list[1], "source/def/", "dest/def/", {"recursive": True})

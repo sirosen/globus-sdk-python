@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
 
 from globus_sdk import utils
 from globus_sdk.types import UUIDLike
@@ -125,3 +125,11 @@ class DeleteData(utils.PayloadWrapper):
             item_data.update(additional_fields)
         log.debug('DeleteData[{}].add_item: "{}"'.format(self["endpoint"], path))
         self["DATA"].append(item_data)
+
+    def iter_items(self) -> Iterator[Dict[str, Any]]:
+        """
+        An iterator of items created by ``add_item``.
+
+        Each item takes the form of a dictionary.
+        """
+        yield from iter(self["DATA"])
