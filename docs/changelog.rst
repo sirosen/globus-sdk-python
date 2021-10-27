@@ -13,7 +13,7 @@ to a major new version of the SDK.
 .. scriv-insert-here
 
 v3.1.0 (2021-10-13)
-===================
+-------------------
 
 * Add ``filter`` as a supported parameter to ``TransferClient.task_list`` (:pr:`484`)
 * The ``filter`` parameter to ``TransferClient.task_list`` and
@@ -26,7 +26,7 @@ v3.1.0 (2021-10-13)
   spite of it being incompatible with `pyjwt[crypto]>=2.0` (:pr:`486`)
 
 v3.0.3 (2021-10-11)
-===================
+-------------------
 
 * Fix several internal decorators which were destroying type information about
   decorated functions. Type signatures of many methods are therefore corrected (:pr:`485`)
