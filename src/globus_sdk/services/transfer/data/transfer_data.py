@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
 
 from globus_sdk import utils
 from globus_sdk.types import UUIDLike
@@ -226,7 +226,7 @@ class TransferData(utils.PayloadWrapper):
 
         :param source_path: Path to the source directory or file to be transferred
         :type source_path: str
-        :param destination_path: Path to the source directory or file will be
+        :param destination_path: Path to the destination directory or file will be
             transferred to
         :type destination_path: str
         :param recursive: Set to True if the target at source path is a directory
@@ -289,3 +289,11 @@ class TransferData(utils.PayloadWrapper):
             )
         )
         self["DATA"].append(item_data)
+
+    def iter_items(self) -> Iterator[Dict[str, Any]]:
+        """
+        An iterator of items created by ``add_item``.
+
+        Each item takes the form of a dictionary.
+        """
+        yield from iter(self["DATA"])
