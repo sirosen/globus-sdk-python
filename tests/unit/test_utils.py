@@ -57,3 +57,16 @@ def test_payload_wrapper_methods():
     assert data.data == {"foo": 1, "bar": 2}
     data.update({"x": "hello", "y": "world"})
     assert data.data == {"foo": 1, "bar": 2, "x": "hello", "y": "world"}
+
+
+# this should work on all python versions, but only means something special on the
+# versions where chainable_classmethod is a custom descriptor
+def test_chainable_classmethod_simple():
+    class Foo:
+        x = {"x": 1}
+
+        @utils.chainable_classmethod
+        def y(cls):
+            return cls.x["x"]
+
+    assert Foo.y() == 1

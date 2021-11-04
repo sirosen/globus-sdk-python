@@ -161,14 +161,6 @@ def test_access_resource_server_property_via_instance(base_client):
         base_client.resource_server == globus_sdk.scopes.TransferScopes.resource_server
     )
 
-    # del is not allowed
-    with pytest.raises(AttributeError):
-        del base_client.resource_server
-
-    # set is not allowed
-    with pytest.raises(AttributeError):
-        base_client.resource_server = "foo"
-
 
 def test_access_resource_server_property_via_class(base_client_class):
     # get works (and returns accurate info)
@@ -176,6 +168,3 @@ def test_access_resource_server_property_via_class(base_client_class):
         base_client_class.resource_server
         == globus_sdk.scopes.TransferScopes.resource_server
     )
-
-    # do not check set and del on the class object -- the descriptor does not define
-    # and operate on these

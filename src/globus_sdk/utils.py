@@ -1,23 +1,14 @@
 import collections
 import collections.abc
 import hashlib
+import sys
 from base64 import b64encode
 from enum import Enum
-from typing import (
-    Any,
-    Callable,
-    Generator,
-    Generic,
-    Iterable,
-    Optional,
-    Type,
-    TypeVar,
-    cast,
-)
+from types import MethodType
+from typing import Any, Callable, Generator, Iterable, Optional, Type, TypeVar
 
 C = TypeVar("C", bound=Callable)
 T = TypeVar("T")
-R = TypeVar("R")
 
 
 def sha256_string(s: str) -> str:
@@ -125,48 +116,46 @@ class PayloadWrapper(collections.UserDict):
     # changing its behavior safely/consistently is simpler
 
 
-class sdk_classproperty(Generic[T, R]):
-    """
-    WARNING: for internal use only.
-    Everything in `globus_sdk.utils` is meant to be internal only, but that holds for
-    this class **in particular**.
+if sys.version_info < (3, 9):
 
-    This is a descriptor which implements `__get__` using `type()` to access the class
-    of the object in a decorator and therefore can be used somewhat
-    like `classmethod(property(...))`
+    class chainable_classmethod:
+        """
+        WARNING: for internal use only.
+        Everything in `globus_sdk.utils` is meant to be internal only, but that holds
+        for this class **in particular**.
 
-    In python3.9, classmethod can be used on other descriptors, such as property.
-    However, in lower python versions, this does not work.
+        In python3.9, classmethod can be used on other descriptors, such as property.
+        However, in lower python versions, this does not work. This is a descriptor
+        which behaves almost identically to the version of classmethod in 3.9.
 
-    After python3.8 EOL, this should be replaced with
+        After python3.8 EOL, this should be replaced with
 
-        @classmethod
-        @property
-        def foo(...): ...
+            @classmethod
+            @property
+            def foo(...): ...
 
-    NOTE: only implements __get__, does not allow for `setter`, `getter`, or `deleter`
-    to be set.
+        For more guidance on how this works, see the python3 descriptor guide:
+          https://docs.python.org/3/howto/descriptor.html#properties
 
-    For more guidance on how this works, see the python3 descriptor guide:
-      https://docs.python.org/3/howto/descriptor.html#properties
+        In particular, the pure python version of `classmethod` shown there is
+        instructive.
+        """
 
-    In particular, the pure python versions of `property` and `classmethod` shown there
-    are instructive.
-    """
+        def __init__(self, func: Callable) -> None:
+            self.func = func
+            self.__doc__ = func.__doc__
 
-    def __init__(self, fget: Callable[[T], R]) -> None:
-        # cast the type of fget -- what we got as the input was an instance method
-        # so we expect it to take 'T' as its type
-        # however, we're turrning this into a class method, so our new fget operates on
-        # the class of T, Type[T]
-        self.fget = cast(Callable[[Type[T]], R], fget)
-        self.__doc__ = fget.__doc__
+        # A couple of these codepaths are marked as no-cover because there aren't very
+        # "normal" ways of writing code to trigger them in the testsuite (e.g. weird MRO
+        # resolution scenarios). However, this is the canonical implementation of a
+        # pure-python version of classmethod for py3.9+ semantics
+        def __get__(self, obj: Any, cls: Optional[Type[T]] = None) -> Any:
+            if cls is None:  # pragma: no cover
+                cls = type(obj)
+            if hasattr(type(self.func), "__get__"):
+                return self.func.__get__(cls)  # type: ignore
+            return MethodType(self.func, cls)  # pragma: no cover
 
-    def __get__(self, obj: T, cls: Optional[Type[T]] = None) -> R:
-        if cls is None:  # pragma: no cover
-            cls = type(obj)
 
-        return self.fget(cls)
-
-    def __set__(self, obj: T, value: Any) -> None:
-        raise AttributeError("Cannot set classproperty")
+else:
+    chainable_classmethod = classmethod
