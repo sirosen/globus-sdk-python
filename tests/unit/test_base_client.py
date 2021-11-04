@@ -6,6 +6,7 @@ from unittest import mock
 import pytest
 
 import globus_sdk
+import globus_sdk.scopes
 from tests.common import get_last_request, register_api_route
 
 
@@ -15,13 +16,19 @@ def auth_client():
 
 
 @pytest.fixture
-def base_client(no_retry_transport):
+def base_client_class(no_retry_transport):
     class CustomClient(globus_sdk.BaseClient):
         base_path = "/v0.10/"
         service_name = "transfer"
         transport_class = no_retry_transport
+        scopes = globus_sdk.scopes.TransferScopes
 
-    return CustomClient()
+    return CustomClient
+
+
+@pytest.fixture
+def base_client(base_client_class):
+    return base_client_class()
 
 
 # not particularly special, just a handy array of codes which should raise
@@ -146,3 +153,29 @@ def test_handle_url_unsafe_chars(base_client):
     res = base_client.get("foo/foo bar")
     assert "x" in res
     assert res["x"] == "y"
+
+
+def test_access_resource_server_property_via_instance(base_client):
+    # get works (and returns accurate info)
+    assert (
+        base_client.resource_server == globus_sdk.scopes.TransferScopes.resource_server
+    )
+
+    # del is not allowed
+    with pytest.raises(AttributeError):
+        del base_client.resource_server
+
+    # set is not allowed
+    with pytest.raises(AttributeError):
+        base_client.resource_server = "foo"
+
+
+def test_access_resource_server_property_via_class(base_client_class):
+    # get works (and returns accurate info)
+    assert (
+        base_client_class.resource_server
+        == globus_sdk.scopes.TransferScopes.resource_server
+    )
+
+    # do not check set and del on the class object -- the descriptor does not define
+    # and operate on these

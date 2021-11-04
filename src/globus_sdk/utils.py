@@ -3,9 +3,21 @@ import collections.abc
 import hashlib
 from base64 import b64encode
 from enum import Enum
-from typing import Any, Callable, Generator, Iterable, Optional, TypeVar
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Generic,
+    Iterable,
+    Optional,
+    Type,
+    TypeVar,
+    cast,
+)
 
 C = TypeVar("C", bound=Callable)
+T = TypeVar("T")
+R = TypeVar("R")
 
 
 def sha256_string(s: str) -> str:
@@ -111,3 +123,50 @@ class PayloadWrapper(collections.UserDict):
     #
     # UserDict inherits from MutableMapping and only defines the dunder methods, so
     # changing its behavior safely/consistently is simpler
+
+
+class sdk_classproperty(Generic[T, R]):
+    """
+    WARNING: for internal use only.
+    Everything in `globus_sdk.utils` is meant to be internal only, but that holds for
+    this class **in particular**.
+
+    This is a descriptor which implements `__get__` using `type()` to access the class
+    of the object in a decorator and therefore can be used somewhat
+    like `classmethod(property(...))`
+
+    In python3.9, classmethod can be used on other descriptors, such as property.
+    However, in lower python versions, this does not work.
+
+    After python3.8 EOL, this should be replaced with
+
+        @classmethod
+        @property
+        def foo(...): ...
+
+    NOTE: only implements __get__, does not allow for `setter`, `getter`, or `deleter`
+    to be set.
+
+    For more guidance on how this works, see the python3 descriptor guide:
+      https://docs.python.org/3/howto/descriptor.html#properties
+
+    In particular, the pure python versions of `property` and `classmethod` shown there
+    are instructive.
+    """
+
+    def __init__(self, fget: Callable[[T], R]) -> None:
+        # cast the type of fget -- what we got as the input was an instance method
+        # so we expect it to take 'T' as its type
+        # however, we're turrning this into a class method, so our new fget operates on
+        # the class of T, Type[T]
+        self.fget = cast(Callable[[Type[T]], R], fget)
+        self.__doc__ = fget.__doc__
+
+    def __get__(self, obj: T, cls: Optional[Type[T]] = None) -> R:
+        if cls is None:  # pragma: no cover
+            cls = type(obj)
+
+        return self.fget(cls)
+
+    def __set__(self, obj: T, value: Any) -> None:
+        raise AttributeError("Cannot set classproperty")
