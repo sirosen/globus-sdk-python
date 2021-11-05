@@ -1,3 +1,4 @@
+import functools
 from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast
 
 from .base import Paginator
@@ -17,7 +18,7 @@ def has_paginator(
     paginator_class: Type[Paginator],
     items_key: Optional[str] = None,
     **paginator_params: Any,
-) -> Callable[[Callable], Callable]:
+) -> Callable[[C], C]:
     """
     Mark a callable -- typically a client method -- as having pagination parameters.
     Usage:
@@ -95,6 +96,7 @@ class PaginatorTable:
         paginator_params = bound_method._paginator_params  # type: ignore
         paginator_items_key = bound_method._paginator_items_key  # type: ignore
 
+        @functools.wraps(bound_method)
         def paginated_method(*args: Any, **kwargs: Any):  # type: ignore
             return paginator_class(
                 bound_method,
