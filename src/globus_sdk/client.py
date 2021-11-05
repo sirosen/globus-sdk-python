@@ -1,6 +1,6 @@
 import logging
 import urllib.parse
-from typing import TYPE_CHECKING, Any, Dict, Optional, Type, Union
+from typing import Any, Dict, Optional, Type, Union
 
 from globus_sdk import config, exc, utils
 from globus_sdk.authorizers import GlobusAuthorizer
@@ -10,11 +10,6 @@ from globus_sdk.scopes import ScopeBuilder
 from globus_sdk.transport import RequestsTransport
 
 log = logging.getLogger(__name__)
-
-if TYPE_CHECKING:
-    _chainable_classmethod = classmethod
-else:
-    _chainable_classmethod = utils.chainable_classmethod
 
 
 class BaseClient:
@@ -110,8 +105,7 @@ class BaseClient:
     def app_name(self, value: str) -> None:
         self._app_name = self.transport.user_agent = value
 
-    @_chainable_classmethod
-    @property
+    @utils.classproperty
     def resource_server(cls) -> Optional[str]:
         """
         The resource_server name for the API and scopes associated with this client.
