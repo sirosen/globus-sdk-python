@@ -57,3 +57,14 @@ def test_payload_wrapper_methods():
     assert data.data == {"foo": 1, "bar": 2}
     data.update({"x": "hello", "y": "world"})
     assert data.data == {"foo": 1, "bar": 2, "x": "hello", "y": "world"}
+
+
+def test_classproperty_simple():
+    class Foo:
+        x = {"x": 1}
+
+        @utils.classproperty
+        def y(cls):
+            return cls.x["x"]
+
+    assert Foo.y == 1

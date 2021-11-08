@@ -1,11 +1,25 @@
 import collections
 import collections.abc
 import hashlib
+import os
+import sys
 from base64 import b64encode
 from enum import Enum
-from typing import Any, Callable, Generator, Iterable, Optional, TypeVar
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Generic,
+    Iterable,
+    Optional,
+    Type,
+    TypeVar,
+    cast,
+)
 
 C = TypeVar("C", bound=Callable)
+T = TypeVar("T")
+R = TypeVar("R")
 
 
 def sha256_string(s: str) -> str:
@@ -111,3 +125,58 @@ class PayloadWrapper(collections.UserDict):
     #
     # UserDict inherits from MutableMapping and only defines the dunder methods, so
     # changing its behavior safely/consistently is simpler
+
+
+def in_sphinx_build() -> bool:  # pragma: no cover
+    # check if `sphinx-build` was used to invoke
+    return os.path.basename(sys.argv[0]) in ["sphinx-build", "sphinx-build.exe"]
+
+
+class _classproperty(Generic[T, R]):
+    """
+    WARNING: for internal use only.
+    Everything in `globus_sdk.utils` is meant to be internal only, but that holds
+    for this class **in particular**.
+
+    This is a well-typed Generic Descriptor which can be used to wrap `classmethod`
+    decorated functions. Usage should be:
+
+        @utils.classproperty
+        def foo(...): ...
+
+    After python3.8 EOL, this should be replaced with
+
+        @classmethod
+        @property
+        def foo(...): ...
+
+    However, this will also require proper mypy support. See also:
+      https://github.com/python/mypy/issues/2563
+
+    For more guidance on how this works, see the python3 descriptor guide:
+      https://docs.python.org/3/howto/descriptor.html#properties
+    """
+
+    def __init__(self, func: Callable[[Type[T]], R]) -> None:
+        self.func = func
+
+    def __get__(self, obj: Any, cls: Type[T]) -> R:
+        return self.func(cls)
+
+
+# if running under sphinx, define this as the stacked classmethod(property(...))
+# decoration, so that proper autodoc generation happens
+if in_sphinx_build():  # pragma: no cover
+
+    def classproperty(func: Callable[[T], R]) -> _classproperty[T, R]:
+        # type ignore this because
+        # - it doesn't match the return type
+        # - mypy doesn't understand classmethod(property(...)) on older pythons
+        return classmethod(property(func))  # type: ignore
+
+
+else:
+
+    def classproperty(func: Callable[[T], R]) -> _classproperty[T, R]:
+        # type cast to convert instance method to class method
+        return _classproperty(cast(Callable[[Type[T]], R], func))

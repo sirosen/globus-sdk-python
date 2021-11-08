@@ -1,8 +1,6 @@
 # type: ignore
 """
 A Globus SDK Sphinx Extension for Autodoc of Class Methods
-
-NOTE: this only works correctly under python3, where unbound methods are functions
 """
 import inspect
 from pydoc import locate
