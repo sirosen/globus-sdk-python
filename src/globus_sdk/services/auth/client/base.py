@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     else:
         from typing_extensions import Literal
 
-from globus_sdk import client, exc, utils
+from globus_sdk import client, exc, paging, utils
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import AuthScopes
@@ -72,6 +72,7 @@ class AuthClient(client.BaseClient):
     .. automethodlist:: globus_sdk.AuthClient
     """
 
+    paginated: paging.PaginatorTable["AuthClient"]
     service_name = "auth"
     error_class = AuthAPIError
     scopes = AuthScopes

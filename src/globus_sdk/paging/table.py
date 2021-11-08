@@ -1,9 +1,23 @@
 import functools
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Optional,
+    Type,
+    TypeVar,
+    cast,
+)
 
 from .base import Paginator
 
+if TYPE_CHECKING:
+    from globus_sdk.client import BaseClient  # noqa: F401
+
 C = TypeVar("C", bound=Callable)
+T = TypeVar("T", bound="BaseClient")
 
 
 # stub for mypy
@@ -58,7 +72,7 @@ def has_paginator(
     return decorate
 
 
-class PaginatorTable:
+class PaginatorTable(Generic[T]):
     """
     A PaginatorTable maps multiple methods of an SDK client to paginated variants.
     Given a method, client.foo annotated with the `has_paginator` decorator, the table
@@ -85,7 +99,7 @@ class PaginatorTable:
     Creation of ``PaginatorTable`` objects is considered a private API.
     """
 
-    def __init__(self, client: Any):
+    def __init__(self, client: T):
         self._client = client
         # _bindings is a lazily loaded table of names -> callables which
         # return paginators

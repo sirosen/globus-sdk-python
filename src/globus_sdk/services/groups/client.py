@@ -1,6 +1,6 @@
 from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
-from globus_sdk import client, response, utils
+from globus_sdk import client, paging, response, utils
 from globus_sdk.scopes import GroupsScopes
 from globus_sdk.types import UUIDLike
 
@@ -35,6 +35,7 @@ class GroupsClient(client.BaseClient):
     .. automethodlist:: globus_sdk.GroupsClient
     """
 
+    paginated: paging.PaginatorTable["GroupsClient"]
     base_path = "/v2/"
     error_class = GroupsAPIError
     service_name = "groups"

@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Callable, Dict, Iterable, Optional, TypeVar, Union
 
-from globus_sdk import client, response, scopes, utils
+from globus_sdk import client, paging, response, scopes, utils
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.types import UUIDLike
 
@@ -41,6 +41,7 @@ class GCSClient(client.BaseClient):
     .. automethodlist:: globus_sdk.GCSClient
     """
 
+    paginated: paging.PaginatorTable["GCSClient"]
     service_name = "globus_connect_server"
     error_class = GCSAPIError
 

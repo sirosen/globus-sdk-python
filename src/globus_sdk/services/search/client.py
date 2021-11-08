@@ -28,6 +28,7 @@ class SearchClient(client.BaseClient):
 
     .. automethodlist:: globus_sdk.SearchClient
     """
+    paginated: paging.PaginatorTable["SearchClient"]
     error_class = SearchAPIError
     service_name = "search"
     scopes = SearchScopes
