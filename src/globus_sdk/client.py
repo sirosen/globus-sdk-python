@@ -38,7 +38,7 @@ class BaseClient:
     error_class: Type[exc.GlobusAPIError] = exc.GlobusAPIError
 
     #: the type of Transport which will be used, defaults to ``RequestsTransport``
-    transport_class: Type = RequestsTransport
+    transport_class: Type[RequestsTransport] = RequestsTransport
 
     #: the scopes for this client may be present as a ``ScopeBuilder``
     scopes: Optional[ScopeBuilder] = None
@@ -50,7 +50,7 @@ class BaseClient:
         base_url: Optional[str] = None,
         authorizer: Optional[GlobusAuthorizer] = None,
         app_name: Optional[str] = None,
-        transport_params: Optional[Dict] = None,
+        transport_params: Optional[Dict[str, Any]] = None,
     ):
         # explicitly check the `service_name` to ensure that it was set
         #
@@ -122,7 +122,7 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> GlobusHTTPResponse:
         """
         Make a GET request to the specified path.
@@ -140,8 +140,8 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[None, Dict, utils.PayloadWrapper] = None,
-        headers: Optional[Dict] = None,
+        data: Union[None, Dict[str, Any], utils.PayloadWrapper] = None,
+        headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> GlobusHTTPResponse:
         """
@@ -167,7 +167,7 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> GlobusHTTPResponse:
         """
         Make a DELETE request to the specified path.
@@ -185,8 +185,8 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[None, Dict, utils.PayloadWrapper] = None,
-        headers: Optional[Dict] = None,
+        data: Union[None, Dict[str, Any], utils.PayloadWrapper] = None,
+        headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> GlobusHTTPResponse:
         """
@@ -212,8 +212,8 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[None, Dict, utils.PayloadWrapper] = None,
-        headers: Optional[Dict] = None,
+        data: Union[None, Dict[str, Any], utils.PayloadWrapper] = None,
+        headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> GlobusHTTPResponse:
         """
@@ -240,8 +240,8 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[None, Dict, utils.PayloadWrapper] = None,
-        headers: Optional[Dict] = None,
+        data: Union[None, Dict[str, Any], utils.PayloadWrapper] = None,
+        headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> GlobusHTTPResponse:
         """

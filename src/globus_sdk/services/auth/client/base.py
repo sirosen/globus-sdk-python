@@ -370,14 +370,14 @@ class AuthClient(client.BaseClient):
 
     @overload
     def oauth2_token(
-        self, form_data: Union[dict, utils.PayloadWrapper]
+        self, form_data: Union[Dict[str, Any], utils.PayloadWrapper]
     ) -> OAuthTokenResponse:
         ...
 
     @overload
     def oauth2_token(
         self,
-        form_data: Union[dict, utils.PayloadWrapper],
+        form_data: Union[Dict[str, Any], utils.PayloadWrapper],
         *,
         body_params: Optional[Dict[str, Any]],
     ) -> OAuthTokenResponse:
@@ -385,14 +385,17 @@ class AuthClient(client.BaseClient):
 
     @overload
     def oauth2_token(
-        self, form_data: Union[dict, utils.PayloadWrapper], *, response_class: Type[RT]
+        self,
+        form_data: Union[Dict[str, Any], utils.PayloadWrapper],
+        *,
+        response_class: Type[RT],
     ) -> RT:
         ...
 
     @overload
     def oauth2_token(
         self,
-        form_data: Union[dict, utils.PayloadWrapper],
+        form_data: Union[Dict[str, Any], utils.PayloadWrapper],
         *,
         body_params: Optional[Dict[str, Any]],
         response_class: Type[RT],
@@ -401,7 +404,7 @@ class AuthClient(client.BaseClient):
 
     def oauth2_token(
         self,
-        form_data: Union[dict, utils.PayloadWrapper],
+        form_data: Union[Dict[str, Any], utils.PayloadWrapper],
         *,
         body_params: Optional[Dict[str, Any]] = None,
         response_class: Union[Type[OAuthTokenResponse], Type[RT]] = OAuthTokenResponse,
@@ -483,7 +486,7 @@ class AuthClient(client.BaseClient):
         openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
         *,
         as_pem: "Literal[False]",
-    ) -> dict:
+    ) -> Dict[str, Any]:
         ...
 
     def get_jwk(
@@ -493,7 +496,7 @@ class AuthClient(client.BaseClient):
         ] = None,
         *,
         as_pem: bool = False,
-    ) -> Union[RSAPublicKey, dict]:
+    ) -> Union[RSAPublicKey, Dict[str, Any]]:
         """
         Fetch the Globus Auth JWK.
 

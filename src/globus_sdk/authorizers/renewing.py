@@ -50,7 +50,7 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         self,
         access_token: Optional[str] = None,
         expires_at: Optional[int] = None,
-        on_refresh: Optional[Callable] = None,
+        on_refresh: Optional[Callable[[OAuthTokenResponse], Any]] = None,
     ):
         self._access_token = None
         self._access_token_hash = None

@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast
 
 from .base import Paginator
 
-C = TypeVar("C", bound=Callable)
+C = TypeVar("C", bound=Callable[..., Any])
 
 
 # stub for mypy
@@ -91,7 +91,7 @@ class PaginatorTable:
         # return paginators
         self._bindings: Dict[str, Callable[..., Paginator]] = {}
 
-    def _add_binding(self, methodname: str, bound_method: Callable) -> None:
+    def _add_binding(self, methodname: str, bound_method: Callable[..., Any]) -> None:
         paginator_class = bound_method._paginator_class  # type: ignore
         paginator_params = bound_method._paginator_params  # type: ignore
         paginator_items_key = bound_method._paginator_items_key  # type: ignore
@@ -108,7 +108,7 @@ class PaginatorTable:
 
         self._bindings[methodname] = paginated_method
 
-    def __getattr__(self, attrname: str) -> Callable:
+    def __getattr__(self, attrname: str) -> Callable[..., Paginator]:
         if attrname not in self._bindings:
             # this could raise AttributeError -- in which case, let it!
             method = getattr(self._client, attrname)

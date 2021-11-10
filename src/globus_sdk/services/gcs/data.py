@@ -191,7 +191,7 @@ class CollectionDocument(utils.PayloadWrapper, abc.ABC):
             self["DATA_TYPE"] = f"collection#{self._deduce_datatype_version()}"
 
     def _set_value(
-        self, key: str, val: Any, callback: Optional[Callable] = None
+        self, key: str, val: Any, callback: Optional[Callable[[Any], Any]] = None
     ) -> None:
         if val is not None:
             self[key] = callback(val) if callback else val
@@ -200,7 +200,7 @@ class CollectionDocument(utils.PayloadWrapper, abc.ABC):
         for k, v in kwargs.items():
             self._set_value(k, v, callback=str)
 
-    def _set_optstrlists(self, **kwargs: Optional[Iterable]) -> None:
+    def _set_optstrlists(self, **kwargs: Optional[Iterable[Any]]) -> None:
         for k, v in kwargs.items():
             self._set_value(k, v, callback=lambda x: list(utils.safe_strseq_iter(x)))
 

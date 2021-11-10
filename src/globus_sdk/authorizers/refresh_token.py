@@ -57,7 +57,7 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         *,
         access_token: Optional[str] = None,
         expires_at: Optional[int] = None,
-        on_refresh: Optional[Callable] = None,
+        on_refresh: Optional[Callable[[OAuthTokenResponse], Any]] = None,
     ):
         log.info(
             "Setting up RefreshTokenAuthorizer with auth_client="

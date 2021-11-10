@@ -6,6 +6,7 @@ import sys
 from base64 import b64encode
 from enum import Enum
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Generator,
@@ -17,9 +18,14 @@ from typing import (
     cast,
 )
 
-C = TypeVar("C", bound=Callable)
+C = TypeVar("C", bound=Callable[..., Any])
 T = TypeVar("T")
 R = TypeVar("R")
+
+if TYPE_CHECKING:
+    PayloadWrapperBase = collections.UserDict[str, Any]
+else:
+    PayloadWrapperBase = collections.UserDict
 
 
 def sha256_string(s: str) -> str:
@@ -69,7 +75,7 @@ def doc_api_method(
     return decorate
 
 
-def safe_strseq_iter(value: Iterable) -> Generator[str, None, None]:
+def safe_strseq_iter(value: Iterable[Any]) -> Generator[str, None, None]:
     """
     Given an Iterable (typically of strings), produce an iterator over it of strings.
     This is a passthrough with two caveats:
@@ -103,7 +109,7 @@ def render_enums_for_api(value: Any) -> Any:
     return value.value if isinstance(value, Enum) else value
 
 
-class PayloadWrapper(collections.UserDict):
+class PayloadWrapper(PayloadWrapperBase):
     """
     A class for defining helper objects which wrap some kind of "payload" dict.
     Typical for helper objects which formulate a request payload, e.g. as JSON.

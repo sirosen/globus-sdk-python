@@ -146,7 +146,7 @@ class RequestsTransport:
         method: str,
         url: str,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[Dict, List, str, None] = None,
+        data: Union[Dict[str, Any], List[Any], str, None] = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> requests.Request:
@@ -192,8 +192,8 @@ class RequestsTransport:
         method: str,
         url: str,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Optional[dict] = None,
-        headers: Optional[dict] = None,
+        data: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
         authorizer: Optional[GlobusAuthorizer] = None,
     ) -> requests.Response:

@@ -15,7 +15,7 @@ class MarkerPaginator(Paginator):
 
     def __init__(
         self,
-        method: Callable,
+        method: Callable[..., Any],
         *,
         items_key: Optional[str] = None,
         client_args: List[Any],

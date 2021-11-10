@@ -167,5 +167,5 @@ class IterableResponse(GlobusHTTPResponse):
         self.iter_key = iter_key
         super().__init__(response, client)
 
-    def __iter__(self) -> Iterator[Mapping]:
-        return iter(cast(Mapping, self)[self.iter_key])
+    def __iter__(self) -> Iterator[Mapping[Any, Any]]:
+        return iter(cast(Mapping[Any, Any], self)[self.iter_key])

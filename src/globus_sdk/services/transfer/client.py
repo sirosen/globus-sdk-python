@@ -421,7 +421,7 @@ class TransferClient(client.BaseClient):
         self,
         endpoint_id: UUIDLike,
         *,
-        requirements_data: Optional[dict],
+        requirements_data: Optional[Dict[str, Any]],
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """

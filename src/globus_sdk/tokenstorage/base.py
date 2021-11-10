@@ -1,7 +1,7 @@
 import abc
 import contextlib
 import os
-from typing import Dict, Iterator, Optional
+from typing import Any, Dict, Iterator, Optional
 
 from globus_sdk.services.auth import OAuthTokenResponse
 
@@ -12,7 +12,7 @@ class StorageAdapter(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_token_data(self, resource_server: str) -> Optional[Dict]:
+    def get_token_data(self, resource_server: str) -> Optional[Dict[str, Any]]:
         """
         Lookup token data for a resource server
 

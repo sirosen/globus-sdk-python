@@ -80,7 +80,7 @@ CREATE TABLE sdk_storage_adapter_internal (
             conn.commit()
         return conn
 
-    def store_config(self, config_name: str, config_dict: Mapping) -> None:
+    def store_config(self, config_name: str, config_dict: Mapping[str, Any]) -> None:
         """
         :param config_name: A string name for the configuration value
         :param config_dict: A dict of config which will be stored serialized as JSON
@@ -98,7 +98,7 @@ CREATE TABLE sdk_storage_adapter_internal (
         )
         self._connection.commit()
 
-    def read_config(self, config_name: str) -> Optional[Dict]:
+    def read_config(self, config_name: str) -> Optional[Dict[str, Any]]:
         """
         :param config_name: A string name for the configuration value
 
