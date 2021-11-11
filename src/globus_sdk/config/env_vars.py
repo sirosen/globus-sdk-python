@@ -21,7 +21,7 @@ def _load_var(
     varname: str,
     default: Any,
     explicit_value: Optional[Any] = None,
-    cast: Optional[Callable] = None,
+    cast: Optional[Callable[[Any, Any], Any]] = None,
 ) -> Any:
     # use the explicit value if given and non-None, otherwise, do an env lookup
     value = (

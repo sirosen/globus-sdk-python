@@ -8,10 +8,10 @@ from .base import Paginator
 class _LimitOffsetBasedPaginator(Paginator):
     def __init__(
         self,
-        method: Callable,
+        method: Callable[..., Any],
         *,
         items_key: Optional[str] = None,
-        get_page_size: Callable[[dict], int],
+        get_page_size: Callable[[Dict[str, Any]], int],
         max_total_results: int,
         page_size: int,
         client_args: List[Any],
@@ -36,7 +36,7 @@ class _LimitOffsetBasedPaginator(Paginator):
             self.limit = self.max_total_results - self.offset
         self.client_kwargs["limit"] = self.limit
 
-    def _update_and_check_offset(self, current_page: dict) -> bool:
+    def _update_and_check_offset(self, current_page: Dict[str, Any]) -> bool:
         self.offset += self.get_page_size(current_page)
         self.client_kwargs["offset"] = self.offset
         return (

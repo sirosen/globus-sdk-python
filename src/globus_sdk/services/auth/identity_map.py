@@ -143,7 +143,7 @@ class IdentityMap:
         )
 
         # the cache is a dict mapping IDs and Usernames
-        self._cache: Dict[str, dict] = {}
+        self._cache: Dict[str, Dict[str, Any]] = {}
 
     def _fetch_batch_including(self, key: str) -> None:
         """

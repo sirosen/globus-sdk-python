@@ -1,5 +1,5 @@
 import re
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 from globus_sdk.response import GlobusHTTPResponse, IterableResponse
 
@@ -36,11 +36,11 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
     :type match: str or callable
     """
 
-    def _default_unpacking_match(self, spec: str) -> Callable[[dict], bool]:
+    def _default_unpacking_match(self, spec: str) -> Callable[[Dict[str, Any]], bool]:
         if not re.fullmatch(r"\w+", spec):
             raise ValueError("Invalid UnpackingGCSResponse specification.")
 
-        def match_func(data: dict) -> bool:
+        def match_func(data: Dict[str, Any]) -> bool:
             if not ("DATA_TYPE" in data and isinstance(data["DATA_TYPE"], str)):
                 return False
             if "#" not in data["DATA_TYPE"]:
@@ -53,7 +53,7 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
     def __init__(
         self,
         response: GlobusHTTPResponse,
-        match: Union[str, Callable[[dict], bool]],
+        match: Union[str, Callable[[Dict[str, Any]], bool]],
     ):
         super().__init__(response)
 
@@ -62,7 +62,7 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
         else:
             self._match_func = self._default_unpacking_match(match)
 
-        self._unpacked_data: Optional[dict] = None
+        self._unpacked_data: Optional[Dict[str, Any]] = None
         self._did_unpack = False
 
     @property
@@ -73,7 +73,7 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
         """
         return self._parsed_json
 
-    def _unpack(self) -> Optional[dict]:
+    def _unpack(self) -> Optional[Dict[str, Any]]:
         """
         Unpack the response from the `"data"` array, returning the first match found.
         If no matches are founds, or the data is the wrong shape, return None.

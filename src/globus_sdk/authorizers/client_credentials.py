@@ -62,7 +62,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         *,
         access_token: Optional[str] = None,
         expires_at: Optional[int] = None,
-        on_refresh: Optional[Callable] = None,
+        on_refresh: Optional[Callable[[OAuthTokenResponse], Any]] = None,
     ):
         log.info(
             "Setting up ClientCredentialsAuthorizer with confidential_client="

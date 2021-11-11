@@ -28,7 +28,7 @@ class Paginator(Iterable[GlobusHTTPResponse], metaclass=abc.ABCMeta):
 
     def __init__(
         self,
-        method: Callable,
+        method: Callable[..., Any],
         *,
         items_key: Optional[str] = None,
         client_args: List[Any],
@@ -47,7 +47,7 @@ class Paginator(Iterable[GlobusHTTPResponse], metaclass=abc.ABCMeta):
         """``pages()`` yields GlobusHTTPResponse objects, each one representing a page
         of results."""
 
-    def items(self) -> Iterator:
+    def items(self) -> Iterator[Any]:
         """
         ``items()`` of a paginator is a generator which yields each item in each page of
         results.

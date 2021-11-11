@@ -160,7 +160,7 @@ class GlobusAPIError(GlobusError):
             json_data = json_data["errors"][0]
         self._load_from_json(json_data)
 
-    def _load_from_json(self, data: dict) -> None:
+    def _load_from_json(self, data: Dict[str, Any]) -> None:
         # rewrite 'code' if present and correct type
         if isinstance(data.get("code"), str):
             self.code = data["code"]

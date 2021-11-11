@@ -1,12 +1,14 @@
 import enum
 import logging
-from typing import Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Optional, TypeVar, cast
 
 import requests
 
 from globus_sdk.authorizers import GlobusAuthorizer
 
 log = logging.getLogger(__name__)
+
+C = TypeVar("C", bound=Callable[..., Any])
 
 
 class RetryContext:
@@ -71,7 +73,7 @@ class _RetryCheckFunc:
     _retry_check_flags: RetryCheckFlags
 
 
-def set_retry_check_flags(flag: RetryCheckFlags) -> Callable[[Callable], Callable]:
+def set_retry_check_flags(flag: RetryCheckFlags) -> Callable[[C], C]:
     """
     A decorator for setting retry check flags on a retry check function.
     Usage:
@@ -80,7 +82,7 @@ def set_retry_check_flags(flag: RetryCheckFlags) -> Callable[[Callable], Callabl
     >>> def foo(ctx): ...
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: C) -> C:
         as_check = cast(_RetryCheckFunc, func)
         as_check._retry_check_flags = flag
         return func
@@ -116,8 +118,8 @@ class RetryCheckRunner:
     # check configs: a list of pairs, (check, flags)
     # a check without flags is assumed to have flags=NONE
     def __init__(self, checks: List[RetryCheck]):
-        self._checks = []
-        self._check_data: Dict[Callable, Dict] = {}
+        self._checks: List[RetryCheck] = []
+        self._check_data: Dict[RetryCheck, Dict[str, Any]] = {}
         for check in checks:
             self._checks.append(check)
             self._check_data[check] = {}

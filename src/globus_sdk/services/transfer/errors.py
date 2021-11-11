@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, Dict, List
 
 import requests
 
@@ -23,6 +23,6 @@ class TransferAPIError(exc.GlobusAPIError):
         args.append(self.request_id)
         return args
 
-    def _load_from_json(self, data: dict) -> None:
+    def _load_from_json(self, data: Dict[str, Any]) -> None:
         super()._load_from_json(data)
         self.request_id = data.get("request_id")

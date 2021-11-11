@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import requests
 
 from globus_sdk import exc
@@ -19,6 +21,6 @@ class SearchAPIError(exc.GlobusAPIError):
         self.error_data = None
         super().__init__(r)
 
-    def _load_from_json(self, data: dict) -> None:
+    def _load_from_json(self, data: Dict[str, Any]) -> None:
         super()._load_from_json(data)
         self.error_data = data.get("error_data")

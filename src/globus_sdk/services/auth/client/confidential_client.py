@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Iterable, Optional, Union
+from typing import Any, Dict, Iterable, Optional, Union
 
 from globus_sdk import exc, utils
 from globus_sdk.authorizers import BasicAuthorizer
@@ -136,7 +136,7 @@ class ConfidentialAppAuthClient(AuthClient):
         return self.current_oauth2_flow_manager
 
     def oauth2_get_dependent_tokens(
-        self, token: str, *, additional_params: Optional[dict] = None
+        self, token: str, *, additional_params: Optional[Dict[str, Any]] = None
     ) -> OAuthDependentTokenResponse:
         """
         Does a `Dependent Token Grant

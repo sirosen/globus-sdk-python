@@ -7,7 +7,7 @@ from globus_sdk.types import UUIDLike
 from .data import BatchMembershipActions, GroupPolicies
 from .errors import GroupsAPIError
 
-C = TypeVar("C", bound=Callable)
+C = TypeVar("C", bound=Callable[..., Any])
 
 
 def _groupdoc(message: str, link: str) -> Callable[[C], C]:

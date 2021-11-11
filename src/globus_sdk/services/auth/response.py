@@ -49,7 +49,7 @@ class _ByScopesGetter:
     def __str__(self) -> str:
         return json.dumps(self.scope_map)
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[str]:
         """iteration gets you every individual scope"""
         return iter(self.scope_map.keys())
 
@@ -133,7 +133,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         )
 
     @property
-    def by_resource_server(self) -> Dict[str, dict]:
+    def by_resource_server(self) -> Dict[str, Dict[str, Any]]:
         """
         Representation of the token response in a ``dict`` indexed by resource
         server.
@@ -173,7 +173,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
             Union[GlobusHTTPResponse, Dict[str, Any]]
         ] = None,
         jwk: Optional[RSAPublicKey] = None,
-        jwt_params: Optional[Dict] = None,
+        jwt_params: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
 
         """
@@ -253,7 +253,7 @@ class OAuthDependentTokenResponse(OAuthTokenResponse):
             Union[GlobusHTTPResponse, Dict[str, Any]]
         ] = None,
         jwk: Optional[RSAPublicKey] = None,
-        jwt_params: Optional[Dict] = None,
+        jwt_params: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         # just in case
         raise NotImplementedError(

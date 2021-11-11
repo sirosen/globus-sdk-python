@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 
@@ -12,7 +12,7 @@ class GCSAPIError(exc.GlobusAPIError):
 
     def __init__(self, r: requests.Response) -> None:
         self.detail_data_type: Optional[str] = None
-        self.detail: Union[None, str, dict] = None
+        self.detail: Union[None, str, Dict[str, Any]] = None
         super().__init__(r)
 
     def _get_args(self) -> List[Any]:
@@ -24,10 +24,10 @@ class GCSAPIError(exc.GlobusAPIError):
             args.append(self.detail)
         return args
 
-    def _load_from_json(self, data: dict) -> None:
+    def _load_from_json(self, data: Dict[str, Any]) -> None:
         super()._load_from_json(data)
         # detail can be a full document, so fetch, then look for a DATA_TYPE
         # and expose it as a top-level attribute for easy access
         self.detail = data.get("detail")
-        if self.detail and "DATA_TYPE" in self.detail:
+        if isinstance(self.detail, dict) and "DATA_TYPE" in self.detail:
             self.detail_data_type = self.detail["DATA_TYPE"]

@@ -9,7 +9,7 @@ from .data import CollectionDocument
 from .errors import GCSAPIError
 from .response import IterableGCSResponse, UnpackingGCSResponse
 
-C = TypeVar("C", bound=Callable)
+C = TypeVar("C", bound=Callable[..., Any])
 
 
 def _gcsdoc(message: str, link: str) -> Callable[[C], C]:
@@ -51,7 +51,7 @@ class GCSClient(client.BaseClient):
         environment: Optional[str] = None,
         authorizer: Optional[GlobusAuthorizer] = None,
         app_name: Optional[str] = None,
-        transport_params: Optional[Dict] = None,
+        transport_params: Optional[Dict[str, Any]] = None,
     ):
         # check if the provided address was a DNS name or an HTTPS URL
         # if it was a URL, do not modify, but if it's a DNS name format it accordingly
