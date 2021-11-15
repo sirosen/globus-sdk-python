@@ -1,11 +1,9 @@
 from typing import Any, Callable, Dict, Iterator, List, Optional
 
-from globus_sdk.response import GlobusHTTPResponse
-
-from .base import Paginator
+from .base import PageT, Paginator
 
 
-class NextTokenPaginator(Paginator):
+class NextTokenPaginator(Paginator[PageT]):
     """
     A paginator which uses `next_token` from payloads to set the `next_token`
     query param to page.
@@ -30,7 +28,7 @@ class NextTokenPaginator(Paginator):
         )
         self.next_token: Optional[str] = None
 
-    def pages(self) -> Iterator[GlobusHTTPResponse]:
+    def pages(self) -> Iterator[PageT]:
         has_next_page = True
         while has_next_page:
             if self.next_token:

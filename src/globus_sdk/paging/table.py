@@ -9,13 +9,13 @@ C = TypeVar("C", bound=Callable[..., Any])
 # stub for mypy
 class _PaginatedFunc:
     _has_paginator: bool
-    _paginator_class: Type[Paginator]
+    _paginator_class: Type[Paginator[Any]]
     _paginator_items_key: Optional[str]
     _paginator_params: Dict[str, Any]
 
 
 def has_paginator(
-    paginator_class: Type[Paginator],
+    paginator_class: Type[Paginator[Any]],
     items_key: Optional[str] = None,
     **paginator_params: Any,
 ) -> Callable[[C], C]:
@@ -89,18 +89,19 @@ class PaginatorTable:
         self._client = client
         # _bindings is a lazily loaded table of names -> callables which
         # return paginators
-        self._bindings: Dict[str, Callable[..., Paginator]] = {}
+        self._bindings: Dict[str, Callable[..., Paginator[Any]]] = {}
 
     def _add_binding(self, methodname: str, bound_method: Callable[..., Any]) -> None:
-        paginator_class = bound_method._paginator_class  # type: ignore
-        paginator_params = bound_method._paginator_params  # type: ignore
-        paginator_items_key = bound_method._paginator_items_key  # type: ignore
+        as_paginated = cast(_PaginatedFunc, bound_method)
+        paginator_class = as_paginated._paginator_class
+        paginator_params = as_paginated._paginator_params
+        paginator_items_key = as_paginated._paginator_items_key
 
         @functools.wraps(bound_method)
-        def paginated_method(*args: Any, **kwargs: Any):  # type: ignore
+        def paginated_method(*args: Any, **kwargs: Any) -> Paginator[Any]:
             return paginator_class(
                 bound_method,
-                client_args=args,
+                client_args=list(args),
                 client_kwargs=kwargs,
                 items_key=paginator_items_key,
                 **paginator_params,
@@ -108,7 +109,7 @@ class PaginatorTable:
 
         self._bindings[methodname] = paginated_method
 
-    def __getattr__(self, attrname: str) -> Callable[..., Paginator]:
+    def __getattr__(self, attrname: str) -> Callable[..., Paginator[Any]]:
         if attrname not in self._bindings:
             # this could raise AttributeError -- in which case, let it!
             method = getattr(self._client, attrname)

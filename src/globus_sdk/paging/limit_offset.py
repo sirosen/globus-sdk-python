@@ -1,11 +1,9 @@
 from typing import Any, Callable, Dict, Iterator, List, Optional
 
-from globus_sdk.response import GlobusHTTPResponse
-
-from .base import Paginator
+from .base import PageT, Paginator
 
 
-class _LimitOffsetBasedPaginator(Paginator):
+class _LimitOffsetBasedPaginator(Paginator[PageT]):
     def __init__(
         self,
         method: Callable[..., Any],
@@ -44,8 +42,8 @@ class _LimitOffsetBasedPaginator(Paginator):
         )
 
 
-class HasNextPaginator(_LimitOffsetBasedPaginator):
-    def pages(self) -> Iterator[GlobusHTTPResponse]:
+class HasNextPaginator(_LimitOffsetBasedPaginator[PageT]):
+    def pages(self) -> Iterator[PageT]:
         has_next_page = True
         while has_next_page:
             self._update_limit()
@@ -56,8 +54,8 @@ class HasNextPaginator(_LimitOffsetBasedPaginator):
             has_next_page = current_page["has_next_page"]
 
 
-class LimitOffsetTotalPaginator(_LimitOffsetBasedPaginator):
-    def pages(self) -> Iterator[GlobusHTTPResponse]:
+class LimitOffsetTotalPaginator(_LimitOffsetBasedPaginator[PageT]):
+    def pages(self) -> Iterator[PageT]:
         has_next_page = True
         while has_next_page:
             self._update_limit()
