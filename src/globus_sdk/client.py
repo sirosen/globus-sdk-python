@@ -1,15 +1,21 @@
+import inspect
 import logging
 import urllib.parse
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union, cast
+
+import typing_extensions as te
 
 from globus_sdk import config, exc, utils
 from globus_sdk.authorizers import GlobusAuthorizer
-from globus_sdk.paging import PaginatorTable
+from globus_sdk.paging import Paginator, PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import ScopeBuilder
 from globus_sdk.transport import RequestsTransport
 
 log = logging.getLogger(__name__)
+
+P = te.ParamSpec("P")
+R = TypeVar("R")
 
 
 class BaseClient:
@@ -96,6 +102,30 @@ class BaseClient:
 
         # setup paginated methods
         self.paginated = PaginatorTable(self)
+
+    def typed_paginator(self, method: Callable[P, R]) -> Callable[P, Paginator[R]]:
+        """
+        This is an alternate method for getting a paginator for a paginated method which
+        correctly preserves the type signature of the paginated method.
+
+        It should be used on instances of clients and only passed bound methods of those
+        clients. For example, given usage
+
+            >>> tc = TransferClient()
+            >>> paginator = tc.paginated.endpoint_search(...)
+
+        a typed paginator can be acquired with
+
+            >>> tc = TransferClient()
+            >>> paginator_call = tc.typed_paginator(tc.endpoint_search)
+            >>> paginator = paginator_call(...)
+
+        Although the syntax is slightly more verbose, this allows `mypy` and other type
+        checkers to more accurately infer the type of the paginator.
+        """
+        assert inspect.ismethod(method)
+        assert method.__self__ == self
+        return cast(Callable[P, Paginator[R]], getattr(self.paginated, method.__name__))
 
     @property
     def app_name(self) -> Optional[str]:
