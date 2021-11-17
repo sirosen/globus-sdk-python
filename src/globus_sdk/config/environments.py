@@ -12,7 +12,7 @@ _SERVICE_URL_VAR_FORMAT = "GLOBUS_SDK_SERVICE_URL_{}"
 class EnvConfig:
     envname: str
     domain: str
-    no_dotapi: List[str] = ["auth"]
+    no_dotapi: List[str] = ["app", "auth"]
 
     # this same dict is inherited (and therefore shared!) by all subclasses
     _registry: Dict[str, Type["EnvConfig"]] = {}
