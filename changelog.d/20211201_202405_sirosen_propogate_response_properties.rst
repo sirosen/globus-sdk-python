@@ -1,5 +1,5 @@
 * The implementation of several properties of ``GlobusHTTPResponse`` has
-  changed (:pr:`NUMBER`)
+  changed (:pr:`497`)
 
   * Responses have a new property, ``headers``, a case-insensitive
     dict of headers from the response
