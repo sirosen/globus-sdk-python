@@ -12,6 +12,30 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.2.0 (2021-12-02)
+-------------------
+
+* Add ``iter_items`` as a method on ``TransferData`` and ``DeleteData`` (:pr:`488`)
+
+* Add the `resource_server` property to client classes and objects. For example,
+  `TransferClient.resource_server` and `GroupsClient().resource_server` are now usable
+  to get the resource server string for the relevant services. `resource_server` is
+  documented as part of `globus_sdk.BaseClient` and may be `None`. (:pr:`489`)
+
+* Fix type annotations on client methods with paginated variants (:pr:`491`)
+
+* ClientCredentialsAuthorizer now accepts ``Union[str, Iterable[str]]``
+  as the type for scopes (:pr:`498`)
+
+* The implementation of several properties of ``GlobusHTTPResponse`` has
+  changed (:pr:`497`)
+
+  * Responses have a new property, ``headers``, a case-insensitive
+    dict of headers from the response
+
+  * Responses now implement ``http_status`` and ``content_type`` as
+    properties without setters
+
 v3.1.0 (2021-10-13)
 -------------------
 
