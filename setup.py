@@ -4,28 +4,28 @@ import re
 from setuptools import find_packages, setup
 
 MYPY_REQUIREMENTS = [
-    "mypy==0.902",
+    "mypy==0.910",
     "types-docutils",
     "types-jwt",
     "types-requests",
     "typing-extensions",
 ]
 LINT_REQUIREMENTS = [
-    "flake8<4",
+    "flake8<5",
     "isort<6",
-    "black==21.6b0",
-    "flake8-bugbear==21.4.3",
+    "black==21.12b0",
+    "flake8-bugbear==21.11.29",
 ] + MYPY_REQUIREMENTS
 TEST_REQUIREMENTS = [
     "pytest<7",
     "pytest-cov<3",
     "pytest-xdist<3",
-    "responses==0.13.3",
+    "responses==0.16.0",
 ]
 DOC_REQUIREMENTS = [
     "sphinx<5",
     "sphinx-issues<2",
-    "furo==2021.09.08",
+    "furo==2021.11.23",
 ]
 DEV_REQUIREMENTS = TEST_REQUIREMENTS + LINT_REQUIREMENTS + DOC_REQUIREMENTS
 

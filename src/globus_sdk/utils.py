@@ -180,7 +180,6 @@ if in_sphinx_build():  # pragma: no cover
         # - mypy doesn't understand classmethod(property(...)) on older pythons
         return classmethod(property(func))  # type: ignore
 
-
 else:
 
     def classproperty(func: Callable[[T], R]) -> _classproperty[T, R]:
