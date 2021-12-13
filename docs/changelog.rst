@@ -12,6 +12,11 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.2.1 (2021-12-13)
+-------------------
+
+* Update to avoid deprecation warnings on python 3.10 (:pr:`499`)
+
 v3.2.0 (2021-12-02)
 -------------------
 
