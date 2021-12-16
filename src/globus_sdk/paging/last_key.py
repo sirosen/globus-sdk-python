@@ -1,11 +1,9 @@
 from typing import Any, Callable, Dict, Iterator, List, Optional
 
-from globus_sdk.response import GlobusHTTPResponse
-
-from .base import Paginator
+from .base import PageT, Paginator
 
 
-class LastKeyPaginator(Paginator):
+class LastKeyPaginator(Paginator[PageT]):
     def __init__(
         self,
         method: Callable[..., Any],
@@ -22,7 +20,7 @@ class LastKeyPaginator(Paginator):
         )
         self.last_key: Optional[str] = None
 
-    def pages(self) -> Iterator[GlobusHTTPResponse]:
+    def pages(self) -> Iterator[PageT]:
         has_next_page = True
         while has_next_page:
             if self.last_key:

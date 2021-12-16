@@ -1,11 +1,9 @@
 from typing import Any, Callable, Dict, Iterator, List, Optional
 
-from globus_sdk.response import GlobusHTTPResponse
-
-from .base import Paginator
+from .base import PageT, Paginator
 
 
-class MarkerPaginator(Paginator):
+class MarkerPaginator(Paginator[PageT]):
     """
     A paginator which uses `has_next_page` and `marker` from payloads, sets the `marker`
     query param to page.
@@ -29,7 +27,7 @@ class MarkerPaginator(Paginator):
         )
         self.marker: Optional[str] = None
 
-    def pages(self) -> Iterator[GlobusHTTPResponse]:
+    def pages(self) -> Iterator[PageT]:
         has_next_page = True
         while has_next_page:
             if self.marker:

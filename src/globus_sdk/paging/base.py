@@ -1,10 +1,12 @@
 import abc
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, TypeVar
 
 from globus_sdk.response import GlobusHTTPResponse
 
+PageT = TypeVar("PageT", bound=GlobusHTTPResponse)
 
-class Paginator(Iterable[GlobusHTTPResponse], metaclass=abc.ABCMeta):
+
+class Paginator(Iterable[PageT], metaclass=abc.ABCMeta):
     """
     Base class for all paginators.
     This guarantees is that they have generator methods named ``pages`` and ``items``.
@@ -32,18 +34,21 @@ class Paginator(Iterable[GlobusHTTPResponse], metaclass=abc.ABCMeta):
         *,
         items_key: Optional[str] = None,
         client_args: List[Any],
-        client_kwargs: Dict[str, Any]
+        client_kwargs: Dict[str, Any],
+        # the Base paginator must accept arbitrary additional kwargs to indicate that
+        # its child classes could define and use additional kwargs
+        **kwargs: Any,
     ):
         self.method = method
         self.items_key = items_key
         self.client_args = client_args
         self.client_kwargs = client_kwargs
 
-    def __iter__(self) -> Iterator[GlobusHTTPResponse]:
+    def __iter__(self) -> Iterator[PageT]:
         yield from self.pages()
 
     @abc.abstractmethod
-    def pages(self) -> Iterator[GlobusHTTPResponse]:
+    def pages(self) -> Iterator[PageT]:
         """``pages()`` yields GlobusHTTPResponse objects, each one representing a page
         of results."""
 
