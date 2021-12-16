@@ -1,21 +1,23 @@
 import functools
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast
+from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, cast
 
-from .base import Paginator
+from globus_sdk.response import GlobusHTTPResponse
 
-C = TypeVar("C", bound=Callable[..., Any])
+from .base import PageT, Paginator
+
+C = TypeVar("C", bound=Callable[..., GlobusHTTPResponse])
 
 
 # stub for mypy
-class _PaginatedFunc:
+class _PaginatedFunc(Generic[PageT]):
     _has_paginator: bool
-    _paginator_class: Type[Paginator[Any]]
+    _paginator_class: Type[Paginator[PageT]]
     _paginator_items_key: Optional[str]
     _paginator_params: Dict[str, Any]
 
 
 def has_paginator(
-    paginator_class: Type[Paginator[Any]],
+    paginator_class: Type[Paginator[PageT]],
     items_key: Optional[str] = None,
     **paginator_params: Any,
 ) -> Callable[[C], C]:
@@ -35,7 +37,7 @@ def has_paginator(
     """
 
     def decorate(func: C) -> C:
-        as_paginated = cast(_PaginatedFunc, func)
+        as_paginated = cast(_PaginatedFunc[PageT], func)
         as_paginated._has_paginator = True
         as_paginated._paginator_class = paginator_class
         as_paginated._paginator_items_key = items_key
@@ -89,16 +91,16 @@ class PaginatorTable:
         self._client = client
         # _bindings is a lazily loaded table of names -> callables which
         # return paginators
-        self._bindings: Dict[str, Callable[..., Paginator[Any]]] = {}
+        self._bindings: Dict[str, Callable[..., Paginator[PageT]]] = {}
 
-    def _add_binding(self, methodname: str, bound_method: Callable[..., Any]) -> None:
-        as_paginated = cast(_PaginatedFunc, bound_method)
+    def _add_binding(self, methodname: str, bound_method: Callable[..., PageT]) -> None:
+        as_paginated = cast(_PaginatedFunc[PageT], bound_method)
         paginator_class = as_paginated._paginator_class
         paginator_params = as_paginated._paginator_params
         paginator_items_key = as_paginated._paginator_items_key
 
         @functools.wraps(bound_method)
-        def paginated_method(*args: Any, **kwargs: Any) -> Paginator[Any]:
+        def paginated_method(*args: Any, **kwargs: Any) -> Paginator[PageT]:
             return paginator_class(
                 bound_method,
                 client_args=list(args),
@@ -109,7 +111,7 @@ class PaginatorTable:
 
         self._bindings[methodname] = paginated_method
 
-    def __getattr__(self, attrname: str) -> Callable[..., Paginator[Any]]:
+    def __getattr__(self, attrname: str) -> Callable[..., Paginator[PageT]]:
         if attrname not in self._bindings:
             # this could raise AttributeError -- in which case, let it!
             method = getattr(self._client, attrname)
