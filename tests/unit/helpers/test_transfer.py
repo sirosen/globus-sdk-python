@@ -273,3 +273,40 @@ def test_tranfer_sync_levels_result(transfer_data, sync_level, result):
     else:
         tdata = transfer_data(sync_level=sync_level)
         assert tdata["sync_level"] == result
+
+
+def test_skip_activation_check_supported(transfer_data, delete_data):
+    # default, false
+    tdata = transfer_data()
+    ddata = delete_data()
+    for data in [tdata, ddata]:
+        assert "skip_activation_check" in data
+        assert data["skip_activation_check"] is False
+
+    # can set to True
+    tdata = transfer_data(skip_activation_check=True)
+    ddata = delete_data(skip_activation_check=True)
+    for data in [tdata, ddata]:
+        assert "skip_activation_check" in data
+        assert data["skip_activation_check"] is True
+
+
+def test_add_filter_rule(transfer_data):
+    tdata = transfer_data()
+    assert "filter_rules" not in tdata
+
+    tdata.add_filter_rule("*.tgz", type="file")
+    assert "filter_rules" in tdata
+    assert isinstance(tdata["filter_rules"], list)
+    assert len(tdata["filter_rules"]) == 1
+    assert tdata["filter_rules"][0]["DATA_TYPE"] == "filter_rule"
+    assert tdata["filter_rules"][0]["method"] == "exclude"
+    assert tdata["filter_rules"][0]["name"] == "*.tgz"
+    assert tdata["filter_rules"][0]["type"] == "file"
+
+    tdata.add_filter_rule("tmp")
+    assert len(tdata["filter_rules"]) == 2
+    assert tdata["filter_rules"][1]["DATA_TYPE"] == "filter_rule"
+    assert tdata["filter_rules"][1]["method"] == "exclude"
+    assert tdata["filter_rules"][1]["name"] == "tmp"
+    assert "type" not in tdata["filter_rules"][1]
