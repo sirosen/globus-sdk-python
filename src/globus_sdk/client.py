@@ -81,7 +81,7 @@ class BaseClient:
             raise ValueError("Either service_name or base_url must be set")
 
         self.base_url = utils.slash_join(
-            config.get_service_url(self.environment, self.service_name)
+            config.get_service_url(self.service_name, environment=self.environment)
             if base_url is None
             else base_url,
             self.base_path,

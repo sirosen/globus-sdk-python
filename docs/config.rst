@@ -42,3 +42,18 @@ verification turned on.
     ``TRANSFER``, etc). For example, set
     ``GLOBUS_SDK_SERVICE_URL_TRANSFER="https://proxy-device.example.org/"`` to direct
     the SDK to use a custom URL when contacting the Globus Transfer service.
+
+Config-Related Functions
+------------------------
+
+There are two functions available to translate the configuration described above into the URLs to use for accessing Globus services.
+
+To return specifically the URL for the Globus Web App in a given environment:
+
+.. autofunction:: globus_sdk.config.get_webapp_url
+
+To return the URL for any other service in a given environment:
+
+.. autofunction:: globus_sdk.config.get_service_url
+
+Note that *no other imports* from ``globus_sdk.config`` are considered public.
