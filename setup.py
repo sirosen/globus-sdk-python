@@ -4,7 +4,7 @@ import re
 from setuptools import find_packages, setup
 
 MYPY_REQUIREMENTS = [
-    "mypy==0.910",
+    "mypy==0.931",
     "types-docutils",
     "types-jwt",
     "types-requests",

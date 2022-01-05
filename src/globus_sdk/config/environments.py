@@ -30,7 +30,7 @@ class EnvConfig:
     #
     # and retrieve it with get_config_by_name("beta")
     def __init_subclass__(cls, **kwargs: Any):
-        super().__init_subclass__(**kwargs)  # type: ignore
+        super().__init_subclass__(**kwargs)
         cls._registry[cls.envname] = cls
 
     @classmethod
