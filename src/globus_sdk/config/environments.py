@@ -2,6 +2,8 @@ import logging
 import os
 from typing import Any, Dict, List, Optional, Type, cast
 
+from .env_vars import get_environment_name
+
 log = logging.getLogger(__name__)
 # the format string for a service URL pulled out of the environment
 # these are handled with uppercased service names, e.g.
@@ -50,8 +52,21 @@ class EnvConfig:
         return cls._registry.get(envname)
 
 
-def get_service_url(environment: str, service: str) -> str:
+def get_service_url(service: str, environment: Optional[str] = None) -> str:
+    """
+    Return the base URL for the given service in this environment. For example:
+
+    >>> from globus_sdk.config import get_service_url
+    >>> get_service_url("auth", environment="sandbox")
+    'https://auth.sandbox.globuscs.info/'
+    >>> get_service_url("search", environment="test")
+    'https://search.api.test.globuscs.info/'
+
+    If no ``environment`` is specified, this will use the ``GLOBUS_SDK_ENVIRONMENT``
+    environment variable.
+    """
     log.debug(f'Service URL Lookup for "{service}" under env "{environment}"')
+    environment = environment or get_environment_name()
     # check for an environment variable of the form
     #   GLOBUS_SDK_SERVICE_URL_*
     # and use it ahead of any env config if set
@@ -66,6 +81,17 @@ def get_service_url(environment: str, service: str) -> str:
     url = conf.get_service_url(service)
     log.debug(f'Service URL Lookup Result: "{service}" is at "{url}"')
     return url
+
+
+def get_webapp_url(environment: Optional[str] = None) -> str:
+    """
+    Return the URL to access the Globus web app in the given environment. For example:
+
+    >>> get_webapp_url("sandbox")
+    'https://app.sandbox.globuscs.info/'
+    """
+    environment = environment or get_environment_name()
+    return get_service_url("app", environment=environment)
 
 
 #

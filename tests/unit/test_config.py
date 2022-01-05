@@ -12,24 +12,24 @@ def test_get_service_url():
     Tests environments, services, and missing values
     """
     assert (
-        globus_sdk.config.get_service_url("production", "auth")
+        globus_sdk.config.get_service_url("auth", environment="production")
         == "https://auth.globus.org/"
     )
     assert (
-        globus_sdk.config.get_service_url("production", "transfer")
+        globus_sdk.config.get_service_url("transfer", environment="production")
         == "https://transfer.api.globus.org/"
     )
     assert (
-        globus_sdk.config.get_service_url("preview", "auth")
+        globus_sdk.config.get_service_url("auth", environment="preview")
         == "https://auth.preview.globus.org/"
     )
     assert (
-        globus_sdk.config.get_service_url("preview", "search")
+        globus_sdk.config.get_service_url("search", environment="preview")
         == "https://search.api.preview.globus.org/"
     )
 
     with pytest.raises(ValueError):
-        globus_sdk.config.get_service_url("nonexistent", "auth")
+        globus_sdk.config.get_service_url("auth", environment="nonexistent")
 
 
 @pytest.mark.parametrize(
@@ -144,11 +144,11 @@ def test_service_url_from_env_var():
         os.environ["GLOBUS_SDK_SERVICE_URL_TRANSFER"] = "https://transfer.example.org/"
         # environment setting gets ignored at this point -- only the override applies
         assert (
-            globus_sdk.config.get_service_url("preview", "transfer")
+            globus_sdk.config.get_service_url("transfer", environment="preview")
             == "https://transfer.example.org/"
         )
         assert (
-            globus_sdk.config.get_service_url("production", "transfer")
+            globus_sdk.config.get_service_url("transfer", environment="production")
             == "https://transfer.example.org/"
         )
         # also try with a made up service
@@ -156,6 +156,17 @@ def test_service_url_from_env_var():
             "GLOBUS_SDK_SERVICE_URL_ION_CANNON"
         ] = "https://ion-cannon.example.org/"
         assert (
-            globus_sdk.config.get_service_url("production", "ion_cannon")
+            globus_sdk.config.get_service_url("ion_cannon", environment="production")
             == "https://ion-cannon.example.org/"
         )
+
+        for env in ["sandbox", "test", "integration"]:
+            os.environ["GLOBUS_SDK_ENVIRONMENT"] = env
+            assert (
+                globus_sdk.config.get_service_url("auth")
+                == f"https://auth.{env}.globuscs.info/"
+            )
+            assert (
+                globus_sdk.config.get_webapp_url()
+                == f"https://app.{env}.globuscs.info/"
+            )

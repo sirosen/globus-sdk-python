@@ -7,4 +7,7 @@
 .. automatically replace it when the PR is merged.
 ..
 
-* Tweak `get_service_url` to be able to return correct webapp URLs (:pr:`NUMBER`)
+* Document ``globus_sdk.config.get_service_url`` and ``globus_sdk.config.get_webapp_url``
+  (:pr:`NUMBER`)
+    * Internally, these are updated to be able to default to the ``GLOBUS_SDK_ENVIRONMENT`` setting,
+      so specifying an environment is no longer required
