@@ -18,14 +18,14 @@ LINT_REQUIREMENTS = [
 ] + MYPY_REQUIREMENTS
 TEST_REQUIREMENTS = [
     "pytest<7",
-    "pytest-cov<3",
+    "coverage<7",
     "pytest-xdist<3",
     "responses==0.16.0",
 ]
 DOC_REQUIREMENTS = [
     "sphinx<5",
-    "sphinx-issues<2",
-    "furo==2021.11.23",
+    "sphinx-issues<3",
+    "furo==2022.1.2",
 ]
 DEV_REQUIREMENTS = TEST_REQUIREMENTS + LINT_REQUIREMENTS + DOC_REQUIREMENTS
 
