@@ -47,6 +47,18 @@ class DeleteData(utils.PayloadWrapper):
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
     :type deadline: str or datetime, optional
+    :param notify_on_succeeded: Send a notification email when the delete task
+        completes with a status of SUCCEEDED.
+        [default: ``True``]
+    :type notify_on_succeeded: bool, optional
+    :param notify_on_failed: Send a notification email when the delete task completes
+        with a status of FAILED.
+        [default: ``True``]
+    :type notify_on_failed: bool, optional
+    :param notify_on_inactive: Send a notification email when the delete task changes
+        status to INACTIVE. e.g. From credentials expiring.
+        [default: ``True``]
+    :type notify_on_inactive: bool, optional
     :param additional_fields: additional fields to be added to the delete
         document. Mostly intended for internal use
     :type additional_fields: dict, optional
@@ -78,6 +90,9 @@ class DeleteData(utils.PayloadWrapper):
         submission_id: Optional[UUIDLike] = None,
         recursive: bool = False,
         deadline: Optional[Union[str, datetime.datetime]] = None,
+        notify_on_succeeded: bool = True,
+        notify_on_failed: bool = True,
+        notify_on_inactive: bool = True,
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__()
@@ -89,6 +104,9 @@ class DeleteData(utils.PayloadWrapper):
         )
         self["endpoint"] = str(endpoint)
         self["recursive"] = recursive
+        self["notify_on_succeeded"] = notify_on_succeeded
+        self["notify_on_failed"] = notify_on_failed
+        self["notify_on_inactive"] = notify_on_inactive
 
         if label is not None:
             self["label"] = label
@@ -109,7 +127,7 @@ class DeleteData(utils.PayloadWrapper):
                     "in via additional_fields)"
                 )
 
-    def add_item(
+    def add_item(  # dead: disable
         self, path: str, *, additional_fields: Optional[Dict[str, Any]] = None
     ) -> None:
         """
@@ -126,10 +144,15 @@ class DeleteData(utils.PayloadWrapper):
         log.debug('DeleteData[{}].add_item: "{}"'.format(self["endpoint"], path))
         self["DATA"].append(item_data)
 
-    def iter_items(self) -> Iterator[Dict[str, Any]]:
+    def iter_items(self) -> Iterator[Dict[str, Any]]:  # dead: disable
         """
         An iterator of items created by ``add_item``.
 
         Each item takes the form of a dictionary.
         """
         yield from iter(self["DATA"])
+
+
+# an __all__ declaration ensures that `dead` passes on this module, which is quite
+# useful
+__all__ = ("DeleteData",)

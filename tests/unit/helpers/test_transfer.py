@@ -197,3 +197,33 @@ def test_transfer_iter_items(transfer_data):
 
     check_item(as_list[0], "source/abc.txt", "dest/abc.txt")
     check_item(as_list[1], "source/def/", "dest/def/", {"recursive": True})
+
+
+@pytest.mark.parametrize("n_succeeded", [None, True, False])
+@pytest.mark.parametrize("n_failed", [None, True, False])
+@pytest.mark.parametrize("n_inactive", [None, True, False])
+def test_notification_options(
+    transfer_data, delete_data, n_succeeded, n_failed, n_inactive
+):
+    notify_kwargs = {}
+    if n_succeeded is not None:
+        notify_kwargs["notify_on_succeeded"] = n_succeeded
+    if n_failed is not None:
+        notify_kwargs["notify_on_failed"] = n_failed
+    if n_inactive is not None:
+        notify_kwargs["notify_on_inactive"] = n_inactive
+
+    ddata = delete_data(**notify_kwargs)
+    tdata = transfer_data(**notify_kwargs)
+
+    def _default(x):
+        return x if x is not None else True
+
+    expect = {
+        "notify_on_succeeded": _default(n_succeeded),
+        "notify_on_failed": _default(n_failed),
+        "notify_on_inactive": _default(n_inactive),
+    }
+    for k, v in expect.items():
+        assert tdata[k] is v
+        assert ddata[k] is v
