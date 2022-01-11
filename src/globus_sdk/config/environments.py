@@ -48,8 +48,8 @@ class EnvConfig:
         return f"https://{service}.api.{cls.domain}/"
 
     @classmethod
-    def get_by_name(cls, envname: str) -> Optional[Type["EnvConfig"]]:
-        return cls._registry.get(envname)
+    def get_by_name(cls, env: str) -> Optional[Type["EnvConfig"]]:
+        return cls._registry.get(env)
 
 
 def get_service_url(service: str, environment: Optional[str] = None) -> str:

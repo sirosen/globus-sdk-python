@@ -92,7 +92,7 @@ class GlobusConnectPersonalOwnerInfo:
     # private methods for SDK usage only
     @classmethod
     def _from_file(cls, filename: str) -> "GlobusConnectPersonalOwnerInfo":
-        with open(filename) as fp:
+        with open(filename, encoding="utf-8") as fp:
             for line in fp:
                 if line.startswith(cls._GRIDMAP_DN_START):
                     return cls(config_dn=line.strip())

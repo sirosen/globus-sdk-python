@@ -29,7 +29,7 @@ class SimpleJSONFileAdapter(FileAdapter):
         Load the file contents as JSON and return the resulting dict
         object. If a dict is not found, raises an error.
         """
-        with open(self.filename) as f:
+        with open(self.filename, encoding="utf-8") as f:
             val = json.load(f)
         if not isinstance(val, dict):
             raise ValueError("reading from json file got non-dict data")
@@ -98,7 +98,7 @@ class SimpleJSONFileAdapter(FileAdapter):
 
         # deny rwx to Group and World, exec to User
         with self.user_only_umask():
-            with open(self.filename, "w") as f:
+            with open(self.filename, "w", encoding="utf-8") as f:
                 json.dump(to_write, f)
 
     def get_by_resource_server(self) -> Dict[str, Any]:
