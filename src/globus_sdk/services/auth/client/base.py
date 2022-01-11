@@ -110,6 +110,16 @@ class AuthClient(client.BaseClient):
 
         Available with any authentication/client type.
 
+        :param usernames: A username or list of usernames to lookup. Mutually exclusive
+            with ``ids``
+        :type usernames: str or iterable of str, optional
+        :param ids: An identity ID or list of IDs to lookup. Mutually exclusive
+            with ``usernames``
+        :type ids: str, UUID, or iterable of str or UUID, optional
+        :param provision: Create identities if they do not exist, allowing clients to
+            get username-to-identity mappings prior to the identity being used
+        :type provision: bool
+
         **Examples**
 
         >>> ac = globus_sdk.AuthClient(...)
