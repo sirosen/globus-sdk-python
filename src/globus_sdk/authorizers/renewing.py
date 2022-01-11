@@ -101,7 +101,6 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
         Using whatever method the specific authorizer implementing this class
         does, get a new token response.
         """
-        pass
 
     @abc.abstractmethod
     def _extract_token_data(self, res: OAuthTokenResponse) -> Dict[str, Any]:

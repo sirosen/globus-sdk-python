@@ -9,7 +9,9 @@ from globus_sdk.services.auth import OAuthTokenResponse
 class StorageAdapter(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def store(self, token_response: OAuthTokenResponse) -> None:
-        pass
+        """
+        Store an `OAuthTokenResponse` in the underlying storage for this adapter.
+        """
 
     @abc.abstractmethod
     def get_token_data(self, resource_server: str) -> Optional[Dict[str, Any]]:
@@ -20,7 +22,6 @@ class StorageAdapter(metaclass=abc.ABCMeta):
         expiration time, or returns ``None``, indicating that there was no data for that
         resource server.
         """
-        pass
 
     def on_refresh(self, token_response: OAuthTokenResponse) -> None:
         """
