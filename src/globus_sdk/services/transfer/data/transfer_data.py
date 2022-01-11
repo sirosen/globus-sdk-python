@@ -155,7 +155,7 @@ class TransferData(utils.PayloadWrapper):
         *,
         label: Optional[str] = None,
         submission_id: Optional[UUIDLike] = None,
-        sync_level: Optional[str] = None,
+        sync_level: Union[str, int, None] = None,
         verify_checksum: bool = False,
         preserve_timestamp: bool = False,
         encrypt_data: bool = False,
@@ -196,12 +196,15 @@ class TransferData(utils.PayloadWrapper):
         # values
         # you can get away with specifying an invalid sync level -- the API
         # will just reject you with an error. This is kind of important: if
-        # more levels are added in the future this method doesn't become
-        # garbage overnight
+        # more levels are added in the future you can pass as an int
         if sync_level is not None:
-            sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
-            # TODO: sync_level not allowed to be int?
-            self["sync_level"] = sync_dict.get(sync_level, sync_level)
+            if isinstance(sync_level, str):
+                sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
+                try:
+                    sync_level = sync_dict[sync_level]
+                except KeyError as err:
+                    raise ValueError(f"Unrecognized sync_level {sync_level}") from err
+            self["sync_level"] = sync_level
 
         self["DATA"] = []
 
