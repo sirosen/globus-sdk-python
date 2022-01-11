@@ -24,7 +24,7 @@ class GlobusAPIError(GlobusError):
     MESSAGE_FIELDS = ["message", "detail"]
     RECOGNIZED_AUTHZ_SCHEMES = ["bearer", "basic", "globus-goauthtoken"]
 
-    def __init__(self, r: requests.Response, *args: Any, **kw: Any):
+    def __init__(self, r: requests.Response, *args: Any, **kwargs: Any):
         self.http_status = r.status_code
         # defaults, may be rewritten during parsing
         self.code = "Error"

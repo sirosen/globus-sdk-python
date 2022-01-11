@@ -1,0 +1,14 @@
+[MASTER]
+# for now, disable docparams plugin (enable it later)
+# load-plugins = pylint.extensions.docparams
+
+[MESSAGES CONTROL]
+disable =
+    format,C,R,
+    import-error,
+    protected-access,
+    logging-fstring-interpolation,
+    logging-format-interpolation
+
+[VARIABLES]
+ignored-argument-names = args|kwargs

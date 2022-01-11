@@ -144,7 +144,7 @@ class GlobusHTTPResponse:
         data = self.data
         try:
             return data[key]
-        except TypeError:
+        except TypeError as err:
             log.error(
                 f"Can't index into responses with underlying data of type {type(data)}"
             )
@@ -154,7 +154,9 @@ class GlobusHTTPResponse:
             #
             # "type" is ambiguous, but we don't know if it's the fault of the
             # class at large, or just a particular call's `data` property
-            raise ValueError("This type of response data does not support indexing.")
+            raise ValueError(
+                "This type of response data does not support indexing."
+            ) from err
 
     def __contains__(self, item: Any) -> bool:
         """

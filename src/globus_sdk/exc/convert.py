@@ -16,7 +16,7 @@ class NetworkError(GlobusError):
     to explain potentially confusing or inconsistent exceptions passed to us
     """
 
-    def __init__(self, msg: str, exc: Exception, *args: Any, **kw: Any):
+    def __init__(self, msg: str, exc: Exception, *args: Any, **kwargs: Any):
         super().__init__(msg)
         self.underlying_exception = exc
 

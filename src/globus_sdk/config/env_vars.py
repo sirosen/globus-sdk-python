@@ -6,9 +6,10 @@ This does not include service URL env vars (see environments.py for loading of t
 """
 import logging
 import os
-from typing import Any, Callable, Optional, cast
+from typing import Any, Callable, Optional, TypeVar, cast, overload
 
 log = logging.getLogger(__name__)
+T = TypeVar("T")
 
 
 ENVNAME_VAR = "GLOBUS_SDK_ENVIRONMENT"
@@ -26,18 +27,37 @@ def _str2bool(val: str) -> bool:
         raise ValueError(f"invalid truth value: {val}")
 
 
+@overload
+def _load_var(
+    varname: str,
+    default: Any,
+    explicit_value: Optional[Any],
+    convert: Callable[[Any, Any], T],
+) -> T:
+    ...
+
+
+@overload
+def _load_var(
+    varname: str,
+    default: str,
+    explicit_value: Optional[str],
+) -> str:
+    ...
+
+
 def _load_var(
     varname: str,
     default: Any,
     explicit_value: Optional[Any] = None,
-    cast: Optional[Callable[[Any, Any], Any]] = None,
+    convert: Optional[Callable[[Any, Any], T]] = None,
 ) -> Any:
     # use the explicit value if given and non-None, otherwise, do an env lookup
     value = (
         explicit_value if explicit_value is not None else os.getenv(varname, default)
     )
-    if cast:
-        value = cast(value, default)
+    if convert:
+        value = convert(value, default)
     # only info log on non-default *values*
     # meaning that if we define the default as 'foo' and someone explicitly sets 'foo',
     # no info log gets emitted
@@ -68,19 +88,16 @@ def _optfloat_cast(value: Any, default: Any) -> Optional[float]:
 
 
 def get_environment_name(inputenv: Optional[str] = None) -> str:
-    return cast(str, _load_var(ENVNAME_VAR, "production", explicit_value=inputenv))
+    return _load_var(ENVNAME_VAR, "production", explicit_value=inputenv)
 
 
 def get_ssl_verify(value: Optional[bool] = None) -> bool:
-    return cast(
-        bool, _load_var(SSL_VERIFY_VAR, True, explicit_value=value, cast=_bool_cast)
-    )
+    return _load_var(SSL_VERIFY_VAR, True, explicit_value=value, convert=_bool_cast)
 
 
 def get_http_timeout(value: Optional[float] = None) -> Optional[float]:
-    ret = cast(
-        Optional[float],
-        _load_var(HTTP_TIMEOUT_VAR, 60.0, explicit_value=value, cast=_optfloat_cast),
+    ret = _load_var(
+        HTTP_TIMEOUT_VAR, 60.0, explicit_value=value, convert=_optfloat_cast
     )
     if ret == -1.0:
         return None
