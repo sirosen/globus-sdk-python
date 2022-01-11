@@ -433,6 +433,8 @@ class TransferClient(client.BaseClient):
             fetched from :meth:`~endpoint_get_activation_requirements`. Only the fields
             for the activation type being used need to be filled in.
         :type requirements_data: dict
+        :param requirements_data: An optional body for the request
+        :type requirements_data: dict, optional
         :param query_params: Any additional parameters will be passed through
             as query params.
         :type query_params: dict, optional
@@ -543,9 +545,9 @@ class TransferClient(client.BaseClient):
         :type max_results: int, optional
         :param next_token: token used for paging
         :type next_token: str, optional
-        :param query_params: Any additional parameters will be passed through
+        :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_param: dict, optional
+        :type query_params: dict, optional
 
         Get a list of all shared endpoints on a given host endpoint.
         """
@@ -606,6 +608,9 @@ class TransferClient(client.BaseClient):
 
         :param endpoint_id: The endpoint whose servers are being listed
         :type endpoint_id: str or UUID
+        :param query_params: Any additional parameters to be passed through
+            as query params.
+        :type query_params: dict, optional
         """
         log.info(f"TransferClient.endpoint_server_list({endpoint_id}, ...)")
         return IterableTransferResponse(
@@ -715,6 +720,9 @@ class TransferClient(client.BaseClient):
 
         :param endpoint_id: The endpoint whose roles are being listed
         :type endpoint_id: str or UUID
+        :param query_params: Any additional parameters to be passed through
+            as query params.
+        :type query_params: dict, optional
         """
         log.info(f"TransferClient.endpoint_role_list({endpoint_id}, ...)")
         return IterableTransferResponse(

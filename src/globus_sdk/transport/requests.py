@@ -201,7 +201,7 @@ class RequestsTransport:
         Send an HTTP request
 
         :param url: URL for the request
-        :type path: str
+        :type url: str
         :param method: HTTP request method, as an all caps string
         :type method: str
         :param query_params: Parameters to be encoded as a query string
@@ -215,6 +215,9 @@ class RequestsTransport:
             registered with the transport. By default, strings get "text" behavior and
             all other objects get "json".
         :type encoding: str
+        :param authorizer: The authorizer which is used to get or update authorization
+            information for the request
+        :type authorizer: GlobusAuthorizer, optional
 
         :return: ``requests.Response`` object
         """
