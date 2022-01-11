@@ -36,7 +36,7 @@ jobs:
         if: ${{ matrix.python-version == '3.10' }}
         run: python -m tox -e lint
       - name: Run Tests
-        run: python -m tox -e py -- --cov-report="term-missing:skip-covered"
+        run: python -m tox -e py,cov-combine,cov-report
       - name: Mindeps Test
         # mindeps runs on py36, as "the oldest everything"
         if: ${{ matrix.python-version == '3.6' && matrix.os == 'ubuntu-latest' }}

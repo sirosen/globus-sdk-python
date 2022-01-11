@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from typing import Any, Dict, Mapping, Optional, cast
+from typing import Any, Dict, Mapping, Optional
 
 from globus_sdk.services.auth import OAuthTokenResponse
 from globus_sdk.tokenstorage.base import FileAdapter
@@ -132,7 +132,7 @@ CREATE TABLE sdk_storage_adapter_internal (
             (self.namespace, config_name),
         ).rowcount
         self._connection.commit()
-        return cast(bool, rowcount != 0)
+        return rowcount != 0
 
     def store(self, token_response: OAuthTokenResponse) -> None:
         """
@@ -214,4 +214,4 @@ CREATE TABLE sdk_storage_adapter_internal (
             (self.namespace, resource_server),
         ).rowcount
         self._connection.commit()
-        return cast(bool, rowcount != 0)
+        return rowcount != 0
