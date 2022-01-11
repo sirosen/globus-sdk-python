@@ -67,13 +67,13 @@ class _ByScopesGetter:
             try:
                 rs_names.add(self.scope_map[scope]["resource_server"])
                 toks.append(self.scope_map[scope])
-            except KeyError:
+            except KeyError as err:
                 raise KeyError(
                     (
                         'Scope specifier "{}" contains scope "{}" '
                         "which was not found"
                     ).format(scopename, scope)
-                )
+                ) from err
         # if there isn't exactly 1 token, it's an error
         if len(rs_names) != 1:
             raise KeyError(
