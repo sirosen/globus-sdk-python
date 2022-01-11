@@ -8,7 +8,8 @@ disable =
     import-error,
     protected-access,
     logging-fstring-interpolation,
-    logging-format-interpolation
+    logging-format-interpolation,
+    fixme,
 
 [VARIABLES]
 ignored-argument-names = args|kwargs

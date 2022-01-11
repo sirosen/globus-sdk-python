@@ -68,7 +68,7 @@ def _load_var(
     return value
 
 
-def _bool_cast(value: Any, default: Any) -> bool:
+def _bool_cast(value: Any, default: Any) -> bool:  # pylint: disable=unused-argument
     if isinstance(value, bool):
         return value
     elif not isinstance(value, str):

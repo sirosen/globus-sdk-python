@@ -998,6 +998,7 @@ class TransferClient(client.BaseClient):
         show_hidden: Optional[bool] = None,
         orderby: Optional[Union[str, List[str]]] = None,
         # note: filter is a soft keyword in python, so using this name is okay
+        # pylint: disable=redefined-builtin
         filter: Union[str, TransferFilterDict, None] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
@@ -1296,6 +1297,7 @@ class TransferClient(client.BaseClient):
         *,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
+        # pylint: disable=redefined-builtin
         filter: Union[str, TransferFilterDict, None] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableTransferResponse:
