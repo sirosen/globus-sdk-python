@@ -1,4 +1,4 @@
-* Several minor bugs have been found and fixed (:pr:`NUMBER`)
+* Several minor bugs have been found and fixed (:pr:`504`)
 ** Exceptions raised in the SDK always use ``raise ... from`` syntax where
    appropriate. This corrects exception chaining in the local endpoint and
    several response objects.
