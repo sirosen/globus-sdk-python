@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Dict, Iterable, MutableMapping, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, MutableMapping, Optional, Set, Tuple
 
 from .client import AuthClient
 
@@ -151,6 +151,46 @@ class IdentityMap:
         # IdentityMap objects share a cache
         self._cache = cache if cache is not None else {}
 
+    def _create_batch(self, key: str) -> List[str]:
+        """
+        Create a batch to do a lookup.
+
+        For whichever set of unresolved names is appropriate, build the batch to
+        lookup up to *at most* the batch size. Also, remove the unresolved names from
+        tracking so that they will not be looked up again.
+        """
+        key_is_username = is_username(key)
+        set_to_use = (
+            self.unresolved_usernames if key_is_username else self.unresolved_ids
+        )
+
+        batch = [key]
+        for _ in range(0, min(self.id_batch_size - 1, len(set_to_use))):
+            # until we've added a value or exhausted the set, keep trying to add
+            added = False
+            while not added and set_to_use:
+                # try to find a value to add by popping elements from the set
+                value = set_to_use.pop()
+
+                # key could be in the set; don't double-add it. e.g.
+                # >>> idmap.add("globus@globus.org")
+                # >>> idmap["globus@globus.org"]
+                if value == key:
+                    continue
+
+                # value may already have been looked up, if the cache is shared
+                if value in self._cache:
+                    continue
+
+                batch.append(value)
+                added = True
+
+            # not necessary for correctness, but avoid extra loop iterations
+            if not set_to_use:
+                break
+
+        return batch
+
     def _fetch_batch_including(self, key: str) -> None:
         """
         Batch resolve identifiers (usernames or IDs), being sure to include the desired,
@@ -159,29 +199,13 @@ class IdentityMap:
 
         Store the results in the internal cache.
         """
-        # for whichever set of unresolved names is appropriate, build the batch to
-        # lookup up to *at most* the batch size
-        # also, remove the unresolved names from tracking so that they will not be
-        # looked up again
-        batch = []
-        set_to_use = (
-            self.unresolved_usernames if is_username(key) else self.unresolved_ids
-        )
-        for _ in range(0, min(self.id_batch_size - 1, len(set_to_use))):
-            batch.append(set_to_use.pop())
-        # avoid double-adding the provided key, but add it if it's missing
-        if key not in batch:
-            batch.append(key)
-        else:
-            try:
-                batch.append(set_to_use.pop())
-            except KeyError:  # empty set, ignore
-                pass
+        batch = self._create_batch(key)
 
         if is_username(key):
             response = self.auth_client.get_identities(usernames=batch)
         else:
             response = self.auth_client.get_identities(ids=batch)
+
         for x in response["identities"]:
             self._cache[x["id"]] = x
             self._cache[x["username"]] = x
@@ -225,15 +249,6 @@ class IdentityMap:
         """
         if key not in self._cache:
             self._fetch_batch_including(key)
-        # if the key was in the cache, double-check that it's not in the unresolved
-        # usernames or IDs for the IdentityMap
-        # otherwise, when a cache is being shared between IdentityMap instances, it's
-        # possible to call out to Auth unnecessarily
-        else:
-            if key in self.unresolved_ids:
-                self.unresolved_ids.remove(key)
-            elif key in self.unresolved_usernames:
-                self.unresolved_usernames.remove(key)
         return self._cache[key]
 
     def __delitem__(self, key: str) -> None:
