@@ -265,6 +265,9 @@ class BaseClient:
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
+
+        :raises GlobusAPIError: a `GlobusAPIError` will be raised if the response to the
+            request is received and has a status code in the 4xx or 5xx categories
         """
         # prepare data...
         # copy headers if present

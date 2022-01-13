@@ -1,0 +1,41 @@
+[MASTER]
+load-plugins = pylint.extensions.docparams
+
+[MESSAGES CONTROL]
+# ignore rules as follows:
+#
+# format,C,R
+# formatting and cosmetic rules which are handled by `black`, `isort`, and
+# other tools
+# refactoring rules (e.g. duplicate or similar code) which are very prone to
+# false positives
+#
+# import-error
+# pylint fails to import a module which is used at runtime, these warnings
+# impede simple usage as in `cd globus_sdk; pylint src/`
+#
+# protected-access
+# "disallowed" usage of our own classes and objects gets underfoot
+#
+# logging-*-interpolation
+# objections to log messages doing eager (vs lazy) string formatting
+# this is potentially an area for improvement
+#
+# fixme
+# these comments are often useful; re-enable this to quickly find FIXME and
+# TODO comments
+#
+# missing-raises-doc
+# most SDK methods currently do not document the exceptions which they raise
+# this is an area for improvement
+disable =
+    format,C,R,
+    import-error,
+    protected-access,
+    logging-fstring-interpolation,
+    logging-format-interpolation,
+    fixme,
+    missing-raises-doc,
+
+[VARIABLES]
+ignored-argument-names = args|kwargs

@@ -155,7 +155,7 @@ class TransferData(utils.PayloadWrapper):
         *,
         label: Optional[str] = None,
         submission_id: Optional[UUIDLike] = None,
-        sync_level: Optional[str] = None,
+        sync_level: Union[str, int, None] = None,
         verify_checksum: bool = False,
         preserve_timestamp: bool = False,
         encrypt_data: bool = False,
@@ -196,12 +196,15 @@ class TransferData(utils.PayloadWrapper):
         # values
         # you can get away with specifying an invalid sync level -- the API
         # will just reject you with an error. This is kind of important: if
-        # more levels are added in the future this method doesn't become
-        # garbage overnight
+        # more levels are added in the future you can pass as an int
         if sync_level is not None:
-            sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
-            # TODO: sync_level not allowed to be int?
-            self["sync_level"] = sync_dict.get(sync_level, sync_level)
+            if isinstance(sync_level, str):
+                sync_dict = {"exists": 0, "size": 1, "mtime": 2, "checksum": 3}
+                try:
+                    sync_level = sync_dict[sync_level]
+                except KeyError as err:
+                    raise ValueError(f"Unrecognized sync_level {sync_level}") from err
+            self["sync_level"] = sync_level
 
         self["DATA"] = []
 
@@ -216,7 +219,7 @@ class TransferData(utils.PayloadWrapper):
                     "in via additional_fields)"
                 )
 
-    def add_item(  # dead: disable
+    def add_item(
         self,
         source_path: str,
         destination_path: str,
@@ -282,9 +285,7 @@ class TransferData(utils.PayloadWrapper):
         )
         self["DATA"].append(item_data)
 
-    def add_symlink_item(  # dead: disable
-        self, source_path: str, destination_path: str
-    ) -> None:
+    def add_symlink_item(self, source_path: str, destination_path: str) -> None:
         """
         Add a symlink to be transferred as a symlink rather than as the
         target of the symlink.
@@ -312,15 +313,10 @@ class TransferData(utils.PayloadWrapper):
         )
         self["DATA"].append(item_data)
 
-    def iter_items(self) -> Iterator[Dict[str, Any]]:  # dead: disable
+    def iter_items(self) -> Iterator[Dict[str, Any]]:
         """
         An iterator of items created by ``add_item``.
 
         Each item takes the form of a dictionary.
         """
         yield from iter(self["DATA"])
-
-
-# an __all__ declaration ensures that `dead` passes on this module, which is quite
-# useful
-__all__ = ("TransferData",)

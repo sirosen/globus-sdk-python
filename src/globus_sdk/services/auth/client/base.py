@@ -119,6 +119,9 @@ class AuthClient(client.BaseClient):
         :param provision: Create identities if they do not exist, allowing clients to
             get username-to-identity mappings prior to the identity being used
         :type provision: bool
+        :param query_params: Any additional parameters to be passed through
+            as query params.
+        :type query_params: dict, optional
 
         **Examples**
 
@@ -434,6 +437,11 @@ class AuthClient(client.BaseClient):
             requires a specialize response class to handle the dramatically different
             format of the Dependent Token Grant response
         :type response_class: class, optional
+        :param form_data: The main body of the request
+        :type form_data: dict or `utils.PayloadWrapper`
+        :param body_params: Any additional parameters to be passed through
+            as body parameters.
+        :type body_params: dict, optional
         :rtype: ``response_class``
         """
         log.info("Fetching new token from Globus Auth")

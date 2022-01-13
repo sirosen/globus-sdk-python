@@ -24,8 +24,8 @@ def _b32decode(v: str) -> str:
     try:
         return str(uuid.UUID(bytes=base64.b32decode(v)))
     # if it fails, then it can't be a b32-encoded identity
-    except ValueError:
-        raise _B32DecodeError("decode and load as UUID failed")
+    except ValueError as err:
+        raise _B32DecodeError("decode and load as UUID failed") from err
 
 
 def _parse_dn_username(s: str) -> Tuple[str, bool]:
@@ -92,7 +92,7 @@ class GlobusConnectPersonalOwnerInfo:
     # private methods for SDK usage only
     @classmethod
     def _from_file(cls, filename: str) -> "GlobusConnectPersonalOwnerInfo":
-        with open(filename) as fp:
+        with open(filename, encoding="utf-8") as fp:
             for line in fp:
                 if line.startswith(cls._GRIDMAP_DN_START):
                     return cls(config_dn=line.strip())

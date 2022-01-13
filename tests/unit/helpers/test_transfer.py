@@ -227,3 +227,28 @@ def test_notification_options(
     for k, v in expect.items():
         assert tdata[k] is v
         assert ddata[k] is v
+
+
+@pytest.mark.parametrize(
+    "sync_level, result",
+    [
+        ("exists", 0),
+        (0, 0),
+        ("size", 1),
+        (1, 1),
+        ("mtime", 2),
+        (2, 2),
+        ("checksum", 3),
+        (3, 3),
+        ("EXISTS", ValueError),
+        ("hash", ValueError),
+        (100, 100),
+    ],
+)
+def test_tranfer_sync_levels_result(transfer_data, sync_level, result):
+    if isinstance(result, type) and issubclass(result, Exception):
+        with pytest.raises(result):
+            transfer_data(sync_level=sync_level)
+    else:
+        tdata = transfer_data(sync_level=sync_level)
+        assert tdata["sync_level"] == result

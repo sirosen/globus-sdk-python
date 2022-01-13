@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional
 from .base import PageT, Paginator
 
 
-class _LimitOffsetBasedPaginator(Paginator[PageT]):
+class _LimitOffsetBasedPaginator(Paginator[PageT]):  # pylint: disable=abstract-method
     def __init__(
         self,
         method: Callable[..., Any],

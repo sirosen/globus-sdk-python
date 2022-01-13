@@ -188,7 +188,7 @@ class LocalGlobusConnectPersonal:
         if self._endpoint_id is None:
             fname = os.path.join(self._local_data_dir, "client-id.txt")
             try:
-                with open(fname) as fp:
+                with open(fname, encoding="utf-8") as fp:
                     self._endpoint_id = fp.read().strip()
             except OSError as e:
                 # no such file or directory gets ignored, everything else reraise

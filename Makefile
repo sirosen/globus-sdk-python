@@ -3,7 +3,7 @@ SDK_VERSION=$(shell grep '^__version__' src/globus_sdk/version.py | cut -d '"' -
 # these are just tox invocations wrapped nicely for convenience
 .PHONY: lint test docs
 lint:
-	tox -e lint,mypy
+	tox -e lint,mypy,pylint
 test:
 	tox
 docs:

@@ -61,6 +61,7 @@ class SearchQuery(utils.PayloadWrapper):
         name: str,
         field_name: str,
         *,
+        # pylint: disable=redefined-builtin
         type: str = "terms",
         size: Optional[int] = None,
         date_interval: Optional[str] = None,
@@ -89,6 +90,7 @@ class SearchQuery(utils.PayloadWrapper):
         field_name: str,
         values: List[str],
         *,
+        # pylint: disable=redefined-builtin
         type: str = "match_all",
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> "SearchQuery":

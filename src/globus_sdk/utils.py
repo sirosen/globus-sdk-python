@@ -23,6 +23,7 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 if TYPE_CHECKING:
+    # pylint: disable=unsubscriptable-object
     PayloadWrapperBase = collections.UserDict[str, Any]
 else:
     PayloadWrapperBase = collections.UserDict

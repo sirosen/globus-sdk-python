@@ -19,25 +19,6 @@ repos:
   hooks:
     - id: blacken-docs
       additional_dependencies: ['black==21.12b0']
-- repo: https://github.com/asottile/dead
-  rev: v1.4.0
-  hooks:
-    - id: dead
-      # run `dead` only on specific files, where
-      # (1) `dead` is passing
-      # (2) the structure of the code makes extra unused variable detection
-      #     useful (e.g. subclasses which *must* pass arguments to their
-      #     superclasses or risk silently swallowing/ignoring arguments)
-      # (3) we are prepared to commit to keeping `dead` happy and using
-      #     `# dead: disable` comments as needed
-      args:
-        - "--files"
-        - |
-          (?x)^(
-            src/globus_sdk/services/gcs/data.py|
-            src/globus_sdk/services/transfer/data/delete_data.py|
-            src/globus_sdk/services/transfer/data/transfer_data.py
-          )
 - repo: https://gitlab.com/pycqa/flake8
   rev: 3.9.2
   hooks:
