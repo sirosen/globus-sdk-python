@@ -83,7 +83,19 @@ class TransferData(utils.PayloadWrapper):
         destination endpoint which don’t exist on the source endpoint or are a
         different type. Only applies for recursive directory transfers.
         [default: ``False``]
-    :param delete_destination_extra: bool, optional
+    :type delete_destination_extra: bool, optional
+    :param notify_on_succeeded: Send a notification email when the transfer completes
+        with a status of SUCCEEDED.
+        [default: ``True``]
+    :type notify_on_succeeded: bool, optional
+    :param notify_on_failed: Send a notification email when the transfer completes
+        with a status of FAILED.
+        [default: ``True``]
+    :type notify_on_failed: bool, optional
+    :param notify_on_inactive: Send a notification email when the transfer changes
+        status to INACTIVE. e.g. From credentials expiring.
+        [default: ``True``]
+    :type notify_on_inactive: bool, optional
     :param additional_fields: additional fields to be added to the transfer
         document. Mostly intended for internal use
     :type additional_fields: dict, optional
@@ -152,6 +164,9 @@ class TransferData(utils.PayloadWrapper):
         fail_on_quota_errors: bool = False,
         recursive_symlinks: str = "ignore",
         delete_destination_extra: bool = False,
+        notify_on_succeeded: bool = True,
+        notify_on_failed: bool = True,
+        notify_on_inactive: bool = True,
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__()
@@ -169,6 +184,9 @@ class TransferData(utils.PayloadWrapper):
         self["skip_source_errors"] = skip_source_errors
         self["fail_on_quota_errors"] = fail_on_quota_errors
         self["delete_destination_extra"] = delete_destination_extra
+        self["notify_on_succeeded"] = notify_on_succeeded
+        self["notify_on_failed"] = notify_on_failed
+        self["notify_on_inactive"] = notify_on_inactive
         if label is not None:
             self["label"] = label
         if deadline is not None:
@@ -198,7 +216,7 @@ class TransferData(utils.PayloadWrapper):
                     "in via additional_fields)"
                 )
 
-    def add_item(
+    def add_item(  # dead: disable
         self,
         source_path: str,
         destination_path: str,
@@ -240,6 +258,8 @@ class TransferData(utils.PayloadWrapper):
             verify_checksum is True, sync_level is "checksum" or 3, or an
             external_checksum is given.
         :type checksum_algorithm: str, optional
+        :param additional_fields: additional fields to be added to the transfer item
+        :type additional_fields: dict, optional
         """
         item_data = {
             "DATA_TYPE": "transfer_item",
@@ -262,7 +282,9 @@ class TransferData(utils.PayloadWrapper):
         )
         self["DATA"].append(item_data)
 
-    def add_symlink_item(self, source_path: str, destination_path: str) -> None:
+    def add_symlink_item(  # dead: disable
+        self, source_path: str, destination_path: str
+    ) -> None:
         """
         Add a symlink to be transferred as a symlink rather than as the
         target of the symlink.
@@ -290,10 +312,15 @@ class TransferData(utils.PayloadWrapper):
         )
         self["DATA"].append(item_data)
 
-    def iter_items(self) -> Iterator[Dict[str, Any]]:
+    def iter_items(self) -> Iterator[Dict[str, Any]]:  # dead: disable
         """
         An iterator of items created by ``add_item``.
 
         Each item takes the form of a dictionary.
         """
         yield from iter(self["DATA"])
+
+
+# an __all__ declaration ensures that `dead` passes on this module, which is quite
+# useful
+__all__ = ("TransferData",)

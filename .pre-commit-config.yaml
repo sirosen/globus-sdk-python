@@ -30,7 +30,14 @@ repos:
       #     superclasses or risk silently swallowing/ignoring arguments)
       # (3) we are prepared to commit to keeping `dead` happy and using
       #     `# dead: disable` comments as needed
-      args: ["--files", "src/globus_sdk/services/gcs/data.py"]
+      args:
+        - "--files"
+        - |
+          (?x)^(
+            src/globus_sdk/services/gcs/data.py|
+            src/globus_sdk/services/transfer/data/delete_data.py|
+            src/globus_sdk/services/transfer/data/transfer_data.py
+          )
 - repo: https://gitlab.com/pycqa/flake8
   rev: 3.9.2
   hooks:
