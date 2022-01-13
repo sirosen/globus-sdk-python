@@ -219,7 +219,7 @@ class TransferData(utils.PayloadWrapper):
                     "in via additional_fields)"
                 )
 
-    def add_item(  # dead: disable
+    def add_item(
         self,
         source_path: str,
         destination_path: str,
@@ -285,9 +285,7 @@ class TransferData(utils.PayloadWrapper):
         )
         self["DATA"].append(item_data)
 
-    def add_symlink_item(  # dead: disable
-        self, source_path: str, destination_path: str
-    ) -> None:
+    def add_symlink_item(self, source_path: str, destination_path: str) -> None:
         """
         Add a symlink to be transferred as a symlink rather than as the
         target of the symlink.
@@ -315,15 +313,10 @@ class TransferData(utils.PayloadWrapper):
         )
         self["DATA"].append(item_data)
 
-    def iter_items(self) -> Iterator[Dict[str, Any]]:  # dead: disable
+    def iter_items(self) -> Iterator[Dict[str, Any]]:
         """
         An iterator of items created by ``add_item``.
 
         Each item takes the form of a dictionary.
         """
         yield from iter(self["DATA"])
-
-
-# an __all__ declaration ensures that `dead` passes on this module, which is quite
-# useful
-__all__ = ("TransferData",)

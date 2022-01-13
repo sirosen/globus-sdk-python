@@ -441,12 +441,3 @@ class GuestCollectionDocument(CollectionDocument):
             user_credential_id=user_credential_id,
         )
         self._ensure_datatype()
-
-
-# an __all__ declaration ensures that `dead` passes on this module, which is quite
-# useful
-__all__ = (
-    "CollectionDocument",
-    "MappedCollectionDocument",
-    "GuestCollectionDocument",
-)

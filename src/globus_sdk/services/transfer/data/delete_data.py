@@ -127,7 +127,7 @@ class DeleteData(utils.PayloadWrapper):
                     "in via additional_fields)"
                 )
 
-    def add_item(  # dead: disable
+    def add_item(
         self, path: str, *, additional_fields: Optional[Dict[str, Any]] = None
     ) -> None:
         """
@@ -144,15 +144,10 @@ class DeleteData(utils.PayloadWrapper):
         log.debug('DeleteData[{}].add_item: "{}"'.format(self["endpoint"], path))
         self["DATA"].append(item_data)
 
-    def iter_items(self) -> Iterator[Dict[str, Any]]:  # dead: disable
+    def iter_items(self) -> Iterator[Dict[str, Any]]:
         """
         An iterator of items created by ``add_item``.
 
         Each item takes the form of a dictionary.
         """
         yield from iter(self["DATA"])
-
-
-# an __all__ declaration ensures that `dead` passes on this module, which is quite
-# useful
-__all__ = ("DeleteData",)
