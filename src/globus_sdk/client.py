@@ -43,11 +43,6 @@ class BaseClient:
     #: the scopes for this client may be present as a ``ScopeBuilder``
     scopes: Optional[ScopeBuilder] = None
 
-    # note the type of 'paginated' on the class to assist mypy
-    # in Paginator.wrap, mypy cannot infer that if X is a BaseClient,
-    # X.paginated is a PaginatorTable
-    paginated: PaginatorTable
-
     def __init__(
         self,
         *,
