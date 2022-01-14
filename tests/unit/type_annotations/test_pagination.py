@@ -14,12 +14,13 @@ def test_transfer_task_list(run_reveal_type):
 
 
 def test_typed_paginated_transfer_task_list(run_reveal_type):
-    # the typed_paginator variant of a method should preserve the parameters
+    # the Paginator.wrap variant of a method should preserve the parameters
     # (ParamSpec) but have an altered return type
     got_type = run_reveal_type(
-        "tc.typed_paginator(tc.task_list)",
+        "Paginator.wrap(tc.task_list)",
         preamble="""\
 import globus_sdk
+from globus_sdk.paging import Paginator
 
 tc = globus_sdk.TransferClient()
 """,

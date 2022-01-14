@@ -1,9 +1,24 @@
 import abc
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, TypeVar
+import inspect
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    TypeVar,
+    cast,
+)
+
+import typing_extensions as te
 
 from globus_sdk.response import GlobusHTTPResponse
 
 PageT = TypeVar("PageT", bound=GlobusHTTPResponse)
+P = te.ParamSpec("P")
+R = TypeVar("R", bound=GlobusHTTPResponse)
 
 
 class Paginator(Iterable[PageT], metaclass=abc.ABCMeta):
@@ -68,3 +83,46 @@ class Paginator(Iterable[PageT], metaclass=abc.ABCMeta):
             )
         for page in self.pages():
             yield from page[self.items_key]
+
+    @classmethod
+    def wrap(cls, method: Callable[P, R]) -> Callable[P, "Paginator[R]"]:
+        """
+        This is an alternate method for getting a paginator for a paginated method which
+        correctly preserves the type signature of the paginated method.
+
+        It should be used on instances of clients and only passed bound methods of those
+        clients. For example, given usage
+
+            >>> tc = TransferClient()
+            >>> paginator = tc.paginated.endpoint_search(...)
+
+        a well-typed paginator can be acquired with
+
+            >>> tc = TransferClient()
+            >>> paginated_call = Paginator.wrap(tc.endpoint_search)
+            >>> paginator = paginated_call(...)
+
+        Although the syntax is slightly more verbose, this allows `mypy` and other type
+        checkers to more accurately infer the type of the paginator.
+        """
+        # these import are deferred to avoid circular dependencies
+        # `globus_sdk.paging` is needed by clients to build paginator tables
+        # but the client class is needed here to be able to check that methods are
+        # methods of clients
+        # the table is needed here for typing, but requires Paginator
+        from ..client import BaseClient
+
+        if not inspect.ismethod(method):
+            raise TypeError(f"Paginator.wrap can only be used on methods, not {method}")
+
+        if not isinstance(method.__self__, BaseClient):
+            raise ValueError(
+                "Paginator.wrap can only be used on methods of globus-sdk clients"
+            )
+
+        try:
+            ret = getattr(method.__self__.paginated, method.__name__)
+        except AttributeError as e:
+            raise ValueError(f"{method.__name__} is not a paginated method") from e
+
+        return cast(Callable[P, Paginator[R]], ret)
