@@ -1,6 +1,7 @@
 import abc
 import functools
 import inspect
+import sys
 from typing import (
     Any,
     Callable,
@@ -15,12 +16,15 @@ from typing import (
     cast,
 )
 
-import typing_extensions as te
-
 from globus_sdk.response import GlobusHTTPResponse
 
+if sys.version_info >= (3, 10):
+    from typing import ParamSpec
+else:
+    from typing_extensions import ParamSpec
+
 PageT = TypeVar("PageT", bound=GlobusHTTPResponse)
-P = te.ParamSpec("P")
+P = ParamSpec("P")
 R = TypeVar("R", bound=GlobusHTTPResponse)
 C = TypeVar("C", bound=Callable[..., GlobusHTTPResponse])
 

@@ -2,27 +2,17 @@ import collections.abc
 import json
 import logging
 import sys
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Iterable,
-    Optional,
-    Type,
-    TypeVar,
-    Union,
-    cast,
-    overload,
-)
+from typing import Any, Dict, Iterable, Optional, Type, TypeVar, Union, cast, overload
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
-if TYPE_CHECKING:
-    if sys.version_info >= (3, 8):
-        from typing import Literal
-    else:
-        from typing_extensions import Literal
+if sys.version_info >= (3, 8):
+    # pylint can't handle quoted annotations yet:
+    # https://github.com/PyCQA/pylint/issues/3299
+    from typing import Literal  # pylint: disable=unused-import
+else:
+    from typing_extensions import Literal
 
 from globus_sdk import client, exc, utils
 from globus_sdk.authorizers import NullAuthorizer
