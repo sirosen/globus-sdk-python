@@ -77,6 +77,9 @@ setup(
         #   non-breaking for our usages
         # - other packages /consumers can specify stricter bounds if necessary
         "cryptography>=3.3.1,!=3.4.0",
+        # depend on the latest version of typing-extensions on python versions which do
+        # not have all of the typing features we use
+        'typing_extensions;python_version<"3.10"',
     ],
     extras_require={"dev": DEV_REQUIREMENTS},
     keywords=["globus"],

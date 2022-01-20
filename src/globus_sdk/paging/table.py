@@ -1,63 +1,10 @@
-import functools
-from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, cast
+from typing import Any, Callable, Dict, TypeVar
 
 from globus_sdk.response import GlobusHTTPResponse
 
 from .base import PageT, Paginator
 
 C = TypeVar("C", bound=Callable[..., GlobusHTTPResponse])
-
-
-# stub for mypy
-class _PaginatedFunc(Generic[PageT]):
-    _has_paginator: bool
-    _paginator_class: Type[Paginator[PageT]]
-    _paginator_items_key: Optional[str]
-    _paginator_params: Dict[str, Any]
-
-
-def has_paginator(
-    paginator_class: Type[Paginator[PageT]],
-    items_key: Optional[str] = None,
-    **paginator_params: Any,
-) -> Callable[[C], C]:
-    """
-    Mark a callable -- typically a client method -- as having pagination parameters.
-    Usage:
-
-    >>> class MyClient(BaseClient):
-    >>>     @has_paginator(MarkerPaginator)
-    >>>     def foo(...): ...
-
-    This will mark ``MyClient.foo`` as paginated with marker style pagination.
-    It will then be possible to get a paginator for ``MyClient.foo`` via
-
-    >>> c = MyClient(...)
-    >>> paginator = c.paginated.foo()
-    """
-
-    def decorate(func: C) -> C:
-        as_paginated = cast(_PaginatedFunc[PageT], func)
-        as_paginated._has_paginator = True
-        as_paginated._paginator_class = paginator_class
-        as_paginated._paginator_items_key = items_key
-        as_paginated._paginator_params = paginator_params
-
-        func.__doc__ = f"""{func.__doc__}
-
-        **Paginated Usage**
-
-        This method supports paginated access. To use the paginated variant, give the
-        same arguments as normal, but prefix the method name with ``paginated``, as in
-
-        >>> client.paginated.{func.__name__}(...)
-
-        For more information, see
-        :ref:`how to make paginated calls <making_paginated_calls>`.
-        """
-        return func
-
-    return decorate
 
 
 class PaginatorTable:
@@ -94,32 +41,17 @@ class PaginatorTable:
         self._bindings: Dict[str, Callable[..., Paginator[PageT]]] = {}
 
     def _add_binding(self, methodname: str, bound_method: Callable[..., PageT]) -> None:
-        as_paginated = cast(_PaginatedFunc[PageT], bound_method)
-        paginator_class = as_paginated._paginator_class
-        paginator_params = as_paginated._paginator_params
-        paginator_items_key = as_paginated._paginator_items_key
-
-        @functools.wraps(bound_method)
-        def paginated_method(*args: Any, **kwargs: Any) -> Paginator[PageT]:
-            return paginator_class(
-                bound_method,
-                client_args=list(args),
-                client_kwargs=kwargs,
-                items_key=paginator_items_key,
-                **paginator_params,
-            )
-
-        self._bindings[methodname] = paginated_method
+        self._bindings[methodname] = Paginator.wrap(bound_method)
 
     def __getattr__(self, attrname: str) -> Callable[..., Paginator[PageT]]:
         if attrname not in self._bindings:
             # this could raise AttributeError -- in which case, let it!
             method = getattr(self._client, attrname)
-            # not callable -> not a method; not marked paginated -> not relevant
-            if not callable(method) or not getattr(method, "_has_paginator", False):
-                raise AttributeError(f"'{attrname}' is not a paginated method")
-
-            self._add_binding(attrname, method)
+            try:
+                self._bindings[attrname] = Paginator.wrap(method)
+            # ValueError is raised if the method being wrapped is not paginated
+            except ValueError as e:
+                raise AttributeError(f"'{attrname}' is not a paginated method") from e
 
         return self._bindings[attrname]
 

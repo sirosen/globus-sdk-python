@@ -3,6 +3,7 @@ import random
 import pytest
 import responses
 
+from globus_sdk.paging import Paginator
 from tests.common import register_api_route
 
 # empty search
@@ -227,7 +228,8 @@ def test_shared_endpoint_list_non_paginated(client):
         assert "id" in item
 
 
-def test_shared_endpoint_list_iter_pages(client):
+@pytest.mark.parametrize("paging_variant", ["attr", "wrap"])
+def test_shared_endpoint_list_iter_pages(client, paging_variant):
     # add each page
     for page in SHARED_ENDPOINT_RESULTS:
         register_api_route(
@@ -235,7 +237,12 @@ def test_shared_endpoint_list_iter_pages(client):
         )
 
     # paginator pages() call gets an iterator of pages
-    paginator = client.paginated.get_shared_endpoint_list("endpoint_id")
+    if paging_variant == "attr":
+        paginator = client.paginated.get_shared_endpoint_list("endpoint_id")
+    elif paging_variant == "wrap":
+        paginator = Paginator.wrap(client.get_shared_endpoint_list)("endpoint_id")
+    else:
+        raise NotImplementedError
     count = 0
     for item in paginator.pages():
         count += 1
@@ -244,7 +251,8 @@ def test_shared_endpoint_list_iter_pages(client):
     assert count == 3
 
 
-def test_shared_endpoint_list_iter_items(client):
+@pytest.mark.parametrize("paging_variant", ["attr", "wrap"])
+def test_shared_endpoint_list_iter_items(client, paging_variant):
     # add each page
     for page in SHARED_ENDPOINT_RESULTS:
         register_api_route(
@@ -252,7 +260,12 @@ def test_shared_endpoint_list_iter_items(client):
         )
 
     # paginator items() call gets an iterator of individual page items
-    paginator = client.paginated.get_shared_endpoint_list("endpoint_id")
+    if paging_variant == "attr":
+        paginator = client.paginated.get_shared_endpoint_list("endpoint_id")
+    elif paging_variant == "wrap":
+        paginator = Paginator.wrap(client.get_shared_endpoint_list)("endpoint_id")
+    else:
+        raise NotImplementedError
     count = 0
     for item in paginator.items():
         count += 1

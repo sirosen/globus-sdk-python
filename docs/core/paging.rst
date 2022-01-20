@@ -93,6 +93,45 @@ returns the total number of results for the search as a field on each page.
 Most use-cases can be solved with ``items()``, and ``pages()`` will be
 available to you if or when you need it.
 
+Typed Paginators with Paginator.wrap
+------------------------------------
+
+This is an alternate syntax for getting a paginated call. It is more verbose,
+but preserves type annotation information correctly. It is therefore preferable
+for users who want to type-check their code with ``mypy``.
+
+``Paginator.wrap`` converts any client method into a callable which returns a
+paginator. Its usage is very similar to the ``.paginated`` syntax.
+
+.. code-block:: python
+
+    import globus_sdk
+    from globus_sdk.paging import Paginator
+
+    tc = globus_sdk.TransferClient(...)
+
+    # convert `tc.endpoint_search` into a call returning a paginator
+    paginated_call = Paginator.wrap(tc.endpoint_search)
+
+    # now the result is a paginator and we can use `pages()` or `items()` as
+    # normal
+    for endpoint_info in paginated_call("tutorial").items():
+        print("got endpoint_id:", endpoint_info["id"])
+
+
+However, if using ``mypy`` to run ``reveal_type``, the results of
+``tc.paginated.task_successful_transfers`` and
+``Paginator.wrap(tc.task_successful_transfers)`` are very different:
+
+.. code-block:: python
+
+    # def (task_id: Union[uuid.UUID, builtins.str], *, query_params: Union[builtins.dict[builtins.str, Any], None] =) -> globus_sdk.services.transfer.response.iterable.IterableTransferResponse
+    reveal_type(tc.task_successful_transfers)
+    # def [PageT <: globus_sdk.response.GlobusHTTPResponse] (*Any, **Any) -> globus_sdk.paging.base.Paginator[PageT`-1]
+    reveal_type(tc.paginated.task_successful_transfers)
+    # def (task_id: Union[uuid.UUID, builtins.str], *, query_params: Union[builtins.dict[builtins.str, Any], None] =) -> globus_sdk.paging.base.Paginator[globus_sdk.services.transfer.response.iterable.IterableTransferResponse*]
+    reveal_type(Paginator.wrap(tc.task_successful_transfers))
+
 Paginator Types
 ---------------
 
