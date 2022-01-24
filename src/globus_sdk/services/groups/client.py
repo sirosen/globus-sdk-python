@@ -79,6 +79,19 @@ class GroupsClient(client.BaseClient):
         """
         return self.post("/groups", data=data, query_params=query_params)
 
+    @_groupdoc("Update a group", "update_group_v2_groups__group_id__put")
+    def update_group(
+        self,
+        group_id: UUIDLike,
+        data: Dict[str, Any],
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        Update a given group.
+        """
+        return self.put(f"/groups/{group_id}", data=data, query_params=query_params)
+
     @_groupdoc(
         "Get the policies for the group",
         "get_policies_v2_groups__group_id__policies_get",
