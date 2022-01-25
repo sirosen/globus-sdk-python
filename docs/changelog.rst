@@ -12,6 +12,47 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.3.0 (2022-01-25)
+-------------------
+
+* Add ``update_group`` method to ``GroupsClient`` (:pr:`506`)
+
+* The ``TransferData`` and ``DeleteData`` helper objects now accept the
+  following parameters: ``notify_on_succeeded``, ``notify_on_failed``, and
+  ``notify_on_inactive``. All three are boolean parameters with a default
+  of ``True``. (:pr:`502`)
+
+* Several minor bugs have been found and fixed (:pr:`504`)
+
+  * Exceptions raised in the SDK always use ``raise ... from`` syntax where
+    appropriate. This corrects exception chaining in the local endpoint and
+    several response objects.
+
+  * The encoding of files opened by the SDK is now always ``UTF-8``
+
+  * ``TransferData`` will now reject unsupported ``sync_level`` values with a
+    ``ValueError`` on initialization, rather than erroring at submission time.
+    The ``sync_level`` has also had its type annotation fixed to allow for
+    ``int`` values.
+
+  * Several instances of undocumented parameters have been discovered, and these
+    are now rectified.
+
+* Add ``Paginator.wrap`` as a method for getting a paginated methods. This interface is more
+  verbose than the existing ``paginated`` methods, but correctly preserves type
+  annotations. It is therefore preferable for users who are using ``mypy`` to do
+  type checking. (:pr:`494`)
+
+* ``Paginator`` objects are now generics over a type var for their page type. The
+  page type is bounded by ``GlobusHTTPResponse``, and most type-checker behaviors
+  will remain unchanged (:pr:`495`)
+
+* Document ``globus_sdk.config.get_service_url`` and ``globus_sdk.config.get_webapp_url``
+  (:pr:`496`)
+
+  * Internally, these are updated to be able to default to the ``GLOBUS_SDK_ENVIRONMENT`` setting,
+    so specifying an environment is no longer required
+
 v3.2.1 (2021-12-13)
 -------------------
 
