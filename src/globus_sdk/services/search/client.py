@@ -102,11 +102,32 @@ class SearchClient(client.BaseClient):
         return self.get(f"/v1/index/{index_id}/search", query_params=query_params)
 
     @utils.doc_api_method("POST Search Query", "search/reference/post_query")
+    @paging.has_paginator(
+        paging.HasNextPaginator,
+        items_key="gmeta",
+        get_page_size=lambda x: x["count"],
+        max_total_results=10000,
+        page_size=100,
+    )
     def post_search(
-        self, index_id: UUIDLike, data: Union[Dict[str, Any], SearchQuery]
+        self,
+        index_id: UUIDLike,
+        data: Union[Dict[str, Any], SearchQuery],
+        *,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /v1/index/<index_id>/search``
+
+        :param index_id: The index on which to search
+        :type index_id: str or UUID
+        :param data: A Search Query document containing the query and any other fields
+        :type data: dict or SearchQuery
+        :param offset: offset used in paging (overwrites any offset in ``data``)
+        :type offset: int, optional
+        :param limit: limit the number of results (overwrites any limit in ``data``)
+        :type limit: int, optional
 
         **Examples**
 
@@ -138,6 +159,13 @@ class SearchClient(client.BaseClient):
         >>> search_result = sc.post_search(index_id, query_data)
         """
         log.info(f"SearchClient.post_search({index_id}, ...)")
+        add_kwargs = {}
+        if offset is not None:
+            add_kwargs["offset"] = offset
+        if limit is not None:
+            add_kwargs["limit"] = limit
+        if add_kwargs:
+            data = {**data, **add_kwargs}
         return self.post(f"v1/index/{index_id}/search", data=data)
 
     #

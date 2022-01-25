@@ -1,0 +1,24 @@
+{
+  "@datatype": "GSearchResult",
+  "@version": "2017-09-01",
+  "count": 1,
+  "gmeta": [
+    {
+      "@datatype": "GMetaResult",
+      "@version": "2019-08-27",
+      "entries": [
+        {
+          "content": {
+            "foo": "bar"
+          },
+          "entry_id": null,
+          "matched_principal_sets": []
+        }
+      ],
+      "subject": "foo-bar"
+    }
+  ],
+  "has_next_page": true,
+  "offset": 0,
+  "total": 10
+}
