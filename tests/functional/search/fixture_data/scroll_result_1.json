@@ -1,0 +1,22 @@
+{
+  "gmeta": [
+    {
+      "@datatype": "GMetaResult",
+      "@version": "2019-08-27",
+      "entries": [
+        {
+          "content": {
+            "foo": "bar"
+          },
+          "entry_id": null,
+          "matched_principal_sets": []
+        }
+      ],
+      "subject": "foo-bar"
+    }
+  ],
+  "count": 1,
+  "total": 2,
+  "has_next_page": true,
+  "marker": "3d34900e3e4211ebb0a806b2af333354"
+}

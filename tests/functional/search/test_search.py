@@ -3,6 +3,7 @@ import urllib.parse
 import uuid
 
 import pytest
+import responses
 
 import globus_sdk
 from tests.common import get_last_request, register_api_route_fixture_file
@@ -97,3 +98,45 @@ def test_search_post_query_arg_overrides(search_client, query_doc):
     # important! these should be unchanged (no side-effects)
     assert query_doc["limit"] == 10
     assert query_doc["offset"] == 0
+
+
+@pytest.mark.parametrize(
+    "query_doc",
+    [
+        {"q": "foo"},
+        globus_sdk.SearchScrollQuery("foo"),
+    ],
+)
+def test_search_paginated_scroll_qeury(search_client, query_doc):
+    index_id = str(uuid.uuid1())
+    register_api_route_fixture_file(
+        "search",
+        f"/v1/index/{index_id}/search",
+        "scroll_result_1.json",
+        method="POST",
+        match=[responses.matchers.json_params_matcher({"q": "foo"})],
+    )
+    register_api_route_fixture_file(
+        "search",
+        f"/v1/index/{index_id}/search",
+        "scroll_result_2.json",
+        method="POST",
+        match=[
+            responses.matchers.json_params_matcher(
+                {"q": "foo", "marker": "3d34900e3e4211ebb0a806b2af333354"}
+            )
+        ],
+    )
+
+    data = list(search_client.paginated.scroll(index_id, query_doc).items())
+    assert len(responses.calls) == 2
+    assert len(data) == 2
+
+    assert isinstance(data[0], dict)
+    assert data[0]["entries"][0]["content"]["foo"] == "bar"
+
+    assert isinstance(data[1], dict)
+    assert data[1]["entries"][0]["content"]["foo"] == "baz"
+
+    # confirm that pagination was not side-effecting
+    assert "marker" not in query_doc

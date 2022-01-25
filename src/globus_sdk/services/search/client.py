@@ -5,7 +5,7 @@ from globus_sdk import client, paging, response, utils
 from globus_sdk.scopes import SearchScopes
 from globus_sdk.types import UUIDLike
 
-from .data import SearchQuery
+from .data import SearchQuery, SearchScrollQuery
 from .errors import SearchAPIError
 
 log = logging.getLogger(__name__)
@@ -164,6 +164,38 @@ class SearchClient(client.BaseClient):
             add_kwargs["offset"] = offset
         if limit is not None:
             add_kwargs["limit"] = limit
+        if add_kwargs:
+            data = {**data, **add_kwargs}
+        return self.post(f"v1/index/{index_id}/search", data=data)
+
+    @utils.doc_api_method("Scroll Query", "search/reference/scroll_query")
+    @paging.has_paginator(paging.MarkerPaginator, items_key="gmeta")
+    def scroll(
+        self,
+        index_id: UUIDLike,
+        data: Union[Dict[str, Any], SearchScrollQuery],
+        *,
+        marker: Optional[str] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``POST /v1/index/<index_id>/scroll``
+
+        :param index_id: The index on which to search
+        :type index_id: str or UUID
+        :param data: A Search Scroll Query document
+        :type data: dict or SearchScrollQuery
+        :param marker: marker used in paging (overwrites any marker in ``data``)
+        :type marker: str, optional
+
+        **Examples**
+
+        >>> sc = globus_sdk.SearchClient(...)
+        >>> scroll_result = sc.scroll(index_id, {"q": "*"})
+        """
+        log.info(f"SearchClient.scroll({index_id}, ...)")
+        add_kwargs = {}
+        if marker is not None:
+            add_kwargs["marker"] = marker
         if add_kwargs:
             data = {**data, **add_kwargs}
         return self.post(f"v1/index/{index_id}/search", data=data)

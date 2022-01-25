@@ -1,9 +1,48 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 from globus_sdk import utils
 
+# workaround for absence of Self type
+# for the workaround and some background, see:
+#   https://github.com/python/mypy/issues/11871
+SearchQueryT = TypeVar("SearchQueryT", bound="_SearchQueryBase")
 
-class SearchQuery(utils.PayloadWrapper):
+
+# an internal class for declaring multiple related types with shared methods
+class _SearchQueryBase(utils.PayloadWrapper):
+    def set_query(self: SearchQueryT, query: str) -> SearchQueryT:
+        self["q"] = query
+        return self
+
+    def set_limit(self: SearchQueryT, limit: int) -> SearchQueryT:
+        self["limit"] = limit
+        return self
+
+    def set_advanced(self: SearchQueryT, advanced: bool) -> SearchQueryT:
+        self["advanced"] = advanced
+        return self
+
+    def add_filter(
+        self: SearchQueryT,
+        field_name: str,
+        values: List[str],
+        *,
+        # pylint: disable=redefined-builtin
+        type: str = "match_all",
+        additional_fields: Optional[Dict[str, Any]] = None,
+    ) -> SearchQueryT:
+        self["filters"] = self.get("filters", [])
+        new_filter = {
+            "field_name": field_name,
+            "values": values,
+            "type": type,
+            **(additional_fields or {}),
+        }
+        self["filters"].append(new_filter)
+        return self
+
+
+class SearchQuery(_SearchQueryBase):
     """
     A specialized dict which has helpers for creating and modifying a Search
     Query document.
@@ -40,20 +79,8 @@ class SearchQuery(utils.PayloadWrapper):
         if additional_fields is not None:
             self.update(additional_fields)
 
-    def set_query(self, query: str) -> "SearchQuery":
-        self["q"] = query
-        return self
-
-    def set_limit(self, limit: int) -> "SearchQuery":
-        self["limit"] = limit
-        return self
-
     def set_offset(self, offset: int) -> "SearchQuery":
         self["offset"] = offset
-        return self
-
-    def set_advanced(self, advanced: bool) -> "SearchQuery":
-        self["advanced"] = advanced
         return self
 
     def add_facet(
@@ -85,25 +112,6 @@ class SearchQuery(utils.PayloadWrapper):
         self["facets"].append(facet)
         return self
 
-    def add_filter(
-        self,
-        field_name: str,
-        values: List[str],
-        *,
-        # pylint: disable=redefined-builtin
-        type: str = "match_all",
-        additional_fields: Optional[Dict[str, Any]] = None,
-    ) -> "SearchQuery":
-        self["filters"] = self.get("filters", [])
-        new_filter = {
-            "field_name": field_name,
-            "values": values,
-            "type": type,
-            **(additional_fields or {}),
-        }
-        self["filters"].append(new_filter)
-        return self
-
     def add_boost(
         self,
         field_name: str,
@@ -132,4 +140,31 @@ class SearchQuery(utils.PayloadWrapper):
         if order is not None:
             sort["order"] = order
         self["sort"].append(sort)
+        return self
+
+
+class SearchScrollQuery(_SearchQueryBase):
+    def __init__(
+        self,
+        q: Optional[str] = None,
+        *,
+        limit: Optional[int] = None,
+        advanced: Optional[bool] = None,
+        marker: Optional[str] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
+    ):
+        super().__init__()
+        if q is not None:
+            self["q"] = q
+        if limit is not None:
+            self["limit"] = limit
+        if marker is not None:
+            self["marker"] = marker
+        if advanced is not None:
+            self["advanced"] = advanced
+        if additional_fields is not None:
+            self.update(additional_fields)
+
+    def set_marker(self, marker: str) -> "SearchScrollQuery":
+        self["marker"] = marker
         return self
