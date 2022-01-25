@@ -12,6 +12,12 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.3.1 (2022-01-25)
+-------------------
+
+* Packaging bugfix. ``globus-sdk`` is now built with pypa's ``build`` tool, to
+  resolve issues with wheel builds.
+
 v3.3.0 (2022-01-25)
 -------------------
 
