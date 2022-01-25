@@ -7,4 +7,4 @@
 .. automatically replace it when the PR is merged.
 ..
 
-* add update_group method to groups client (:pr:`NUMBER`)
+* add update_group method to groups client (:pr:`506`)
