@@ -1,6 +1,3 @@
-.. module:: globus_sdk.search
-
-
 Globus Search
 =============
 
@@ -13,7 +10,19 @@ Globus Search
 Helper Objects
 --------------
 
+Note that you should not use ``SearchQueryBase`` directly, and it is not
+importable from the top level of the SDK. It is included in documentation
+only to document the methods it provides to its subclasses.
+
+.. autoclass:: globus_sdk.services.search.data.SearchQueryBase
+   :members:
+   :show-inheritance:
+
 .. autoclass:: globus_sdk.SearchQuery
+   :members:
+   :show-inheritance:
+
+.. autoclass:: globus_sdk.SearchScrollQuery
    :members:
    :show-inheritance:
 
