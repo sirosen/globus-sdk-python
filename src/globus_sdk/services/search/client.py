@@ -524,3 +524,94 @@ class SearchClient(client.BaseClient):
         """
         log.info(f"SearchClient.get_task_list({index_id})")
         return self.get(f"/v1/task_list/{index_id}", query_params=query_params)
+
+    #
+    # Role Management
+    #
+
+    @utils.doc_api_method("Create Role", "search/reference/role_create/")
+    def create_role(
+        self,
+        index_id: UUIDLike,
+        data: Dict[str, Any],
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``POST /v1/index/<index_id>/role``
+
+        Create a new role on an index. You must already have the ``owner`` or
+        ``admin`` role on an index to create additional roles.
+
+        Roles are specified as a role name (one of ``"owner"``, ``"admin"``, or
+        ``"writer"``) and a `Principal URN
+        <https://docs.globus.org/api/search/overview/#principal_urns>`_.
+
+        :param index_id: The index on which to create the role
+        :type index_id: uuid or str
+        :param data: The partial role document to use for creation
+        :type data: dict
+        :param query_params: Any additional query params to pass
+        :type query_params: dict, optional
+
+        **Examples**
+
+        >>> identity_id = "46bd0f56-e24f-11e5-a510-131bef46955c"
+        >>> sc = globus_sdk.SearchClient(...)
+        >>> sc.create_role(
+        >>>     index_id,
+        >>>     {
+        >>>         "role_name": "writer",
+        >>>         "principal": f"urn:globus:auth:identity:{identity_id}"
+        >>>     }
+        >>> )
+        """
+        log.info("SearchClient.create_role(%s, ...)", index_id)
+        return self.post(
+            f"/v1/index/{index_id}/role", data=data, query_params=query_params
+        )
+
+    @utils.doc_api_method("Get Role List", "search/reference/role_list/")
+    def get_role_list(
+        self, index_id: UUIDLike, *, query_params: Optional[Dict[str, Any]] = None
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``GET /v1/index/<index_id>/role_list``
+
+        List all roles on an index. You must have the ``owner`` or ``admin``
+        role on an index to list roles.
+
+        :param index_id: The index on which to list roles
+        :type index_id: uuid or str
+        :param query_params: Any additional query params to pass
+        :type query_params: dict, optional
+        """
+        log.info("SearchClient.get_role_list(%s)", index_id)
+        return self.get(f"/v1/index/{index_id}/role_list", query_params=query_params)
+
+    @utils.doc_api_method("Role Delete", "search/reference/role_delete/")
+    def delete_role(
+        self,
+        index_id: UUIDLike,
+        role_id: str,
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``DELETE /v1/index/<index_id>/role/<role_id>``
+
+        Delete a role from an index. You must have the ``owner`` or ``admin``
+        role on an index to delete roles. You cannot remove the last ``owner`` from an
+        index.
+
+        :param index_id: The index from which to delete a role
+        :type index_id: uuid or str
+        :param role_id: The role to delete
+        :type role_id: str
+        :param query_params: Any additional query params to pass
+        :type query_params: dict, optional
+        """
+        log.info("SearchClient.delete_role(%s, %s)", index_id, role_id)
+        return self.delete(
+            f"/v1/index/{index_id}/role/{role_id}", query_params=query_params
+        )
