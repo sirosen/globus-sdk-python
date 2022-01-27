@@ -26,7 +26,10 @@ GO_EP1_SERVER_ID = 207976
 
 
 def get_last_request():
-    return responses.calls[-1].request
+    try:
+        return responses.calls[-1].request
+    except IndexError:
+        return None
 
 
 def register_api_route(

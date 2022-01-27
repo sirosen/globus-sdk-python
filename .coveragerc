@@ -1,8 +1,11 @@
 [run]
 parallel = True
+include = src/*
+omit = src/globus_sdk/_sphinxext.py
 
 [report]
 show_missing = True
+skip_covered = True
 
 exclude_lines =
     # the pragma to disable coverage
@@ -15,5 +18,3 @@ exclude_lines =
     if TYPE_CHECKING:
     # skip overloads
     @overload
-
-omit = src/globus_sdk/_sphinxext.py
