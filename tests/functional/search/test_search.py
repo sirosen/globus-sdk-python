@@ -107,7 +107,7 @@ def test_search_post_query_arg_overrides(search_client, query_doc):
         globus_sdk.SearchScrollQuery("foo"),
     ],
 )
-def test_search_paginated_scroll_qeury(search_client, query_doc):
+def test_search_paginated_scroll_query(search_client, query_doc):
     index_id = str(uuid.uuid1())
     register_api_route_fixture_file(
         "search",
