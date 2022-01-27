@@ -101,12 +101,23 @@ class GCSClient(client.BaseClient):
     def get_collection_list(
         self,
         *,
+        mapped_collection_id: Optional[UUIDLike] = None,
+        filter: Union[  # pylint: disable=redefined-builtin
+            str, Iterable[str], None
+        ] = None,
         include: Union[str, Iterable[str], None] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableGCSResponse:
         """
         ``GET /collections``
 
+        :param mapped_collection_id: Filter collections which were created using this
+            mapped collection ID.
+        :type mapped_collection_id: str or UUID
+        :param filter: Filter the returned set to any combination of the following:
+            ``mapped_collections``, ``guest_collections``, ``managed_by_me``,
+            ``created_by_me``.
+        :type filter: str or iterable of str, optional
         :param include: Names of additional documents to include in the response
         :type include: str or iterable of str, optional
         :param query_params: Additional passthrough query parameters
@@ -120,6 +131,12 @@ class GCSClient(client.BaseClient):
             if isinstance(include, str):
                 include = [include]
             query_params["include"] = ",".join(include)
+        if mapped_collection_id is not None:
+            query_params["mapped_collection_id"] = mapped_collection_id
+        if filter is not None:
+            if isinstance(filter, str):
+                filter = [filter]
+            query_params["filter"] = ",".join(filter)
         return IterableGCSResponse(self.get("collections", query_params=query_params))
 
     @_gcsdoc("Get Collection", "openapi_Collections/#getCollection")
