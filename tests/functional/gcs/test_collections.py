@@ -40,6 +40,16 @@ def test_get_collection_list_include_param(client):
     assert "include" in req.params
     assert req.params["include"] == "foo,bar"
 
+    client.get_collection_list(mapped_collection_id="MAPPED_COLLECTION")
+    assert get_last_request().params.get("mapped_collection_id") == "MAPPED_COLLECTION"
+
+    filters = ["mapped_collections", "created_by_me"]
+    client.get_collection_list(filter=filters)
+    assert get_last_request().params.get("filter") == ",".join(filters)
+
+    client.get_collection_list(filter="created_by_me")
+    assert get_last_request().params.get("filter") == "created_by_me"
+
 
 def test_error_parsing_forbidden(client):
     register_api_route_fixture_file(
