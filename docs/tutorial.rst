@@ -14,19 +14,37 @@ them with our service.
 
 These are the steps we will take:
 
-#. :ref:`Get a Client <tutorial_step1>`
-#. :ref:`Get and Save Client ID <tutorial_step2>`
-#. :ref:`Get Some Access Tokens! <tutorial_step3>`
-#. :ref:`Use Your Tokens, Talk to the Service <tutorial_step4>`
+#. :ref:`Create a Client <tutorial_step1>`
+#. :ref:`Login and get tokens! <tutorial_step2>`
+#. :ref:`Use tokens to access the service <tutorial_step3>`
+#. :ref:`Explore the OAuthTokenResponse <tutorial_step4>`
+#. :ref:`Do a login flow with Refresh Tokens <tutorial_step5>`
+#. :ref:`Selected Examples <tutorial_step6>`
 
 That should be enough to get you up and started.
-You can also proceed to the :ref:`Advanced Tutorial <advanced_tutorial>` steps
-to dig deeper into the SDK.
+
+Background on OAuth2 Clients
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Globus uses OAuth2 to handle authentication. In order to login, your
+application must be registered with Globus Auth. This is called a "client" in
+OAuth2, but Globus will also sometimes call this an "app".
+
+If you plan to create your own application, you should create a new client by
+following the instructions below. However, just for the purposes of this
+tutorial, we have created a tutorial client which you may use.
 
 .. _tutorial_step1:
 
-Step 1: Get a Client
-~~~~~~~~~~~~~~~~~~~~
+Step 1: Create a Client
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    You can skip this section and jump right in by using the CLIENT_ID seen in
+    the example code blocks below! That is the ID of the tutorial client, which
+    lets you get started quickly and easily. Come back and create a client of
+    your own when you're ready!
 
 In order to complete an OAuth2 flow to get tokens, you must have a client or
 "app" definition registered with Globus.
@@ -36,43 +54,29 @@ Navigate to the `Developer Site <https://developers.globus.org>`_ and select
 You will be prompted to login -- do so with the account you wish to use as your
 app's administrator.
 
-When prompted, create a Project named "SDK Tutorial Project".
-Projects let you share the administrative burden of a collection of apps, but
-we won't be sharing the SDK Tutorial Project.
+When prompted, create a Project. A Project is a collection of clients with a
+shared list of administrators.
+Projects let you share the administrative burden of a collection of apps.
 
-In the "Add..." menu for "SDK Tutorial Project", select "Add new app".
+In the "Add" menu for your Project, select "Add new app". To follow this
+tutorial, we will specify several values you should use.
 
 Enter the following pieces of information:
 
-- **App Name**: "SDK Tutorial App"
 - **Native App**: Check this Box
-- **Scopes**: "openid", "profile", "email",
-  "urn:globus:auth:scope:transfer.api.globus.org:all"
 - **Redirects**: https://auth.globus.org/v2/web/auth-code
-- **Required Identity**: <Leave Unchecked>
-- **Pre-select Identity Provider**: <Leave Unchecked>
-- **Privacy Policy**: <Leave Blank>
-- **Terms & Conditions**: <Leave Blank>
 
 and click "Create App".
 
 .. warning::
 
     The **Native App** setting cannot be changed after a client is created.
+    If it is not selected during creation, you must create a replacement client.
 
-.. _tutorial_step2:
+Expand the dropdown for the new app, and you should see an array of
+attributes of your client.
 
-Step 2: Get and Save Client ID
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-On the "Apps" screen you should now see all of your Projects, probably just
-"SDK Tutorial Project", and all of the Apps they contain, probably just "SDK
-Tutorial App".
-Expand the dropdown for the tutorial App, and you should see an array of
-attributes of your client, including the ones we specified in Step 1, and a
-bunch of new things.
-
-We want to get the Client ID from this screen.
+You will need the Client ID from this screen.
 Feel free to think of this as your App's "username".
 You can hardcode it into scripts, store it in a config file, or even put it
 into a database.
@@ -81,10 +85,10 @@ It's non-secure information and you can treat it as such.
 In the rest of the tutorial we will assume in all code samples that it is
 available in the variable, ``CLIENT_ID``.
 
-.. _tutorial_step3:
+.. _tutorial_step2:
 
-Step 3: Get Some Access Tokens!
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 2: Login and get tokens!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Talking to Globus Services as a user requires that you authenticate to your new
 App and get it Tokens, credentials proving that you logged into it and gave it
@@ -98,13 +102,14 @@ Run the following code sample to get your Access Tokens:
 
     import globus_sdk
 
-    CLIENT_ID = "<YOUR_ID_HERE>"
-
+    # this is the tutorial client ID
+    # replace this string with your ID for production use
+    CLIENT_ID = "61338d24-54d5-408f-a10d-66c06b59f6d2"
     client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
-    client.oauth2_start_flow()
 
+    client.oauth2_start_flow()
     authorize_url = client.oauth2_get_authorize_url()
-    print("Please go to this URL and login: {0}".format(authorize_url))
+    print(f"Please go to this URL and login:\n\n{authorize_url}\n")
 
     auth_code = input("Please enter the code you get after login here: ").strip()
     token_response = client.oauth2_exchange_code_for_tokens(auth_code)
@@ -117,19 +122,29 @@ Run the following code sample to get your Access Tokens:
     TRANSFER_TOKEN = globus_transfer_data["access_token"]
 
 
-Managing credentials is one of the more advanced features of the SDK.
-If you want to read in depth about these steps, please look through our various
-:ref:`Examples <examples>`.
+The Globus SDK offers several features for managing credentials. The following components
+are useful for further reading:
 
-.. _tutorial_step4:
+* :ref:`using GlobusAuthorizer objects <authorization>` handle passing tokens to Globus,
+  and may handle token expiration
 
-Step 4: Use Your Tokens, Talk to the Service
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* :ref:`TokenStorage <tokenstorage>` objects handle storage of tokens
+
+These are covered by several of the available :ref:`Examples <examples>` as
+well.
+
+.. _tutorial_step3:
+
+Step 3: Use tokens to access the service
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Continuing from the example above, you have two credentials to Globus Services
 on hand: the ``AUTH_TOKEN`` and the ``TRANSFER_TOKEN``.
-We'll focus on the ``TRANSFER_TOKEN`` for now. It's how you authorize access to
-the Globus Transfer service.
+
+We'll focus on the ``TRANSFER_TOKEN`` for now. It's used to access the Tansfer
+service.
+
+.. _authorizer_first_use:
 
 .. code-block:: python
 
@@ -154,29 +169,41 @@ to login again when it expires.
 Advanced Tutorial
 -----------------
 
-In the first 4 steps of the Tutorial, we did a lot of hocus-pocus to procure
-Access Tokens, but we didn't dive into how we are getting them (or why they
-exist at all).
-Not only will we talk through more detail on Access Tokens, but we'll also
-explore more advanced use cases and their near-cousins, Refresh Tokens.
+In the first steps of the Tutorial, we did a login flow to get an Access Token,
+and used it. However, we didn't explain what that token is and how it works.
 
-Advanced 1: Exploring the OAuthTokenResponse
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In this section, not only will we talk through more detail on Access Tokens, but
+we'll also explore more advanced use cases and their near-cousins, Refresh Tokens.
 
-We powered through the OAuth2 flow in the basic tutorial.
-It's worth looking closer at the token response itself, as it is of particular
-interest.
-This is the ultimate product of the flow, and it contains all of the
-credentials that we'll want and need moving forward.
+.. _tutorial_step4:
 
-Remember:
+Step 4: Explore the OAuthTokenResponse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the basic tutorial, we extracted an access token with these steps:
 
 .. code-block:: python
 
-    client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
-    client.oauth2_start_flow()
+    token_response = client.oauth2_exchange_code_for_tokens(auth_code)
+    globus_transfer_data = token_response.by_resource_server["transfer.api.globus.org"]
+    TRANSFER_TOKEN = globus_transfer_data["access_token"]
 
-    print("Please go to this URL and login: {0}".format(client.oauth2_get_authorize_url()))
+It's worth looking closer at the token response itself, as it is of particular
+interest.
+
+This is the ultimate product of the login flow, and it contains the credentials
+resulting from login.
+
+To recap, the whole flow can be done like so:
+
+.. code-block:: python
+
+    CLIENT_ID = "61338d24-54d5-408f-a10d-66c06b59f6d2"
+    client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
+
+    client.oauth2_start_flow()
+    authorize_url = client.oauth2_get_authorize_url()
+    print(f"Please go to this URL and login:\n\n{authorize_url}\n")
 
     auth_code = input("Please enter the code here: ").strip()
     token_response = client.oauth2_exchange_code_for_tokens(auth_code)
@@ -207,45 +234,44 @@ Let's take a look at ``str(token_response.by_resource_server)``:
       }
     }
 
-A token response is structured with the following info:
+The keys in the token response, ``"auth.globus.org"`` and ``"transfer.api.globus.org"``,
+are the services which require tokens. These are the Resource Servers in the
+response, and for each one, the response contains the following info:
 
-- Resource Servers: The services (e.x. APIs) which require Tokens. These are
-  the keys, `"auth.globus.org"` and `"transfer.api.globus.org"`
-- Access Tokens: Credentials you can use to talk to Resource Servers. We get
-  back separate Access Tokens for each Resource Server. Importantly, this means
-  that if Globus is issuing tokens to `evil.api.example.com`, you don't need to
-  worry that `evil.api.example.com` will ever see tokens valid for Globus
-  Transfer
-- Scope: A list of activities that the Access Token is good for against the
-  Resource Server. They are defined and enforced by the Resource Server.
-- token_type: With what kind of authorization should the Access Token be
-  used? For the foreseeable future, all Globus tokens are sent as Bearer Auth
-  headers.
-- expires_at_seconds: A POSIX timestamp -- the time at which the relevant
-  Access Token expires and is no longer accepted by the service.
-- Refresh Tokens: Credentials used to replace or "refresh" your access tokens
-  when they expire. If requested, you'll get one for each Resource Server.
-  Details on their usage are in the next Advanced Tutorial
+- access_token: a credential which authenticates access to the Resource Server
+- scope: a list of activities for which the access_token grants permissions
+- token_type: the kind of authorization for which the token is used. All Globus
+  tokens are sent as Bearer Auth headers
+- expires_at_seconds: a POSIX timestamp for the time when the access_token
+  expires
+- refresh_token: a credential which can be used to replace or "refresh" the
+  access_token when it expires. ``None`` unless explicitly requested.
+  Details on refresh_token are in the next section
 
+.. _tutorial_step5:
 
-Advanced 2: Refresh Tokens, Never Login Again
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 5: Do a login flow with Refresh Tokens
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Logging in to Globus through the web interface gets pretty old pretty fast.
-In fact, as soon as you write your first cron job against Globus, you'll need
-something better.
-Enter Refresh Tokens: credentials which never expire unless revoked, and which
-can be used to get new Access Tokens whenever those do expire.
+As described above, there is enough code to do a login flow and get an Access
+Token. However, that token will expire after a short duration, after which the
+user will need to login again.
 
-Getting yourself refresh tokens to play with is actually pretty easy. Just
-tweak your login flow with one argument:
+This can be avoided by requesting a Refresh Token, which is valid indefinitely
+(unless revoked). The purpose of Refresh Tokens is to allow an application to
+replace its Access Tokens without a fresh login.
+
+The code above can easily include Refresh Tokens by modifying the call to
+``oauth2_start_flow`` as follows:
 
 .. code-block:: python
 
+    CLIENT_ID = "61338d24-54d5-408f-a10d-66c06b59f6d2"
     client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
-    client.oauth2_start_flow(refresh_tokens=True)
 
-    print("Please go to this URL and login: {0}".format(client.oauth2_get_authorize_url()))
+    client.oauth2_start_flow(refresh_tokens=True)
+    authorize_url = client.oauth2_get_authorize_url()
+    print(f"Please go to this URL and login:\n\n{authorize_url}\n")
 
     auth_code = input("Please enter the code here: ").strip()
     token_response = client.oauth2_exchange_code_for_tokens(auth_code)
@@ -253,26 +279,25 @@ tweak your login flow with one argument:
 If you peek at the ``token_response`` now, you'll see that the
 ``"refresh_token"`` fields are no longer nulled.
 
-Now we've got a problem though: it's great to say that you can refresh tokens
-whenever you want, but how do you know when to do that? And what if an Access
-Token gets revoked before it's ready to expire?
-It turns out that using these correctly is pretty delicate, but there is a way
-forward that's pretty much painless.
+However, this only solves half of the problem. When should a new Access Token
+be requested? The Globus SDK solves this problem for you with the
+``GlobusAuthorizer`` objects :ref:`introduced above <authorizer_first_use>`.
+The key is the :class:`RefreshTokenAuthorizer <globus_sdk.RefreshTokenAuthorizer>`
+object, which handles refreshes.
 
-Let's assume you want to do this with the ``globus_sdk.TransferClient``.
+Let's assume you want to do this with the :class:`TransferClient <globus_sdk.TransferClient>`.
 
 .. code-block:: python
 
-    # let's get stuff for the Globus Transfer service
+    # get credentials for the Globus Transfer service
     globus_transfer_data = token_response.by_resource_server["transfer.api.globus.org"]
-    # the refresh token and access token, often abbreviated as RT and AT
+    # the refresh token and access token are often abbreviated as RT and AT
     transfer_rt = globus_transfer_data["refresh_token"]
     transfer_at = globus_transfer_data["access_token"]
     expires_at_s = globus_transfer_data["expires_at_seconds"]
 
-    # Now we've got the data we need, but what do we do?
-    # That "GlobusAuthorizer" from before is about to come to the rescue
-
+    # construct a RefreshTokenAuthorizer
+    # note that `client` is passed to it, to allow it to do the refreshes
     authorizer = globus_sdk.RefreshTokenAuthorizer(
         transfer_rt, client, access_token=transfer_at, expires_at=expires_at_s
     )
@@ -281,13 +306,27 @@ Let's assume you want to do this with the ``globus_sdk.TransferClient``.
     # work -- for days and days, months and months, even years
     tc = globus_sdk.TransferClient(authorizer=authorizer)
 
-A couple of things to note about this: ``access_token`` and ``expires_at`` are
-optional arguments to ``RefreshTokenAuthorizer``. So, if all you've got on hand
-is a refresh token, it can handle the bootstrapping problem.
-Also, it's good to know that the ``RefreshTokenAuthorizer`` will retry the
-first call that fails with an authorization error. If the second call also
-fails, it won't try anymore.
 
-Finally, and perhaps most importantly, we must stress that you need to protect
-your Refresh Tokens. They are an infinite lifetime credential to act as you,
-so, like passwords, they should only be stored in secure locations.
+With the above code, ``tc`` is a ``TransferClient`` which can authenticate
+indefinitely, refreshing the Access Token whenever it expires.
+
+.. _tutorial_step6:
+
+Step 6: Selected Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- The :ref:`Minimal File Transfer Script <example_minimal_transfer>` provides a
+  simple example of a file transfer
+
+This example builds upon everything documented above. It will also include the
+use of new features not covered by this tutorial. In particular, it will use
+:ref:`the scopes module <scopes>` to provide scope strings as constants,
+:class:`TransferData <globus_sdk.TransferData>` as a helper to construct a
+transfer task document, and the ``requested_scopes`` argument to
+``oauth2_start_flow`` (instead of the default scopes).
+
+- The :ref:`Group Listing Script <example_group_listing>` provides a
+  simple example of use of the Globus Groups service
+
+Like the Minimal File Transfer Script, this example builds upon the tutorial,
+specifying scopes. It demonstrates some simple output processing as well.
