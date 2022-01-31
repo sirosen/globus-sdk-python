@@ -97,11 +97,12 @@ Change:
     tc = globus_sdk.TransferClient(...)
     response = tc.get_endpoint(foo)  # again, just an example operation
 
-Import BaseClient from globus_sdk
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Updates to BaseClient Usage
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You may be using the globus-sdk ``BaseClient`` object to implement a custom
-client or for type annotations.
+client or for type annotations. Firstly, ``BaseClient`` is available from the
+base ``globus_sdk`` namespace.
 
 Change:
 
@@ -112,6 +113,29 @@ Change:
 
     # globus-sdk v3
     from globus_sdk import BaseClient
+
+Secondly, creating a ``BaseClient`` is different. Previously, initializing a
+``BaseClient`` had one required positional argument ``service``. Now, this
+exists as a class attribute, which subclasses can overwrite.
+
+Change:
+
+.. code-block:: python
+
+    # globus-sdk v1 or v2
+    class MyClient(BaseClient):
+        pass
+
+
+    MyClient("my-service", **kwargs)
+
+
+    # globus-sdk v3
+    class MyClient(BaseClient):
+        service_name = "my-service"
+
+
+    MyClient(**kwargs)
 
 Import exceptions from globus_sdk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
