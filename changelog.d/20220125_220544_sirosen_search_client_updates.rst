@@ -1,1 +1,1 @@
-* Support pagination on ``SearchClient.post_search`` (:pr:`NUMBER`)
+* Support pagination on ``SearchClient.post_search`` (:pr:`507`)
