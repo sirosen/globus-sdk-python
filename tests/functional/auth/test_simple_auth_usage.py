@@ -130,35 +130,6 @@ def test_get_identities_success(usernames, client, identities_single_response):
 
 
 @pytest.mark.parametrize(
-    "usernames, expect",
-    [
-        (
-            "globus@globus.org,sirosen@globus.org",
-            "globus@globus.org,sirosen@globus.org",
-        ),
-        (
-            (StringWrapper("sirosen@globus.org"), StringWrapper("globus@globus.org")),
-            "sirosen@globus.org,globus@globus.org",
-        ),
-        (
-            ["globus@globus.org", "sirosen@globus.org"],
-            "globus@globus.org,sirosen@globus.org",
-        ),
-    ],
-)
-def test_get_identities_multiple_success(
-    usernames, expect, client, identities_multiple_response
-):
-    res = client.get_identities(usernames=usernames)
-
-    assert res.data == json.loads(IDENTITIES_MULTIPLE_RESPONSE)
-
-    lastreq = get_last_request()
-    assert "usernames" in lastreq.params
-    assert lastreq.params["usernames"] == expect
-
-
-@pytest.mark.parametrize(
     "inval, outval",
     [
         (True, "true"),
@@ -174,6 +145,34 @@ def test_get_identities_provision(inval, outval, client, identities_single_respo
     lastreq = get_last_request()
     assert "provision" in lastreq.params
     assert lastreq.params["provision"] == outval
+
+
+@pytest.mark.parametrize(
+    "usernames",
+    [
+        "globus@globus.org,sirosen@globus.org",
+        (StringWrapper("sirosen@globus.org"), StringWrapper("globus@globus.org")),
+        ["globus@globus.org", "sirosen@globus.org"],
+    ],
+)
+def test_get_identities_multiple_usernames_success(
+    usernames, client, identities_multiple_response
+):
+    expect_usernames = ["globus@globus.org", "sirosen@globus.org"]
+    if isinstance(usernames, str):
+        expect_param = usernames
+    else:
+        expect_param = ",".join([str(x) for x in usernames])
+
+    res = client.get_identities(usernames=usernames)
+
+    assert res.data == json.loads(IDENTITIES_MULTIPLE_RESPONSE)
+    # test iteration on the response
+    assert [x["username"] for x in res] == expect_usernames
+
+    lastreq = get_last_request()
+    assert "usernames" in lastreq.params
+    assert lastreq.params["usernames"] == expect_param
 
 
 @pytest.mark.parametrize(
@@ -194,13 +193,18 @@ def test_get_identities_provision(inval, outval, client, identities_single_respo
     ],
 )
 def test_get_identities_multiple_ids_success(ids, client, identities_multiple_response):
-    expect = ",".join(
-        ["46bd0f56-e24f-11e5-a510-131bef46955c", "ae341a98-d274-11e5-b888-dbae3a8ba545"]
-    )
+    expect_ids = [
+        "46bd0f56-e24f-11e5-a510-131bef46955c",
+        "ae341a98-d274-11e5-b888-dbae3a8ba545",
+    ]
+    expect_param = ",".join(expect_ids)
+
     res = client.get_identities(ids=ids)
 
     assert res.data == json.loads(IDENTITIES_MULTIPLE_RESPONSE)
+    # test iteration on the response
+    assert [x["id"] for x in res] == expect_ids
 
     lastreq = get_last_request()
     assert "ids" in lastreq.params
-    assert lastreq.params["ids"] == expect
+    assert lastreq.params["ids"] == expect_param
