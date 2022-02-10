@@ -22,7 +22,7 @@ from globus_sdk.types import IntLike, UUIDLike
 
 from ..errors import AuthAPIError
 from ..flow_managers import GlobusOAuthFlowManager
-from ..response import OAuthTokenResponse
+from ..response import GetIdentitiesResponse, OAuthTokenResponse
 
 log = logging.getLogger(__name__)
 
@@ -119,13 +119,13 @@ class AuthClient(client.BaseClient):
         >>> # by IDs
         >>> r = ac.get_identities(ids="46bd0f56-e24f-11e5-a510-131bef46955c")
         >>> r.data
-        {u'identities': [{u'email': None,
-           u'id': u'46bd0f56-e24f-11e5-a510-131bef46955c',
-           u'identity_provider': u'7daddf46-70c5-45ee-9f0f-7244fe7c8707',
-           u'name': None,
-           u'organization': None,
-           u'status': u'unused',
-           u'username': u'globus@globus.org'}]}
+        {'identities': [{'email': None,
+           'id': '46bd0f56-e24f-11e5-a510-131bef46955c',
+           'identity_provider': '7daddf46-70c5-45ee-9f0f-7244fe7c8707',
+           'name': None,
+           'organization': None,
+           'status': 'unused',
+           'username': 'globus@globus.org'}]}
         >>> ac.get_identities(
         >>>     ids=",".join(
         >>>         ("46bd0f56-e24f-11e5-a510-131bef46955c",
@@ -147,6 +147,13 @@ class AuthClient(client.BaseClient):
         >>>     ids=["46bd0f56-e24f-11e5-a510-131bef46955c",
         >>>          "168edc3d-c6ba-478c-9cf8-541ff5ebdc1c"])
         ...
+
+        The result itself is iterable, so you can use it like so:
+
+        >>> for identity in ac.get_identities(
+        >>>     usernames=['globus@globus.org', 'auth@globus.org']
+        >>> ):
+        >>>     print(identity["id"])
         """
 
         def _convert_listarg(
@@ -181,7 +188,9 @@ class AuthClient(client.BaseClient):
                 "identities set! Expected to result in errors"
             )
 
-        return self.get("/v2/api/identities", query_params=query_params)
+        return GetIdentitiesResponse(
+            self.get("/v2/api/identities", query_params=query_params)
+        )
 
     def oauth2_get_authorize_url(
         self, *, query_params: Optional[Dict[str, Any]] = None
