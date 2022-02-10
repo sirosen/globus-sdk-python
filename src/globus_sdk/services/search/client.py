@@ -198,7 +198,7 @@ class SearchClient(client.BaseClient):
             add_kwargs["marker"] = marker
         if add_kwargs:
             data = {**data, **add_kwargs}
-        return self.post(f"v1/index/{index_id}/search", data=data)
+        return self.post(f"v1/index/{index_id}/scroll", data=data)
 
     #
     # Bulk data indexing

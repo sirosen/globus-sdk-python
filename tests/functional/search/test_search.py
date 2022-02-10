@@ -111,14 +111,14 @@ def test_search_paginated_scroll_query(search_client, query_doc):
     index_id = str(uuid.uuid1())
     register_api_route_fixture_file(
         "search",
-        f"/v1/index/{index_id}/search",
+        f"/v1/index/{index_id}/scroll",
         "scroll_result_1.json",
         method="POST",
         match=[responses.matchers.json_params_matcher({"q": "foo"})],
     )
     register_api_route_fixture_file(
         "search",
-        f"/v1/index/{index_id}/search",
+        f"/v1/index/{index_id}/scroll",
         "scroll_result_2.json",
         method="POST",
         match=[
