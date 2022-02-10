@@ -5,7 +5,7 @@ from globus_sdk import client, paging, response, utils
 from globus_sdk.scopes import SearchScopes
 from globus_sdk.types import UUIDLike
 
-from .data import SearchQuery
+from .data import SearchQuery, SearchScrollQuery
 from .errors import SearchAPIError
 
 log = logging.getLogger(__name__)
@@ -102,11 +102,32 @@ class SearchClient(client.BaseClient):
         return self.get(f"/v1/index/{index_id}/search", query_params=query_params)
 
     @utils.doc_api_method("POST Search Query", "search/reference/post_query")
+    @paging.has_paginator(
+        paging.HasNextPaginator,
+        items_key="gmeta",
+        get_page_size=lambda x: x["count"],
+        max_total_results=10000,
+        page_size=100,
+    )
     def post_search(
-        self, index_id: UUIDLike, data: Union[Dict[str, Any], SearchQuery]
+        self,
+        index_id: UUIDLike,
+        data: Union[Dict[str, Any], SearchQuery],
+        *,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /v1/index/<index_id>/search``
+
+        :param index_id: The index on which to search
+        :type index_id: str or UUID
+        :param data: A Search Query document containing the query and any other fields
+        :type data: dict or SearchQuery
+        :param offset: offset used in paging (overwrites any offset in ``data``)
+        :type offset: int, optional
+        :param limit: limit the number of results (overwrites any limit in ``data``)
+        :type limit: int, optional
 
         **Examples**
 
@@ -138,7 +159,46 @@ class SearchClient(client.BaseClient):
         >>> search_result = sc.post_search(index_id, query_data)
         """
         log.info(f"SearchClient.post_search({index_id}, ...)")
+        add_kwargs = {}
+        if offset is not None:
+            add_kwargs["offset"] = offset
+        if limit is not None:
+            add_kwargs["limit"] = limit
+        if add_kwargs:
+            data = {**data, **add_kwargs}
         return self.post(f"v1/index/{index_id}/search", data=data)
+
+    @utils.doc_api_method("Scroll Query", "search/reference/scroll_query")
+    @paging.has_paginator(paging.MarkerPaginator, items_key="gmeta")
+    def scroll(
+        self,
+        index_id: UUIDLike,
+        data: Union[Dict[str, Any], SearchScrollQuery],
+        *,
+        marker: Optional[str] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``POST /v1/index/<index_id>/scroll``
+
+        :param index_id: The index on which to search
+        :type index_id: str or UUID
+        :param data: A Search Scroll Query document
+        :type data: dict or SearchScrollQuery
+        :param marker: marker used in paging (overwrites any marker in ``data``)
+        :type marker: str, optional
+
+        **Examples**
+
+        >>> sc = globus_sdk.SearchClient(...)
+        >>> scroll_result = sc.scroll(index_id, {"q": "*"})
+        """
+        log.info(f"SearchClient.scroll({index_id}, ...)")
+        add_kwargs = {}
+        if marker is not None:
+            add_kwargs["marker"] = marker
+        if add_kwargs:
+            data = {**data, **add_kwargs}
+        return self.post(f"v1/index/{index_id}/scroll", data=data)
 
     #
     # Bulk data indexing
@@ -464,3 +524,94 @@ class SearchClient(client.BaseClient):
         """
         log.info(f"SearchClient.get_task_list({index_id})")
         return self.get(f"/v1/task_list/{index_id}", query_params=query_params)
+
+    #
+    # Role Management
+    #
+
+    @utils.doc_api_method("Create Role", "search/reference/role_create/")
+    def create_role(
+        self,
+        index_id: UUIDLike,
+        data: Dict[str, Any],
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``POST /v1/index/<index_id>/role``
+
+        Create a new role on an index. You must already have the ``owner`` or
+        ``admin`` role on an index to create additional roles.
+
+        Roles are specified as a role name (one of ``"owner"``, ``"admin"``, or
+        ``"writer"``) and a `Principal URN
+        <https://docs.globus.org/api/search/overview/#principal_urns>`_.
+
+        :param index_id: The index on which to create the role
+        :type index_id: uuid or str
+        :param data: The partial role document to use for creation
+        :type data: dict
+        :param query_params: Any additional query params to pass
+        :type query_params: dict, optional
+
+        **Examples**
+
+        >>> identity_id = "46bd0f56-e24f-11e5-a510-131bef46955c"
+        >>> sc = globus_sdk.SearchClient(...)
+        >>> sc.create_role(
+        >>>     index_id,
+        >>>     {
+        >>>         "role_name": "writer",
+        >>>         "principal": f"urn:globus:auth:identity:{identity_id}"
+        >>>     }
+        >>> )
+        """
+        log.info("SearchClient.create_role(%s, ...)", index_id)
+        return self.post(
+            f"/v1/index/{index_id}/role", data=data, query_params=query_params
+        )
+
+    @utils.doc_api_method("Get Role List", "search/reference/role_list/")
+    def get_role_list(
+        self, index_id: UUIDLike, *, query_params: Optional[Dict[str, Any]] = None
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``GET /v1/index/<index_id>/role_list``
+
+        List all roles on an index. You must have the ``owner`` or ``admin``
+        role on an index to list roles.
+
+        :param index_id: The index on which to list roles
+        :type index_id: uuid or str
+        :param query_params: Any additional query params to pass
+        :type query_params: dict, optional
+        """
+        log.info("SearchClient.get_role_list(%s)", index_id)
+        return self.get(f"/v1/index/{index_id}/role_list", query_params=query_params)
+
+    @utils.doc_api_method("Role Delete", "search/reference/role_delete/")
+    def delete_role(
+        self,
+        index_id: UUIDLike,
+        role_id: str,
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``DELETE /v1/index/<index_id>/role/<role_id>``
+
+        Delete a role from an index. You must have the ``owner`` or ``admin``
+        role on an index to delete roles. You cannot remove the last ``owner`` from an
+        index.
+
+        :param index_id: The index from which to delete a role
+        :type index_id: uuid or str
+        :param role_id: The role to delete
+        :type role_id: str
+        :param query_params: Any additional query params to pass
+        :type query_params: dict, optional
+        """
+        log.info("SearchClient.delete_role(%s, %s)", index_id, role_id)
+        return self.delete(
+            f"/v1/index/{index_id}/role/{role_id}", query_params=query_params
+        )

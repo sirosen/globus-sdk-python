@@ -1,0 +1,22 @@
+{
+  "gmeta": [
+    {
+      "@datatype": "GMetaResult",
+      "@version": "2019-08-27",
+      "entries": [
+        {
+          "content": {
+            "foo": "baz"
+          },
+          "entry_id": null,
+          "matched_principal_sets": []
+        }
+      ],
+      "subject": "foo-baz"
+    }
+  ],
+  "count": 1,
+  "total": 2,
+  "has_next_page": false,
+  "marker": null
+}

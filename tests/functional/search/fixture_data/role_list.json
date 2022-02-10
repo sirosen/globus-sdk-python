@@ -1,0 +1,20 @@
+{
+  "role_list": [
+    {
+      "creation_date": "2021-11-09 20:26:45",
+      "id": "MDMwMjM5",
+      "index_id": "60d1160b-f016-40b0-8545-99619865873d",
+      "principal": "urn:globus:auth:identity:ae332d86-d274-11e5-b885-b31714a110e9",
+      "principal_type": "identity",
+      "role_name": "owner"
+    },
+    {
+      "creation_date": "2022-01-24 15:33:41",
+      "id": "MDQ0ODYz",
+      "index_id": "60d1160b-f016-40b0-8545-99619865873d",
+      "principal": "urn:globus:auth:identity:c699d42e-d274-11e5-bf75-1fc5bf53bb24",
+      "principal_type": "identity",
+      "role_name": "writer"
+    }
+  ]
+}

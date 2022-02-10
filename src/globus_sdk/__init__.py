@@ -47,7 +47,12 @@ from .services.groups import (
     GroupsManager,
     GroupVisibility,
 )
-from .services.search import SearchAPIError, SearchClient, SearchQuery
+from .services.search import (
+    SearchAPIError,
+    SearchClient,
+    SearchQuery,
+    SearchScrollQuery,
+)
 from .services.transfer import (
     DeleteData,
     TransferAPIError,
@@ -87,6 +92,7 @@ __all__ = (
     "DeleteData",
     "SearchClient",
     "SearchQuery",
+    "SearchScrollQuery",
     "GroupsClient",
     "BatchMembershipActions",
     "GroupPolicies",
