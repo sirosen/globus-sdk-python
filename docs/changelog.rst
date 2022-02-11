@@ -12,6 +12,31 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.4.0 (2022-02-11)
+-------------------
+
+* Support pagination on ``SearchClient.post_search`` (:pr:`507`)
+
+* Add support for scroll queries to ``SearchClient``. ``SearchClient.scroll``
+  and ``SearchClient.paginated.scroll`` are now available as methods, and a new
+  helper class, ``SearchScrollQuery``, can be used to easily construct
+  scrolling queries. (:pr:`507`)
+
+* Add methods to ``SearchClient`` for managing index roles. ``create_role``,
+  ``delete_role``, and ``get_role_list`` (:pr:`507`)
+
+* Add ``mapped_collection`` and ``filter`` query arguments to ``GCSClient.get_collection_list`` (:pr:`510`)
+
+* Add role methods to ``GCSClient`` (:pr:`513`)
+
+  * ``GCSClient.get_role_list`` lists endpoint or collection roles
+  * ``GCSClient.create_role`` creates a role
+  * ``GCSClient.get_role`` gets a single role
+  * ``GCSClient.delete_role`` deletes a role
+
+* The response from ``AuthClient.get_identities`` now supports iteration,
+  returning results from the ``"identities"`` array (:pr:`514`)
+
 v3.3.1 (2022-01-25)
 -------------------
 
