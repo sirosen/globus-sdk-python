@@ -43,17 +43,20 @@ class RegisteredResponse:
         self.kwargs = kwargs
 
     def _set_response(self, *, replace: bool) -> None:
-        kwargs = {"headers": self.headers, "match_querystring": False, **self.kwargs}
+        kwargs: Dict[str, Any] = {
+            "headers": self.headers,
+            "match_querystring": False,
+            **self.kwargs,
+        }
         if self.json is not None:
             kwargs["json"] = self.json
         if self.body is not None:
             kwargs["body"] = self.body
 
         if replace:
-            func = responses.replace
+            responses.replace(self.method, self.full_url, **kwargs)
         else:
-            func = responses.add
-        func(self.method, self.full_url, **kwargs)
+            responses.add(self.method, self.full_url, **kwargs)
 
     def add(self) -> None:
         self._set_response(replace=False)
