@@ -21,7 +21,7 @@ jobs:
       - name: install tox
         run: python -m pip install -U tox
       - name: run linting
-        run: tox -e mypy,pylint
+        run: tox -e mypy,pylint,mypy-mindeps
 
   test:
     strategy:
