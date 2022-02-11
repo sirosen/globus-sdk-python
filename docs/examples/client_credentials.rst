@@ -95,7 +95,7 @@ Depending on your needs, you may need to track the expiration times along with
 your tokens.
 
 Using ClientCredentialsAuthorizer
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The SDK also provides a specialized Authorizer which can be used to
 automatically handle token expiration.

@@ -42,7 +42,8 @@ The shortest version of the flow looks like this:
     import globus_sdk
 
     # you must have a client ID
-    CLIENT_ID = "..."
+    # for demonstration purposes, this is the tutorial client ID
+    CLIENT_ID = "61338d24-54d5-408f-a10d-66c06b59f6d2"
 
     client = globus_sdk.NativeAppAuthClient(CLIENT_ID)
     client.oauth2_start_flow()
@@ -60,8 +61,8 @@ The shortest version of the flow looks like this:
     globus_transfer_token = globus_transfer_data["access_token"]
 
 
-Do It With Refresh Tokens
-~~~~~~~~~~~~~~~~~~~~~~~~~
+With Refresh Tokens
+~~~~~~~~~~~~~~~~~~~
 
 The flow above will give you access tokens (short-lived credentials), good for
 one-off operations.
