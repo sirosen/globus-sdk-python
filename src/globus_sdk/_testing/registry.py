@@ -1,4 +1,5 @@
-from typing import Any, Dict, Iterator, Optional
+import importlib
+from typing import Any, Dict, Iterator, Optional, Union
 
 import responses
 
@@ -24,7 +25,7 @@ class RegisteredResponse:
         metadata: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         body: Optional[str] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         self.service = service
         self.path = path
@@ -62,7 +63,12 @@ class RegisteredResponse:
 
 
 class ResponseSet:
-    def __init__(self, **kwargs: RegisteredResponse) -> None:
+    def __init__(
+        self,
+        metadata: Optional[Dict[str, Any]] = None,
+        **kwargs: RegisteredResponse,
+    ) -> None:
+        self.metadata = metadata
         self._data: Dict[str, RegisteredResponse] = {**kwargs}
 
     def register(self, case: str, value: RegisteredResponse) -> None:
@@ -91,3 +97,40 @@ class ResponseSet:
     def activate_all(self) -> None:
         for x in self:
             x.add()
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: Dict[str, Dict[str, Any]],
+        metadata: Optional[Dict[str, Any]] = None,
+        **kwargs: Dict[str, Dict[str, Any]],
+    ) -> "ResponseSet":
+        # constructor which expects native dicts and converts them to RegisteredResponse
+        # objects, then puts them into the ResponseSet
+        return cls(
+            metadata=metadata, **{k: RegisteredResponse(**v) for k, v in data.items()}
+        )
+
+
+_RESPONSE_SET_REGISTRY: Dict[str, ResponseSet] = {}
+
+
+def register_response_set(
+    name: str,
+    rset: Union[ResponseSet, Dict[str, Dict[str, Any]]],
+    metadata: Optional[Dict[str, Any]] = None,
+) -> ResponseSet:
+    if isinstance(rset, dict):
+        rset = ResponseSet.from_dict(rset, metadata=metadata)
+    _RESPONSE_SET_REGISTRY[name] = rset
+    return rset
+
+
+def get_response_set(name: str) -> ResponseSet:
+    # first priority: check the explicit registry
+    if name in _RESPONSE_SET_REGISTRY:
+        return _RESPONSE_SET_REGISTRY[name]
+    # after that, check the built-in "registry" built from modules
+    module = importlib.import_module(f"globus_sdk._testing.data.{name}")
+    assert isinstance(module.RESPONSES, ResponseSet)
+    return module.RESPONSES

@@ -1,24 +1,29 @@
-import importlib
-from typing import cast
-
-from .registry import RegisteredResponse, ResponseSet
-
-
-def load_fixture_set(name: str) -> ResponseSet:
-    module = importlib.import_module(f"globus_sdk._testing.data.{name}")
-    return cast(ResponseSet, module.RESPONSES)
+from .registry import (
+    RegisteredResponse,
+    ResponseSet,
+    get_response_set,
+    register_response_set,
+)
 
 
-def load_fixture(
+def load_response_set(name: str) -> ResponseSet:
+    ret = get_response_set(name)
+    ret.activate_all()
+    return ret
+
+
+def load_response(
     name: str, *, case: str = "default", replace: bool = False
 ) -> RegisteredResponse:
-    rset = load_fixture_set(name)
+    rset = get_response_set(name)
     return rset.activate(case, replace=replace)
 
 
 __all__ = (
     "ResponseSet",
     "RegisteredResponse",
-    "load_fixture_set",
-    "load_fixture",
+    "load_response_set",
+    "load_response",
+    "get_response_set",
+    "register_response_set",
 )
