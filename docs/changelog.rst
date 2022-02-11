@@ -12,6 +12,13 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.4.1 (2022-02-11)
+-------------------
+
+* The ``typing_extensions`` requirement in package metadata now sets a lower
+  bound of ``4.0``, to force upgrades of installations to get a new enough version
+  (:pr:`518`)
+
 v3.4.0 (2022-02-11)
 -------------------
 
