@@ -1,5 +1,7 @@
 from globus_sdk._testing.registry import RegisteredResponse, ResponseSet
 
+from ._common import ERROR_ID, UNAUTHORIZED_AUTH_RESPONSE_JSON
+
 _globus_at_globus_data = {
     "email": None,
     "id": "46bd0f56-e24f-11e5-a510-131bef46955c",
@@ -21,8 +23,8 @@ _sirosen_at_globus_data = {
 
 RESPONSES = ResponseSet(
     default=RegisteredResponse(
-        "auth",
-        "/v2/api/identities",
+        service="auth",
+        path="/v2/api/identities",
         json={"identities": [_globus_at_globus_data]},
         metadata={
             "id": _globus_at_globus_data["id"],
@@ -30,8 +32,8 @@ RESPONSES = ResponseSet(
         },
     ),
     multiple=RegisteredResponse(
-        "auth",
-        "/v2/api/identities",
+        service="auth",
+        path="/v2/api/identities",
         json={"identities": [_globus_at_globus_data, _sirosen_at_globus_data]},
         metadata={
             "ids": [_globus_at_globus_data["id"], _sirosen_at_globus_data["id"]],
@@ -40,5 +42,12 @@ RESPONSES = ResponseSet(
                 _sirosen_at_globus_data["username"],
             ],
         },
+    ),
+    unauthorized=RegisteredResponse(
+        service="auth",
+        path="/v2/api/identities",
+        status=401,
+        json=UNAUTHORIZED_AUTH_RESPONSE_JSON,
+        metadata={"error_id": ERROR_ID},
     ),
 )

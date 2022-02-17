@@ -26,7 +26,7 @@ def client(no_retry_transport):
 
 
 def test_get_identities_unauthorized(client):
-    data = load_response("auth.unauthorized", case="get_identities")
+    data = load_response(client.get_identities, case="unauthorized")
 
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
         client.get_identities(usernames="foobar@example.com")
@@ -47,7 +47,7 @@ def test_get_identities_unauthorized(client):
     ],
 )
 def test_get_identities_success(usernames, client):
-    data = load_response("auth.get_identities")
+    data = load_response(client.get_identities)
     res = client.get_identities(usernames=usernames)
 
     assert [x["id"] for x in res] == [data.metadata["id"]]
@@ -71,7 +71,7 @@ def test_get_identities_success(usernames, client):
     ],
 )
 def test_get_identities_provision(inval, outval, client):
-    load_response("auth.get_identities")
+    load_response(client.get_identities)
     client.get_identities(usernames="globus@globus.org", provision=inval)
     lastreq = get_last_request()
     assert "provision" in lastreq.params
@@ -87,7 +87,7 @@ def test_get_identities_provision(inval, outval, client):
     ],
 )
 def test_get_identities_multiple_usernames_success(usernames, client):
-    data = load_response("auth.get_identities", case="multiple")
+    data = load_response(client.get_identities, case="multiple")
     if isinstance(usernames, str):
         expect_param = usernames
     else:
@@ -121,7 +121,7 @@ def test_get_identities_multiple_usernames_success(usernames, client):
     ],
 )
 def test_get_identities_multiple_ids_success(ids, client):
-    data = load_response("auth.get_identities", case="multiple")
+    data = load_response(client.get_identities, case="multiple")
     expect_param = ",".join(data.metadata["ids"])
 
     res = client.get_identities(ids=ids)

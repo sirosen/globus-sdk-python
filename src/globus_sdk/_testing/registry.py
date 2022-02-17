@@ -18,8 +18,9 @@ class RegisteredResponse:
 
     def __init__(
         self,
-        service: str,
+        *,
         path: str,
+        service: Optional[str] = None,
         method: str = responses.GET,
         headers: Optional[Dict[str, str]] = None,
         metadata: Optional[Dict[str, Any]] = None,
@@ -29,7 +30,10 @@ class RegisteredResponse:
     ) -> None:
         self.service = service
         self.path = path
-        self.full_url = slash_join(self._url_map[service], path)
+        if service:
+            self.full_url = slash_join(self._url_map[service], path)
+        else:
+            self.full_url = path
 
         self.method = method
         self.json = json
@@ -42,7 +46,7 @@ class RegisteredResponse:
         self.metadata = metadata or {}
         self.kwargs = kwargs
 
-    def _set_response(self, *, replace: bool) -> None:
+    def add(self) -> "RegisteredResponse":
         kwargs: Dict[str, Any] = {
             "headers": self.headers,
             "match_querystring": False,
@@ -53,16 +57,8 @@ class RegisteredResponse:
         if self.body is not None:
             kwargs["body"] = self.body
 
-        if replace:
-            responses.replace(self.method, self.full_url, **kwargs)
-        else:
-            responses.add(self.method, self.full_url, **kwargs)
-
-    def add(self) -> None:
-        self._set_response(replace=False)
-
-    def replace(self) -> None:
-        self._set_response(replace=True)
+        responses.add(self.method, self.full_url, **kwargs)
+        return self
 
 
 class ResponseSet:
@@ -89,13 +85,8 @@ class ResponseSet:
     def __iter__(self) -> Iterator[RegisteredResponse]:
         return iter(self._data.values())
 
-    def activate(self, case: str, *, replace: bool = False) -> RegisteredResponse:
-        res = self.lookup(case)
-        if replace:
-            res.replace()
-        else:
-            res.add()
-        return res
+    def activate(self, case: str) -> RegisteredResponse:
+        return self.lookup(case).add()
 
     def activate_all(self) -> None:
         for x in self:
@@ -115,25 +106,42 @@ class ResponseSet:
         )
 
 
-_RESPONSE_SET_REGISTRY: Dict[str, ResponseSet] = {}
+_RESPONSE_SET_REGISTRY: Dict[Any, ResponseSet] = {}
 
 
 def register_response_set(
-    name: str,
+    set_id: Any,
     rset: Union[ResponseSet, Dict[str, Dict[str, Any]]],
     metadata: Optional[Dict[str, Any]] = None,
 ) -> ResponseSet:
     if isinstance(rset, dict):
         rset = ResponseSet.from_dict(rset, metadata=metadata)
-    _RESPONSE_SET_REGISTRY[name] = rset
+    _RESPONSE_SET_REGISTRY[set_id] = rset
     return rset
 
 
-def get_response_set(name: str) -> ResponseSet:
+def get_response_set(set_id: Any) -> ResponseSet:
     # first priority: check the explicit registry
-    if name in _RESPONSE_SET_REGISTRY:
-        return _RESPONSE_SET_REGISTRY[name]
+    if set_id in _RESPONSE_SET_REGISTRY:
+        return _RESPONSE_SET_REGISTRY[set_id]
+
+    # if ID is a string, it's the (optionally dotted) name of a module
+    if isinstance(set_id, str):
+        module_name = f"globus_sdk._testing.data.{set_id}"
+    else:
+        assert hasattr(
+            set_id, "__qualname__"
+        ), f"cannot load response set from {type(set_id)}"
+        # support modules like
+        #   globus_sdk/_testing/data/AuthClient/get_identities.py
+        # for lookups like
+        #   get_response_set(AuthClient.get_identities)
+        module_name = f"globus_sdk._testing.data.{set_id.__qualname__}"
+
     # after that, check the built-in "registry" built from modules
-    module = importlib.import_module(f"globus_sdk._testing.data.{name}")
+    try:
+        module = importlib.import_module(module_name)
+    except ModuleNotFoundError as e:
+        raise ValueError(f"no fixtures defined for {module_name}") from e
     assert isinstance(module.RESPONSES, ResponseSet)
     return module.RESPONSES

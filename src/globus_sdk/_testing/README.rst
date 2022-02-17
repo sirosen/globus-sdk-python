@@ -48,9 +48,24 @@ activated by name:
     from globus_sdk._testing import load_response
 
     # load_response will add the response to `responses` and return it
-    load_response("auth.get_identities")
+    load_response("AuthClient.get_identities")
     # "case" is used to have a single name map to multiple responses
-    data = load_response("auth.get_identities", case="multiple")
+    data = load_response("AuthClient.get_identities", case="multiple")
+
+Responses can also be activated by passing an SDK client method, bound or
+unbound, as in:
+
+.. code-block:: python
+
+    import globus_sdk
+    from globus_sdk._testing import load_response
+
+    load_response(globus_sdk.AuthClient.get_identities)
+    load_response(globus_sdk.AuthClient.get_identities, case="unauthorized")
+
+    # or, with a bound method
+    ac = globus_sdk.AuthClient()
+    load_response(ac.AuthClient.get_identities, case="multiple")
 
 Activating "Scenarios"
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -74,16 +89,21 @@ response is ``"default"``.
 
 .. code-block:: python
 
+    from globus_sdk import AuthClient
     from globus_sdk._testing import get_response_set
 
     # rset will not be activated
-    rset = get_response_set("auth.unauthenticated")
+    rset = get_response_set(AuthClient.get_identities)
     # you can get an individual response from rset
-    get_ids = rset.get("get_identities")
-    # you can manually activate the whole set
+    get_ids = rset.get("default")
+    # you can manually activate a whole set
     rset.activate_all()
     # or just one response from it by name
-    rset.activate("get_identities")
+    rset.activate("default")
+
+Note that activating a whole repsonse set may or may not make sense. For
+example, the response set for ``AuthClient.get_identities`` provides various
+responses for the same API call.
 
 Registering Response Sets
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -126,3 +146,7 @@ override the builtin response sets, if names match.
     # you can then pull the epid from the metadata
     epid = fixtures.metadata["endpoint_id"]
     transfer_client.operation_ls(epid)
+
+``register_response_set`` can therefore be used to load fixture data early in
+a tetstsuite run (e.g. as an autouse session-level fixture), for reference
+later in the testsuite.

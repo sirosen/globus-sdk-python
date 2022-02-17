@@ -1,3 +1,5 @@
+from typing import Any
+
 from .registry import (
     RegisteredResponse,
     ResponseSet,
@@ -6,17 +8,15 @@ from .registry import (
 )
 
 
-def load_response_set(name: str) -> ResponseSet:
-    ret = get_response_set(name)
+def load_response_set(set_id: Any) -> ResponseSet:
+    ret = get_response_set(set_id)
     ret.activate_all()
     return ret
 
 
-def load_response(
-    name: str, *, case: str = "default", replace: bool = False
-) -> RegisteredResponse:
-    rset = get_response_set(name)
-    return rset.activate(case, replace=replace)
+def load_response(set_id: Any, *, case: str = "default") -> RegisteredResponse:
+    rset = get_response_set(set_id)
+    return rset.activate(case)
 
 
 __all__ = (
