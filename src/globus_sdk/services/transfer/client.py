@@ -1,7 +1,7 @@
 import logging
 import time
 import uuid
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from globus_sdk import client, exc, paging, response, utils
 from globus_sdk.scopes import TransferScopes
@@ -10,6 +10,7 @@ from globus_sdk.types import DateLike, IntLike, UUIDLike
 from .data import DeleteData, TransferData
 from .errors import TransferAPIError
 from .response import ActivationRequirementsResponse, IterableTransferResponse
+from .transport import TransferRequestsTransport
 
 log = logging.getLogger(__name__)
 
@@ -97,6 +98,7 @@ class TransferClient(client.BaseClient):
     """
     service_name = "transfer"
     base_path = "/v0.10/"
+    transport_class: Type[TransferRequestsTransport] = TransferRequestsTransport
     error_class = TransferAPIError
     scopes = TransferScopes
 
