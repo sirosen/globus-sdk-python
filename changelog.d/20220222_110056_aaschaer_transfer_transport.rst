@@ -7,4 +7,4 @@
 .. automatically replace it when the PR is merged.
 ..
 
-* Add TransferRequestsTransport class that does not retry ExternalErrors. This fixes cases in which the TransferClient incorrectly retried requests (:pr:`NUMBER`)
+* Add TransferRequestsTransport class that does not retry ExternalErrors. This fixes cases in which the TransferClient incorrectly retried requests (:pr:`522`)
