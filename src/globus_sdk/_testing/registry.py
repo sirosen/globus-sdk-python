@@ -3,6 +3,8 @@ from typing import Any, Dict, Iterator, Optional, Union
 
 import responses
 
+import globus_sdk
+
 from ..utils import slash_join
 
 
@@ -120,6 +122,29 @@ def register_response_set(
     return rset
 
 
+def _resolve_qualname(name: str) -> str:
+    if "." not in name:
+        return name
+    prefix, suffix = name.split(".", 1)
+    if not hasattr(globus_sdk, prefix):
+        return name
+
+    # something from globus_sdk, could be a client class
+    maybe_client = getattr(globus_sdk, prefix)
+
+    # there are a dozen ways of writing this check, but the point is
+    # "if it's not a client class"
+    if not (
+        isinstance(maybe_client, type)
+        and issubclass(maybe_client, globus_sdk.BaseClient)
+    ):
+        return name
+
+    assert issubclass(maybe_client, globus_sdk.BaseClient)
+    service_name = maybe_client.service_name
+    return f"{service_name}.{suffix}"
+
+
 def get_response_set(set_id: Any) -> ResponseSet:
     # first priority: check the explicit registry
     if set_id in _RESPONSE_SET_REGISTRY:
@@ -133,10 +158,12 @@ def get_response_set(set_id: Any) -> ResponseSet:
             set_id, "__qualname__"
         ), f"cannot load response set from {type(set_id)}"
         # support modules like
-        #   globus_sdk/_testing/data/AuthClient/get_identities.py
+        #   globus_sdk/_testing/data/auth/get_identities.py
         # for lookups like
         #   get_response_set(AuthClient.get_identities)
-        module_name = f"globus_sdk._testing.data.{set_id.__qualname__}"
+        module_name = (
+            f"globus_sdk._testing.data.{_resolve_qualname(set_id.__qualname__)}"
+        )
 
     # after that, check the built-in "registry" built from modules
     try:
