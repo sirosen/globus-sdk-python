@@ -1,10 +1,10 @@
-import json
 import uuid
 
 import pytest
 
 import globus_sdk
-from tests.common import get_last_request, register_api_route
+from globus_sdk._testing import load_response
+from tests.common import get_last_request
 
 
 class StringWrapper:
@@ -17,72 +17,6 @@ class StringWrapper:
         return self.s
 
 
-UNAUTHORIZED_RESPONSE_BODY = (
-    '{"errors": [{"status": "401", '
-    '"id": "cb6a50f8-ac67-11e8-b5fd-0e54e5d1d510", "code": "UNAUTHORIZED", '
-    '"detail": "Call must be authenticated", "title": "Unauthorized"}], '
-    '"error_description": "Unauthorized", "error": "unauthorized"}'
-)
-
-IDENTITIES_SINGLE_RESPONSE = """\
-{
-  "identities": [
-    {
-      "email": null,
-      "id": "46bd0f56-e24f-11e5-a510-131bef46955c",
-      "identity_provider": "7daddf46-70c5-45ee-9f0f-7244fe7c8707",
-      "name": null,
-      "organization": null,
-      "status": "unused",
-      "username": "globus@globus.org"
-    }
-  ]
-}"""
-
-
-IDENTITIES_MULTIPLE_RESPONSE = """\
-{
-  "identities": [
-    {
-      "email": null,
-      "id": "46bd0f56-e24f-11e5-a510-131bef46955c",
-      "identity_provider": "927d7238-f917-4eb2-9ace-c523fa9ba34e",
-      "name": null,
-      "organization": null,
-      "status": "unused",
-      "username": "globus@globus.org"
-    },
-    {
-      "email": "sirosen@globus.org",
-      "id": "ae341a98-d274-11e5-b888-dbae3a8ba545",
-      "identity_provider": "927d7238-f917-4eb2-9ace-c523fa9ba34e",
-      "name": "Stephen Rosen",
-      "organization": "Globus Team",
-      "status": "used",
-      "username": "sirosen@globus.org"
-    }
-  ]
-}"""
-
-
-@pytest.fixture
-def identities_single_response():
-    register_api_route(
-        "auth",
-        "/v2/api/identities?usernames=foobar@example.com",
-        body=IDENTITIES_SINGLE_RESPONSE,
-    )
-
-
-@pytest.fixture
-def identities_multiple_response():
-    register_api_route(
-        "auth",
-        "/v2/api/identities?usernames=foobar@example.com",
-        body=IDENTITIES_MULTIPLE_RESPONSE,
-    )
-
-
 @pytest.fixture
 def client(no_retry_transport):
     class CustomAuthClient(globus_sdk.AuthClient):
@@ -92,20 +26,15 @@ def client(no_retry_transport):
 
 
 def test_get_identities_unauthorized(client):
-    register_api_route(
-        "auth",
-        "/v2/api/identities?usernames=foobar@example.com",
-        body=UNAUTHORIZED_RESPONSE_BODY,
-        status=401,
-    )
+    data = load_response(client.get_identities, case="unauthorized")
 
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
         client.get_identities(usernames="foobar@example.com")
 
     err = excinfo.value
     assert err.code == "UNAUTHORIZED"
-    assert err.raw_text == UNAUTHORIZED_RESPONSE_BODY
-    assert err.raw_json == json.loads(UNAUTHORIZED_RESPONSE_BODY)
+    assert data.metadata["error_id"] in err.raw_text
+    assert err.raw_json == data.json
 
 
 @pytest.mark.parametrize(
@@ -117,10 +46,11 @@ def test_get_identities_unauthorized(client):
         ("globus@globus.org",),
     ],
 )
-def test_get_identities_success(usernames, client, identities_single_response):
+def test_get_identities_success(usernames, client):
+    data = load_response(client.get_identities)
     res = client.get_identities(usernames=usernames)
 
-    assert res.data == json.loads(IDENTITIES_SINGLE_RESPONSE)
+    assert [x["id"] for x in res] == [data.metadata["id"]]
 
     lastreq = get_last_request()
     assert lastreq.params == {
@@ -140,7 +70,8 @@ def test_get_identities_success(usernames, client, identities_single_response):
         ("true", "true"),
     ],
 )
-def test_get_identities_provision(inval, outval, client, identities_single_response):
+def test_get_identities_provision(inval, outval, client):
+    load_response(client.get_identities)
     client.get_identities(usernames="globus@globus.org", provision=inval)
     lastreq = get_last_request()
     assert "provision" in lastreq.params
@@ -155,10 +86,8 @@ def test_get_identities_provision(inval, outval, client, identities_single_respo
         ["globus@globus.org", "sirosen@globus.org"],
     ],
 )
-def test_get_identities_multiple_usernames_success(
-    usernames, client, identities_multiple_response
-):
-    expect_usernames = ["globus@globus.org", "sirosen@globus.org"]
+def test_get_identities_multiple_usernames_success(usernames, client):
+    data = load_response(client.get_identities, case="multiple")
     if isinstance(usernames, str):
         expect_param = usernames
     else:
@@ -166,9 +95,8 @@ def test_get_identities_multiple_usernames_success(
 
     res = client.get_identities(usernames=usernames)
 
-    assert res.data == json.loads(IDENTITIES_MULTIPLE_RESPONSE)
-    # test iteration on the response
-    assert [x["username"] for x in res] == expect_usernames
+    assert [x["username"] for x in res] == data.metadata["usernames"]
+    assert [x["id"] for x in res] == data.metadata["ids"]
 
     lastreq = get_last_request()
     assert "usernames" in lastreq.params
@@ -192,18 +120,14 @@ def test_get_identities_multiple_usernames_success(
         ],
     ],
 )
-def test_get_identities_multiple_ids_success(ids, client, identities_multiple_response):
-    expect_ids = [
-        "46bd0f56-e24f-11e5-a510-131bef46955c",
-        "ae341a98-d274-11e5-b888-dbae3a8ba545",
-    ]
-    expect_param = ",".join(expect_ids)
+def test_get_identities_multiple_ids_success(ids, client):
+    data = load_response(client.get_identities, case="multiple")
+    expect_param = ",".join(data.metadata["ids"])
 
     res = client.get_identities(ids=ids)
 
-    assert res.data == json.loads(IDENTITIES_MULTIPLE_RESPONSE)
-    # test iteration on the response
-    assert [x["id"] for x in res] == expect_ids
+    assert [x["id"] for x in res] == data.metadata["ids"]
+    assert [x["username"] for x in res] == data.metadata["usernames"]
 
     lastreq = get_last_request()
     assert "ids" in lastreq.params
