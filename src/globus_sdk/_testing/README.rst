@@ -65,7 +65,7 @@ unbound, as in:
 
     # or, with a bound method
     ac = globus_sdk.AuthClient()
-    load_response(ac.AuthClient.get_identities, case="multiple")
+    load_response(ac.get_identities, case="multiple")
 
 Activating "Scenarios"
 ~~~~~~~~~~~~~~~~~~~~~~

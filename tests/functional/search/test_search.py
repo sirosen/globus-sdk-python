@@ -6,6 +6,7 @@ import pytest
 import responses
 
 import globus_sdk
+from globus_sdk._testing import load_response
 from tests.common import get_last_request, register_api_route_fixture_file
 
 
@@ -18,12 +19,9 @@ def search_client(no_retry_transport):
 
 
 def test_search_query_simple(search_client):
-    index_id = str(uuid.uuid1())
-    register_api_route_fixture_file(
-        "search", f"/v1/index/{index_id}/search", "query_result_foo.json"
-    )
+    meta = load_response(search_client.search).metadata
 
-    res = search_client.search(index_id, q="foo")
+    res = search_client.search(meta["index_id"], q="foo")
     assert res.http_status == 200
 
     data = res.data
@@ -50,12 +48,9 @@ def test_search_query_simple(search_client):
     ],
 )
 def test_search_post_query_simple(search_client, query_doc):
-    index_id = str(uuid.uuid1())
-    register_api_route_fixture_file(
-        "search", f"/v1/index/{index_id}/search", "query_result_foo.json", method="POST"
-    )
+    meta = load_response(search_client.post_search).metadata
 
-    res = search_client.post_search(index_id, query_doc)
+    res = search_client.post_search(meta["index_id"], query_doc)
     assert res.http_status == 200
 
     data = res.data
@@ -76,12 +71,9 @@ def test_search_post_query_simple(search_client, query_doc):
     ],
 )
 def test_search_post_query_arg_overrides(search_client, query_doc):
-    index_id = str(uuid.uuid1())
-    register_api_route_fixture_file(
-        "search", f"/v1/index/{index_id}/search", "query_result_foo.json", method="POST"
-    )
+    meta = load_response(search_client.post_search).metadata
 
-    res = search_client.post_search(index_id, query_doc, limit=100, offset=150)
+    res = search_client.post_search(meta["index_id"], query_doc, limit=100, offset=150)
     assert res.http_status == 200
 
     data = res.data
