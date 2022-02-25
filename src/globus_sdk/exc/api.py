@@ -106,7 +106,10 @@ class GlobusAPIError(GlobusError):
             self._get_request_authorization_scheme(),
             self.http_status,
             self.code,
-            self.message,
+            # if the message is "", try using response reason
+            # for details on these, and some examples, see
+            #   https://datatracker.ietf.org/doc/html/rfc7231#section-6.1
+            self.message or self._underlying_response.reason,
         ]
 
     def _parse_response(self) -> None:
