@@ -48,9 +48,9 @@ activated by name:
     from globus_sdk._testing import load_response
 
     # load_response will add the response to `responses` and return it
-    load_response("AuthClient.get_identities")
+    load_response("auth.get_identities")
     # "case" is used to have a single name map to multiple responses
-    data = load_response("AuthClient.get_identities", case="multiple")
+    data = load_response("auth.get_identities", case="multiple")
 
 Responses can also be activated by passing an SDK client method, bound or
 unbound, as in:
@@ -150,3 +150,44 @@ override the builtin response sets, if names match.
 ``register_response_set`` can therefore be used to load fixture data early in
 a tetstsuite run (e.g. as an autouse session-level fixture), for reference
 later in the testsuite.
+
+Loading Responses without Registering
+-------------------------------------
+
+Because ``RegisteredResponse`` takes care of resolving ``"auth"`` to the Auth
+URL, ``"transfer"`` to the Transfer URL, and so forth, you might want to use
+``globus_sdk._testing`` in lieu of ``responses`` even when registering single
+responses for individual tests.
+
+To support this mode of usage, ``load_response`` can take a
+``RegisteredResponse`` instance, and ``load_response_set`` can take a
+``ResponseSet`` instance.
+
+Consider the following example of a parametrized test which uses
+``load_response(RegisteredResponse(...))`` as a replacement for
+``responses.add``:
+
+.. code-block:: python
+
+    from globus_sdk._testing import load_response, RegisteredResponse
+    import pytest
+
+
+    @pytest.mark.parametrize("message", ["foo", "bar"])
+    def test_get_identities_sends_back_strange_message(message):
+        load_response(
+            RegisteredResponse(
+                service="auth",
+                path="/v2/api/identities",
+                json={"message": message},
+            )
+        )
+
+        ac = globus_sdk.AuthClient()
+        res = ac.get_identities(usernames="foo@example.com")
+        assert res["message"] == message
+
+
+In this mode of usage, the response set registry is skipped altogether. It is
+not necessary to name or organize the response fixtures in a way that is usable
+outside of the specific test.
