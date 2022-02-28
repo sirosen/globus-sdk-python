@@ -20,7 +20,7 @@ TEST_REQUIREMENTS = [
     "pytest<7",
     "coverage<7",
     "pytest-xdist<3",
-    "responses==0.16.0",
+    "responses==0.17.0",
 ]
 DOC_REQUIREMENTS = [
     "sphinx<5",

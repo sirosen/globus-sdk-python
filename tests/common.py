@@ -33,13 +33,7 @@ def get_last_request():
 
 
 def register_api_route(
-    service,
-    path,
-    method=responses.GET,
-    adding_headers=None,
-    replace=False,
-    match_querystring=False,
-    **kwargs
+    service, path, method=responses.GET, adding_headers=None, replace=False, **kwargs
 ):
     """
     Handy wrapper for adding URIs to the response mock state.
@@ -62,19 +56,11 @@ def register_api_route(
 
     if replace:
         responses.replace(
-            method,
-            full_url,
-            headers=adding_headers,
-            match_querystring=match_querystring,
-            **kwargs
+            method, full_url, headers=adding_headers, match_querystring=None, **kwargs
         )
     else:
         responses.add(
-            method,
-            full_url,
-            headers=adding_headers,
-            match_querystring=match_querystring,
-            **kwargs
+            method, full_url, headers=adding_headers, match_querystring=None, **kwargs
         )
 
 
