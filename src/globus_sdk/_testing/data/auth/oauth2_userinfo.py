@@ -1,4 +1,4 @@
-from globus_sdk._testing.registry import RegisteredResponse, ResponseSet
+from globus_sdk._testing.models import RegisteredResponse, ResponseSet
 
 from ._common import ERROR_ID, UNAUTHORIZED_AUTH_RESPONSE_JSON
 

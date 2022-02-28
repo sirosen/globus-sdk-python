@@ -1,19 +1,20 @@
 import pytest
 import requests
-import responses
 
 import globus_sdk
+from globus_sdk._testing import RegisteredResponse, load_response
 
 
 @pytest.mark.parametrize("error_status", [500, 429, 502, 503, 504])
 def test_retry_on_transient_error(client, mocksleep, error_status):
-    responses.add(
-        responses.GET,
-        "https://foo.api.globus.org/bar",
-        status=error_status,
-        body="Uh-oh!",
+    load_response(
+        RegisteredResponse(
+            path="https://foo.api.globus.org/bar", status=error_status, body="Uh-oh!"
+        )
     )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     # no sign of an error in the client
     res = client.get("/bar")
@@ -27,12 +28,15 @@ def test_retry_on_transient_error(client, mocksleep, error_status):
 def test_retry_on_network_error(client, mocksleep):
     # set the response to be a requests NetworkError -- responses will raise the
     # exception when the call is made
-    responses.add(
-        responses.GET,
-        "https://foo.api.globus.org/bar",
-        body=requests.ConnectionError("foo-err"),
+    load_response(
+        RegisteredResponse(
+            path="https://foo.api.globus.org/bar",
+            body=requests.ConnectionError("foo-err"),
+        )
     )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     # no sign of an error in the client
     res = client.get("/bar")
@@ -47,10 +51,14 @@ def test_retry_on_network_error(client, mocksleep):
 def test_retry_limit(client, mocksleep, num_errors, expect_err):
     # N errors followed by a success
     for _i in range(num_errors):
-        responses.add(
-            responses.GET, "https://foo.api.globus.org/bar", status=500, body="Uh-oh!"
+        load_response(
+            RegisteredResponse(
+                path="https://foo.api.globus.org/bar", status=500, body="Uh-oh!"
+            )
         )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     if expect_err:
         with pytest.raises(globus_sdk.GlobusAPIError):
@@ -70,10 +78,14 @@ def test_transport_retry_limit(client, mocksleep):
     client.transport.max_retries = 2
 
     for _i in range(3):
-        responses.add(
-            responses.GET, "https://foo.api.globus.org/bar", status=500, body="Uh-oh!"
+        load_response(
+            RegisteredResponse(
+                path="https://foo.api.globus.org/bar", status=500, body="Uh-oh!"
+            )
         )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     with pytest.raises(globus_sdk.GlobusAPIError):
         client.get("/bar")
@@ -94,22 +106,29 @@ def test_bad_max_retries_causes_error(client):
 
 def test_persistent_connection_error(client):
     for _i in range(6):
-        responses.add(
-            responses.GET,
-            "https://foo.api.globus.org/bar",
-            body=requests.ConnectionError("foo-err"),
+        load_response(
+            RegisteredResponse(
+                path="https://foo.api.globus.org/bar",
+                body=requests.ConnectionError("foo-err"),
+            )
         )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     with pytest.raises(globus_sdk.GlobusConnectionError):
         client.get("/bar")
 
 
 def test_no_retry_401_no_authorizer(client):
-    responses.add(
-        responses.GET, "https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+    load_response(
+        RegisteredResponse(
+            path="https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+        )
     )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     # error gets raised in client (no retry)
     with pytest.raises(globus_sdk.GlobusAPIError) as excinfo:
@@ -118,10 +137,14 @@ def test_no_retry_401_no_authorizer(client):
 
 
 def test_retry_with_authorizer(client):
-    responses.add(
-        responses.GET, "https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+    load_response(
+        RegisteredResponse(
+            path="https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+        )
     )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     # an authorizer class which does nothing but claims to support handling of
     # unauthorized errors
@@ -150,10 +173,14 @@ def test_retry_with_authorizer(client):
 
 
 def test_no_retry_with_authorizer_no_handler(client):
-    responses.add(
-        responses.GET, "https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+    load_response(
+        RegisteredResponse(
+            path="https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+        )
     )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     # an authorizer class which does nothing and does not claim to handle
     # unauthorized errors
@@ -181,13 +208,19 @@ def test_no_retry_with_authorizer_no_handler(client):
 
 
 def test_retry_with_authorizer_persistent_401(client):
-    responses.add(
-        responses.GET, "https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+    load_response(
+        RegisteredResponse(
+            path="https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+        )
     )
-    responses.add(
-        responses.GET, "https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+    load_response(
+        RegisteredResponse(
+            path="https://foo.api.globus.org/bar", status=401, body="Unauthorized"
+        )
     )
-    responses.add(responses.GET, "https://foo.api.globus.org/bar", body='{"baz": 1}')
+    load_response(
+        RegisteredResponse(path="https://foo.api.globus.org/bar", json={"baz": 1})
+    )
 
     # an authorizer class which does nothing but claims to support handling of
     # unauthorized errors
