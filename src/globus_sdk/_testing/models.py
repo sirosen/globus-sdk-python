@@ -48,7 +48,7 @@ class RegisteredResponse:
     def add(self) -> "RegisteredResponse":
         kwargs: Dict[str, Any] = {
             "headers": self.headers,
-            "match_querystring": False,
+            "match_querystring": None,
             **self.kwargs,
         }
         if self.json is not None:
