@@ -144,3 +144,38 @@ def test_store_and_refresh(mock_response, mock_refresh_response):
     assert data["access_token"] == "access_token_1"
     data = adapter.get_token_data("resource_server_2")
     assert data["access_token"] == "access_token_2_refreshed"
+
+
+def test_iter_namespaces(mock_response, db_filename):
+    foo_adapter = SQLiteAdapter(db_filename, namespace="foo")
+    bar_adapter = SQLiteAdapter(db_filename, namespace="bar")
+    baz_adapter = SQLiteAdapter(db_filename, namespace="baz")
+
+    for adapter in [foo_adapter, bar_adapter, baz_adapter]:
+        assert list(adapter.iter_namespaces()) == []
+        assert list(adapter.iter_namespaces(include_config_namespaces=True)) == []
+
+    foo_adapter.store(mock_response)
+
+    for adapter in [foo_adapter, bar_adapter, baz_adapter]:
+        assert list(adapter.iter_namespaces()) == ["foo"]
+        assert list(adapter.iter_namespaces(include_config_namespaces=True)) == ["foo"]
+
+    bar_adapter.store(mock_response)
+
+    for adapter in [foo_adapter, bar_adapter, baz_adapter]:
+        assert set(adapter.iter_namespaces()) == {"foo", "bar"}
+        assert set(adapter.iter_namespaces(include_config_namespaces=True)) == {
+            "foo",
+            "bar",
+        }
+
+    baz_adapter.store_config("some_conf", {})
+
+    for adapter in [foo_adapter, bar_adapter, baz_adapter]:
+        assert set(adapter.iter_namespaces()) == {"foo", "bar"}
+        assert set(adapter.iter_namespaces(include_config_namespaces=True)) == {
+            "foo",
+            "bar",
+            "baz",
+        }
