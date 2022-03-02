@@ -12,6 +12,27 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.5.0 (2022-03-02)
+-------------------
+
+* ``globus_sdk.IdentityMap`` can now take a cache as an input. This allows
+  multiple ``IdentityMap`` instances to share the same storage cache. Any
+  mutable mapping type is valid, so the cache can be backed by a database or
+  other storage (:pr:`500`)
+
+* Add ``TransferRequestsTransport`` class that does not retry ExternalErrors.
+  This fixes cases in which the ``TransferClient`` incorrectly retried requests (:pr:`522`)
+
+* Use the "reason phrase" as a failover for stringified API errors with no body (:pr:`524`)
+
+* Add support for ``include`` as a parameter to ``GroupsClient.get_group``.
+  ``include`` can be a string or iterable of strings (:pr:`528`)
+
+* Enhance documentation for all of the parameters on methods of ``GroupsClient``
+
+* Add a new method to tokenstorage, ``SQLiteAdapter.iter_namespaces``, which
+  iterates over all namespaces visible in the token database (:pr:`529`)
+
 v3.4.2 (2022-02-18)
 -------------------
 
