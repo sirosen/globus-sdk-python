@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Dict, Iterable, List, MutableMapping, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, MutableMapping, Optional, Set, Tuple
 
 from .client import AuthClient
 
@@ -151,7 +151,7 @@ class IdentityMap:
         # IdentityMap objects share a cache
         self._cache = cache if cache is not None else {}
 
-    def _create_batch(self, key: str) -> List[str]:
+    def _create_batch(self, key: str) -> Set[str]:
         """
         Create a batch to do a lookup.
 
@@ -164,30 +164,16 @@ class IdentityMap:
             self.unresolved_usernames if key_is_username else self.unresolved_ids
         )
 
-        batch = [key]
-        for _ in range(0, min(self.id_batch_size - 1, len(set_to_use))):
-            # until we've added a value or exhausted the set, keep trying to add
-            added = False
-            while not added and set_to_use:
-                # try to find a value to add by popping elements from the set
-                value = set_to_use.pop()
+        batch = {key}
+        # until we've exhausted the set or filled the batch, keep trying to add
+        while set_to_use and len(batch) < self.id_batch_size:
+            value = set_to_use.pop()
 
-                # key could be in the set; don't double-add it. e.g.
-                # >>> idmap.add("globus@globus.org")
-                # >>> idmap["globus@globus.org"]
-                if value == key:
-                    continue
+            # value may already have been looked up if the cache is shared, skip those
+            if value in self._cache:
+                continue
 
-                # value may already have been looked up, if the cache is shared
-                if value in self._cache:
-                    continue
-
-                batch.append(value)
-                added = True
-
-            # not necessary for correctness, but avoid extra loop iterations
-            if not set_to_use:
-                break
+            batch.add(value)
 
         return batch
 
