@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Dict, Iterator, Mapping, Optional, Set
 
 from globus_sdk.services.auth import OAuthTokenResponse
 from globus_sdk.tokenstorage.base import FileAdapter
@@ -11,11 +11,13 @@ class SQLiteAdapter(FileAdapter):
     """
     :param dbname: The name of the DB file to write to and read from. If the string
         ":memory:" is used, an in-memory database will be used instead.
+    :type dbname: str
     :param namespace: A "namespace" to use within the database. All operations will
         be performed indexed under this string, so that multiple distinct sets of tokens
         may be stored in the database. You might use usernames as the namespace to
         implement a multi-user system, or profile names to allow multiple Globus
         accounts to be used by a single user.
+    :type namespace: str, optional
 
     A storage adapter for storing tokens in sqlite databases.
 
@@ -83,7 +85,9 @@ CREATE TABLE sdk_storage_adapter_internal (
     def store_config(self, config_name: str, config_dict: Mapping[str, Any]) -> None:
         """
         :param config_name: A string name for the configuration value
+        :type config_name: str
         :param config_dict: A dict of config which will be stored serialized as JSON
+        :type config_dict: Mapping
 
         Store a config dict under the current namespace in the config table.
         Allows arbitrary configuration data to be namespaced under the namespace, so
@@ -101,6 +105,7 @@ CREATE TABLE sdk_storage_adapter_internal (
     def read_config(self, config_name: str) -> Optional[Dict[str, Any]]:
         """
         :param config_name: A string name for the configuration value
+        :type config_name: str
 
         Load a config dict under the current namespace in the config table.
         If no value is found, returns None
@@ -122,6 +127,7 @@ CREATE TABLE sdk_storage_adapter_internal (
     def remove_config(self, config_name: str) -> bool:
         """
         :param config_name: A string name for the configuration value
+        :type config_name: str
 
         Delete a previously stored configuration value.
 
@@ -138,6 +144,7 @@ CREATE TABLE sdk_storage_adapter_internal (
         """
         :param token_response: a globus_sdk.OAuthTokenResponse object containing token
                                data to store
+        :type token_response: globus_sdk.OAuthTokenResponse
 
         By default, ``self.on_refresh`` is just an alias for this function.
 
@@ -166,6 +173,7 @@ CREATE TABLE sdk_storage_adapter_internal (
 
         :param resource_server: The name of a resource server to lookup in the DB, as
             one would use as a key in OAuthTokenResponse.by_resource_server
+        :type resource_server: str
         """
         for row in self._connection.execute(
             "SELECT token_data_json FROM token_storage "
@@ -208,6 +216,7 @@ CREATE TABLE sdk_storage_adapter_internal (
 
         :param resource_server: The name of the resource server to remove from the DB,
             as one would use as a key in OAuthTokenResponse.by_resource_server
+        :type resource_server: str
         """
         rowcount = self._connection.execute(
             "DELETE FROM token_storage WHERE namespace=? AND resource_server=?",
@@ -215,3 +224,32 @@ CREATE TABLE sdk_storage_adapter_internal (
         ).rowcount
         self._connection.commit()
         return rowcount != 0
+
+    def iter_namespaces(
+        self, *, include_config_namespaces: bool = False
+    ) -> Iterator[str]:
+        """
+        Iterate over the namespaces which are in use in this storage adapter's database.
+        The presence of tokens for a namespace does not indicate that those tokens are
+        valid, only that they have been stored and have not been removed.
+
+        :param include_config_namespaces: Include namespaces which appear only in the
+            configuration storage section of the sqlite database. By default, only
+            namespaces which were used for token storage will be returned
+        :type include_config_namespaces: bool, optional
+        """
+        seen: Set[str] = set()
+        for row in self._connection.execute(
+            "SELECT DISTINCT namespace FROM token_storage;"
+        ):
+            namespace = row[0]
+            seen.add(namespace)
+            yield namespace
+
+        if include_config_namespaces:
+            for row in self._connection.execute(
+                "SELECT DISTINCT namespace FROM config_storage;"
+            ):
+                namespace = row[0]
+                if namespace not in seen:
+                    yield namespace
