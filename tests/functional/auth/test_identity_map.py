@@ -221,3 +221,37 @@ def test_identity_map_prepopulated_cache(client):
     assert idmap[meta["username"]] is None
     # still no calls made
     assert len(responses.calls) == 0
+
+
+def test_identity_map_batch_limit(client):
+    meta1 = load_response(client.get_identities).metadata
+    meta2 = load_response(client.get_identities, case="sirosen").metadata
+
+    # setup the ID map with a size limit of 1
+    idmap = globus_sdk.IdentityMap(client, id_batch_size=1)
+    idmap.add(meta2["id"])
+    idmap.add(meta1["id"])
+
+    # no requests yet...
+    assert len(responses.calls) == 0
+
+    # do the first lookup, using the second ID to be added
+    # only one call should be made
+    assert idmap[meta1["id"]]["username"] == meta1["username"]
+    assert len(responses.calls) == 1
+    # 1 ID left unresolved
+    assert len(idmap.unresolved_ids) == 1
+    # the last (only) API call was by ID with one ID
+    last_req = get_last_request()
+    assert "usernames" not in last_req.params
+    assert last_req.params == {"ids": meta1["id"]}
+
+    # second lookup works as well
+    assert idmap[meta2["id"]]["username"] == meta2["username"]
+    assert len(responses.calls) == 2
+    # no IDs left unresolved
+    assert len(idmap.unresolved_ids) == 0
+    # the last API call was by ID with one ID
+    last_req = get_last_request()
+    assert "usernames" not in last_req.params
+    assert last_req.params == {"ids": meta2["id"]}

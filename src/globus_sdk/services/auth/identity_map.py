@@ -164,7 +164,12 @@ class IdentityMap:
             self.unresolved_usernames if key_is_username else self.unresolved_ids
         )
 
+        # start the batch with the key being looked up, and if it is in the unresolved
+        # list remove it
         batch = {key}
+        if key in set_to_use:
+            set_to_use.remove(key)
+
         # until we've exhausted the set or filled the batch, keep trying to add
         while set_to_use and len(batch) < self.id_batch_size:
             value = set_to_use.pop()
