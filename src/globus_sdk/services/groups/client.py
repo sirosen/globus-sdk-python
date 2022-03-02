@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Optional, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, Optional, TypeVar, Union
 
 from globus_sdk import client, response, utils
 from globus_sdk.scopes import GroupsScopes
@@ -49,16 +49,36 @@ class GroupsClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         Return a list of groups your identity belongs to.
+
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.get("/groups/my_groups", query_params=query_params)
 
     @_groupdoc("Get Group", "get_group_v2_groups__group_id__get")
     def get_group(
-        self, group_id: UUIDLike, *, query_params: Optional[Dict[str, Any]] = None
+        self,
+        group_id: UUIDLike,
+        *,
+        include: Union[None, str, Iterable[str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
         Get details about a specific group
+
+        :param group_id: the ID of the group
+        :type group_id: str or UUID
+        :param include: list of additional fields to include (allowed fields are
+            ``memberships``, ``my_memberships``, ``policies``, ``allowed_actions``, and
+            ``child_ids``)
+        :type include: str or iterable of str, optional
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
+        if query_params is None:
+            query_params = {}
+        if include is not None:
+            query_params["include"] = ",".join(utils.safe_strseq_iter(include))
         return self.get(f"/groups/{group_id}", query_params=query_params)
 
     @_groupdoc("Delete a group", "delete_group_v2_groups__group_id__delete")
@@ -67,6 +87,11 @@ class GroupsClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         Delete a group.
+
+        :param group_id: the ID of the group
+        :type group_id: str or UUID
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.delete(f"/groups/{group_id}", query_params=query_params)
 
@@ -76,6 +101,11 @@ class GroupsClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         Create a group.
+
+        :param data: the group document to create
+        :type data: dict
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.post("/groups", data=data, query_params=query_params)
 
@@ -89,6 +119,13 @@ class GroupsClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         Update a given group.
+
+        :param group_id: the ID of the group
+        :type group_id: str or UUID
+        :param data: the group document to use for update
+        :type data: dict
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.put(f"/groups/{group_id}", data=data, query_params=query_params)
 
@@ -101,6 +138,11 @@ class GroupsClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         Get policies for the given group
+
+        :param group_id: the ID of the group
+        :type group_id: str or UUID
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.get(f"/groups/{group_id}/policies", query_params=query_params)
 
@@ -117,6 +159,13 @@ class GroupsClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         Set policies for the group.
+
+        :param group_id: the ID of the group
+        :type group_id: str or UUID
+        :param data: the group policy document to set
+        :type data: dict or ``GroupPolicies``
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.put(
             f"/groups/{group_id}/policies", data=data, query_params=query_params
@@ -132,6 +181,9 @@ class GroupsClient(client.BaseClient):
         """
         Get identity preferences.  Currently this only includes whether the
         user allows themselves to be added to groups.
+
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.get("/preferences", query_params=query_params)
 
@@ -148,6 +200,16 @@ class GroupsClient(client.BaseClient):
         """
         Set identity preferences.  Currently this only includes whether the
         user allows themselves to be added to groups.
+
+        :param data: the identity set preferences document
+        :type data: dict
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
+
+        **Examples**
+
+        >>> gc = globus_sdk.GroupsClient(...)
+        >>> gc.set_identity_preferences({"allow_add": False})
         """
         return self.put("/preferences", data=data, query_params=query_params)
 
@@ -163,6 +225,11 @@ class GroupsClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         Get membership fields for your identities.
+
+        :param group_id: the ID of the group
+        :type group_id: str or UUID
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.get(
             f"/groups/{group_id}/membership_fields", query_params=query_params
@@ -180,7 +247,14 @@ class GroupsClient(client.BaseClient):
         query_params: Optional[Dict[str, Any]] = None,
     ) -> response.GlobusHTTPResponse:
         """
-        Get membership fields for your identities.
+        Set membership fields for your identities.
+
+        :param group_id: the ID of the group
+        :type group_id: str or UUID
+        :param data: the membership fields document
+        :type data: dict
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
         """
         return self.put(
             f"/groups/{group_id}/membership_fields",
@@ -201,5 +275,22 @@ class GroupsClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         Execute a batch of actions against several group memberships.
+
+        :param group_id: the ID of the group
+        :type group_id: str or UUID
+        :param actions: the batch of membership actions to perform, modifying, creating,
+            and removing memberships in the group
+        :type actions: dict or BatchMembershipActions
+        :param query_params: additional passthrough query parameters
+        :type query_params: dict, optional
+
+        **Examples**
+
+        >>> gc = globus_sdk.GroupsClient(...)
+        >>> group_id = ...
+        >>> batch = globus_sdk.BatchMembershipActions()
+        >>> batch.add_members("ae332d86-d274-11e5-b885-b31714a110e9")
+        >>> batch.invite_members("c699d42e-d274-11e5-bf75-1fc5bf53bb24")
+        >>> gc.batch_membership_action(group_id, batch)
         """
         return self.post(f"/groups/{group_id}", data=actions, query_params=query_params)

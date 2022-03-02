@@ -1,4 +1,7 @@
 import json
+import urllib.parse
+
+import pytest
 
 from globus_sdk import (
     GroupMemberVisibility,
@@ -6,6 +9,7 @@ from globus_sdk import (
     GroupRequiredSignupFields,
     GroupVisibility,
 )
+from globus_sdk._testing import load_response
 from tests.common import get_last_request, register_api_route_fixture_file
 
 
@@ -21,30 +25,40 @@ def test_my_groups_simple(groups_client):
 
 
 def test_get_group(groups_client):
-    register_api_route_fixture_file(
-        "groups", "/v2/groups/d3974728-6458-11e4-b72d-123139141556", "group.json"
+    meta = load_response(groups_client.get_group).metadata
+
+    res = groups_client.get_group(group_id=meta["group_id"])
+    assert res.http_status == 200
+    assert "Claptrap" in res["name"]
+
+
+@pytest.mark.parametrize(
+    "include_param",
+    ["policies", "policies,memberships", ["memberships", "policies", "child_ids"]],
+)
+def test_get_group_include(groups_client, include_param):
+    meta = load_response(groups_client.get_group).metadata
+    expect_param = (
+        ",".join(include_param) if not isinstance(include_param, str) else include_param
     )
 
-    res = groups_client.get_group(group_id="d3974728-6458-11e4-b72d-123139141556")
+    res = groups_client.get_group(group_id=meta["group_id"], include=include_param)
     assert res.http_status == 200
+    assert "Claptrap" in res["name"]
 
-    data = res.data
-    assert "Claptrap" in data["name"]
+    req = get_last_request()
+    assert req.body is None
+    parsed_qs = urllib.parse.parse_qs(urllib.parse.urlparse(req.url).query)
+    assert len(parsed_qs["include"]) == 1
+    assert parsed_qs["include"][0] == expect_param
 
 
 def test_delete_group(groups_client):
-    register_api_route_fixture_file(
-        "groups",
-        "/v2/groups/d3974728-6458-11e4-b72d-123139141556",
-        "group.json",
-        method="DELETE",
-    )
+    meta = load_response(groups_client.delete_group).metadata
 
-    res = groups_client.delete_group(group_id="d3974728-6458-11e4-b72d-123139141556")
+    res = groups_client.delete_group(group_id=meta["group_id"])
     assert res.http_status == 200
-
-    data = res.data
-    assert "Claptrap" in data["name"]
+    assert "Claptrap" in res["name"]
 
 
 def test_create_group(groups_manager):
