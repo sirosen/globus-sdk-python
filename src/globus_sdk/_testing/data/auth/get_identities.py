@@ -43,6 +43,16 @@ RESPONSES = ResponseSet(
             ],
         },
     ),
+    sirosen=RegisteredResponse(
+        service="auth",
+        path="/v2/api/identities",
+        json={"identities": [_sirosen_at_globus_data]},
+        metadata={
+            "id": _sirosen_at_globus_data["id"],
+            "username": _sirosen_at_globus_data["username"],
+            "org": _sirosen_at_globus_data["organization"],
+        },
+    ),
     unauthorized=RegisteredResponse(
         service="auth",
         path="/v2/api/identities",
