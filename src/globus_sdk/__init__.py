@@ -54,7 +54,9 @@ from .services.search import (
     SearchScrollQuery,
 )
 from .services.transfer import (
+    ActivationRequirementsResponse,
     DeleteData,
+    IterableTransferResponse,
     TransferAPIError,
     TransferClient,
     TransferData,
@@ -90,6 +92,8 @@ __all__ = (
     "TransferClient",
     "TransferData",
     "DeleteData",
+    "ActivationRequirementsResponse",
+    "IterableTransferResponse",
     "SearchClient",
     "SearchQuery",
     "SearchScrollQuery",
