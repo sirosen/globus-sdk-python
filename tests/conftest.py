@@ -3,7 +3,10 @@ from unittest import mock
 import pytest
 import responses
 
+import globus_sdk
 from globus_sdk.transport import RequestsTransport
+
+globus_sdk._DISABLE_TESTING_WARNING = True
 
 
 @pytest.fixture(autouse=True)
