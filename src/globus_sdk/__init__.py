@@ -119,3 +119,5 @@ __all__ = (
 # configure logging for a library, per python best practices:
 # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
 logging.getLogger("globus_sdk").addHandler(logging.NullHandler())
+
+_ENABLE_TESTING = False
