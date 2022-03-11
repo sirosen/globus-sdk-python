@@ -1,4 +1,5 @@
 import logging
+import os
 
 from .authorizers import (
     AccessTokenAuthorizer,
@@ -120,4 +121,9 @@ __all__ = (
 # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
 logging.getLogger("globus_sdk").addHandler(logging.NullHandler())
 
-_DISABLE_TESTING_WARNING = False
+# the warning on imports of `testing` can be disabled via an env var or at runtime
+#
+# the `testing` module is private, but linters may complain about private imports
+# so we use the `testing` name to accommodate linting within the Globus team, but
+# guarded with a warning
+_DISABLE_TESTING_WARNING = os.getenv("GLOBUS_SDK_DISABLE_TESTING_WARNING") is not None
