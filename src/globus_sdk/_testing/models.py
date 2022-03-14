@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 import responses
 
@@ -23,7 +23,7 @@ class RegisteredResponse:
         method: str = responses.GET,
         headers: Optional[Dict[str, str]] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
+        json: Union[None, List[Any], Dict[str, Any]] = None,
         body: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
