@@ -12,6 +12,16 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.6.0 (2022-03-18)
+-------------------
+
+* ``ScopeBuilder`` objects now support ``known_url_scopes``, and known scope
+  arguments to a ``ScopeBuilder`` may now be of type ``str`` in addition to
+  ``list[str]`` (:pr:`536`)
+
+* Add the ``RequestsTransport.tune`` contextmanager to the transport layer,
+  allowing the settings on the transport to be set temporarily (:pr:`540`)
+
 v3.5.0 (2022-03-02)
 -------------------
 
