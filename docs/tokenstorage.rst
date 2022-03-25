@@ -26,7 +26,7 @@ For example:
     my_file_adapter = SimpleJSONFileAdapter(os.path.expanduser("~/mytokens.json"))
 
     if not my_file_adapter.file_exists():
-        # ... do a login low, getting back initial tokens
+        # ... do a login flow, getting back initial tokens
         # elided for simplicity here
         token_response = ...
         # now store the tokens, and pull out the tokens for the

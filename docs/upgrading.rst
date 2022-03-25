@@ -25,11 +25,10 @@ the globus-sdk at the same time, consider adding this snippet:
 
 .. code-block:: python
 
-    from distutils.version import LooseVersion
     import globus_sdk
 
-    GLOBUS_SDK_VERSION = tuple(LooseVersion(globus_sdk.__version__).version)
-    GLOBUS_SDK_MAJOR_VERSION = GLOBUS_SDK_VERSION[0]
+    GLOBUS_SDK_VERSION = tuple(globus_sdk.__version__.split("."))
+    GLOBUS_SDK_MAJOR_VERSION = int(GLOBUS_SDK_VERSION[0])
 
 This will parse the Globus SDK version information into a tuple and grab the
 first element (the major version number) as an integer.
@@ -226,7 +225,7 @@ Passthrough Parameters are Explicit
 
 Many methods in version 2 accepted arbitrary keyword arguments which were then
 transformed into query or body parameters based on the context. This is no
-allowed, but methods can still be passed additional query parameters in the
+longer allowed, but methods can still be passed additional query parameters in the
 form of a ``query_params`` dict.
 
 For example, if the Transfer API is known to support a query param ``foo=bar``
