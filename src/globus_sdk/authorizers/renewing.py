@@ -74,7 +74,7 @@ class RenewingAuthorizer(GlobusAuthorizer, metaclass=abc.ABCMeta):
 
         if self.access_token is not None:
             log.info(
-                "RenewingAuthorizer will start by using access_token"
+                "RenewingAuthorizer will start by using access_token "
                 f'with hash "{self._access_token_hash}"'
             )
         # if data were unspecified, fetch a new access token
