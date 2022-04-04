@@ -15,6 +15,7 @@ class EnvConfig:
     envname: str
     domain: str
     no_dotapi: List[str] = ["app", "auth"]
+    automate_services: List[str] = ["actions", "flows", "timer"]
 
     # this same dict is inherited (and therefore shared!) by all subclasses
     _registry: Dict[str, Type["EnvConfig"]] = {}
@@ -45,6 +46,8 @@ class EnvConfig:
         # check `no_dotapi` for services which don't have `.api` in their names
         if service in cls.no_dotapi:
             return f"https://{service}.{cls.domain}/"
+        if service in cls.automate_services:
+            return f"https://{cls.envname}.{service}.automate.globus.org/"
         return f"https://{service}.api.{cls.domain}/"
 
     @classmethod
@@ -103,6 +106,8 @@ class ProductionEnvConfig(EnvConfig):
     envname = "production"
     domain = "globus.org"
     nexus_url = "https://nexus.api.globusonline.org/"
+    timer_url = "https://timer.automate.globus.org/"
+    actions_url = "https://actions.automate.globus.org/"
 
 
 class PreviewEnvConfig(EnvConfig):
@@ -118,5 +123,8 @@ for envname in ["sandbox", "integration", "test", "staging"]:
     type(
         f"{envname.title()}EnvConfig",
         (EnvConfig,),
-        {"envname": envname, "domain": f"{envname}.globuscs.info"},
+        {
+            "envname": envname,
+            "domain": f"{envname}.globuscs.info",
+        },
     )

@@ -41,5 +41,6 @@ very simply::
     auth
     groups
     search
+    timer
     transfer
     gcs
