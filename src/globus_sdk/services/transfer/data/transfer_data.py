@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 class TransferData(utils.PayloadWrapper):
     r"""
     Convenience class for constructing a transfer document, to use as the
-    `data` parameter to
+    ``data`` parameter to
     :meth:`submit_transfer <globus_sdk.TransferClient.submit_transfer>`.
 
     At least one item must be added using
