@@ -360,7 +360,7 @@ class RequestsTransport:
         - default_check_expired_authorization
         - default_check_request_exception
         - default_check_retry_after_header
-        - default_check_tranisent_error
+        - default_check_transient_error
 
         It can be overridden to register additional hooks or to remove the default
         hooks.
