@@ -26,11 +26,11 @@ class TimerJob(PayloadWrapper):
     :type callback_url: str
     :param callback_body: JSON data which Timer will send to the Action Provider on
         each invocation
+    :type callback_body: dict
     :param start: The datetime at which to start the Timer job.
     :type start: datetime.datetime or str
     :param interval: The interval at which the Timer job should recur.
     :type interval: datetime.timedelta
-    :type callback_body: dict
     :param name: A (not necessarily unique) name to identify this job in Timer
     :type name: str, optional
     :param stop_after: A date after which the Timer job will stop running
