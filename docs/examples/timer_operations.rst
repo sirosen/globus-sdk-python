@@ -33,7 +33,9 @@ define our recurring Timer job.
     auth_code = input("Enter the auth code here: ").strip()
     token_response = native_client.oauth2_exchange_code_for_tokens(auth_code)
     timer_token = token_response.by_resource_server[TIMER_CLIENT_ID]["access_token"]
-    transfer_token = token_response.by_resource_server["transfer.api.globus.org"]["access_token"]
+    transfer_token = token_response.by_resource_server["transfer.api.globus.org"][
+        "access_token"
+    ]
 
     # Set up a transfer client and create a `TransferData` object
     transfer_authorizer = AccessTokenAuthorizer(transfer_token)
