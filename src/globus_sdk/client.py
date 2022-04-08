@@ -11,6 +11,8 @@ from globus_sdk.transport import RequestsTransport
 
 log = logging.getLogger(__name__)
 
+DataParamType = Union[None, str, Dict[str, Any], utils.PayloadWrapper]
+
 
 class BaseClient:
     r"""
@@ -137,7 +139,7 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[None, Dict[str, Any], utils.PayloadWrapper] = None,
+        data: DataParamType = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> GlobusHTTPResponse:
@@ -182,7 +184,7 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[None, Dict[str, Any], utils.PayloadWrapper] = None,
+        data: DataParamType = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> GlobusHTTPResponse:
@@ -209,7 +211,7 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[None, Dict[str, Any], utils.PayloadWrapper] = None,
+        data: DataParamType = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> GlobusHTTPResponse:
@@ -237,7 +239,7 @@ class BaseClient:
         path: str,
         *,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Union[None, Dict[str, Any], utils.PayloadWrapper] = None,
+        data: DataParamType = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
     ) -> GlobusHTTPResponse:

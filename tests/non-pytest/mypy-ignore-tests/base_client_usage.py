@@ -10,3 +10,8 @@ i: int = globus_sdk.BaseClient.resource_server  # type: ignore [assignment]
 c = globus_sdk.BaseClient()
 s = c.resource_server
 i = c.resource_server  # type: ignore [assignment]
+
+# check that data:list warns, but other types are okay
+r = c.request("POST", "/foo", data="bar")
+r = c.request("POST", "/foo", data={})
+r = c.request("POST", "/foo", data=list())  # type: ignore [arg-type]

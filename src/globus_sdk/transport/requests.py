@@ -268,7 +268,7 @@ class RequestsTransport:
         method: str,
         url: str,
         query_params: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any]] = None,
+        data: Union[Dict[str, Any], str, None] = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
         authorizer: Optional[GlobusAuthorizer] = None,
