@@ -12,6 +12,19 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+v3.7.0 (2022-04-08)
+-------------------
+
+* Add a client for the Timer service (:pr:`548`)
+
+  * Add ``TimerClient`` class, along with ``TimerJob`` for constructing data
+    to pass to the Timer service for job creation, and ``TimerAPIError``
+  * Modify ``globus_sdk.config`` utilities to provide URLs for Actions and
+    Timer services
+
+* Fix annotations to allow request data to be a string. This is
+  supported at runtime but was missing from annotations. (:pr:`549`)
+
 v3.6.0 (2022-03-18)
 -------------------
 
