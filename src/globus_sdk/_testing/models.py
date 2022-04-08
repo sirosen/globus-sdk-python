@@ -13,6 +13,7 @@ class RegisteredResponse:
         "search": "https://search.api.globus.org/",
         "gcs": "https://abc.xyz.data.globus.org/api",
         "groups": "https://groups.api.globus.org/v2/",
+        "timer": "https://timer.automate.globus.org/",
     }
 
     def __init__(

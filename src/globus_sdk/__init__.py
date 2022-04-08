@@ -53,6 +53,7 @@ from .services.search import (
     SearchQuery,
     SearchScrollQuery,
 )
+from .services.timer import TimerAPIError, TimerClient, TimerJob
 from .services.transfer import (
     ActivationRequirementsResponse,
     DeleteData,
@@ -113,6 +114,9 @@ __all__ = (
     "GCSAPIError",
     "GlobusConnectPersonalOwnerInfo",
     "LocalGlobusConnectPersonal",
+    "TimerAPIError",
+    "TimerClient",
+    "TimerJob",
 )
 
 
