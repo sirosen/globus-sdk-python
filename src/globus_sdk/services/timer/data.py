@@ -29,16 +29,18 @@ class TimerJob(PayloadWrapper):
     :type callback_body: dict
     :param start: The datetime at which to start the Timer job.
     :type start: datetime.datetime or str
-    :param interval: The interval at which the Timer job should recur.
-    :type interval: datetime.timedelta
+    :param interval: The interval at which the Timer job should recur. Interpreted as
+        seconds if specified as an integer. If ``stop_after_n == 1``, i.e. the job is
+        set to run only a single time, then interval *must* be None.
+    :type interval: datetime.timedelta or int
     :param name: A (not necessarily unique) name to identify this job in Timer
     :type name: str, optional
     :param stop_after: A date after which the Timer job will stop running
     :type stop_after: datetime.datetime, optional
     :param stop_after_n: A number of executions after which the Timer job will stop
     :type stop_after_n: int
-    :param scope: The scope Timer will need in order to authorize against the Action
-        Provider specified in the callback URL.
+    :param scope: Timer defaults to the Transfer 'all' scope. Use this parameter to
+        change the scope used by Timer when calling the Transfer Action Provider.
     :type scope: str, optional
 
     .. automethodlist:: globus_sdk.TimerJob
@@ -100,16 +102,18 @@ class TimerJob(PayloadWrapper):
         :type transfer_data: globus_sdk.TransferData
         :param start: The datetime at which to start the Timer job.
         :type start: datetime.datetime or str
-        :param interval: The interval at which the Timer job should recur.
-        :type interval: datetime.timedelta
+        :param interval: The interval at which the Timer job should recur. Interpreted
+            as seconds if specified as an integer. If ``stop_after_n == 1``, i.e. the
+            job is set to run only a single time, then interval *must* be None.
+        :type interval: datetime.timedelta or int
         :param name: A (not necessarily unique) name to identify this job in Timer
         :type name: str, optional
         :param stop_after: A date after which the Timer job will stop running
         :type stop_after: datetime.datetime, optional
         :param stop_after_n: A number of executions after which the Timer job will stop
         :type stop_after_n: int
-        :param scope: The scope Timer will need in order to authorize against the Action
-            Provider specified in the callback URL.
+        :param scope: Timer defaults to the Transfer 'all' scope. Use this parameter to
+            change the scope used by Timer when calling the Transfer Action Provider.
         :type scope: str, optional
         :param environment: For internal use: because this method needs to generate a
             URL for the Transfer Action Provider, this argument can control which
