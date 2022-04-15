@@ -242,6 +242,8 @@ class BaseClient:
         data: DataParamType = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
+        allow_redirects: bool = True,
+        stream: bool = False,
     ) -> GlobusHTTPResponse:
         """
         Send an HTTP request
@@ -261,6 +263,12 @@ class BaseClient:
             registered with the transport. By default, strings get "text" behavior and
             all other objects get "json".
         :type encoding: str
+        :param allow_redirects: Follow Location headers on redirect response
+            automatically. Defaults to ``True``
+        :type allow_redirects: bool
+        :param stream: Do not immediately download the response content. Defaults to
+            ``False``
+        :type stream: bool
 
         :return: :class:`GlobusHTTPResponse \
         <globus_sdk.response.GlobusHTTPResponse>` object
@@ -289,6 +297,8 @@ class BaseClient:
             headers=rheaders,
             encoding=encoding,
             authorizer=self.authorizer,
+            allow_redirects=allow_redirects,
+            stream=stream,
         )
         log.debug("request made to URL: %s", r.url)
 

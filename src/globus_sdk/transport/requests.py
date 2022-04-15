@@ -272,6 +272,8 @@ class RequestsTransport:
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
         authorizer: Optional[GlobusAuthorizer] = None,
+        allow_redirects: bool = True,
+        stream: bool = False,
     ) -> requests.Response:
         """
         Send an HTTP request
@@ -294,6 +296,12 @@ class RequestsTransport:
         :param authorizer: The authorizer which is used to get or update authorization
             information for the request
         :type authorizer: GlobusAuthorizer, optional
+        :param allow_redirects: Follow Location headers on redirect response
+            automatically. Defaults to ``True``
+        :type allow_redirects: bool
+        :param stream: Do not immediately download the response content. Defaults to
+            ``False``
+        :type stream: bool
 
         :return: ``requests.Response`` object
         """
@@ -313,7 +321,11 @@ class RequestsTransport:
             try:
                 log.debug("request about to send")
                 resp = ctx.response = self.session.send(
-                    req.prepare(), timeout=self.http_timeout, verify=self.verify_ssl
+                    req.prepare(),
+                    timeout=self.http_timeout,
+                    verify=self.verify_ssl,
+                    allow_redirects=allow_redirects,
+                    stream=stream,
                 )
             except requests.RequestException as err:
                 log.debug("request hit error (RequestException)")
