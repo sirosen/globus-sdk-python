@@ -1,4 +1,4 @@
-* Several changes expose more details of HTTP requests (:pr:`NUMBER`)
+* Several changes expose more details of HTTP requests (:pr:`551`)
   * ``GlobusAPIError`` has a new property ``headers`` which provides the
     case-insensitive mapping of header values from the response
   * ``GlobusAPIError`` and ``GlobusHTTPResponse`` now include ``http_reason``,
