@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Mapping, Optional, Union, cast
 
 import requests
 
@@ -34,6 +34,27 @@ class GlobusAPIError(GlobusError):
         self._underlying_response = r
         self._parse_response()
         super().__init__(*self._get_args())
+
+    @property
+    def http_reason(self) -> str:
+        """
+        The HTTP reason string from the response.
+
+        This is the part of the status line after the status code, and typically is a
+        string description of the status. If the status line is
+        ``HTTP/1.1 404 Not Found``, then this is the string ``"Not Found"``.
+        """
+        return self._underlying_response.reason
+
+    @property
+    def headers(self) -> Mapping[str, str]:
+        """
+        The HTTP response headers as a case-insensitive mapping.
+
+        For example, ``headers["Content-Length"]`` and ``headers["content-length"]`` are
+        treated as equivalent.
+        """
+        return self._underlying_response.headers
 
     def _json_content_type(self) -> bool:
         r = self._underlying_response

@@ -10,7 +10,7 @@ from globus_sdk.response import GlobusHTTPResponse, IterableResponse
 _TestResponse = namedtuple("_TestResponse", ("data", "r"))
 
 
-def _response(data=None, encoding="utf-8", headers=None, status=None):
+def _response(data=None, encoding="utf-8", headers=None, status: int = 200):
     r = requests.Response()
 
     is_json = isinstance(data, (dict, list))
@@ -29,8 +29,9 @@ def _response(data=None, encoding="utf-8", headers=None, status=None):
     elif is_json:
         r.headers["Content-Type"] = "application/json"
 
-    if status is not None:
-        r.status_code = status
+    r.status_code = status
+
+    r.reason = {200: "OK", 404: "Not Found"}.get(status, "Unknown")
 
     return r
 
@@ -196,6 +197,22 @@ def test_http_status_code_on_response():
 
     r3 = GlobusHTTPResponse(r2)  # wrap another response
     assert r3.http_status == 404
+
+
+def test_http_reason_on_response():
+    r1 = _response(status=404)
+    r2 = GlobusHTTPResponse(r1, client=mock.Mock())  # handle a Response object
+    r3 = GlobusHTTPResponse(r2)  # wrap another response
+    assert r1.reason == "Not Found"
+    assert r2.http_reason == "Not Found"
+    assert r3.http_reason == "Not Found"
+
+    r4 = _response(status=200)
+    r5 = GlobusHTTPResponse(r4, client=mock.Mock())  # handle a Response object
+    r6 = GlobusHTTPResponse(r5)  # wrap another response
+    assert r4.reason == "OK"
+    assert r5.http_reason == "OK"
+    assert r6.http_reason == "OK"
 
 
 def test_http_headers_from_response():

@@ -32,6 +32,14 @@ def _mk_response(
         resp.headers.update(headers)
 
     resp.status_code = str(status)
+    resp.reason = {
+        200: "OK",
+        400: "Bad Request",
+        401: "Unauthorized",
+        403: "Forbidden",
+        404: "Not Found",
+        500: "Server Error",
+    }.get(status, "Unknown")
     method = method or "GET"
     url = url or "default-example-url.bogus"
     resp.url = url
@@ -405,3 +413,33 @@ def test_convert_requests_exception(orig, conv_class):
     conv = exc.convert_request_exception(orig)
     assert conv.underlying_exception == orig
     assert isinstance(conv, conv_class)
+
+
+@pytest.mark.parametrize(
+    "status, expect_reason",
+    [
+        (400, "Bad Request"),
+        (500, "Server Error"),
+    ],
+)
+def test_http_reason_exposure(status, expect_reason):
+    res = _mk_response(
+        {"errors": [{"message": "json error message", "code": "Json Error"}]},
+        status,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json"},
+    )
+    err = exc.GlobusAPIError(res.r)
+    assert err.http_reason == expect_reason
+
+
+def test_http_header_exposure():
+    res = _mk_response(
+        {"errors": [{"message": "json error message", "code": "Json Error"}]},
+        400,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json", "Spam": "Eggs"},
+    )
+    err = exc.GlobusAPIError(res.r)
+    assert err.headers["spam"] == "Eggs"
+    assert err.headers["Content-Type"] == "application/json"
