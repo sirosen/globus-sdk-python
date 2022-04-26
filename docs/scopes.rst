@@ -76,6 +76,45 @@ To elaborate on the above example:
     # data from the response
     tokendata = token_response.by_resource_server[TransferScopes.resource_server]
 
+MutableScope objects
+--------------------
+
+In order to support optional and dependent scopes, an additional type is
+provided by ``globus_sdk.scopes``: the ``MutableScope`` class.
+
+``MutableScope`` can be constructed directly, from full scope strings, or via a
+``ScopeBuilder``'s ``make_mutable`` method, given a scope's short name.
+
+For example, one can create a ``MutableScope`` from the Groups "all" scope as
+follows:
+
+.. code-block:: python
+
+    from globus_sdk.scopes import GroupsScopes
+
+    scope = GroupsScopes.make_mutable("all")
+
+MutableScopes provide the most value when handling scope dependencies. For
+example, given a Globus Connect Server Mapped Collection, it may be desirable
+to construct a "data_access" scope as an optional dependency for the Transfer
+Scope. To do so, one first creates the mutable scope object, then adds the
+dependency to it:
+
+.. code-block:: python
+
+    from globus_sdk.scopes import GCSCollectionScopeBuilder, TransferScopes
+
+    MAPPED_COLLECTION_ID = "...ID HERE..."
+
+    transfer_scope = TransferScopes.make_mutable("all")
+    transfer_scope.add_dependency(
+        GCSCollectionScopeBuilder(MAPPED_COLLECTION_ID).data_access, optional=True
+    )
+
+``MutableScope``\s can be used in most of the same locations where scope
+strings can be used, but you can also call ``str()`` on them to get a
+stringified representation.
+
 ScopeBuilder Types and Constants
 --------------------------------
 
@@ -88,6 +127,10 @@ ScopeBuilder Types and Constants
     :show-inheritance:
 
 .. autoclass:: globus_sdk.scopes.GCSCollectionScopeBuilder
+    :members:
+    :show-inheritance:
+
+.. autoclass:: globus_sdk.scopes.MutableScope
     :members:
     :show-inheritance:
 

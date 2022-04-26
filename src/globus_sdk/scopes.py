@@ -1,6 +1,98 @@
-from typing import List, Union
+from typing import Dict, Iterable, Iterator, List, Union
 
 from globus_sdk import utils
+
+# this type alias is meant for internal use, which is why it's named with an underscore
+_ScopeCollectionType = Union[
+    str,
+    "MutableScope",
+    Iterable[str],
+    Iterable["MutableScope"],
+    Iterable[Union[str, "MutableScope"]],
+]
+
+
+def _iter_scope_collection(obj: _ScopeCollectionType) -> Iterator[str]:
+    if isinstance(obj, str):
+        yield obj
+    elif isinstance(obj, MutableScope):
+        yield str(obj)
+    else:
+        for item in obj:
+            yield str(item)
+
+
+class MutableScope:
+    """
+    A mutable scope is a representation of a scope which allows modifications to be
+    made. In particular, it supports handling scope dependencies via
+    ``add_dependency``. A MutableScope can be created
+
+    `str(MutableScope(...))` produces a valid scope string for use in various methods.
+
+    :param scope_string: The scope which will be used as the basis for this MutableScope
+    :type scope_string: str
+    :param optional: The scope may be marked as optional. This means that the scope can
+        be declined by the user without declining consent for other scopes
+    :type optional: bool
+    """
+
+    def __init__(self, scope_string: str, *, optional: bool = False) -> None:
+        self.optional = optional
+        self._scope_string = scope_string
+        # map from scope name to optional=t/f
+        # this means that dependencies are not ordered, but that adding the same
+        # dependency twice is a no-op
+        self._dependencies: Dict[str, bool] = {}
+
+    def add_dependency(self, scope: str, *, optional: bool = False) -> "MutableScope":
+        """
+        Add a scope dependency. The dependent scope relationship will be stored in the
+        MutableScope and will be evident in its string representation.
+
+        :param scope: The scope upon which the current scope depends
+        :type scope: str
+        :param optional: Mark the dependency an optional one. By default it is not. An
+            optional scope dependency can be declined by the user without declining
+            consent for the primary scope
+        :type optional: bool, optional
+        """
+        if scope.startswith("*"):
+            raise ValueError(
+                "Scope strings for add_dependency cannot contain a leading '*'. "
+                "To pass an optional scope, first strip any leading '*', and use "
+                "'optional=True' if the scope must be marked optional."
+            )
+        self._dependencies[scope] = optional
+        return self
+
+    def __repr__(self) -> str:
+        parts: List[str] = [f"'{self._scope_string}'"]
+        if self.optional:
+            parts.append("optional=True")
+        if self._dependencies:
+            parts.append(f"dependencies={self._dependencies}")
+        return "MutableScope(" + ", ".join(parts) + ")"
+
+    def _formatted_dependencies(self) -> Iterator[str]:
+        for scope in self._dependencies:
+            optional_prefix = "*" if self._dependencies[scope] else ""
+            yield optional_prefix + scope
+
+    def __str__(self) -> str:
+        base_scope = ("*" if self.optional else "") + self._scope_string
+        if not self._dependencies:
+            return base_scope
+        return base_scope + "[" + " ".join(self._formatted_dependencies()) + "]"
+
+    @staticmethod
+    def scopes2str(obj: _ScopeCollectionType) -> str:
+        """
+        Given a scope string, a collection of scope strings, a MutableScope object, a
+        collection of MutableScope objects, or a mixed collection of strings and
+        MutableScopes, convert to a string which can be used in a request.
+        """
+        return " ".join(_iter_scope_collection(obj))
 
 
 class ScopeBuilder:
@@ -93,6 +185,33 @@ class ScopeBuilder:
         :type scope_name: str
         """
         return f"https://auth.globus.org/scopes/{self.resource_server}/{scope_name}"
+
+    def make_mutable(self, scope: str) -> MutableScope:
+        """
+        For a given scope, create a MutableScope object.
+
+        The ``scope`` name given refers to the name of a scope attached to the
+        ScopeBuilder. It is given by attribute name, not by the full scope string.
+
+        **Examples**
+
+        Using the ``TransferScopes`` object, one could reference ``all`` as follows:
+
+        >>> TransferScopes.all
+        'urn:globus:auth:scope:transfer.api.globus.org:all'
+        >>> TransferScopes.make_mutable("all")
+        MutableScope('urn:globus:auth:scope:transfer.api.globus.org:all')
+
+        This is equivalent to constructing a MutableScope object from the resolved
+        scope string, as in
+
+        >>> MutableScope(TransferScopes.all)
+        MutableScope('urn:globus:auth:scope:transfer.api.globus.org:all')
+
+        :param scope: The name of the scope to convert to a MutableScope
+        :type scope: str
+        """
+        return MutableScope(getattr(self, scope))
 
 
 class GCSEndpointScopeBuilder(ScopeBuilder):

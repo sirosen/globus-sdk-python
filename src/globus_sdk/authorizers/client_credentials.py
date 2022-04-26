@@ -1,6 +1,7 @@
 import logging
-from typing import Any, Callable, Dict, Iterable, Optional, Union
+from typing import Any, Callable, Dict, Optional
 
+from globus_sdk.scopes import MutableScope, _ScopeCollectionType
 from globus_sdk.services.auth import ConfidentialAppAuthClient, OAuthTokenResponse
 
 from .renewing import RenewingAuthorizer
@@ -36,7 +37,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         access tokens that will be used for the Authorization header. These scopes must
         all be for the same resource server, or else the token response will have
         multiple access tokens.
-    :type scopes: str, or iterable of str
+    :type scopes: str, MutableScope, or iterable of str or MutableScope
     :param access_token: Initial Access Token to use, only used if ``expires_at`` is
         also set. Must be requested with the same set of scopes passed to this
         authorizer.
@@ -58,20 +59,21 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
     def __init__(
         self,
         confidential_client: ConfidentialAppAuthClient,
-        scopes: Union[str, Iterable[str]],
+        scopes: _ScopeCollectionType,
         *,
         access_token: Optional[str] = None,
         expires_at: Optional[int] = None,
         on_refresh: Optional[Callable[[OAuthTokenResponse], Any]] = None,
     ):
-        log.info(
-            "Setting up ClientCredentialsAuthorizer with confidential_client="
-            f"[instance:{id(confidential_client)}] and scopes={scopes}"
-        )
 
         # values for _get_token_data
         self.confidential_client = confidential_client
-        self.scopes = scopes
+        self.scopes = MutableScope.scopes2str(scopes)
+
+        log.info(
+            "Setting up ClientCredentialsAuthorizer with confidential_client="
+            f"[instance:{id(confidential_client)}] and scopes={self.scopes}"
+        )
 
         super().__init__(access_token, expires_at, on_refresh)
 

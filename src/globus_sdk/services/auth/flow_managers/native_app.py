@@ -4,9 +4,9 @@ import logging
 import os
 import re
 import urllib.parse
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
-from globus_sdk import utils
+from globus_sdk import scopes, utils
 from globus_sdk.exc import GlobusSDKUsageError
 
 from ..oauth2_constants import DEFAULT_REQUESTED_SCOPES
@@ -80,7 +80,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
     :param requested_scopes: The scopes on the token(s) being requested, as a
         space-separated string or iterable of strings. Defaults to
         ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-    :type requested_scopes: str or iterable of str, optional
+    :type requested_scopes: str, MutableScope, or iterable of str or MutableScope,
+        optional
     :param redirect_uri: The page that users should be directed to after authenticating
         at the authorize URL. Defaults to 'https://auth.globus.org/v2/web/auth-code',
         which displays the resulting ``auth_code`` for users to copy-paste back into
@@ -105,7 +106,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
     def __init__(
         self,
         auth_client: "globus_sdk.AuthClient",
-        requested_scopes: Optional[Union[str, Iterable[str]]] = None,
+        requested_scopes: Optional[scopes._ScopeCollectionType] = None,
         redirect_uri: Optional[str] = None,
         state: str = "_default",
         verifier: Optional[str] = None,
@@ -126,11 +127,11 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
                 f'Invalid value for client_id. Got "{self.client_id}"'
             )
 
-        # default to the default requested scopes
-        self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
         # convert scopes iterable to string immediately on load
-        if not isinstance(self.requested_scopes, str):
-            self.requested_scopes = " ".join(self.requested_scopes)
+        # and default to the default requested scopes
+        self.requested_scopes = scopes.MutableScope.scopes2str(
+            requested_scopes or DEFAULT_REQUESTED_SCOPES
+        )
 
         # default to `/v2/web/auth-code` on whatever environment we're looking
         # at -- most typically it will be `https://auth.globus.org/`
