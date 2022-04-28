@@ -4,6 +4,10 @@ from .data import (
     GCSRoleDocument,
     GuestCollectionDocument,
     MappedCollectionDocument,
+    POSIXStagingStoragePolicies,
+    POSIXStoragePolicies,
+    StorageGatewayDocument,
+    StorageGatewayPolicies,
 )
 from .errors import GCSAPIError
 from .response import IterableGCSResponse, UnpackingGCSResponse
@@ -14,6 +18,10 @@ __all__ = (
     "CollectionDocument",
     "GuestCollectionDocument",
     "MappedCollectionDocument",
+    "StorageGatewayDocument",
+    "StorageGatewayPolicies",
+    "POSIXStoragePolicies",
+    "POSIXStagingStoragePolicies",
     "GCSAPIError",
     "IterableGCSResponse",
     "UnpackingGCSResponse",

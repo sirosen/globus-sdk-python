@@ -4,6 +4,8 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 from globus_sdk import utils
 from globus_sdk.types import UUIDLike
 
+from ._common import ensure_datatype
+
 #
 # NOTE -- on the organization of arguments in this module --
 #
@@ -103,6 +105,7 @@ class CollectionDocument(utils.PayloadWrapper, abc.ABC):
     :type additional_fields: dict, optional
     """
 
+    DATATYPE_BASE: str = "collection"
     DATATYPE_VERSION_IMPLICATIONS: Dict[str, Tuple[int, int, int]] = {
         "disable_anonymous_writes": (1, 5, 0),
         "force_verify": (1, 4, 0),
@@ -176,19 +179,6 @@ class CollectionDocument(utils.PayloadWrapper, abc.ABC):
     @abc.abstractmethod
     def collection_type(self) -> str:
         raise NotImplementedError
-
-    def _deduce_datatype_version(self) -> str:
-        max_deduced_version = (1, 0, 0)
-        for fieldname, version in self.DATATYPE_VERSION_IMPLICATIONS.items():
-            if fieldname not in self:
-                continue
-            if version > max_deduced_version:
-                max_deduced_version = version
-        return ".".join(str(x) for x in max_deduced_version)
-
-    def _ensure_datatype(self) -> None:
-        if "DATA_TYPE" not in self:
-            self["DATA_TYPE"] = f"collection#{self._deduce_datatype_version()}"
 
 
 class MappedCollectionDocument(CollectionDocument):
@@ -324,7 +314,7 @@ class MappedCollectionDocument(CollectionDocument):
         )
         self._set_value("sharing_restrict_paths", sharing_restrict_paths)
         self._set_value("policies", policies)
-        self._ensure_datatype()
+        ensure_datatype(self)
 
 
 class GuestCollectionDocument(CollectionDocument):
@@ -422,4 +412,4 @@ class GuestCollectionDocument(CollectionDocument):
             mapped_collection_id=mapped_collection_id,
             user_credential_id=user_credential_id,
         )
-        self._ensure_datatype()
+        ensure_datatype(self)
