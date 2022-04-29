@@ -132,9 +132,7 @@ class GCSClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         if include is not None:
-            if isinstance(include, str):
-                include = [include]
-            query_params["include"] = ",".join(include)
+            query_params["include"] = ",".join(utils.safe_strseq_iter(include))
         if mapped_collection_id is not None:
             query_params["mapped_collection_id"] = mapped_collection_id
         if filter is not None:
@@ -246,22 +244,24 @@ class GCSClient(client.BaseClient):
     def get_storage_gateway_list(
         self,
         *,
-        include: Optional[str] = None,
+        include: Union[None, str, Iterable[str]] = None,
         query_params: Optional[Dict[str, Any]] = None,
     ) -> IterableGCSResponse:
         """
         ``GET /storage_gateways``
 
-        :param include: Pass "private_policies" to include private storage gateway
-            policies in the responses. Requires ``administrator`` role on the Endpoint
-        :type include: str, optional
+        :param include: Optional document types to include in the response. If
+            'private_policies' is included, then include private storage gateway
+            policies in the attached storage_gateways document. This requires an
+            ``administrator`` role on the Endpoint.
+        :type include: str or iterable of str, optional
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
         if query_params is None:
             query_params = {}
         if include is not None:
-            query_params["include"] = include
+            query_params["include"] = ",".join(utils.safe_strseq_iter(include))
         return IterableGCSResponse(
             self.get("/storage_gateways", query_params=query_params)
         )
@@ -300,11 +300,11 @@ class GCSClient(client.BaseClient):
 
         :param storage_gateway_id: UUID for the Storage Gateway to be gotten
         :type storage_gateway_id: str or UUID
-        :param include: Document types to include in the response. If
+        :param include: Optional document types to include in the response. If
             'private_policies' is included, then include private storage gateway
             policies in the attached storage_gateways document. This requires an
             ``administrator`` role on the Endpoint.
-        :type include: str or iterable of str
+        :type include: str or iterable of str, optional
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
