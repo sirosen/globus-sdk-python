@@ -50,3 +50,17 @@ def test_posix_staging_env_vars():
         "stage_app": "/globus/bin/posix-stage-data",
         "environment": [{"name": "VOLUME", "value": "/vol/0"}],
     }
+
+
+@pytest.mark.parametrize(
+    "doc_class",
+    [StorageGatewayDocument, POSIXStagingStoragePolicies, POSIXStoragePolicies],
+)
+def test_storage_gateway_documents_support_additional_fields(doc_class):
+    d = doc_class()
+    assert "DATA_TYPE" in d
+    assert "foo" not in d
+
+    d2 = doc_class(additional_fields={"foo": "bar"})
+    assert "DATA_TYPE" in d2
+    assert d2["foo"] == "bar"

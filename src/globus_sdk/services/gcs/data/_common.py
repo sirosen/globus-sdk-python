@@ -11,10 +11,10 @@ class DocumentWithInducedDatatype(Protocol):
     DATATYPE_BASE: str
     DATATYPE_VERSION_IMPLICATIONS: Dict[str, Tuple[int, int, int]]
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self, key: str) -> bool:  # pragma: no cover
         ...
 
-    def __setitem__(self, key: str, value: Any) -> None:
+    def __setitem__(self, key: str, value: Any) -> None:  # pragma: no cover
         ...
 
 
