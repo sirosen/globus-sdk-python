@@ -35,7 +35,10 @@ class RegisteredResponse:
         else:
             self.full_url = path
 
-        self.method = method
+        # convert the method to uppercase so that specifying `method="post"` will match
+        # correctly -- method matching is case sensitive but we don't need to expose the
+        # possibility of a non-uppercase method
+        self.method = method.upper()
         self.json = json
         self.body = body
 
