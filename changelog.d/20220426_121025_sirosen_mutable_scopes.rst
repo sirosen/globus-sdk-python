@@ -1,4 +1,4 @@
-* New tools for working with optional and dependent scope strings (:pr:`NUMBER`)
+* New tools for working with optional and dependent scope strings (:pr:`553`)
 
   * A new class is provided for constructing optional and dependent scope
     strings, ``MutableScope``. Import as in
