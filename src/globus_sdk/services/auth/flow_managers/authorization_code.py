@@ -1,8 +1,8 @@
 import logging
 import urllib.parse
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from globus_sdk import utils
+from globus_sdk import scopes, utils
 
 from ..oauth2_constants import DEFAULT_REQUESTED_SCOPES
 from ..response import OAuthTokenResponse
@@ -56,15 +56,15 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         self,
         auth_client: "globus_sdk.AuthClient",
         redirect_uri: str,
-        requested_scopes: Optional[Union[str, Iterable[str]]] = None,
+        requested_scopes: Optional[scopes._ScopeCollectionType] = None,
         state: str = "_default",
         refresh_tokens: bool = False,
     ):
-        # default to the default requested scopes
-        self.requested_scopes = requested_scopes or DEFAULT_REQUESTED_SCOPES
-        # convert scopes iterable to string immediately on load
-        if not isinstance(self.requested_scopes, str):
-            self.requested_scopes = " ".join(self.requested_scopes)
+        # convert a scope object or iterable to string immediately on load
+        # and default to the default requested scopes
+        self.requested_scopes: str = scopes.MutableScope.scopes2str(
+            requested_scopes or DEFAULT_REQUESTED_SCOPES
+        )
 
         # store the remaining parameters directly, with no transformation
         self.client_id = auth_client.client_id
