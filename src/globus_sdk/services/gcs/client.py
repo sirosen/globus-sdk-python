@@ -5,7 +5,7 @@ from globus_sdk import client, paging, response, scopes, utils
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.types import UUIDLike
 
-from .data import CollectionDocument, GCSRoleDocument
+from .data import CollectionDocument, GCSRoleDocument, StorageGatewayDocument
 from .errors import GCSAPIError
 from .response import IterableGCSResponse, UnpackingGCSResponse
 
@@ -97,6 +97,10 @@ class GCSClient(client.BaseClient):
         """
         return scopes.GCSCollectionScopeBuilder(str(collection_id))
 
+    #
+    # collection methods
+    #
+
     @_gcsdoc("List Collections", "openapi_Collections/#ListCollections")
     def get_collection_list(
         self,
@@ -128,9 +132,7 @@ class GCSClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         if include is not None:
-            if isinstance(include, str):
-                include = [include]
-            query_params["include"] = ",".join(include)
+            query_params["include"] = ",".join(utils.safe_strseq_iter(include))
         if mapped_collection_id is not None:
             query_params["mapped_collection_id"] = mapped_collection_id
         if filter is not None:
@@ -229,6 +231,147 @@ class GCSClient(client.BaseClient):
         :type query_params: dict, optional
         """
         return self.delete(f"/collections/{collection_id}", query_params=query_params)
+
+    #
+    # storage gateway methods
+    #
+
+    @_gcsdoc("List Storage Gateways", "openapi_Storage_Gateways/#getStorageGateways")
+    @paging.has_paginator(
+        paging.MarkerPaginator,
+        items_key="data",
+    )
+    def get_storage_gateway_list(
+        self,
+        *,
+        include: Union[None, str, Iterable[str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> IterableGCSResponse:
+        """
+        ``GET /storage_gateways``
+
+        :param include: Optional document types to include in the response. If
+            'private_policies' is included, then include private storage gateway
+            policies in the attached storage_gateways document. This requires an
+            ``administrator`` role on the Endpoint.
+        :type include: str or iterable of str, optional
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+        """
+        if query_params is None:
+            query_params = {}
+        if include is not None:
+            query_params["include"] = ",".join(utils.safe_strseq_iter(include))
+        return IterableGCSResponse(
+            self.get("/storage_gateways", query_params=query_params)
+        )
+
+    @_gcsdoc("Create a Storage Gateway", "openapi_Storage_Gateways/#postStorageGateway")
+    def create_storage_gateway(
+        self,
+        data: Union[Dict[str, Any], StorageGatewayDocument],
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> UnpackingGCSResponse:
+        """
+        ``POST /storage_gateways``
+
+        :param data: Data in the format of a Storage Gateway document, it is recommended
+            to use the ``StorageGatewayDocumment`` class to construct this data.
+        :type data: dict or StorageGatewayDocument
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+        """
+        return UnpackingGCSResponse(
+            self.post("/storage_gateways", data=data, query_params=query_params),
+            "storage_gateway",
+        )
+
+    @_gcsdoc("Get a Storage Gateway", "openapi_Storage_Gateways/#getStorageGateway")
+    def get_storage_gateway(
+        self,
+        storage_gateway_id: UUIDLike,
+        *,
+        include: Union[None, str, Iterable[str]] = None,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> UnpackingGCSResponse:
+        """
+        ``GET /storage_gateways/<storage_gateway_id>``
+
+        :param storage_gateway_id: UUID for the Storage Gateway to be gotten
+        :type storage_gateway_id: str or UUID
+        :param include: Optional document types to include in the response. If
+            'private_policies' is included, then include private storage gateway
+            policies in the attached storage_gateways document. This requires an
+            ``administrator`` role on the Endpoint.
+        :type include: str or iterable of str, optional
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+        """
+        if query_params is None:
+            query_params = {}
+        if include is not None:
+            query_params["include"] = ",".join(utils.safe_strseq_iter(include))
+
+        return UnpackingGCSResponse(
+            self.get(
+                f"/storage_gateways/{storage_gateway_id}",
+                query_params=query_params,
+            ),
+            "storage_gateway",
+        )
+
+    @_gcsdoc(
+        "Update a Storage Gateway", "openapi_Storage_Gateways/#patchStorageGateway"
+    )
+    def update_storage_gateway(
+        self,
+        storage_gateway_id: UUIDLike,
+        data: Union[Dict[str, Any], StorageGatewayDocument],
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``PATCH /storage_gateways/<storage_gateway_id>``
+
+        :param storage_gateway_id: UUID for the Storage Gateway to be updated
+        :type storage_gateway_id: str or UUID
+        :param data: Data in the format of a Storage Gateway document, it is recommended
+            to use the ``StorageGatewayDocumment`` class to construct this data.
+        :type data: dict or StorageGatewayDocument
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+        """
+        return self.patch(
+            f"/storage_gateways/{storage_gateway_id}",
+            data=data,
+            query_params=query_params,
+        )
+
+    @_gcsdoc(
+        "Delete a Storage Gateway", "openapi_Storage_Gateways/#deleteStorageGateway"
+    )
+    def delete_storage_gateway(
+        self,
+        storage_gateway_id: Union[str, uuid.UUID],
+        *,
+        query_params: Optional[Dict[str, Any]] = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        ``DELETE /storage_gateways/<storage_gateway_id>``
+
+        :param storage_gateway_id: UUID for the Storage Gateway to be deleted
+        :type storage_gateway_id: str or UUID
+        :param query_params: Additional passthrough query parameters
+        :type query_params: dict, optional
+        """
+        return self.delete(
+            f"/storage_gateways/{storage_gateway_id}", query_params=query_params
+        )
+
+    #
+    # role methods
+    #
 
     @_gcsdoc("List Roles", "openapi_Roles/#listRoles")
     @paging.has_paginator(

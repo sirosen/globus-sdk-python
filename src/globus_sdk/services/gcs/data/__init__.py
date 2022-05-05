@@ -1,28 +1,23 @@
-from .client import GCSClient
-from .data import (
+from .collection import (
     CollectionDocument,
-    GCSRoleDocument,
     GuestCollectionDocument,
     MappedCollectionDocument,
+)
+from .role import GCSRoleDocument
+from .storage_gateway import (
     POSIXStagingStoragePolicies,
     POSIXStoragePolicies,
     StorageGatewayDocument,
     StorageGatewayPolicies,
 )
-from .errors import GCSAPIError
-from .response import IterableGCSResponse, UnpackingGCSResponse
 
 __all__ = (
-    "GCSClient",
-    "GCSRoleDocument",
-    "CollectionDocument",
-    "GuestCollectionDocument",
     "MappedCollectionDocument",
+    "GuestCollectionDocument",
+    "CollectionDocument",
+    "GCSRoleDocument",
     "StorageGatewayDocument",
     "StorageGatewayPolicies",
     "POSIXStoragePolicies",
     "POSIXStagingStoragePolicies",
-    "GCSAPIError",
-    "IterableGCSResponse",
-    "UnpackingGCSResponse",
 )

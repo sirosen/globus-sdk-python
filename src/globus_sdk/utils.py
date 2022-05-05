@@ -121,9 +121,6 @@ class PayloadWrapper(PayloadWrapperBase):
     requested encoder (e.g. as a JSON request body).
     """
 
-    # note: this class doesn't actually define any methods, properties, or attributes
-    # it's just our own flavor of UserDict, which wraps a 'data' dict
-    #
     # use UserDict rather than subclassing dict so that our API is always consistent
     # e.g. `dict.pop` does not invoke `dict.__delitem__`. Overriding `__delitem__` on a
     # dict subclass can lead to inconsistent behavior between usages like these:
@@ -132,6 +129,28 @@ class PayloadWrapper(PayloadWrapperBase):
     #
     # UserDict inherits from MutableMapping and only defines the dunder methods, so
     # changing its behavior safely/consistently is simpler
+
+    #
+    # internal helpers for setting non-null values
+    #
+
+    def _set_value(
+        self, key: str, val: Any, callback: Optional[Callable[[Any], Any]] = None
+    ) -> None:
+        if val is not None:
+            self[key] = callback(val) if callback else val
+
+    def _set_optstrs(self, **kwargs: Any) -> None:
+        for k, v in kwargs.items():
+            self._set_value(k, v, callback=str)
+
+    def _set_optstrlists(self, **kwargs: Optional[Iterable[Any]]) -> None:
+        for k, v in kwargs.items():
+            self._set_value(k, v, callback=lambda x: list(safe_strseq_iter(x)))
+
+    def _set_optbools(self, **kwargs: Optional[bool]) -> None:
+        for k, v in kwargs.items():
+            self._set_value(k, v, callback=bool)
 
 
 def in_sphinx_build() -> bool:  # pragma: no cover

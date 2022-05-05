@@ -35,6 +35,10 @@ from .services.gcs import (
     GCSRoleDocument,
     GuestCollectionDocument,
     MappedCollectionDocument,
+    POSIXStagingStoragePolicies,
+    POSIXStoragePolicies,
+    StorageGatewayDocument,
+    StorageGatewayPolicies,
 )
 from .services.groups import (
     BatchMembershipActions,
@@ -111,6 +115,10 @@ __all__ = (
     "CollectionDocument",
     "GuestCollectionDocument",
     "MappedCollectionDocument",
+    "StorageGatewayDocument",
+    "StorageGatewayPolicies",
+    "POSIXStoragePolicies",
+    "POSIXStagingStoragePolicies",
     "GCSAPIError",
     "GlobusConnectPersonalOwnerInfo",
     "LocalGlobusConnectPersonal",
