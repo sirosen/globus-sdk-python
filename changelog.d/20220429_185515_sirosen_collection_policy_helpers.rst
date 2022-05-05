@@ -1,5 +1,5 @@
 * Add helper objects and methods for interacting with Globus Connect Server
-  Storage Gateways (:pr:`NUMBER`)
+  Storage Gateways (:pr:`554`)
 
   * New methods on ``GCSClient``: ``create_storage_gateway``, ``get_storage_gateway``,
     ``get_storage_gateway_list``, ``update_storage_gateway``,
