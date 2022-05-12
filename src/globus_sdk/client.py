@@ -1,9 +1,8 @@
 import logging
 import urllib.parse
-from typing import Any, Dict, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Type, Union
 
 from globus_sdk import config, exc, utils
-from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.paging import PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import ScopeBuilder
@@ -12,6 +11,9 @@ from globus_sdk.transport import RequestsTransport
 log = logging.getLogger(__name__)
 
 DataParamType = Union[None, str, Dict[str, Any], utils.PayloadWrapper]
+
+if TYPE_CHECKING:
+    from globus_sdk.authorizers import GlobusAuthorizer
 
 
 class BaseClient:
@@ -50,7 +52,7 @@ class BaseClient:
         *,
         environment: Optional[str] = None,
         base_url: Optional[str] = None,
-        authorizer: Optional[GlobusAuthorizer] = None,
+        authorizer: Optional["GlobusAuthorizer"] = None,
         app_name: Optional[str] = None,
         transport_params: Optional[Dict[str, Any]] = None,
     ):

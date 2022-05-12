@@ -2,12 +2,21 @@ import contextlib
 import logging
 import random
 import time
-from typing import Any, Callable, Dict, Iterator, List, Optional, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Union,
+    cast,
+)
 
 import requests
 
 from globus_sdk import config, exc
-from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.transport.encoders import (
     FormRequestEncoder,
     JSONRequestEncoder,
@@ -23,6 +32,9 @@ from .retry import (
     RetryContext,
     set_retry_check_flags,
 )
+
+if TYPE_CHECKING:
+    from globus_sdk.authorizers import GlobusAuthorizer
 
 log = logging.getLogger(__name__)
 
@@ -244,7 +256,7 @@ class RequestsTransport:
         return self.encoders[encoding].encode(method, url, query_params, data, headers)
 
     def _set_authz_header(
-        self, authorizer: Optional[GlobusAuthorizer], req: requests.Request
+        self, authorizer: Optional["GlobusAuthorizer"], req: requests.Request
     ) -> None:
         if authorizer:
             authz_header = authorizer.get_authorization_header()
@@ -271,7 +283,7 @@ class RequestsTransport:
         data: Union[Dict[str, Any], str, None] = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
-        authorizer: Optional[GlobusAuthorizer] = None,
+        authorizer: Optional["GlobusAuthorizer"] = None,
         allow_redirects: bool = True,
         stream: bool = False,
     ) -> requests.Response:

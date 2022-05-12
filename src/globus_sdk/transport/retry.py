@@ -1,10 +1,11 @@
 import enum
 import logging
-from typing import Any, Callable, Dict, List, Optional, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, TypeVar, cast
 
 import requests
 
-from globus_sdk.authorizers import GlobusAuthorizer
+if TYPE_CHECKING:
+    from globus_sdk.authorizers import GlobusAuthorizer
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ class RetryContext:
         self,
         attempt: int,
         *,
-        authorizer: Optional[GlobusAuthorizer] = None,
+        authorizer: Optional["GlobusAuthorizer"] = None,
         response: Optional[requests.Response] = None,
         exception: Optional[Exception] = None,
     ):

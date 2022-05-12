@@ -1,8 +1,10 @@
 import logging
-from typing import Any, Callable, Dict, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional
 
 from globus_sdk.scopes import MutableScope, _ScopeCollectionType
-from globus_sdk.services.auth import ConfidentialAppAuthClient, OAuthTokenResponse
+
+if TYPE_CHECKING:
+    from globus_sdk.services.auth import ConfidentialAppAuthClient, OAuthTokenResponse
 
 from .renewing import RenewingAuthorizer
 
@@ -58,12 +60,12 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
 
     def __init__(
         self,
-        confidential_client: ConfidentialAppAuthClient,
+        confidential_client: "ConfidentialAppAuthClient",
         scopes: _ScopeCollectionType,
         *,
         access_token: Optional[str] = None,
         expires_at: Optional[int] = None,
-        on_refresh: Optional[Callable[[OAuthTokenResponse], Any]] = None,
+        on_refresh: Optional[Callable[["OAuthTokenResponse"], Any]] = None,
     ):
 
         # values for _get_token_data
@@ -77,7 +79,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
 
         super().__init__(access_token, expires_at, on_refresh)
 
-    def _get_token_response(self) -> OAuthTokenResponse:
+    def _get_token_response(self) -> "OAuthTokenResponse":
         """
         Make a client credentials grant
         """
@@ -85,7 +87,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
             requested_scopes=self.scopes
         )
 
-    def _extract_token_data(self, res: OAuthTokenResponse) -> Dict[str, Any]:
+    def _extract_token_data(self, res: "OAuthTokenResponse") -> Dict[str, Any]:
         """
         Get the tokens .by_resource_server,
         Ensure that only one token was gotten, and return that token.

@@ -1,8 +1,8 @@
 import abc
 import functools
-import inspect
 import sys
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
@@ -29,12 +29,14 @@ R = TypeVar("R", bound=GlobusHTTPResponse)
 C = TypeVar("C", bound=Callable[..., GlobusHTTPResponse])
 
 
-# stub for mypy
-class _PaginatedFunc(Generic[PageT]):
-    _has_paginator: bool
-    _paginator_class: Type["Paginator[PageT]"]
-    _paginator_items_key: Optional[str]
-    _paginator_params: Dict[str, Any]
+if TYPE_CHECKING:
+
+    # stub for mypy
+    class _PaginatedFunc(Generic[PageT]):
+        _has_paginator: bool
+        _paginator_class: Type["Paginator[PageT]"]
+        _paginator_items_key: Optional[str]
+        _paginator_params: Dict[str, Any]
 
 
 class Paginator(Iterable[PageT], metaclass=abc.ABCMeta):
@@ -121,12 +123,15 @@ class Paginator(Iterable[PageT], metaclass=abc.ABCMeta):
         Although the syntax is slightly more verbose, this allows `mypy` and other type
         checkers to more accurately infer the type of the paginator.
         """
+        # defer for faster overall imports
+        import inspect
+
         if not inspect.ismethod(method):
             raise TypeError(f"Paginator.wrap can only be used on methods, not {method}")
         if not getattr(method, "_has_paginator", False):
             raise ValueError(f"'{method}' is not a paginated method")
 
-        as_paginated = cast(_PaginatedFunc[PageT], method)
+        as_paginated = cast("_PaginatedFunc[PageT]", method)
         paginator_class = as_paginated._paginator_class
         paginator_params = as_paginated._paginator_params
         paginator_items_key = as_paginated._paginator_items_key
@@ -165,7 +170,7 @@ def has_paginator(
     """
 
     def decorate(func: C) -> C:
-        as_paginated = cast(_PaginatedFunc[PageT], func)
+        as_paginated = cast("_PaginatedFunc[PageT]", func)
         as_paginated._has_paginator = True
         as_paginated._paginator_class = paginator_class
         as_paginated._paginator_items_key = items_key

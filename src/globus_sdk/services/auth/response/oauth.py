@@ -3,15 +3,14 @@ import logging
 import time
 from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union, cast
 
-import jwt
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-
 from globus_sdk import exc
 from globus_sdk.response import GlobusHTTPResponse
 
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
+    from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+
     from ..client import AuthClient
 
 
@@ -172,7 +171,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         openid_configuration: Optional[
             Union[GlobusHTTPResponse, Dict[str, Any]]
         ] = None,
-        jwk: Optional[RSAPublicKey] = None,
+        jwk: Optional["RSAPublicKey"] = None,
         jwt_params: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
 
@@ -191,6 +190,9 @@ class OAuthTokenResponse(GlobusHTTPResponse):
             step. These are passed verbatim to the jwt library.
         :type jwt_params: dict
         """
+        # defer import of `jwt` to avoid slowing down imports of `globus_sdk`
+        import jwt
+
         logger.info('Decoding ID Token "%s"', self["id_token"])
         auth_client = cast("AuthClient", self.client)
 
@@ -252,7 +254,7 @@ class OAuthDependentTokenResponse(OAuthTokenResponse):
         openid_configuration: Optional[
             Union[GlobusHTTPResponse, Dict[str, Any]]
         ] = None,
-        jwk: Optional[RSAPublicKey] = None,
+        jwk: Optional["RSAPublicKey"] = None,
         jwt_params: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         # just in case

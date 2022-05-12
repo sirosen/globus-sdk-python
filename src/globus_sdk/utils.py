@@ -1,10 +1,4 @@
 import collections
-import collections.abc
-import hashlib
-import os
-import sys
-from base64 import b64encode
-from enum import Enum
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -30,11 +24,15 @@ else:
 
 
 def sha256_string(s: str) -> str:
+    import hashlib
+
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
 def b64str(s: str) -> str:
-    return b64encode(s.encode("utf-8")).decode("utf-8")
+    import base64
+
+    return base64.b64encode(s.encode("utf-8")).decode("utf-8")
 
 
 def slash_join(a: str, b: Optional[str]) -> str:
@@ -101,13 +99,16 @@ def render_enums_for_api(value: Any) -> Any:
     If a value is an iterable type, it will be converted to a list and the values will
     also be converted if they are enum values.
     """
+    import collections.abc
+    import enum
+
     # special-case: handle str and bytes because these types are technically iterable
     # types (of bytes or str values) which could trip someone up
     if isinstance(value, (str, bytes)):
         return value
     if isinstance(value, collections.abc.Iterable):
         return [render_enums_for_api(x) for x in value]
-    return value.value if isinstance(value, Enum) else value
+    return value.value if isinstance(value, enum.Enum) else value
 
 
 class PayloadWrapper(PayloadWrapperBase):
@@ -135,6 +136,9 @@ class PayloadWrapper(PayloadWrapperBase):
 
 
 def in_sphinx_build() -> bool:  # pragma: no cover
+    import os
+    import sys
+
     # check if `sphinx-build` was used to invoke
     return os.path.basename(sys.argv[0]) in ["sphinx-build", "sphinx-build.exe"]
 
