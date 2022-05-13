@@ -34,3 +34,17 @@ def test_import_str(importstring):
     assert status == 0, str(proc.communicate())
     proc.stdout.close()
     proc.stderr.close()
+
+
+def test_requests_is_not_eagerly_imported():
+    execstr = "import sys, globus_sdk; assert 'requests' not in sys.modules"
+    proc = subprocess.Popen(
+        f'{PYTHON_BINARY} -c "{execstr}"',
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    status = proc.wait()
+    assert status == 0, str(proc.communicate())
+    proc.stdout.close()
+    proc.stderr.close()
