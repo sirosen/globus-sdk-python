@@ -1,8 +1,9 @@
-from typing import Any, Dict, List, Optional, Union
-
-import requests
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from globus_sdk import exc
+
+if TYPE_CHECKING:
+    import requests
 
 
 class GCSAPIError(exc.GlobusAPIError):
@@ -10,7 +11,7 @@ class GCSAPIError(exc.GlobusAPIError):
     Error class for the GCS Manager API client
     """
 
-    def __init__(self, r: requests.Response) -> None:
+    def __init__(self, r: "requests.Response") -> None:
         self.detail_data_type: Optional[str] = None
         self.detail: Union[None, str, Dict[str, Any]] = None
         super().__init__(r)

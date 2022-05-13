@@ -1,6 +1,5 @@
 import abc
 import functools
-import inspect
 import sys
 from typing import (
     Any,
@@ -121,6 +120,8 @@ class Paginator(Iterable[PageT], metaclass=abc.ABCMeta):
         Although the syntax is slightly more verbose, this allows `mypy` and other type
         checkers to more accurately infer the type of the paginator.
         """
+        import inspect
+
         if not inspect.ismethod(method):
             raise TypeError(f"Paginator.wrap can only be used on methods, not {method}")
         if not getattr(method, "_has_paginator", False):

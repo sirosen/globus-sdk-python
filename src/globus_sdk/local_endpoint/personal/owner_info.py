@@ -1,5 +1,4 @@
 import base64
-import shlex
 import uuid
 from typing import Optional, Tuple
 
@@ -63,6 +62,8 @@ class GlobusConnectPersonalOwnerInfo:
     id: Optional[str]
 
     def __init__(self, *, config_dn: str) -> None:
+        import shlex
+
         lineinfo = shlex.split(config_dn)
         if len(lineinfo) != 2:
             raise ValueError("Malformed DN: not right length")

@@ -1,9 +1,9 @@
+import base64
 import collections
 import collections.abc
 import hashlib
 import os
 import sys
-from base64 import b64encode
 from enum import Enum
 from typing import (
     TYPE_CHECKING,
@@ -30,11 +30,13 @@ else:
 
 
 def sha256_string(s: str) -> str:
+
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
 def b64str(s: str) -> str:
-    return b64encode(s.encode("utf-8")).decode("utf-8")
+
+    return base64.b64encode(s.encode("utf-8")).decode("utf-8")
 
 
 def slash_join(a: str, b: Optional[str]) -> str:

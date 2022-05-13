@@ -2,10 +2,18 @@ import collections.abc
 import json
 import logging
 import sys
-from typing import Any, Dict, Iterable, Optional, Type, TypeVar, Union, cast, overload
-
-import jwt
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 if sys.version_info >= (3, 8):
     # pylint can't handle quoted annotations yet:
@@ -23,6 +31,9 @@ from globus_sdk.types import IntLike, UUIDLike
 from ..errors import AuthAPIError
 from ..flow_managers import GlobusOAuthFlowManager
 from ..response import GetIdentitiesResponse, OAuthTokenResponse
+
+if TYPE_CHECKING:
+    from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 log = logging.getLogger(__name__)
 
@@ -494,7 +505,7 @@ class AuthClient(client.BaseClient):
         openid_configuration: Optional[Union[GlobusHTTPResponse, Dict[str, Any]]],
         *,
         as_pem: "Literal[True]",
-    ) -> RSAPublicKey:
+    ) -> "RSAPublicKey":
         ...
 
     @overload
@@ -513,7 +524,7 @@ class AuthClient(client.BaseClient):
         ] = None,
         *,
         as_pem: bool = False,
-    ) -> Union[RSAPublicKey, Dict[str, Any]]:
+    ) -> Union["RSAPublicKey", Dict[str, Any]]:
         """
         Fetch the Globus Auth JWK.
 
@@ -525,6 +536,8 @@ class AuthClient(client.BaseClient):
         :param as_pem: Decode the JWK to an RSA PEM key, typically for JWT decoding
         :type as_pem: bool
         """
+        import jwt
+
         log.info("Fetching JWK")
         if openid_configuration:
             jwks_uri = openid_configuration["jwks_uri"]
@@ -541,8 +554,8 @@ class AuthClient(client.BaseClient):
             log.debug("JWK as_pem=True requested, decoding...")
             # decode from JWK to an RSA PEM key for JWT decoding
             # cast here because this should never be private key
-            jwk_as_pem: RSAPublicKey = cast(
-                RSAPublicKey,
+            jwk_as_pem: "RSAPublicKey" = cast(
+                "RSAPublicKey",
                 jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk_data["keys"][0])),
             )
             log.debug("JWK PEM decoding finished successfully")

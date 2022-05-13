@@ -1,8 +1,9 @@
-from typing import Any
-
-import requests
+from typing import TYPE_CHECKING, Any
 
 from .base import GlobusError
+
+if TYPE_CHECKING:
+    import requests
 
 # Wrappers around requests exceptions, so the SDK is somewhat independent from details
 # about requests
@@ -34,8 +35,9 @@ class GlobusConnectionError(NetworkError):
     """A connection error occured while making a REST request."""
 
 
-def convert_request_exception(exc: requests.RequestException) -> GlobusError:
+def convert_request_exception(exc: "requests.RequestException") -> GlobusError:
     """Converts incoming requests.Exception to a Globus NetworkError"""
+    import requests
 
     if isinstance(exc, requests.ConnectTimeout):
         return GlobusConnectionTimeoutError("ConnectTimeoutError on request", exc)

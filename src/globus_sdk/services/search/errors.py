@@ -1,8 +1,9 @@
-from typing import Any, Dict
-
-import requests
+from typing import TYPE_CHECKING, Any, Dict
 
 from globus_sdk import exc
+
+if TYPE_CHECKING:
+    import requests
 
 
 class SearchAPIError(exc.GlobusAPIError):
@@ -17,7 +18,7 @@ class SearchAPIError(exc.GlobusAPIError):
     # the Search API always and only returns 'message' for string messages
     MESSAGE_FIELDS = ["message"]
 
-    def __init__(self, r: requests.Response) -> None:
+    def __init__(self, r: "requests.Response") -> None:
         self.error_data = None
         super().__init__(r)
 

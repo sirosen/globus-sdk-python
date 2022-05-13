@@ -1,8 +1,9 @@
-from typing import Any, Dict, List
-
-import requests
+from typing import TYPE_CHECKING, Any, Dict, List
 
 from globus_sdk import exc
+
+if TYPE_CHECKING:
+    import requests
 
 
 class TransferAPIError(exc.GlobusAPIError):
@@ -14,7 +15,7 @@ class TransferAPIError(exc.GlobusAPIError):
                       provided when contacting support@globus.org.
     """
 
-    def __init__(self, r: requests.Response) -> None:
+    def __init__(self, r: "requests.Response") -> None:
         self.request_id = None
         super().__init__(r)
 

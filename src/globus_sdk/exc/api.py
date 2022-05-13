@@ -1,10 +1,11 @@
 import logging
-from typing import Any, Dict, List, Mapping, Optional, Union, cast
-
-import requests
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Union, cast
 
 from .base import GlobusError
 from .err_info import ErrorInfoContainer
+
+if TYPE_CHECKING:
+    import requests
 
 log = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ class GlobusAPIError(GlobusError):
     MESSAGE_FIELDS = ["message", "detail"]
     RECOGNIZED_AUTHZ_SCHEMES = ["bearer", "basic", "globus-goauthtoken"]
 
-    def __init__(self, r: requests.Response, *args: Any, **kwargs: Any):
+    def __init__(self, r: "requests.Response", *args: Any, **kwargs: Any):
         self.http_status = r.status_code
         # defaults, may be rewritten during parsing
         self.code = "Error"

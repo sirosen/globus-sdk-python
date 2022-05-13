@@ -11,11 +11,11 @@ from typing import (
     cast,
 )
 
-from requests import Response
-
 log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
+    import requests
+
     import globus_sdk
 
 
@@ -40,7 +40,7 @@ class GlobusHTTPResponse:
 
     def __init__(
         self,
-        response: Union[Response, "GlobusHTTPResponse"],
+        response: Union["requests.Response", "GlobusHTTPResponse"],
         client: Optional["globus_sdk.BaseClient"] = None,
     ):
         # init on a GlobusHTTPResponse: we are wrapping this data
@@ -49,7 +49,7 @@ class GlobusHTTPResponse:
             if client is not None:
                 raise ValueError("Redundant client with wrapped response")
             self._wrapped: Optional[GlobusHTTPResponse] = response
-            self._response: Optional[Response] = None
+            self._response: Optional["requests.Response"] = None
             self.client: "globus_sdk.BaseClient" = self._wrapped.client
 
             # copy parsed JSON data off of '_wrapped'
@@ -78,7 +78,7 @@ class GlobusHTTPResponse:
                 self._parsed_json = None
 
     @property
-    def _raw_response(self) -> Response:
+    def _raw_response(self) -> "requests.Response":
         # this is an internal property which traverses any series of wrapped responses
         # until reaching a requests response object
         if self._response is not None:
@@ -187,7 +187,7 @@ class IterableResponse(GlobusHTTPResponse):
 
     def __init__(
         self,
-        response: Union[Response, "GlobusHTTPResponse"],
+        response: Union["requests.Response", "GlobusHTTPResponse"],
         client: Optional["globus_sdk.BaseClient"] = None,
         *,
         iter_key: Optional[str] = None,

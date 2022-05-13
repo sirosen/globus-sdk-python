@@ -2,9 +2,17 @@ import contextlib
 import logging
 import random
 import time
-from typing import Any, Callable, Dict, Iterator, List, Optional, Union, cast
-
-import requests
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Union,
+    cast,
+)
 
 from globus_sdk import config, exc
 from globus_sdk.authorizers import GlobusAuthorizer
@@ -24,10 +32,13 @@ from .retry import (
     set_retry_check_flags,
 )
 
+if TYPE_CHECKING:
+    import requests
+
 log = logging.getLogger(__name__)
 
 
-def _parse_retry_after(response: requests.Response) -> Optional[int]:
+def _parse_retry_after(response: "requests.Response") -> Optional[int]:
     val = response.headers.get("Retry-After")
     if not val:
         return None
@@ -115,6 +126,8 @@ class RequestsTransport:
         max_sleep: int = 10,
         max_retries: Optional[int] = None,
     ):
+        import requests
+
         self.session = requests.Session()
         self.verify_ssl = config.get_ssl_verify(verify_ssl)
         self.http_timeout = config.get_http_timeout(http_timeout)
@@ -225,7 +238,7 @@ class RequestsTransport:
         data: Union[Dict[str, Any], List[Any], str, None] = None,
         headers: Optional[Dict[str, str]] = None,
         encoding: Optional[str] = None,
-    ) -> requests.Request:
+    ) -> "requests.Request":
         if not headers:
             headers = {}
         headers = {**self._headers, **headers}
@@ -244,7 +257,7 @@ class RequestsTransport:
         return self.encoders[encoding].encode(method, url, query_params, data, headers)
 
     def _set_authz_header(
-        self, authorizer: Optional[GlobusAuthorizer], req: requests.Request
+        self, authorizer: Optional[GlobusAuthorizer], req: "requests.Request"
     ) -> None:
         if authorizer:
             authz_header = authorizer.get_authorization_header()
@@ -274,7 +287,7 @@ class RequestsTransport:
         authorizer: Optional[GlobusAuthorizer] = None,
         allow_redirects: bool = True,
         stream: bool = False,
-    ) -> requests.Response:
+    ) -> "requests.Response":
         """
         Send an HTTP request
 
@@ -305,6 +318,8 @@ class RequestsTransport:
 
         :return: ``requests.Response`` object
         """
+        import requests
+
         log.debug("starting request for %s", url)
         resp: Optional[requests.Response] = None
         req = self._encode(method, url, query_params, data, headers, encoding)
@@ -384,6 +399,8 @@ class RequestsTransport:
 
     def default_check_request_exception(self, ctx: RetryContext) -> RetryCheckResult:
         """check if a network error was encountered"""
+        import requests
+
         if ctx.exception and isinstance(ctx.exception, requests.RequestException):
             return RetryCheckResult.do_retry
         return RetryCheckResult.no_decision

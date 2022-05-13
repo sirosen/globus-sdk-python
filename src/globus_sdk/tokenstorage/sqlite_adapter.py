@@ -1,10 +1,12 @@
 import json
-import sqlite3
-from typing import Any, Dict, Iterator, Mapping, Optional, Set
+from typing import TYPE_CHECKING, Any, Dict, Iterator, Mapping, Optional, Set
 
 from globus_sdk.services.auth import OAuthTokenResponse
 from globus_sdk.tokenstorage.base import FileAdapter
 from globus_sdk.version import __version__
+
+if TYPE_CHECKING:
+    import sqlite3
 
 
 class SQLiteAdapter(FileAdapter):
@@ -39,7 +41,9 @@ class SQLiteAdapter(FileAdapter):
     def _is_memory_db(self) -> bool:
         return self.dbname == ":memory:"
 
-    def _init_and_connect(self) -> sqlite3.Connection:
+    def _init_and_connect(self) -> "sqlite3.Connection":
+        import sqlite3
+
         init_tables = self._is_memory_db() or not self.file_exists()
         if init_tables and not self._is_memory_db():  # real file needs to be created
             with self.user_only_umask():
