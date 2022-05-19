@@ -29,6 +29,14 @@ else:
     PayloadWrapperBase = collections.UserDict
 
 
+class MissingType:
+    def __repr__(self) -> str:
+        return "<globus_sdk.utils.missing>"
+
+
+missing = MissingType()
+
+
 def sha256_string(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
@@ -137,7 +145,7 @@ class PayloadWrapper(PayloadWrapperBase):
     def _set_value(
         self, key: str, val: Any, callback: Optional[Callable[[Any], Any]] = None
     ) -> None:
-        if val is not None:
+        if val is not None and val is not missing:
             self[key] = callback(val) if callback else val
 
     def _set_optstrs(self, **kwargs: Any) -> None:
@@ -151,6 +159,10 @@ class PayloadWrapper(PayloadWrapperBase):
     def _set_optbools(self, **kwargs: Optional[bool]) -> None:
         for k, v in kwargs.items():
             self._set_value(k, v, callback=bool)
+
+    def _set_optints(self, **kwargs: Any) -> None:
+        for k, v in kwargs.items():
+            self._set_value(k, v, callback=int)
 
 
 def in_sphinx_build() -> bool:  # pragma: no cover

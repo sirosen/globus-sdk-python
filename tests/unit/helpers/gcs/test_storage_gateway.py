@@ -1,8 +1,19 @@
 import pytest
 
 from globus_sdk import (
+    ActiveScaleStoragePolicies,
+    AzureBlobStoragePolicies,
+    BlackPearlStoragePolicies,
+    BoxStoragePolicies,
+    CephStoragePolicies,
+    GoogleCloudStoragePolicies,
+    GoogleDriveStoragePolicies,
+    HPSSStoragePolicies,
+    IrodsStoragePolicies,
+    OneDriveStoragePolicies,
     POSIXStagingStoragePolicies,
     POSIXStoragePolicies,
+    S3StoragePolicies,
     StorageGatewayDocument,
 )
 
@@ -54,7 +65,22 @@ def test_posix_staging_env_vars():
 
 @pytest.mark.parametrize(
     "doc_class",
-    [StorageGatewayDocument, POSIXStagingStoragePolicies, POSIXStoragePolicies],
+    [
+        StorageGatewayDocument,
+        POSIXStagingStoragePolicies,
+        POSIXStoragePolicies,
+        BlackPearlStoragePolicies,
+        BoxStoragePolicies,
+        CephStoragePolicies,
+        GoogleDriveStoragePolicies,
+        GoogleCloudStoragePolicies,
+        OneDriveStoragePolicies,
+        AzureBlobStoragePolicies,
+        S3StoragePolicies,
+        ActiveScaleStoragePolicies,
+        IrodsStoragePolicies,
+        HPSSStoragePolicies,
+    ],
 )
 def test_storage_gateway_documents_support_additional_fields(doc_class):
     d = doc_class()
@@ -64,3 +90,16 @@ def test_storage_gateway_documents_support_additional_fields(doc_class):
     d2 = doc_class(additional_fields={"foo": "bar"})
     assert "DATA_TYPE" in d2
     assert d2["foo"] == "bar"
+
+
+def test_onedrive_storage_policies_tenant_is_nullable():
+    doc = OneDriveStoragePolicies()
+    assert "tenant" not in doc
+
+    doc = OneDriveStoragePolicies(tenant="foo")
+    assert "tenant" in doc
+    assert doc["tenant"] == "foo"
+
+    doc = OneDriveStoragePolicies(tenant=None)
+    assert "tenant" in doc
+    assert doc["tenant"] is None
