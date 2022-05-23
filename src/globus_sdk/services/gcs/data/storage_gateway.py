@@ -413,7 +413,7 @@ class OneDriveStoragePolicies(StorageGatewayPolicies):
         DATA_TYPE: str = "onedrive_storage_policies#1.0.0",
         client_id: Optional[str] = None,
         secret: Optional[str] = None,
-        tenant: Union[str, None, utils.MissingType] = utils.missing,
+        tenant: Optional[str] = None,
         user_api_rate_limit: Optional[int] = None,
         additional_fields: Optional[Dict[str, Any]] = None,
     ) -> None:
@@ -421,8 +421,6 @@ class OneDriveStoragePolicies(StorageGatewayPolicies):
         self._set_optstrs(
             DATA_TYPE=DATA_TYPE, client_id=client_id, secret=secret, tenant=tenant
         )
-        if tenant is None:  # explicit null value allowed
-            self["tenant"] = None
         self._set_optints(user_api_rate_limit=user_api_rate_limit)
         if additional_fields is not None:
             self.update(additional_fields)

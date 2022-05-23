@@ -29,14 +29,6 @@ else:
     PayloadWrapperBase = collections.UserDict
 
 
-class MissingType:
-    def __repr__(self) -> str:
-        return "<globus_sdk.utils.missing>"
-
-
-missing = MissingType()
-
-
 def sha256_string(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
@@ -145,7 +137,7 @@ class PayloadWrapper(PayloadWrapperBase):
     def _set_value(
         self, key: str, val: Any, callback: Optional[Callable[[Any], Any]] = None
     ) -> None:
-        if val is not None and val is not missing:
+        if val is not None:
             self[key] = callback(val) if callback else val
 
     def _set_optstrs(self, **kwargs: Any) -> None:

@@ -90,16 +90,3 @@ def test_storage_gateway_documents_support_additional_fields(doc_class):
     d2 = doc_class(additional_fields={"foo": "bar"})
     assert "DATA_TYPE" in d2
     assert d2["foo"] == "bar"
-
-
-def test_onedrive_storage_policies_tenant_is_nullable():
-    doc = OneDriveStoragePolicies()
-    assert "tenant" not in doc
-
-    doc = OneDriveStoragePolicies(tenant="foo")
-    assert "tenant" in doc
-    assert doc["tenant"] == "foo"
-
-    doc = OneDriveStoragePolicies(tenant=None)
-    assert "tenant" in doc
-    assert doc["tenant"] is None
