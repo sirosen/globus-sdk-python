@@ -61,7 +61,15 @@ def _mk_json_response(data, status):
 
 @pytest.fixture
 def json_response():
-    json_data = {"errors": [{"message": "json error message", "code": "Json Error"}]}
+    json_data = {
+        "errors": [
+            {
+                "message": "json error message",
+                "title": "json error message",
+                "code": "Json Error",
+            }
+        ]
+    }
     return _mk_json_response(json_data, 400)
 
 
@@ -88,7 +96,7 @@ def transfer_response():
 
 @pytest.fixture
 def simple_auth_response():
-    auth_data = {"error": "simple auth error message"}
+    auth_data = {"detail": "simple auth error message"}
     return _mk_json_response(auth_data, 404)
 
 
@@ -98,7 +106,7 @@ def nested_auth_response():
         "errors": [
             {"detail": "nested auth error message", "code": "Auth Error"},
             {
-                "message": "some other error which will not be seen",
+                "title": "some other error which will not be seen",
                 "code": "HiddenError",
             },
         ]
