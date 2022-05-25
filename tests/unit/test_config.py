@@ -27,6 +27,10 @@ def test_get_service_url():
         globus_sdk.config.get_service_url("search", environment="preview")
         == "https://search.api.preview.globus.org/"
     )
+    assert (
+        globus_sdk.config.get_service_url("timer", environment="preview")
+        == "https://preview.timer.automate.globus.org/"
+    )
 
     with pytest.raises(ValueError):
         globus_sdk.config.get_service_url("auth", environment="nonexistent")
@@ -38,17 +42,23 @@ def test_get_service_url():
     + [(x, False) for x in [str(False), "0", "NO", "false", "f", "False", "OFF"]]
     + [(x, ValueError) for x in ["invalid", "1.0", "0.0"]],  # type: ignore
 )
-def test_get_ssl_verify(value, expected_result):
+def test_get_ssl_verify(value, expected_result, monkeypatch):
     """
     Confirms bool cast returns correct bools from sets of string values
     """
-    with mock.patch.dict(os.environ):
-        os.environ["GLOBUS_SDK_VERIFY_SSL"] = value
-        if isinstance(expected_result, bool):
-            assert globus_sdk.config.get_ssl_verify() == expected_result
-        else:
-            with pytest.raises(expected_result):
-                globus_sdk.config.get_ssl_verify()
+    monkeypatch.setenv("GLOBUS_SDK_VERIFY_SSL", value)
+    if isinstance(expected_result, bool):
+        assert globus_sdk.config.get_ssl_verify() == expected_result
+    else:
+        with pytest.raises(expected_result):
+            globus_sdk.config.get_ssl_verify()
+
+
+@pytest.mark.parametrize("value", ["invalid", 1.0, object()])
+def test_get_ssl_verify_rejects_bad_explicit_value(value, monkeypatch):
+    monkeypatch.delenv("GLOBUS_SDK_VERIFY_SSL", raising=False)
+    with pytest.raises(ValueError):
+        globus_sdk.config.get_ssl_verify(value)
 
 
 def test_get_ssl_verify_with_explicit_value():
