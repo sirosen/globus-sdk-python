@@ -391,6 +391,10 @@ def test_authz_params_info():
     [
         (requests.RequestException("exc_message"), exc.NetworkError),
         (requests.Timeout("timeout_message"), exc.GlobusTimeoutError),
+        (
+            requests.ConnectTimeout("connect_timeout_message"),
+            exc.GlobusConnectionTimeoutError,
+        ),
         (requests.ConnectionError("connection_message"), exc.GlobusConnectionError),
     ],
 )
@@ -406,6 +410,10 @@ def test_requests_err_wrappers(orig, wrap_class):
     [
         (requests.RequestException("exc_message"), exc.NetworkError),
         (requests.Timeout("timeout_message"), exc.GlobusTimeoutError),
+        (
+            requests.ConnectTimeout("connect_timeout_message"),
+            exc.GlobusConnectionTimeoutError,
+        ),
         (requests.ConnectionError("connection_message"), exc.GlobusConnectionError),
     ],
 )
@@ -443,3 +451,72 @@ def test_http_header_exposure():
     err = exc.GlobusAPIError(res.r)
     assert err.headers["spam"] == "Eggs"
     assert err.headers["Content-Type"] == "application/json"
+
+
+# do not parametrize each of these independently: it would result in hundreds of tests
+# which are not meaningfully non-overlapping in what they test
+# instead, iterate through "full variations" to keep the suite faster
+@pytest.mark.parametrize(
+    "http_method, http_status, error_code, request_url, error_message, authz_scheme",
+    [
+        (
+            "POST",
+            404,
+            "FooError",
+            "https://bogus.example.com/foo",
+            "got a foo error",
+            "bearer",
+        ),
+        ("PATCH", 500, None, "https://bogus.example.org/bar", "", "unknown-token"),
+        ("PUT", 501, None, "https://bogus.example.org/bar", None, None),
+    ],
+)
+def test_error_repr_has_expected_info(
+    http_method, http_status, authz_scheme, request_url, error_code, error_message
+):
+    http_reason = {404: "Not Found", 500: "Server Error", 501: "Not Implemented"}.get(
+        http_status
+    )
+
+    body = {"otherfield": "otherdata"}
+    if error_code is not None:
+        body["code"] = error_code
+    if error_message is not None:
+        body["message"] = error_message
+
+    headers = {"Content-Type": "application/json", "Spam": "Eggs"}
+    if authz_scheme is not None:
+        headers["Authorization"] = f"{authz_scheme} TOKENINFO"
+
+    # build the response -> error -> error repr
+    res = _mk_response(
+        body,
+        http_status,
+        method=http_method,
+        data_transform=json.dumps,
+        url=request_url,
+        headers=headers,
+    )
+    err = exc.GlobusAPIError(res.r)
+    stringified = repr(err)
+
+    # check using substring -- do not check exact format
+    assert http_method in stringified
+    assert request_url in stringified
+    if authz_scheme in exc.GlobusAPIError.RECOGNIZED_AUTHZ_SCHEMES:
+        assert authz_scheme in stringified
+    # confirm that actual tokens don't get into the repr, regardless of authz scheme
+    assert "TOKENINFO" not in stringified
+    assert str(http_status) in stringified
+    if error_code is not None:
+        assert error_code in stringified
+    else:
+        assert "'Error'" in stringified
+    if error_message is None:
+        assert "otherdata" in stringified
+    else:
+        assert "otherdata" not in stringified
+        if error_message:
+            assert error_message in stringified
+        else:
+            assert http_reason in stringified
