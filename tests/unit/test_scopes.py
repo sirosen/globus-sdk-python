@@ -32,6 +32,16 @@ def test_known_url_scopes():
     )
 
 
+def test_scopebuilder_str():
+    sb = ScopeBuilder(str(uuid.UUID(int=0)), known_scopes="foo", known_url_scopes="bar")
+    rs, foo_scope, bar_scope = sb.resource_server, sb.foo, sb.bar
+
+    stringified = str(sb)
+    assert rs in stringified
+    assert foo_scope in stringified
+    assert bar_scope in stringified
+
+
 def test_mutable_scope_str_and_repr_simple():
     s = MutableScope("simple")
     assert str(s) == "simple"
