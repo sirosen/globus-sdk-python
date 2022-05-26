@@ -12,4 +12,4 @@ class AuthAPIError(exc.GlobusAPIError):
     Customizes message parsing to support the field named 'error'.
     """
 
-    MESSAGE_FIELDS = ["message", "detail", "error"]
+    MESSAGE_FIELDS = ["detail", "title"]
