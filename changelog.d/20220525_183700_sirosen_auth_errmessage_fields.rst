@@ -1,1 +1,1 @@
-* Update the fields used to extract ``AuthAPIError`` messages (:pr:`NUMBER`)
+* Update the fields used to extract ``AuthAPIError`` messages (:pr:`566`)
