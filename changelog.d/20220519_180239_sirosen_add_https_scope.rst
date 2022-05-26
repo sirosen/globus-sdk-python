@@ -1,1 +1,1 @@
-* Add ``https`` scope to ``GCSCollectionScopeBuilder`` (:pr:`NUMBER`)
+* Add ``https`` scope to ``GCSCollectionScopeBuilder`` (:pr:`563`)
