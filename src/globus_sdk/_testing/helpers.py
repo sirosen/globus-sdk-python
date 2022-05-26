@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, cast
 
 import requests
 import responses
@@ -6,6 +6,6 @@ import responses
 
 def get_last_request() -> Optional[requests.PreparedRequest]:
     try:
-        return responses.calls[-1].request
+        return cast(requests.PreparedRequest, responses.calls[-1].request)
     except IndexError:
         return None
