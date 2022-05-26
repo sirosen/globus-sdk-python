@@ -241,11 +241,16 @@ class GCSCollectionScopeBuilder(ScopeBuilder):
 
     >>> sb = GCSCollectionScopeBuilder("xyz")
     >>> da_scope = sb.data_access
+    >>> https_scope = sb.https
     """
 
     @property
     def data_access(self) -> str:
         return self.url_scope_string("data_access")
+
+    @property
+    def https(self) -> str:
+        return self.url_scope_string("https")
 
 
 class _AuthScopesBuilder(ScopeBuilder):
