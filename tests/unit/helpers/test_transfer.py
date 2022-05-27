@@ -60,7 +60,7 @@ def test_tranfer_init(transfer_data):
 
 def test_transfer_add_item(transfer_data):
     """
-    Adds three items to TransferData, verifies results
+    Adds items to TransferData, verifies results
     """
     tdata = transfer_data()
     # add item
@@ -89,6 +89,7 @@ def test_transfer_add_item(transfer_data):
     assert r_data["external_checksum"] is None
     assert r_data["checksum_algorithm"] is None
 
+    # item with checksum
     checksum = "d577273ff885c3f84dadb8578bb41399"
     algorithm = "MD5"
     tdata.add_item(
@@ -102,6 +103,17 @@ def test_transfer_add_item(transfer_data):
     assert not c_data["recursive"]
     assert c_data["external_checksum"] == checksum
     assert c_data["checksum_algorithm"] == algorithm
+
+    # add an item which uses `additional_fields`
+    addfields = {"foo": "bar", "bar": "baz"}
+    tdata.add_item(source_path, dest_path, additional_fields=addfields)
+    assert len(tdata["DATA"]) == 4
+    fields_data = tdata["DATA"][3]
+    assert fields_data["DATA_TYPE"] == "transfer_item"
+    assert fields_data["source_path"] == source_path
+    assert fields_data["destination_path"] == dest_path
+    assert not fields_data["recursive"]
+    assert all(fields_data[k] == v for k, v in addfields.items())
 
 
 def test_transfer_add_symlink_item(transfer_data):
@@ -145,17 +157,26 @@ def test_delete_init(delete_data):
 
 def test_delete_add_item(delete_data):
     """
-    Adds an item to DeleteData, verifies results
+    Adds items to DeleteData, verifies results
     """
     ddata = delete_data()
-    # add item
+
+    # add normal item
     path = "source/path/"
     ddata.add_item(path)
-    # verify results
     assert len(ddata["DATA"]) == 1
     data = ddata["DATA"][0]
     assert data["DATA_TYPE"] == "delete_item"
     assert data["path"] == path
+
+    # add an item which uses `additional_fields`
+    addfields = {"foo": "bar", "bar": "baz"}
+    ddata.add_item(path, additional_fields=addfields)
+    assert len(ddata["DATA"]) == 2
+    fields_data = ddata["DATA"][1]
+    assert fields_data["DATA_TYPE"] == "delete_item"
+    assert fields_data["path"] == path
+    assert all(fields_data[k] == v for k, v in addfields.items())
 
 
 def test_delete_iter_items(delete_data):

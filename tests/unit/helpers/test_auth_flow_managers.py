@@ -1,10 +1,14 @@
 import base64
 import hashlib
 import os
+from unittest import mock
 
 import pytest
 
 from globus_sdk import GlobusSDKUsageError
+from globus_sdk.services.auth.flow_managers.authorization_code import (
+    GlobusAuthorizationCodeFlowManager,
+)
 from globus_sdk.services.auth.flow_managers.native_app import make_native_app_challenge
 
 
@@ -52,3 +56,23 @@ def test_random_native_app_challenge(monkeypatch):
 
     assert len(b64vals) == 2
     assert b64vals == [b"xyz", hashlib.sha256(b"abc123").digest()]
+
+
+def test_get_authorize_url_for_authorization_code():
+    mock_client = mock.Mock()
+    mock_client.client_id = "MOCK_CLIENT_ID"
+    mock_client.base_url = "https://auth.globus.org/"
+    flow_manager = GlobusAuthorizationCodeFlowManager(
+        mock_client, redirect_uri="https://foo.example.org/authenticate"
+    )
+
+    silly_string = "ANANAS_IS_PINEAPPLE_BUT_BANANE_IS_BANANA"
+
+    authorize_url = flow_manager.get_authorize_url()
+    assert authorize_url.startswith("https://auth.globus.org")
+    assert silly_string not in authorize_url
+
+    silly_authorize_url = flow_manager.get_authorize_url(
+        query_params={"silly_string": silly_string}
+    )
+    assert silly_string in silly_authorize_url
