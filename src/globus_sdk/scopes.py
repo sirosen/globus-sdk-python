@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, Iterator, List, Union
+from typing import Dict, Iterable, Iterator, List, Tuple, Union
 
 from globus_sdk import utils
 
@@ -110,6 +110,8 @@ class ScopeBuilder:
     :type known_url_scopes: list of str, optional
     """
 
+    _classattr_scope_names: List[str] = []
+
     def __init__(
         self,
         resource_server: str,
@@ -128,11 +130,14 @@ class ScopeBuilder:
             if known_url_scopes is not None
             else []
         )
+        self._known_scope_names: List[str] = []
         if self._known_scopes:
             for scope_name in self._known_scopes:
+                self._known_scope_names.append(scope_name)
                 setattr(self, scope_name, self.urn_scope_string(scope_name))
         if self._known_url_scopes:
             for scope_name in self._known_url_scopes:
+                self._known_scope_names.append(scope_name)
                 setattr(self, scope_name, self.url_scope_string(scope_name))
 
     # custom __getattr__ instructs `mypy` that unknown attributes of a ScopeBuilder are
@@ -213,6 +218,17 @@ class ScopeBuilder:
         """
         return MutableScope(getattr(self, scope))
 
+    def _iter_scopes(self) -> Iterator[Tuple[str, str]]:
+        for name in self._classattr_scope_names:
+            yield (name, getattr(self, name))
+        for name in self._known_scope_names:
+            yield (name, getattr(self, name))
+
+    def __str__(self) -> str:
+        return f"ScopeBuilder[{self.resource_server}]\n" + "\n".join(
+            f"  {k}:\n    {v}" for k, v in self._iter_scopes()
+        )
+
 
 class GCSEndpointScopeBuilder(ScopeBuilder):
     """
@@ -225,6 +241,8 @@ class GCSEndpointScopeBuilder(ScopeBuilder):
     >>> sb = GCSEndpointScopeBuilder("xyz")
     >>> mc_scope = sb.manage_collections
     """
+
+    _classattr_scope_names = ["manage_collections"]
 
     @property
     def manage_collections(self) -> str:
@@ -244,6 +262,8 @@ class GCSCollectionScopeBuilder(ScopeBuilder):
     >>> https_scope = sb.https
     """
 
+    _classattr_scope_names = ["data_access", "https"]
+
     @property
     def data_access(self) -> str:
         return self.url_scope_string("data_access")
@@ -254,6 +274,8 @@ class GCSCollectionScopeBuilder(ScopeBuilder):
 
 
 class _AuthScopesBuilder(ScopeBuilder):
+    _classattr_scope_names = ["openid", "email", "profile"]
+
     openid: str = "openid"
     email: str = "email"
     profile: str = "profile"
