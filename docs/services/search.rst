@@ -1,7 +1,9 @@
 Globus Search
 =============
 
-.. autoclass:: globus_sdk.SearchClient
+.. currentmodule:: globus_sdk
+
+.. autoclass:: SearchClient
    :members:
    :member-order: bysource
    :show-inheritance:
@@ -10,28 +12,29 @@ Globus Search
 Helper Objects
 --------------
 
-Note that you should not use ``SearchQueryBase`` directly, and it is not
-importable from the top level of the SDK. It is included in documentation
+Note that you should not use
+:class:`SearchQueryBase <globus_sdk.services.search.data.SearchQueryBase>` directly,
+and it is not importable from the top level of the SDK. It is included in documentation
 only to document the methods it provides to its subclasses.
 
 .. autoclass:: globus_sdk.services.search.data.SearchQueryBase
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.SearchQuery
+.. autoclass:: SearchQuery
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.SearchScrollQuery
+.. autoclass:: SearchScrollQuery
    :members:
    :show-inheritance:
 
 Client Errors
 -------------
 
-When an error occurs, a ``SearchClient`` will raise this specialized type of
-error, rather than a generic ``GlobusAPIError``.
+When an error occurs, a :class:`SearchClient` will raise this specialized type of
+error, rather than a generic :class:`GlobusAPIError`.
 
-.. autoclass:: globus_sdk.SearchAPIError
+.. autoclass:: SearchAPIError
    :members:
    :show-inheritance:

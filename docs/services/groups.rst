@@ -1,10 +1,9 @@
-.. module:: globus_sdk
-
-
 Globus Groups
 =============
 
-.. autoclass:: globus_sdk.GroupsClient
+.. currentmodule:: globus_sdk
+
+.. autoclass:: GroupsClient
    :members:
    :member-order: bysource
    :show-inheritance:
@@ -13,8 +12,8 @@ Globus Groups
 Helper Objects
 --------------
 
-These helper objects make it easier to create and submit data to a ``GroupsClient``.
-Additionally, they may be used in concert with the ``GroupsManager`` to perform
+These helper objects make it easier to create and submit data to a :class:`GroupsClient`.
+Additionally, they may be used in concert with the :class:`GroupsManager` to perform
 operations.
 
 These enums define values which can be passed to other helpers:
@@ -38,15 +37,15 @@ These enums define values which can be passed to other helpers:
 Payload Types
 ~~~~~~~~~~~~~
 
-A ``BatchMembershipActions`` defines how to formulate requests to add, remove, or modify
+A :class:`BatchMembershipActions` defines how to formulate requests to add, remove, or modify
 memberships in a group. It can be used to formulate multiple operations to submit in a single
 request to the service.
 
 .. autoclass:: BatchMembershipActions
    :members:
 
-A ``GroupPolicies`` object defines the various policies which can be set on a
-group. It can be used with the ``GroupsClient`` or the ``GroupsManager``.
+A :class:`GroupPolicies` object defines the various policies which can be set on a
+group. It can be used with the :class:`GroupsClient` or the :class:`GroupsManager`.
 
 .. autoclass:: GroupPolicies
    :members:
@@ -54,9 +53,9 @@ group. It can be used with the ``GroupsClient`` or the ``GroupsManager``.
 High-Level Client Wrappers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``GroupsManager`` is a high-level helper which wraps a ``GroupsClient``. Many common
-operations which require assembling a ``BatchMembershipActions`` and submitting the
-result can be achieved with a single method-call on a ``GroupsManager``.
+The :class:`GroupsManager` is a high-level helper which wraps a :class:`GroupsClient`. Many common
+operations which require assembling a :class:`BatchMembershipActions` and submitting the
+result can be achieved with a single method-call on a :class:`GroupsManager`.
 
 .. autoclass:: GroupsManager
    :members:
@@ -64,7 +63,7 @@ result can be achieved with a single method-call on a ``GroupsManager``.
 Client Errors
 -------------
 
-When an error occurs, a ``GroupsClient`` will raise this type of error:
+When an error occurs, a :class:`GroupsClient` will raise this type of error:
 
 .. autoclass:: GroupsAPIError
    :members:

@@ -1,6 +1,8 @@
 Globus SDK for Python
 =====================
 
+.. module:: globus_sdk
+
 This SDK provides a convenient Pythonic interface to
 `Globus <https://www.globus.org>`_ web APIs,
 including the Transfer API and the Globus Auth API. Documentation

@@ -118,32 +118,34 @@ stringified representation.
 ScopeBuilder Types and Constants
 --------------------------------
 
-.. autoclass:: globus_sdk.scopes.ScopeBuilder
+.. module:: globus_sdk.scopes
+
+.. autoclass:: ScopeBuilder
     :members:
     :show-inheritance:
 
-.. autoclass:: globus_sdk.scopes.GCSEndpointScopeBuilder
+.. autoclass:: GCSEndpointScopeBuilder
     :members:
     :show-inheritance:
 
-.. autoclass:: globus_sdk.scopes.GCSCollectionScopeBuilder
+.. autoclass:: GCSCollectionScopeBuilder
     :members:
     :show-inheritance:
 
-.. autoclass:: globus_sdk.scopes.MutableScope
+.. autoclass:: MutableScope
     :members:
     :show-inheritance:
 
-.. autodata:: globus_sdk.scopes.AuthScopes
+.. autodata:: AuthScopes
     :annotation:
 
-.. autodata:: globus_sdk.scopes.GroupsScopes
+.. autodata:: GroupsScopes
     :annotation:
 
-.. autodata:: globus_sdk.scopes.NexusScopes
+.. autodata:: NexusScopes
     :annotation:
 
-.. autodata:: globus_sdk.scopes.SearchScopes
+.. autodata:: SearchScopes
     :annotation:
 
 .. autodata:: globus_sdk.scopes.TransferScopes

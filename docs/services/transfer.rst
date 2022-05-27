@@ -1,13 +1,15 @@
 Globus Transfer
 ===============
 
+.. currentmodule:: globus_sdk
+
 Client
 ------
 
-The primary interface for the Globus Transfer API is the ``TransferClient``
+The primary interface for the Globus Transfer API is the :class:`TransferClient`
 class.
 
-.. autoclass:: globus_sdk.TransferClient
+.. autoclass:: TransferClient
    :members:
    :member-order: bysource
    :show-inheritance:
@@ -17,23 +19,23 @@ Helper Objects
 --------------
 
 These helper objects make it easier to correctly create data for consumption by
-a ``TransferClient``.
+a :class:`TransferClient`.
 
-.. autoclass:: globus_sdk.TransferData
+.. autoclass:: TransferData
    :members:
    :show-inheritance:
 
-.. autoclass:: globus_sdk.DeleteData
+.. autoclass:: DeleteData
    :members:
    :show-inheritance:
 
 Client Errors
 -------------
 
-When an error occurs, a ``TransferClient`` will raise this specialized type of
-error, rather than a generic ``GlobusAPIError``.
+When an error occurs, a :class:`TransferClient` will raise this specialized type of
+error, rather than a generic :class:`GlobusAPIError`.
 
-.. autoclass:: globus_sdk.TransferAPIError
+.. autoclass:: TransferAPIError
    :members:
    :show-inheritance:
 

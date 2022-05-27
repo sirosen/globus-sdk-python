@@ -3,6 +3,8 @@
 Local Endpoints
 ===============
 
+.. currentmodule:: globus_sdk
+
 Unlike SDK functionality for accessing Globus APIs, the locally available
 Globus Endpoints require special treatment.
 These accesses are not authenticated via Globus Auth, and may rely upon the
@@ -21,10 +23,10 @@ Globus Connect Personal
 Globus Connect Personal endpoints belonging to the current user may be accessed
 via instances of the following class:
 
-.. autoclass:: globus_sdk.LocalGlobusConnectPersonal
+.. autoclass:: LocalGlobusConnectPersonal
    :members:
    :member-order: bysource
 
-.. autoclass:: globus_sdk.GlobusConnectPersonalOwnerInfo
+.. autoclass:: GlobusConnectPersonalOwnerInfo
    :members:
    :member-order: bysource
