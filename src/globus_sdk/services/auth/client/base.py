@@ -15,10 +15,10 @@ else:
     from typing_extensions import Literal
 
 from globus_sdk import client, exc, utils
+from globus_sdk._types import IntLike, UUIDLike
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import AuthScopes
-from globus_sdk.types import IntLike, UUIDLike
 
 from ..errors import AuthAPIError
 from ..flow_managers import GlobusOAuthFlowManager

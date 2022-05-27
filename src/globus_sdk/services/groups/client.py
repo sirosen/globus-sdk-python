@@ -1,8 +1,8 @@
 from typing import Any, Callable, Dict, Iterable, Optional, TypeVar, Union
 
 from globus_sdk import client, response, utils
+from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import GroupsScopes
-from globus_sdk.types import UUIDLike
 
 from .data import BatchMembershipActions, GroupPolicies
 from .errors import GroupsAPIError

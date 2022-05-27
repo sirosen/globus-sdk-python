@@ -3,7 +3,7 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
 
 from globus_sdk import utils
-from globus_sdk.types import UUIDLike
+from globus_sdk._types import UUIDLike
 
 if TYPE_CHECKING:
     import globus_sdk

@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Iterable, Optional
 
 from globus_sdk import utils
-from globus_sdk.types import UUIDLike
+from globus_sdk._types import UUIDLike
 
 
 class GroupRole(Enum):

@@ -4,8 +4,8 @@ import uuid
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from globus_sdk import client, exc, paging, response, utils
+from globus_sdk._types import DateLike, IntLike, UUIDLike
 from globus_sdk.scopes import TransferScopes
-from globus_sdk.types import DateLike, IntLike, UUIDLike
 
 from .data import DeleteData, TransferData
 from .errors import TransferAPIError

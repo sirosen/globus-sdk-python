@@ -2,8 +2,8 @@ import logging
 from typing import Any, Dict, Optional, Union
 
 from globus_sdk import client, paging, response, utils
+from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import SearchScopes
-from globus_sdk.types import UUIDLike
 
 from .data import SearchQuery, SearchScrollQuery
 from .errors import SearchAPIError

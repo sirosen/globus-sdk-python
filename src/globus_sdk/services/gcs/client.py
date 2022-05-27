@@ -2,8 +2,8 @@ import uuid
 from typing import Any, Callable, Dict, Iterable, Optional, TypeVar, Union
 
 from globus_sdk import client, paging, response, scopes, utils
+from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
-from globus_sdk.types import UUIDLike
 
 from .data import CollectionDocument, GCSRoleDocument, StorageGatewayDocument
 from .errors import GCSAPIError

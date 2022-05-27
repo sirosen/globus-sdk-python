@@ -1,7 +1,7 @@
 from typing import Iterable, Optional
 
 from globus_sdk import response
-from globus_sdk.types import UUIDLike
+from globus_sdk._types import UUIDLike
 
 from .client import GroupsClient
 from .data import (

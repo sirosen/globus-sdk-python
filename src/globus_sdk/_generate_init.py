@@ -21,11 +21,11 @@ from .version import __version__
 
 
 def _force_eager_imports() -> None:
-    import globus_sdk
+    current_module = sys.modules[__name__]
 
-    for attribute_set in globus_sdk._LAZY_IMPORT_TABLE.values():
+    for attribute_set in _LAZY_IMPORT_TABLE.values():
         for attr in attribute_set:
-            getattr(globus_sdk, attr)
+            getattr(current_module, attr)
 """
 
 FIXED_EPILOG = """
