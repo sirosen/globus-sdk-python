@@ -113,8 +113,7 @@ def test_transfer_add_item(transfer_data):
     assert fields_data["source_path"] == source_path
     assert fields_data["destination_path"] == dest_path
     assert not fields_data["recursive"]
-    for k, v in addfields.items():
-        assert fields_data[k] == v
+    assert all(fields_data[k] == v for k, v in addfields.items())
 
 
 def test_transfer_add_symlink_item(transfer_data):
@@ -177,8 +176,7 @@ def test_delete_add_item(delete_data):
     fields_data = ddata["DATA"][1]
     assert fields_data["DATA_TYPE"] == "delete_item"
     assert fields_data["path"] == path
-    for k, v in addfields.items():
-        assert fields_data[k] == v
+    assert all(fields_data[k] == v for k, v in addfields.items())
 
 
 def test_delete_iter_items(delete_data):
