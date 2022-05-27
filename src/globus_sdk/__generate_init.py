@@ -18,6 +18,14 @@ import sys
 import typing
 
 from .version import __version__
+
+
+def _force_eager_imports() -> None:
+    import globus_sdk
+
+    for attribute_set in globus_sdk._LAZY_IMPORT_TABLE.values():
+        for attr in attribute_set:
+            getattr(globus_sdk, attr)
 """
 
 FIXED_EPILOG = """
@@ -154,6 +162,7 @@ def _generate_lazy_import_table() -> Iterator[str]:
 def _generate_all_tuple() -> Iterator[str]:
     yield "__all__ = ("
     yield '    "__version__",'
+    yield '    "_force_eager_imports",'
     for _modname, items in _LAZY_IMPORT_TABLE:
         for item in items:
             yield f'    "{item}",'

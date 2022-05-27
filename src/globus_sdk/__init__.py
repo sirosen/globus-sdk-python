@@ -11,6 +11,14 @@ import typing
 from .version import __version__
 
 
+def _force_eager_imports() -> None:
+    import globus_sdk
+
+    for attribute_set in globus_sdk._LAZY_IMPORT_TABLE.values():
+        for attr in attribute_set:
+            getattr(globus_sdk, attr)
+
+
 _LAZY_IMPORT_TABLE = {
     "authorizers": {
         "AccessTokenAuthorizer",
@@ -183,6 +191,7 @@ else:
 
 __all__ = (
     "__version__",
+    "_force_eager_imports",
     "AccessTokenAuthorizer",
     "BasicAuthorizer",
     "ClientCredentialsAuthorizer",
