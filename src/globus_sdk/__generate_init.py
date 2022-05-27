@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import pathlib
 import textwrap
 from typing import Iterator, List, Tuple
@@ -187,7 +189,7 @@ def _generate_init() -> str:
 
 
 def main() -> None:
-    with open(HERE / "__init__.py", "w") as fp:
+    with open(HERE / "__init__.py", "w", encoding="utf-8") as fp:
         fp.write(_generate_init())
 
 

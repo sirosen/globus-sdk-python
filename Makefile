@@ -1,13 +1,15 @@
 SDK_VERSION=$(shell grep '^__version__' src/globus_sdk/version.py | cut -d '"' -f2)
 
 # these are just tox invocations wrapped nicely for convenience
-.PHONY: lint test docs
+.PHONY: lint test docs all-checks
 lint:
 	tox -e lint,mypy,mypy-test,pylint
 test:
 	tox
 docs:
 	tox -e docs
+all-checks:
+	tox -e lint,pylint,mypy,mypy-test,test-lazy-imports,py36,py310,poetry-check,twine-check,docs
 
 .PHONY: showvars release prepare-release
 showvars:

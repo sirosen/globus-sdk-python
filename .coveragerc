@@ -4,6 +4,7 @@ include = src/*
 omit =
     src/globus_sdk/_sphinxext.py
     src/globus_sdk/_testing/*
+    src/globus_sdk/__generate_init.py
 
 [report]
 show_missing = True
