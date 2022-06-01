@@ -1,5 +1,5 @@
 * Imports from ``globus_sdk`` are now evaluated lazily via module-level
-  ``__getattr__`` on python 3.7+ (:pr:`NUMBER`)
+  ``__getattr__`` on python 3.7+ (:pr:`571`)
 
   * This improves the performance of imports for almost all use-cases, in some
     cases by over 80%
