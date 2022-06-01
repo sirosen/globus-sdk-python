@@ -152,6 +152,10 @@ class PayloadWrapper(PayloadWrapperBase):
         for k, v in kwargs.items():
             self._set_value(k, v, callback=bool)
 
+    def _set_optints(self, **kwargs: Any) -> None:
+        for k, v in kwargs.items():
+            self._set_value(k, v, callback=int)
+
 
 def in_sphinx_build() -> bool:  # pragma: no cover
     # check if `sphinx-build` was used to invoke
