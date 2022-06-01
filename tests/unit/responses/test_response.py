@@ -107,6 +107,21 @@ def test_str(dict_response, list_response):
     assert "nonexistent" not in str(list_response.r)
 
 
+def test_text_response_repr_and_str_contain_raw_data():
+    expect_text = """pu-erh is a distinctive aged tea primarily produced in Yunnan
+
+    depending on the tea used and how it is aged, it can be bright, floral, and fruity
+    or it can take on mushroomy, fermented, and malty notes
+    """
+    raw = _response(
+        expect_text, encoding="utf-8", headers={"Content-Type": "text/plain"}
+    )
+    res = GlobusHTTPResponse(raw, client=mock.Mock())
+
+    assert expect_text in repr(res)
+    assert expect_text in str(res)
+
+
 def test_getitem(dict_response, list_response):
     """
     Confirms that values can be accessed from the GlobusResponse
@@ -121,7 +136,7 @@ def test_getitem(dict_response, list_response):
     assert list_response.r[:-1] == list_response.data[:-1]
 
 
-def test_contains(dict_response, list_response):
+def test_contains(dict_response, list_response, text_http_response):
     """
     Confirms that individual values are seen in the GlobusResponse
     """
@@ -132,6 +147,8 @@ def test_contains(dict_response, list_response):
     for item in list_response.data:
         assert item in list_response.r
     assert "nonexistent" not in list_response.r
+
+    assert "foo" not in text_http_response.r
 
 
 def test_bool(dict_response, list_response):
@@ -158,7 +175,7 @@ def test_len(dict_response, list_response):
     assert len(null.r) == 0
 
 
-def test_get(dict_response, list_response):
+def test_get(dict_response, list_response, text_http_response):
     """
     Gets individual values from dict response, confirms results
     Confirms list response correctly fails as non indexable
@@ -168,6 +185,9 @@ def test_get(dict_response, list_response):
 
     with pytest.raises(AttributeError):
         list_response.r.get("value1")
+
+    assert text_http_response.r.get("foo") is None
+    assert text_http_response.r.get("foo", default="bar") == "bar"
 
 
 def test_text(malformed_http_response, text_http_response):
