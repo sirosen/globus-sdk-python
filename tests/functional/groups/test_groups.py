@@ -10,6 +10,7 @@ from globus_sdk import (
     GroupVisibility,
 )
 from globus_sdk._testing import get_last_request, load_response
+from globus_sdk.response import ArrayResponse
 from tests.common import register_api_route_fixture_file
 
 
@@ -19,9 +20,9 @@ def test_my_groups_simple(groups_client):
     res = groups_client.get_my_groups()
     assert res.http_status == 200
 
-    data = res.data
-    assert isinstance(data, list)
-    assert set(meta["group_names"]) == {g["name"] for g in data}
+    assert isinstance(res, ArrayResponse)
+    assert isinstance(res.data, list)
+    assert set(meta["group_names"]) == {g["name"] for g in res}
 
 
 def test_get_group(groups_client):

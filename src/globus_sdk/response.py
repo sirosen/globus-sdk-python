@@ -1,3 +1,4 @@
+import collections.abc
 import json
 import logging
 from typing import (
@@ -5,6 +6,7 @@ from typing import (
     Any,
     ClassVar,
     Iterator,
+    List,
     Mapping,
     Optional,
     Union,
@@ -31,7 +33,8 @@ class GlobusHTTPResponse:
     ``GlobusHTTPResponse`` object implements the immutable mapping protocol for
     dict-style access. This is just an alias for access to the underlying data.
 
-    If ``data`` is not a dictionary, item access will raise ``TypeError``.
+    If the response data is not a dictionary or list, item access will raise
+    ``TypeError``.
 
     >>> print("Response ID": r["id"]) # alias for r.data["id"]
 
@@ -148,7 +151,7 @@ class GlobusHTTPResponse:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.text})"
 
-    def __getitem__(self, key: str) -> Any:
+    def __getitem__(self, key: Union[str, int, slice]) -> Any:
         # force evaluation of the data property outside of the upcoming
         # try-catch so that we don't accidentally catch TypeErrors thrown
         # during the getter function itself
@@ -177,6 +180,12 @@ class GlobusHTTPResponse:
             return False
         return item in self.data
 
+    def __bool__(self) -> bool:
+        """
+        ``bool(response)`` is an alias for ``bool(response.data)``
+        """
+        return bool(self.data)
+
 
 class IterableResponse(GlobusHTTPResponse):
     """This response class adds an __iter__ method on an 'iter_key' variable.
@@ -203,3 +212,21 @@ class IterableResponse(GlobusHTTPResponse):
 
     def __iter__(self) -> Iterator[Mapping[Any, Any]]:
         return iter(cast(Mapping[Any, Any], self)[self.iter_key])
+
+
+class ArrayResponse(GlobusHTTPResponse):
+    """This response class adds an ``__iter__`` method which assumes that the top-level
+    data of the response is a JSON array."""
+
+    def __iter__(self) -> Iterator[Any]:
+        return iter(cast(List[Any], self.data))
+
+    def __len__(self) -> int:
+        """
+        ``len(response)`` is an alias for ``len(response.data)``
+        """
+        if not isinstance(self.data, collections.abc.Sequence):
+            raise TypeError(
+                f"Cannot take len() on data when type is '{type(self.data).__name__}'"
+            )
+        return len(self.data)
