@@ -1,4 +1,5 @@
 import json
+import re
 from collections import namedtuple
 from unittest import mock
 
@@ -163,16 +164,28 @@ def test_bool(dict_response, list_response):
     assert bool(null.r) is False
 
 
-def test_len(dict_response, list_response):
-    assert len(dict_response.r) == len(dict_response.data)
-    assert len(list_response.r) == len(list_response.data)
+def test_len(list_response):
+    array = ArrayResponse(list_response.r)
+    assert len(array) == len(list_response.data)
 
-    empty_dict, empty_list = _mk_json_response({}), _mk_json_response([])
-    assert len(empty_dict.r) == 0
-    assert len(empty_list.r) == 0
+    empty_list = _mk_json_response([])
+    empty_array = ArrayResponse(empty_list.r)
+    assert len(empty_list.data) == 0
+    assert len(empty_array) == 0
 
-    null = _mk_json_response(None)
-    assert len(null.r) == 0
+
+def test_len_bad_data(dict_response):
+    null_array = ArrayResponse(_mk_json_response(None).r)
+    with pytest.raises(
+        TypeError, match=re.escape("Cannot take len() on data when type is 'NoneType'")
+    ):
+        len(null_array)
+
+    dict_array = ArrayResponse(dict_response.r)
+    with pytest.raises(
+        TypeError, match=re.escape("Cannot take len() on data when type is 'dict'")
+    ):
+        len(dict_array)
 
 
 def test_get(dict_response, list_response, text_http_response):

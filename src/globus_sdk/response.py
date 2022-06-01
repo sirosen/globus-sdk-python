@@ -1,3 +1,4 @@
+import collections.abc
 import json
 import logging
 from typing import (
@@ -185,14 +186,6 @@ class GlobusHTTPResponse:
         """
         return bool(self.data)
 
-    def __len__(self) -> int:
-        """
-        ``len(response)`` is an alias for ``len(response.data)``
-        """
-        if self.data is None:
-            return 0
-        return len(self.data)
-
 
 class IterableResponse(GlobusHTTPResponse):
     """This response class adds an __iter__ method on an 'iter_key' variable.
@@ -227,3 +220,13 @@ class ArrayResponse(GlobusHTTPResponse):
 
     def __iter__(self) -> Iterator[Any]:
         return iter(cast(List[Any], self.data))
+
+    def __len__(self) -> int:
+        """
+        ``len(response)`` is an alias for ``len(response.data)``
+        """
+        if not isinstance(self.data, collections.abc.Sequence):
+            raise TypeError(
+                f"Cannot take len() on data when type is '{type(self.data).__name__}'"
+            )
+        return len(self.data)
