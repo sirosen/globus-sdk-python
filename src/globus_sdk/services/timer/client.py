@@ -2,8 +2,8 @@ import logging
 from typing import Any, Dict, Optional, Union
 
 from globus_sdk import client, response
+from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import TimerScopes
-from globus_sdk.types import UUIDLike
 
 from .data import TimerJob
 from .errors import TimerAPIError

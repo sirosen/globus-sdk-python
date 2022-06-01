@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional
 
 from globus_sdk import utils
-from globus_sdk.types import UUIDLike
+from globus_sdk._types import UUIDLike
 
 
 class GCSRoleDocument(utils.PayloadWrapper):

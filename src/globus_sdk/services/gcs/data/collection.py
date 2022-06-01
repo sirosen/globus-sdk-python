@@ -2,7 +2,7 @@ import abc
 from typing import Any, Dict, Iterable, Optional, Tuple
 
 from globus_sdk import utils
-from globus_sdk.types import UUIDLike
+from globus_sdk._types import UUIDLike
 
 from ._common import ensure_datatype
 
