@@ -1,4 +1,4 @@
-* Improve handling of array-style API responses (:pr:`NUMBER`)
+* Improve handling of array-style API responses (:pr:`575`)
 
   * Response objects now define ``__bool__`` as ``bool(data)``. This
     means that ``bool(response)`` could be ``False`` if the data is ``{}``,
