@@ -1,4 +1,4 @@
-* Add support for more ``StorageGatewayPolicies`` documents. (:pr:`NUMBER`)
+* Add support for more ``StorageGatewayPolicies`` documents. (:pr:`562`)
   The following types are now available:
 
   * ``BlackPearlStoragePolicies``
