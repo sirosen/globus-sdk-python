@@ -3,6 +3,8 @@
 Service Clients
 ===============
 
+.. currentmodule:: globus_sdk
+
 The Globus SDK provides a client class for every public Globus API.
 Each client object takes authentication credentials from config files,
 environment variables, or programmatically via :ref:`GlobusAuthorizers <authorization>`.
@@ -10,7 +12,7 @@ environment variables, or programmatically via :ref:`GlobusAuthorizers <authoriz
 Once instantiated, a Client gives you high-level interface to make API calls,
 without needing to know Globus API endpoints or their various parameters.
 
-For example, you could use the ``TransferClient`` to list your task history
+For example, you could use the :class:`TransferClient` to list your task history
 very simply::
 
     from globus_sdk import TransferClient, AccessTokenAuthorizer

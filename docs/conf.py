@@ -19,11 +19,16 @@ with open("nitpick_ignore.txt") as fp:
         else:
             nitpick_ignore.append(tuple(line.split()))
 
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+}
+
 
 # sphinx extensions (minimally, we want autodoc and viewcode to build the site)
 # plus, we have our own custom extension in the SDK to include
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_issues",
     "globus_sdk._sphinxext",
