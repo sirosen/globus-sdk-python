@@ -46,14 +46,16 @@ class GroupsClient(client.BaseClient):
     )
     def get_my_groups(
         self, *, query_params: Optional[Dict[str, Any]] = None
-    ) -> response.GlobusHTTPResponse:
+    ) -> response.ArrayResponse:
         """
         Return a list of groups your identity belongs to.
 
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
         """
-        return self.get("/groups/my_groups", query_params=query_params)
+        return response.ArrayResponse(
+            self.get("/groups/my_groups", query_params=query_params)
+        )
 
     @_groupdoc("Get Group", "get_group_v2_groups__group_id__get")
     def get_group(

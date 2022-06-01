@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 import requests
 
-from globus_sdk.response import GlobusHTTPResponse, IterableResponse
+from globus_sdk.response import ArrayResponse, GlobusHTTPResponse, IterableResponse
 
 _TestResponse = namedtuple("_TestResponse", ("data", "r"))
 
@@ -111,11 +111,14 @@ def test_getitem(dict_response, list_response):
     """
     Confirms that values can be accessed from the GlobusResponse
     """
+    # str indexing
     for key in dict_response.data:
         assert dict_response.r[key] == dict_response.data[key]
-
+    # int indexing
     for i in range(len(list_response.data)):
         assert list_response.r[i] == list_response.data[i]
+    # slice indexing
+    assert list_response.r[:-1] == list_response.data[:-1]
 
 
 def test_contains(dict_response, list_response):
@@ -129,6 +132,30 @@ def test_contains(dict_response, list_response):
     for item in list_response.data:
         assert item in list_response.r
     assert "nonexistent" not in list_response.r
+
+
+def test_bool(dict_response, list_response):
+    assert bool(dict_response) is True
+    assert bool(list_response) is True
+
+    empty_dict, empty_list = _mk_json_response({}), _mk_json_response([])
+    assert bool(empty_dict.r) is False
+    assert bool(empty_list.r) is False
+
+    null = _mk_json_response(None)
+    assert bool(null.r) is False
+
+
+def test_len(dict_response, list_response):
+    assert len(dict_response.r) == len(dict_response.data)
+    assert len(list_response.r) == len(list_response.data)
+
+    empty_dict, empty_list = _mk_json_response({}), _mk_json_response([])
+    assert len(empty_dict.r) == 0
+    assert len(empty_list.r) == 0
+
+    null = _mk_json_response(None)
+    assert len(null.r) == 0
 
 
 def test_get(dict_response, list_response):
@@ -186,6 +213,26 @@ def test_cannot_construct_base_iterable_response():
     r = _response(b"foo: bar, baz: buzz")
     with pytest.raises(TypeError):
         IterableResponse(r, client=mock.Mock())
+
+
+def test_iterable_response_using_iter_key():
+    class MyIterableResponse(IterableResponse):
+        default_iter_key = "default_iter"
+
+    raw = _response({"default_iter": [0, 1], "other_iter": [3, 4]})
+
+    default = MyIterableResponse(raw, client=mock.Mock())
+    assert list(default) == [0, 1]
+
+    withkey = MyIterableResponse(raw, client=mock.Mock(), iter_key="other_iter")
+    assert list(withkey) == [3, 4]
+
+
+def test_can_iter_array_response(list_response):
+    arr = ArrayResponse(list_response.r)
+    # sorted/reversed are just example stdlib functions which use iter
+    assert list(sorted(arr)) == list(sorted(list_response.data))
+    assert list(reversed(arr)) == list(reversed(list_response.data))
 
 
 def test_http_status_code_on_response():
