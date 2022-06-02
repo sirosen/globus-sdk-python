@@ -47,6 +47,9 @@ class DeleteData(utils.PayloadWrapper):
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
     :type deadline: str or datetime, optional
+    :param skip_activation_check: When true, allow submission even if the endpoint
+        isn't currently activated
+    :type skip_activation_check: bool, optional
     :param notify_on_succeeded: Send a notification email when the delete task
         completes with a status of SUCCEEDED.
         [default: ``True``]
@@ -90,6 +93,7 @@ class DeleteData(utils.PayloadWrapper):
         submission_id: Optional[UUIDLike] = None,
         recursive: bool = False,
         deadline: Optional[Union[str, datetime.datetime]] = None,
+        skip_activation_check: bool = False,
         notify_on_succeeded: bool = True,
         notify_on_failed: bool = True,
         notify_on_inactive: bool = True,
@@ -104,6 +108,7 @@ class DeleteData(utils.PayloadWrapper):
         )
         self["endpoint"] = str(endpoint)
         self["recursive"] = recursive
+        self["skip_activation_check"] = skip_activation_check
         self["notify_on_succeeded"] = notify_on_succeeded
         self["notify_on_failed"] = notify_on_failed
         self["notify_on_inactive"] = notify_on_inactive

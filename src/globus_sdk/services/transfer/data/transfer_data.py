@@ -1,6 +1,12 @@
 import datetime
 import logging
+import sys
 from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 from globus_sdk import utils
 from globus_sdk._types import UUIDLike
@@ -70,6 +76,9 @@ class TransferData(utils.PayloadWrapper):
         ``"copy"`` follows symlinks on the source, failing if the link is invalid.
         [default: ``"ignore"``]
     :type recursive_symlinks: str
+    :param skip_activation_check: When true, allow submission even if the endpoints
+        aren't currently activated
+    :type skip_activation_check: bool, optional
     :param skip_source_errors: When true, source permission denied and file
         not found errors from the source endpoint will cause the offending
         path to be skipped.
@@ -155,11 +164,14 @@ class TransferData(utils.PayloadWrapper):
         *,
         label: Optional[str] = None,
         submission_id: Optional[UUIDLike] = None,
-        sync_level: Union[str, int, None] = None,
+        sync_level: Union[
+            Literal["exists", "size", "mtime", "checksum"], int, None
+        ] = None,
         verify_checksum: bool = False,
         preserve_timestamp: bool = False,
         encrypt_data: bool = False,
         deadline: Optional[Union[datetime.datetime, str]] = None,
+        skip_activation_check: bool = False,
         skip_source_errors: bool = False,
         fail_on_quota_errors: bool = False,
         recursive_symlinks: str = "ignore",
@@ -181,6 +193,7 @@ class TransferData(utils.PayloadWrapper):
         self["preserve_timestamp"] = preserve_timestamp
         self["encrypt_data"] = encrypt_data
         self["recursive_symlinks"] = recursive_symlinks
+        self["skip_activation_check"] = skip_activation_check
         self["skip_source_errors"] = skip_source_errors
         self["fail_on_quota_errors"] = fail_on_quota_errors
         self["delete_destination_extra"] = delete_destination_extra
@@ -312,6 +325,56 @@ class TransferData(utils.PayloadWrapper):
             )
         )
         self["DATA"].append(item_data)
+
+    def add_filter_rule(
+        self,
+        name: str,
+        *,
+        method: Literal["exclude"] = "exclude",
+        type: Optional[  # pylint: disable=redefined-builtin
+            Literal["file", "dir"]
+        ] = None,
+    ) -> None:
+        """
+        Add a filter rule to the transfer document.
+
+        These rules specify which items are or are not included when recursively
+        transferring directories.
+
+        Currently, only ``method="exclude"`` (the default) is supported. This means that
+        items matching the ``name`` field will be excluded from the transfer.
+
+        :param name: A pattern to match against item names. Wildcards are supported, as
+            are character groups: ``*`` matches everything, ``?`` matches any single
+            character, ``[]`` matches any single character within the brackets, and
+            ``[!]`` matches any single character not within the brackets.
+        :type name: str
+        :param method: The method to use for filtering. Only the default, ``"exclude"``
+            is supported.
+        :type method: str, optional
+        :param type: The types of items on which to apply this filter rule. Either
+            ``"file"`` or ``"dir"``. If unspecified, the rule applies to both.
+        :type type: str, optional
+
+        Example Usage:
+
+        >>> tdata = TransferData(...)
+        >>> tdata.add_filter_rule("*.tgz", type="file")
+        >>> tdata.add_filter_rule("*.tar.gz", type="file")
+
+        ``tdata`` now describes a transfer which will skip any gzipped tar files with
+        the extensions `.tgz` or `.tar.gz`
+        """
+        if "filter_rules" not in self:
+            self["filter_rules"] = []
+        rule = {
+            "DATA_TYPE": "filter_rule",
+            "method": method,
+            "name": name,
+        }
+        if type is not None:
+            rule["type"] = type
+        self["filter_rules"].append(rule)
 
     def iter_items(self) -> Iterator[Dict[str, Any]]:
         """
