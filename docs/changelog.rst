@@ -12,6 +12,84 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.9.0:
+
+v3.9.0 (2022-06-02)
+-------------------
+
+* Add helper objects and methods for interacting with Globus Connect Server
+  Storage Gateways (:pr:`554`)
+
+  * New methods on ``GCSClient``: ``create_storage_gateway``, ``get_storage_gateway``,
+    ``get_storage_gateway_list``, ``update_storage_gateway``,
+    ``delete_storage_gateway``
+
+  * New helper classes for constructing storage gateway documents.
+    ``StorageGatewayDocument`` is the main one, but also
+    ``POSIXStoragePolicies`` and ``POSIXStagingStoragePolicies`` are added for
+    declaring the storage gateway ``policies`` field. More policy helpers will
+    be added in future versions.
+
+* Add support for more ``StorageGatewayPolicies`` documents. (:pr:`562`)
+  The following types are now available:
+
+  * ``BlackPearlStoragePolicies``
+  * ``BoxStoragePolicies``
+  * ``CephStoragePolicies``
+  * ``GoogleDriveStoragePolicies``
+  * ``GoogleCloudStoragePolicies``
+  * ``OneDriveStoragePolicies``
+  * ``AzureBlobStoragePolicies``
+  * ``S3StoragePolicies``
+  * ``ActiveScaleStoragePolicies``
+  * ``IrodsStoragePolicies``
+  * ``HPSSStoragePolicies``
+
+* Add ``https`` scope to ``GCSCollectionScopeBuilder`` (:pr:`563`)
+
+* Update the fields used to extract ``AuthAPIError`` messages (:pr:`566`)
+
+* ``ScopeBuilder`` objects now implement ``__str__`` for easy viewing.
+  For example, ``print(globus_sdk.TransferClient.scopes)`` (:pr:`568`)
+
+* Imports from ``globus_sdk`` are now evaluated lazily via module-level
+  ``__getattr__`` on python 3.7+ (:pr:`571`)
+
+  * This improves the performance of imports for almost all use-cases, in some
+    cases by over 80%
+
+  * The method ``globus_sdk._force_eager_imports()`` can be used to force
+    non-lazy imports, for latency sensitive applications which wish to control
+    when the time cost of import evaluation is paid. This method is private and is
+    therefore is not covered under the ``globus-sdk``'s SemVer guarantees, but it is
+    expected to remain stable for the foreseeable future.
+
+* Several improvements to Transfer helper objects (:pr:`573`)
+
+  * Add ``TransferData.add_filter_rule`` for adding filter rules (exclude
+    rules) to transfers
+
+  * Add ``skip_activation_check`` as an argument to ``DeleteData`` and
+    ``TransferData``
+
+  * The ``sync_level`` argument to ``TransferData`` is now annotated more
+    accurately to reject bad strings
+
+* Improve handling of array-style API responses (:pr:`575`)
+
+  * Response objects now define ``__bool__`` as ``bool(data)``. This
+    means that ``bool(response)`` could be ``False`` if the data is ``{}``,
+    ``[]``, ``0``, or other falsey-types. Previously,
+    ``__bool__`` was not defined, meaning it was always ``True``
+
+  * ``globus_sdk.response.ArrayResponse`` is a new class which describes
+    responses which are expected to hold a top-level array. It satisfies the
+    sequence protocol, allowing indexing with integers and slices, iteration
+    over the array data, and length checking with ``len(response)``
+
+  * ``globus_sdk.GroupsClient.get_my_groups`` returns an ``ArrayResponse``,
+    meaning the response data can now be iterated and otherwise used
+
 .. _changelog-3.8.0:
 
 v3.8.0 (2022-05-04)
