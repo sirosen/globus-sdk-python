@@ -1,4 +1,4 @@
-* Several improvements to Transfer helper objects (:pr:`NUMBER`)
+* Several improvements to Transfer helper objects (:pr:`573`)
 
   * Add ``TransferData.add_filter_rule`` for adding filter rules (exclude
     rules) to transfers
