@@ -53,7 +53,7 @@ For example:
         tokens["refresh_token"],
         auth_client,
         access_token=tokens["access_token"],
-        expires_at=tokens["access_token_expires"],
+        expires_at=tokens["expires_at_seconds"],
         on_refresh=my_file_adapter.on_refresh,
     )
 
@@ -62,12 +62,20 @@ For example:
         auth_client,
         ["urn:globus:auth:transfer.api.globus.org:all"],
         access_token=tokens["access_token"],
-        expires_at=tokens["access_token_expires"],
+        expires_at=tokens["expires_at_seconds"],
         on_refresh=my_file_adapter.on_refresh,
     )
 
     # and then use the authorizer on a client!
     tc = globus_sdk.TransferClient(authorizer=authorizer)
+
+
+Complete Example Usage
+~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`Group Listing With Token Storage Script <example_group_listing_with_token_storage>`
+provides complete and runnable example which leverages ``tokenstorage``.
+
 
 Adapter Types
 -------------
