@@ -7,4 +7,4 @@
 .. automatically replace it when the PR is merged.
 ..
 
-* Remove nonexistant monitor_ongoing scope from TransferScopes (:pr:`NUMBER`)
+* Remove nonexistant monitor_ongoing scope from TransferScopes (:pr:`583`)
