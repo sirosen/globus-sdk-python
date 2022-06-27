@@ -12,6 +12,24 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.10.0:
+
+v3.10.0 (2022-06-27)
+--------------------
+
+* Add User Credential methods to ``GCSClient`` (:pr:`582`)
+
+  * ``get_user_credential_list``
+  * ``get_user_credential``
+  * ``create_user_credential``
+  * ``update_user_credential``
+  * ``delete_user_credential``
+
+* Add ``connector_id_to_name`` helper to ``GCSClient`` to resolve GCS Connector
+  UUIDs to human readable Connector display names (:pr:`582`)
+
+* Remove nonexistent ``monitor_ongoing`` scope from ``TransferScopes`` (:pr:`583`)
+
 .. _changelog-3.9.0:
 
 v3.9.0 (2022-06-02)
