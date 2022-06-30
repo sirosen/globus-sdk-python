@@ -7,4 +7,4 @@
 .. automatically replace it when the PR is merged.
 ..
 
-* Add guest collection example script to docs (:pr:`NUMBER`)
+* Add guest collection example script to docs (:pr:`590`)
