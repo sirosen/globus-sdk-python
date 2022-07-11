@@ -12,6 +12,16 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.10.1:
+
+v3.10.1 (2022-07-11)
+--------------------
+
+* Add guest collection example script to docs (:pr:`590`)
+
+* Use ``setattr`` in the lazy-importer. This makes attribute access after
+  imports faster by several orders of magnitude. (:pr:`591`)
+
 .. _changelog-3.10.0:
 
 v3.10.0 (2022-06-27)
