@@ -1,6 +1,12 @@
 name: changelog
 on:
-  - pull_request
+  pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - opened
+      - reopened
+      - synchronize
 
 jobs:
   check_has_news_in_changelog_dir:
