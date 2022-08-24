@@ -79,6 +79,11 @@ _LAZY_IMPORT_TABLE = {
         "HPSSStoragePolicies",
         "UserCredentialDocument",
     },
+    "services.flows": {
+        "FlowsClient",
+        "FlowsAPIError",
+        "IterableFlowsResponse",
+    },
     "services.groups": {
         "BatchMembershipActions",
         "GroupMemberVisibility",
@@ -157,6 +162,9 @@ if typing.TYPE_CHECKING or sys.version_info < (3, 7):
     from .services.gcs import IrodsStoragePolicies
     from .services.gcs import HPSSStoragePolicies
     from .services.gcs import UserCredentialDocument
+    from .services.flows import FlowsClient
+    from .services.flows import FlowsAPIError
+    from .services.flows import IterableFlowsResponse
     from .services.groups import BatchMembershipActions
     from .services.groups import GroupMemberVisibility
     from .services.groups import GroupPolicies
@@ -255,6 +263,9 @@ __all__ = (
     "IrodsStoragePolicies",
     "HPSSStoragePolicies",
     "UserCredentialDocument",
+    "FlowsClient",
+    "FlowsAPIError",
+    "IterableFlowsResponse",
     "BatchMembershipActions",
     "GroupMemberVisibility",
     "GroupPolicies",
