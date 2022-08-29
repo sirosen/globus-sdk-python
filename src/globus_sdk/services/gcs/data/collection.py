@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict, Iterable, Optional, Tuple
+from typing import Any, Dict, Iterable, Optional, Tuple, Union
 
 from globus_sdk import utils
 from globus_sdk._types import UUIDLike
@@ -268,7 +268,7 @@ class MappedCollectionDocument(CollectionDocument):
         allow_guest_collections: Optional[bool] = None,
         disable_anonymous_writes: Optional[bool] = None,
         # dicts
-        policies: Optional[Dict[str, Any]] = None,
+        policies: Union["CollectionPolicies", Dict[str, Any], None] = None,
         # > specific args end <
         # additional fields
         additional_fields: Optional[Dict[str, Any]] = None,
@@ -413,3 +413,108 @@ class GuestCollectionDocument(CollectionDocument):
             user_credential_id=user_credential_id,
         )
         ensure_datatype(self)
+
+
+class CollectionPolicies(utils.PayloadWrapper, abc.ABC):
+    """
+    This is the abstract base type for Collection Policies documents to use as the
+    ``policies`` parameter when creating a CollectionDocument.
+
+    Several fields on policy documents are marked as ``Private``. This means that they
+    are not visible except to admins and owners of the collection.
+    """
+
+
+class POSIXCollectionPolicies(CollectionPolicies):
+    """
+    Convenience class for constructing a Posix Collection Policy
+    document to use as the `policies` parameter when creating a
+    CollectionDocument
+
+    :param DATA_TYPE: Versioned document type. Defaults to the appropriate type for
+        this class.
+    :type DATA_TYPE: str, optional
+    :param sharing_groups_allow: POSIX groups which are allowed to create guest
+        collections.
+    :type sharing_groups_allow: iterable of str, optional
+    :param sharing_groups_deny: POSIX groups which are not allowed to create guest
+        collections.
+    :type sharing_groups_deny: iterable of str, optional
+    :param additional_fields: Additional data for inclusion in the policy document
+    :type additional_fields: dict, optional
+    """
+
+    def __init__(
+        self,
+        DATA_TYPE: str = "posix_collection_policies#1.0.0",
+        sharing_groups_allow: Union[None, str, Iterable[str]] = None,
+        sharing_groups_deny: Union[None, str, Iterable[str]] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        self._set_optstrs(DATA_TYPE=DATA_TYPE)
+        self._set_optstrlists(
+            sharing_groups_allow=sharing_groups_allow,
+            sharing_groups_deny=sharing_groups_deny,
+        )
+        if additional_fields is not None:
+            self.update(additional_fields)
+
+
+class POSIXStagingCollectionPolicies(CollectionPolicies):
+    """
+    Convenience class for constructing a Posix Staging Collection Policy
+    document to use as the ``policies`` parameter when creating a
+    CollectionDocument
+
+    :param DATA_TYPE: Versioned document type. Defaults to the appropriate type for
+        this class.
+    :type DATA_TYPE: str, optional
+    :param sharing_groups_allow: POSIX groups which are allowed to create guest
+        collections.
+    :type sharing_groups_allow: iterable of str, optional
+    :param sharing_groups_deny: POSIX groups which are not allowed to create guest
+        collections.
+    :type sharing_groups_deny: iterable of str, optional
+    :param additional_fields: Additional data for inclusion in the policy document
+    :type additional_fields: dict, optional
+    """
+
+    def __init__(
+        self,
+        DATA_TYPE: str = "posix_staging_collection_policies#1.0.0",
+        sharing_groups_allow: Union[None, str, Iterable[str]] = None,
+        sharing_groups_deny: Union[None, str, Iterable[str]] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        self._set_optstrs(DATA_TYPE=DATA_TYPE)
+        self._set_optstrlists(
+            sharing_groups_allow=sharing_groups_allow,
+            sharing_groups_deny=sharing_groups_deny,
+        )
+        if additional_fields is not None:
+            self.update(additional_fields)
+
+
+class GoogleCloudStorageCollectionPolicies(CollectionPolicies):
+    """
+    Convenience class for constructing a Google Cloud Storage Collection Policy
+    document to use as the ``policies`` parameter when creating a CollectionDocument
+
+    :param DATA_TYPE: Versioned document type. Defaults to the appropriate type for
+        this class.
+    :type DATA_TYPE: str, optional
+    :param project: Google Cloud Platform project ID that is used by this collection
+    :type project: str, optional
+    :param additional_fields: Additional data for inclusion in the policy document
+    :type additional_fields: dict, optional
+    """
+
+    def __init__(
+        self,
+        DATA_TYPE: str = "google_cloud_storage_collection_policies#1.0.0",
+        project: Optional[str] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        self._set_optstrs(DATA_TYPE=DATA_TYPE, project=project)
+        if additional_fields is not None:
+            self.update(additional_fields)
