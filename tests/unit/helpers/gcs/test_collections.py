@@ -4,8 +4,11 @@ import pytest
 
 from globus_sdk import (
     CollectionDocument,
+    GoogleCloudStorageCollectionPolicies,
     GuestCollectionDocument,
     MappedCollectionDocument,
+    POSIXCollectionPolicies,
+    POSIXStagingCollectionPolicies,
 )
 
 STUB_SG_ID = uuid.uuid1()  # storage gateway
@@ -86,3 +89,64 @@ def test_datatype_version_deduction_add_custom(monkeypatch):
         additional_fields={custom_field: "foo"},
     )
     assert g["DATA_TYPE"] == "collection#1.20.0"
+
+
+@pytest.mark.parametrize(
+    "policies_type",
+    (
+        dict,
+        POSIXCollectionPolicies,
+        POSIXStagingCollectionPolicies,
+        GoogleCloudStorageCollectionPolicies,
+    ),
+)
+def test_collection_policies_field(policies_type):
+    if policies_type is dict:
+        policy_data = {"spam": "eggs"}
+    elif policies_type in (POSIXCollectionPolicies, POSIXStagingCollectionPolicies):
+        policy_data = policies_type(
+            sharing_groups_allow=["foo", "bar"],
+            sharing_groups_deny="baz",
+            additional_fields={"spam": "eggs"},
+        )
+    elif policies_type is GoogleCloudStorageCollectionPolicies:
+        policy_data = GoogleCloudStorageCollectionPolicies(
+            project="foo", additional_fields={"spam": "eggs"}
+        )
+    else:
+        raise NotImplementedError
+
+    # only Mapped Collections support a policies subdocument
+    doc = MappedCollectionDocument(
+        storage_gateway_id=STUB_SG_ID,
+        collection_base_path="/",
+        policies=policy_data,
+    )
+
+    assert "policies" in doc
+    assert isinstance(doc["policies"], dict)
+
+    if policies_type is dict:
+        assert doc["policies"] == {"spam": "eggs"}
+    elif policies_type is POSIXCollectionPolicies:
+        assert doc["policies"] == {
+            "DATA_TYPE": "posix_collection_policies#1.0.0",
+            "spam": "eggs",
+            "sharing_groups_allow": ["foo", "bar"],
+            "sharing_groups_deny": ["baz"],
+        }
+    elif policies_type is POSIXStagingCollectionPolicies:
+        assert doc["policies"] == {
+            "DATA_TYPE": "posix_staging_collection_policies#1.0.0",
+            "spam": "eggs",
+            "sharing_groups_allow": ["foo", "bar"],
+            "sharing_groups_deny": ["baz"],
+        }
+    elif policies_type is GoogleCloudStorageCollectionPolicies:
+        assert doc["policies"] == {
+            "DATA_TYPE": "google_cloud_storage_collection_policies#1.0.0",
+            "spam": "eggs",
+            "project": "foo",
+        }
+    else:
+        raise NotImplementedError

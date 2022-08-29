@@ -62,6 +62,10 @@ _LAZY_IMPORT_TABLE = {
         "GCSRoleDocument",
         "GuestCollectionDocument",
         "MappedCollectionDocument",
+        "CollectionPolicies",
+        "POSIXCollectionPolicies",
+        "POSIXStagingCollectionPolicies",
+        "GoogleCloudStorageCollectionPolicies",
         "StorageGatewayDocument",
         "StorageGatewayPolicies",
         "POSIXStoragePolicies",
@@ -146,6 +150,10 @@ if typing.TYPE_CHECKING or sys.version_info < (3, 7):
     from .services.gcs import GCSRoleDocument
     from .services.gcs import GuestCollectionDocument
     from .services.gcs import MappedCollectionDocument
+    from .services.gcs import CollectionPolicies
+    from .services.gcs import POSIXCollectionPolicies
+    from .services.gcs import POSIXStagingCollectionPolicies
+    from .services.gcs import GoogleCloudStorageCollectionPolicies
     from .services.gcs import StorageGatewayDocument
     from .services.gcs import StorageGatewayPolicies
     from .services.gcs import POSIXStoragePolicies
@@ -247,6 +255,10 @@ __all__ = (
     "GCSRoleDocument",
     "GuestCollectionDocument",
     "MappedCollectionDocument",
+    "CollectionPolicies",
+    "POSIXCollectionPolicies",
+    "POSIXStagingCollectionPolicies",
+    "GoogleCloudStorageCollectionPolicies",
     "StorageGatewayDocument",
     "StorageGatewayPolicies",
     "POSIXStoragePolicies",

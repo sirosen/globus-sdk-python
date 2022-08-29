@@ -1,7 +1,11 @@
 from .collection import (
     CollectionDocument,
+    CollectionPolicies,
+    GoogleCloudStorageCollectionPolicies,
     GuestCollectionDocument,
     MappedCollectionDocument,
+    POSIXCollectionPolicies,
+    POSIXStagingCollectionPolicies,
 )
 from .role import GCSRoleDocument
 from .storage_gateway import (
@@ -24,11 +28,20 @@ from .storage_gateway import (
 from .user_credential import UserCredentialDocument
 
 __all__ = (
+    # collection documents
     "MappedCollectionDocument",
     "GuestCollectionDocument",
     "CollectionDocument",
+    # collection document second-order helpers
+    "CollectionPolicies",
+    "POSIXCollectionPolicies",
+    "POSIXStagingCollectionPolicies",
+    "GoogleCloudStorageCollectionPolicies",
+    # role document
     "GCSRoleDocument",
+    # storage gateway document
     "StorageGatewayDocument",
+    # storage gateway document second-order helpers
     "StorageGatewayPolicies",
     "POSIXStoragePolicies",
     "POSIXStagingStoragePolicies",
@@ -43,5 +56,6 @@ __all__ = (
     "ActiveScaleStoragePolicies",
     "IrodsStoragePolicies",
     "HPSSStoragePolicies",
+    # user credential document
     "UserCredentialDocument",
 )
