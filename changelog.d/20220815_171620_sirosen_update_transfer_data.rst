@@ -1,6 +1,6 @@
 * Adjust behaviors of ``TransferData`` and ``TimerJob`` to make
   ``TimerJob.from_transfer_data`` work and to defer requesting the
-  ``submission_id`` until the task submission call (:pr:`NUMBER`)
+  ``submission_id`` until the task submission call (:pr:`602`)
 ** ``TransferData`` avoids passing ``null`` for several values when they are
    omitted, ranging from optional parameters to ``add_item`` to
    ``skip_activation_check``
