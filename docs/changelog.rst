@@ -12,6 +12,22 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.12.0:
+
+v3.12.0 (2022-09-21)
+--------------------
+
+* Add Mapped Collection policy helper types for constructing ``policies`` data. (:pr:`607`)
+  The following new types are introduced:
+** ``CollectionPolicies`` (the base class for these types)
+** ``POSIXCollectionPolicies``
+** ``POSIXStagingCollectionPolicies``
+** ``GoogleCloudStorageCollectionPolicies``
+
+* Fix bug where ``UserCredential`` policies were being converted to a string (:pr:`608`)
+
+* Corrected the Flows service ``resource_server`` string to ``flows.globus.org`` (:pr:`612`)
+
 .. _changelog-3.11.0:
 
 v3.11.0 (2022-08-30)
