@@ -334,7 +334,7 @@ class SearchClient(client.BaseClient):
         ``index_id``, even data which is not visible to the current user:
 
         >>> sc = globus_sdk.SearchClient(...)
-        >>> subject_data = sc.get_subject(index_id, 'http://example.com/abc')
+        >>> subject_data = sc.delete_subject(index_id, 'http://example.com/abc')
         """
         if query_params is None:
             query_params = {}
