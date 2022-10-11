@@ -37,6 +37,138 @@ class FlowsClient(client.BaseClient):
     service_name = "flows"
     scopes = scopes.FlowsScopes
 
+    @_flowdoc("Create Flow", "Flows/paths/~1flows/post")
+    def create_flow(
+        self,
+        title: str,
+        definition: Dict[str, Any],
+        input_schema: Dict[str, Any],
+        subtitle: Optional[str] = None,
+        description: Optional[str] = None,
+        flow_viewers: Optional[List[str]] = None,
+        flow_starters: Optional[List[str]] = None,
+        flow_administrators: Optional[List[str]] = None,
+        keywords: Optional[List[str]] = None,
+        additional_fields: Optional[Dict[str, Any]] = None,
+    ) -> GlobusHTTPResponse:
+        """
+        Create a Flow
+
+        Example Usage:
+
+        .. code-block:: python
+
+            from globus_sdk import FlowsClient
+
+            ...
+            flows = FlowsClient(...)
+            flows.create_flow(
+                title="my-cool-flow",
+                definition={
+                    "StartAt": "the-one-true-state",
+                    "States": {"the-one-true-state": {"Type": "Pass", "End": True}},
+                },
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "input-a": {"type": "string"},
+                        "input-b": {"type": "number"},
+                        "input-c": {"type": "boolean"},
+                    },
+                },
+            )
+
+        :param title: A non-unique, human-friendly name used for displaying the
+            flow to end users.
+        :type title: str (1 - 128 characters)
+        :param definition: JSON object specifying flows states and execution order. For
+            a more detailed explanation of the flow definition, see
+            `Authoring Flows <https://globus-automate-client.readthedocs.io/en/latest/authoring_flows.html>`_
+        :type definition: dict
+        :param input_schema: A JSON Schema to which Flow Invocation input must conform
+        :type input_schema: dict
+        :param subtitle: A concise summary of the flow’s purpose.
+        :type subtitle: str (0 - 128 characters), optional
+        :param description: A detailed description of the flow's purpose for end user
+            display.
+        :type description: str (0 - 4096 characters), optional
+        :param flow_viewers: A set of Principal URN values, or the value "public"
+            indicating entities who can view the flow
+
+            Examples:
+
+            .. code-block:: json
+
+                [ "public" ]
+
+            .. code-block:: json
+
+                [
+                    "urn:globus:auth:identity:b44bddda-d274-11e5-978a-9f15789a8150",
+                    "urn:globus:groups:id:c1dcd951-3f35-4ea3-9f28-a7cdeaf8b68f"
+                ]
+
+
+        :type flow_viewers: list[str], optional
+        :param flow_starters: A set of Principal URN values, or the value
+            "all_authenticated_users" indicating entities who can initiate a *Run* of
+            the flow
+
+            Examples:
+
+            .. code-block:: json
+
+                [ "all_authenticated_users" ]
+
+
+            .. code-block:: json
+
+                [
+                    "urn:globus:auth:identity:b44bddda-d274-11e5-978a-9f15789a8150",
+                    "urn:globus:groups:id:c1dcd951-3f35-4ea3-9f28-a7cdeaf8b68f"
+                ]
+
+        :type flow_starters: list[str], optional
+        :param flow_administrators: A set of Principal URN values indicating entities
+            who can perform administrative operations on the flow (create, delete,
+            update)
+
+            Example:
+
+            .. code-block:: json
+
+                [
+                    "urn:globus:auth:identity:b44bddda-d274-11e5-978a-9f15789a8150",
+                    "urn:globus:groups:id:c1dcd951-3f35-4ea3-9f28-a7cdeaf8b68f"
+                ]
+
+        :type flow_administrators: list[str], optional
+        :param keywords: A set of terms used to categorize the flow used in query and
+            discovery operations
+        :type keywords: list[str] (0 - 1024 items), optional
+        :param additional_fields: Additional Key/Value pairs sent to the create API
+        :type additional_fields: dict or str -> any, optional
+        """  # noqa E501
+
+        data = {
+            k: v
+            for k, v in {
+                "title": title,
+                "definition": definition,
+                "input_schema": input_schema,
+                "subtitle": subtitle,
+                "description": description,
+                "flow_viewers": flow_viewers,
+                "flow_starters": flow_starters,
+                "flow_administrators": flow_administrators,
+                "keywords": keywords,
+            }.items()
+            if v is not None
+        }
+        data.update(additional_fields or {})
+
+        return self.post("/flows", data=data)
+
     @_flowdoc("List Flows", "Flows/paths/~1flows/get")
     def list_flows(
         self,
