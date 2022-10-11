@@ -1,2 +1,2 @@
 
-* Added ``FlowsClient.create_flow(...)`` (:pr:`NUMBER`)
+* Added ``FlowsClient.create_flow(...)`` (:pr:`614`)
