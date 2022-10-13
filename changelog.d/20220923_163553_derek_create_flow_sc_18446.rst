@@ -1,2 +1,0 @@
-
-* Added ``FlowsClient.create_flow(...)`` (:pr:`614`)

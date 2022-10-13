@@ -12,6 +12,24 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.13.0:
+
+v3.13.0 (2022-10-13)
+--------------------
+
+* Add ``connect_params`` to ``SQLiteAdapter``, enabling customization of the
+  sqlite connection (:pr:`613`)
+
+* Add ``FlowsClient.create_flow(...)`` (:pr:`614`)
+
+* Add ``globus_sdk.SpecificFlowClient`` to manage interactions performed against
+  a specific flow (:pr:`616`)
+
+* Fix rst formatting for a few nested bullet points in existing changelog (:pr:`619`)
+
+* Add support to ``FlowsClient.list_flows`` for pagination and the ``orderby``
+  parameter (:pr:`621`, :pr:`622`)
+
 .. _changelog-3.12.0:
 
 v3.12.0 (2022-09-21)
