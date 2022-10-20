@@ -1,6 +1,15 @@
 import typing as t
 
 TWO_HOP_TRANSFER_FLOW_ID = "24bc4997-b483-4c25-a19c-64b0afc00743"
+TWO_HOP_TRANSFER_FLOW_OWNER_ID = "b44bddda-d274-11e5-978a-9f15789a8150"
+TWO_HOP_TRANSFER_FLOW_USER_SCOPE = (
+    "https://auth.globus.org/scopes/"
+    + TWO_HOP_TRANSFER_FLOW_ID
+    + "/flow_"
+    + TWO_HOP_TRANSFER_FLOW_ID.replace("-", "_")
+    + "_user"
+)
+
 TWO_HOP_TRANSFER_FLOW_DEFINITION = {
     "States": {
         "Transfer1": {
@@ -72,9 +81,7 @@ TWO_HOP_TRANSFER_FLOW_DOC = {
         },
         "additionalProperties": False,
     },
-    "globus_auth_scope": "https://auth.globus.org/scopes/"
-    + TWO_HOP_TRANSFER_FLOW_ID
-    + "/flow_24bc4997_b483_4c25_a19c_64b0afc00743_user",
+    "globus_auth_scope": TWO_HOP_TRANSFER_FLOW_USER_SCOPE,
     "synchronous": False,
     "log_supported": True,
     "types": ["Action"],
@@ -88,23 +95,23 @@ TWO_HOP_TRANSFER_FLOW_DOC = {
     "created_at": "2020-09-01T17:59:20.711845+00:00",
     "updated_at": "2020-09-01T17:59:20.711845+00:00",
     "user_role": "flow_starter",
-    "created_by": "urn:globus:auth:identity:b44bddda-d274-11e5-978a-9f15789a8150",
+    "created_by": f"urn:globus:auth:identity:{TWO_HOP_TRANSFER_FLOW_OWNER_ID}",
     "visible_to": [],
     "runnable_by": [],
     "administered_by": [],
     "action_url": f"https://flows.globus.org/flows/{TWO_HOP_TRANSFER_FLOW_ID}",
     "flow_url": f"https://flows.globus.org/flows/{TWO_HOP_TRANSFER_FLOW_ID}",
-    "flow_owner": "urn:globus:auth:identity:b44bddda-d274-11e5-978a-9f15789a8150",
+    "flow_owner": f"urn:globus:auth:identity:{TWO_HOP_TRANSFER_FLOW_OWNER_ID}",
     "flow_viewers": [
         "public",
-        "urn:globus:auth:identity:b44bddda-d274-11e5-978a-9f15789a8150",
+        f"urn:globus:auth:identity:{TWO_HOP_TRANSFER_FLOW_OWNER_ID}",
     ],
     "flow_starters": [
         "all_authenticated_users",
-        "urn:globus:auth:identity:b44bddda-d274-11e5-978a-9f15789a8150",
+        f"urn:globus:auth:identity:{TWO_HOP_TRANSFER_FLOW_OWNER_ID}",
     ],
     "flow_administrators": [
-        "urn:globus:auth:identity:b44bddda-d274-11e5-978a-9f15789a8150"
+        f"urn:globus:auth:identity:{TWO_HOP_TRANSFER_FLOW_OWNER_ID}"
     ],
 }
 

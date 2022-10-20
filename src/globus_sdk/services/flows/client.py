@@ -237,6 +237,27 @@ class FlowsClient(client.BaseClient):
 
         return IterableFlowsResponse(self.get("/flows", query_params=query_params))
 
+    @_flowdoc("Delete Flow", "Flows/paths/~1flows~1{flow_id}/delete")
+    def delete_flow(
+        self,
+        flow_id: UUIDLike,
+        *,
+        query_params: t.Optional[t.Dict[str, t.Any]] = None,
+    ) -> GlobusHTTPResponse:
+        """Delete a Flow
+
+        :param flow_id: The ID of the flow to delete
+        :type flow_id: str or UUID, optional
+        :param query_params: Any additional parameters to be passed through
+            as query params.
+        :type query_params: dict, optional
+        """
+
+        if query_params is None:
+            query_params = {}
+
+        return self.delete(f"/flows/{flow_id}", query_params=query_params)
+
 
 class SpecificFlowClient(client.BaseClient):
     r"""
