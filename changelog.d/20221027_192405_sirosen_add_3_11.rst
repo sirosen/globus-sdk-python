@@ -1,1 +1,1 @@
-* Python 3.11 is now officially supported (:pr:`NUMBER`)
+* Python 3.11 is now officially supported (:pr:`628`)
