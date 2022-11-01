@@ -12,6 +12,19 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.14.0:
+
+v3.14.0 (2022-11-01)
+--------------------
+
+* Add support for ``FlowsClient.get_flow`` and ``FlowsClient.delete_flow``
+  (:pr:`631`, :pr:`626`)
+
+* Add a ``close()`` method to ``SQLiteAdapter`` which closes the underlying
+  connection (:pr:`628`)
+
+* Python 3.11 is now officially supported (:pr:`628`)
+
 .. _changelog-3.13.0:
 
 v3.13.0 (2022-10-13)
