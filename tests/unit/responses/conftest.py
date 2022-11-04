@@ -48,5 +48,45 @@ def make_oauth_token_response():
 
 
 @pytest.fixture
+def make_oauth_dependent_token_response():
+    """
+    response with conveniently formatted names to help with iteration in tests
+    """
+
+    def f(client=None):
+        return make_response(
+            response_class=(
+                globus_sdk.services.auth.response.OAuthDependentTokenResponse
+            ),
+            json_body=[
+                {
+                    "access_token": "access_token_4",
+                    "expires_in": 3600,
+                    "refresh_token": "refresh_token_4",
+                    "resource_server": "resource_server_4",
+                    "scope": "scope4",
+                    "token_type": "bearer",
+                },
+                {
+                    "access_token": "access_token_5",
+                    "expires_in": 3600,
+                    "refresh_token": "refresh_token_5",
+                    "resource_server": "resource_server_5",
+                    "scope": "scope5",
+                    "token_type": "bearer",
+                },
+            ],
+            client=client,
+        )
+
+    return f
+
+
+@pytest.fixture
 def oauth_token_response(make_oauth_token_response):
     return make_oauth_token_response()
+
+
+@pytest.fixture
+def oauth_dependent_token_response(make_oauth_dependent_token_response):
+    return make_oauth_dependent_token_response()

@@ -80,3 +80,14 @@ def test_stringify(oauth_token_response):
     # it contains the by_resource_server mapping (but we won't assert anything about
     # that data other than that it starts with a '{')
     assert "  by_resource_server:\n    {" in data
+
+
+def test_stringify_dependent_tokens(oauth_dependent_token_response):
+    data = str(oauth_dependent_token_response)
+    # it starts the right way
+    assert data.startswith("OAuthDependentTokenResponse:\n")
+    # it does not contain the id_token, so this is indicated as None
+    assert "  id_token: None\n" in data
+    # it contains the by_resource_server mapping (but we won't assert anything about
+    # that data other than that it starts with a '{')
+    assert "  by_resource_server:\n    {" in data
