@@ -227,14 +227,9 @@ class OAuthTokenResponse(GlobusHTTPResponse):
 
     def __str__(self) -> str:
         by_rs = json.dumps(self.by_resource_server, indent=2, separators=(",", ": "))
-        # dict case -- typical response
-        if isinstance(self.data, dict):
-            id_token_to_print = t.cast(t.Optional[str], self.get("id_token"))
-            if id_token_to_print is not None:
-                id_token_to_print = id_token_to_print[:10] + "... (truncated)"
-        # other (list) case -- dependent tokens response
-        else:
-            id_token_to_print = None
+        id_token_to_print = t.cast(t.Optional[str], self.get("id_token"))
+        if id_token_to_print is not None:
+            id_token_to_print = id_token_to_print[:10] + "... (truncated)"
         return (
             f"{self.__class__.__name__}:\n"
             + f"  id_token: {id_token_to_print}\n"
