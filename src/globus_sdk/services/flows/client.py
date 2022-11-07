@@ -201,7 +201,8 @@ class FlowsClient(client.BaseClient):
         marker: t.Optional[str] = None,
         query_params: t.Optional[t.Dict[str, t.Any]] = None,
     ) -> IterableFlowsResponse:
-        """List deployed Flows
+        """
+        List deployed Flows
 
         :param filter_role: A role name specifying the minimum permissions required for
             a Flow to be included in the response.
@@ -233,6 +234,7 @@ class FlowsClient(client.BaseClient):
 
         Values for ``orderby`` consist of a field name, a space, and an
         ordering mode -- ``ASC`` for "ascending" and ``DESC`` for "descending".
+
         Supported field names are
 
           - ``id``
@@ -314,9 +316,10 @@ class SpecificFlowClient(client.BaseClient):
             transport_params=transport_params,
         )
         self._flow_id = flow_id
+        user_scope_value = f"flow_{str(flow_id).replace('-', '_')}_user"
         self.scopes = ScopeBuilder(
             resource_server=str(self._flow_id),
-            known_url_scopes=[f"flow_{flow_id}_user"],
+            known_url_scopes=[("user", user_scope_value)],
         )
 
     @_flowdoc("Run Flow", "~1flows~1{flow_id}~1run/post")
