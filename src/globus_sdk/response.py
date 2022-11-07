@@ -123,9 +123,9 @@ class GlobusHTTPResponse:
     def get(self, key: str, default: t.Any = None) -> t.Any:
         """
         ``get`` is just an alias for ``data.get(key, default)``, but with the added
-        check that if ``data`` is ``None``, it returns the default.
+        checks that if ``data`` is ``None`` or a list, it returns the default.
         """
-        if self.data is None:
+        if self.data is None or isinstance(self.data, list):
             return default
         # NB: `default` is provided as a positional because the native dict type
         # doesn't recognize a keyword argument `default`

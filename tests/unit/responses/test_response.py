@@ -196,8 +196,8 @@ def test_get(dict_response, list_response, text_http_response):
     for item in dict_response.data:
         assert dict_response.r.get(item) == dict_response.data.get(item)
 
-    with pytest.raises(AttributeError):
-        list_response.r.get("value1")
+    assert list_response.r.get("value1") is None
+    assert list_response.r.get("value1", "foo") == "foo"
 
     assert text_http_response.r.get("foo") is None
     assert text_http_response.r.get("foo", default="bar") == "bar"
