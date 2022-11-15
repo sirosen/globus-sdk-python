@@ -2,7 +2,7 @@ import uuid
 
 import pytest
 
-from globus_sdk.scopes import FlowsScopes, MutableScope, ScopeBuilder
+from globus_sdk.scopes import FlowsScopes, Scope, ScopeBuilder, ScopeParseError
 
 
 def test_url_scope_string():
@@ -79,67 +79,73 @@ def test_sb_allowed_inputs_types():
     assert list_sb.do_a_thing == scope_1_urn
 
 
-def test_mutable_scope_str_and_repr_simple():
-    s = MutableScope("simple")
+def test_scope_str_and_repr_simple():
+    s = Scope("simple")
     assert str(s) == "simple"
-    assert repr(s) == "MutableScope('simple')"
-
-    s2 = MutableScope("simple", optional=True)
-    assert str(s2) == "*simple"
-    assert repr(s2) == "MutableScope('simple', optional=True)"
+    assert repr(s) == "Scope('simple')"
 
 
-def test_mutable_scope_str_and_repr_with_dependencies():
-    s = MutableScope("top")
+def test_scope_str_and_repr_optional():
+    s = Scope("simple", optional=True)
+    assert str(s) == "*simple"
+    assert repr(s) == "Scope('simple', optional=True)"
+
+
+def test_scope_str_and_repr_with_dependencies():
+    s = Scope("top")
     s.add_dependency("foo")
     assert str(s) == "top[foo]"
-    s.add_dependency("bar", optional=True)
-    # NOTE: order is not guaranteed for dict() until python3.7
-    assert str(s) in ("top[foo *bar]", "top[*bar foo]")
-    assert repr(s) in (
-        "MutableScope('top', dependencies={'foo': False, 'bar': True})",
-        "MutableScope('top', dependencies={'bar': True, 'foo': False})",
-    )
-
-    s2 = MutableScope("top", optional=True)
-    s2.add_dependency("foo")
-    assert str(s2) == "*top[foo]"
-    s2.add_dependency("bar", optional=True)
-    # NOTE: order is not guaranteed for dict() until python3.7
-    assert str(s2) in ("*top[foo *bar]", "*top[*bar foo]")
-    assert repr(s2) in (
-        "MutableScope('top', optional=True, dependencies={'foo': False, 'bar': True})",
-        "MutableScope('top', optional=True, dependencies={'bar': True, 'foo': False})",
-    )
+    s.add_dependency("bar")
+    assert str(s) == "top[foo bar]"
+    assert repr(s) == "Scope('top', dependencies=[Scope('foo'), Scope('bar')])"
 
 
-def test_mutable_scope_str_nested():
-    top = MutableScope("top")
-    mid = MutableScope("mid")
-    bottom = MutableScope("bottom")
-    mid.add_dependency(str(bottom))
-    top.add_dependency(str(mid))
+def test_add_dependency_warns_on_optional_but_still_has_good_str_and_repr():
+    s = Scope("top")
+    # this should warn, the use of `optional=...` rather than adding a Scope object
+    # when optional dependencies are wanted is deprecated
+    with pytest.warns(DeprecationWarning):
+        s.add_dependency("foo", optional=True)
+
+    # confirm the str representation and repr for good measure
+    assert str(s) == "top[*foo]"
+    assert repr(s) == "Scope('top', dependencies=[Scope('foo', optional=True)])"
+
+
+@pytest.mark.parametrize("optional_arg", (True, False))
+def test_add_dependency_fails_if_optional_is_combined_with_scope(optional_arg):
+    s = Scope("top")
+    s2 = Scope("bottom")
+    with pytest.raises(ValueError):
+        s.add_dependency(s2, optional=optional_arg)
+
+
+def test_scope_str_nested():
+    top = Scope("top")
+    mid = Scope("mid")
+    bottom = Scope("bottom")
+    mid.add_dependency(bottom)
+    top.add_dependency(mid)
     assert str(bottom) == "bottom"
     assert str(mid) == "mid[bottom]"
     assert str(top) == "top[mid[bottom]]"
 
 
-def test_mutable_scope_collection_to_str():
-    foo = MutableScope("foo")
-    bar = MutableScope("bar")
+def test_scope_collection_to_str():
+    foo = Scope("foo")
+    bar = Scope("bar")
     baz = "baz"
-    assert MutableScope.scopes2str(foo) == "foo"
-    assert MutableScope.scopes2str([foo, bar]) == "foo bar"
-    assert MutableScope.scopes2str(baz) == "baz"
-    assert MutableScope.scopes2str([foo, baz]) == "foo baz"
+    assert Scope.scopes2str(foo) == "foo"
+    assert Scope.scopes2str([foo, bar]) == "foo bar"
+    assert Scope.scopes2str(baz) == "baz"
+    assert Scope.scopes2str([foo, baz]) == "foo baz"
 
 
-def test_mutable_scope_rejects_scope_with_optional_marker():
-    s = MutableScope("top")
-    with pytest.raises(ValueError) as excinfo:
-        s.add_dependency("*subscope")
-
-    assert "add_dependency cannot contain a leading '*'" in str(excinfo.value)
+def test_add_dependency_parses_scope_with_optional_marker():
+    s = Scope("top")
+    s.add_dependency("*subscope")
+    assert str(s) == "top[*subscope]"
+    assert repr(s) == "Scope('top', dependencies=[Scope('subscope', optional=True)])"
 
 
 def test_scopebuilder_make_mutable_produces_same_strings():
@@ -148,9 +154,233 @@ def test_scopebuilder_make_mutable_produces_same_strings():
     assert str(sb.make_mutable("bar")) == sb.bar
 
 
+def test_scopebuilder_make_mutable_can_be_optional():
+    sb = ScopeBuilder(str(uuid.UUID(int=0)), known_scopes="foo")
+    assert str(sb.make_mutable("foo", optional=True)) == "*" + sb.foo
+
+
 def test_flows_scopes_creation():
     assert FlowsScopes.resource_server == "flows.globus.org"
     assert (
         FlowsScopes.run
         == "https://auth.globus.org/scopes/eec9b274-0c81-4334-bdc2-54e90e689b9a/run"
     )
+
+
+def test_scope_parsing_allows_empty_string():
+    scopes = Scope.parse("")
+    assert scopes == []
+
+
+@pytest.mark.parametrize(
+    "scope_string1,scope_string2",
+    [
+        ("foo ", "foo"),
+        (" foo", "foo"),
+        ("foo[ bar]", "foo[bar]"),
+    ],
+)
+def test_scope_parsing_ignores_non_semantic_whitespace(scope_string1, scope_string2):
+    list1 = Scope.parse(scope_string1)
+    list2 = Scope.parse(scope_string2)
+    assert len(list1) == len(list2) == 1
+    s1, s2 = list1[0], list2[0]
+    # Scope.__eq__ is not defined, so equivalence checking is manual (and somewhat error
+    # prone) for now
+    assert s1._scope_string == s2._scope_string
+    assert s1.optional == s2.optional
+    for i in range(len(s1.dependencies)):
+        assert s1.dependencies[i]._scope_string == s2.dependencies[i]._scope_string
+        assert s1.dependencies[i].optional == s2.dependencies[i].optional
+
+
+@pytest.mark.parametrize(
+    "scopestring",
+    [
+        # ending in '*'
+        "foo*",
+        "foo *",
+        # '*' followed by '[] '
+        "foo*[bar]",
+        "foo *[bar]",
+        "foo [bar*]",
+        "foo * ",
+        "* foo",
+        # empty brackets
+        "foo[]",
+        # starting with open bracket
+        "[foo]",
+        # double brackets
+        "foo[[bar]]",
+        # unbalanced open brackets
+        "foo[",
+        "foo[bar",
+        # unbalanced close brackets
+        "foo]",
+        "foo bar]",
+        "foo[bar]]",
+        "foo[bar] baz]",
+        # space before brackets
+        "foo [bar]",
+        # missing space before next scope string after ']'
+        "foo[bar]baz",
+    ],
+)
+def test_scope_parsing_rejects_bad_inputs(scopestring):
+    with pytest.raises(ScopeParseError):
+        Scope.parse(scopestring)
+
+
+@pytest.mark.parametrize(
+    "scopestring",
+    ("foo", "*foo", "foo[bar]", "foo[*bar]", "foo bar", "foo[bar[baz]]"),
+)
+def test_scope_parsing_accepts_valid_inputs(scopestring):
+    # test *only* that parsing does not error and returns a non-empty list of scopes
+    scopes = Scope.parse(scopestring)
+    assert isinstance(scopes, list)
+    assert len(scopes) > 0
+    assert isinstance(scopes[0], Scope)
+
+
+@pytest.mark.parametrize("rs_name", (str(uuid.UUID(int=0)), "example.globus.org"))
+@pytest.mark.parametrize("scope_format", ("urn", "url"))
+def test_scope_parsing_can_consume_scopebuilder_results(rs_name, scope_format):
+    sb = ScopeBuilder(rs_name)
+    if scope_format == "urn":
+        scope_string = sb.urn_scope_string("foo")
+        expect_string = f"urn:globus:auth:scope:{rs_name}:foo"
+    elif scope_format == "url":
+        scope_string = sb.url_scope_string("foo")
+        expect_string = f"https://auth.globus.org/scopes/{rs_name}/foo"
+    else:
+        raise NotImplementedError
+
+    scope = Scope.deserialize(scope_string)
+    assert str(scope) == expect_string
+
+
+def test_scope_deserialize_simple():
+    scope = Scope.deserialize("foo")
+    assert str(scope) == "foo"
+
+
+def test_scope_deserialize_with_dependencies():
+    # oh, while we're here, let's also check that our whitespace insensitivity works
+    scope = Scope.deserialize("foo[ bar   *baz  ]")
+    assert str(scope) == "foo[bar *baz]"
+
+
+def test_scope_deserialize_fails_on_empty():
+    with pytest.raises(ValueError):
+        Scope.deserialize("  ")
+
+
+def test_scope_deserialize_fails_on_multiple_top_level_scopes():
+    with pytest.raises(ValueError):
+        Scope.deserialize("foo bar")
+
+
+@pytest.mark.parametrize("scope_str", ("*foo", "foo[bar]", "foo[", "foo]", "foo bar"))
+def test_scope_init_forbids_special_chars(scope_str):
+    with pytest.raises(ValueError):
+        Scope(scope_str)
+
+
+def test_scope_contains_requires_scope_objects():
+    s = Scope("foo")
+    assert not s._contains("foo")
+
+
+@pytest.mark.parametrize(
+    "contained, containing, expect",
+    [
+        # string matching, including optional on both sides
+        ("foo", "foo", True),  # identity
+        ("*foo", "*foo", True),  # identity
+        ("foo", "bar", False),
+        ("foo", "*bar", False),
+        ("*foo", "bar", False),
+        # optional-ness is one-way when mismatched
+        ("foo", "*foo", False),
+        ("*foo", "foo", True),
+        # dependency matching is also one-way when mismatched
+        ("foo[bar]", "foo[bar]", True),  # identity
+        ("foo[bar]", "foo", False),
+        ("foo", "foo[bar]", True),
+        ("foo", "foo[bar[baz]]", True),
+        ("foo[bar]", "foo[bar[baz]]", True),
+        ("foo[bar[baz]]", "foo[bar[baz]]", True),  # identity
+        # and the combination of dependencies with optional also works
+        ("foo[*bar]", "foo[bar[baz]]", True),
+        ("foo[*bar]", "foo[*bar[baz]]", True),
+        ("foo[bar]", "foo[bar[*baz]]", True),
+        ("foo[*bar]", "foo[bar[*baz]]", True),
+    ],
+)
+def test_scope_contains_simple_cases(contained, containing, expect):
+    outer_s = Scope.deserialize(containing)
+    inner_s = Scope.deserialize(contained)
+    assert outer_s._contains(inner_s) == expect
+
+
+@pytest.mark.parametrize(
+    "contained, containing, expect",
+    [
+        # "simple" cases for multiple dependencies
+        ("foo[bar baz]", "foo[bar[baz] baz]", True),
+        ("foo[bar baz]", "foo[bar[baz]]", False),
+        ("foo[baz bar]", "foo[bar[baz] baz]", True),
+        ("foo[bar baz]", "foo[bar[baz] baz buzz]", True),
+        # these scenarios will mirror some "realistic" usage
+        (
+            "timer[transfer_ap[transfer]]",
+            "timer[transfer_ap[transfer[*foo/data_access]]]",
+            True,
+        ),
+        (
+            "timer[transfer_ap[transfer[*foo/data_access]]]",
+            "timer[transfer_ap[transfer[*foo/data_access *bar/data_access]]]",
+            True,
+        ),
+        (
+            "timer[transfer_ap[transfer[*bar *foo]]]",
+            "timer[transfer_ap[transfer[*foo *bar *baz]]]",
+            True,
+        ),
+        (
+            "timer[transfer_ap[transfer[*foo/data_access]]]",
+            "timer[transfer_ap[transfer]]",
+            False,
+        ),
+        (
+            "timer[transfer_ap[transfer[*foo/data_access *bar/data_access]]]",
+            "timer[transfer_ap[transfer[*foo/data_access]]]",
+            False,
+        ),
+        (
+            "timer[transfer_ap[transfer[foo/data_access]]]",
+            "timer[transfer_ap[transfer[*foo/data_access]]]",
+            False,
+        ),
+        (
+            "timer[transfer_ap[transfer[*foo/data_access]]]",
+            "timer[transfer_ap[transfer[foo/data_access]]]",
+            True,
+        ),
+        (
+            "timer[transfer_ap[*transfer[*foo/data_access]]]",
+            "timer[transfer_ap[transfer[foo/data_access]]]",
+            True,
+        ),
+        (
+            "timer[transfer_ap[transfer[*foo/data_access]]]",
+            "timer[transfer_ap[*transfer[foo/data_access]]]",
+            False,
+        ),
+    ],
+)
+def test_scope_contains_complex_usages(contained, containing, expect):
+    outer_s = Scope.deserialize(containing)
+    inner_s = Scope.deserialize(contained)
+    assert outer_s._contains(inner_s) == expect
