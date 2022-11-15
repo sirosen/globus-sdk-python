@@ -1,5 +1,5 @@
 * Enhance scope utilities with scope parsing, attached to
-  ``globus_sdk.scopes.Scope`` (:pr:`NUMBER`)
+  ``globus_sdk.scopes.Scope`` (:pr:`642`)
 
   * ``MutableScope`` has been renamed to ``Scope``. Both names remain available
     for backwards compatibility, but the preferred name is now ``Scope``
