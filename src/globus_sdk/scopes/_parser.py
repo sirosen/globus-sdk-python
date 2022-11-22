@@ -1,6 +1,6 @@
 import enum
 import typing as t
-from collections import deque
+from collections import defaultdict, deque
 
 
 class ScopeParseError(ValueError):
@@ -157,6 +157,9 @@ class ScopeGraph:
         self.top_level_scopes: t.Set[str] = set()
         self.nodes: t.Set[str] = set()
         self.edges: t.Set[t.Tuple[str, str, bool]] = set()
+        self._nodes_to_outbound_edges: t.Dict[
+            str, t.Set[t.Tuple[str, str, bool]]
+        ] = defaultdict(set)
 
     @property
     def dependencies(self):
@@ -164,6 +167,7 @@ class ScopeGraph:
 
     def add_edge(self, src: str, dest: str, optional: bool) -> None:
         self.edges.add((src, dest, optional))
+        self._nodes_to_outbound_edges[src].add((src, dest, optional))
 
     def _normalize_optionals(self) -> None:
         to_remove: t.Set[t.Tuple[str, str, bool]] = set()
@@ -175,32 +179,31 @@ class ScopeGraph:
             if alter_ego in self.edges:
                 to_remove.add(edge)
         self.edges = self.edges - to_remove
-
-    def _edges_from(self, node: str) -> t.Iterator[t.Tuple[str, str, bool]]:
-        for e in self.edges:
-            if e[0] == node:
-                yield e
+        for edge in to_remove:
+            src, _, _ = edge
+            self._nodes_to_outbound_edges[src].remove(edge)
 
     def _check_cycles(self) -> None:
         nodes_to_check = set(self.nodes)
+        seen_nodes = set()
+        new_edges_to_visit = set()
         while nodes_to_check:
-            seen_nodes = set()
             start = nodes_to_check.pop()
             seen_nodes.add(start)
-            edges_to_visit = set(self._edges_from(start))
+            edges_to_visit = self._nodes_to_outbound_edges[start]
             while edges_to_visit:
-                edges_to_rm = edges_to_visit.copy()
-                for e in edges_to_visit:
-                    _source, dest, _optional = e
+                new_edges_to_visit.clear()
+                for _source, dest, _optional in edges_to_visit:
                     if dest in seen_nodes:
                         raise ScopeCycleError(
                             "scopes contain a cyclic dependency on "
                             f"{dest} ({list(seen_nodes)})"
                         )
                     seen_nodes.add(dest)
-                    edges_to_visit = edges_to_visit.union(set(self._edges_from(dest)))
-                edges_to_visit = edges_to_visit - edges_to_rm
-            nodes_to_check = nodes_to_check - seen_nodes
+                    new_edges_to_visit |= self._nodes_to_outbound_edges[dest]
+                edges_to_visit = new_edges_to_visit
+            nodes_to_check -= seen_nodes
+            seen_nodes.clear()
 
     def __str__(self) -> str:
         lines = ["digraph scopes {", '  rankdir="LR";', ""]
