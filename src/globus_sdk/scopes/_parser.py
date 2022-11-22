@@ -7,6 +7,10 @@ class ScopeParseError(ValueError):
     pass
 
 
+class ScopeCycleError(ValueError):
+    pass
+
+
 class ParseTokenType(enum.Enum):
     # a string like 'urn:globus:auth:scopes:transfer.api.globus.org:all'
     scope_string = enum.auto()
@@ -161,7 +165,7 @@ class ScopeGraph:
     def add_edge(self, src: str, dest: str, optional: bool) -> None:
         self.edges.add((src, dest, optional))
 
-    def _normalize_optionals(self):
+    def _normalize_optionals(self) -> None:
         to_remove: t.Set[t.Tuple[str, str, bool]] = set()
         for edge in self.edges:
             src, dest, optional = edge
@@ -171,6 +175,32 @@ class ScopeGraph:
             if alter_ego in self.edges:
                 to_remove.add(edge)
         self.edges = self.edges - to_remove
+
+    def _edges_from(self, node: str) -> t.Iterator[t.Tuple[str, str, bool]]:
+        for e in self.edges:
+            if e[0] == node:
+                yield e
+
+    def _check_cycles(self) -> None:
+        nodes_to_check = set(self.nodes)
+        while nodes_to_check:
+            seen_nodes = set()
+            start = nodes_to_check.pop()
+            seen_nodes.add(start)
+            edges_to_visit = set(self._edges_from(start))
+            while edges_to_visit:
+                edges_to_rm = edges_to_visit.copy()
+                for e in edges_to_visit:
+                    _source, dest, _optional = e
+                    if dest in seen_nodes:
+                        raise ScopeCycleError(
+                            "scopes contain a cyclic dependency on "
+                            f"{dest} ({list(seen_nodes)})"
+                        )
+                    seen_nodes.add(dest)
+                    edges_to_visit = edges_to_visit.union(set(self._edges_from(dest)))
+                edges_to_visit = edges_to_visit - edges_to_rm
+            nodes_to_check = nodes_to_check - seen_nodes
 
     def __str__(self) -> str:
         lines = ["digraph scopes {", '  rankdir="LR";', ""]
@@ -215,6 +245,7 @@ def parse(scopes: str) -> ScopeGraph:
     trees = ScopeTreeNode.parse(scopes)
     graph = _convert_trees(trees)
     graph._normalize_optionals()
+    graph._check_cycles()
     return graph
 
 
