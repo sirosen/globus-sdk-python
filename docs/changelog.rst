@@ -12,6 +12,51 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.15.0:
+
+v3.15.0 (2022-11-22)
+--------------------
+
+* Scope Names can be set explicitly in a ``ScopeBuilder`` (:pr:`641`)
+
+* Introduced ``ScopeBuilder.scope_names`` property (:pr:`641`)
+
+* Fixed SpecificFlowClient scope string (:pr:`641`)
+
+* Improve the ``__str__`` implementation for ``OAuthTokenResponse`` (:pr:`640`)
+
+* When ``GlobusHTTPResponse`` contains a list, calls to ``get()`` will no
+  longer fail with an ``AttributeError`` but will return the default value
+  (``None`` if unspecified) instead (:pr:`644`)
+
+* Add support for ``interpret_globs`` and ``ignore_missing`` to ``DeleteData`` (:pr:`646`)
+
+* A new object, ``globus_sdk.LocalGlobusConnectServer`` can be used to inspect
+  the local installation of Globus Connect Server (:pr:`647`)
+
+  * The object supports properties for ``endpoint_id`` and ``domain_name``
+
+  * This only supports Globus Connect Server version 5
+
+* The filter argument to TransferClient.operation_ls now accepts a list to pass
+  multiple filter params (:pr:`652`)
+
+* Fix a bug in the type annotations for transport objects which restricted the
+  size of status code tuples set as classvars (:pr:`651`)
+
+* Improvements to ``MutableScope`` objects (:pr:`654`)
+
+  * ``MutableScope(...).serialize()`` is added, and ``str(MutableScope(...))`` uses it
+
+  * ``MutableScope.add_dependency`` now supports ``MutableScope`` objects as inputs
+
+  * The ``optional`` argument to ``add_dependency`` is deprecated.
+    ``MutableScope(...).add_dependency(MutableScope("foo", optional=True))``
+    can be used to add an optional dependency
+
+  * ``ScopeBuilder.make_mutable`` now accepts a keyword argument ``optional``.
+    This allows, for example, ``TransferScopes.make_mutable("all", optional=True)``
+
 .. _changelog-3.14.0:
 
 v3.14.0 (2022-11-01)
