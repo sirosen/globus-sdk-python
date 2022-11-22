@@ -1,3 +1,4 @@
+from ._parser import ScopeParseError
 from .builder import ScopeBuilder
 from .data import (
     AuthScopes,
@@ -10,7 +11,7 @@ from .data import (
     TimerScopes,
     TransferScopes,
 )
-from .scope_definition import Scope, ScopeParseError
+from .scope_definition import Scope
 
 # alias to old name
 #

@@ -1,17 +1,10 @@
 """
-This defines the Scope object and the scope parser.
-Because these components are mutually dependent, it's easiest if they're kept in a
-single module.
+This defines the Scope object and exposes use of the parser.
 """
-import enum
 import typing as t
 import warnings
 
 from globus_sdk._types import ScopeCollectionType
-
-
-class ScopeParseError(ValueError):
-    pass
 
 
 def _iter_scope_collection(obj: ScopeCollectionType) -> t.Iterator[str]:
@@ -22,115 +15,6 @@ def _iter_scope_collection(obj: ScopeCollectionType) -> t.Iterator[str]:
     else:
         for item in obj:
             yield str(item)
-
-
-class ParseTokenType(enum.Enum):
-    # a string like 'urn:globus:auth:scopes:transfer.api.globus.org:all'
-    scope_string = enum.auto()
-    # the optional marker, '*'
-    opt_marker = enum.auto()
-    # '[' and ']'
-    lbracket = enum.auto()
-    rbracket = enum.auto()
-
-
-class ParseToken:
-    def __init__(self, value: str, token_type: ParseTokenType) -> None:
-        self.value = value
-        self.token_type = token_type
-
-
-def _tokenize(scope_string: str) -> t.List[ParseToken]:
-    tokens: t.List[ParseToken] = []
-    current_token: t.List[str] = []
-    for idx, c in enumerate(scope_string):
-        try:
-            peek: t.Optional[str] = scope_string[idx + 1]
-        except IndexError:
-            peek = None
-
-        if c in "[]* ":
-            if current_token:
-                tokens.append(
-                    ParseToken("".join(current_token), ParseTokenType.scope_string)
-                )
-                current_token = []
-
-            if c == "*":
-                if peek == " ":
-                    raise ScopeParseError("'*' must not be followed by a space")
-                tokens.append(ParseToken(c, ParseTokenType.opt_marker))
-            elif c == "[":
-                tokens.append(ParseToken(c, ParseTokenType.lbracket))
-            elif c == "]":
-                if peek is not None and peek not in (" ", "]"):
-                    raise ScopeParseError("']' may only be followed by a space or ']'")
-                tokens.append(ParseToken(c, ParseTokenType.rbracket))
-            elif c == " ":
-                if peek == "[":
-                    raise ScopeParseError("'[' cannot have a preceding space")
-            else:
-                raise NotImplementedError
-        else:
-            current_token.append(c)
-    if current_token:
-        tokens.append(ParseToken("".join(current_token), ParseTokenType.scope_string))
-    return tokens
-
-
-def _parse_tokens(tokens: t.List[ParseToken]) -> t.List["Scope"]:
-    # value to return
-    ret: t.List[Scope] = []
-    # track whether or not the current scope is optional (has a preceding *)
-    current_optional = False
-    # keep a stack of "parents", each time we enter a `[` context, push the last scope
-    # and each time we exit via a `]`, pop from the stack
-    parents: t.List[Scope] = []
-    # track the current (or, by similar terminology, "last") complete scope seen
-    current_scope: t.Optional[Scope] = None
-
-    for idx in range(len(tokens)):
-        token = tokens[idx]
-        try:
-            peek: t.Optional[ParseToken] = tokens[idx + 1]
-        except IndexError:
-            peek = None
-
-        if token.token_type == ParseTokenType.opt_marker:
-            current_optional = True
-            if peek is None:
-                raise ScopeParseError("ended in optional marker")
-            if peek.token_type != ParseTokenType.scope_string:
-                raise ScopeParseError(
-                    "a scope string must always follow an optional marker"
-                )
-
-        elif token.token_type == ParseTokenType.lbracket:
-            if peek is None:
-                raise ScopeParseError("ended in left bracket")
-            if peek.token_type == ParseTokenType.rbracket:
-                raise ScopeParseError("found empty brackets")
-            if peek.token_type == ParseTokenType.lbracket:
-                raise ScopeParseError("found double left-bracket")
-            if not current_scope:
-                raise ScopeParseError("found '[' without a preceding scope string")
-
-            parents.append(current_scope)
-        elif token.token_type == ParseTokenType.rbracket:
-            if not parents:
-                raise ScopeParseError("found ']' with no matching '[' preceding it")
-            parents.pop()
-        else:
-            current_scope = Scope(token.value, optional=current_optional)
-            current_optional = False
-            if parents:
-                parents[-1].dependencies.append(current_scope)
-            else:
-                ret.append(current_scope)
-    if parents:
-        raise ScopeParseError("unclosed brackets, missing ']'")
-
-    return ret
 
 
 class Scope:
@@ -160,20 +44,14 @@ class Scope:
                 "Scope instances may not contain the special characters '[]* '. "
                 "Use either Scope.deserialize or Scope.parse instead"
             )
-        self._scope_string = scope_string
+        self.scope_string = scope_string
         self.optional = optional
         self.dependencies: t.List[Scope] = [] if dependencies is None else dependencies
 
     @staticmethod
     def parse(scope_string: str) -> t.List["Scope"]:
-        """
-        Parse an arbitrary scope string to a list of scopes.
-
-        Zero or more than one scope may be returned, as in the case of an empty string
-        or space-delimited scopes.
-        """
-        tokens = _tokenize(scope_string)
-        return _parse_tokens(tokens)
+        # FIXME: what should this do with a parse graph?
+        raise NotImplementedError()
 
     @classmethod
     def deserialize(cls, scope_string: str) -> "Scope":
@@ -192,7 +70,7 @@ class Scope:
         return data[0]
 
     def serialize(self) -> str:
-        base_scope = ("*" if self.optional else "") + self._scope_string
+        base_scope = ("*" if self.optional else "") + self.scope_string
         if not self.dependencies:
             return base_scope
         return (
@@ -234,7 +112,7 @@ class Scope:
         return self
 
     def __repr__(self) -> str:
-        parts: t.List[str] = [f"'{self._scope_string}'"]
+        parts: t.List[str] = [f"'{self.scope_string}'"]
         if self.optional:
             parts.append("optional=True")
         if self.dependencies:
