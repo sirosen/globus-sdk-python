@@ -161,6 +161,17 @@ class ScopeGraph:
     def add_edge(self, src: str, dest: str, optional: bool) -> None:
         self.edges.add((src, dest, optional))
 
+    def _normalize_optionals(self):
+        to_remove: t.Set[t.Tuple[str, str, bool]] = set()
+        for edge in self.edges:
+            src, dest, optional = edge
+            if not optional:
+                continue
+            alter_ego = (src, dest, not optional)
+            if alter_ego in self.edges:
+                to_remove.add(edge)
+        self.edges = self.edges - to_remove
+
     def __str__(self) -> str:
         lines = ["digraph scopes {", '  rankdir="LR";', ""]
         for node in self.top_level_scopes:
@@ -202,7 +213,9 @@ def _convert_trees(trees: t.List[ScopeTreeNode]) -> ScopeGraph:
 
 def parse(scopes: str) -> ScopeGraph:
     trees = ScopeTreeNode.parse(scopes)
-    return _convert_trees(trees)
+    graph = _convert_trees(trees)
+    graph._normalize_optionals()
+    return graph
 
 
 if __name__ == "__main__":
