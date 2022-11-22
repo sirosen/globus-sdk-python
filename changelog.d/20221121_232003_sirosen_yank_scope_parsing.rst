@@ -1,4 +1,4 @@
-* Improvements to ``MutableScope`` objects (:pr:`NUMBER`)
+* Improvements to ``MutableScope`` objects (:pr:`654`)
 
   * ``MutableScope(...).serialize()`` is added, and ``str(MutableScope(...))`` uses it
 
