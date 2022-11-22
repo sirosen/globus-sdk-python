@@ -78,17 +78,17 @@ To elaborate on the above example:
     # data from the response
     tokendata = token_response.by_resource_server[TransferScopes.resource_server]
 
-MutableScope objects
---------------------
+Scope objects
+-------------
 
 In order to support optional and dependent scopes, an additional type is
-provided by ``globus_sdk.scopes``: the ``MutableScope`` class.
+provided by ``globus_sdk.scopes``: the ``Scope`` class.
 
-``MutableScope`` can be constructed directly or via a ``ScopeBuilder``'s
-``make_mutable`` method, given a scope's short name.
+``Scope`` can be constructed directly, from full scope strings, or via a
+``ScopeBuilder``'s ``make_mutable`` method, given a scope's short name.
 
-For example, one can create a ``MutableScope`` from the Groups "all" scope
-as follows:
+For example, one can create a ``Scope`` from the Groups "all" scope as
+follows:
 
 .. code-block:: python
 
@@ -96,18 +96,65 @@ as follows:
 
     scope = GroupsScopes.make_mutable("all")
 
-``MutableScope`` objects primarily provide two main pieces of functionality:
-dynamically building a scope tree and serializing to a string.
+``Scope`` objects primarily provide three main pieces of functionality:
+parsing from a string, dynamically building a scope tree, and serializing to a
+string.
+
+Scope Parsing
+~~~~~~~~~~~~~
+
+:meth:`Scope.parse` is the primary parsing method. Given a string, parsing may
+produce a list of scopes. The reason for this is that a scope string being
+requested may be a space-delimited set of scopes. For example, the following
+parse is desirable:
+
+.. code-block:: pycon
+
+    >>> Scope.parse("openid urn:globus:auth:scopes:transfer.api.globus.org:all")
+    [
+      Scope("openid"),
+      Scope("urn:globus:auth:scopes:transfer.api.globus.org:all"),
+    ]
+
+Additionally, scopes can be deserialized from strings with
+:meth:`Scope.deserialize`. This is similar to ``parse``, but it must return
+exactly one scope. For example,
+
+.. code-block:: pycon
+
+    >>> Scope.deserialize("urn:globus:auth:scopes:transfer.api.globus.org:all")
+    Scope("urn:globus:auth:scopes:transfer.api.globus.org:all")
+
+Parsing supports scopes with dependencies and optional scopes denoted by the
+``*`` marker. Therefore, the following is also a valid parse:
+
+.. code-block:: pycon
+
+    >>> transfer_scope = "urn:globus:auth:scopes:transfer.api.globus.org:all"
+    >>> collection_scope = (
+    ...     "https://auth.globus.org/scopes/c855676f-7840-4630-9b16-ef260aaf02c3/data_access"
+    ... )
+    >>> Scope.deserialize(f"{transfer_scope}[*{collection_scope}]")
+    Scope(
+      "urn:globus:auth:scopes:transfer.api.globus.org:all",
+      dependencies=[
+        Scope(
+          "https://auth.globus.org/scopes/c855676f-7840-4630-9b16-ef260aaf02c3/data_access",
+          optional=True
+        )
+      ]
+    )
 
 Dynamic Scope Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``MutableScope`` objects provide a tree-like interface for constructing scopes
-and their dependencies.
+In the parsing example above, a scope string was constructed as a format string
+which was then parsed into a complex dependent scope structure. This can be
+done directly, without needing to encode the scope as a string beforehand.
 
-For example, the transfer scope dependent upon a collection scope may be
-constructed by means of ``MutableScope`` methods and the ``make_mutable`` method
-of scope builders thusly:
+For example, the same transfer scope dependent upon a collection scope may be
+constructed by means of ``Scope`` methods and the ``make_mutable`` method of
+scope builders:
 
 .. code-block:: python
 
@@ -123,7 +170,7 @@ of scope builders thusly:
     # add data_access as a dependency
     transfer_scope.add_dependency(data_access_scope)
 
-``MutableScope``\s can be used in most of the same locations where scope
+``Scope``\s can be used in most of the same locations where scope
 strings can be used, but you can also call ``str()`` on them to get a
 stringified representation.
 
@@ -131,31 +178,31 @@ Serializing Scopes
 ~~~~~~~~~~~~~~~~~~
 
 Whenever scopes are being sent to Globus services, they need to be encoded as
-strings. All mutabl scope objects support this by means of their defined
-``serialize`` method. Note that ``__str__`` for a ``MutableScope`` is just an
-alias for ``serialize``. For example, the following is valid usage to demonstrate
+strings. All scope objects support this by means of their defined ``serialize``
+method. Note that ``__str__`` for a ``Scope`` is just an alias for
+``serialize``. For example, the following is valid usage to demonstrate
 ``str()``, ``repr()``, and ``serialize()``:
 
 .. code-block:: pycon
 
-    >>> from globus_sdk.scopes import MutableScope
-    >>> foo = MutableScope("foo")
-    >>> bar = MutableScope("bar")
+    >>> from globus_sdk.scopes import Scope
+    >>> foo = Scope("foo")
+    >>> bar = Scope("bar")
     >>> bar.add_dependency("baz")
     >>> foo.add_dependency(bar)
-    >>> print(str(MutableScope("foo")))
+    >>> print(str(Scope("foo")))
     foo[bar *baz]
     >>> print(bar.serialize())
     bar[baz]
-    >>> alpha = MutableScope("alpha")
-    >>> alpha.add_dependency(MutableScope("beta", optional=True))
+    >>> alpha = Scope("alpha")
+    >>> alpha.add_dependency("*beta")
     >>> print(repr(alpha))
-    MutableScope("alpha", dependencies=[MutableScope("beta", optional=True)])
+    Scope("alpha", dependencies=[Scope("beta", optional=True)])
 
-MutableScope Reference
-~~~~~~~~~~~~~~~~~~~~~~
+Scope Reference
+~~~~~~~~~~~~~~~
 
-.. autoclass:: MutableScope
+.. autoclass:: Scope
     :members:
     :show-inheritance:
 
