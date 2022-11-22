@@ -1,5 +1,6 @@
 import enum
 import typing as t
+from collections import deque
 
 
 class ScopeParseError(ValueError):
@@ -147,74 +148,66 @@ class ScopeTreeNode:
         return _parse_tokens(tokens)
 
 
-class ScopeGraphNode:
-    def __init__(
-        self,
-        scope_string: str,
-    ) -> None:
-        self.scope_string = scope_string
-        self.edges: t.List[t.Tuple[ScopeGraphNode, bool]] = []
+class ScopeGraph:
+    def __init__(self):
+        self.top_level_scopes: t.Set[str] = set()
+        self.nodes: t.Set[str] = set()
+        self.edges: t.Set[t.Tuple[str, str, bool]] = set()
 
     @property
     def dependencies(self):
         return self.edges
 
-    def add_edge(self, dest: "ScopeGraphNode", optional: bool) -> None:
-        if (dest, optional) not in self.edges:
-            self.edges.append((dest, optional))
+    def add_edge(self, src: str, dest: str, optional: bool) -> None:
+        self.edges.add((src, dest, optional))
 
     def __str__(self) -> str:
-        return self.scope_string
+        lines = ["digraph scopes {", '  rankdir="LR";', ""]
+        for node in self.top_level_scopes:
+            lines.append("  " + node)
+        lines.append("")
 
-
-def _convert_trees(
-    trees: t.List[ScopeTreeNode],
-) -> t.Tuple[t.List[str], t.List[ScopeGraphNode]]:
-    name_to_node_map: t.Dict[str, ScopeGraphNode] = {}
-
-    # populate the map with values, but don't draw any edges yet
-    node_queue = list(trees)
-    for tree_node in node_queue:
-        scope_string = tree_node.scope_string
-        if scope_string not in name_to_node_map:
-            name_to_node_map[scope_string] = ScopeGraphNode(scope_string)
-        for dep in tree_node.dependencies:
-            node_queue.append(dep)
-
-    # having done that, reset and populate the edges in a second BFS traversal
-    node_queue = list(trees)
-    for tree_node in node_queue:
-        scope_string = tree_node.scope_string
-        graph_node = name_to_node_map[scope_string]
-        for dep in tree_node.dependencies:
-            node_queue.append(dep)
-            graph_node_dep = name_to_node_map[dep.scope_string]
-            graph_node.add_edge(graph_node_dep, dep.optional)
-
-    return ([t.scope_string for t in trees], list(name_to_node_map.values()))
-
-
-def parse(scopes: str) -> t.Tuple[t.Set[str], t.Set["ScopeGraphNode"]]:
-    trees = ScopeTreeNode.parse(scopes)
-    top_level_scopes, graph_nodes = _convert_trees(trees)
-    return set(top_level_scopes), set(graph_nodes)
-
-
-def graph_to_dot(nodes: t.Set[ScopeGraphNode]) -> str:
-    lines = ["digraph scopes {", '  rankdir="LR";', ""]
-    for node in nodes:
-        for target, optional in node.edges:
-            target_str = str(target)
+        # do two passes to put all non-optional edges first
+        for source, dest, optional in self.edges:
             if optional:
-                target_str += ' [ label = "optional" ]'
-            lines.append(f"  {node} -> {target_str};")
-    lines.append("}")
-    return "\n".join(lines)
+                continue
+            lines.append(f"  {source} -> {dest};")
+        for source, dest, optional in self.edges:
+            if not optional:
+                continue
+            lines.append(f'  {source} -> {dest} [ label = "optional" ];')
+        lines.append("")
+        lines.append("}")
+        return "\n".join(lines)
+
+
+def _convert_trees(trees: t.List[ScopeTreeNode]) -> ScopeGraph:
+    graph = ScopeGraph()
+    node_queue: t.Deque[ScopeTreeNode] = deque()
+
+    for tree_node in trees:
+        node_queue.append(tree_node)
+        graph.top_level_scopes.add(tree_node.scope_string)
+
+    while node_queue:
+        tree_node = node_queue.pop()
+        scope_string = tree_node.scope_string
+        graph.nodes.add(scope_string)
+        for dep in tree_node.dependencies:
+            node_queue.append(dep)
+            graph.add_edge(scope_string, dep.scope_string, dep.optional)
+
+    return graph
+
+
+def parse(scopes: str) -> ScopeGraph:
+    trees = ScopeTreeNode.parse(scopes)
+    return _convert_trees(trees)
 
 
 if __name__ == "__main__":
     import sys
 
-    top_level_scopes, graph = parse(sys.argv[1])
-    print("top level scopes:", ", ".join(top_level_scopes))
-    print(graph_to_dot(graph))
+    graph = parse(sys.argv[1])
+    print("top level scopes:", ", ".join(graph.top_level_scopes))
+    print(graph)
