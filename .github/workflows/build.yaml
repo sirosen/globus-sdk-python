@@ -31,7 +31,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         # we do not want a large number of windows and macos builds, so
         # enumerate them explicitly
         include:
@@ -39,6 +39,9 @@ jobs:
             python-version: "3.11"
           - os: macos-latest
             python-version: "3.11"
+          # py3.6 doesn't work on ubuntu 22.04+
+          - os: ubuntu-20.04
+            python-version: "3.6"
     name: "test py${{ matrix.python-version }} on ${{ matrix.os }} "
     runs-on: ${{ matrix.os }}
     steps:
@@ -62,7 +65,7 @@ jobs:
       - run: tox -e test-lazy-imports
 
   test-mindeps:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: "mindeps"
     steps:
       - uses: actions/checkout@v3
