@@ -12,6 +12,16 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.15.1:
+
+v3.15.1 (2022-12-13)
+--------------------
+
+* AuthorizationParameterInfo now exposes session_required_policies (:pr:`658`)
+
+* Fix a bug where ``TransferClient.endpoint_manager_task_list`` didn't handle
+  the ``last_key`` argument when paginated (:pr:`662`)
+
 .. _changelog-3.15.0:
 
 v3.15.0 (2022-11-22)
