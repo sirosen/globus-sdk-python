@@ -8,4 +8,4 @@
 ..
 
 * Fix a bug where ``TransferClient.endpoint_manager_task_list`` didn't handle
-  the ``last_key`` argument when paginated (:pr:`NUMBER`)
+  the ``last_key`` argument when paginated (:pr:`662`)
