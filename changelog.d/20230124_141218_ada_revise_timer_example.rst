@@ -1,1 +1,1 @@
-* Fix the Timer code example (:pr:`NUMBER`)
+* Fix the Timer code example (:pr:`672`)
