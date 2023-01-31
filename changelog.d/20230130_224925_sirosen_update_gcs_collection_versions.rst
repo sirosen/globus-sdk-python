@@ -1,5 +1,5 @@
 * Improved GCS Collection datatype detection to support ``collection#1.6.0``
-  and ``collection#1.7.0`` documents (:pr:`NUMBER`)
+  and ``collection#1.7.0`` documents (:pr:`675`)
 
   * ``guest_auth_policy_id`` is now supported on ``MappedCollectionDcoument``
 
