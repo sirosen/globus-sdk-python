@@ -1,4 +1,7 @@
+import logging
 import typing as t
+
+log = logging.getLogger(__name__)
 
 
 class ErrorInfo:
@@ -64,9 +67,18 @@ class AuthorizationParameterInfo(ErrorInfo):
         self.session_required_single_domain = t.cast(
             t.Optional[t.List[str]], data.get("session_required_single_domain")
         )
-        self.session_required_policies = t.cast(
-            t.Optional[str], data.get("session_required_policies")
-        )
+
+        # get str|None and parse as appropriate
+        self.session_required_policies: t.Optional[t.List[str]] = None
+        session_required_policies = data.get("session_required_policies")
+        if isinstance(session_required_policies, str):
+            self.session_required_policies = session_required_policies.split(",")
+        elif session_required_policies is not None:
+            log.warning(
+                "During ErrorInfo instantiation, got unexpected type for "
+                "'session_required_policies'. "
+                f"Expected 'str', but got '{type(session_required_policies)}'"
+            )
 
 
 class ConsentRequiredInfo(ErrorInfo):
