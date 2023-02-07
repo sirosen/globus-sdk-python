@@ -12,6 +12,36 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.16.0:
+
+v3.16.0 (2023-02-07)
+--------------------
+
+* Fix the Timer code example (:pr:`672`)
+
+* New documentation examples for Transfer Task submission in the presence of
+  ``ConsentRequired`` errors (:pr:`673`)
+
+* Improved GCS Collection datatype detection to support ``collection#1.6.0``
+  and ``collection#1.7.0`` documents (:pr:`675`)
+
+  * ``guest_auth_policy_id`` is now supported on ``MappedCollectionDcoument``
+
+  * ``user_message`` strings over 64 characters are now supported
+
+* Allow UUID values for the ``client_id`` parameter to ``AuthClient`` and its
+  subclasses (:pr:`676`)
+
+* The ``session_required_policies`` attribute of ``AuthorizationInfo`` is now
+  parsed as a list of strings when present, and ``None`` when absent. (:pr:`678`)
+
+* ``globus_sdk.ArrayResponse`` and ``globus_sdk.IterableResponse`` are now
+  available as names. Previously, these were only importable from
+  ``globus_sdk.response`` (:pr:`680`)
+
+* ``ArrayResponse`` and ``IterableResponse`` have better error behaviors when
+  the API data does not match their expected types (:pr:`680`)
+
 .. _changelog-3.15.1:
 
 v3.15.1 (2022-12-13)
