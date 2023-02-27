@@ -12,6 +12,28 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.17.0:
+
+v3.17.0 (2023-02-27)
+--------------------
+
+* Remove support for python3.6 (:pr:`681`)
+
+* Fix a typo in ``TransferClient.endpoint_manager_task_successful_transfers``
+  which prevented calls from being made correctly (:pr:`683`)
+
+* Make ``MutableScope.scope_string`` a public instance attribute (was
+  ``_scope_string``) (:pr:`687`)
+
+* ``MutableScope`` objects can now be used in the ``oauth2_start_flow`` and
+  ``oauth2_client_credentials_tokens`` methods of ``AuthClient`` classes as part
+  of ``requested_scopes`` (:pr:`689`)
+
+* Globus Groups methods which required enums as arguments now also accept
+  a variety of ``Literal`` strings in their annotations as well. This is
+  coupled with changes to ensure that strings and enums are always serialized
+  correctly in these cases. (:pr:`691`)
+
 .. _changelog-3.16.0:
 
 v3.16.0 (2023-02-07)
