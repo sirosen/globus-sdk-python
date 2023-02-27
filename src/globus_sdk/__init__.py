@@ -38,6 +38,7 @@ _LAZY_IMPORT_TABLE = {
         "GlobusSDKUsageError",
         "GlobusTimeoutError",
         "NetworkError",
+        "RemovedInV4Warning",
     },
     "local_endpoint": {
         "GlobusConnectPersonalOwnerInfo",
@@ -138,6 +139,7 @@ if t.TYPE_CHECKING:
     from .exc import GlobusSDKUsageError
     from .exc import GlobusTimeoutError
     from .exc import NetworkError
+    from .exc import RemovedInV4Warning
     from .local_endpoint import GlobusConnectPersonalOwnerInfo
     from .local_endpoint import LocalGlobusConnectPersonal
     from .local_endpoint import LocalGlobusConnectServer
@@ -298,6 +300,7 @@ __all__ = (
     "POSIXStagingStoragePolicies",
     "POSIXStoragePolicies",
     "RefreshTokenAuthorizer",
+    "RemovedInV4Warning",
     "S3StoragePolicies",
     "SearchAPIError",
     "SearchClient",

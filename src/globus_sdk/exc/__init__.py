@@ -13,6 +13,7 @@ from .err_info import (
     ErrorInfo,
     ErrorInfoContainer,
 )
+from .warnings import RemovedInV4Warning, warn_deprecated
 
 __all__ = (
     "GlobusError",
@@ -27,4 +28,6 @@ __all__ = (
     "ErrorInfoContainer",
     "AuthorizationParameterInfo",
     "ConsentRequiredInfo",
+    "RemovedInV4Warning",
+    "warn_deprecated",
 )
