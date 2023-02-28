@@ -162,7 +162,7 @@ class ResponseSet:
         return iter(self._data.values())
 
     def cases(self) -> t.Iterator[str]:
-        return iter(self._data.keys())
+        return iter(self._data)
 
     def activate(
         self,
