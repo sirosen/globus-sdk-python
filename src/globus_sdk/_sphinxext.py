@@ -141,6 +141,36 @@ class ListKnownScopes(AddContentDirective):
         yield ""
 
 
+class EnumerateTestingFixtures(AddContentDirective):
+    has_content = False
+    required_arguments = 1
+    optional_arguments = 0
+
+    def gen_rst(self):
+        from globus_sdk._testing import get_response_set
+
+        classname = self.arguments[0]
+        yield (
+            f":class:`{classname}` has registered responses "
+            "for the following methods:"
+        )
+        yield ""
+        for methodname, method in _classname2methods(classname, []):
+            try:
+                rset = get_response_set(method)
+                # success -> has a response
+            except ValueError:
+                continue
+                # error -> has no response, continue
+            for casename in rset.cases():
+                # use "attr" rather than "meth" so that sphinx does not add parens
+                # the use of the method as an attribute of the class or instance better
+                # matches how `_testing` handles things
+                yield f'* :py:attr:`~{classname}.{methodname}` (``case="{casename}"``)'
+        yield ""
+
+
 def setup(app):
     app.add_directive("automethodlist", AutoMethodList)
     app.add_directive("listknownscopes", ListKnownScopes)
+    app.add_directive("enumeratetestingfixtures", EnumerateTestingFixtures)
