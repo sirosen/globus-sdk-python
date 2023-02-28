@@ -161,6 +161,9 @@ class ResponseSet:
     ) -> t.Iterator[RegisteredResponse | ResponseList]:
         return iter(self._data.values())
 
+    def cases(self) -> t.Iterator[str]:
+        return iter(self._data.keys())
+
     def activate(
         self,
         case: str,

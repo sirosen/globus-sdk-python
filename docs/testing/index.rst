@@ -21,3 +21,4 @@ Globus SDK _testing (alpha)
 
     getting_started
     reference
+    method_list
