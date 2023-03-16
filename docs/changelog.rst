@@ -12,6 +12,44 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.18.0:
+
+v3.18.0 (2023-03-16)
+--------------------
+
+* When users input empty ``requested_scopes`` values, these are now rejected
+  with a usage error instead of being translated into the default set of
+  ``requested_scopes``
+
+* Behaviors which will change in version 4.0.0 of the ``globus-sdk`` now emit
+  deprecation warnings.
+
+* Omitting ``requested_scopes`` or specifying it as ``None`` is now deprecated
+  and will emit a warning. In version 4, users will always be required to
+  specify their scopes when performing login flows. This applies to the
+  following methods:
+
+  * ``ConfidentialAppAuthClient.oauth2_client_credentials_tokens``
+  * ``AuthClient.oauth2_start_flow``
+
+* ``SearchClient.update_entry`` and ``SearchClient.create_entry`` are
+  officially deprecated and will emit a warning. These APIs are aliases of
+  ``SearchClient.ingest``, but their existence has caused confusion. Users are
+  encouraged to switch to ``SearchClient.ingest`` instead (:pr:`695`)
+
+* ``TransferData.add_item`` now defaults to omitting ``recursive`` rather than
+  setting its value to ``False``. This change better matches new Transfer API
+  behaviors which treat the absence of the ``recursive`` flag as meaning
+  autodetect, rather than the previous default of ``False``. Setting the
+  recursive flag can still have beneficial behaviors, but should not be
+  necessary for many use-cases (:pr:`696`)
+
+* Fix the type annotation for `max_sleep` on client transports to allow `float`
+  values (:pr:`697`)
+
+* ``ConfidentialAppAuthClient.oauth2_get_dependent_tokens`` now supports the
+  ``refresh_tokens`` parameter to enable requests for dependent refresh tokens (:pr:`698`)
+
 .. _changelog-3.17.0:
 
 v3.17.0 (2023-02-27)
