@@ -7,4 +7,4 @@
 .. automatically replace it when the PR is merged.
 ..
 
-* Support passing "include" as a transfer `filter_rule` method (:pr:`NUMBER`)
+* Support passing "include" as a transfer `filter_rule` method (:pr:`712`)
