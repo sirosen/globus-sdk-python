@@ -12,6 +12,33 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.19.0:
+
+v3.19.0 (2023-04-14)
+--------------------
+
+* Added ``FlowsClient.update_flow(...)`` (:pr:`710`)
+
+* Support passing "include" as a transfer ``filter_rule`` method (:pr:`712`)
+
+* Documentation for client methods has been improved to more consistently
+  format and display examples and other information (:pr:`714`)
+
+* The return type of ``AuthClient.get_identities`` is now correctly annotated as
+  an iterable type, ``globus_sdk.GetIdentitiesResponse`` (:pr:`716`)
+
+* Make the request-like interface for response objects and errors more uniform. (:pr:`715`)
+
+  * Both ``GlobusHTTPResponse`` and ``GlobusAPIError`` are updated to ensure
+    that they have the following properties in common: ``http_status``,
+    ``http_reason``, ``headers``, ``content_type``, ``text``
+
+  * ``GlobusAPIError.raw_text`` is deprecated in favor of ``text``
+
+  * ``GlobusHTTPResponse`` and ``GlobusAPIError`` have both gained a new
+    property, ``binary_content``, which returns the unencoded response data as
+    bytes
+
 .. _changelog-3.18.0:
 
 v3.18.0 (2023-03-16)
