@@ -1,4 +1,4 @@
-* Make the request-like interface for response objects and errors more uniform. (:pr:`NUMBER`)
+* Make the request-like interface for response objects and errors more uniform. (:pr:`715`)
 
   * Both ``GlobusHTTPResponse`` and ``GlobusAPIError`` are updated to ensure
     that they have the following properties in common: ``http_status``,
