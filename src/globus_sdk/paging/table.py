@@ -40,14 +40,16 @@ class PaginatorTable:
         self._client = client
         # _bindings is a lazily loaded table of names -> callables which
         # return paginators
-        self._bindings: dict[str, t.Callable[..., Paginator[PageT]]] = {}
+        self._bindings: dict[str, t.Callable[..., Paginator[GlobusHTTPResponse]]] = {}
 
     def _add_binding(
         self, methodname: str, bound_method: t.Callable[..., PageT]
     ) -> None:
         self._bindings[methodname] = Paginator.wrap(bound_method)
 
-    def __getattr__(self, attrname: str) -> t.Callable[..., Paginator[PageT]]:
+    def __getattr__(
+        self, attrname: str
+    ) -> t.Callable[..., Paginator[GlobusHTTPResponse]]:
         if attrname not in self._bindings:
             # this could raise AttributeError -- in which case, let it!
             method = getattr(self._client, attrname)

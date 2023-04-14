@@ -22,7 +22,7 @@ class DocumentWithInducedDatatype(Protocol):
     def __contains__(self, key: str) -> bool:  # pragma: no cover
         ...
 
-    def __setitem__(self, key: str, value: t.Any) -> None:  # pragma: no cover
+    def __setitem__(self, key: str, item: t.Any) -> None:  # pragma: no cover
         ...
 
     def __getitem__(self, key: str) -> t.Any:  # pragma: no cover

@@ -168,16 +168,21 @@ class _classproperty(t.Generic[T, R]):
 
 # if running under sphinx, define this as the stacked classmethod(property(...))
 # decoration, so that proper autodoc generation happens
+
+
+def _sphinx_classproperty(func: t.Callable[[T], R]) -> _classproperty[T, R]:
+    # type ignore this because
+    # - it doesn't match the return type
+    # - mypy doesn't understand classmethod(property(...)) on older pythons
+    return classmethod(property(func))  # type: ignore
+
+
+def _runtime_classproperty(func: t.Callable[[T], R]) -> _classproperty[T, R]:
+    # type cast to convert instance method to class method
+    return _classproperty(t.cast(t.Callable[[t.Type[T]], R], func))
+
+
 if in_sphinx_build():  # pragma: no cover
-
-    def classproperty(func: t.Callable[[T], R]) -> _classproperty[T, R]:
-        # type ignore this because
-        # - it doesn't match the return type
-        # - mypy doesn't understand classmethod(property(...)) on older pythons
-        return classmethod(property(func))  # type: ignore
-
+    classproperty = _sphinx_classproperty
 else:
-
-    def classproperty(func: t.Callable[[T], R]) -> _classproperty[T, R]:
-        # type cast to convert instance method to class method
-        return _classproperty(t.cast(t.Callable[[t.Type[T]], R], func))
+    classproperty = _runtime_classproperty

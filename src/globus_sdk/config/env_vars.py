@@ -53,7 +53,7 @@ def _load_var(
     default: t.Any,
     explicit_value: t.Any | None = None,
     convert: t.Callable[[t.Any, t.Any], T] | None = None,
-) -> t.Any:
+) -> t.Any | T:
     # use the explicit value if given and non-None, otherwise, do an env lookup
     value = (
         explicit_value if explicit_value is not None else os.getenv(varname, default)
