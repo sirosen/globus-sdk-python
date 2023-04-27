@@ -1,2 +1,2 @@
 
-* Implemented ``FlowsClient.get_run_logs(...)` (:pr:`NUMBER`)
+* Implemented ``FlowsClient.get_run_logs(...)` (:pr:`722`)
