@@ -448,6 +448,64 @@ class FlowsClient(client.BaseClient):
 
         return self.delete(f"/flows/{flow_id}", query_params=query_params)
 
+    @paging.has_paginator(paging.MarkerPaginator, items_key="entries")
+    def get_run_logs(
+        self,
+        run_id: UUIDLike,
+        *,
+        limit: int | None = None,
+        reverse_order: bool | None = None,
+        marker: str | None = None,
+        query_params: dict[str, t.Any] | None = None,
+    ) -> IterableFlowsResponse:
+        """
+        Retrieve the execution logs associated with a run
+
+        These logs describe state transitions and associated payloads for a run
+
+        :param run_id: Run ID to retrieve logs for
+        :type run_id: str or UUID, optional
+        :param limit: Maximum number of log entries to return (server default: 10)
+             (value between 1 and 100 inclusive)
+        :type limit: int, optional
+        :param reverse_order: Return results in reverse chronological order (server
+            default: false)
+        :type reverse_order: bool
+        :param marker: Marker for the next page of results (provided by the server)
+        :type marker: str, optional
+        :param query_params: Any additional parameters to be passed through
+        :type query_params: dict, optional
+
+        .. tab-set::
+
+            .. tab-item:: Paginated Usage
+
+                .. paginatedusage:: get_run_logs
+
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: flows.get_run_logs
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Get Run Logs
+                    :service: flows
+                    :ref: Runs/paths/~1runs~1{action_id}~1log/get
+        """
+
+        query_params = {
+            "limit": limit,
+            "reverse_order": reverse_order,
+            "marker": marker,
+            **(query_params or {}),
+        }
+        # Filter out request keys with None values to allow server defaults
+        query_params = {k: v for k, v in query_params.items() if v is not None}
+        return IterableFlowsResponse(
+            self.get(f"/runs/{run_id}/log", query_params=query_params)
+        )
+
     def get_run(
         self,
         run_id: UUIDLike,
