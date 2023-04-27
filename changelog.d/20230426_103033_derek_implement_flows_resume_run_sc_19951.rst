@@ -1,2 +1,2 @@
 
-* Implemented ``SpecificFlowClient.resume_run(...)`` (:pr:`NUMBER`)
+* Implemented ``SpecificFlowClient.resume_run(...)`` (:pr:`723`)
