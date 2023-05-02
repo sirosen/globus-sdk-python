@@ -20,4 +20,18 @@ RESPONSES = ResponseSet(
         json=TWO_HOP_TRANSFER_RUN,
         match=[matchers.json_params_matcher(params=_request_params)],
     ),
+    missing_scope_error=RegisteredResponse(
+        service="flows",
+        method="POST",
+        path=f"/flows/{TWO_HOP_TRANSFER_FLOW_ID}/run",
+        status=403,
+        json={
+            "error": {
+                "code": "MISSING_SCOPE",
+                "detail": (
+                    "This action requires the following scope: frobulate[demuddle]"
+                ),
+            }
+        },
+    ),
 )
