@@ -11,32 +11,59 @@ from .warnings import warn_deprecated
 
 log = logging.getLogger(__name__)
 
+_CACHE_SENTINEL = object()
+
 
 class GlobusAPIError(GlobusError):
     """
     Wraps errors returned by a REST API.
 
-    :ivar http_status: HTTP status code (int)
-    :ivar code: Error code from the API (str),
-                or "Error" for unclassified errors
-    :ivar message: Error message from the API. In general, this will be more
-                   useful to developers, but there may be cases where it's
-                   suitable for display to end users.
+    :ivar int http_status: HTTP status code
+    :ivar str code: Error code from the API or "Error" for unclassified errors
+    :ivar list[str] messages: A list of error messages, extracted from the response
+        data. If the data cannot be parsed or does not contain any clear message fields,
+        this list may be empty.
+    :ivar list[dict] errors: A list of sub-error documents, as would be presented by
+        JSON:API APIs and similar interfaces. If no such parse succeeds, the list will
+        be empty.
     """
 
-    MESSAGE_FIELDS = ["message", "detail"]
+    MESSAGE_FIELDS = ["message", "detail", "title"]
     RECOGNIZED_AUTHZ_SCHEMES = ["bearer", "basic", "globus-goauthtoken"]
 
     def __init__(self, r: requests.Response, *args: t.Any, **kwargs: t.Any):
+        self._cached_raw_json: t.Any = _CACHE_SENTINEL
+
         self.http_status = r.status_code
         # defaults, may be rewritten during parsing
         self.code = "Error"
-        self.message = r.text
+        self.messages: list[str] = []
+        self.errors: list[dict[str, t.Any]] = []
 
         self._info: ErrorInfoContainer | None = None
         self._underlying_response = r
         self._parse_response()
         super().__init__(*self._get_args())
+
+    @property
+    def message(self) -> str | None:
+        """
+        An error message from the API.
+
+        If there are multiple messages available, this will contain all messages joined
+        with semicolons. If there is no message available, this will be ``None``.
+        """
+        if self.messages:
+            return "; ".join(self.messages)
+        return None
+
+    @message.setter
+    def message(self, value: str) -> None:
+        warn_deprecated(
+            "Setting a message on GlobusAPIError objects is deprecated. "
+            "This overwrites any parsed messages. Append to 'messages' instead."
+        )
+        self.messages = [value]
 
     @property
     def http_reason(self) -> str:
@@ -77,21 +104,30 @@ class GlobusAPIError(GlobusError):
 
         If the body cannot be loaded as JSON, this is None
         """
-        r = self._underlying_response
-        if not self._json_content_type():
-            return None
+        if self._cached_raw_json == _CACHE_SENTINEL:
+            self._cached_raw_json = None
+            if self._json_content_type():
+                try:
+                    # technically, this could be a non-dict JSON type, like a list or
+                    # string but in those cases the user can just cast -- the "normal"
+                    # case is a dict
+                    self._cached_raw_json = self._underlying_response.json()
+                except ValueError:
+                    log.error(
+                        "Error body could not be JSON decoded! "
+                        "This means the Content-Type is wrong, or the "
+                        "body is malformed!"
+                    )
+        return t.cast("dict[str, t.Any]", self._cached_raw_json)
 
-        try:
-            # technically, this could be a non-dict JSON type, like a list or string
-            # but in those cases the user can just cast -- the "normal" case is a dict
-            return t.cast(t.Dict[str, t.Any], r.json())
-        except ValueError:
-            log.error(
-                "Error body could not be JSON decoded! "
-                "This means the Content-Type is wrong, or the "
-                "body is malformed!"
-            )
-            return None
+    @property
+    def _dict_data(self) -> dict[str, t.Any]:
+        """
+        A "type asserting" wrapper over raw_json which errors if the type is not dict.
+        """
+        if not isinstance(self.raw_json, dict):
+            raise ValueError("cannot use _dict_data when data is non-dict type")
+        return self.raw_json
 
     @property
     def text(self) -> str:
@@ -126,8 +162,7 @@ class GlobusAPIError(GlobusError):
         could not be parsed.
         """
         if self._info is None:
-            rawjson = self.raw_json
-            json_data = rawjson if isinstance(rawjson, dict) else None
+            json_data = self.raw_json if isinstance(self.raw_json, dict) else None
             self._info = ErrorInfoContainer(json_data)
         return self._info
 
@@ -158,66 +193,83 @@ class GlobusAPIError(GlobusError):
             self.message or self._underlying_response.reason,
         ]
 
-    def _parse_response(self) -> None:
+    def _parse_response(self) -> bool:
         """
         This is an intermediate step between 'raw_json' (loading bare JSON data)
-        and the "real" parsing method, '_load_from_json'
+        and the "real" parsing methods.
+        In order to better support subclass usage, this returns True if parsing should
+        continue or False if it was aborted.
 
         _parse_response() pulls the JSON body and does the following:
-        - if the data is not a dict, ensure _load_from_json is not called (so it only
-          gets called on dict data)
-        - if the data contains an 'errors' array, pull out the first error document and
-          pass that to _load_from_json()
-        - log a warning on non-dict JSON data
+        - on non-dict JSON data, log and abort early. Don't error since this
+          is already part of exception construction, just stop parsing.
+        - parse any array of subdocument errors, tailored towards JSON:API
+          (_parse_errors_array)
+        - parse the code field from the document root
+          (_parse_code)
+        - if there are multiple sub-errors, extract messages from each of them
+          (_parse_messages)
+
+        Parsing the 'errors' array can be overridden to support custom error schemas,
+        but by default it sniffs for JSON:API formatted data by looking for an 'errors'
+        array and filtering it to dict members.
         """
-        json_data = self.raw_json
-        if json_data is None:
+        if self.raw_json is None:
             log.debug("Error body was not parsed as JSON")
-            return
-        if not isinstance(json_data, dict):
+            return False
+        if not isinstance(self.raw_json, dict):
             log.warning(  # type: ignore[unreachable]
                 "Error body could not be parsed as JSON because it was not a dict"
             )
-            return
+            return False
 
-        # if there appears to be a list of errors in the response data, grab the
-        # first error from that list for parsing
-        # this is only done if we determine that
-        # - 'errors' is present and is a non-empty list
-        # - 'errors[0]' is a dict
-        #
-        # this gracefully handles other uses of the key 'errors', e.g. as an int:
-        #   {"message": "foo", "errors": 6}
-        if (
-            isinstance(json_data.get("errors"), list)
-            and len(json_data["errors"]) > 0
-            and isinstance(json_data["errors"][0], dict)
-        ):
-            # log a warning only when there is more than one error in the list
-            # if an API sends back an error of the form
-            #   {"errors": [{"foo": "bar"}]}
-            # then the envelope doesn't matter and there's only one error to parse
-            if len(json_data["errors"]) != 1:
-                log.warning(
-                    "Doing JSON load of error response with multiple "
-                    "errors. Exception data will only include the "
-                    "first error, but there are really %d errors",
-                    len(json_data["errors"]),
-                )
-            # try to grab the first error in the list, but also check
-            # if it isn't a dict
-            json_data = json_data["errors"][0]
-        self._load_from_json(json_data)
+        # at this point, the data has been confirmed to be a JSON object, so we can use
+        # `_dict_data` to get a well-typed version of it
+        self._parse_errors_array()
+        self._parse_code()
+        self._parse_messages()
+        return True
 
-    def _load_from_json(self, data: dict[str, t.Any]) -> None:
-        # rewrite 'code' if present and correct type
-        if isinstance(data.get("code"), str):
-            self.code = data["code"]
+    def _parse_errors_array(self) -> None:
+        """
+        Extract any array of subdocument errors into the `errors` array.
 
-        for f in self.MESSAGE_FIELDS:
-            if isinstance(data.get(f), str):
-                log.debug("Loaded message from '%s' field", f)
-                self.message = data[f]
-                break
-        else:
-            log.debug("No message found in parsed error body")
+        This should be the first parsing component called.
+        """
+        if isinstance(self._dict_data.get("errors"), list):
+            subdocuments = [
+                subdoc
+                for subdoc in self._dict_data["errors"]
+                if isinstance(subdoc, dict)
+            ]
+            if subdocuments:
+                self.errors = subdocuments
+
+    def _parse_code(self) -> None:
+        # use 'code' if present and correct type
+        if isinstance(self._dict_data.get("code"), str):
+            self.code = t.cast(str, self._dict_data["code"])
+        # otherwise, check if all 'errors' which contain a 'code' have the same one
+        # if so, that will be safe to use instead
+        elif self.errors:
+            codes: set[str] = set()
+            for error in self.errors:
+                if isinstance(error.get("code"), str):
+                    codes.add(error["code"])
+            if len(codes) == 1:
+                self.code = codes.pop()
+
+    def _parse_messages(self) -> None:
+        # either there is an array of subdocument errors or there is not,
+        # in which case we load only from the root doc
+        for doc in self.errors or [self._dict_data]:
+            for f in self.MESSAGE_FIELDS:
+                if isinstance(doc.get(f), str):
+                    log.debug("Loaded message from '%s' field", f)
+                    self.messages.append(doc[f])
+                    # NOTE! this break ensures we take only one field per error
+                    # document (or subdocument) as the 'message'
+                    # so that a doc like
+                    #   {"message": "foo", "detail": "bar"}
+                    # has a single message, "foo"
+                    break

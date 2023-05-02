@@ -36,9 +36,9 @@ def test_timer_error_load_nested(make_json_response):
     assert err.message == "field required: body.start; field required: body.end"
 
 
-def test_timer_error_load_unrecognize_format(make_json_response):
+def test_timer_error_load_unrecognized_format(make_json_response):
     response = make_json_response({}, 400)
 
     err = TimerAPIError(response.r)
-    assert err.code == "Unknown Error"
-    assert err.message == "Could not parse error details from the response"
+    assert err.code == "Error"
+    assert err.message is None

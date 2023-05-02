@@ -21,9 +21,9 @@ def transfer_response(make_json_response):
         # wrong format (but still parseable)
         ("default_json_response", "400", "Json Error", "json error message", None),
         # defaults for non-json data
-        ("default_text_response", "401", "Error", "error message", None),
+        ("default_text_response", "401", "Error", "Unauthorized", None),
         # malformed data is at least rendered successfully into an error
-        ("malformed_response", "403", "Error", "{", None),
+        ("malformed_response", "403", "Error", "Forbidden", None),
     ),
 )
 def test_get_args_transfer(

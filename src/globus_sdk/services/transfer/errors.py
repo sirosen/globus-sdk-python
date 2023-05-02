@@ -17,7 +17,7 @@ class TransferAPIError(exc.GlobusAPIError):
     """
 
     def __init__(self, r: requests.Response) -> None:
-        self.request_id = None
+        self.request_id: str | None = None
         super().__init__(r)
 
     def _get_args(self) -> list[t.Any]:
@@ -25,6 +25,8 @@ class TransferAPIError(exc.GlobusAPIError):
         args.append(self.request_id)
         return args
 
-    def _load_from_json(self, data: dict[str, t.Any]) -> None:
-        super()._load_from_json(data)
-        self.request_id = data.get("request_id")
+    def _parse_response(self) -> bool:
+        if not super()._parse_response():
+            return False
+        self.request_id = t.cast("dict[str, t.Any]", self.raw_json).get("request_id")
+        return True

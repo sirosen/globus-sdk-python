@@ -70,7 +70,7 @@ def test_get_args(default_json_response, default_text_response, malformed_respon
         None,
         "401",
         "Error",
-        "error message",
+        "Unauthorized",
     ]
     err = GlobusAPIError(malformed_response.r)
     assert err._get_args() == [
@@ -79,7 +79,7 @@ def test_get_args(default_json_response, default_text_response, malformed_respon
         None,
         "403",
         "Error",
-        "{",
+        "Forbidden",
     ]
 
 
@@ -92,7 +92,7 @@ def test_get_args_on_unknown_json(make_json_response):
         None,
         "400",
         "Error",
-        '{"foo": "bar"}',
+        "Bad Request",
     ]
 
 
@@ -105,7 +105,7 @@ def test_get_args_on_non_dict_json(make_json_response):
         None,
         "400",
         "Error",
-        '["foo", "bar"]',
+        "Bad Request",
     ]
 
 
@@ -369,7 +369,7 @@ def test_http_header_exposure(make_response):
             "bearer",
         ),
         ("PATCH", 500, None, "https://bogus.example.org/bar", "", "unknown-token"),
-        ("PUT", 501, None, "https://bogus.example.org/bar", None, None),
+        ("PUT", 501, None, "https://bogus.example.org/bar", "Not Implemented", None),
     ],
 )
 def test_error_repr_has_expected_info(
@@ -429,3 +429,95 @@ def test_error_repr_has_expected_info(
             assert error_message in stringified
         else:
             assert http_reason in stringified
+
+
+def test_loads_jsonapi_error_subdocuments(make_response):
+    res = make_response(
+        {
+            "errors": [
+                {
+                    "code": "TooShort",
+                    "title": "Password data too short",
+                    "detail": "password was only 3 chars long, must be at least 8",
+                },
+                {
+                    "code": "MissingSpecial",
+                    "title": "Password data missing special chars",
+                    "detail": "password must have non-alphanumeric characters",
+                },
+                {
+                    "code": "ContainsCommonDogName",
+                    "title": "Password data has a popular dog name",
+                    "detail": "password cannot contain 'spot', 'woofy', or 'clifford'",
+                },
+            ]
+        },
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json"},
+    )
+    err = GlobusAPIError(res.r)
+    # code is not taken from any of the subdocuments (inherently too ambiguous)
+    assert err.code == "Error"
+    # but messages can be extracted, and they prefer detail to title
+    assert err.messages == [
+        "password was only 3 chars long, must be at least 8",
+        "password must have non-alphanumeric characters",
+        "password cannot contain 'spot', 'woofy', or 'clifford'",
+    ]
+
+
+def test_loads_jsonapi_error_subdocuments_with_common_code(make_response):
+    res = make_response(
+        {
+            "errors": [
+                {
+                    "code": "MissingClass",
+                    "title": "Must contain capital letter",
+                    "detail": "password must contain at least one capital letter",
+                },
+                {
+                    "code": "MissingClass",
+                    "title": "Must contain special chars",
+                    "detail": "password must have non-alphanumeric characters",
+                },
+            ]
+        },
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json"},
+    )
+    err = GlobusAPIError(res.r)
+    # code is taken because all subdocuments have the same code
+    assert err.code == "MissingClass"
+
+
+def test_loads_jsonapi_error_messages_from_various_fields(make_response):
+    res = make_response(
+        {
+            "errors": [
+                {
+                    "message": "invalid password value",
+                },
+                {
+                    "title": "Must contain capital letter",
+                },
+                {
+                    "detail": "password must have non-alphanumeric characters",
+                },
+            ]
+        },
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json"},
+    )
+    err = GlobusAPIError(res.r)
+    # code stays at the default
+    assert err.code == "Error"
+    # messages are extracted, and they use whichever field is appropriate for
+    # each sub-error
+    assert err.messages == [
+        "invalid password value",
+        "Must contain capital letter",
+        "password must have non-alphanumeric characters",
+    ]

@@ -20,9 +20,11 @@ class SearchAPIError(exc.GlobusAPIError):
     MESSAGE_FIELDS = ["message"]
 
     def __init__(self, r: requests.Response) -> None:
-        self.error_data = None
+        self.error_data: dict[str, t.Any] | None = None
         super().__init__(r)
 
-    def _load_from_json(self, data: dict[str, t.Any]) -> None:
-        super()._load_from_json(data)
-        self.error_data = data.get("error_data")
+    def _parse_response(self) -> bool:
+        if not super()._parse_response():
+            return False
+        self.error_data = t.cast(t.Dict[str, t.Any], self.raw_json).get("error_data")
+        return True
