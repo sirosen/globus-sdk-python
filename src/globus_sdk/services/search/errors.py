@@ -26,5 +26,5 @@ class SearchAPIError(exc.GlobusAPIError):
     def _parse_response(self) -> bool:
         if not super()._parse_response():
             return False
-        self.error_data = t.cast(t.Dict[str, t.Any], self.raw_json).get("error_data")
+        self.error_data = self._dict_data.get("error_data")
         return True

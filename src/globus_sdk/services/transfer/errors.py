@@ -28,5 +28,5 @@ class TransferAPIError(exc.GlobusAPIError):
     def _parse_response(self) -> bool:
         if not super()._parse_response():
             return False
-        self.request_id = t.cast("dict[str, t.Any]", self.raw_json).get("request_id")
+        self.request_id = self._dict_data.get("request_id")
         return True

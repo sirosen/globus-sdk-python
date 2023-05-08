@@ -32,7 +32,7 @@ class GCSAPIError(exc.GlobusAPIError):
 
         # detail can be a full document, so fetch, then look for a DATA_TYPE
         # and expose it as a top-level attribute for easy access
-        self.detail = t.cast("dict[str, t.Any]", self.raw_json).get("detail")
+        self.detail = self._dict_data.get("detail")
         if isinstance(self.detail, dict) and "DATA_TYPE" in self.detail:
             self.detail_data_type = self.detail["DATA_TYPE"]
         return True
