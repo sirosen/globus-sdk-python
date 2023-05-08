@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import typing as t
 
 from globus_sdk import GlobusHTTPResponse, client, paging, scopes
@@ -11,7 +12,14 @@ from globus_sdk.scopes import ScopeBuilder
 from .errors import FlowsAPIError
 from .response import IterableFlowsResponse
 
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
 log = logging.getLogger(__name__)
+
+OrderByTuple = t.Tuple[str, Literal["DESC", "ASC"]]
 
 
 class FlowsClient(client.BaseClient):
@@ -201,7 +209,7 @@ class FlowsClient(client.BaseClient):
         *,
         filter_role: str | None = None,
         filter_fulltext: str | None = None,
-        orderby: str | None = None,
+        orderby: str | OrderByTuple | None = None,
         marker: str | None = None,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableFlowsResponse:
@@ -214,7 +222,7 @@ class FlowsClient(client.BaseClient):
         :param filter_fulltext: A string to use in a full-text search to filter results
         :type filter_fulltext: str, optional
         :param orderby: A criterion for ordering flows in the listing
-        :type orderby: str, optional
+        :type orderby: str or tuple, optional
         :param marker: A marker for pagination
         :type marker: str, optional
         :param query_params: Any additional parameters to be passed through
@@ -238,6 +246,7 @@ class FlowsClient(client.BaseClient):
 
         Values for ``orderby`` consist of a field name, a space, and an
         ordering mode -- ``ASC`` for "ascending" and ``DESC`` for "descending".
+        Alternatively, the field name and ordering mode may be passed as a tuple.
 
         Supported field names are
 
@@ -249,8 +258,8 @@ class FlowsClient(client.BaseClient):
           - ``created_at``
           - ``updated_at``
 
-        For example, ``orderby="updated_at DESC"`` requests a descending sort on update
-        times, getting the most recently updated flow first.
+        For example, ``orderby=("updated_at", "DESC")`` requests a descending sort on
+        update times, getting the most recently updated flow first.
 
         .. tab-set::
 
@@ -272,7 +281,7 @@ class FlowsClient(client.BaseClient):
         if filter_fulltext is not None:
             query_params["filter_fulltext"] = filter_fulltext
         if orderby is not None:
-            query_params["orderby"] = orderby
+            query_params["orderby"] = _format_orderby(orderby)
         if marker is not None:
             query_params["marker"] = marker
 
@@ -678,3 +687,9 @@ class SpecificFlowClient(client.BaseClient):
                     :ref: Runs/paths/~1flows~1{flow_id}~1runs~1{run_id}~1resume/post
         """
         return self.post(f"/runs/{run_id}/resume")
+
+
+def _format_orderby(x: str | OrderByTuple) -> str:
+    if isinstance(x, str):
+        return x
+    return " ".join(x)

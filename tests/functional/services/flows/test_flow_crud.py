@@ -36,7 +36,7 @@ def test_delete_flow(flows_client):
 
 @pytest.mark.parametrize("filter_fulltext", [None, "foo"])
 @pytest.mark.parametrize("filter_role", [None, "bar"])
-@pytest.mark.parametrize("orderby", [None, "created_at ASC"])
+@pytest.mark.parametrize("orderby", [None, "created_at ASC", ("created_by", "DESC")])
 def test_list_flows_simple(flows_client, filter_fulltext, filter_role, orderby):
     meta = load_response(flows_client.list_flows).metadata
 
@@ -47,6 +47,12 @@ def test_list_flows_simple(flows_client, filter_fulltext, filter_role, orderby):
         add_kwargs["filter_role"] = filter_role
     if orderby:
         add_kwargs["orderby"] = orderby
+
+    expect_orderby_param = None
+    if isinstance(orderby, str):
+        expect_orderby_param = orderby
+    elif isinstance(orderby, tuple):
+        expect_orderby_param = " ".join(orderby)
 
     res = flows_client.list_flows(**add_kwargs)
     assert res.http_status == 200
@@ -63,7 +69,7 @@ def test_list_flows_simple(flows_client, filter_fulltext, filter_role, orderby):
         for k, v in (
             ("filter_fulltext", filter_fulltext),
             ("filter_role", filter_role),
-            ("orderby", orderby),
+            ("orderby", expect_orderby_param),
         )
         if v is not None
     }
