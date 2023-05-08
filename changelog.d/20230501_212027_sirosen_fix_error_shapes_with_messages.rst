@@ -11,11 +11,11 @@
     messages. When there is only one message, ``messages`` will only contain
     one item.
 
-  * The ``message`` field is now an alias for a joined string of of
+  * The ``message`` field is now an alias for a joined string of
     ``messages``. Assigning a string to ``message`` is supported for error
     subclasses, but is deprecated.
 
-  * ``message`` will now be ``None`` when no error message can be parsed.
+  * ``message`` will now be ``None`` when no messages can be parsed from the error data.
     Previously, the default for ``message`` would be an alias for ``text``.
 
   * An additional field is checked by default for error message data,
