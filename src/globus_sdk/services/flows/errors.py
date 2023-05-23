@@ -8,7 +8,7 @@ class FlowsAPIError(GlobusAPIError):
     Error class to represent error responses from Flows.
     """
 
-    def _parse_errors_array(self) -> None:
+    def _parse_undefined_error_format(self) -> bool:
         """
         Treat any top-level "error" key as an "array of size 1".
         Meaning that we'll see a single subdocument for data shaped like
@@ -18,19 +18,22 @@ class FlowsAPIError(GlobusAPIError):
               }
             }
         """
-        if isinstance(self._dict_data.get("error"), dict):
-            self.errors = [self._dict_data["error"]]
-        else:
-            return super()._parse_errors_array()
+        # if there is not a top-level 'error' key, no special behavior is defined
+        # fall-back to the base class implementation
+        if not isinstance(self._dict_data.get("error"), dict):
+            return super()._parse_undefined_error_format()
 
-    def _parse_messages(self) -> None:
-        if isinstance(self._dict_data.get("error"), dict) and isinstance(
-            self._dict_data["error"].get("detail"), list
-        ):
-            for error_detail in self._dict_data["error"]["detail"]:
-                if isinstance(error_detail, dict) and isinstance(
-                    error_detail.get("msg"), str
-                ):
-                    self.messages.append(error_detail["msg"])
+        self.errors = [self._dict_data["error"]]
+        self.code = self._extract_code_from_error_array(self.errors)
+
+        details = self._dict_data["error"].get("detail")
+        if isinstance(details, list):
+            self.messages = [
+                error_detail["msg"]
+                for error_detail in details
+                if isinstance(error_detail.get("msg"), str)
+            ]
         else:
-            super()._parse_messages()
+            self.messages = self._extract_messages_from_error_array(self.errors)
+
+        return True

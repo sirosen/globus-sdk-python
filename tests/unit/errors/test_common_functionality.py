@@ -431,7 +431,11 @@ def test_error_repr_has_expected_info(
             assert http_reason in stringified
 
 
-def test_loads_jsonapi_error_subdocuments(make_response):
+@pytest.mark.parametrize(
+    "content_type",
+    ("application/json", "application/unknown+json", "application/vnd.api+json"),
+)
+def test_loads_jsonapi_error_subdocuments(make_response, content_type):
     res = make_response(
         {
             "errors": [
@@ -454,11 +458,20 @@ def test_loads_jsonapi_error_subdocuments(make_response):
         },
         422,
         data_transform=json.dumps,
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": content_type},
     )
     err = GlobusAPIError(res.r)
+
     # code is not taken from any of the subdocuments (inherently too ambiguous)
-    assert err.code == "Error"
+    # behavior will depend on which parsing path was taken
+    if content_type.endswith("vnd.api+json"):
+        # code becomes None because we saw "true" JSON:API and can opt-in to
+        # better behavior
+        assert err.code is None
+    else:
+        # code remains 'Error' for backwards compatibility in the non-JSON:API case
+        assert err.code == "Error"
+
     # but messages can be extracted, and they prefer detail to title
     assert err.messages == [
         "password was only 3 chars long, must be at least 8",
@@ -467,7 +480,11 @@ def test_loads_jsonapi_error_subdocuments(make_response):
     ]
 
 
-def test_loads_jsonapi_error_subdocuments_with_common_code(make_response):
+@pytest.mark.parametrize(
+    "content_type",
+    ("application/json", "application/unknown+json", "application/vnd.api+json"),
+)
+def test_loads_jsonapi_error_subdocuments_with_common_code(make_response, content_type):
     res = make_response(
         {
             "errors": [
@@ -485,14 +502,18 @@ def test_loads_jsonapi_error_subdocuments_with_common_code(make_response):
         },
         422,
         data_transform=json.dumps,
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": content_type},
     )
     err = GlobusAPIError(res.r)
     # code is taken because all subdocuments have the same code
     assert err.code == "MissingClass"
 
 
-def test_loads_jsonapi_error_messages_from_various_fields(make_response):
+@pytest.mark.parametrize(
+    "content_type",
+    ("application/json", "application/unknown+json", "application/vnd.api+json"),
+)
+def test_loads_jsonapi_error_messages_from_various_fields(make_response, content_type):
     res = make_response(
         {
             "errors": [
@@ -509,15 +530,27 @@ def test_loads_jsonapi_error_messages_from_various_fields(make_response):
         },
         422,
         data_transform=json.dumps,
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": content_type},
     )
     err = GlobusAPIError(res.r)
-    # code stays at the default
-    assert err.code == "Error"
     # messages are extracted, and they use whichever field is appropriate for
     # each sub-error
-    assert err.messages == [
-        "invalid password value",
-        "Must contain capital letter",
-        "password must have non-alphanumeric characters",
-    ]
+    # note that 'message' will *not* be extracted if the Content-Type indicated JSON:API
+    # because JSON:API does not define such a field
+    if content_type.endswith("vnd.api+json"):
+        # code becomes None because we saw "true" JSON:API and can opt-in to
+        # better behavior
+        assert err.code is None
+        assert err.messages == [
+            "Must contain capital letter",
+            "password must have non-alphanumeric characters",
+        ]
+    else:
+        # code remains 'Error' for backwards compatibility in the non-JSON:API case
+        assert err.code == "Error"
+
+        assert err.messages == [
+            "invalid password value",
+            "Must contain capital letter",
+            "password must have non-alphanumeric characters",
+        ]

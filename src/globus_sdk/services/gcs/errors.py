@@ -26,10 +26,7 @@ class GCSAPIError(exc.GlobusAPIError):
             args.append(self.detail)
         return args
 
-    def _parse_response(self) -> bool:
-        if not super()._parse_response():
-            return False
-
+    def _final_parse_callback(self) -> bool:
         # detail can be a full document, so fetch, then look for a DATA_TYPE
         # and expose it as a top-level attribute for easy access
         self.detail = self._dict_data.get("detail")

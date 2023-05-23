@@ -9,10 +9,10 @@ class TimerAPIError(GlobusAPIError):
 
     Has no particular additions to the base ``GlobusAPIError``, but implements a
     different method for parsing error responses from Timer due to the differences
-    between pydantic-generated errors and other errors.
+    between various error formats used.
     """
 
-    def _parse_errors_array(self) -> None:
+    def _parse_undefined_error_format(self) -> bool:
         """
         Treat any top-level "error" key as an "array of size 1".
         Meaning that we'll see a single subdocument for data shaped like
@@ -21,22 +21,8 @@ class TimerAPIError(GlobusAPIError):
                 "foo": "bar"
               }
             }
-        """
-        if isinstance(self._dict_data.get("error"), dict):
-            self.errors = [self._dict_data["error"]]
-        else:
-            return super()._parse_errors_array()
 
-    def _parse_code(self) -> None:
-        if isinstance(self._dict_data.get("detail"), list):
-            self.code = "Validation Error"
-        else:
-            super()._parse_code()
-
-    def _parse_messages(self) -> None:
-        """
-        The messages are assembled from arrays of validation details when present.
-        Error shapes include:
+        Error shapes also include validation errors in a 'details' array:
 
             {
                 "detail": [
@@ -53,12 +39,42 @@ class TimerAPIError(GlobusAPIError):
                 ]
             }
         """
-        if isinstance(self._dict_data.get("detail"), list):
-            self.messages.extend(
-                [
-                    e["msg"] + ": " + ".".join(k for k in e["loc"])
-                    for e in self._dict_data["detail"]
-                ]
-            )
+        # if there is not a top-level 'error' key and no top-level
+        # 'detail' key, no special behavior is defined
+        # fall-back to the base class implementation
+        # but before that fallback, try the two relevant branches
+
+        # if 'error' is present, use it to populate the errors array
+        # extract 'code' from it
+        # and extract 'messages' from it
+        if isinstance(self._dict_data.get("error"), dict):
+            self.errors = [self._dict_data["error"]]
+            self.code = self._extract_code_from_error_array(self.errors)
+            self.messages = self._extract_messages_from_error_array(self.errors)
+            return True
+        elif isinstance(self._dict_data.get("detail"), list):
+            # FIXME:
+            # the 'code' is currently being set explicitly by the
+            # SDK in this case even though none was provided by
+            # the service
+            # in a future version of the SDK, the code should be `None`
+            self.code = "Validation Error"
+
+            # collect the errors array from details
+            self.errors = [d for d in self._dict_data["detail"] if isinstance(d, dict)]
+
+            # drop error objects which don't have the relevant fields
+            # and then build custom 'messages' for Globus Timers errors
+            details = [
+                d
+                for d in self.errors
+                if isinstance(d.get("msg"), str)
+                and isinstance(d.get("loc"), list)
+                and all(isinstance(path_item, str) for path_item in d["loc"])
+            ]
+            self.messages = [
+                e["msg"] + ": " + ".".join(k for k in e["loc"]) for e in details
+            ]
+            return True
         else:
-            super()._parse_messages()
+            return super()._parse_undefined_error_format()
