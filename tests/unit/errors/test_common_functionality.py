@@ -554,3 +554,53 @@ def test_loads_jsonapi_error_messages_from_various_fields(make_response, content
             "Must contain capital letter",
             "password must have non-alphanumeric characters",
         ]
+
+
+@pytest.mark.parametrize(
+    "error_doc",
+    (
+        # Type Zero Error Format
+        {"code": "FooCode", "message": "FooMessage"},
+        # Undefined Error Format
+        {"message": "FooMessage"},
+    ),
+)
+def test_non_jsonapi_parsing_uses_root_as_errors_array_by_default(
+    make_response, error_doc
+):
+    res = make_response(
+        error_doc,
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json"},
+    )
+    err = GlobusAPIError(res.r)
+
+    # errors is the doc root wrapped in a list
+    assert err.errors == [error_doc]
+
+
+@pytest.mark.parametrize(
+    "error_doc",
+    (
+        # Type Zero Error Format with sub-error data
+        {"code": "FooCode", "message": "FooMessage", "errors": [{"bar": "baz"}]},
+        # Type Zero Error Format with *empty* sub-error data
+        {"code": "FooCode", "message": "FooMessage", "errors": []},
+        # Undefined Error Format with sub-error data
+        {"message": "FooMessage", "errors": [{"bar": "baz"}]},
+        # Undefined Error Format with *empty* sub-error data
+        {"message": "FooMessage", "errors": []},
+    ),
+)
+def test_non_jsonapi_parsing_uses_errors_array_if_present(make_response, error_doc):
+    res = make_response(
+        error_doc,
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json"},
+    )
+    err = GlobusAPIError(res.r)
+
+    # errors is the 'errors' list
+    assert err.errors == error_doc["errors"]

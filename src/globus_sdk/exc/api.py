@@ -309,6 +309,12 @@ class GlobusAPIError(GlobusError):
         self.code = self._dict_data["code"]
         self.messages = [self._dict_data["message"]]
         self.request_id = self._dict_data.get("request_id")
+        if isinstance(self._dict_data.get("errors"), list) and all(
+            isinstance(subdoc, dict) for subdoc in self._dict_data["errors"]
+        ):
+            self.errors = self._dict_data["errors"]
+        else:
+            self.errors = [self._dict_data]
         return True
 
     def _parse_undefined_error_format(self) -> bool:
@@ -316,15 +322,15 @@ class GlobusAPIError(GlobusError):
         # this is also a great place for custom parsing to hook in for different APIs
         # if we know that there's an unusual format in use
 
-        # attempt to pull out errors if possible
-        if isinstance(self._dict_data.get("errors"), list):
-            subdocuments = [
-                subdoc
-                for subdoc in self._dict_data["errors"]
-                if isinstance(subdoc, dict)
-            ]
-            if subdocuments:
-                self.errors = subdocuments
+        # attempt to pull out errors if possible and valid
+        if isinstance(self._dict_data.get("errors"), list) and all(
+            isinstance(subdoc, dict) for subdoc in self._dict_data["errors"]
+        ):
+            self.errors = self._dict_data["errors"]
+        # if no 'errors' were found, or 'errors' is invalid, then
+        # 'errors' should be set to contain the root document
+        else:
+            self.errors = [self._dict_data]
 
         # use 'code' if present and correct type
         if isinstance(self._dict_data.get("code"), str):
