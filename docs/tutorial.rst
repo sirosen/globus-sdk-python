@@ -248,6 +248,20 @@ response, and for each one, the response contains the following info:
   access_token when it expires. ``None`` unless explicitly requested.
   Details on refresh_token are in the next section
 
+.. note::
+
+    The keys into ``by_resource_server`` are the registered ``resource_server``
+    value for the service.
+
+    For Globus hosted services like Globus Auth and Globus Transfer, the
+    ``resource_server`` is the hostname for the service, and can be retrieved
+    via the ``resource_server`` class attribute for the relevant client.
+    e.g., ``globus_sdk.TransferClient.resource_server``.
+
+    For other services, including Globus Connect Server v5, the ``resource_server``
+    value will be the ID of the service client. For Globus Connect Server v5, this
+    is the ID of the Endpoint.
+
 .. _tutorial_step5:
 
 Step 5: Do a login flow with Refresh Tokens
