@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from globus_sdk.exc import GlobusAPIError
+from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
 
 class FlowsAPIError(GlobusAPIError):
@@ -23,7 +23,7 @@ class FlowsAPIError(GlobusAPIError):
         if not isinstance(self._dict_data.get("error"), dict):
             return super()._parse_undefined_error_format()
 
-        self.errors = [self._dict_data["error"]]
+        self.errors = [ErrorSubdocument(self._dict_data["error"])]
         self.code = self._extract_code_from_error_array(self.errors)
 
         details = self._dict_data["error"].get("detail")

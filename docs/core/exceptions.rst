@@ -65,7 +65,6 @@ Malformed calls to Globus SDK methods typically raise ``GlobusSDKUsageError``,
 but, in rare cases, may raise standard python exceptions (``ValueError``,
 ``OSError``, etc.)
 
-
 Error Classes
 -------------
 
@@ -96,6 +95,34 @@ Error Classes
 .. autoclass:: globus_sdk.GlobusConnectionTimeoutError
    :members:
    :show-inheritance:
+
+.. _error_subdocuments:
+
+ErrorSubdocuments
+-----------------
+
+Errors returned from APIs may define a series of subdocuments, each containing
+an error object. This is used if there were multiple errors encountered and the
+API wants to send them back all at once.
+
+All instances of ``GlobusAPIError`` define an attribute, ``errors``, which is
+an array of ``ErrorSubdocument``\s. It may be empty if there were no subdocuments.
+
+Error handling code can inspect these sub-errors like so:
+
+.. code-block:: python
+
+    try:
+        some_complex_globus_operation()
+    except GlobusAPIError as e:
+        if e.errors:
+            print("sub-errors encountered")
+            print("(code, message)")
+            for suberror in e.errors:
+                print(f"({suberror.code}, {suberror.message}")
+
+.. autoclass:: globus_sdk.exc.ErrorSubdocument
+    :members:
 
 .. _error_info:
 

@@ -31,9 +31,8 @@ class GlobusAPIError(GlobusError):
     :ivar list[str] messages: A list of error messages, extracted from the response
         data. If the data cannot be parsed or does not contain any clear message fields,
         this list may be empty.
-    :ivar list[dict] errors: A list of sub-error documents, as would be presented by
-        JSON:API APIs and similar interfaces. If no such parse succeeds, the list will
-        be empty.
+    :ivar list[GlobusSubError] errors: A list of sub-error documents, as would be
+        presented by JSON:API APIs and similar interfaces.
     """
 
     MESSAGE_FIELDS = ["message", "detail", "title"]
@@ -47,7 +46,7 @@ class GlobusAPIError(GlobusError):
         self.code: str | None = "Error"
         self.request_id: str | None = None
         self.messages: list[str] = []
-        self.errors: list[dict[str, t.Any]] = []
+        self.errors: list[ErrorSubdocument] = []
 
         self._info: ErrorInfoContainer | None = None
         self._underlying_response = r
@@ -261,6 +260,15 @@ class GlobusAPIError(GlobusError):
             return False
         return self._final_parse_callback()
 
+    def _final_parse_callback(self) -> bool:
+        """
+        A final internal callback for extra customizations after
+        fully successful parsing.
+
+        By default, does nothing.
+        """
+        return True
+
     def _detect_error_format(self) -> _ErrorFormat:
         # if the JSON:API mimetype was used, inspect the data to make sure it is
         # well-formed
@@ -292,68 +300,82 @@ class GlobusAPIError(GlobusError):
         return _ErrorFormat.type_zero
 
     def _parse_jsonapi_error_format(self) -> bool:
-        # parsing a JSON:API error is only called after the field type for 'errors'
-        # has been checked
-        # however, the nested/underlying fields will not have been checked yet
-        self.errors = self._dict_data["errors"]
+        """
+        Parsing a JSON:API Error
+
+        This is only called after the field type for 'errors' has been checked.
+        However, the nested/underlying fields will not have been checked yet.
+        """
+        self.errors = [ErrorSubdocument(e) for e in self._dict_data["errors"]]
         self.code = self._extract_code_from_error_array(self.errors)
-        self.messages = self._extract_messages_from_error_array(
-            self.errors, ("detail", "title")
-        )
+        self.messages = self._extract_messages_from_error_array(self.errors)
         return True
 
     def _parse_type_zero_error_format(self) -> bool:
-        # parsing a Type Zero error is only called after Type Zero has been detected
-        # therefore, we already have assurances about the values in 'code' and 'message'
-        # note that 'request_id' could be absent but *must* be a string if present
+        """
+        Parsing a Type Zero Error
+
+        This is only called after Type Zero has been detected. Therefore, we already
+        have assurances about the values in 'code' and 'message'.
+        Note that 'request_id' could be absent but *must* be a string if present.
+        """
         self.code = self._dict_data["code"]
         self.messages = [self._dict_data["message"]]
         self.request_id = self._dict_data.get("request_id")
         if isinstance(self._dict_data.get("errors"), list) and all(
             isinstance(subdoc, dict) for subdoc in self._dict_data["errors"]
         ):
-            self.errors = self._dict_data["errors"]
+            raw_errors = self._dict_data["errors"]
         else:
-            self.errors = [self._dict_data]
+            raw_errors = [self._dict_data]
+        self.errors = [
+            ErrorSubdocument(e, message_fields=self.MESSAGE_FIELDS) for e in raw_errors
+        ]
         return True
 
     def _parse_undefined_error_format(self) -> bool:
-        # Undefined parsing: best effort support for unknown data shapes
-        # this is also a great place for custom parsing to hook in for different APIs
-        # if we know that there's an unusual format in use
+        """
+        Undefined Parsing: best effort support for unknown data shapes
+
+        This is also a great place for custom parsing to hook in for different APIs
+        if we know that there's an unusual format in use
+        """
 
         # attempt to pull out errors if possible and valid
         if isinstance(self._dict_data.get("errors"), list) and all(
             isinstance(subdoc, dict) for subdoc in self._dict_data["errors"]
         ):
-            self.errors = self._dict_data["errors"]
+            raw_errors = self._dict_data["errors"]
         # if no 'errors' were found, or 'errors' is invalid, then
         # 'errors' should be set to contain the root document
         else:
-            self.errors = [self._dict_data]
+            raw_errors = [self._dict_data]
+        self.errors = [
+            ErrorSubdocument(e, message_fields=self.MESSAGE_FIELDS) for e in raw_errors
+        ]
 
         # use 'code' if present and correct type
         if isinstance(self._dict_data.get("code"), str):
             self.code = t.cast(str, self._dict_data["code"])
-        # otherwise, check if all 'errors' which contain a 'code' have the same one
-        # if so, that will be safe to use instead
+        # otherwise, pull 'code' from the sub-errors array
         elif self.errors:
-            code = self._extract_code_from_error_array(self.errors)
-            if code is not None:
-                self.code = code
+            # in undefined parse cases, the code will be left as `"Error"` for
+            # a higher degree of backwards compatibility
+            maybe_code = self._extract_code_from_error_array(self.errors)
+            if maybe_code is not None:
+                self.code = maybe_code
 
         # either there is an array of subdocument errors or there is not,
         # in which case we load only from the root doc
         self.messages = self._extract_messages_from_error_array(
-            self.errors or [self._dict_data]
+            self.errors
+            or [ErrorSubdocument(self._dict_data, message_fields=self.MESSAGE_FIELDS)]
         )
 
         return True
 
     def _extract_messages_from_error_array(
-        self,
-        errors: list[dict[str, t.Any]],
-        message_fields: t.Sequence[str] | None = None,
+        self, errors: list[ErrorSubdocument]
     ) -> list[str]:
         """
         Extract 'messages' from an array of errors (JSON:API or otherwise)
@@ -361,26 +383,14 @@ class GlobusAPIError(GlobusError):
         This is done by checking each error document for the desired message fields and
         popping out the first such message for each document.
         """
-        if message_fields is None:
-            message_fields = self.MESSAGE_FIELDS
-
         ret: list[str] = []
         for doc in errors:
-            for f in message_fields:
-                if isinstance(doc.get(f), str):
-                    log.debug("Loaded message from '%s' field", f)
-                    ret.append(doc[f])
-                    # NOTE! this break ensures we take only one field per error
-                    # document (or subdocument) as the 'message'
-                    # so that a doc like
-                    #   {"message": "foo", "detail": "bar"}
-                    # has a single message, "foo"
-                    break
-
+            if doc.message is not None:
+                ret.append(doc.message)
         return ret
 
     def _extract_code_from_error_array(
-        self, errors: list[dict[str, t.Any]]
+        self, errors: list[ErrorSubdocument]
     ) -> str | None:
         """
         Extract a 'code' field from an array of errors (JSON:API or otherwise)
@@ -389,17 +399,71 @@ class GlobusAPIError(GlobusError):
         """
         codes: set[str] = set()
         for error in errors:
-            if isinstance(error.get("code"), str):
-                codes.add(error["code"])
+            if error.code is not None:
+                codes.add(error.code)
         if len(codes) == 1:
             return codes.pop()
         return None
 
-    def _final_parse_callback(self) -> bool:
-        """
-        A final internal callback for extra customizations after
-        fully successful parsing.
 
-        By default, does nothing.
+class ErrorSubdocument:
+    """
+    Error subdocuments as returned by Globus APIs.
+
+    :ivar dict raw: The unparsed error subdocument
+    """
+
+    # the default set of fields to use for message extraction, in order
+    # selected to match the fields defined by JSON:API by default
+    DEFAULT_MESSAGE_FIELDS: tuple[str, ...] = ("detail", "title")
+
+    def __init__(
+        self, data: dict[str, t.Any], *, message_fields: t.Sequence[str] | None = None
+    ) -> None:
+        self.raw = data
+        self._message_fields: tuple[str, ...]
+
+        if message_fields is not None:
+            self._message_fields = tuple(message_fields)
+        else:
+            self._message_fields = self.DEFAULT_MESSAGE_FIELDS
+
+    @property
+    def message(self) -> str | None:
         """
-        return True
+        The 'message' string of this subdocument, derived from its data based on the
+        parsing context.
+
+        May be `None` if no message is defined.
+        """
+        return _extract_message_from_dict(self.raw, self._message_fields)
+
+    @property
+    def code(self) -> str | None:
+        """
+        The 'code' string of this subdocument, derived from its data based on the
+        parsing context.
+
+        May be `None` if no code is defined.
+        """
+        if isinstance(self.raw.get("code"), str):
+            return t.cast(str, self.raw["code"])
+        return None
+
+    def get(self, key: str, default: t.Any = None) -> t.Any | None:
+        """
+        A dict-like getter for the raw data.
+        """
+        return self.raw.get(key, default)
+
+
+def _extract_message_from_dict(
+    data: dict[str, t.Any], message_fields: tuple[str, ...]
+) -> str | None:
+    """
+    Extract a single message string from a dict if one is present.
+    """
+    for f in message_fields:
+        if isinstance(data.get(f), str):
+            return t.cast(str, data[f])
+    return None

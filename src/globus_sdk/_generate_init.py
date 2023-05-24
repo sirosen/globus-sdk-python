@@ -81,6 +81,7 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
         "exc",
         (
             "GlobusAPIError",
+            "ErrorSubdocument",
             "GlobusConnectionError",
             "GlobusConnectionTimeoutError",
             "GlobusError",

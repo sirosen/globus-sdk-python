@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from globus_sdk.exc import GlobusAPIError
+import typing as t
+
+from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
 
 class TimerAPIError(GlobusAPIError):
@@ -48,7 +50,7 @@ class TimerAPIError(GlobusAPIError):
         # extract 'code' from it
         # and extract 'messages' from it
         if isinstance(self._dict_data.get("error"), dict):
-            self.errors = [self._dict_data["error"]]
+            self.errors = [ErrorSubdocument(self._dict_data["error"])]
             self.code = self._extract_code_from_error_array(self.errors)
             self.messages = self._extract_messages_from_error_array(self.errors)
             return True
@@ -61,20 +63,32 @@ class TimerAPIError(GlobusAPIError):
             self.code = "Validation Error"
 
             # collect the errors array from details
-            self.errors = [d for d in self._dict_data["detail"] if isinstance(d, dict)]
+            self.errors = [
+                ErrorSubdocument(d)
+                for d in self._dict_data["detail"]
+                if isinstance(d, dict)
+            ]
 
             # drop error objects which don't have the relevant fields
             # and then build custom 'messages' for Globus Timers errors
-            details = [
-                d
-                for d in self.errors
-                if isinstance(d.get("msg"), str)
-                and isinstance(d.get("loc"), list)
-                and all(isinstance(path_item, str) for path_item in d["loc"])
-            ]
+            details = list(_details_from_errors(self.errors))
             self.messages = [
-                e["msg"] + ": " + ".".join(k for k in e["loc"]) for e in details
+                f"{e['msg']}: {'.'.join(k for k in e['loc'])}" for e in details
             ]
             return True
         else:
             return super()._parse_undefined_error_format()
+
+
+def _details_from_errors(
+    errors: list[ErrorSubdocument],
+) -> t.Iterator[dict[str, t.Any]]:
+    for d in errors:
+        if not isinstance(d.get("msg"), str):
+            continue
+        loc_list = d.get("loc")
+        if not isinstance(loc_list, list):
+            continue
+        if not all(isinstance(path_item, str) for path_item in loc_list):
+            continue
+        yield d.raw

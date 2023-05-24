@@ -4,7 +4,7 @@ import json
 import pytest
 import requests
 
-from globus_sdk import GlobusAPIError, RemovedInV4Warning, exc
+from globus_sdk import ErrorSubdocument, GlobusAPIError, RemovedInV4Warning, exc
 
 
 def _strmatch_any_order(inputstr, prefix, midfixes, suffix, sep=", "):
@@ -576,8 +576,14 @@ def test_non_jsonapi_parsing_uses_root_as_errors_array_by_default(
     )
     err = GlobusAPIError(res.r)
 
-    # errors is the doc root wrapped in a list
-    assert err.errors == [error_doc]
+    # errors is the doc root wrapped in a list, but converted to a subdocument error
+    assert len(err.errors) == 1
+    subdoc = err.errors[0]
+    assert isinstance(subdoc, ErrorSubdocument)
+    assert subdoc.raw == error_doc
+    # note that 'message' is supported for error message extraction
+    # vs 'detail' and 'title' for JSON:API data
+    assert subdoc.message == error_doc["message"]
 
 
 @pytest.mark.parametrize(
@@ -602,5 +608,9 @@ def test_non_jsonapi_parsing_uses_errors_array_if_present(make_response, error_d
     )
     err = GlobusAPIError(res.r)
 
-    # errors is the 'errors' list
-    assert err.errors == error_doc["errors"]
+    # errors is the 'errors' list converted to error subdocs
+    # first some sanity checks...
+    assert len(err.errors) == len(error_doc["errors"])
+    assert all(isinstance(subdoc, ErrorSubdocument) for subdoc in err.errors)
+    # ...and then a true equivalence test
+    assert [e.raw for e in err.errors] == error_doc["errors"]

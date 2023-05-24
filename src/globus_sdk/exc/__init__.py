@@ -1,4 +1,4 @@
-from .api import GlobusAPIError
+from .api import ErrorSubdocument, GlobusAPIError
 from .base import GlobusError, GlobusSDKUsageError
 from .convert import (
     GlobusConnectionError,
@@ -19,6 +19,7 @@ __all__ = (
     "GlobusError",
     "GlobusSDKUsageError",
     "GlobusAPIError",
+    "ErrorSubdocument",
     "NetworkError",
     "GlobusTimeoutError",
     "GlobusConnectionTimeoutError",

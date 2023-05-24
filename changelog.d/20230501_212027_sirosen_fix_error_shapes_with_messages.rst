@@ -11,7 +11,8 @@
 
   * A new attribute is added to API error objects, ``errors``. This is a list
     of subdocuments parsed from the error data, especially relevant for
-    JSON:API errors and similar formats.
+    JSON:API errors and similar formats. See the
+    :ref:`ErrorSubdocument documentation <error_subdocuments>` for details.
 
   * A new attribute is now present on API error objects, ``messages``. This is
     a list of messages parsed from the error data, for errors with multiple
