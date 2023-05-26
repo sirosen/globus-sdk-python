@@ -106,7 +106,7 @@ an error object. This is used if there were multiple errors encountered and the
 API wants to send them back all at once.
 
 All instances of ``GlobusAPIError`` define an attribute, ``errors``, which is
-an array of ``ErrorSubdocument``\s. It may be empty if there were no subdocuments.
+an array of ``ErrorSubdocument``\s.
 
 Error handling code can inspect these sub-errors like so:
 
