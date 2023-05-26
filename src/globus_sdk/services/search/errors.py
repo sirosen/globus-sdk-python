@@ -20,6 +20,6 @@ class SearchAPIError(exc.GlobusAPIError):
         self.error_data: dict[str, t.Any] | None = None
         super().__init__(r)
 
-    def _final_parse_callback(self) -> bool:
+    def _post_parse_hook(self) -> bool:
         self.error_data = self._dict_data.get("error_data")
         return True

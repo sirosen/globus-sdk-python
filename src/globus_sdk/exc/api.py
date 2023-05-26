@@ -233,7 +233,7 @@ class GlobusAPIError(GlobusError):
         - Attempt to detect the error format in use, then dispatch to the relevant
           subparser: JSON:API, Type Zero, or Undefined
 
-        - if subparsing succeeded, call the `_final_parse_callback` hook to allow
+        - if subparsing succeeded, call the `_post_parse_hook` hook to allow
           subclasses to trivially add more computed attributes. This could also be
           done by altering `__init__` but it's nicer to have a dedicated hook because
           it is guaranteed to only be called if the rest of parsing succeeded
@@ -258,12 +258,11 @@ class GlobusAPIError(GlobusError):
 
         if not subparse_result:
             return False
-        return self._final_parse_callback()
+        return self._post_parse_hook()
 
-    def _final_parse_callback(self) -> bool:
+    def _post_parse_hook(self) -> bool:
         """
-        A final internal callback for extra customizations after
-        fully successful parsing.
+        An internal callback for extra customizations after fully successful parsing.
 
         By default, does nothing.
         """
@@ -380,8 +379,13 @@ class GlobusAPIError(GlobusError):
         """
         Extract 'messages' from an array of errors (JSON:API or otherwise)
 
-        This is done by checking each error document for the desired message fields and
-        popping out the first such message for each document.
+        Each subdocument *may* define its messages, so this is the aggregate of messages
+        from those documents which had messages.
+
+        Note that subdocuments may be instructed about their `message_fields` by the
+        error class and parsing path which they take. Therefore, this may be extracting
+        `"message"`, `"detail"`, or `"title"` in the base implementation and other
+        fields if a subclass customizes this further.
         """
         ret: list[str] = []
         for doc in errors:
