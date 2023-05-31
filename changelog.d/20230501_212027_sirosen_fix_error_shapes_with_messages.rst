@@ -1,7 +1,7 @@
 * Error parsing in the SDK has been enhanced to better support JSON:API and
   related error formats with multiple sub-errors. Several attributes are
   added or changed. For most SDK users, the changes will be completely
-  transparent or a minor improvement. (:pr:`NUMBER`)
+  transparent or a minor improvement. (:pr:`725`)
 
   * Error parsing now attempts to detect the format of the error data and will
     parse JSON:API data differently from non-JSON:API data. Furthermore,
