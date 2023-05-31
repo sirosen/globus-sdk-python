@@ -4,7 +4,7 @@ import json
 import pytest
 import requests
 
-from globus_sdk import GlobusAPIError, RemovedInV4Warning, exc
+from globus_sdk import ErrorSubdocument, GlobusAPIError, RemovedInV4Warning, exc
 
 
 def _strmatch_any_order(inputstr, prefix, midfixes, suffix, sep=", "):
@@ -70,7 +70,7 @@ def test_get_args(default_json_response, default_text_response, malformed_respon
         None,
         "401",
         "Error",
-        "error message",
+        "Unauthorized",
     ]
     err = GlobusAPIError(malformed_response.r)
     assert err._get_args() == [
@@ -79,7 +79,7 @@ def test_get_args(default_json_response, default_text_response, malformed_respon
         None,
         "403",
         "Error",
-        "{",
+        "Forbidden",
     ]
 
 
@@ -92,7 +92,7 @@ def test_get_args_on_unknown_json(make_json_response):
         None,
         "400",
         "Error",
-        '{"foo": "bar"}',
+        "Bad Request",
     ]
 
 
@@ -105,7 +105,7 @@ def test_get_args_on_non_dict_json(make_json_response):
         None,
         "400",
         "Error",
-        '["foo", "bar"]',
+        "Bad Request",
     ]
 
 
@@ -369,7 +369,7 @@ def test_http_header_exposure(make_response):
             "bearer",
         ),
         ("PATCH", 500, None, "https://bogus.example.org/bar", "", "unknown-token"),
-        ("PUT", 501, None, "https://bogus.example.org/bar", None, None),
+        ("PUT", 501, None, "https://bogus.example.org/bar", "Not Implemented", None),
     ],
 )
 def test_error_repr_has_expected_info(
@@ -429,3 +429,188 @@ def test_error_repr_has_expected_info(
             assert error_message in stringified
         else:
             assert http_reason in stringified
+
+
+@pytest.mark.parametrize(
+    "content_type",
+    ("application/json", "application/unknown+json", "application/vnd.api+json"),
+)
+def test_loads_jsonapi_error_subdocuments(make_response, content_type):
+    res = make_response(
+        {
+            "errors": [
+                {
+                    "code": "TooShort",
+                    "title": "Password data too short",
+                    "detail": "password was only 3 chars long, must be at least 8",
+                },
+                {
+                    "code": "MissingSpecial",
+                    "title": "Password data missing special chars",
+                    "detail": "password must have non-alphanumeric characters",
+                },
+                {
+                    "code": "ContainsCommonDogName",
+                    "title": "Password data has a popular dog name",
+                    "detail": "password cannot contain 'spot', 'woofy', or 'clifford'",
+                },
+            ]
+        },
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": content_type},
+    )
+    err = GlobusAPIError(res.r)
+
+    # code is not taken from any of the subdocuments (inherently too ambiguous)
+    # behavior will depend on which parsing path was taken
+    if content_type.endswith("vnd.api+json"):
+        # code becomes None because we saw "true" JSON:API and can opt-in to
+        # better behavior
+        assert err.code is None
+    else:
+        # code remains 'Error' for backwards compatibility in the non-JSON:API case
+        assert err.code == "Error"
+
+    # but messages can be extracted, and they prefer detail to title
+    assert err.messages == [
+        "password was only 3 chars long, must be at least 8",
+        "password must have non-alphanumeric characters",
+        "password cannot contain 'spot', 'woofy', or 'clifford'",
+    ]
+
+
+@pytest.mark.parametrize(
+    "content_type",
+    ("application/json", "application/unknown+json", "application/vnd.api+json"),
+)
+def test_loads_jsonapi_error_subdocuments_with_common_code(make_response, content_type):
+    res = make_response(
+        {
+            "errors": [
+                {
+                    "code": "MissingClass",
+                    "title": "Must contain capital letter",
+                    "detail": "password must contain at least one capital letter",
+                },
+                {
+                    "code": "MissingClass",
+                    "title": "Must contain special chars",
+                    "detail": "password must have non-alphanumeric characters",
+                },
+            ]
+        },
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": content_type},
+    )
+    err = GlobusAPIError(res.r)
+    # code is taken because all subdocuments have the same code
+    assert err.code == "MissingClass"
+
+
+@pytest.mark.parametrize(
+    "content_type",
+    ("application/json", "application/unknown+json", "application/vnd.api+json"),
+)
+def test_loads_jsonapi_error_messages_from_various_fields(make_response, content_type):
+    res = make_response(
+        {
+            "errors": [
+                {
+                    "message": "invalid password value",
+                },
+                {
+                    "title": "Must contain capital letter",
+                },
+                {
+                    "detail": "password must have non-alphanumeric characters",
+                },
+            ]
+        },
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": content_type},
+    )
+    err = GlobusAPIError(res.r)
+    # messages are extracted, and they use whichever field is appropriate for
+    # each sub-error
+    # note that 'message' will *not* be extracted if the Content-Type indicated JSON:API
+    # because JSON:API does not define such a field
+    if content_type.endswith("vnd.api+json"):
+        # code becomes None because we saw "true" JSON:API and can opt-in to
+        # better behavior
+        assert err.code is None
+        assert err.messages == [
+            "Must contain capital letter",
+            "password must have non-alphanumeric characters",
+        ]
+    else:
+        # code remains 'Error' for backwards compatibility in the non-JSON:API case
+        assert err.code == "Error"
+
+        assert err.messages == [
+            "invalid password value",
+            "Must contain capital letter",
+            "password must have non-alphanumeric characters",
+        ]
+
+
+@pytest.mark.parametrize(
+    "error_doc",
+    (
+        # Type Zero Error Format
+        {"code": "FooCode", "message": "FooMessage"},
+        # Undefined Error Format
+        {"message": "FooMessage"},
+    ),
+)
+def test_non_jsonapi_parsing_uses_root_as_errors_array_by_default(
+    make_response, error_doc
+):
+    res = make_response(
+        error_doc,
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json"},
+    )
+    err = GlobusAPIError(res.r)
+
+    # errors is the doc root wrapped in a list, but converted to a subdocument error
+    assert len(err.errors) == 1
+    subdoc = err.errors[0]
+    assert isinstance(subdoc, ErrorSubdocument)
+    assert subdoc.raw == error_doc
+    # note that 'message' is supported for error message extraction
+    # vs 'detail' and 'title' for JSON:API data
+    assert subdoc.message == error_doc["message"]
+
+
+@pytest.mark.parametrize(
+    "error_doc",
+    (
+        # Type Zero Error Format with sub-error data
+        {"code": "FooCode", "message": "FooMessage", "errors": [{"bar": "baz"}]},
+        # Type Zero Error Format with *empty* sub-error data
+        {"code": "FooCode", "message": "FooMessage", "errors": []},
+        # Undefined Error Format with sub-error data
+        {"message": "FooMessage", "errors": [{"bar": "baz"}]},
+        # Undefined Error Format with *empty* sub-error data
+        {"message": "FooMessage", "errors": []},
+    ),
+)
+def test_non_jsonapi_parsing_uses_errors_array_if_present(make_response, error_doc):
+    res = make_response(
+        error_doc,
+        422,
+        data_transform=json.dumps,
+        headers={"Content-Type": "application/json"},
+    )
+    err = GlobusAPIError(res.r)
+
+    # errors is the 'errors' list converted to error subdocs
+    # first some sanity checks...
+    assert len(err.errors) == len(error_doc["errors"])
+    assert all(isinstance(subdoc, ErrorSubdocument) for subdoc in err.errors)
+    # ...and then a true equivalence test
+    assert [e.raw for e in err.errors] == error_doc["errors"]

@@ -63,13 +63,13 @@ def success_response():
 @pytest.fixture
 def default_json_response(make_json_response):
     json_data = {
+        "code": "Json Error",
         "errors": [
             {
                 "message": "json error message",
                 "title": "json error message",
-                "code": "Json Error",
             }
-        ]
+        ],
     }
     return make_json_response(json_data, 400)
 

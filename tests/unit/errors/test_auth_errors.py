@@ -15,7 +15,7 @@ def nested_auth_response(make_json_response):
         "errors": [
             {"detail": "nested auth error message", "code": "Auth Error"},
             {
-                "title": "some other error which will not be seen",
+                "title": "some secondary error",
                 "code": "HiddenError",
             },
         ]
@@ -28,13 +28,18 @@ def nested_auth_response(make_json_response):
     (
         # normal auth error data
         ("simple_auth_response", "404", "Error", "simple auth error message"),
-        ("nested_auth_response", "404", "Auth Error", "nested auth error message"),
+        (
+            "nested_auth_response",
+            "404",
+            "Error",
+            "nested auth error message; some secondary error",
+        ),
         # wrong format (but still parseable)
         ("default_json_response", "400", "Json Error", "json error message"),
         # defaults for non-json data
-        ("default_text_response", "401", "Error", "error message"),
+        ("default_text_response", "401", "Error", "Unauthorized"),
         # malformed data is at least rendered successfully into an error
-        ("malformed_response", "403", "Error", "{"),
+        ("malformed_response", "403", "Error", "Forbidden"),
     ),
 )
 def test_get_args_auth(request, response_fixture_name, status, code, message):

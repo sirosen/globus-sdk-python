@@ -32,6 +32,7 @@ _LAZY_IMPORT_TABLE = {
     },
     "exc": {
         "GlobusAPIError",
+        "ErrorSubdocument",
         "GlobusConnectionError",
         "GlobusConnectionTimeoutError",
         "GlobusError",
@@ -134,6 +135,7 @@ if t.TYPE_CHECKING:
     from .authorizers import RefreshTokenAuthorizer
     from .client import BaseClient
     from .exc import GlobusAPIError
+    from .exc import ErrorSubdocument
     from .exc import GlobusConnectionError
     from .exc import GlobusConnectionTimeoutError
     from .exc import GlobusError
@@ -257,6 +259,7 @@ __all__ = (
     "CollectionPolicies",
     "ConfidentialAppAuthClient",
     "DeleteData",
+    "ErrorSubdocument",
     "FlowsAPIError",
     "FlowsClient",
     "GCSAPIError",

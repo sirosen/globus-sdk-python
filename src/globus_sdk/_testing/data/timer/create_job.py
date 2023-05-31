@@ -9,7 +9,33 @@ RESPONSES = ResponseSet(
         path="/jobs/",
         method="POST",
         json=JOB_JSON,
-        metadata={"job_id": JOB_ID},
         status=201,
+    ),
+    validation_error=RegisteredResponse(
+        service="timer",
+        path="/jobs/",
+        method="POST",
+        json={
+            "detail": [
+                {
+                    "loc": ["body", "start"],
+                    "msg": "field required",
+                    "type": "value_error.missing",
+                },
+                {
+                    "loc": ["body", "callback_url"],
+                    "msg": "field required",
+                    "type": "value_error.missing",
+                },
+            ]
+        },
+        metadata={
+            "job_id": JOB_ID,
+            "expect_messages": [
+                "field required: body.start",
+                "field required: body.callback_url",
+            ],
+        },
+        status=422,
     ),
 )

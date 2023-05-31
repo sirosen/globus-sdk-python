@@ -26,10 +26,10 @@ class GCSAPIError(exc.GlobusAPIError):
             args.append(self.detail)
         return args
 
-    def _load_from_json(self, data: dict[str, t.Any]) -> None:
-        super()._load_from_json(data)
+    def _post_parse_hook(self) -> bool:
         # detail can be a full document, so fetch, then look for a DATA_TYPE
         # and expose it as a top-level attribute for easy access
-        self.detail = data.get("detail")
+        self.detail = self._dict_data.get("detail")
         if isinstance(self.detail, dict) and "DATA_TYPE" in self.detail:
             self.detail_data_type = self.detail["DATA_TYPE"]
+        return True

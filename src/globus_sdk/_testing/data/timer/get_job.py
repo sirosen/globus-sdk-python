@@ -118,4 +118,17 @@ RESPONSES = ResponseSet(
         method="GET",
         json=JOB_JSON,
     ),
+    simple_500_error=RegisteredResponse(
+        service="timer",
+        path=f"/jobs/{JOB_ID}",
+        method="GET",
+        status=500,
+        json={
+            "error": {
+                "code": "ERROR",
+                "detail": "Request failed terribly",
+                "status": 500,
+            }
+        },
+    ),
 )

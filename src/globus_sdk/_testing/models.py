@@ -57,9 +57,6 @@ class RegisteredResponse:
         self.method = method.upper()
         self.json = json
         self.body = body
-
-        if headers is None:
-            headers = {"Content-Type": "application/json"}
         self.headers = headers
 
         self._metadata = metadata
