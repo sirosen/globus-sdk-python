@@ -1,2 +1,2 @@
 
-* Fix pagination on iterable gcs client routes  (:pr:`NUMBER`)
+* Fix pagination on iterable gcs client routes  (:pr:`738`)
