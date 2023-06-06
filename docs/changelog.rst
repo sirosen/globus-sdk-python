@@ -12,6 +12,14 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.20.1:
+
+v3.20.1 (2023-06-06)
+--------------------
+
+* Fix ``TransferClient.operation_mkdir`` and ``TransferClient.operation_rename`` to no
+  longer send null ``local_user`` by default (:pr:`741`)
+
 .. _changelog-3.20.0:
 
 v3.20.0 (2023-06-05)
