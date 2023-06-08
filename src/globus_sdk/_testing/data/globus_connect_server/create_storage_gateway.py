@@ -44,4 +44,22 @@ RESPONSES = ResponseSet(
             ],
         },
     ),
+    validation_error=RegisteredResponse(
+        path="/storage_gateways",
+        service="gcs",
+        method="POST",
+        status=422,
+        json={
+            "DATA_TYPE": "result#1.0.0",
+            "code": "unprocessable_entity",
+            "detail": "",
+            "http_response_code": 422,
+            "message": "Data Validation Error",
+        },
+        metadata={
+            "http_status": 422,
+            "code": "unprocessable_entity",
+            "message": "Data Validation Error",
+        },
+    ),
 )

@@ -20,4 +20,23 @@ RESPONSES = ResponseSet(
             "data": [{}],
         },
     ),
+    permission_denied_error=RegisteredResponse(
+        service="gcs",
+        method="DELETE",
+        path=f"/storage_gateways/{metadata['id']}",
+        status=403,
+        json={
+            "DATA_TYPE": "result#1.0.0",
+            "code": "permission_denied",
+            "detail": "",
+            "http_response_code": 403,
+            "message": None,
+        },
+        metadata={
+            "http_status": 403,
+            "code": "permission_denied",
+            "message": "",
+            **metadata,
+        },
+    ),
 )

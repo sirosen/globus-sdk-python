@@ -2,6 +2,7 @@ import urllib.parse
 
 import pytest
 
+import globus_sdk
 from globus_sdk._testing import get_last_request, load_response
 
 
@@ -46,6 +47,20 @@ def test_create_storage_gateway(client):
     # confirm top level access to storage gateway data
     assert res["id"] == meta["id"]
     assert res["display_name"] == meta["display_name"]
+
+
+def test_create_storage_gateway_validation_error(client):
+    meta = load_response(
+        client.create_storage_gateway, case="validation_error"
+    ).metadata
+
+    with pytest.raises(globus_sdk.GCSAPIError) as excinfo:
+        client.create_storage_gateway({})
+
+    error = excinfo.value
+    assert error.http_status == meta["http_status"]
+    assert error.code == meta["code"]
+    assert error.message == meta["message"]
 
 
 @pytest.mark.parametrize(
@@ -95,3 +110,17 @@ def test_delete_storage_gateway(client):
     # confirm top level access to response data
     assert res["code"] == "success"
     assert res["message"] == "Operation successful"
+
+
+def test_delete_storage_gateway_permission_denied(client):
+    meta = load_response(
+        client.delete_storage_gateway, case="permission_denied_error"
+    ).metadata
+
+    with pytest.raises(globus_sdk.GCSAPIError) as excinfo:
+        client.delete_storage_gateway(meta["id"])
+
+    error = excinfo.value
+    assert error.http_status == meta["http_status"]
+    assert error.code == meta["code"]
+    assert error.message == meta["message"]
