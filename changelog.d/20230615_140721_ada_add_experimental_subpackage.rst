@@ -1,1 +1,1 @@
-* Add an ``experimental`` subpackage. (:pr:`NUMBER`)
+* Add an ``experimental`` subpackage. (:pr:`751`)
