@@ -18,3 +18,4 @@ Globus SDK Experimental Components
     :caption: Contents
     :maxdepth: 1
 
+    scope_parser
