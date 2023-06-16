@@ -12,6 +12,22 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.21.0:
+
+v3.21.0 (2023-06-16)
+--------------------
+
+* ``AuthAPIError`` will now parse a unique ``id`` found in the error
+  subdocuments as the ``request_id`` attribute (:pr:`749`)
+
+* Add a ``FlowsClient.update_run()`` method. (:pr:`744`)
+
+* Add a ``FlowsClient.delete_run()`` method. (:pr:`747`)
+
+* Add a ``FlowsClient.cancel_run()`` method. (:pr:`747`)
+
+* Add an ``experimental`` subpackage. (:pr:`751`)
+
 .. _changelog-3.20.1:
 
 v3.20.1 (2023-06-06)
