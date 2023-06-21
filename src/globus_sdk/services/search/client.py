@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from globus_sdk import client, paging, response
+from globus_sdk import client, paging, response, utils
 from globus_sdk._types import UUIDLike
 from globus_sdk.exc.warnings import warn_deprecated
 from globus_sdk.scopes import SearchScopes
@@ -396,6 +396,61 @@ class SearchClient(client.BaseClient):
         """
         log.info(f"SearchClient.delete_by_query({index_id}, ...)")
         return self.post(f"/v1/index/{index_id}/delete_by_query", data=data)
+
+    def batch_delete_by_subject(
+        self,
+        index_id: UUIDLike,
+        subjects: t.Iterable[str],
+        additional_params: dict[str, t.Any] | None = None,
+    ) -> response.GlobusHTTPResponse:
+        """
+        Delete data in a Search index as an asynchronous task, deleting multiple
+        documents based on their ``subject`` values.
+
+        A ``task_id`` value will be included in the response.
+
+        :param index_id: The index in which to delete data
+        :type index_id: str or UUID
+        :param subjects: The subjects to delete, as an iterable of strings
+        :type subjects: iterable of str
+        :param additional_params: Additional parameters to include in the request body
+        :type additional_params: dict, optional
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: python
+
+                    sc = globus_sdk.SearchClient(...)
+                    sc.batch_delete_by_subject(
+                        index_id,
+                        subjects=[
+                            "very-cool-document",
+                            "less-cool-document",
+                            "document-wearing-sunglasses",
+                        ],
+                    )
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: search.batch_delete_by_subject
+
+            .. tab-item:: API Info
+
+                ``POST /v1/index/<index_id>/batch_delete_by_subject``
+
+                .. extdoclink:: Delete By Subject
+                    :ref: search/reference/batch_delete_by_subject/
+        """
+        log.info(f"SearchClient.batch_delete_by_subject({index_id}, ...)")
+        # convert the provided subjects to a list and use the "safe iter" helper to
+        # ensure that a single string is *not* treated as an iterable of strings,
+        # which is usually not intentional
+        body = {"subjects": list(utils.safe_strseq_iter(subjects))}
+        if additional_params:
+            body.update(additional_params)
+        return self.post(f"/v1/index/{index_id}/batch_delete_by_subject", data=body)
 
     #
     # Subject Operations
