@@ -205,8 +205,7 @@ class AuthClient(client.BaseClient):
         query_params: dict[str, t.Any] | None = None,
     ) -> GetIdentityProvidersResponse:
         r"""
-        Given ``domains=...`` or (exclusive) ``ids=...``,
-        look up information for the matching set of identity providers.
+        Look up information about identity providers by domains or by IDs.
 
         :param domains: A domain or iterable of domains to lookup. Mutually exclusive
             with ``ids``.
@@ -673,7 +672,7 @@ class AuthClient(client.BaseClient):
             return jwk_as_pem
 
 
-def _commasep(val: t.Iterable[str | UUIDLike] | str | UUIDLike) -> str:
+def _commasep(val: UUIDLike | t.Iterable[UUIDLike]) -> str:
     # note that this explicit handling of Iterable allows for string-like objects to be
     # passed to this function and be stringified by the `str()` call
     if isinstance(val, collections.abc.Iterable):

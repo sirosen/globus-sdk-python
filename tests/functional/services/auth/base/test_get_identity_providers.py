@@ -4,7 +4,7 @@ import globus_sdk
 from globus_sdk._testing import get_last_request, load_response
 
 
-def test_get_identity_providers(client):
+def test_get_identity_providers_by_domains(client):
     meta = load_response(client.get_identity_providers).metadata
     res = client.get_identity_providers(domains=meta["domains"])
 
