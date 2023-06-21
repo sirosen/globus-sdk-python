@@ -9,3 +9,13 @@ class GetIdentitiesResponse(IterableResponse):
     """
 
     default_iter_key = "identities"
+
+
+class GetIdentityProvidersResponse(IterableResponse):
+    """
+    Response class specific to the Get Identity Providers API
+
+    Provides iteration on the "identity_providers" array in the response.
+    """
+
+    default_iter_key = "identity_providers"
