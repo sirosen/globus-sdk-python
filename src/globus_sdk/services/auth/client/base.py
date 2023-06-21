@@ -281,9 +281,9 @@ class AuthClient(client.BaseClient):
         # this handles lists of values as well as individual values gracefully
         # letting us consume args whose `__str__` methods produce "the right
         # thing"
-        elif domains:
+        elif domains is not None:
             query_params["domains"] = _commasep(domains)
-        elif ids:
+        elif ids is not None:
             query_params["ids"] = _commasep(ids)
         else:
             log.warning(
