@@ -17,14 +17,18 @@ else:
     from typing_extensions import Literal
 
 from globus_sdk import client, exc, utils
-from globus_sdk._types import IntLike, UUIDLike
+from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import AuthScopes
 
 from ..errors import AuthAPIError
 from ..flow_managers import GlobusOAuthFlowManager
-from ..response import GetIdentitiesResponse, OAuthTokenResponse
+from ..response import (
+    GetIdentitiesResponse,
+    GetIdentityProvidersResponse,
+    OAuthTokenResponse,
+)
 
 log = logging.getLogger(__name__)
 
@@ -167,29 +171,19 @@ class AuthClient(client.BaseClient):
                     :ref: auth/reference/#v2_api_identities_resources
         """  # noqa: E501
 
-        def _convert_listarg(
-            val: (t.Iterable[IntLike | UUIDLike] | IntLike | UUIDLike),
-        ) -> str:
-            if isinstance(val, collections.abc.Iterable):
-                return ",".join(utils.safe_strseq_iter(val))
-            return str(val)
-
         log.info("Looking up Globus Auth Identities")
 
         if query_params is None:
             query_params = {}
 
-        # if either of these params has a truthy value, stringify it safely,
-        # letting us consume args whose `__str__` methods produce "the right
-        # thing"
-        # most notably, lets `ids` take a single UUID object safely
+        # if either of these params has a truthy value, stringify it
         if usernames:
-            query_params["usernames"] = _convert_listarg(usernames)
+            query_params["usernames"] = _commasep(usernames)
             query_params["provision"] = (
                 "false" if str(provision).lower() == "false" else "true"
             )
         if ids:
-            query_params["ids"] = _convert_listarg(ids)
+            query_params["ids"] = _commasep(ids)
 
         log.debug(f"query_params={query_params}")
 
@@ -201,6 +195,106 @@ class AuthClient(client.BaseClient):
 
         return GetIdentitiesResponse(
             self.get("/v2/api/identities", query_params=query_params)
+        )
+
+    def get_identity_providers(
+        self,
+        *,
+        domains: t.Iterable[str] | str | None = None,
+        ids: t.Iterable[UUIDLike] | UUIDLike | None = None,
+        query_params: dict[str, t.Any] | None = None,
+    ) -> GetIdentityProvidersResponse:
+        r"""
+        Given ``domains=...`` or (exclusive) ``ids=...``,
+        look up information for the matching set of identity providers.
+
+        :param domains: A domain or iterable of domains to lookup. Mutually exclusive
+            with ``ids``.
+        :type domains: str or iterable of str, optional
+        :param ids: An identity provider ID or iterable of IDs to lookup. Mutually exclusive
+            with ``domains``.
+        :type ids: str, UUID, or iterable of str or UUID, optional
+        :param query_params: Any additional parameters to be passed through
+            as query params.
+        :type query_params: dict, optional
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> # get by ID
+                    >>> r = ac.get_identity_providers(ids="41143743-f3c8-4d60-bbdb-eeecaba85bd9")
+                    >>> r.data
+                    {
+                      "identity_providers": [
+                        {
+                          "alternative_names": [],
+                          "name": "Globus ID",
+                          "domains": ["globusid.org"],
+                          "id": "41143743-f3c8-4d60-bbdb-eeecaba85bd9",
+                          "short_name": "globusid"
+                        }
+                      ]
+                    }
+                    >>> ac.get_identities(
+                    ...     ids=["41143743-f3c8-4d60-bbdb-eeecaba85bd9", "927d7238-f917-4eb2-9ace-c523fa9ba34e"]
+                    ... )
+                    >>> # or by domain
+                    >>> ac.get_identities(domains="globusid.org")
+                    >>> ac.get_identities(domains=["globus.org", "globusid.org"])
+
+                The result itself is iterable, so you can use it like so:
+
+                .. code-block:: python
+
+                    for idp in ac.get_identity_providers(domains=["globus.org", "globusid.org"]):
+                        print(f"name: {idp['name']}")
+                        print(f"id: {idp['id']}")
+                        print(f"domains: {idp['domains']}")
+                        print()
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.get_identity_providers
+
+            .. tab-item:: API Info
+
+                ``GET /v2/api/identity_providers``
+
+                .. extdoclink:: Get Identity Providers
+                    :ref: auth/reference/#get_identity_providers
+        """  # noqa: E501
+
+        log.info("Looking up Globus Auth Identity Providers")
+
+        if query_params is None:
+            query_params = {}
+
+        if domains is not None and ids is not None:
+            raise exc.GlobusSDKUsageError(
+                "AuthClient.get_identity_providers does not take both "
+                "'domains' and 'ids'. These are mutually exclusive."
+            )
+        # if either of these params has a truthy value, stringify it
+        # this handles lists of values as well as individual values gracefully
+        # letting us consume args whose `__str__` methods produce "the right
+        # thing"
+        elif domains:
+            query_params["domains"] = _commasep(domains)
+        elif ids:
+            query_params["ids"] = _commasep(ids)
+        else:
+            log.warning(
+                "neither 'domains' nor 'ids' provided to get_identity_providers(). "
+                "This can only succeed if 'query_params' were given."
+            )
+
+        log.debug(f"query_params={query_params}")
+        return GetIdentityProvidersResponse(
+            self.get("/v2/api/identity_providers", query_params=query_params)
         )
 
     def oauth2_get_authorize_url(
@@ -577,3 +671,11 @@ class AuthClient(client.BaseClient):
             )
             log.debug("JWK PEM decoding finished successfully")
             return jwk_as_pem
+
+
+def _commasep(val: t.Iterable[str | UUIDLike] | str | UUIDLike) -> str:
+    # note that this explicit handling of Iterable allows for string-like objects to be
+    # passed to this function and be stringified by the `str()` call
+    if isinstance(val, collections.abc.Iterable):
+        return ",".join(utils.safe_strseq_iter(val))
+    return str(val)
