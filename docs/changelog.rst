@@ -12,6 +12,21 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.22.0:
+
+v3.22.0 (2023-06-22)
+--------------------
+
+* Add support for ``AuthClient.get_identity_providers`` for looking up Identity
+  Providers by domain or ID in Globus Auth (:pr:`757`)
+
+* Add a method to the Globus Search client, ``SearchClient.batch_delete_by_subject`` (:pr:`760`)
+
+* Add ``AuthScopes.manage_projects`` to scope data. This is also accessible as
+  ``AuthClient.scopes.manage_projects`` (:pr:`761`)
+
+* Alpha features of globus-sdk are now documented in the "Unstable" doc section (:pr:`753`)
+
 .. _changelog-3.21.0:
 
 v3.21.0 (2023-06-16)
