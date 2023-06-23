@@ -1,6 +1,6 @@
 * ``AuthClient``, ``NativeAppAuthClient``, and ``ConfidentialAppAuthClient``
   have had their init signatures updated to explicitly list available
-  parameters. (:pr:`NUMBER`)
+  parameters. (:pr:`764`)
 
   * Type annotations for these classes are now more accurate
 
