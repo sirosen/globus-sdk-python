@@ -118,5 +118,6 @@ you can use, e.g.,:
     response dictionaries):
 
 .. code-block:: python
+
     session_error.utils.to_session_error(other_error)  # GlobusSessionError
     session_error.utils.to_session_errors([other_error])  # [GlobusSessionError, ...]

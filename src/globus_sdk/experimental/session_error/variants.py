@@ -2,22 +2,37 @@ import typing as t
 
 from .session_error import GlobusSessionError, GlobusSessionErrorAuthorizationParameters
 
+T = t.TypeVar("T", bound="LegacySessionErrorVariant")
 
-class LegacyConsentRequiredTransferError:
+
+class LegacySessionErrorVariant:
+    """
+    Abstract base class for errors which can be converted to a Globus Session Error.
+    """
+
+    @classmethod
+    def from_dict(cls: t.Type[T], error_dict: t.Dict[str, t.Any]) -> T:
+        raise NotImplementedError()
+
+    def to_session_error(self) -> GlobusSessionError:
+        raise NotImplementedError()
+
+
+class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
     """
     The ConsentRequired error format emitted by the Globus Transfer service.
     """
 
     def __init__(
         self,
-        code: t.Literal["ConsentRequired"],
+        code: str,
         required_scopes: t.List[str],
         message: t.Optional[str] = None,
         request_id: t.Optional[str] = None,
         resource: t.Optional[str] = None,
         **kwargs: t.Any,
     ):
-        self.code: t.Literal["ConsentRequired"] = code
+        self.code: str = code
         self.required_scopes: t.List[str] = required_scopes
         self.message: t.Optional[str] = message
         self.request_id: t.Optional[str] = request_id
@@ -56,7 +71,7 @@ class LegacyConsentRequiredTransferError:
         return cls(**error_dict)
 
 
-class LegacyConsentRequiredAPError:
+class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
     """
     The ConsentRequired error format emitted by the legacy Globus Transfer
     Action Providers.
@@ -64,12 +79,12 @@ class LegacyConsentRequiredAPError:
 
     def __init__(
         self,
-        code: t.Literal["ConsentRequired"],
+        code: str,
         required_scope: str,
         description: t.Optional[str] = None,
         **kwargs: t.Any,
     ):
-        self.code: t.Literal["ConsentRequired"] = code
+        self.code: str = code
         self.required_scope: str = required_scope
         self.description: t.Optional[str] = description
         self.extra_fields: t.Dict[str, t.Any] = kwargs
@@ -209,7 +224,7 @@ class LegacyAuthorizationParameters:
         return cls(**param_dict)
 
 
-class LegacyAuthorizationParametersError:
+class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
     """
     Defines an Authorization Parameters error that describes all known variants
     in use by Globus services.

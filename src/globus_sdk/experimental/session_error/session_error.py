@@ -65,7 +65,9 @@ class GlobusSessionErrorAuthorizationParameters:
         self.extra_fields: t.Dict[str, t.Any] = kwargs
 
     @classmethod
-    def from_dict(cls, param_dict: t.Dict[str, t.Any]) -> "GlobusSessionError":
+    def from_dict(
+        cls, param_dict: t.Dict[str, t.Any]
+    ) -> "GlobusSessionErrorAuthorizationParameters":
         """
         Instantiate from a session error authorization parameters dictionary. Raises
         a ValueError if the dictionary does not contain a valid GlobusSessionError.
