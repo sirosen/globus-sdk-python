@@ -17,3 +17,4 @@ Globus SDK Experimental Components
     :maxdepth: 1
 
     scope_parser
+    session_errors
