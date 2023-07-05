@@ -6,6 +6,7 @@ import hashlib
 import os
 import sys
 import typing as t
+import uuid
 from base64 import b64encode
 from enum import Enum
 
@@ -44,13 +45,14 @@ def slash_join(a: str, b: str | None) -> str:
 
 
 def safe_strseq_iter(
-    value: t.Iterable[t.Any],
-) -> t.Generator[str, None, None]:
+    value: t.Iterable[t.Any] | str | uuid.UUID,
+) -> t.Iterator[str]:
     """
     Given an Iterable (typically of strings), produce an iterator over it of strings.
-    This is a passthrough with two caveats:
+    This is a passthrough with some caveats:
     - if the value is a solitary string, yield only that value
-    - str value in the iterable which is not a string
+    - if the value is a solitary UUID, yield only that value (as a string)
+    - str values in the iterable which are not strings
 
     This helps handle cases where a string is passed to a function expecting an iterable
     of strings, as well as cases where an iterable of UUID objects is accepted for a
@@ -58,6 +60,8 @@ def safe_strseq_iter(
     """
     if isinstance(value, str):
         yield value
+    elif isinstance(value, uuid.UUID):
+        yield str(value)
     else:
         for x in value:
             yield str(x)

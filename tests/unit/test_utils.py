@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 
 from globus_sdk import utils
@@ -68,3 +70,16 @@ def test_classproperty_simple():
             return cls.x["x"]
 
     assert Foo.y == 1
+
+
+@pytest.mark.parametrize(
+    "value, expected_result",
+    (
+        ("foo", ["foo"]),
+        ((1, 2, 3), ["1", "2", "3"]),
+        (uuid.UUID(int=10), [f"{uuid.UUID(int=10)}"]),
+        (["foo", uuid.UUID(int=5)], ["foo", f"{uuid.UUID(int=5)}"]),
+    ),
+)
+def test_safe_strseq_iter(value, expected_result):
+    assert list(utils.safe_strseq_iter(value)) == expected_result

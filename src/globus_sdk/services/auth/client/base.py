@@ -318,6 +318,10 @@ class AuthClient(client.BaseClient):
             self.get("/v2/api/identity_providers", query_params=query_params)
         )
 
+    #
+    # Developer APIs
+    #
+
     def get_projects(self) -> IterableResponse:
         """
         Look up projects on which the authenticated user is an admin.
@@ -369,6 +373,74 @@ class AuthClient(client.BaseClient):
                     :ref: auth/reference/#get_projects
         """  # noqa: E501
         return GetProjectsResponse(self.get("/v2/api/projects"))
+
+    def create_project(
+        self,
+        display_name: str,
+        contact_email: str,
+        admin_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
+        admin_group_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
+    ) -> GlobusHTTPResponse:
+        """
+        Create a new project. Requires the ``manage_projects`` scope.
+
+        At least one of ``admin_ids`` or ``admin_group_ids`` must be provided.
+
+        :param display_name: The name of the project
+        :type display_name: str
+        :param contact_email: The email address of the project's point of contact
+        :type contact_email: str
+        :param admin_ids: A list of user IDs to be added as admins of the project
+        :type admin_ids: str or uuid or iterable of str or uuid, optional
+        :param admin_group_ids: A list of group IDs to be added as admins of the project
+        :type admin_group_ids: str or uuid or iterable of str or uuid, optional
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                When creating a project, your account is not necessarily included as an
+                admin. The following snippet uses the ``manage_projects`` scope as well
+                as the ``openid`` and ``email`` scopes to get the current user ID and
+                email address and use those data to setup the project.
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> userinfo = ac.oauth2_userinfo()
+                    >>> identity_id = userinfo["sub"]
+                    >>> email = userinfo["email"]
+                    >>> r = ac.create_project(
+                    ...     "My Project",
+                    ...     contact_email=email,
+                    ...     admin_ids=identity_id,
+                    ... )
+                    >>> project_id = r["project"]["id"]
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.create_project
+
+            .. tab-item:: API Info
+
+                ``POST /v2/api/projects``
+
+                .. extdoclink:: Create Project
+                    :ref: auth/reference/#create_project
+        """
+        body: dict[str, t.Any] = {
+            "display_name": display_name,
+            "contact_email": contact_email,
+        }
+        if admin_ids is not None:
+            body["admin_ids"] = list(utils.safe_strseq_iter(admin_ids))
+        if admin_group_ids is not None:
+            body["admin_group_ids"] = list(utils.safe_strseq_iter(admin_group_ids))
+        return self.post("/v2/api/projects", data={"project": body})
+
+    #
+    # OAuth2 Behaviors & APIs
+    #
 
     def oauth2_get_authorize_url(
         self,
