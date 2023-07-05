@@ -45,13 +45,12 @@ def slash_join(a: str, b: str | None) -> str:
 
 
 def safe_strseq_iter(
-    value: t.Iterable[t.Any] | bytes | str | uuid.UUID,
+    value: t.Iterable[t.Any] | str | uuid.UUID,
 ) -> t.Iterator[str]:
     """
     Given an Iterable (typically of strings), produce an iterator over it of strings.
     This is a passthrough with some caveats:
     - if the value is a solitary string, yield only that value
-    - if the value is a bytestring, yield the utf-8 decoded string
     - if the value is a solitary UUID, yield only that value (as a string)
     - str values in the iterable which are not strings
 
@@ -61,8 +60,6 @@ def safe_strseq_iter(
     """
     if isinstance(value, str):
         yield value
-    elif isinstance(value, bytes):
-        yield value.decode()
     elif isinstance(value, uuid.UUID):
         yield str(value)
     else:

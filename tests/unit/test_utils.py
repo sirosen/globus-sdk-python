@@ -76,7 +76,6 @@ def test_classproperty_simple():
     "value, expected_result",
     (
         ("foo", ["foo"]),
-        (b"foo", ["foo"]),
         ((1, 2, 3), ["1", "2", "3"]),
         (uuid.UUID(int=10), [f"{uuid.UUID(int=10)}"]),
         (["foo", uuid.UUID(int=5)], ["foo", f"{uuid.UUID(int=5)}"]),
