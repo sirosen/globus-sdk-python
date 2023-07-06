@@ -3,13 +3,13 @@ import typing as t
 
 from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
-from .session_error import GlobusSessionError
-from .variants import (
+from ._variants import (
     LegacyAuthorizationParametersError,
     LegacyConsentRequiredAPError,
     LegacyConsentRequiredTransferError,
     LegacySessionErrorVariant,
 )
+from .session_error import GlobusSessionError
 
 log = logging.getLogger(__name__)
 
