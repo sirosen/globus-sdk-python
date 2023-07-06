@@ -20,6 +20,7 @@ def to_session_error(
     attempting to match to GlobusSessionError (preferred) or legacy variants.
 
     .. note::
+
         a GlobusAPIError may contain multiple errors, and in this case only a single
         session error is returned for the first error that matches a known format.
 
@@ -71,6 +72,7 @@ def to_session_errors(
     GlobusSessionError (preferred) or legacy variants.
 
     .. note::
+
         A GlobusAPIError may contain multiple errors, so the result
         list could be longer than the provided list.
 

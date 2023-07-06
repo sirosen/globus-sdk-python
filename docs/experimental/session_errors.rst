@@ -3,7 +3,7 @@ Session Errors
 
 Globus Session Error is a response format that conveys to a client any
 modifications to a session (i.e., "boosting") that will be required
-in order to complete a particular request.
+to complete a particular request.
 
 The ``session_errors`` module provides a number of tools to make it easier to
 identify and handle these errors when they occur.
@@ -25,7 +25,7 @@ response's session_required_scopes one could use, e.g.,:
 
 ``GlobusSessionError`` enforces types strictly when parsing a Globus Session
 Error response dictionary, and will raise a ``ValueError`` if a supported
-field is supplied with value of the wrong type. ``GlobusSessionError`` does
+field is supplied with a value of the wrong type. ``GlobusSessionError`` does
 not, however, attempt to mimic or itself enforce any logic specific to the
 Globus Auth service with regard to what represents a coherent combination
 of fields (e.g., that ``session_required_mfa`` requires either
@@ -51,7 +51,7 @@ in your application, e.g.:
     # Render a strict dictionary
     error.to_dict()
 
-If non-canonical fields were supplied on creation (either as keyword arguments
+If non-canonical fields are supplied on creation (either as keyword arguments
 during instantiation or as fields in a dictionary supplied to ``from_dict()``),
 you can preserve these fields in the rendered output dictionary
 by specifying ``include_extra=True``.
@@ -83,7 +83,7 @@ Parsing Responses
 -----------------
 
 If you are writing a client to a Globus API, the ``session_errors`` subpackage
-in the Python SDK provides utilities to detect legacy session error response
+provides utilities to detect legacy session error response
 formats and normalize them.
 
 To detect if a ``GlobusAPIError``, ``ErrorSubdocument``, or JSON response
@@ -98,7 +98,10 @@ you can use, e.g.,:
         "code": "ConsentRequired",
         "message": "Missing required foo consent",
     }
-    session_error.utils.is_session_error(error_dict)  # False
+    # The dict is not a session error, so `False` is returned.
+    session_error.utils.is_session_error(error_dict)
+
+    # The dict is not a session error and cannot be converted.
     session_error.utils.to_session_error(error_dict)  # None
 
     error_dict = {
@@ -110,11 +113,12 @@ you can use, e.g.,:
     session_error.utils.to_session_error(error_dict)  # GlobusSessionError
 
 .. note::
+
     If a GlobusAPIError represents multiple errors that were returned in an
     array, this only returns the first error in that array that can be
     converted to the Globus Session Error response format. In this case (and,
-    in general) it's preferable to use ``to_session_error()`` (which also
-    accepts a list of ``GlobusAPIErrors``, ``ErrorSubdocuments``, and JSON
+    in general) it's preferable to use ``to_session_errors()`` (which also
+    accepts a list of ``GlobusAPIError``s, ``ErrorSubdocument``s, and JSON
     response dictionaries):
 
 .. code-block:: python
