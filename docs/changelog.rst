@@ -12,6 +12,68 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.23.0:
+
+v3.23.0 (2023-07-06)
+--------------------
+
+Added
+~~~~~
+
+- Add ``AuthClient`` methods to support the Projects APIs for listing,
+  creating, updating, and deleting projects.
+
+  - ``AuthClient.get_projects`` (:pr:`766`)
+  - ``AuthClient.create_project`` (:pr:`772`)
+  - ``AuthClient.update_project`` (:pr:`774`)
+  - ``AuthClient.delete_project`` (:pr:`776`)
+
+- ``globus_sdk._testing`` now exposes a method, ``construct_error`` which makes
+  it simpler to explicitly construct and return a Globus SDK error object for
+  testing. This is used in the SDK's own testsuite and is available for
+  ``_testing`` users. (:pr:`770`)
+
+- ``AuthClient.oauth2_get_authorize_url`` now supports the following parameters
+  for session management: ``session_required_identities``,
+  ``session_required_single_domain``, and ``session_required_policies``. Each
+  of these accept list inputs, as returned by
+  ``ErrorInfo.authorization_parameters``. (:pr:`773`)
+
+Changed
+~~~~~~~
+
+* ``AuthClient``, ``NativeAppAuthClient``, and ``ConfidentialAppAuthClient``
+  have had their init signatures updated to explicitly list available
+  parameters. (:pr:`764`)
+
+  * Type annotations for these classes are now more accurate
+
+  * The ``NativeAppAuthClient`` and ``ConfidentialAppAuthClient`` classes do
+    not accept ``authorizer`` in their init signatures. Previously this was
+    accepted but raised a ``GlobusSDKUsageError``. Attempting to pass an
+    ``authorizer`` will now result in a ``TypeError``.
+
+- ``session_required_policies`` parsing in ``AuthorizationParameterInfo`` now
+  supports the policies being returned as a ``list[str]`` in addition to
+  supporting ``str`` (:pr:`769`)
+
+Fixed
+~~~~~
+
+- ``AuthorizationParameterInfo`` is now more type-safe, and will not return
+  parsed data from a response without checking that the data has correct types
+  (:pr:`769`)
+
+- Adjust the ``FlowsClient.get_run()`` ``include_flow_description`` parameter
+  so it is submitted only when it has a value. (:pr:`778`)
+
+Documentation
+~~~~~~~~~~~~~
+
+- The ``_testing`` documentation has been expanded with a dropdown view of the
+  response contents for each method. In support of this, client method testing
+  docs have been reorganized into a page per service. (:pr:`767`)
+
 .. _changelog-3.22.0:
 
 v3.22.0 (2023-06-22)
@@ -29,7 +91,7 @@ Added
   ``AuthClient.scopes.manage_projects`` (:pr:`761`)
 
 Documentation
--------------
+~~~~~~~~~~~~~
 
 * Alpha features of globus-sdk are now documented in the "Unstable" doc section (:pr:`753`)
 
