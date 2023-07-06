@@ -1,8 +1,7 @@
-import json
-
 import pytest
 
-from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
+from globus_sdk._testing import construct_error
+from globus_sdk.exc import ErrorSubdocument
 from globus_sdk.experimental.session_error import (
     GlobusSessionError,
     has_session_errors,
@@ -10,24 +9,6 @@ from globus_sdk.experimental.session_error import (
     to_session_error,
     to_session_errors,
 )
-
-# TODO: We should move this to a common location
-from tests.unit.errors.conftest import _mk_response
-
-
-def _error_for_json_dict(error_dict, status=403, method="POST", headers=None):
-    combined_headers = {"Content-Type": "application/json"}
-    if headers:
-        combined_headers.update(headers)
-
-    response = _mk_response(
-        data=error_dict,
-        status=status,
-        method=method,
-        headers=combined_headers,
-        data_transform=json.dumps,
-    )
-    return GlobusAPIError(response.r)
 
 
 @pytest.mark.parametrize(
@@ -64,7 +45,7 @@ def test_create_session_error_from_consent_error(error_dict, status):
     """
     # Create various supplementary objects representing this error
     error_subdoc = ErrorSubdocument(error_dict)
-    api_error = _error_for_json_dict(error_dict, status=status)
+    api_error = construct_error(body=error_dict, http_status=status)
 
     for error in (error_dict, error_subdoc, api_error):
         # Test boolean utility functions
@@ -121,7 +102,7 @@ def test_create_session_error_from_authorization_error(authorization_parameters)
     # Create various supplementary objects representing this error
     error_dict = {"authorization_parameters": authorization_parameters}
     error_subdoc = ErrorSubdocument(error_dict)
-    api_error = _error_for_json_dict(error_dict)
+    api_error = construct_error(body=error_dict, http_status=403)
 
     for error in (error_dict, error_subdoc, api_error):
         # Test boolean utility functions
@@ -178,7 +159,7 @@ def test_create_session_error_from_authorization_error_csv(authorization_paramet
             error_dict["authorization_parameters"][key] = value
 
     error_subdoc = ErrorSubdocument(error_dict)
-    api_error = _error_for_json_dict(error_dict)
+    api_error = construct_error(body=error_dict, http_status=403)
 
     for error in (error_dict, error_subdoc, api_error):
         # Test boolean utility functions
@@ -206,8 +187,8 @@ def test_create_session_errors_from_multiple_errors():
     GlobusSessionErrors, and additionally test that this is correct even when mingled
     with other accepted data types.
     """
-    consent_errors = _error_for_json_dict(
-        {
+    consent_errors = construct_error(
+        body={
             "errors": [
                 {
                     "code": "ConsentRequired",
@@ -230,11 +211,12 @@ def test_create_session_errors_from_multiple_errors():
                     },
                 },
             ]
-        }
+        },
+        http_status=403,
     )
 
-    authorization_error = _error_for_json_dict(
-        {
+    authorization_error = construct_error(
+        body={
             "authorization_parameters": {
                 "session_message": (
                     "You need to authenticate with an identity that "
@@ -242,14 +224,16 @@ def test_create_session_errors_from_multiple_errors():
                 ),
                 "session_required_policies": ["foo", "baz"],
             }
-        }
+        },
+        http_status=403,
     )
 
-    not_an_error = _error_for_json_dict(
-        {
+    not_an_error = construct_error(
+        body={
             "code": "NotAnError",
             "message": "This is not an error",
-        }
+        },
+        http_status=403,
     )
 
     all_errors = [consent_errors, not_an_error, authorization_error]
@@ -312,7 +296,7 @@ def test_create_session_error_from_legacy_authorization_error_with_code():
 
     # Create various supplementary objects representing this error
     error_subdoc = ErrorSubdocument(error_dict)
-    api_error = _error_for_json_dict(error_dict)
+    api_error = construct_error(body=error_dict, http_status=403)
 
     for error in (error_dict, error_subdoc, api_error):
         # Test boolean utility functions
@@ -344,8 +328,8 @@ def test_backward_compatibility_consent_required_error():
     # Create an API error with a backward compatible data schema using
     # distinct values for duplicative fields to facilitate testing
     # (in practice these would be the same)
-    error = _error_for_json_dict(
-        {
+    error = construct_error(
+        body={
             "code": "ConsentRequired",
             "message": "Missing required foo_bar consent",
             "request_id": "WmMV97A1w",
@@ -362,7 +346,7 @@ def test_backward_compatibility_consent_required_error():
                 "optional": "A non-canonical field",
             },
         },
-        status=403,
+        http_status=403,
     )
 
     # Test boolean utility functions
