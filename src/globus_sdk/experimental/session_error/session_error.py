@@ -88,7 +88,9 @@ class GlobusSessionErrorAuthorizationParameters:
             if field_name in param_dict and not isinstance(
                 param_dict[field_name], field_type
             ):
-                raise ValueError(f"{field_name} must be of type {field_type.__name__}")
+                raise ValueError(
+                    f"'{field_name}' must be of type {field_type.__name__}"
+                )
 
         return cls(**param_dict)
 
@@ -155,12 +157,12 @@ class GlobusSessionError(GlobusError):
         """
 
         if "code" not in error_dict:
-            raise ValueError("GlobusSessionError must have a code")
+            raise ValueError("Must have a 'code'")
 
         # Enforce that authorization_parameters is in the error_dict and
         # contains at least one of the fields we expect
         if "authorization_parameters" not in error_dict:
-            raise ValueError("GlobusSessionError must have authorization_parameters")
+            raise ValueError("Must have 'authorization_parameters'")
 
         kwargs = copy.deepcopy(error_dict)
 

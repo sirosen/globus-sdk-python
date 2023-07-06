@@ -1,5 +1,5 @@
+import logging
 import typing as t
-from contextlib import suppress
 
 from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
@@ -10,6 +10,8 @@ from .variants import (
     LegacyConsentRequiredTransferError,
     LegacySessionErrorVariant,
 )
+
+log = logging.getLogger(__name__)
 
 
 def to_session_error(
@@ -48,8 +50,12 @@ def to_session_error(
         error_dict = error
 
     # Prefer a proper session error, if possible
-    with suppress(ValueError):
+    try:
         return GlobusSessionError.from_dict(error_dict)
+    except ValueError as err:
+        log.debug(
+            f"Failed to parse error as 'GlobusSessionError' because: {err.args[0]}"
+        )
 
     supported_variants: t.List[t.Type[LegacySessionErrorVariant]] = [
         LegacyAuthorizationParametersError,
@@ -57,8 +63,12 @@ def to_session_error(
         LegacyConsentRequiredAPError,
     ]
     for variant in supported_variants:
-        with suppress(ValueError):
+        try:
             return variant.from_dict(error_dict).to_session_error()
+        except ValueError as err:
+            log.debug(
+                f"Failed to parse error as '{variant.__name__}' because: {err.args[0]}"
+            )
 
     return None
 

@@ -63,10 +63,10 @@ class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
         :type error_dict: dict
         """
         if error_dict.get("code") != "ConsentRequired":
-            raise ValueError("Must be a ConsentRequired error")
+            raise ValueError("'code' must be 'ConsentRequired'")
 
         if not error_dict.get("required_scopes"):
-            raise ValueError("Must include required_scopes")
+            raise ValueError("Must include 'required_scopes'")
 
         return cls(**error_dict)
 
@@ -116,10 +116,10 @@ class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
         :type error_dict: dict
         """
         if error_dict.get("code") != "ConsentRequired":
-            raise ValueError("Must be a ConsentRequired error")
+            raise ValueError("'code' must be 'ConsentRequired'")
 
         if not error_dict.get("required_scope"):
-            raise ValueError("Must include required_scope")
+            raise ValueError("Must include 'required_scope'")
 
         return cls(**error_dict)
 
@@ -257,10 +257,7 @@ class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
         if not isinstance(error_dict, dict) or not isinstance(
             error_dict.get("authorization_parameters"), dict
         ):
-            raise ValueError(
-                "LegacyAuthorizationParametersError must be a dict that contains an "
-                "'authorization_parameters' dict"
-            )
+            raise ValueError("Must contain an 'authorization_parameters' dict")
 
         extra_fields = {
             key: value
