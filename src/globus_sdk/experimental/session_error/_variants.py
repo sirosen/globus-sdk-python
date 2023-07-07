@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing as t
 
 from .session_error import GlobusSessionError, GlobusSessionErrorAuthorizationParameters
@@ -11,7 +13,7 @@ class LegacySessionErrorVariant:
     """
 
     @classmethod
-    def from_dict(cls: t.Type[T], error_dict: t.Dict[str, t.Any]) -> T:
+    def from_dict(cls: t.Type[T], error_dict: dict[str, t.Any]) -> T:
         raise NotImplementedError()
 
     def to_session_error(self) -> GlobusSessionError:
@@ -26,18 +28,18 @@ class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
     def __init__(
         self,
         code: str,
-        required_scopes: t.List[str],
-        message: t.Optional[str] = None,
-        request_id: t.Optional[str] = None,
-        resource: t.Optional[str] = None,
+        required_scopes: list[str],
+        message: str | None = None,
+        request_id: str | None = None,
+        resource: str | None = None,
         **kwargs: t.Any,
     ):
         self.code: str = code
-        self.required_scopes: t.List[str] = required_scopes
-        self.message: t.Optional[str] = message
-        self.request_id: t.Optional[str] = request_id
-        self.resource: t.Optional[str] = resource
-        self.extra_fields: t.Dict[str, t.Any] = kwargs
+        self.required_scopes: list[str] = required_scopes
+        self.message: str | None = message
+        self.request_id: str | None = request_id
+        self.resource: str | None = resource
+        self.extra_fields: dict[str, t.Any] = kwargs
 
     def to_session_error(self) -> GlobusSessionError:
         """
@@ -53,8 +55,8 @@ class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
 
     @classmethod
     def from_dict(
-        cls, error_dict: t.Dict[str, t.Any]
-    ) -> "LegacyConsentRequiredTransferError":
+        cls, error_dict: dict[str, t.Any]
+    ) -> LegacyConsentRequiredTransferError:
         """
         Instantiate from an error dictionary. Raises a ValueError if the dictionary
         does not contain a recognized LegacyConsentRequiredTransferError.
@@ -81,13 +83,13 @@ class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
         self,
         code: str,
         required_scope: str,
-        description: t.Optional[str] = None,
+        description: str | None = None,
         **kwargs: t.Any,
     ):
         self.code: str = code
         self.required_scope: str = required_scope
-        self.description: t.Optional[str] = description
-        self.extra_fields: t.Dict[str, t.Any] = kwargs
+        self.description: str | None = description
+        self.extra_fields: dict[str, t.Any] = kwargs
 
     def to_session_error(self) -> GlobusSessionError:
         """
@@ -105,9 +107,7 @@ class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
         )
 
     @classmethod
-    def from_dict(
-        cls, error_dict: t.Dict[str, t.Any]
-    ) -> "LegacyConsentRequiredAPError":
+    def from_dict(cls, error_dict: dict[str, t.Any]) -> LegacyConsentRequiredAPError:
         """
         Instantiate from an error dictionary. Raises a ValueError if the dictionary
         does not contain a recognized LegacyConsentRequiredAPError.
@@ -143,29 +143,27 @@ class LegacyAuthorizationParameters:
 
     def __init__(
         self,
-        session_message: t.Optional[str] = None,
-        session_required_identities: t.Optional[t.List[str]] = None,
-        session_required_policies: t.Optional[t.Union[str, t.List[str]]] = None,
-        session_required_single_domain: t.Optional[t.Union[str, t.List[str]]] = None,
-        session_required_mfa: t.Optional[bool] = None,
-        session_required_scopes: t.Optional[t.List[str]] = None,
+        session_message: str | None = None,
+        session_required_identities: list[str] | None = None,
+        session_required_policies: str | list[str] | None = None,
+        session_required_single_domain: str | list[str] | None = None,
+        session_required_mfa: bool | None = None,
+        session_required_scopes: list[str] | None = None,
         **kwargs: t.Any,
     ):
-        self.session_message: t.Optional[str] = session_message
-        self.session_required_identities: t.Optional[
-            t.List[str]
-        ] = session_required_identities
-        self.session_required_policies: t.Optional[
-            t.Union[str, t.List[str]]
-        ] = session_required_policies
-        self.session_required_single_domain: t.Optional[
-            t.Union[str, t.List[str]]
-        ] = session_required_single_domain
-        self.session_required_mfa: t.Optional[bool] = session_required_mfa
+        self.session_message: str | None = session_message
+        self.session_required_identities: list[str] | None = session_required_identities
+        self.session_required_policies: str | list[
+            str
+        ] | None = session_required_policies
+        self.session_required_single_domain: str | list[
+            str
+        ] | None = session_required_single_domain
+        self.session_required_mfa: bool | None = session_required_mfa
         # Declared here for compatibility with mixed legacy payloads
-        self.session_required_scopes: t.Optional[t.List[str]] = session_required_scopes
+        self.session_required_scopes: list[str] | None = session_required_scopes
         # Retain any additional fields
-        self.extra_fields: t.Dict[str, t.Any] = kwargs
+        self.extra_fields: dict[str, t.Any] = kwargs
 
     def to_session_error_authorization_parameters(
         self,
@@ -196,9 +194,7 @@ class LegacyAuthorizationParameters:
         )
 
     @classmethod
-    def from_dict(
-        cls, param_dict: t.Dict[str, t.Any]
-    ) -> "LegacyAuthorizationParameters":
+    def from_dict(cls, param_dict: dict[str, t.Any]) -> LegacyAuthorizationParameters:
         """
         Create from a dictionary. Raises a ValueError if the dictionary does not contain
         a recognized LegacyAuthorizationParameters format.
@@ -235,7 +231,7 @@ class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
     def __init__(
         self,
         authorization_parameters: LegacyAuthorizationParameters,
-        code: t.Optional[str] = None,
+        code: str | None = None,
         **kwargs: t.Any,
     ):
         self.authorization_parameters: LegacyAuthorizationParameters = (
@@ -243,12 +239,12 @@ class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
         )
         self.code: str = code or self.DEFAULT_CODE
         # Retain any additional fields
-        self.extra_fields: t.Dict[str, t.Any] = kwargs
+        self.extra_fields: dict[str, t.Any] = kwargs
 
     @classmethod
     def from_dict(
-        cls, error_dict: t.Dict[str, t.Any]
-    ) -> "LegacyAuthorizationParametersError":
+        cls, error_dict: dict[str, t.Any]
+    ) -> LegacyAuthorizationParametersError:
         """
         Instantiate a LegacyAuthorizationParametersError from a dictionary.
         """

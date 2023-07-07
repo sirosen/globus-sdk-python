@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import typing as t
 
@@ -46,28 +48,28 @@ class GlobusSessionErrorAuthorizationParameters:
 
     def __init__(
         self,
-        session_message: t.Optional[str] = None,
-        session_required_identities: t.Optional[t.List[str]] = None,
-        session_required_policies: t.Optional[t.List[str]] = None,
-        session_required_single_domain: t.Optional[t.List[str]] = None,
-        session_required_mfa: t.Optional[bool] = None,
-        session_required_scopes: t.Optional[t.List[str]] = None,
+        session_message: str | None = None,
+        session_required_identities: list[str] | None = None,
+        session_required_policies: list[str] | None = None,
+        session_required_single_domain: list[str] | None = None,
+        session_required_mfa: bool | None = None,
+        session_required_scopes: list[str] | None = None,
         **kwargs: t.Any,
     ):
-        self.session_message: t.Optional[str] = session_message
+        self.session_message: str | None = session_message
         self.session_required_identities = session_required_identities
         self.session_required_policies = session_required_policies
-        self.session_required_single_domain: t.Optional[
-            t.List[str]
-        ] = session_required_single_domain
-        self.session_required_mfa: t.Optional[bool] = session_required_mfa
-        self.session_required_scopes: t.Optional[t.List[str]] = session_required_scopes
-        self.extra_fields: t.Dict[str, t.Any] = kwargs
+        self.session_required_single_domain: list[
+            str
+        ] | None = session_required_single_domain
+        self.session_required_mfa: bool | None = session_required_mfa
+        self.session_required_scopes: list[str] | None = session_required_scopes
+        self.extra_fields: dict[str, t.Any] = kwargs
 
     @classmethod
     def from_dict(
-        cls, param_dict: t.Dict[str, t.Any]
-    ) -> "GlobusSessionErrorAuthorizationParameters":
+        cls, param_dict: dict[str, t.Any]
+    ) -> GlobusSessionErrorAuthorizationParameters:
         """
         Instantiate from a session error authorization parameters dictionary. Raises
         a ValueError if the dictionary does not contain a valid GlobusSessionError.
@@ -94,7 +96,7 @@ class GlobusSessionErrorAuthorizationParameters:
 
         return cls(**param_dict)
 
-    def to_dict(self, include_extra: bool = False) -> t.Dict[str, t.Any]:
+    def to_dict(self, include_extra: bool = False) -> dict[str, t.Any]:
         """
         Return a session error authorization parameters dictionary.
 
@@ -148,7 +150,7 @@ class GlobusSessionError(GlobusError):
         self.extra_fields = kwargs
 
     @classmethod
-    def from_dict(cls, error_dict: t.Dict[str, t.Any]) -> "GlobusSessionError":
+    def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusSessionError:
         """
         Instantiate a GlobusSessionError from a dictionary.
 
@@ -175,7 +177,7 @@ class GlobusSessionError(GlobusError):
 
         return cls(**kwargs)
 
-    def to_dict(self, include_extra: bool = False) -> t.Dict[str, t.Any]:
+    def to_dict(self, include_extra: bool = False) -> dict[str, t.Any]:
         """
         Return a session error response dictionary.
 

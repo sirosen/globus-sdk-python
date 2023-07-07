@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import typing as t
 
@@ -15,8 +17,8 @@ log = logging.getLogger(__name__)
 
 
 def to_session_error(
-    error: t.Union[GlobusAPIError, ErrorSubdocument, t.Dict[str, t.Any]]
-) -> t.Optional[GlobusSessionError]:
+    error: GlobusAPIError | ErrorSubdocument | dict[str, t.Any]
+) -> GlobusSessionError | None:
     """
     Converts a GlobusAPIError, ErrorSubdocument, or dict into a GlobusSessionError by
     attempting to match to GlobusSessionError (preferred) or legacy variants.
@@ -57,7 +59,7 @@ def to_session_error(
             f"Failed to parse error as 'GlobusSessionError' because: {err.args[0]}"
         )
 
-    supported_variants: t.List[t.Type[LegacySessionErrorVariant]] = [
+    supported_variants: list[t.Type[LegacySessionErrorVariant]] = [
         LegacyAuthorizationParametersError,
         LegacyConsentRequiredTransferError,
         LegacyConsentRequiredAPError,
@@ -74,8 +76,8 @@ def to_session_error(
 
 
 def to_session_errors(
-    errors: t.List[t.Union[GlobusAPIError, ErrorSubdocument, t.Dict[str, t.Any]]]
-) -> t.List[GlobusSessionError]:
+    errors: list[GlobusAPIError | ErrorSubdocument | dict[str, t.Any]]
+) -> list[GlobusSessionError]:
     """
     Converts a list of GlobusAPIErrors, ErrorSubdocuments, or dicts into a list of
     GlobusSessionErrors by attempting to match each error to
@@ -91,7 +93,7 @@ def to_session_errors(
     :param errors: The errors to convert.
     :type errors: a list of GlobusAPIErrors, ErrorSubdocuments, or dicts
     """
-    candidate_errors: t.List[t.Union[ErrorSubdocument, t.Dict[str, t.Any]]] = []
+    candidate_errors: list[ErrorSubdocument | dict[str, t.Any]] = []
     for error in errors:
         if isinstance(error, GlobusAPIError):
             # Use the ErrorSubdocuments
@@ -107,7 +109,7 @@ def to_session_errors(
 
 
 def is_session_error(
-    error: t.Union[GlobusAPIError, ErrorSubdocument, t.Dict[str, t.Any]]
+    error: GlobusAPIError | ErrorSubdocument | dict[str, t.Any]
 ) -> bool:
     """
     Return True if the provided error matches a known session error format.
@@ -119,7 +121,7 @@ def is_session_error(
 
 
 def has_session_errors(
-    errors: t.List[t.Union[GlobusAPIError, ErrorSubdocument, t.Dict[str, t.Any]]]
+    errors: list[GlobusAPIError | ErrorSubdocument | dict[str, t.Any]]
 ) -> bool:
     """
     Return True if any of the provided errors match a known session error format.
