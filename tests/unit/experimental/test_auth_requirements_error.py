@@ -1,9 +1,13 @@
+import inspect
+
 import pytest
 
 from globus_sdk._testing import construct_error
 from globus_sdk.exc import ErrorSubdocument
 from globus_sdk.experimental.auth_requirements_error import (
+    GlobusAuthorizationParameters,
     GlobusAuthRequirementsError,
+    _variants,
     has_auth_requirements_errors,
     is_auth_requirements_error,
     to_auth_requirements_error,
@@ -404,3 +408,25 @@ def test_backward_compatibility_consent_required_error():
             "optional": "A non-canonical field",
         },
     }
+
+
+@pytest.mark.parametrize(
+    "target_class",
+    [
+        GlobusAuthRequirementsError,
+        GlobusAuthorizationParameters,
+        _variants.LegacyAuthorizationParameters,
+        _variants.LegacyAuthorizationParametersError,
+        _variants.LegacyConsentRequiredTransferError,
+        _variants.LegacyConsentRequiredAPError,
+    ],
+)
+def test_constructors_include_all_supported_fields(target_class):
+    """
+    Test that all supported fields are included in the constructors.
+    """
+
+    method_sig = inspect.signature(target_class.__init__)
+    for field_name in target_class.SUPPORTED_FIELDS:
+        # Make sure the constructor has a parameter for this field
+        assert field_name in method_sig.parameters

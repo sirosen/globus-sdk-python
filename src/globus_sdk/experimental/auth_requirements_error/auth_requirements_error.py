@@ -4,6 +4,8 @@ import typing as t
 
 from globus_sdk.exc import GlobusError
 
+from . import validators
+
 
 class GlobusAuthorizationParameters:
     """
@@ -45,12 +47,12 @@ class GlobusAuthorizationParameters:
     extra_fields: dict[str, t.Any]
 
     SUPPORTED_FIELDS = {
-        "session_message": str,
-        "session_required_identities": list,
-        "session_required_policies": list,
-        "session_required_single_domain": list,
-        "session_required_mfa": bool,
-        "session_required_scopes": list,
+        "session_message": validators.OptionalString,
+        "session_required_identities": validators.OptionalListOfStrings,
+        "session_required_policies": validators.OptionalListOfStrings,
+        "session_required_single_domain": validators.OptionalListOfStrings,
+        "session_required_mfa": validators.OptionalBool,
+        "session_required_scopes": validators.OptionalListOfStrings,
     }
 
     def __init__(
@@ -63,12 +65,11 @@ class GlobusAuthorizationParameters:
         session_required_scopes: list[str] | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message = session_message
-        self.session_required_identities = session_required_identities
-        self.session_required_policies = session_required_policies
-        self.session_required_single_domain = session_required_single_domain
-        self.session_required_mfa = session_required_mfa
-        self.session_required_scopes = session_required_scopes
+        # Validate and assign supported fields
+        for field_name, validator in self.SUPPORTED_FIELDS.items():
+            field_value = validator(locals()[field_name])
+            setattr(self, field_name, field_value)
+
         self.extra_fields = extra or {}
 
         # Enforce that the error contains at least one of the fields we expect
@@ -80,14 +81,6 @@ class GlobusAuthorizationParameters:
                 "Must include at least one supported authorization parameter: "
                 ", ".join(self.SUPPORTED_FIELDS.keys())
             )
-
-        # Enforce the field types
-        for field_name, field_type in self.SUPPORTED_FIELDS.items():
-            field_value = getattr(self, field_name)
-            if field_value is not None and not isinstance(field_value, field_type):
-                raise ValueError(
-                    f"'{field_name}' must be of type {field_type.__name__}"
-                )
 
     @classmethod
     def from_dict(cls, param_dict: dict[str, t.Any]) -> GlobusAuthorizationParameters:
@@ -154,8 +147,10 @@ class GlobusAuthRequirementsError(GlobusError):
     extra_fields: dict[str, t.Any]
 
     SUPPORTED_FIELDS = {
-        "code": str,
-        "authorization_parameters": GlobusAuthorizationParameters,
+        "code": validators.String,
+        "authorization_parameters": validators.ClassInstance(
+            GlobusAuthorizationParameters
+        ),
     }
 
     def __init__(
@@ -166,22 +161,18 @@ class GlobusAuthRequirementsError(GlobusError):
         | None,
         extra: dict[str, t.Any] | None,
     ):
-        if code is None:
-            raise ValueError("Must have a 'code'")
-        self.code = code
-
-        self.extra_fields = extra or {}
-
-        # Enforce that authorization_parameters is in the error_dict and
-        # contains at least one of the fields we expect
-        if isinstance(authorization_parameters, GlobusAuthorizationParameters):
-            self.authorization_parameters = authorization_parameters
-        elif isinstance(authorization_parameters, dict):
-            self.authorization_parameters = GlobusAuthorizationParameters.from_dict(
+        # Convert authorization_parameters if it's a dict
+        if isinstance(authorization_parameters, dict):
+            authorization_parameters = GlobusAuthorizationParameters.from_dict(
                 param_dict=authorization_parameters
             )
-        else:
-            raise ValueError("Must have 'authorization_parameters'")
+
+        # Validate and assign supported fields
+        for field_name, validator in self.SUPPORTED_FIELDS.items():
+            field_value = validator(locals()[field_name])
+            setattr(self, field_name, field_value)
+
+        self.extra_fields = extra or {}
 
     @classmethod
     def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusAuthRequirementsError:
