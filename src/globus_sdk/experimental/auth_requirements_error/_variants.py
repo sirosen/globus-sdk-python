@@ -16,9 +16,24 @@ class LegacyAuthRequirementsErrorVariant:
     Globus Auth Requirements Error.
     """
 
+    SUPPORTED_FIELDS: dict[str, t.Tuple[t.Type[t.Any], ...]] = {}
+
     @classmethod
     def from_dict(cls: t.Type[T], error_dict: dict[str, t.Any]) -> T:
-        raise NotImplementedError()
+        """
+        Instantiate from an error dictionary.
+
+        :param error_dict: The dictionary to instantiate the error from.
+        :type error_dict: dict
+        """
+        # Extract any extra fields
+        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        kwargs: dict[str, t.Any] = {"extra": extras}
+        # Ensure required fields are supplied
+        for field_name in cls.SUPPORTED_FIELDS.keys():
+            kwargs[field_name] = error_dict.get(field_name)
+
+        return cls(**kwargs)
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         raise NotImplementedError()
@@ -68,26 +83,6 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
             ),
             extra=self.extra_fields,
         )
-
-    @classmethod
-    def from_dict(
-        cls, error_dict: dict[str, t.Any]
-    ) -> LegacyConsentRequiredTransferError:
-        """
-        Instantiate from an error dictionary. Raises a ValueError if the dictionary
-        does not contain a recognized LegacyConsentRequiredTransferError.
-
-        :param error_dict: The dictionary to instantiate the error from.
-        :type error_dict: dict
-        """
-        # Extract any extra fields
-        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
-        kwargs: dict[str, t.Any] = {"extra": extras}
-        # Ensure required fields are supplied
-        for field_name in cls.SUPPORTED_FIELDS.keys():
-            kwargs[field_name] = error_dict.get(field_name)
-
-        return cls(**kwargs)
 
 
 class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
@@ -143,25 +138,6 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
                 if k != "authorization_parameters"
             },
         )
-
-    @classmethod
-    def from_dict(cls, error_dict: dict[str, t.Any]) -> LegacyConsentRequiredAPError:
-        """
-        Instantiate from an error dictionary. Raises a ValueError if the dictionary
-        does not contain a recognized LegacyConsentRequiredAPError.
-
-        :param error_dict: The dictionary to create the error from.
-        :type error_dict: dict
-        """
-
-        # Extract any extra fields
-        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
-        kwargs: dict[str, t.Any] = {"extra": extras}
-        # Ensure required fields are supplied
-        for field_name in cls.SUPPORTED_FIELDS.keys():
-            kwargs[field_name] = error_dict.get(field_name)
-
-        return cls(**kwargs)
 
 
 class LegacyAuthorizationParameters:
@@ -257,8 +233,7 @@ class LegacyAuthorizationParameters:
     @classmethod
     def from_dict(cls, param_dict: dict[str, t.Any]) -> LegacyAuthorizationParameters:
         """
-        Create from a dictionary. Raises a ValueError if the dictionary does not contain
-        a recognized LegacyAuthorizationParameters format.
+        Instantiate from an authorization_parameters dictionary.
 
         :param param_dict: The dictionary to create the AuthorizationParameters from.
         :type param_dict: dict
@@ -312,23 +287,6 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
 
         # Retain any additional fields
         self.extra_fields = extra or {}
-
-    @classmethod
-    def from_dict(
-        cls, error_dict: dict[str, t.Any]
-    ) -> LegacyAuthorizationParametersError:
-        """
-        Instantiate a LegacyAuthorizationParametersError from a dictionary.
-        """
-
-        # Extract any extra fields
-        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
-        kwargs: dict[str, t.Any] = {"extra": extras}
-        # Ensure required fields are supplied
-        for field_name in cls.SUPPORTED_FIELDS.keys():
-            kwargs[field_name] = error_dict.get(field_name)
-
-        return cls(**kwargs)
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
