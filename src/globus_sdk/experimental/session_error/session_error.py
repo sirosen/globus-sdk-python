@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import typing as t
 
 from globus_sdk.exc import GlobusError
@@ -37,6 +36,14 @@ class GlobusSessionErrorAuthorizationParameters:
     :vartype extra_fields: dict
     """
 
+    session_message: str | None
+    session_required_identities: list[str] | None
+    session_required_policies: list[str] | None
+    session_required_single_domain: list[str] | None
+    session_required_mfa: bool | None
+    session_required_scopes: list[str] | None
+    extra_fields: dict[str, t.Any]
+
     SUPPORTED_FIELDS = {
         "session_message": str,
         "session_required_identities": list,
@@ -54,17 +61,33 @@ class GlobusSessionErrorAuthorizationParameters:
         session_required_single_domain: list[str] | None = None,
         session_required_mfa: bool | None = None,
         session_required_scopes: list[str] | None = None,
-        **kwargs: t.Any,
+        extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message: str | None = session_message
+        self.session_message = session_message
         self.session_required_identities = session_required_identities
         self.session_required_policies = session_required_policies
-        self.session_required_single_domain: list[
-            str
-        ] | None = session_required_single_domain
-        self.session_required_mfa: bool | None = session_required_mfa
-        self.session_required_scopes: list[str] | None = session_required_scopes
-        self.extra_fields: dict[str, t.Any] = kwargs
+        self.session_required_single_domain = session_required_single_domain
+        self.session_required_mfa = session_required_mfa
+        self.session_required_scopes = session_required_scopes
+        self.extra_fields = extra or {}
+
+        # Enforce that the error contains at least one of the fields we expect
+        if not any(
+            (getattr(self, field_name) is not None)
+            for field_name in self.SUPPORTED_FIELDS.keys()
+        ):
+            raise ValueError(
+                "Must include at least one supported authorization parameter: "
+                ", ".join(self.SUPPORTED_FIELDS.keys())
+            )
+
+        # Enforce the field types
+        for field_name, field_type in self.SUPPORTED_FIELDS.items():
+            field_value = getattr(self, field_name)
+            if field_value is not None and not isinstance(field_value, field_type):
+                raise ValueError(
+                    f"'{field_name}' must be of type {field_type.__name__}"
+                )
 
     @classmethod
     def from_dict(
@@ -78,23 +101,14 @@ class GlobusSessionErrorAuthorizationParameters:
         :type param_dict: dict
         """
 
-        # Enforce that the error_dict contains at least one of the fields we expect
-        if not any(field in param_dict for field in cls.SUPPORTED_FIELDS.keys()):
-            raise ValueError(
-                "Must include at least one supported authorization parameter: "
-                ", ".join(cls.SUPPORTED_FIELDS.keys())
-            )
+        # Extract any extra fields
+        extras = {k: v for k, v in param_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        kwargs: dict[str, t.Any] = {"extra": extras}
+        # Ensure required fields are supplied
+        for field_name in cls.SUPPORTED_FIELDS.keys():
+            kwargs[field_name] = param_dict.get(field_name)
 
-        # Enforce the field types
-        for field_name, field_type in cls.SUPPORTED_FIELDS.items():
-            if field_name in param_dict and not isinstance(
-                param_dict[field_name], field_type
-            ):
-                raise ValueError(
-                    f"'{field_name}' must be of type {field_type.__name__}"
-                )
-
-        return cls(**param_dict)
+        return cls(**kwargs)
 
     def to_dict(self, include_extra: bool = False) -> dict[str, t.Any]:
         """
@@ -137,17 +151,43 @@ class GlobusSessionError(GlobusError):
     :vartype extra_fields: dict
     """
 
+    code: str
+    authorization_parameters: GlobusSessionErrorAuthorizationParameters
+    extra_fields: dict[str, t.Any]
+
+    SUPPORTED_FIELDS = {
+        "code": str,
+        "authorization_parameters": GlobusSessionErrorAuthorizationParameters,
+    }
+
     def __init__(
         self,
-        code: str,
-        authorization_parameters: GlobusSessionErrorAuthorizationParameters,
-        **kwargs: t.Any,
+        code: str | None,
+        authorization_parameters: dict[str, t.Any]
+        | GlobusSessionErrorAuthorizationParameters
+        | None,
+        extra: dict[str, t.Any] | None,
     ):
-        self.code: str = code
-        self.authorization_parameters: GlobusSessionErrorAuthorizationParameters = (
-            authorization_parameters
-        )
-        self.extra_fields = kwargs
+        if code is None:
+            raise ValueError("Must have a 'code'")
+        self.code = code
+
+        self.extra_fields = extra or {}
+
+        # Enforce that authorization_parameters is in the error_dict and
+        # contains at least one of the fields we expect
+        if isinstance(
+            authorization_parameters, GlobusSessionErrorAuthorizationParameters
+        ):
+            self.authorization_parameters = authorization_parameters
+        elif isinstance(authorization_parameters, dict):
+            self.authorization_parameters = (
+                GlobusSessionErrorAuthorizationParameters.from_dict(
+                    param_dict=authorization_parameters
+                )
+            )
+        else:
+            raise ValueError("Must have 'authorization_parameters'")
 
     @classmethod
     def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusSessionError:
@@ -158,22 +198,12 @@ class GlobusSessionError(GlobusError):
         :type error_dict: dict
         """
 
-        if "code" not in error_dict:
-            raise ValueError("Must have a 'code'")
-
-        # Enforce that authorization_parameters is in the error_dict and
-        # contains at least one of the fields we expect
-        if "authorization_parameters" not in error_dict:
-            raise ValueError("Must have 'authorization_parameters'")
-
-        kwargs = copy.deepcopy(error_dict)
-
-        # Create our GlobusAuthorizationParameters object
-        kwargs[
-            "authorization_parameters"
-        ] = GlobusSessionErrorAuthorizationParameters.from_dict(
-            param_dict=kwargs.pop("authorization_parameters")
-        )
+        # Extract any extra fields
+        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        kwargs: dict[str, t.Any] = {"extra": extras}
+        # Ensure required fields are supplied
+        for field_name in cls.SUPPORTED_FIELDS.keys():
+            kwargs[field_name] = error_dict.get(field_name)
 
         return cls(**kwargs)
 

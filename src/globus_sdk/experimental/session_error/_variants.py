@@ -25,21 +25,32 @@ class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
     The ConsentRequired error format emitted by the Globus Transfer service.
     """
 
+    code: str
+    required_scopes: list[str]
+    extra_fields: dict[str, t.Any]
+
+    SUPPORTED_FIELDS = {
+        "code": (str,),
+        "required_scopes": (list,),
+    }
+
     def __init__(
         self,
-        code: str,
-        required_scopes: list[str],
-        message: str | None = None,
-        request_id: str | None = None,
-        resource: str | None = None,
-        **kwargs: t.Any,
+        code: str | None,
+        required_scopes: list[str] | None,
+        extra: dict[str, t.Any] | None = None,
     ):
-        self.code: str = code
-        self.required_scopes: list[str] = required_scopes
-        self.message: str | None = message
-        self.request_id: str | None = request_id
-        self.resource: str | None = resource
-        self.extra_fields: dict[str, t.Any] = kwargs
+        # Needed to make mypy happy w/ stricter types on instance vars.
+        # Will clean up in a subsequent commit
+        if not isinstance(code, str) or code != "ConsentRequired":
+            raise ValueError("'code' must be the string 'ConsentRequired'")
+
+        if not isinstance(required_scopes, list):
+            raise ValueError("'required_scopes' must be a list")
+
+        self.code = code
+        self.required_scopes = required_scopes
+        self.extra_fields = extra or {}
 
     def to_session_error(self) -> GlobusSessionError:
         """
@@ -49,8 +60,9 @@ class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
             code=self.code,
             authorization_parameters=GlobusSessionErrorAuthorizationParameters(
                 session_required_scopes=self.required_scopes,
-                session_message=self.message,
+                session_message=self.extra_fields.get("message"),
             ),
+            extra=self.extra_fields,
         )
 
     @classmethod
@@ -64,13 +76,14 @@ class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
         :param error_dict: The dictionary to instantiate the error from.
         :type error_dict: dict
         """
-        if error_dict.get("code") != "ConsentRequired":
-            raise ValueError("'code' must be 'ConsentRequired'")
+        # Extract any extra fields
+        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        kwargs: dict[str, t.Any] = {"extra": extras}
+        # Ensure required fields are supplied
+        for field_name in cls.SUPPORTED_FIELDS.keys():
+            kwargs[field_name] = error_dict.get(field_name)
 
-        if not error_dict.get("required_scopes"):
-            raise ValueError("Must include 'required_scopes'")
-
-        return cls(**error_dict)
+        return cls(**kwargs)
 
 
 class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
@@ -79,17 +92,32 @@ class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
     Action Providers.
     """
 
+    code: str
+    required_scope: str
+    extra_fields: dict[str, t.Any]
+
+    SUPPORTED_FIELDS = {
+        "code": (str,),
+        "required_scope": (str,),
+    }
+
     def __init__(
         self,
-        code: str,
-        required_scope: str,
-        description: str | None = None,
-        **kwargs: t.Any,
+        code: str | None,
+        required_scope: str | None,
+        extra: dict[str, t.Any] | None,
     ):
-        self.code: str = code
-        self.required_scope: str = required_scope
-        self.description: str | None = description
-        self.extra_fields: dict[str, t.Any] = kwargs
+        # Needed to make mypy happy w/ stricter types on instance vars.
+        # Will clean up in a subsequent commit
+        if not isinstance(code, str) or code != "ConsentRequired":
+            raise ValueError("'code' must be the string 'ConsentRequired'")
+
+        if not isinstance(required_scope, str):
+            raise ValueError("'required_scope' must be a list")
+
+        self.code = code
+        self.required_scope = required_scope
+        self.extra_fields = extra or {}
 
     def to_session_error(self) -> GlobusSessionError:
         """
@@ -102,8 +130,14 @@ class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
             code=self.code,
             authorization_parameters=GlobusSessionErrorAuthorizationParameters(
                 session_required_scopes=[self.required_scope],
-                session_message=self.description,
+                session_message=self.extra_fields.get("description"),
+                extra=self.extra_fields.get("authorization_parameters"),
             ),
+            extra={
+                k: v
+                for k, v in self.extra_fields.items()
+                if k != "authorization_parameters"
+            },
         )
 
     @classmethod
@@ -115,13 +149,15 @@ class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
         :param error_dict: The dictionary to create the error from.
         :type error_dict: dict
         """
-        if error_dict.get("code") != "ConsentRequired":
-            raise ValueError("'code' must be 'ConsentRequired'")
 
-        if not error_dict.get("required_scope"):
-            raise ValueError("Must include 'required_scope'")
+        # Extract any extra fields
+        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        kwargs: dict[str, t.Any] = {"extra": extras}
+        # Ensure required fields are supplied
+        for field_name in cls.SUPPORTED_FIELDS.keys():
+            kwargs[field_name] = error_dict.get(field_name)
 
-        return cls(**error_dict)
+        return cls(**kwargs)
 
 
 class LegacyAuthorizationParameters:
@@ -129,6 +165,15 @@ class LegacyAuthorizationParameters:
     An Authorization Parameters object that describes all known variants in use by
     Globus services.
     """
+
+    session_message: str | None
+    session_required_identities: list[str] | None
+    session_required_policies: str | list[str] | None
+    session_required_single_domain: str | list[str] | None
+    session_required_mfa: bool | None
+    # Declared here for compatibility with mixed legacy payloads
+    session_required_scopes: list[str] | None
+    extra_fields: dict[str, t.Any]
 
     DEFAULT_CODE = "AuthorizationRequired"
 
@@ -149,21 +194,33 @@ class LegacyAuthorizationParameters:
         session_required_single_domain: str | list[str] | None = None,
         session_required_mfa: bool | None = None,
         session_required_scopes: list[str] | None = None,
-        **kwargs: t.Any,
+        extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message: str | None = session_message
-        self.session_required_identities: list[str] | None = session_required_identities
-        self.session_required_policies: str | list[
-            str
-        ] | None = session_required_policies
-        self.session_required_single_domain: str | list[
-            str
-        ] | None = session_required_single_domain
-        self.session_required_mfa: bool | None = session_required_mfa
+        self.session_message = session_message
+        self.session_required_identities = session_required_identities
+        self.session_required_policies = session_required_policies
+        self.session_required_single_domain = session_required_single_domain
+        self.session_required_mfa = session_required_mfa
         # Declared here for compatibility with mixed legacy payloads
-        self.session_required_scopes: list[str] | None = session_required_scopes
+        self.session_required_scopes = session_required_scopes
         # Retain any additional fields
-        self.extra_fields: dict[str, t.Any] = kwargs
+        self.extra_fields = extra or {}
+
+        # Enforce that the error contains at least one of the fields we expect
+        if not any(
+            (getattr(self, field_name) is not None)
+            for field_name in self.SUPPORTED_FIELDS.keys()
+        ):
+            raise ValueError(
+                "Must include at least one supported authorization parameter: "
+                ", ".join(self.SUPPORTED_FIELDS.keys())
+            )
+
+        # Enforce the field types
+        for field_name, field_types in self.SUPPORTED_FIELDS.items():
+            field_value = getattr(self, field_name)
+            if field_value is not None and not isinstance(field_value, field_types):
+                raise ValueError(f"'{field_name}' must be one of {field_types}")
 
     def to_session_error_authorization_parameters(
         self,
@@ -190,7 +247,7 @@ class LegacyAuthorizationParameters:
             session_required_policies=required_policies,
             session_required_single_domain=required_single_domain,
             session_required_scopes=self.session_required_scopes,
-            **self.extra_fields,
+            extra=self.extra_fields,
         )
 
     @classmethod
@@ -202,22 +259,15 @@ class LegacyAuthorizationParameters:
         :param param_dict: The dictionary to create the AuthorizationParameters from.
         :type param_dict: dict
         """
-        if not any(field in param_dict for field in cls.SUPPORTED_FIELDS.keys()):
-            raise ValueError(
-                "Must include at least one supported authorization parameter: "
-                ", ".join(cls.SUPPORTED_FIELDS.keys())
-            )
 
-        for field, field_types in cls.SUPPORTED_FIELDS.items():
-            if field not in param_dict:
-                continue
-            if not isinstance(param_dict[field], field_types):
-                raise ValueError(
-                    f"Field {field} must be one of {field_types}, "
-                    "got {error_dict[field]}"
-                )
+        # Extract any extra fields
+        extras = {k: v for k, v in param_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        kwargs: dict[str, t.Any] = {"extra": extras}
+        # Ensure required fields are supplied
+        for field_name in cls.SUPPORTED_FIELDS.keys():
+            kwargs[field_name] = param_dict.get(field_name)
 
-        return cls(**param_dict)
+        return cls(**kwargs)
 
 
 class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
@@ -226,20 +276,38 @@ class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
     in use by Globus services.
     """
 
+    authorization_parameters: LegacyAuthorizationParameters
+    code: str
+    extra_fields: dict[str, t.Any]
+
     DEFAULT_CODE = "AuthorizationRequired"
+
+    SUPPORTED_FIELDS = {
+        "code": (str,),
+        "authorization_parameters": (LegacyAuthorizationParameters,),
+    }
 
     def __init__(
         self,
-        authorization_parameters: LegacyAuthorizationParameters,
+        authorization_parameters: dict[str, t.Any]
+        | LegacyAuthorizationParameters
+        | None,
         code: str | None = None,
-        **kwargs: t.Any,
+        extra: dict[str, t.Any] | None = None,
     ):
-        self.authorization_parameters: LegacyAuthorizationParameters = (
-            authorization_parameters
-        )
-        self.code: str = code or self.DEFAULT_CODE
+        self.code = code or self.DEFAULT_CODE
+
+        if isinstance(authorization_parameters, LegacyAuthorizationParameters):
+            self.authorization_parameters = authorization_parameters
+        elif isinstance(authorization_parameters, dict):
+            self.authorization_parameters = LegacyAuthorizationParameters.from_dict(
+                param_dict=authorization_parameters
+            )
+        else:
+            raise ValueError("Must have 'authorization_parameters'")
+
         # Retain any additional fields
-        self.extra_fields: dict[str, t.Any] = kwargs
+        self.extra_fields = extra or {}
 
     @classmethod
     def from_dict(
@@ -249,25 +317,14 @@ class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
         Instantiate a LegacyAuthorizationParametersError from a dictionary.
         """
 
-        # Enforce that authorization_parameters is present in the error_dict
-        if not isinstance(error_dict, dict) or not isinstance(
-            error_dict.get("authorization_parameters"), dict
-        ):
-            raise ValueError("Must contain an 'authorization_parameters' dict")
+        # Extract any extra fields
+        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        kwargs: dict[str, t.Any] = {"extra": extras}
+        # Ensure required fields are supplied
+        for field_name in cls.SUPPORTED_FIELDS.keys():
+            kwargs[field_name] = error_dict.get(field_name)
 
-        extra_fields = {
-            key: value
-            for key, value in error_dict.items()
-            if key not in ("authorization_parameters", "code")
-        }
-
-        return cls(
-            authorization_parameters=LegacyAuthorizationParameters.from_dict(
-                error_dict["authorization_parameters"]
-            ),
-            code=error_dict.get("code"),
-            **extra_fields,
-        )
+        return cls(**kwargs)
 
     def to_session_error(self) -> GlobusSessionError:
         """
@@ -279,5 +336,5 @@ class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
         return GlobusSessionError(
             authorization_parameters=authorization_parameters,
             code=self.code,
-            **self.extra_fields,
+            extra=self.extra_fields,
         )
