@@ -74,7 +74,7 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
         return GlobusAuthRequirementsError(
             code=self.code,
             authorization_parameters=GlobusAuthorizationParameters(
-                session_required_scopes=self.required_scopes,
+                required_scopes=self.required_scopes,
                 session_message=self.extra_fields.get("message"),
             ),
             extra=self.extra_fields,
@@ -119,7 +119,7 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
         return GlobusAuthRequirementsError(
             code=self.code,
             authorization_parameters=GlobusAuthorizationParameters(
-                session_required_scopes=[self.required_scope],
+                required_scopes=[self.required_scope],
                 session_message=self.extra_fields.get("description"),
                 extra=self.extra_fields.get("authorization_parameters"),
             ),
@@ -143,7 +143,7 @@ class LegacyAuthorizationParameters:
     session_required_single_domain: str | list[str] | None
     session_required_mfa: bool | None
     # Declared here for compatibility with mixed legacy payloads
-    session_required_scopes: list[str] | None
+    required_scopes: list[str] | None
     extra_fields: dict[str, t.Any]
 
     DEFAULT_CODE = "AuthorizationRequired"
@@ -158,7 +158,6 @@ class LegacyAuthorizationParameters:
             validators.OptionalListOfStringsOrCommaDelimitedStrings
         ),
         "session_required_mfa": validators.OptionalBool,
-        "session_required_scopes": validators.OptionalListOfStrings,
     }
 
     def __init__(
@@ -168,7 +167,6 @@ class LegacyAuthorizationParameters:
         session_required_policies: str | list[str] | None = None,
         session_required_single_domain: str | list[str] | None = None,
         session_required_mfa: bool | None = None,
-        session_required_scopes: list[str] | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
         # Validate and assign supported fields
@@ -193,7 +191,8 @@ class LegacyAuthorizationParameters:
         self,
     ) -> GlobusAuthorizationParameters:
         """
-        Return a GlobusAuthRequirementsError representing this error.
+        Return a normalized GlobusAuthorizationParameters instance representing
+        these parameters.
 
         Normalizes fields that may have been provided
         as comma-delimited strings to lists of strings.
@@ -213,7 +212,6 @@ class LegacyAuthorizationParameters:
             session_required_mfa=self.session_required_mfa,
             session_required_policies=required_policies,
             session_required_single_domain=required_single_domain,
-            session_required_scopes=self.session_required_scopes,
             extra=self.extra_fields,
         )
 

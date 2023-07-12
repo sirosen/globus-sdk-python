@@ -14,14 +14,14 @@ GlobusAuthRequirementsError
 The ``GlobusAuthRequirementsError`` class provides a model for working with Globus
 Auth Requirements Error responses in the Python SDK. The shape of an instance closely
 matches that of the JSON response, such that in order to access a
-response's session_required_scopes one could use, e.g.,:
+response's required_scopes one could use, e.g.,:
 
 .. code-block:: python
 
     from globus_sdk.experimental import auth_requirements_error
 
     error = auth_requirements_error.GlobusAuthRequirementsError(response)
-    error.authorization_parameters.session_required_scopes
+    error.authorization_parameters.required_scopes
 
 ``GlobusAuthRequirementsError`` enforces types strictly when parsing a Globus
 Auth Requirements Error response dictionary, and will raise a ``ValueError`` if a
@@ -43,7 +43,7 @@ in your application, e.g.:
     error = auth_requirements_error.GlobusAuthRequirementsError(
         code="ConsentRequired",
         authorization_parameters=GlobusAuthorizationParameters(
-            session_required_scopes=["urn:globus:auth:scope:transfer.api.globus.org"],
+            required_scopes=["urn:globus:auth:scope:transfer.api.globus.org"],
             session_message="Missing required 'foo' consent",
         ),
     )
@@ -67,7 +67,7 @@ by specifying ``include_extra=True``.
         required_scopes=["urn:globus:auth:scope:transfer.api.globus.org:all[*foo]"],
         resource="/transfer",
         authorization_parameters=GlobusAuthorizationParameters(
-            session_required_scopes=["urn:globus:auth:scope:transfer.api.globus.org"],
+            required_scopes=["urn:globus:auth:scope:transfer.api.globus.org"],
             session_message="Missing required 'foo' consent",
         ),
     )

@@ -30,8 +30,8 @@ class GlobusAuthorizationParameters:
     :ivar session_required_mfa: Whether MFA is required for the session.
     :vartype session_required_mfa: bool, optional
 
-    :ivar session_required_scopes: A list of scopes for which consent is required.
-    :vartype session_required_scopes: list of str, optional
+    :ivar required_scopes: A list of scopes for which consent is required.
+    :vartype required_scopes: list of str, optional
 
     :ivar extra_fields: A dictionary of additional fields that were provided. May
         be used for forward/backward compatibility.
@@ -43,7 +43,7 @@ class GlobusAuthorizationParameters:
     session_required_policies: list[str] | None
     session_required_single_domain: list[str] | None
     session_required_mfa: bool | None
-    session_required_scopes: list[str] | None
+    required_scopes: list[str] | None
     extra_fields: dict[str, t.Any]
 
     SUPPORTED_FIELDS = {
@@ -52,7 +52,7 @@ class GlobusAuthorizationParameters:
         "session_required_policies": validators.OptionalListOfStrings,
         "session_required_single_domain": validators.OptionalListOfStrings,
         "session_required_mfa": validators.OptionalBool,
-        "session_required_scopes": validators.OptionalListOfStrings,
+        "required_scopes": validators.OptionalListOfStrings,
     }
 
     def __init__(
@@ -62,7 +62,7 @@ class GlobusAuthorizationParameters:
         session_required_policies: list[str] | None = None,
         session_required_single_domain: list[str] | None = None,
         session_required_mfa: bool | None = None,
-        session_required_scopes: list[str] | None = None,
+        required_scopes: list[str] | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
         # Validate and assign supported fields
