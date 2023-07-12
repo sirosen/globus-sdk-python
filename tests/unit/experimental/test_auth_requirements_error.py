@@ -427,3 +427,37 @@ def test_constructors_include_all_supported_fields(target_class):
     for field_name in target_class.SUPPORTED_FIELDS:
         # Make sure the constructor has a parameter for this field
         assert field_name in method_sig.parameters
+
+
+@pytest.mark.parametrize(
+    "target_class, field_name",
+    [
+        (GlobusAuthRequirementsError, "code"),
+        (_variants.LegacyAuthorizationParametersError, "authorization_parameters"),
+        (_variants.LegacyConsentRequiredTransferError, "code"),
+        (_variants.LegacyConsentRequiredAPError, "code"),
+    ],
+)
+def test_error_from_dict_insufficient_input(target_class, field_name):
+    """ """
+    with pytest.raises(ValueError) as exc_info:
+        target_class.from_dict({})
+
+    assert f"Error validating field '{field_name}'" in str(exc_info.value)
+
+
+@pytest.mark.parametrize(
+    "target_class",
+    [
+        GlobusAuthorizationParameters,
+        _variants.LegacyAuthorizationParameters,
+    ],
+)
+def test_authorization_parameters_from_dict_insufficient_input(target_class):
+    """ """
+    with pytest.raises(ValueError) as exc_info:
+        target_class.from_dict({})
+
+    assert "Must include at least one supported authorization parameter" in str(
+        exc_info.value
+    )

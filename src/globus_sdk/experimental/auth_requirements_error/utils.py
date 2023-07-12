@@ -57,10 +57,7 @@ def to_auth_requirements_error(
     try:
         return GlobusAuthRequirementsError.from_dict(error_dict)
     except ValueError as err:
-        log.debug(
-            "Failed to parse error as "
-            f"'GlobusAuthRequirementsError' because: {err.args[0]}"
-        )
+        log.debug(f"Failed to parse error as 'GlobusAuthRequirementsError' ({err})")
 
     supported_variants: list[t.Type[LegacyAuthRequirementsErrorVariant]] = [
         LegacyAuthorizationParametersError,
@@ -71,9 +68,7 @@ def to_auth_requirements_error(
         try:
             return variant.from_dict(error_dict).to_auth_requirements_error()
         except ValueError as err:
-            log.debug(
-                f"Failed to parse error as '{variant.__name__}' because: {err.args[0]}"
-            )
+            log.debug(f"Failed to parse error as '{variant.__name__}' ({err})")
 
     return None
 

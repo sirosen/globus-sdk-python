@@ -67,7 +67,11 @@ class GlobusAuthorizationParameters:
     ):
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
-            field_value = validator(locals()[field_name])
+            try:
+                field_value = validator(locals()[field_name])
+            except ValueError as e:
+                raise ValueError(f"Error validating field '{field_name}': {e}") from e
+
             setattr(self, field_name, field_value)
 
         self.extra_fields = extra or {}
@@ -79,7 +83,7 @@ class GlobusAuthorizationParameters:
         ):
             raise ValueError(
                 "Must include at least one supported authorization parameter: "
-                ", ".join(self.SUPPORTED_FIELDS.keys())
+                + ", ".join(self.SUPPORTED_FIELDS.keys())
             )
 
     @classmethod
@@ -169,7 +173,11 @@ class GlobusAuthRequirementsError(GlobusError):
 
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
-            field_value = validator(locals()[field_name])
+            try:
+                field_value = validator(locals()[field_name])
+            except ValueError as e:
+                raise ValueError(f"Error validating field '{field_name}': {e}") from e
+
             setattr(self, field_name, field_value)
 
         self.extra_fields = extra or {}

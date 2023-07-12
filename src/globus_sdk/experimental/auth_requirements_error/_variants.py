@@ -62,7 +62,11 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
     ):
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
-            field_value = validator(locals()[field_name])
+            try:
+                field_value = validator(locals()[field_name])
+            except ValueError as e:
+                raise ValueError(f"Error validating field '{field_name}': {e}") from e
+
             setattr(self, field_name, field_value)
 
         self.extra_fields = extra or {}
@@ -104,7 +108,11 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
     ):
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
-            field_value = validator(locals()[field_name])
+            try:
+                field_value = validator(locals()[field_name])
+            except ValueError as e:
+                raise ValueError(f"Error validating field '{field_name}': {e}") from e
+
             setattr(self, field_name, field_value)
 
         self.extra_fields = extra or {}
@@ -171,7 +179,11 @@ class LegacyAuthorizationParameters:
     ):
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
-            field_value = validator(locals()[field_name])
+            try:
+                field_value = validator(locals()[field_name])
+            except ValueError as e:
+                raise ValueError(f"Error validating field '{field_name}': {e}") from e
+
             setattr(self, field_name, field_value)
 
         # Retain any additional fields
@@ -272,7 +284,11 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
 
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
-            field_value = validator(locals()[field_name])
+            try:
+                field_value = validator(locals()[field_name])
+            except ValueError as e:
+                raise ValueError(f"Error validating field '{field_name}': {e}") from e
+
             setattr(self, field_name, field_value)
 
         # Retain any additional fields
