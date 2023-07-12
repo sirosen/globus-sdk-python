@@ -27,8 +27,8 @@ response's required_scopes one could use, e.g.,:
 Auth Requirements Error response dictionary, and will raise a ``ValueError`` if a
 supported field is supplied with a value of the wrong type.
 ``GlobusAuthRequirementsError`` does not, however, attempt to mimic or itself enforce
-any logic specific to the Globus Auth service with regard to what represents a coherent
-combination of fields (e.g., that ``session_required_mfa`` requires either
+any logic specific to the Globus Auth service with regard to what represents a valid
+combination of fields (e.g., ``session_required_mfa`` requires either
 ``session_required_identities`` or ``session_required_single_domain``
 in order to be properly handled).
 
@@ -38,9 +38,9 @@ in your application, e.g.:
 
 .. code-block:: python
 
-    from globus_sdk.experimental import auth_requirements_error
+    from globus_sdk.experimental.auth_requirements_error import GlobusAuthRequirementsError
 
-    error = auth_requirements_error.GlobusAuthRequirementsError(
+    error = GlobusAuthRequirementsError(
         code="ConsentRequired",
         authorization_parameters=GlobusAuthorizationParameters(
             required_scopes=["urn:globus:auth:scope:transfer.api.globus.org"],
@@ -51,25 +51,28 @@ in your application, e.g.:
     # Render a strict dictionary
     error.to_dict()
 
-If non-canonical fields are supplied on creation (either as keyword arguments
-during instantiation or as fields in a dictionary supplied to ``from_dict()``),
-you can preserve these fields in the rendered output dictionary
-by specifying ``include_extra=True``.
+If non-canonical fields are needed, the ``extra`` argument can be used to
+supply a dictionary of additional fields to include. Non-canonical fields present
+in the provided dictionary when calling ``from_dict()`` are stored similarly.
+You can include these fields in the rendered output dictionary
+by specifying ``include_extra=True`` when calling ``to_dict()``.
 
 .. code-block:: python
 
-    from globus_sdk.experimental import auth_requirements_error
+    from globus_sdk.experimental.auth_requirements_error import GlobusAuthRequirementsError
 
-    error = auth_requirements_error.GlobusAuthRequirementsError(
+    error = GlobusAuthRequirementsError(
         code="ConsentRequired",
-        message="Missing required 'foo' consent",
-        request_id="WmMV97A1w",
-        required_scopes=["urn:globus:auth:scope:transfer.api.globus.org:all[*foo]"],
-        resource="/transfer",
         authorization_parameters=GlobusAuthorizationParameters(
             required_scopes=["urn:globus:auth:scope:transfer.api.globus.org"],
             session_message="Missing required 'foo' consent",
         ),
+        extra={
+            "message": "Missing required 'foo' consent",
+            "request_id": "WmMV97A1w",
+            "required_scopes": ["urn:globus:auth:scope:transfer.api.globus.org:all[*foo]"],
+            "resource": "/transfer",
+        },
     )
 
     # Render a dictionary with extra fields
@@ -83,7 +86,7 @@ Parsing Responses
 -----------------
 
 If you are writing a client to a Globus API, the ``auth_requirements_error`` subpackage
-provides utilities to detect legacy auth requirements error response
+provides utilities to detect legacy Globus Auth requirements error response
 formats and normalize them.
 
 To detect if a ``GlobusAPIError``, ``ErrorSubdocument``, or JSON response
@@ -116,7 +119,7 @@ Requirements Error, you can use, e.g.,:
 
 .. note::
 
-    If a GlobusAPIError represents multiple errors that were returned in an
+    If a ``GlobusAPIError`` represents multiple errors that were returned in an
     array, this only returns the first error in that array that can be
     converted to the Globus Auth Requirements Error response format. In this case (and,
     in general) it's preferable to use ``to_auth_requirements_errors()`` (which also
