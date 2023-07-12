@@ -159,7 +159,7 @@ class GlobusAuthRequirementsError(GlobusError):
         authorization_parameters: dict[str, t.Any]
         | GlobusAuthorizationParameters
         | None,
-        extra: dict[str, t.Any] | None,
+        extra: dict[str, t.Any] | None = None,
     ):
         # Convert authorization_parameters if it's a dict
         if isinstance(authorization_parameters, dict):
