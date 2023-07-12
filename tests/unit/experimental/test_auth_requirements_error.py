@@ -63,7 +63,7 @@ def test_create_auth_requirements_error_from_consent_error(error_dict, status):
         authreq_error = to_auth_requirements_error(error)
         assert isinstance(authreq_error, GlobusAuthRequirementsError)
         assert authreq_error.code == "ConsentRequired"
-        assert authreq_error.authorization_parameters.session_required_scopes == [
+        assert authreq_error.authorization_parameters.required_scopes == [
             "urn:globus:auth:scope:transfer.api.globus.org:all[*foo *bar]"
         ]
         assert (
@@ -204,7 +204,7 @@ def test_create_auth_requirements_errors_from_multiple_errors():
                     "code": "ConsentRequired",
                     "message": "Missing required foo_bar consent",
                     "authorization_parameters": {
-                        "session_required_scopes": [
+                        "required_scopes": [
                             "urn:globus:auth:scope:transfer.api.globus.org:all[*bar]"
                         ],
                         "session_message": "Missing required foo_bar consent",
@@ -214,7 +214,7 @@ def test_create_auth_requirements_errors_from_multiple_errors():
                     "code": "ConsentRequired",
                     "message": "Missing required foo_baz consent",
                     "authorization_parameters": {
-                        "session_required_scopes": [
+                        "required_scopes": [
                             "urn:globus:auth:scope:transfer.api.globus.org:all[*baz]"
                         ],
                         "session_message": "Missing required foo_baz consent",
@@ -262,7 +262,7 @@ def test_create_auth_requirements_errors_from_multiple_errors():
 
     # Check that the proper auth requirements errors were produced
     assert authreq_errors[0].code == "ConsentRequired"
-    assert authreq_errors[0].authorization_parameters.session_required_scopes == [
+    assert authreq_errors[0].authorization_parameters.required_scopes == [
         "urn:globus:auth:scope:transfer.api.globus.org:all[*bar]"
     ]
     assert (
@@ -270,7 +270,7 @@ def test_create_auth_requirements_errors_from_multiple_errors():
         == "Missing required foo_bar consent"
     )
     assert authreq_errors[1].code == "ConsentRequired"
-    assert authreq_errors[1].authorization_parameters.session_required_scopes == [
+    assert authreq_errors[1].authorization_parameters.required_scopes == [
         "urn:globus:auth:scope:transfer.api.globus.org:all[*baz]"
     ]
     assert (
@@ -350,10 +350,9 @@ def test_backward_compatibility_consent_required_error():
             "resource": "/transfer",
             "authorization_parameters": {
                 "session_message": "Missing baz consent",
-                "session_required_scopes": [
+                "required_scopes": [
                     "urn:globus:auth:scope:transfer.api.globus.org:all[*baz]"
                 ],
-                "session_required_policies": "foo,bar",
                 "optional": "A non-canonical field",
             },
         },
@@ -371,7 +370,7 @@ def test_backward_compatibility_consent_required_error():
     authreq_error = to_auth_requirements_error(error)
     assert isinstance(authreq_error, GlobusAuthRequirementsError)
     assert authreq_error.code == "ConsentRequired"
-    assert authreq_error.authorization_parameters.session_required_scopes == [
+    assert authreq_error.authorization_parameters.required_scopes == [
         "urn:globus:auth:scope:transfer.api.globus.org:all[*baz]"
     ]
     assert (
@@ -383,10 +382,9 @@ def test_backward_compatibility_consent_required_error():
         "code": "ConsentRequired",
         "authorization_parameters": {
             "session_message": "Missing baz consent",
-            "session_required_scopes": [
+            "required_scopes": [
                 "urn:globus:auth:scope:transfer.api.globus.org:all[*baz]"
             ],
-            "session_required_policies": ["foo", "bar"],
         },
     }
 
@@ -401,10 +399,9 @@ def test_backward_compatibility_consent_required_error():
         "resource": "/transfer",
         "authorization_parameters": {
             "session_message": "Missing baz consent",
-            "session_required_scopes": [
+            "required_scopes": [
                 "urn:globus:auth:scope:transfer.api.globus.org:all[*baz]"
             ],
-            "session_required_policies": ["foo", "bar"],
             "optional": "A non-canonical field",
         },
     }
