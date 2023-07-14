@@ -28,6 +28,23 @@ def b64str(s: str) -> str:
     return b64encode(s.encode("utf-8")).decode("utf-8")
 
 
+def replace_notimplemented_methods(*methodnames: str) -> t.Callable[[T], T]:
+    def gen_notimplemented(method: str) -> t.Callable[..., t.NoReturn]:
+        def injected_method(self: t.Any, *args: t.Any, **kwargs: t.Any) -> t.NoReturn:
+            raise NotImplementedError(
+                f"{self.__class__.__name__} does not support {method}"
+            )
+
+        return injected_method
+
+    def decorator(cls: T) -> T:
+        for methodname in methodnames:
+            setattr(cls, methodname, gen_notimplemented(methodname))
+        return cls
+
+    return decorator
+
+
 def slash_join(a: str, b: str | None) -> str:
     """
     Join a and b with a single slash, regardless of whether they already

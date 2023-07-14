@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import typing as t
 
+from globus_sdk import utils
 from globus_sdk._types import ScopeCollectionType, UUIDLike
 from globus_sdk.authorizers import NullAuthorizer
 
@@ -13,6 +14,9 @@ from .base import AuthClient
 log = logging.getLogger(__name__)
 
 
+@utils.replace_notimplemented_methods(
+    "get_identities",
+)
 class NativeAppAuthClient(AuthClient):
     """
     This type of ``AuthClient`` is used to represent a Native App's
