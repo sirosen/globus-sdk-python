@@ -3,7 +3,7 @@ Changed
 
 - The enforcement logic for URLs in ``BaseClient`` instantiation has been
   improved to only require that ``service_name`` be set if ``base_url`` is not
-  provided. (:pr:`NUMBER`)
+  provided. (:pr:`786`)
 
   - This change primarily impacts subclasses, which no longer need to set the
     ``service_name`` class variable if they ensure that the ``base_url`` is
