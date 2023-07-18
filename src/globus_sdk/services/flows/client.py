@@ -3,13 +3,13 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from globus_sdk import GlobusHTTPResponse, client, paging, scopes
+from globus_sdk import GlobusHTTPResponse, client, paging, scopes, utils
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.scopes import ScopeBuilder
 
 from .errors import FlowsAPIError
-from .response import IterableFlowsResponse
+from .response import IterableFlowsResponse, IterableRunsResponse
 
 log = logging.getLogger(__name__)
 
@@ -487,6 +487,54 @@ class FlowsClient(client.BaseClient):
 
         return self.delete(f"/flows/{flow_id}", query_params=query_params)
 
+    @paging.has_paginator(paging.MarkerPaginator, items_key="runs")
+    def list_runs(
+        self,
+        *,
+        filter_flow_id: t.Iterable[UUIDLike] | UUIDLike | None = None,
+        marker: str | None = None,
+        query_params: dict[str, t.Any] | None = None,
+    ) -> IterableRunsResponse:
+        """
+        List all runs.
+
+        :param filter_flow_id: One or more Flow IDs used to filter the results
+        :type filter_flow_id: str, UUID, or iterable of str or UUID, optional
+        :param marker: A pagination marker, used to get the next page of results.
+        :type marker: str, optional
+        :param query_params: Any additional parameters to be passed through
+        :type query_params: dict, optional
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: python
+
+                    flows = globus_sdk.FlowsClient(...)
+                    for run in flows.list_runs():
+                        print(run["run_id"])
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: flows.list_runs
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: List Runs
+                    :service: flows
+                    :ref: Runs/paths/~1runs/get
+        """
+        if query_params is None:
+            query_params = {}
+        if filter_flow_id is not None:
+            query_params["filter_flow_id"] = ",".join(
+                utils.safe_strseq_iter(filter_flow_id)
+            )
+        if marker is not None:
+            query_params["marker"] = marker
+        return IterableRunsResponse(self.get("/runs", query_params=query_params))
+
     @paging.has_paginator(paging.MarkerPaginator, items_key="entries")
     def get_run_logs(
         self,
@@ -520,7 +568,6 @@ class FlowsClient(client.BaseClient):
             .. tab-item:: Paginated Usage
 
                 .. paginatedusage:: get_run_logs
-
 
             .. tab-item:: Example Response Data
 
