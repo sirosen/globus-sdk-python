@@ -12,6 +12,34 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.24.0:
+
+v3.24.0 (2023-07-18)
+--------------------
+
+Added
+~~~~~
+
+- Add ``FlowsClient.list_runs`` as a method for listing all runs for the
+  current user, with support for pagination. (:pr:`782`)
+
+- Add ``SearchClient`` methods for managing search index lifecycle:
+  ``create_index``, ``delete_index``, and ``reopen_index`` (:pr:`785`)
+
+Changed
+~~~~~~~
+
+- The enforcement logic for URLs in ``BaseClient`` instantiation has been
+  improved to only require that ``service_name`` be set if ``base_url`` is not
+  provided. (:pr:`786`)
+
+  - This change primarily impacts subclasses, which no longer need to set the
+    ``service_name`` class variable if they ensure that the ``base_url`` is
+    always passed with a non-null value.
+
+  - Direct instantiation of ``BaseClient`` is now possible, although not
+    recommended for most use-cases.
+
 .. _changelog-3.23.0:
 
 v3.23.0 (2023-07-06)
