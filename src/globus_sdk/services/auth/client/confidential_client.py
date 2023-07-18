@@ -10,15 +10,15 @@ from globus_sdk.response import GlobusHTTPResponse
 from .._common import stringify_requested_scopes
 from ..flow_managers import GlobusAuthorizationCodeFlowManager
 from ..response import OAuthDependentTokenResponse, OAuthTokenResponse
-from .base import AuthClient
+from .base import BaseAuthClient
 
 log = logging.getLogger(__name__)
 
 
-class ConfidentialAppAuthClient(AuthClient):
+class ConfidentialAppAuthClient(BaseAuthClient):
     """
-    This is a specialized type of ``AuthClient`` used to represent an App with
-    a Client ID and Client Secret wishing to communicate with Globus Auth.
+    This is a specialized type of :class:`BaseAuthClient` used to represent an App
+    with a Client ID and Client Secret wishing to communicate with Globus Auth.
     It must be given a Client ID and a Client Secret, and furthermore, these
     will be used to establish a :class:`BasicAuthorizer <globus_sdk.BasicAuthorizer>`
     for authorization purposes.
@@ -29,7 +29,10 @@ class ConfidentialAppAuthClient(AuthClient):
     <https://github.com/globus/globus-sample-data-portal>`_, which have their
     own credentials for authenticating against Globus Auth.
 
-    Any keyword arguments given are passed through to the ``AuthClient``
+    :param client_secret: The client secret used for authentication
+    :type client_secret: str
+
+    All other arguments given are passed through to the :class:`BaseAuthClient`
     constructor.
 
     .. automethodlist:: globus_sdk.ConfidentialAppAuthClient

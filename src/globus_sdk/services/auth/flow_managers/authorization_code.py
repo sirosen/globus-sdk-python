@@ -32,8 +32,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
     Secret (to prove that it really is the application that the user just
     authorized).
 
-    :param auth_client: The ``AuthClient`` used to extract default values for the flow,
-        and also to make calls to the Auth service.
+    :param auth_client: The client used to extract default values for the flow, and also
+        to make calls to the Auth service.
     :type auth_client: :class:`ConfidentialAppAuthClient \
         <globus_sdk.ConfidentialAppAuthClient>`
     :param redirect_uri: The page that users should be directed to after authenticating
@@ -55,7 +55,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
 
     def __init__(
         self,
-        auth_client: globus_sdk.AuthClient,
+        auth_client: globus_sdk.ConfidentialAppAuthClient,
         redirect_uri: str,
         requested_scopes: ScopeCollectionType | None = None,
         state: str = "_default",

@@ -38,37 +38,30 @@ log = logging.getLogger(__name__)
 RT = t.TypeVar("RT", bound=GlobusHTTPResponse)
 
 
-class AuthClient(client.BaseClient):
+class BaseAuthClient(client.BaseClient):
     """
-    Client for the
+    Shared base for client for the
     `Globus Auth API <https://docs.globus.org/api/auth/>`_
 
-    This class provides helper methods for most common resources in the
-    Auth API, and the common low-level interface from
-    :class:`BaseClient <globus_sdk.client.BaseClient>` of ``get``, ``put``,
+    This class provides methods which are common to :class:`AuthClient`,
+    :class:`ConfidentialAppAuthClient`, and :class:`NativeAppAuthClient`.
+    Primarily, these revolve around the OAuth2 and OIDC protocols and include
+    the common low-level interface from
+    :class:`BaseClient <globus_sdk.BaseClient>` of ``get``, ``put``,
     ``post``, and ``delete`` methods, which can be used to access any API
     resource.
 
-    There are generally two types of resources, distinguished by the type
-    of authentication which they use. Resources available to end users of
-    Globus are authenticated with a Globus Auth Token
-    ("Authentication: Bearer ..."), while resources available to OAuth
-    Clients are authenticated using Basic Auth with the Client's ID and
-    Secret.
-    Some resources may be available with either authentication type.
+    :class:`~.AuthClient` should be used for most cases of clients with token
+    authentication, whereas the other client types should only be used for their
+    relevant application types.
 
-    **Examples**
+    :param client_id: The client ID of this client, if there is one
+    :type client_id: str, optional
 
-    Initializing an ``AuthClient`` to authenticate a user making calls to the
-    Globus Auth service with an access token takes the form
+    All other arguments are passed through to the
+    :class:`BaseClient <globus_sdk.BaseClient>` constructor.
 
-    >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
-    >>> ac = AuthClient(authorizer=AccessTokenAuthorizer('<token_string>'))
-
-    You can, of course, use other kinds of Authorizers (notably the
-    ``RefreshTokenAuthorizer``).
-
-    .. automethodlist:: globus_sdk.AuthClient
+    .. automethodlist:: globus_sdk.BaseAuthClient
     """
 
     service_name = "auth"
@@ -102,6 +95,8 @@ class AuthClient(client.BaseClient):
             f"client_id='{client_id}', type(authorizer)={type(authorizer)}"
         )
 
+    # get_identities is defined on the base client class because it is shared between
+    # AuthClient and ConfidentialAppAuthClient
     def get_identities(
         self,
         *,
@@ -218,317 +213,6 @@ class AuthClient(client.BaseClient):
         return GetIdentitiesResponse(
             self.get("/v2/api/identities", query_params=query_params)
         )
-
-    def get_identity_providers(
-        self,
-        *,
-        domains: t.Iterable[str] | str | None = None,
-        ids: t.Iterable[UUIDLike] | UUIDLike | None = None,
-        query_params: dict[str, t.Any] | None = None,
-    ) -> GetIdentityProvidersResponse:
-        r"""
-        Look up information about identity providers by domains or by IDs.
-
-        :param domains: A domain or iterable of domains to lookup. Mutually exclusive
-            with ``ids``.
-        :type domains: str or iterable of str, optional
-        :param ids: An identity provider ID or iterable of IDs to lookup. Mutually exclusive
-            with ``domains``.
-        :type ids: str, UUID, or iterable of str or UUID, optional
-        :param query_params: Any additional parameters to be passed through
-            as query params.
-        :type query_params: dict, optional
-
-        .. tab-set::
-
-            .. tab-item:: Example Usage
-
-                .. code-block:: pycon
-
-                    >>> ac = globus_sdk.AuthClient(...)
-                    >>> # get by ID
-                    >>> r = ac.get_identity_providers(ids="41143743-f3c8-4d60-bbdb-eeecaba85bd9")
-                    >>> r.data
-                    {
-                      "identity_providers": [
-                        {
-                          "alternative_names": [],
-                          "name": "Globus ID",
-                          "domains": ["globusid.org"],
-                          "id": "41143743-f3c8-4d60-bbdb-eeecaba85bd9",
-                          "short_name": "globusid"
-                        }
-                      ]
-                    }
-                    >>> ac.get_identities(
-                    ...     ids=["41143743-f3c8-4d60-bbdb-eeecaba85bd9", "927d7238-f917-4eb2-9ace-c523fa9ba34e"]
-                    ... )
-                    >>> # or by domain
-                    >>> ac.get_identities(domains="globusid.org")
-                    >>> ac.get_identities(domains=["globus.org", "globusid.org"])
-
-                The result itself is iterable, so you can use it like so:
-
-                .. code-block:: python
-
-                    for idp in ac.get_identity_providers(domains=["globus.org", "globusid.org"]):
-                        print(f"name: {idp['name']}")
-                        print(f"id: {idp['id']}")
-                        print(f"domains: {idp['domains']}")
-                        print()
-
-            .. tab-item:: Example Response Data
-
-                .. expandtestfixture:: auth.get_identity_providers
-
-            .. tab-item:: API Info
-
-                ``GET /v2/api/identity_providers``
-
-                .. extdoclink:: Get Identity Providers
-                    :ref: auth/reference/#get_identity_providers
-        """  # noqa: E501
-
-        log.info("Looking up Globus Auth Identity Providers")
-
-        if query_params is None:
-            query_params = {}
-
-        if domains is not None and ids is not None:
-            raise exc.GlobusSDKUsageError(
-                "AuthClient.get_identity_providers does not take both "
-                "'domains' and 'ids'. These are mutually exclusive."
-            )
-        # if either of these params has a truthy value, stringify it
-        # this handles lists of values as well as individual values gracefully
-        # letting us consume args whose `__str__` methods produce "the right
-        # thing"
-        elif domains is not None:
-            query_params["domains"] = _commasep(domains)
-        elif ids is not None:
-            query_params["ids"] = _commasep(ids)
-        else:
-            log.warning(
-                "neither 'domains' nor 'ids' provided to get_identity_providers(). "
-                "This can only succeed if 'query_params' were given."
-            )
-
-        log.debug(f"query_params={query_params}")
-        return GetIdentityProvidersResponse(
-            self.get("/v2/api/identity_providers", query_params=query_params)
-        )
-
-    #
-    # Developer APIs
-    #
-
-    def get_projects(self) -> IterableResponse:
-        """
-        Look up projects on which the authenticated user is an admin.
-        Requires the ``manage_projects`` scope.
-
-        .. tab-set::
-
-            .. tab-item:: Example Usage
-
-                .. code-block:: pycon
-
-                    >>> ac = globus_sdk.AuthClient(...)
-                    >>> r = ac.get_projects()
-                    >>> r.data
-                    {
-                      'projects": [
-                        {
-                          'admin_ids": ["41143743-f3c8-4d60-bbdb-eeecaba85bd9"]
-                          'contact_email": "support@globus.org",
-                          'display_name": "Globus SDK Demo Project",
-                          'admin_group_ids": None,
-                          'id": "927d7238-f917-4eb2-9ace-c523fa9ba34e",
-                          'project_name": "Globus SDK Demo Project",
-                          'admins": {
-                            'identities": ["41143743-f3c8-4d60-bbdb-eeecaba85bd9"],
-                            'groups": [],
-                          },
-                      ]
-                    }
-
-                The result itself is iterable, so you can use it like so:
-
-                .. code-block:: python
-
-                    for project in ac.get_projects():
-                        print(f"name: {project['display_name']}")
-                        print(f"id: {project['id']}")
-                        print()
-
-            .. tab-item:: Example Response Data
-
-                .. expandtestfixture:: auth.get_projects
-
-            .. tab-item:: API Info
-
-                ``GET /v2/api/projects``
-
-                .. extdoclink:: Get Projects
-                    :ref: auth/reference/#get_projects
-        """  # noqa: E501
-        return GetProjectsResponse(self.get("/v2/api/projects"))
-
-    def create_project(
-        self,
-        display_name: str,
-        contact_email: str,
-        *,
-        admin_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
-        admin_group_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
-    ) -> GlobusHTTPResponse:
-        """
-        Create a new project. Requires the ``manage_projects`` scope.
-
-        At least one of ``admin_ids`` or ``admin_group_ids`` must be provided.
-
-        :param display_name: The name of the project
-        :type display_name: str
-        :param contact_email: The email address of the project's point of contact
-        :type contact_email: str
-        :param admin_ids: A list of user IDs to be added as admins of the project
-        :type admin_ids: str or uuid or iterable of str or uuid, optional
-        :param admin_group_ids: A list of group IDs to be added as admins of the project
-        :type admin_group_ids: str or uuid or iterable of str or uuid, optional
-
-        .. tab-set::
-
-            .. tab-item:: Example Usage
-
-                When creating a project, your account is not necessarily included as an
-                admin. The following snippet uses the ``manage_projects`` scope as well
-                as the ``openid`` and ``email`` scopes to get the current user ID and
-                email address and use those data to setup the project.
-
-                .. code-block:: pycon
-
-                    >>> ac = globus_sdk.AuthClient(...)
-                    >>> userinfo = ac.oauth2_userinfo()
-                    >>> identity_id = userinfo["sub"]
-                    >>> email = userinfo["email"]
-                    >>> r = ac.create_project(
-                    ...     "My Project",
-                    ...     contact_email=email,
-                    ...     admin_ids=identity_id,
-                    ... )
-                    >>> project_id = r["project"]["id"]
-
-            .. tab-item:: Example Response Data
-
-                .. expandtestfixture:: auth.create_project
-
-            .. tab-item:: API Info
-
-                ``POST /v2/api/projects``
-
-                .. extdoclink:: Create Project
-                    :ref: auth/reference/#create_project
-        """
-        body: dict[str, t.Any] = {
-            "display_name": display_name,
-            "contact_email": contact_email,
-        }
-        if admin_ids is not None:
-            body["admin_ids"] = list(utils.safe_strseq_iter(admin_ids))
-        if admin_group_ids is not None:
-            body["admin_group_ids"] = list(utils.safe_strseq_iter(admin_group_ids))
-        return self.post("/v2/api/projects", data={"project": body})
-
-    def update_project(
-        self,
-        project_id: UUIDLike,
-        *,
-        display_name: str | None = None,
-        contact_email: str | None = None,
-        admin_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
-        admin_group_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
-    ) -> GlobusHTTPResponse:
-        """
-        Update a project. Requires the ``manage_projects`` scope.
-
-        :param project_id: The ID of the project to update
-        :type project_id: str or uuid
-        :param display_name: The name of the project
-        :type display_name: str
-        :param contact_email: The email address of the project's point of contact
-        :type contact_email: str
-        :param admin_ids: A list of user IDs to be set as admins of the project
-        :type admin_ids: str or uuid or iterable of str or uuid, optional
-        :param admin_group_ids: A list of group IDs to be set as admins of the project
-        :type admin_group_ids: str or uuid or iterable of str or uuid, optional
-
-        .. tab-set::
-
-            .. tab-item:: Example Usage
-
-                The following snippet uses the ``manage_projects`` scope as well
-                as the ``email`` scope to get the current user email address and set it
-                as a project's contact email:
-
-                .. code-block:: pycon
-
-                    >>> ac = globus_sdk.AuthClient(...)
-                    >>> project_id = ...
-                    >>> userinfo = ac.oauth2_userinfo()
-                    >>> email = userinfo["email"]
-                    >>> r = ac.update_project(project_id, contact_email=email)
-
-            .. tab-item:: Example Response Data
-
-                .. expandtestfixture:: auth.update_project
-
-            .. tab-item:: API Info
-
-                ``POST /v2/api/projects``
-
-                .. extdoclink:: Update Project
-                    :ref: auth/reference/#update_project
-        """
-        body: dict[str, t.Any] = {}
-        if display_name is not None:
-            body["display_name"] = display_name
-        if contact_email is not None:
-            body["contact_email"] = contact_email
-        if admin_ids is not None:
-            body["admin_ids"] = list(utils.safe_strseq_iter(admin_ids))
-        if admin_group_ids is not None:
-            body["admin_group_ids"] = list(utils.safe_strseq_iter(admin_group_ids))
-        return self.put(f"/v2/api/projects/{project_id}", data={"project": body})
-
-    def delete_project(self, project_id: UUIDLike) -> GlobusHTTPResponse:
-        """
-        Delete a project. Requires the ``manage_projects`` scope.
-
-        :param project_id: The ID of the project to delete
-        :type project_id: str or uuid
-
-        .. tab-set::
-
-            .. tab-item:: Example Usage
-
-                .. code-block:: pycon
-
-                    >>> ac = globus_sdk.AuthClient(...)
-                    >>> project_id = ...
-                    >>> r = ac.delete_project(project_id)
-
-            .. tab-item:: Example Response Data
-
-                .. expandtestfixture:: auth.delete_project
-
-            .. tab-item:: API Info
-
-                ``DELETE /v2/api/projects/{project_id}``
-
-                .. extdoclink:: Delete Project
-                    :ref: auth/reference/#delete_project
-        """
-        return self.delete(f"/v2/api/projects/{project_id}")
 
     #
     # OAuth2 Behaviors & APIs
@@ -871,6 +555,10 @@ class AuthClient(client.BaseClient):
         log.info("Looking up OIDC-style Userinfo from Globus Auth")
         return self.get("/v2/oauth2/userinfo")
 
+    #
+    # OIDC features
+    #
+
     def get_openid_configuration(self) -> GlobusHTTPResponse:
         """
         Fetch the OpenID Connect configuration data from the well-known URI for Globus
@@ -936,6 +624,338 @@ class AuthClient(client.BaseClient):
             )
             log.debug("JWK PEM decoding finished successfully")
             return jwk_as_pem
+
+
+class AuthClient(BaseAuthClient):
+    """
+    Client for the
+    `Globus Auth API <https://docs.globus.org/api/auth/>`_ intended for use with
+    Globus Auth token authentication ("Authorization: Bearer ...").
+
+    **Examples**
+
+    Initializing an ``AuthClient`` to authenticate a user making calls to the
+    Globus Auth service with an access token takes the form
+
+    >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
+    >>> ac = AuthClient(authorizer=AccessTokenAuthorizer('<token_string>'))
+
+    You can, of course, use other kinds of Authorizers (notably the
+    ``RefreshTokenAuthorizer``).
+
+    .. automethodlist:: globus_sdk.AuthClient
+    """
+
+    def get_identity_providers(
+        self,
+        *,
+        domains: t.Iterable[str] | str | None = None,
+        ids: t.Iterable[UUIDLike] | UUIDLike | None = None,
+        query_params: dict[str, t.Any] | None = None,
+    ) -> GetIdentityProvidersResponse:
+        r"""
+        Look up information about identity providers by domains or by IDs.
+
+        :param domains: A domain or iterable of domains to lookup. Mutually exclusive
+            with ``ids``.
+        :type domains: str or iterable of str, optional
+        :param ids: An identity provider ID or iterable of IDs to lookup. Mutually exclusive
+            with ``domains``.
+        :type ids: str, UUID, or iterable of str or UUID, optional
+        :param query_params: Any additional parameters to be passed through
+            as query params.
+        :type query_params: dict, optional
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> # get by ID
+                    >>> r = ac.get_identity_providers(ids="41143743-f3c8-4d60-bbdb-eeecaba85bd9")
+                    >>> r.data
+                    {
+                      "identity_providers": [
+                        {
+                          "alternative_names": [],
+                          "name": "Globus ID",
+                          "domains": ["globusid.org"],
+                          "id": "41143743-f3c8-4d60-bbdb-eeecaba85bd9",
+                          "short_name": "globusid"
+                        }
+                      ]
+                    }
+                    >>> ac.get_identities(
+                    ...     ids=["41143743-f3c8-4d60-bbdb-eeecaba85bd9", "927d7238-f917-4eb2-9ace-c523fa9ba34e"]
+                    ... )
+                    >>> # or by domain
+                    >>> ac.get_identities(domains="globusid.org")
+                    >>> ac.get_identities(domains=["globus.org", "globusid.org"])
+
+                The result itself is iterable, so you can use it like so:
+
+                .. code-block:: python
+
+                    for idp in ac.get_identity_providers(domains=["globus.org", "globusid.org"]):
+                        print(f"name: {idp['name']}")
+                        print(f"id: {idp['id']}")
+                        print(f"domains: {idp['domains']}")
+                        print()
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.get_identity_providers
+
+            .. tab-item:: API Info
+
+                ``GET /v2/api/identity_providers``
+
+                .. extdoclink:: Get Identity Providers
+                    :ref: auth/reference/#get_identity_providers
+        """  # noqa: E501
+
+        log.info("Looking up Globus Auth Identity Providers")
+
+        if query_params is None:
+            query_params = {}
+
+        if domains is not None and ids is not None:
+            raise exc.GlobusSDKUsageError(
+                "AuthClient.get_identity_providers does not take both "
+                "'domains' and 'ids'. These are mutually exclusive."
+            )
+        # if either of these params has a truthy value, stringify it
+        # this handles lists of values as well as individual values gracefully
+        # letting us consume args whose `__str__` methods produce "the right
+        # thing"
+        elif domains is not None:
+            query_params["domains"] = _commasep(domains)
+        elif ids is not None:
+            query_params["ids"] = _commasep(ids)
+        else:
+            log.warning(
+                "neither 'domains' nor 'ids' provided to get_identity_providers(). "
+                "This can only succeed if 'query_params' were given."
+            )
+
+        log.debug(f"query_params={query_params}")
+        return GetIdentityProvidersResponse(
+            self.get("/v2/api/identity_providers", query_params=query_params)
+        )
+
+    #
+    # Developer APIs
+    #
+
+    def get_projects(self) -> IterableResponse:
+        """
+        Look up projects on which the authenticated user is an admin.
+        Requires the ``manage_projects`` scope.
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> r = ac.get_projects()
+                    >>> r.data
+                    {
+                      'projects": [
+                        {
+                          'admin_ids": ["41143743-f3c8-4d60-bbdb-eeecaba85bd9"]
+                          'contact_email": "support@globus.org",
+                          'display_name": "Globus SDK Demo Project",
+                          'admin_group_ids": None,
+                          'id": "927d7238-f917-4eb2-9ace-c523fa9ba34e",
+                          'project_name": "Globus SDK Demo Project",
+                          'admins": {
+                            'identities": ["41143743-f3c8-4d60-bbdb-eeecaba85bd9"],
+                            'groups": [],
+                          },
+                      ]
+                    }
+
+                The result itself is iterable, so you can use it like so:
+
+                .. code-block:: python
+
+                    for project in ac.get_projects():
+                        print(f"name: {project['display_name']}")
+                        print(f"id: {project['id']}")
+                        print()
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.get_projects
+
+            .. tab-item:: API Info
+
+                ``GET /v2/api/projects``
+
+                .. extdoclink:: Get Projects
+                    :ref: auth/reference/#get_projects
+        """  # noqa: E501
+        return GetProjectsResponse(self.get("/v2/api/projects"))
+
+    def create_project(
+        self,
+        display_name: str,
+        contact_email: str,
+        *,
+        admin_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
+        admin_group_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
+    ) -> GlobusHTTPResponse:
+        """
+        Create a new project. Requires the ``manage_projects`` scope.
+
+        At least one of ``admin_ids`` or ``admin_group_ids`` must be provided.
+
+        :param display_name: The name of the project
+        :type display_name: str
+        :param contact_email: The email address of the project's point of contact
+        :type contact_email: str
+        :param admin_ids: A list of user IDs to be added as admins of the project
+        :type admin_ids: str or uuid or iterable of str or uuid, optional
+        :param admin_group_ids: A list of group IDs to be added as admins of the project
+        :type admin_group_ids: str or uuid or iterable of str or uuid, optional
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                When creating a project, your account is not necessarily included as an
+                admin. The following snippet uses the ``manage_projects`` scope as well
+                as the ``openid`` and ``email`` scopes to get the current user ID and
+                email address and use those data to setup the project.
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> userinfo = ac.oauth2_userinfo()
+                    >>> identity_id = userinfo["sub"]
+                    >>> email = userinfo["email"]
+                    >>> r = ac.create_project(
+                    ...     "My Project",
+                    ...     contact_email=email,
+                    ...     admin_ids=identity_id,
+                    ... )
+                    >>> project_id = r["project"]["id"]
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.create_project
+
+            .. tab-item:: API Info
+
+                ``POST /v2/api/projects``
+
+                .. extdoclink:: Create Project
+                    :ref: auth/reference/#create_project
+        """
+        body: dict[str, t.Any] = {
+            "display_name": display_name,
+            "contact_email": contact_email,
+        }
+        if admin_ids is not None:
+            body["admin_ids"] = list(utils.safe_strseq_iter(admin_ids))
+        if admin_group_ids is not None:
+            body["admin_group_ids"] = list(utils.safe_strseq_iter(admin_group_ids))
+        return self.post("/v2/api/projects", data={"project": body})
+
+    def update_project(
+        self,
+        project_id: UUIDLike,
+        *,
+        display_name: str | None = None,
+        contact_email: str | None = None,
+        admin_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
+        admin_group_ids: UUIDLike | t.Iterable[UUIDLike] | None = None,
+    ) -> GlobusHTTPResponse:
+        """
+        Update a project. Requires the ``manage_projects`` scope.
+
+        :param project_id: The ID of the project to update
+        :type project_id: str or uuid
+        :param display_name: The name of the project
+        :type display_name: str
+        :param contact_email: The email address of the project's point of contact
+        :type contact_email: str
+        :param admin_ids: A list of user IDs to be set as admins of the project
+        :type admin_ids: str or uuid or iterable of str or uuid, optional
+        :param admin_group_ids: A list of group IDs to be set as admins of the project
+        :type admin_group_ids: str or uuid or iterable of str or uuid, optional
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                The following snippet uses the ``manage_projects`` scope as well
+                as the ``email`` scope to get the current user email address and set it
+                as a project's contact email:
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> project_id = ...
+                    >>> userinfo = ac.oauth2_userinfo()
+                    >>> email = userinfo["email"]
+                    >>> r = ac.update_project(project_id, contact_email=email)
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.update_project
+
+            .. tab-item:: API Info
+
+                ``POST /v2/api/projects``
+
+                .. extdoclink:: Update Project
+                    :ref: auth/reference/#update_project
+        """
+        body: dict[str, t.Any] = {}
+        if display_name is not None:
+            body["display_name"] = display_name
+        if contact_email is not None:
+            body["contact_email"] = contact_email
+        if admin_ids is not None:
+            body["admin_ids"] = list(utils.safe_strseq_iter(admin_ids))
+        if admin_group_ids is not None:
+            body["admin_group_ids"] = list(utils.safe_strseq_iter(admin_group_ids))
+        return self.put(f"/v2/api/projects/{project_id}", data={"project": body})
+
+    def delete_project(self, project_id: UUIDLike) -> GlobusHTTPResponse:
+        """
+        Delete a project. Requires the ``manage_projects`` scope.
+
+        :param project_id: The ID of the project to delete
+        :type project_id: str or uuid
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> project_id = ...
+                    >>> r = ac.delete_project(project_id)
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.delete_project
+
+            .. tab-item:: API Info
+
+                ``DELETE /v2/api/projects/{project_id}``
+
+                .. extdoclink:: Delete Project
+                    :ref: auth/reference/#delete_project
+        """
+        return self.delete(f"/v2/api/projects/{project_id}")
 
 
 def _commasep(val: UUIDLike | t.Iterable[UUIDLike]) -> str:

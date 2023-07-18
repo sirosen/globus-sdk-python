@@ -1,4 +1,9 @@
-from .client import AuthClient, ConfidentialAppAuthClient, NativeAppAuthClient
+from .client import (
+    AuthClient,
+    BaseAuthClient,
+    ConfidentialAppAuthClient,
+    NativeAppAuthClient,
+)
 from .errors import AuthAPIError
 from .flow_managers import (
     GlobusAuthorizationCodeFlowManager,
@@ -12,6 +17,7 @@ from .response import (
 )
 
 __all__ = [
+    "BaseAuthClient",
     "AuthClient",
     "AuthAPIError",
     "NativeAppAuthClient",

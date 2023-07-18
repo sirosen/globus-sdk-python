@@ -4,10 +4,23 @@ Globus Auth
 .. currentmodule:: globus_sdk
 
 There are several types of client object for communicating with the Globus Auth
-service. A client object may represent your application (as the driver of
-authentication and authorization flows), in which case the
-:class:`NativeAppAuthClient` or :class:`ConfidentialAppAuthClient` classes should
-generally be used.
+service.
+
+A client object may represent an application (as the driver of authentication and
+authorization flows), in which case the :class:`NativeAppAuthClient` or
+:class:`ConfidentialAppAuthClient` classes should generally be used.
+
+For authentication using token auth, generally the appropriate choice is
+:class:`AuthClient`.
+
+:class:`BaseAuthClient` defines shared interfaces for the other three but is
+generally not recommended for direct instantiation.
+
+.. autoclass:: BaseAuthClient
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+   :exclude-members: error_class
 
 .. autoclass:: AuthClient
    :members:

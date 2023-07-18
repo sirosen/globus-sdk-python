@@ -8,14 +8,14 @@ from globus_sdk.authorizers import NullAuthorizer
 
 from ..flow_managers import GlobusNativeAppFlowManager
 from ..response import OAuthTokenResponse
-from .base import AuthClient
+from .base import BaseAuthClient
 
 log = logging.getLogger(__name__)
 
 
-class NativeAppAuthClient(AuthClient):
+class NativeAppAuthClient(BaseAuthClient):
     """
-    This type of ``AuthClient`` is used to represent a Native App's
+    This type of :class:`BaseAuthClient` is used to represent a Native App's
     communications with Globus Auth.
     It requires a Client ID, and cannot take an ``authorizer``.
 
@@ -24,7 +24,7 @@ class NativeAppAuthClient(AuthClient):
     credentials, several Globus Auth interactions have to be specialized to
     accommodate the absence of a secret.
 
-    Any keyword arguments given are passed through to the ``AuthClient``
+    All arguments given are passed through to the :class:`BaseAuthClient`
     constructor.
 
     .. automethodlist:: globus_sdk.NativeAppAuthClient

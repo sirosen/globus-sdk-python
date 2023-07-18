@@ -53,6 +53,7 @@ _LAZY_IMPORT_TABLE = {
     },
     "services.auth": {
         "AuthAPIError",
+        "BaseAuthClient",
         "AuthClient",
         "ConfidentialAppAuthClient",
         "IdentityMap",
@@ -150,6 +151,7 @@ if t.TYPE_CHECKING:
     from .response import IterableResponse
     from .response import ArrayResponse
     from .services.auth import AuthAPIError
+    from .services.auth import BaseAuthClient
     from .services.auth import AuthClient
     from .services.auth import ConfidentialAppAuthClient
     from .services.auth import IdentityMap
@@ -248,6 +250,7 @@ __all__ = (
     "AuthAPIError",
     "AuthClient",
     "AzureBlobStoragePolicies",
+    "BaseAuthClient",
     "BaseClient",
     "BasicAuthorizer",
     "BatchMembershipActions",
