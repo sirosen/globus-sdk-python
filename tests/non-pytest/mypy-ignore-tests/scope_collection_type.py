@@ -30,70 +30,76 @@ foo(1)  # type: ignore[arg-type]
 foo((False,))  # type: ignore[arg-type]
 
 
+# setup clients for use below
+native_client = globus_sdk.NativeAppAuthClient("dummy_client_id")
+cc_client = globus_sdk.ConfidentialAppAuthClient(
+    "dummy_client_id", "dummy_client_secret"
+)
+
+
 # now, verify that we can pass scope collections to flow managers
-bare_client = globus_sdk.AuthClient()
 GlobusAuthorizationCodeFlowManager(
-    bare_client,
+    cc_client,
     "https://example.org/redirect-uri",
     requested_scopes="foo",
 )
 GlobusNativeAppFlowManager(
-    bare_client,
+    native_client,
     requested_scopes="foo",
 )
 GlobusAuthorizationCodeFlowManager(
-    bare_client,
+    cc_client,
     "https://example.org/redirect-uri",
     requested_scopes=("foo", "bar"),
 )
 GlobusNativeAppFlowManager(
-    bare_client,
+    native_client,
     requested_scopes=("foo", "bar"),
 )
 GlobusAuthorizationCodeFlowManager(
-    bare_client,
+    cc_client,
     "https://example.org/redirect-uri",
     requested_scopes=MutableScope("foo"),
 )
 GlobusNativeAppFlowManager(
-    bare_client,
+    native_client,
     requested_scopes=MutableScope("foo"),
 )
 GlobusAuthorizationCodeFlowManager(
-    bare_client,
+    cc_client,
     "https://example.org/redirect-uri",
     requested_scopes=[MutableScope("foo")],
 )
 GlobusNativeAppFlowManager(
-    bare_client,
+    native_client,
     requested_scopes=[MutableScope("foo")],
 )
 GlobusAuthorizationCodeFlowManager(
-    bare_client,
+    cc_client,
     "https://example.org/redirect-uri",
     requested_scopes=[MutableScope("foo"), "bar"],
 )
 GlobusNativeAppFlowManager(
-    bare_client,
+    native_client,
     requested_scopes=[MutableScope("foo"), "bar"],
 )
 # bad usages
 GlobusAuthorizationCodeFlowManager(
-    bare_client,
+    cc_client,
     "https://example.org/redirect-uri",
     requested_scopes=1,  # type: ignore[arg-type]
 )
 GlobusNativeAppFlowManager(
-    bare_client,
+    native_client,
     requested_scopes=1,  # type: ignore[arg-type]
 )
 GlobusAuthorizationCodeFlowManager(
-    bare_client,
+    cc_client,
     "https://example.org/redirect-uri",
     requested_scopes=none_list,  # type: ignore[arg-type]
 )
 GlobusNativeAppFlowManager(
-    bare_client,
+    native_client,
     requested_scopes=none_list,  # type: ignore[arg-type]
 )
 
@@ -101,11 +107,6 @@ GlobusNativeAppFlowManager(
 # furthermore, verify that we can pass these collection types to the client classes
 # which wrap the flow managers
 # note that oauth2_start_flow allows the scopes as a positional arg
-native_client = globus_sdk.NativeAppAuthClient("dummy_client_id")
-cc_client = globus_sdk.ConfidentialAppAuthClient(
-    "dummy_client_id", "dummy_client_secret"
-)
-
 native_client.oauth2_start_flow("foo")
 cc_client.oauth2_start_flow("https://example.org/redirect-uri", "foo")
 native_client.oauth2_start_flow(requested_scopes="foo")
