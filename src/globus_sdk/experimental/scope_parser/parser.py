@@ -260,9 +260,9 @@ def parse_scope_graph(scopes: str) -> ScopeGraph:
 if __name__ == "__main__":
     import sys
 
-    graph = parse_scope_graph(sys.argv[1])
+    parsed_graph = parse_scope_graph(sys.argv[1])
     print(
         "top level scopes:",
-        ", ".join([name for name, _optional in graph.top_level_scopes]),
+        ", ".join([name for name, _optional in parsed_graph.top_level_scopes]),
     )
-    print(graph)
+    print(parsed_graph)
