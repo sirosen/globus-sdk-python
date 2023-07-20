@@ -12,6 +12,30 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.25.0:
+
+v3.25.0 (2023-07-20)
+--------------------
+
+Added
+~~~~~
+
+- The ``jwt_params`` argument to ``decode_id_token()`` now allows ``"leeway"``
+  to be included to pass a ``leeway`` parameter to pyjwt. (:pr:`790`)
+
+Fixed
+~~~~~
+
+- ``decode_id_token()`` defaulted to having no tolerance for clock drift. Slight
+  clock drift could lead to JWT claim validation errors. The new default is
+  0.5s which should be sufficient for most cases. (:pr:`790`)
+
+Documentation
+~~~~~~~~~~~~~
+
+- New scripts in the example gallery demonstrate usage of the Globus Auth
+  Developer APIs to List, Create, Delete, and Update Projects. (:pr:`777`)
+
 .. _changelog-3.24.0:
 
 v3.24.0 (2023-07-18)
