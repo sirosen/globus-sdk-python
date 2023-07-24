@@ -13,7 +13,7 @@ It should be regarded as very similar to the existing ``MutableScope`` object in
 - ``Scope.parse`` is available, for parsing scopes from strings
 - The Globus SDK does not support using ``Scope`` in all of the locations where
   ``MutableScope`` is supported -- Scope objects must be stringified for use
-- ``Scope`` objects define a ``_contains__`` method, allowing one to check if one scope
+- ``Scope`` objects define a ``__contains__`` method, allowing one to check if one scope
   properly contains another
 
 .. warning::
