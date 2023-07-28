@@ -157,10 +157,6 @@ class ScopeGraph:
             str, set[tuple[str, str, bool]]
         ] = defaultdict(set)
 
-    @property
-    def dependencies(self) -> set[tuple[str, str, bool]]:
-        return self.edges
-
     def get_child_edges(self, node: str) -> set[tuple[str, str, bool]]:
         return set(self._nodes_to_outbound_edges[node])
 
