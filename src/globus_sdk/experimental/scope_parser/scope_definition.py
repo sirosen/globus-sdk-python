@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t
 import warnings
 
-from .parser import parse_scope_graph
+from ._parser import parse_scope_graph
 
 
 class Scope:

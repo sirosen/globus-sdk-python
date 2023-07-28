@@ -4,13 +4,7 @@ import enum
 import typing as t
 from collections import defaultdict, deque
 
-
-class ScopeParseError(ValueError):
-    """The error raised if scope parsing fails."""
-
-
-class ScopeCycleError(ScopeParseError):
-    """The error raised if scope parsing discovers a cycle."""
+from .errors import ScopeCycleError, ScopeParseError
 
 
 class ParseTokenType(enum.Enum):
@@ -113,7 +107,7 @@ def _parse_tokens(tokens: list[ParseToken]) -> list[ScopeTreeNode]:
             current_scope = ScopeTreeNode(token.value, optional=current_optional)
             current_optional = False
             if parents:
-                parents[-1].dependencies.append(current_scope)
+                parents[-1].add_dependency(current_scope)
             else:
                 ret.append(current_scope)
     if parents:

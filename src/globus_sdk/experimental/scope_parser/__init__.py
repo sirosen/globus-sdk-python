@@ -1,4 +1,4 @@
-from .parser import ScopeCycleError, ScopeParseError
+from .errors import ScopeCycleError, ScopeParseError
 from .scope_definition import Scope
 
 __all__ = (
