@@ -179,33 +179,49 @@ class ScopeGraph:
             self._nodes_to_outbound_edges[src].remove(edge)
 
     def _check_cycles(self) -> None:
-        # this is an *extremely* simple cycle detection check which takes
-        # quadratic time in the size of the graph (O(V^2+V*E))
-        # however, for many small graph sizes, which is typical for scope construction,
-        # the speed of the quadratic but non-recursive approach used here is superior to
-        # the speed of an O(V+E) recursive approach (e.g. Tarjan's algorithm)
-        #
-        # it could be improved in the future by writing a more elaborate O(V+E)
-        # algorithm unrolled into an iterative implementation
-        nodes_to_check = set(self.nodes)
+        # explore the graph using an iterative Breadth-First Search
+        # as we explore the graph, keep track of paths of ancestry being explored
+        # if we ever find a back-edge along one of those paths of ancestry, that
+        # means that there must be a cycle
 
-        while nodes_to_check:
-            start = nodes_to_check.pop()
-            seen_nodes: set[str] = {start}
+        # start from the top-level nodes (which we know to be the roots of this
+        # forest-shaped graph)
+        # we will track this as the set of paths to continue to branch and explore
+        paths_to_explore: list[list[str]] = [
+            [node] for node, _ in self.top_level_scopes
+        ]
 
-            edges_to_visit = self.get_child_edges(start)
-            while edges_to_visit:
-                new_edges_to_visit: set[tuple[str, str, bool]] = set()
+        while paths_to_explore:
+            # the "new_paths_to_explore" tracks the set of paths which we will evaluate
+            # in the next iteration, starting with nothing
+            # if no out-edges are found from the terminal nodes of any path, we will
+            # stop exploring the graph
+            # but otherwise, we will continue to rebuild this until the entire graph
+            # has been traversed
+            new_paths_to_explore: list[list[str]] = []
 
-                for _source, dest, _optional in edges_to_visit:
-                    if dest == start:
+            for path in paths_to_explore:
+                # get out-edges from the last node in the path
+                terminus = path[-1]
+                children = self.get_child_edges(terminus)
+
+                # if the node was a leaf, no children, we are done exploring this path
+                if not children:
+                    continue
+
+                # for each child edge, do two basic things:
+                # - check if we found a back-edge (cycle!)
+                # - create a new path to explore, with the child node as its current
+                #   terminus
+                for edge in children:
+                    _, dest, _ = edge
+                    if dest in path:
                         raise ScopeCycleError(
-                            "scopes contain a cyclic dependency on "
-                            f"{start} ({list(seen_nodes)})"
+                            f"A cycle was found involving '{dest}' "
+                            f"(path: {path[path.index(dest):]})"
                         )
-                    seen_nodes.add(dest)
-                    new_edges_to_visit |= self.get_child_edges(dest)
-                edges_to_visit = new_edges_to_visit
+                    new_paths_to_explore.append(list(path) + [dest])
+            paths_to_explore = new_paths_to_explore
 
     def __str__(self) -> str:
         lines = ["digraph scopes {", '  rankdir="LR";', ""]

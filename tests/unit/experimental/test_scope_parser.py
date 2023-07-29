@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from globus_sdk.experimental.scope_parser import Scope, ScopeCycleError, ScopeParseError
@@ -140,6 +142,32 @@ def test_scope_parsing_rejects_bad_inputs(scopestring):
 def test_scope_parsing_catches_and_rejects_cycles(scopestring):
     with pytest.raises(ScopeCycleError):
         Scope.parse(scopestring)
+
+
+def test_scope_parsing_catches_and_rejects_very_large_cycles_quickly():
+    """
+    WARNING: this test is hardware speed dependent and could fail on slow systems.
+
+    This test creates a very long cycle and validates that it can be caught in a
+    small timeframe of < 100ms.
+    Observed times on a test system were <20ms, and in CI were <60ms.
+
+    Although checking the speed in this way is not ideal, we want to avoid high
+    time-complexity in the cycle detection. This test offers good protection against any
+    major performance regression.
+    """
+    scope_string = ""
+    for i in range(1000):
+        scope_string += f"foo{i}["
+    scope_string += " foo10"
+    for _ in range(1000):
+        scope_string += "]"
+
+    t0 = time.time()
+    with pytest.raises(ScopeCycleError):
+        Scope.parse(scope_string)
+    t1 = time.time()
+    assert t1 - t0 < 0.1
 
 
 @pytest.mark.parametrize(
