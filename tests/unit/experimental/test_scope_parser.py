@@ -1,6 +1,6 @@
 import pytest
 
-from globus_sdk.experimental.scope_parser import Scope, ScopeParseError
+from globus_sdk.experimental.scope_parser import Scope, ScopeCycleError, ScopeParseError
 
 
 def test_scope_str_and_repr_simple():
@@ -123,6 +123,22 @@ def test_scope_parsing_ignores_non_semantic_whitespace(scope_string1, scope_stri
 )
 def test_scope_parsing_rejects_bad_inputs(scopestring):
     with pytest.raises(ScopeParseError):
+        Scope.parse(scopestring)
+
+
+@pytest.mark.parametrize(
+    "scopestring",
+    [
+        "foo[foo]",
+        "foo[*foo]",
+        "foo[bar[foo]]",
+        "foo[bar[baz[bar]]]",
+        "foo[bar[*baz[bar]]]",
+        "foo[bar[*baz[*bar]]]",
+    ],
+)
+def test_scope_parsing_catches_and_rejects_cycles(scopestring):
+    with pytest.raises(ScopeCycleError):
         Scope.parse(scopestring)
 
 
@@ -262,3 +278,16 @@ def test_scope_contains_complex_usages(contained, containing, expect):
     outer_s = Scope.deserialize(containing)
     inner_s = Scope.deserialize(contained)
     assert (inner_s in outer_s) == expect
+
+
+@pytest.mark.parametrize(
+    "original, reserialized",
+    [
+        ("foo[bar *bar]", {"foo[bar]"}),
+        ("foo[*bar bar]", {"foo[bar]"}),
+        ("foo[bar[baz]] bar[*baz]", {"foo[bar[baz]]", "bar[baz]"}),
+        ("foo[bar[*baz]] bar[baz]", {"foo[bar[baz]]", "bar[baz]"}),
+    ],
+)
+def test_scope_parsing_normalizes_optionals(original, reserialized):
+    assert {s.serialize() for s in Scope.parse(original)} == reserialized

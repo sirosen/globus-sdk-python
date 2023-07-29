@@ -179,26 +179,86 @@ class ScopeGraph:
             self._nodes_to_outbound_edges[src].remove(edge)
 
     def _check_cycles(self) -> None:
-        nodes_to_check = set(self.nodes)
-        seen_nodes = set()
-        new_edges_to_visit: set[tuple[str, str, bool]] = set()
-        while nodes_to_check:
-            start = nodes_to_check.pop()
-            seen_nodes.add(start)
-            edges_to_visit = self._nodes_to_outbound_edges[start]
-            while edges_to_visit:
-                new_edges_to_visit.clear()
-                for _source, dest, _optional in edges_to_visit:
-                    if dest in seen_nodes:
-                        raise ScopeCycleError(
-                            "scopes contain a cyclic dependency on "
-                            f"{dest} ({list(seen_nodes)})"
-                        )
-                    seen_nodes.add(dest)
-                    new_edges_to_visit |= self._nodes_to_outbound_edges[dest]
-                edges_to_visit = new_edges_to_visit
-            nodes_to_check -= seen_nodes
-            seen_nodes.clear()
+        # check for two invariants:
+        # 1. no strongly connected components of size > 1
+        # 2. no self-loops
+        #
+        # for (1) we use Tarjan's algorithm
+        # thorough comments for the algorithm follow because it is subtle and nontrivial
+        # however, we do not seek to explain *why* the algorithm works here
+        #
+        # see also:
+        #   Wikipedia
+        #   https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
+        #
+        #   Original Paper (1972)
+        #     https://citeseerx.ist.psu.edu/doc/10.1.1.327.8418
+        #
+        # the following four variables are for Tarjan's
+        # - index: the index of the current node
+        # - stack: a stack of nodes
+        # - node_indices: a map from each node to its index, an incrementing integer
+        #   which is assigned to each node as it is discovered
+        # - node_lowlink: a map from each node to its lowlink, the smallest index of any
+        #   node reachable from this node on the stack
+        index = 0
+        stack: list[str] = []
+        node_indices: dict[str, int] = {}
+        node_lowlink: dict[str, int] = {}
+
+        # the strongconnect method yields strongly connected components (as an iterator)
+        def strongconnect(node: str) -> t.Iterator[list[str]]:
+            nonlocal index
+            nonlocal stack
+            node_indices[node] = index
+            node_lowlink[node] = index
+            index += 1
+            stack.append(node)
+
+            # for all children of the current node...
+            for _, dest, _ in self.get_child_edges(node):
+                # if the child has not been visited, visit it (recursively)
+                # effectively, this proceeds down a DFS incrementing the index
+                # assigned to newly discovered nodes
+                if dest not in node_indices:
+                    yield from strongconnect(dest)
+                    # after uncovering the strongly connected components which are
+                    # reachable from the dest, update the lowlink of the current node
+                    # if dest found a lower lowlink
+                    # this would indicate that dest or its descendants point back "up"
+                    # the stack to 'node' or one of its ancestors
+                    node_lowlink[node] = min(node_lowlink[node], node_lowlink[dest])
+                # otherwise, but only if dest is on the stack, update the lowlink of
+                # 'node' if necessary
+                if dest in stack:
+                    node_lowlink[node] = min(node_lowlink[node], node_indices[dest])
+
+            # if the current node was discovered to be a root node (because it was not
+            # connected to any node with a lower index) then pop the stack until we
+            # reach the current node, and that will be a strongly connected component
+            if node_lowlink[node] == node_indices[node]:
+                component: list[str] = []
+                while stack[-1] != node:
+                    top = stack.pop()
+                    component.append(top)
+                component.append(stack.pop())
+                yield component
+
+        # first, check for self-loops to eliminate this case
+        for src, dest, _ in self.edges:
+            if src == dest:
+                raise ScopeCycleError(f"A self-loop was detected: {src}->{dest}")
+
+        # now, detect strongly connected components
+        components: list[list[str]] = []
+        for node in self.nodes:
+            if node in node_indices:
+                continue
+            components.extend(strongconnect(node))
+
+        for component in components:
+            if len(component) > 1:
+                raise ScopeCycleError(f"A cycle was detected: {component}")
 
     def __str__(self) -> str:
         lines = ["digraph scopes {", '  rankdir="LR";', ""]
