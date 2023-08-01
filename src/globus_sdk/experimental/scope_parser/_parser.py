@@ -153,16 +153,11 @@ class ScopeGraph:
         self.top_level_scopes: set[tuple[str, bool]] = set()
         self.nodes: set[str] = set()
         self.edges: set[tuple[str, str, bool]] = set()
-        self._nodes_to_outbound_edges: dict[
-            str, set[tuple[str, str, bool]]
-        ] = defaultdict(set)
-
-    def get_child_edges(self, node: str) -> set[tuple[str, str, bool]]:
-        return set(self._nodes_to_outbound_edges[node])
+        self.adjacency_matrix: dict[str, set[tuple[str, str, bool]]] = defaultdict(set)
 
     def add_edge(self, src: str, dest: str, optional: bool) -> None:
         self.edges.add((src, dest, optional))
-        self._nodes_to_outbound_edges[src].add((src, dest, optional))
+        self.adjacency_matrix[src].add((src, dest, optional))
 
     def _normalize_optionals(self) -> None:
         to_remove: set[tuple[str, str, bool]] = set()
@@ -176,52 +171,46 @@ class ScopeGraph:
         self.edges = self.edges - to_remove
         for edge in to_remove:
             src, _, _ = edge
-            self._nodes_to_outbound_edges[src].remove(edge)
+            self.adjacency_matrix[src].remove(edge)
 
     def _check_cycles(self) -> None:
-        # explore the graph using an iterative Breadth-First Search
+        # explore the graph using an iterative Depth-First Search
         # as we explore the graph, keep track of paths of ancestry being explored
         # if we ever find a back-edge along one of those paths of ancestry, that
         # means that there must be a cycle
 
         # start from the top-level nodes (which we know to be the roots of this
         # forest-shaped graph)
-        # we will track this as the set of paths to continue to branch and explore
-        paths_to_explore: list[list[str]] = [
-            [node] for node, _ in self.top_level_scopes
+        # we will track this as the set of paths to continue to branch and explore in a
+        # stack and pop from it until it is empty, thus implementing DFS
+        #
+        # conceptually, the paths could be implemented as `list[str]`, which would
+        # preserve the order in which we encountered each node. Using frozenset is a
+        # micro-optimization which makes checks faster, since we only care to detect
+        # *that* there was a cycle, not what the shape of that cycle was
+        paths_to_explore: list[tuple[frozenset[str], str]] = [
+            (frozenset((node,)), node) for node, _ in self.top_level_scopes
         ]
 
         while paths_to_explore:
-            # the "new_paths_to_explore" tracks the set of paths which we will evaluate
-            # in the next iteration, starting with nothing
-            # if no out-edges are found from the terminal nodes of any path, we will
-            # stop exploring the graph
-            # but otherwise, we will continue to rebuild this until the entire graph
-            # has been traversed
-            new_paths_to_explore: list[list[str]] = []
+            path, terminus = paths_to_explore.pop()
 
-            for path in paths_to_explore:
-                # get out-edges from the last node in the path
-                terminus = path[-1]
-                children = self.get_child_edges(terminus)
+            # get out-edges from the last node in the path
+            children = self.adjacency_matrix[terminus]
 
-                # if the node was a leaf, no children, we are done exploring this path
-                if not children:
-                    continue
+            # if the node was a leaf, no children, we are done exploring this path
+            if not children:
+                continue
 
-                # for each child edge, do two basic things:
-                # - check if we found a back-edge (cycle!)
-                # - create a new path to explore, with the child node as its current
-                #   terminus
-                for edge in children:
-                    _, dest, _ = edge
-                    if dest in path:
-                        raise ScopeCycleError(
-                            f"A cycle was found involving '{dest}' "
-                            f"(path: {path[path.index(dest):]})"
-                        )
-                    new_paths_to_explore.append(list(path) + [dest])
-            paths_to_explore = new_paths_to_explore
+            # for each child edge, do two basic things:
+            # - check if we found a back-edge (cycle!)
+            # - create a new path to explore, with the child node as its current
+            #   terminus
+            for edge in children:
+                _, dest, _ = edge
+                if dest in path:
+                    raise ScopeCycleError(f"A cycle was found involving '{dest}'")
+                paths_to_explore.append((path.union((dest,)), dest))
 
     def __str__(self) -> str:
         lines = ["digraph scopes {", '  rankdir="LR";', ""]

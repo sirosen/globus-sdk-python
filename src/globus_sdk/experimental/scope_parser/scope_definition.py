@@ -65,7 +65,7 @@ class Scope:
 
         while bfs_additions:
             current_scope = bfs_additions.pop(0)
-            edges = scope_graph.get_child_edges(current_scope.scope_string)
+            edges = scope_graph.adjacency_matrix[current_scope.scope_string]
             for _, dest, optional in edges:
                 dest_scope = Scope(dest, optional=optional)
                 current_scope.add_dependency(dest_scope)
