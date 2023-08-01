@@ -5,8 +5,8 @@ Scope Parser
 
 .. currentmodule:: globus_sdk.experimental.scope_parser
 
-This component defines a Scope object and exposes use of a parser which can
-parse scope strings into trees of Scope objects.
+This component defines a ``Scope`` object and exposes use of a parser which can
+parse scope strings into trees of ``Scope`` objects.
 It should be regarded as very similar to the existing ``MutableScope`` object in
 ``globus_sdk.scopes``. Key differences from ``MutableScope``:
 
@@ -16,11 +16,11 @@ It should be regarded as very similar to the existing ``MutableScope`` object in
 - ``Scope`` objects define a ``__contains__`` method, allowing one to check if one scope
   properly contains another
 
-.. warning::
+.. note::
 
-    This module is experimental due to the limitations of scope strings as a
-    representation of consent trees. The scope trees produced by parsing do
-    not necessarily describe real consent structures in Globus Auth.
+    The scope trees produced by parsing represent prospective consent structures as
+    would be produced by a single authentication flow in Auth. No external APIs (e.g.,
+    the Get Consents API) are used to validate or mutate the data.
 
 Reference
 ---------
