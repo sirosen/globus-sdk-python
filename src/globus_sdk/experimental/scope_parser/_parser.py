@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import enum
 import typing as t
 from collections import defaultdict, deque
@@ -17,10 +18,10 @@ class ParseTokenType(enum.Enum):
     rbracket = enum.auto()
 
 
+@dataclasses.dataclass
 class ParseToken:
-    def __init__(self, value: str, token_type: ParseTokenType) -> None:
-        self.value = value
-        self.token_type = token_type
+    value: str
+    token_type: ParseTokenType
 
 
 def _tokenize(scope_string: str) -> list[ParseToken]:
@@ -117,10 +118,9 @@ def _parse_tokens(tokens: list[ParseToken]) -> list[ScopeTreeNode]:
 
 
 class ScopeTreeNode:
-    """
-    This is an intermediate representation for scope parsing.
-    """
-
+    #
+    # This is an intermediate representation for scope parsing.
+    #
     def __init__(
         self,
         scope_string: str,
@@ -257,14 +257,3 @@ def parse_scope_graph(scopes: str) -> ScopeGraph:
     graph._normalize_optionals()
     graph._check_cycles()
     return graph
-
-
-if __name__ == "__main__":
-    import sys
-
-    parsed_graph = parse_scope_graph(sys.argv[1])
-    print(
-        "top level scopes:",
-        ", ".join([name for name, _optional in parsed_graph.top_level_scopes]),
-    )
-    print(parsed_graph)
