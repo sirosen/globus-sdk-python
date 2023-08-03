@@ -26,7 +26,7 @@ class ParseToken:
 
 def _tokenize(scope_string: str) -> list[ParseToken]:
     tokens: list[ParseToken] = []
-    current_token: list[str] = []
+    start = 0
     for idx, c in enumerate(scope_string):
         try:
             peek: str | None = scope_string[idx + 1]
@@ -34,12 +34,12 @@ def _tokenize(scope_string: str) -> list[ParseToken]:
             peek = None
 
         if c in "[]* ":
-            if current_token:
+            if start != idx:
                 tokens.append(
-                    ParseToken("".join(current_token), ParseTokenType.scope_string)
+                    ParseToken(scope_string[start:idx], ParseTokenType.scope_string)
                 )
-                current_token = []
 
+            start = idx + 1
             if c == "*":
                 if peek == " ":
                     raise ScopeParseError("'*' must not be followed by a space")
@@ -55,10 +55,9 @@ def _tokenize(scope_string: str) -> list[ParseToken]:
                     raise ScopeParseError("'[' cannot have a preceding space")
             else:
                 raise NotImplementedError
-        else:
-            current_token.append(c)
-    if current_token:
-        tokens.append(ParseToken("".join(current_token), ParseTokenType.scope_string))
+    remainder = scope_string[start:].strip()
+    if remainder:
+        tokens.append(ParseToken(remainder, ParseTokenType.scope_string))
     return tokens
 
 
