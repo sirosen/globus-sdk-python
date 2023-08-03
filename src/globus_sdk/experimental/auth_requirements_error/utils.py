@@ -7,26 +7,28 @@ from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
 from ._variants import (
     LegacyAuthorizationParametersError,
+    LegacyAuthRequirementsErrorVariant,
     LegacyConsentRequiredAPError,
     LegacyConsentRequiredTransferError,
-    LegacySessionErrorVariant,
 )
-from .session_error import GlobusSessionError
+from .auth_requirements_error import GlobusAuthRequirementsError
 
 log = logging.getLogger(__name__)
 
 
-def to_session_error(
+def to_auth_requirements_error(
     error: GlobusAPIError | ErrorSubdocument | dict[str, t.Any]
-) -> GlobusSessionError | None:
+) -> GlobusAuthRequirementsError | None:
     """
-    Converts a GlobusAPIError, ErrorSubdocument, or dict into a GlobusSessionError by
-    attempting to match to GlobusSessionError (preferred) or legacy variants.
+    Converts a GlobusAPIError, ErrorSubdocument, or dict into a
+    GlobusAuthRequirementsError by attempting to match to
+    GlobusAuthRequirementsError (preferred) or legacy variants.
 
     .. note::
 
         a GlobusAPIError may contain multiple errors, and in this case only a single
-        session error is returned for the first error that matches a known format.
+        GlobusAuthRequirementsError is returned for the first error that matches
+        a known format.
 
 
     If the provided error does not match a known format, None is returned.
@@ -40,33 +42,34 @@ def to_session_error(
     if isinstance(error, GlobusAPIError):
         # Iterate over ErrorSubdocuments
         for subdoc in error.errors:
-            session_error = to_session_error(subdoc)
-            if session_error is not None:
-                # Return only the first session error we encounter
-                return session_error
-        # We failed to find a session error
+            authreq_error = to_auth_requirements_error(subdoc)
+            if authreq_error is not None:
+                # Return only the first auth requirements error we encounter
+                return authreq_error
+        # We failed to find a Globus Auth Requirements Error
         return None
     elif isinstance(error, ErrorSubdocument):
         error_dict = error.raw
     else:
         error_dict = error
 
-    # Prefer a proper session error, if possible
+    # Prefer a proper auth requirements error, if possible
     try:
-        return GlobusSessionError.from_dict(error_dict)
+        return GlobusAuthRequirementsError.from_dict(error_dict)
     except ValueError as err:
         log.debug(
-            f"Failed to parse error as 'GlobusSessionError' because: {err.args[0]}"
+            "Failed to parse error as "
+            f"'GlobusAuthRequirementsError' because: {err.args[0]}"
         )
 
-    supported_variants: list[t.Type[LegacySessionErrorVariant]] = [
+    supported_variants: list[t.Type[LegacyAuthRequirementsErrorVariant]] = [
         LegacyAuthorizationParametersError,
         LegacyConsentRequiredTransferError,
         LegacyConsentRequiredAPError,
     ]
     for variant in supported_variants:
         try:
-            return variant.from_dict(error_dict).to_session_error()
+            return variant.from_dict(error_dict).to_auth_requirements_error()
         except ValueError as err:
             log.debug(
                 f"Failed to parse error as '{variant.__name__}' because: {err.args[0]}"
@@ -75,13 +78,13 @@ def to_session_error(
     return None
 
 
-def to_session_errors(
+def to_auth_requirements_errors(
     errors: list[GlobusAPIError | ErrorSubdocument | dict[str, t.Any]]
-) -> list[GlobusSessionError]:
+) -> list[GlobusAuthRequirementsError]:
     """
     Converts a list of GlobusAPIErrors, ErrorSubdocuments, or dicts into a list of
-    GlobusSessionErrors by attempting to match each error to
-    GlobusSessionError (preferred) or legacy variants.
+    GlobusAuthRequirementsErrors by attempting to match each error to
+    GlobusAuthRequirementsError (preferred) or legacy variants.
 
     .. note::
 
@@ -101,32 +104,34 @@ def to_session_errors(
         else:
             candidate_errors.append(error)
 
-    # Try to convert all candidate errors to session errors
-    all_errors = [to_session_error(error) for error in candidate_errors]
+    # Try to convert all candidate errors to auth requirements errors
+    all_errors = [to_auth_requirements_error(error) for error in candidate_errors]
 
-    # Remove any errors that did not resolve to a session error
+    # Remove any errors that did not resolve to a Globus Auth Requirements Error
     return [error for error in all_errors if error is not None]
 
 
-def is_session_error(
+def is_auth_requirements_error(
     error: GlobusAPIError | ErrorSubdocument | dict[str, t.Any]
 ) -> bool:
     """
-    Return True if the provided error matches a known session error format.
+    Return True if the provided error matches a known
+    Globus Auth Requirements Error format.
 
     :param error: The error to check.
     :type error: a GlobusAPIError, ErrorSubdocument, or dict
     """
-    return to_session_error(error) is not None
+    return to_auth_requirements_error(error) is not None
 
 
-def has_session_errors(
+def has_auth_requirements_errors(
     errors: list[GlobusAPIError | ErrorSubdocument | dict[str, t.Any]]
 ) -> bool:
     """
-    Return True if any of the provided errors match a known session error format.
+    Return True if any of the provided errors match a known
+    Globus Auth Requirements Error format.
 
     :param errors: The errors to check.
     :type errors: a list of GlobusAPIErrors, ErrorSubdocuments, or dicts
     """
-    return any(is_session_error(error) for error in errors)
+    return any(is_auth_requirements_error(error) for error in errors)

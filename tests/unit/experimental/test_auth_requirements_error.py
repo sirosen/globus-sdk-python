@@ -2,12 +2,12 @@ import pytest
 
 from globus_sdk._testing import construct_error
 from globus_sdk.exc import ErrorSubdocument
-from globus_sdk.experimental.session_error import (
-    GlobusSessionError,
-    has_session_errors,
-    is_session_error,
-    to_session_error,
-    to_session_errors,
+from globus_sdk.experimental.auth_requirements_error import (
+    GlobusAuthRequirementsError,
+    has_auth_requirements_errors,
+    is_auth_requirements_error,
+    to_auth_requirements_error,
+    to_auth_requirements_errors,
 )
 
 
@@ -38,10 +38,10 @@ from globus_sdk.experimental.session_error import (
         ),
     ),
 )
-def test_create_session_error_from_consent_error(error_dict, status):
+def test_create_auth_requirements_error_from_consent_error(error_dict, status):
     """
     Test that various ConsentRequired error shapes can be detected and converted
-    to a GlobusSessionError.
+    to a GlobusAuthRequirementsError.
     """
     # Create various supplementary objects representing this error
     error_subdoc = ErrorSubdocument(error_dict)
@@ -49,21 +49,21 @@ def test_create_session_error_from_consent_error(error_dict, status):
 
     for error in (error_dict, error_subdoc, api_error):
         # Test boolean utility functions
-        assert is_session_error(error)
-        assert has_session_errors([error])
+        assert is_auth_requirements_error(error)
+        assert has_auth_requirements_errors([error])
 
         # Check that this only produces one error
-        assert len(to_session_errors([error])) == 1
+        assert len(to_auth_requirements_errors([error])) == 1
 
-        # Create a session error from a Transfer format error
-        session_error = to_session_error(error)
-        assert isinstance(session_error, GlobusSessionError)
-        assert session_error.code == "ConsentRequired"
-        assert session_error.authorization_parameters.session_required_scopes == [
+        # Create a Globus Auth requirements error from a Transfer format error
+        authreq_error = to_auth_requirements_error(error)
+        assert isinstance(authreq_error, GlobusAuthRequirementsError)
+        assert authreq_error.code == "ConsentRequired"
+        assert authreq_error.authorization_parameters.session_required_scopes == [
             "urn:globus:auth:scope:transfer.api.globus.org:all[*foo *bar]"
         ]
         assert (
-            session_error.authorization_parameters.session_message
+            authreq_error.authorization_parameters.session_message
             == "Missing required foo_bar consent"
         )
 
@@ -94,10 +94,12 @@ def test_create_session_error_from_consent_error(error_dict, status):
         },
     ),
 )
-def test_create_session_error_from_authorization_error(authorization_parameters):
+def test_create_auth_requirements_error_from_authorization_error(
+    authorization_parameters,
+):
     """
-    Test that various AuthorizationRequired error shapes can be detected and converted
-    to a GlobusSessionError.
+    Test that various authorization parameters error shapes can be detected and
+    converted to a GlobusAuthRequirementsError.
     """
     # Create various supplementary objects representing this error
     error_dict = {"authorization_parameters": authorization_parameters}
@@ -106,22 +108,23 @@ def test_create_session_error_from_authorization_error(authorization_parameters)
 
     for error in (error_dict, error_subdoc, api_error):
         # Test boolean utility functions
-        assert is_session_error(error)
-        assert has_session_errors([error])
+        assert is_auth_requirements_error(error)
+        assert has_auth_requirements_errors([error])
 
         # Check that this only produces one error
-        assert len(to_session_errors([error])) == 1
+        assert len(to_auth_requirements_errors([error])) == 1
 
-        # Create a session error from a legacy authorization parameters format error
-        session_error = to_session_error(error)
-        assert isinstance(session_error, GlobusSessionError)
+        # Create a Globus Auth requirements error from a legacy
+        # authorization parameters format error
+        authreq_error = to_auth_requirements_error(error)
+        assert isinstance(authreq_error, GlobusAuthRequirementsError)
 
         # Check that the default error code is set
-        assert session_error.code == "AuthorizationRequired"
+        assert authreq_error.code == "AuthorizationRequired"
 
         # Iterate over the expected attributes and check that they match
         for name, value in authorization_parameters.items():
-            assert getattr(session_error.authorization_parameters, name) == value
+            assert getattr(authreq_error.authorization_parameters, name) == value
 
 
 @pytest.mark.parametrize(
@@ -143,11 +146,13 @@ def test_create_session_error_from_authorization_error(authorization_parameters)
         },
     ),
 )
-def test_create_session_error_from_authorization_error_csv(authorization_parameters):
+def test_create_auth_requirements_error_from_authorization_error_csv(
+    authorization_parameters,
+):
     """
-    Test that AuthorizationRequired error shapes that provide lists as comma-delimited
-    values can be detected and converted to a GlobusSessionError normalizing to
-    lists of strings for those values.
+    Test that authorization parameters error shapes that provide lists as comma-
+    delimited values can be detected and converted to a GlobusAuthRequirementsError
+    normalizing to lists of strings for those values.
     """
     # Create various supplementary objects representing this error
     error_dict = {"authorization_parameters": {}}
@@ -163,29 +168,30 @@ def test_create_session_error_from_authorization_error_csv(authorization_paramet
 
     for error in (error_dict, error_subdoc, api_error):
         # Test boolean utility functions
-        assert is_session_error(error)
-        assert has_session_errors([error])
+        assert is_auth_requirements_error(error)
+        assert has_auth_requirements_errors([error])
 
         # Check that this only produces one error
-        assert len(to_session_errors([error])) == 1
+        assert len(to_auth_requirements_errors([error])) == 1
 
-        # Create a session error from a legacy authorization parameters format error
-        session_error = to_session_error(error)
-        assert isinstance(session_error, GlobusSessionError)
+        # Create a Globus Auth requirements error from a legacy
+        # authorization parameters format error
+        authreq_error = to_auth_requirements_error(error)
+        assert isinstance(authreq_error, GlobusAuthRequirementsError)
 
         # Check that the default error code is set
-        assert session_error.code == "AuthorizationRequired"
+        assert authreq_error.code == "AuthorizationRequired"
 
         # Iterate over the expected attributes and check that they match
         for name, value in authorization_parameters.items():
-            assert getattr(session_error.authorization_parameters, name) == value
+            assert getattr(authreq_error.authorization_parameters, name) == value
 
 
-def test_create_session_errors_from_multiple_errors():
+def test_create_auth_requirements_errors_from_multiple_errors():
     """
     Test that a GlobusAPIError with multiple subdocuments is converted to multiple
-    GlobusSessionErrors, and additionally test that this is correct even when mingled
-    with other accepted data types.
+    GlobusAuthRequirementsErrors, and additionally test that this is correct even
+    when mingled with other accepted data types.
     """
     consent_errors = construct_error(
         body={
@@ -239,48 +245,48 @@ def test_create_session_errors_from_multiple_errors():
     all_errors = [consent_errors, not_an_error, authorization_error]
 
     # Test boolean utility function
-    assert has_session_errors(all_errors)
+    assert has_auth_requirements_errors(all_errors)
 
-    # Create session errors from a all errors
-    session_errors = to_session_errors(all_errors)
-    assert isinstance(session_errors, list)
-    assert len(session_errors) == 3
+    # Create auth requirements errors from a all errors
+    authreq_errors = to_auth_requirements_errors(all_errors)
+    assert isinstance(authreq_errors, list)
+    assert len(authreq_errors) == 3
 
     # Check that errors properly converted
-    for session_error in session_errors:
-        assert isinstance(session_error, GlobusSessionError)
+    for authreq_error in authreq_errors:
+        assert isinstance(authreq_error, GlobusAuthRequirementsError)
 
-    # Check that the proper session errors were produced
-    assert session_errors[0].code == "ConsentRequired"
-    assert session_errors[0].authorization_parameters.session_required_scopes == [
+    # Check that the proper auth requirements errors were produced
+    assert authreq_errors[0].code == "ConsentRequired"
+    assert authreq_errors[0].authorization_parameters.session_required_scopes == [
         "urn:globus:auth:scope:transfer.api.globus.org:all[*bar]"
     ]
     assert (
-        session_errors[0].authorization_parameters.session_message
+        authreq_errors[0].authorization_parameters.session_message
         == "Missing required foo_bar consent"
     )
-    assert session_errors[1].code == "ConsentRequired"
-    assert session_errors[1].authorization_parameters.session_required_scopes == [
+    assert authreq_errors[1].code == "ConsentRequired"
+    assert authreq_errors[1].authorization_parameters.session_required_scopes == [
         "urn:globus:auth:scope:transfer.api.globus.org:all[*baz]"
     ]
     assert (
-        session_errors[1].authorization_parameters.session_message
+        authreq_errors[1].authorization_parameters.session_message
         == "Missing required foo_baz consent"
     )
-    assert session_errors[2].code == "AuthorizationRequired"
-    assert session_errors[2].authorization_parameters.session_required_policies == [
+    assert authreq_errors[2].code == "AuthorizationRequired"
+    assert authreq_errors[2].authorization_parameters.session_required_policies == [
         "foo",
         "baz",
     ]
-    assert session_errors[2].authorization_parameters.session_message == (
+    assert authreq_errors[2].authorization_parameters.session_message == (
         "You need to authenticate with an identity that matches the required policies"
     )
 
 
-def test_create_session_error_from_legacy_authorization_error_with_code():
+def test_create_auth_requirements_error_from_legacy_authorization_error_with_code():
     """
-    Test that legacy AuthorizationRequired error shapes that provide a `code` can be
-    detected and converted to a GlobusSessionError while retaining the `code`.
+    Test that legacy authorization parameters error shapes that provide a `code` can be
+    detected and converted to a GlobusAuthRequirementsError while retaining the `code`.
     """
     # Create a legacy authorization parameters error with a code
     error_dict = {
@@ -300,21 +306,22 @@ def test_create_session_error_from_legacy_authorization_error_with_code():
 
     for error in (error_dict, error_subdoc, api_error):
         # Test boolean utility functions
-        assert is_session_error(error)
-        assert has_session_errors([error])
+        assert is_auth_requirements_error(error)
+        assert has_auth_requirements_errors([error])
 
         # Check that this only produces one error
-        assert len(to_session_errors([error])) == 1
+        assert len(to_auth_requirements_errors([error])) == 1
 
-        # Create a session error from a legacy authorization parameters format error
-        session_error = to_session_error(error)
-        assert isinstance(session_error, GlobusSessionError)
+        # Create a Globus Auth requirements error from a legacy
+        # authorization parameters format error
+        authreq_error = to_auth_requirements_error(error)
+        assert isinstance(authreq_error, GlobusAuthRequirementsError)
 
         # Check that the custom error code is set
-        assert session_error.code == "UnsatisfiedPolicy"
+        assert authreq_error.code == "UnsatisfiedPolicy"
 
         # Iterate over the expected attributes and check that they match
-        assert session_error.authorization_parameters.session_required_policies == [
+        assert authreq_error.authorization_parameters.session_required_policies == [
             "foo",
             "baz",
         ]
@@ -323,7 +330,7 @@ def test_create_session_error_from_legacy_authorization_error_with_code():
 def test_backward_compatibility_consent_required_error():
     """
     Test that a consent required error with a comingled backward-compatible
-    data schema is converted to a GlobusSessionError.
+    data schema is converted to a GlobusAuthRequirementsError.
     """
     # Create an API error with a backward compatible data schema using
     # distinct values for duplicative fields to facilitate testing
@@ -350,25 +357,25 @@ def test_backward_compatibility_consent_required_error():
     )
 
     # Test boolean utility functions
-    assert is_session_error(error)
-    assert has_session_errors([error])
+    assert is_auth_requirements_error(error)
+    assert has_auth_requirements_errors([error])
 
     # Check that this only produces one error
-    assert len(to_session_errors([error])) == 1
+    assert len(to_auth_requirements_errors([error])) == 1
 
-    # Create a session error
-    session_error = to_session_error(error)
-    assert isinstance(session_error, GlobusSessionError)
-    assert session_error.code == "ConsentRequired"
-    assert session_error.authorization_parameters.session_required_scopes == [
+    # Create a Globus Auth requirements error
+    authreq_error = to_auth_requirements_error(error)
+    assert isinstance(authreq_error, GlobusAuthRequirementsError)
+    assert authreq_error.code == "ConsentRequired"
+    assert authreq_error.authorization_parameters.session_required_scopes == [
         "urn:globus:auth:scope:transfer.api.globus.org:all[*baz]"
     ]
     assert (
-        session_error.authorization_parameters.session_message == "Missing baz consent"
+        authreq_error.authorization_parameters.session_message == "Missing baz consent"
     )
 
     # Test that only suppotred fields are present in the dict
-    assert session_error.to_dict() == {
+    assert authreq_error.to_dict() == {
         "code": "ConsentRequired",
         "authorization_parameters": {
             "session_message": "Missing baz consent",
@@ -380,7 +387,7 @@ def test_backward_compatibility_consent_required_error():
     }
 
     # Test that extra fields are present in the dict
-    assert session_error.to_dict(include_extra=True) == {
+    assert authreq_error.to_dict(include_extra=True) == {
         "code": "ConsentRequired",
         "message": "Missing required foo_bar consent",
         "request_id": "WmMV97A1w",

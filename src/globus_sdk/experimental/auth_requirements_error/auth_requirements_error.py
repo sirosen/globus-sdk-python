@@ -5,7 +5,7 @@ import typing as t
 from globus_sdk.exc import GlobusError
 
 
-class GlobusSessionErrorAuthorizationParameters:
+class GlobusAuthorizationParameters:
     """
     Represents authorization parameters that can be used to instruct a client
     which additional authorizations are needed in order to complete a request.
@@ -90,12 +90,9 @@ class GlobusSessionErrorAuthorizationParameters:
                 )
 
     @classmethod
-    def from_dict(
-        cls, param_dict: dict[str, t.Any]
-    ) -> GlobusSessionErrorAuthorizationParameters:
+    def from_dict(cls, param_dict: dict[str, t.Any]) -> GlobusAuthorizationParameters:
         """
-        Instantiate from a session error authorization parameters dictionary. Raises
-        a ValueError if the dictionary does not contain a valid GlobusSessionError.
+        Instantiate from an authorization parameters dictionary.
 
         :param param_dict: The dictionary to create the error from.
         :type param_dict: dict
@@ -112,33 +109,34 @@ class GlobusSessionErrorAuthorizationParameters:
 
     def to_dict(self, include_extra: bool = False) -> dict[str, t.Any]:
         """
-        Return a session error authorization parameters dictionary.
+        Return an authorization parameters dictionary.
 
         :param include_extra: Whether to include stored extra (non-standard) fields in
             the returned dictionary.
         :type include_extra: bool
         """
-        session_error_dict = {}
+        error_dict = {}
 
         # Set any authorization parameters
         for field in self.SUPPORTED_FIELDS.keys():
             if getattr(self, field) is not None:
-                session_error_dict[field] = getattr(self, field)
+                error_dict[field] = getattr(self, field)
 
         # Set any extra fields
         if include_extra:
-            session_error_dict.update(self.extra_fields)
+            error_dict.update(self.extra_fields)
 
-        return session_error_dict
+        return error_dict
 
 
-class GlobusSessionError(GlobusError):
+class GlobusAuthRequirementsError(GlobusError):
     """
-    Represents a Globus Session Error.
+    Represents a Globus Auth Requirements Error.
 
-    A Session Error is a class of error that is returned by Globus services to
-    indicate that additional authorization is required in order to complete a request
-    and contains information that can be used to request the appropriate authorization.
+    A Globus Auth Requirements Error is a class of error that is returned by Globus
+    services to indicate that additional authorization is required in order to complete
+    a request and contains information that can be used to request the appropriate
+    authorization.
 
     :ivar code: The error code for this error.
     :vartype code: str
@@ -152,19 +150,19 @@ class GlobusSessionError(GlobusError):
     """
 
     code: str
-    authorization_parameters: GlobusSessionErrorAuthorizationParameters
+    authorization_parameters: GlobusAuthorizationParameters
     extra_fields: dict[str, t.Any]
 
     SUPPORTED_FIELDS = {
         "code": str,
-        "authorization_parameters": GlobusSessionErrorAuthorizationParameters,
+        "authorization_parameters": GlobusAuthorizationParameters,
     }
 
     def __init__(
         self,
         code: str | None,
         authorization_parameters: dict[str, t.Any]
-        | GlobusSessionErrorAuthorizationParameters
+        | GlobusAuthorizationParameters
         | None,
         extra: dict[str, t.Any] | None,
     ):
@@ -176,23 +174,19 @@ class GlobusSessionError(GlobusError):
 
         # Enforce that authorization_parameters is in the error_dict and
         # contains at least one of the fields we expect
-        if isinstance(
-            authorization_parameters, GlobusSessionErrorAuthorizationParameters
-        ):
+        if isinstance(authorization_parameters, GlobusAuthorizationParameters):
             self.authorization_parameters = authorization_parameters
         elif isinstance(authorization_parameters, dict):
-            self.authorization_parameters = (
-                GlobusSessionErrorAuthorizationParameters.from_dict(
-                    param_dict=authorization_parameters
-                )
+            self.authorization_parameters = GlobusAuthorizationParameters.from_dict(
+                param_dict=authorization_parameters
             )
         else:
             raise ValueError("Must have 'authorization_parameters'")
 
     @classmethod
-    def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusSessionError:
+    def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusAuthRequirementsError:
         """
-        Instantiate a GlobusSessionError from a dictionary.
+        Instantiate a GlobusAuthRequirementsError from a dictionary.
 
         :param error_dict: The dictionary to create the error from.
         :type error_dict: dict
@@ -209,13 +203,13 @@ class GlobusSessionError(GlobusError):
 
     def to_dict(self, include_extra: bool = False) -> dict[str, t.Any]:
         """
-        Return a session error response dictionary.
+        Return a Globus Auth Requirements Error response dictionary.
 
         :param include_extra: Whether to include stored extra (non-standard) fields
             in the dictionary.
         :type include_extra: bool, optional (default: False)
         """
-        session_error_dict = {
+        error_dict = {
             "code": self.code,
             "authorization_parameters": self.authorization_parameters.to_dict(
                 include_extra=include_extra
@@ -224,6 +218,6 @@ class GlobusSessionError(GlobusError):
 
         # Set any extra fields
         if include_extra:
-            session_error_dict.update(self.extra_fields)
+            error_dict.update(self.extra_fields)
 
-        return session_error_dict
+        return error_dict

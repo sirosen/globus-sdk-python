@@ -16,5 +16,5 @@ Globus SDK Experimental Components
     :caption: Contents
     :maxdepth: 1
 
+    auth_requirements_errors
     scope_parser
-    session_errors

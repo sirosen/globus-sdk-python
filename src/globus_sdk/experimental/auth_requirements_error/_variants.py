@@ -2,25 +2,29 @@ from __future__ import annotations
 
 import typing as t
 
-from .session_error import GlobusSessionError, GlobusSessionErrorAuthorizationParameters
+from .auth_requirements_error import (
+    GlobusAuthorizationParameters,
+    GlobusAuthRequirementsError,
+)
 
-T = t.TypeVar("T", bound="LegacySessionErrorVariant")
+T = t.TypeVar("T", bound="LegacyAuthRequirementsErrorVariant")
 
 
-class LegacySessionErrorVariant:
+class LegacyAuthRequirementsErrorVariant:
     """
-    Abstract base class for errors which can be converted to a Globus Session Error.
+    Abstract base class for errors which can be converted to a
+    Globus Auth Requirements Error.
     """
 
     @classmethod
     def from_dict(cls: t.Type[T], error_dict: dict[str, t.Any]) -> T:
         raise NotImplementedError()
 
-    def to_session_error(self) -> GlobusSessionError:
+    def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         raise NotImplementedError()
 
 
-class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
+class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
     """
     The ConsentRequired error format emitted by the Globus Transfer service.
     """
@@ -52,13 +56,13 @@ class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
         self.required_scopes = required_scopes
         self.extra_fields = extra or {}
 
-    def to_session_error(self) -> GlobusSessionError:
+    def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
-        Return a GlobusSessionError representing this error.
+        Return a GlobusAuthRequirementsError representing this error.
         """
-        return GlobusSessionError(
+        return GlobusAuthRequirementsError(
             code=self.code,
-            authorization_parameters=GlobusSessionErrorAuthorizationParameters(
+            authorization_parameters=GlobusAuthorizationParameters(
                 session_required_scopes=self.required_scopes,
                 session_message=self.extra_fields.get("message"),
             ),
@@ -86,7 +90,7 @@ class LegacyConsentRequiredTransferError(LegacySessionErrorVariant):
         return cls(**kwargs)
 
 
-class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
+class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
     """
     The ConsentRequired error format emitted by the legacy Globus Transfer
     Action Providers.
@@ -119,16 +123,16 @@ class LegacyConsentRequiredAPError(LegacySessionErrorVariant):
         self.required_scope = required_scope
         self.extra_fields = extra or {}
 
-    def to_session_error(self) -> GlobusSessionError:
+    def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
-        Return a GlobusSessionError representing this error.
+        Return a GlobusAuthRequirementsError representing this error.
 
         Normalizes the required_scope field to a list and uses the description
         to set the session message.
         """
-        return GlobusSessionError(
+        return GlobusAuthRequirementsError(
             code=self.code,
-            authorization_parameters=GlobusSessionErrorAuthorizationParameters(
+            authorization_parameters=GlobusAuthorizationParameters(
                 session_required_scopes=[self.required_scope],
                 session_message=self.extra_fields.get("description"),
                 extra=self.extra_fields.get("authorization_parameters"),
@@ -222,11 +226,11 @@ class LegacyAuthorizationParameters:
             if field_value is not None and not isinstance(field_value, field_types):
                 raise ValueError(f"'{field_name}' must be one of {field_types}")
 
-    def to_session_error_authorization_parameters(
+    def to_authorization_parameters(
         self,
-    ) -> GlobusSessionErrorAuthorizationParameters:
+    ) -> GlobusAuthorizationParameters:
         """
-        Return a GlobusSessionError representing this error.
+        Return a GlobusAuthRequirementsError representing this error.
 
         Normalizes fields that may have been provided
         as comma-delimited strings to lists of strings.
@@ -240,7 +244,7 @@ class LegacyAuthorizationParameters:
         if isinstance(required_single_domain, str):
             required_single_domain = required_single_domain.split(",")
 
-        return GlobusSessionErrorAuthorizationParameters(
+        return GlobusAuthorizationParameters(
             session_message=self.session_message,
             session_required_identities=self.session_required_identities,
             session_required_mfa=self.session_required_mfa,
@@ -270,7 +274,7 @@ class LegacyAuthorizationParameters:
         return cls(**kwargs)
 
 
-class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
+class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
     """
     Defines an Authorization Parameters error that describes all known variants
     in use by Globus services.
@@ -326,14 +330,14 @@ class LegacyAuthorizationParametersError(LegacySessionErrorVariant):
 
         return cls(**kwargs)
 
-    def to_session_error(self) -> GlobusSessionError:
+    def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
-        Return a GlobusSessionError representing this error.
+        Return a GlobusAuthRequirementsError representing this error.
         """
         authorization_parameters = (
-            self.authorization_parameters.to_session_error_authorization_parameters()
+            self.authorization_parameters.to_authorization_parameters()
         )
-        return GlobusSessionError(
+        return GlobusAuthRequirementsError(
             authorization_parameters=authorization_parameters,
             code=self.code,
             extra=self.extra_fields,
