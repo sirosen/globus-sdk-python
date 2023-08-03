@@ -167,11 +167,11 @@ class ScopeGraph:
         # stack and pop from it until it is empty, thus implementing DFS
         #
         # conceptually, the paths could be implemented as `list[str]`, which would
-        # preserve the order in which we encountered each node. Using frozenset is a
+        # preserve the order in which we encountered each node. Using a set is a
         # micro-optimization which makes checks faster, since we only care to detect
         # *that* there was a cycle, not what the shape of that cycle was
-        paths_to_explore: list[tuple[frozenset[str], str]] = [
-            (frozenset((node,)), node) for node, _ in self.top_level_scopes
+        paths_to_explore: list[tuple[set[str], str]] = [
+            ({node}, node) for node, _ in self.top_level_scopes
         ]
 
         while paths_to_explore:
