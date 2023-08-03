@@ -1,68 +1,50 @@
 from __future__ import annotations
 
-import dataclasses
-import enum
 import typing as t
 from collections import defaultdict, deque
 
 from .errors import ScopeCycleError, ScopeParseError
 
-
-class ParseTokenType(enum.Enum):
-    # a string like 'urn:globus:auth:scopes:transfer.api.globus.org:all'
-    scope_string = enum.auto()
-    # the optional marker, '*'
-    opt_marker = enum.auto()
-    # '[' and ']'
-    lbracket = enum.auto()
-    rbracket = enum.auto()
+SPECIAL_CHARACTERS = set("[]* ")
+SPECIAL_TOKENS = set("[]*")
 
 
-@dataclasses.dataclass
-class ParseToken:
-    value: str
-    token_type: ParseTokenType
-
-
-def _tokenize(scope_string: str) -> list[ParseToken]:
-    tokens: list[ParseToken] = []
-    current_token: list[str] = []
+def _tokenize(scope_string: str) -> list[str]:
+    tokens: list[str] = []
+    start = 0
     for idx, c in enumerate(scope_string):
         try:
             peek: str | None = scope_string[idx + 1]
         except IndexError:
             peek = None
 
-        if c in "[]* ":
-            if current_token:
-                tokens.append(
-                    ParseToken("".join(current_token), ParseTokenType.scope_string)
-                )
-                current_token = []
+        if c in SPECIAL_CHARACTERS:
+            if start != idx:
+                tokens.append(scope_string[start:idx])
 
+            start = idx + 1
             if c == "*":
                 if peek == " ":
                     raise ScopeParseError("'*' must not be followed by a space")
-                tokens.append(ParseToken(c, ParseTokenType.opt_marker))
+                tokens.append(c)
             elif c == "[":
-                tokens.append(ParseToken(c, ParseTokenType.lbracket))
+                tokens.append(c)
             elif c == "]":
                 if peek is not None and peek not in (" ", "]"):
                     raise ScopeParseError("']' may only be followed by a space or ']'")
-                tokens.append(ParseToken(c, ParseTokenType.rbracket))
+                tokens.append(c)
             elif c == " ":
                 if peek == "[":
                     raise ScopeParseError("'[' cannot have a preceding space")
             else:
                 raise NotImplementedError
-        else:
-            current_token.append(c)
-    if current_token:
-        tokens.append(ParseToken("".join(current_token), ParseTokenType.scope_string))
+    remainder = scope_string[start:].strip()
+    if remainder:
+        tokens.append(remainder)
     return tokens
 
 
-def _parse_tokens(tokens: list[ParseToken]) -> list[ScopeTreeNode]:
+def _parse_tokens(tokens: list[str]) -> list[ScopeTreeNode]:
     # value to return
     ret: list[ScopeTreeNode] = []
     # track whether or not the current scope is optional (has a preceding *)
@@ -76,36 +58,36 @@ def _parse_tokens(tokens: list[ParseToken]) -> list[ScopeTreeNode]:
     for idx in range(len(tokens)):
         token = tokens[idx]
         try:
-            peek: ParseToken | None = tokens[idx + 1]
+            peek: str | None = tokens[idx + 1]
         except IndexError:
             peek = None
 
-        if token.token_type == ParseTokenType.opt_marker:
+        if token == "*":
             current_optional = True
             if peek is None:
                 raise ScopeParseError("ended in optional marker")
-            if peek.token_type != ParseTokenType.scope_string:
+            if peek in SPECIAL_TOKENS:
                 raise ScopeParseError(
                     "a scope string must always follow an optional marker"
                 )
 
-        elif token.token_type == ParseTokenType.lbracket:
+        elif token == "[":
             if peek is None:
                 raise ScopeParseError("ended in left bracket")
-            if peek.token_type == ParseTokenType.rbracket:
+            if peek == "]":
                 raise ScopeParseError("found empty brackets")
-            if peek.token_type == ParseTokenType.lbracket:
+            if peek == "[":
                 raise ScopeParseError("found double left-bracket")
             if not current_scope:
                 raise ScopeParseError("found '[' without a preceding scope string")
 
             parents.append(current_scope)
-        elif token.token_type == ParseTokenType.rbracket:
+        elif token == "]":
             if not parents:
                 raise ScopeParseError("found ']' with no matching '[' preceding it")
             parents.pop()
         else:
-            current_scope = ScopeTreeNode(token.value, optional=current_optional)
+            current_scope = ScopeTreeNode(token, optional=current_optional)
             current_optional = False
             if parents:
                 parents[-1].add_dependency(current_scope)
@@ -185,11 +167,11 @@ class ScopeGraph:
         # stack and pop from it until it is empty, thus implementing DFS
         #
         # conceptually, the paths could be implemented as `list[str]`, which would
-        # preserve the order in which we encountered each node. Using frozenset is a
+        # preserve the order in which we encountered each node. Using a set is a
         # micro-optimization which makes checks faster, since we only care to detect
         # *that* there was a cycle, not what the shape of that cycle was
-        paths_to_explore: list[tuple[frozenset[str], str]] = [
-            (frozenset((node,)), node) for node, _ in self.top_level_scopes
+        paths_to_explore: list[tuple[set[str], str]] = [
+            ({node}, node) for node, _ in self.top_level_scopes
         ]
 
         while paths_to_explore:
