@@ -64,7 +64,7 @@ class GlobusAuthorizationParameters:
         session_required_mfa: bool | None = None,
         required_scopes: list[str] | None = None,
         extra: dict[str, t.Any] | None = None,
-    ):
+    ):  # pylint: disable=unused-argument
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
             try:
@@ -159,7 +159,7 @@ class GlobusAuthRequirementsError(GlobusError):
 
     def __init__(
         self,
-        code: str | None,
+        code: str | None,  # pylint: disable=unused-argument
         authorization_parameters: dict[str, t.Any]
         | GlobusAuthorizationParameters
         | None,

@@ -59,7 +59,7 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
         code: str | None,
         required_scopes: list[str] | None,
         extra: dict[str, t.Any] | None = None,
-    ):
+    ):  # pylint: disable=unused-argument
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
             try:
@@ -105,7 +105,7 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
         code: str | None,
         required_scope: str | None,
         extra: dict[str, t.Any] | None,
-    ):
+    ):  # pylint: disable=unused-argument
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
             try:
@@ -176,7 +176,7 @@ class LegacyAuthorizationParameters:
         session_required_single_domain: str | list[str] | None = None,
         session_required_mfa: bool | None = None,
         extra: dict[str, t.Any] | None = None,
-    ):
+    ):  # pylint: disable=unused-argument
         # Validate and assign supported fields
         for field_name, validator in self.SUPPORTED_FIELDS.items():
             try:
