@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+import sys
 import typing as t
 from contextlib import suppress
+
+if sys.version_info >= (3, 9):
+    from typing import get_type_hints
+else:
+    from typing_extensions import get_type_hints
 
 T = t.TypeVar("T")
 
@@ -101,3 +107,49 @@ OptionalListOfStringsOrCommaDelimitedStrings: t.Callable[
 OptionalBool: t.Callable[[t.Any], bool | None] = _anyof(
     (_boolean, _null), description="a bool or null"
 )
+
+
+def run_annotated_validators(o: object, require_at_least_one: bool = False) -> None:
+    found_non_null = False
+    validator_annotations = list(get_validator_annotations(o))
+
+    for attrname, value in validator_annotations:
+        try:
+            validator_result = value(getattr(o, attrname))
+        except ValueError as e:
+            raise ValueError(f"Error validating field '{attrname}': {e}") from e
+        setattr(o, attrname, validator_result)
+        if validator_result is not None:
+            found_non_null = True
+
+    if require_at_least_one and not found_non_null:
+        raise ValueError(
+            "Must include at least one supported parameter: "
+            + ", ".join([f for f, _ in validator_annotations])
+        )
+
+
+def get_supported_fields(o_or_cls: object | type) -> list[str]:
+    return [field_name for (field_name, _) in get_validator_annotations(o_or_cls)]
+
+
+def get_validator_annotations(
+    o_or_cls: object | type,
+) -> t.Iterator[tuple[str, t.Callable[..., t.Any]]]:
+    if isinstance(o_or_cls, type):
+        cls = o_or_cls
+    else:
+        cls = o_or_cls.__class__
+
+    for attrname, value in get_type_hints(cls, include_extras=True).items():
+        # an Annotated[...] annotation produces a special form "_AnnotatedAlias"
+        # rather than inspecting typing internals, check that the interface we want
+        # (`__metadata__` is present and is a tuple) is satisfied by the annotation
+        if not isinstance(getattr(value, "__metadata__", None), tuple):
+            continue
+
+        maybe_validator = value.__metadata__[0]
+        if not callable(maybe_validator):
+            continue
+
+        yield (attrname, maybe_validator)

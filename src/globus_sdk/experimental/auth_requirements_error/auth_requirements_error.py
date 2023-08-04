@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import sys
 import typing as t
 
 from globus_sdk.exc import GlobusError
 
 from . import validators
+
+if sys.version_info >= (3, 9):
+    from typing import Annotated
+else:
+    from typing_extensions import Annotated
 
 
 class GlobusAuthorizationParameters:
@@ -38,22 +44,21 @@ class GlobusAuthorizationParameters:
     :vartype extra_fields: dict
     """
 
-    session_message: str | None
-    session_required_identities: list[str] | None
-    session_required_policies: list[str] | None
-    session_required_single_domain: list[str] | None
-    session_required_mfa: bool | None
-    required_scopes: list[str] | None
-    extra_fields: dict[str, t.Any]
-
-    SUPPORTED_FIELDS = {
-        "session_message": validators.OptionalString,
-        "session_required_identities": validators.OptionalListOfStrings,
-        "session_required_policies": validators.OptionalListOfStrings,
-        "session_required_single_domain": validators.OptionalListOfStrings,
-        "session_required_mfa": validators.OptionalBool,
-        "required_scopes": validators.OptionalListOfStrings,
-    }
+    session_message: Annotated[t.Optional[str], validators.OptionalString]
+    session_required_identities: Annotated[
+        t.Optional[t.List[str]], validators.OptionalListOfStrings
+    ]
+    session_required_policies: Annotated[
+        t.Optional[t.List[str]], validators.OptionalListOfStrings
+    ]
+    session_required_single_domain: Annotated[
+        t.Optional[t.List[str]], validators.OptionalListOfStrings
+    ]
+    session_required_mfa: Annotated[t.Optional[bool], validators.OptionalBool]
+    required_scopes: Annotated[
+        t.Optional[t.List[str]], validators.OptionalListOfStrings
+    ]
+    extra_fields: t.Dict[str, t.Any]
 
     def __init__(
         self,
@@ -65,27 +70,16 @@ class GlobusAuthorizationParameters:
         session_required_mfa: bool | None = None,
         required_scopes: list[str] | None = None,
         extra: dict[str, t.Any] | None = None,
-    ):  # pylint: disable=unused-argument
-        # Validate and assign supported fields
-        for field_name, validator in self.SUPPORTED_FIELDS.items():
-            try:
-                field_value = validator(locals()[field_name])
-            except ValueError as e:
-                raise ValueError(f"Error validating field '{field_name}': {e}") from e
-
-            setattr(self, field_name, field_value)
-
+    ):
+        self.session_message = session_message
+        self.session_required_identities = session_required_identities
+        self.session_required_policies = session_required_policies
+        self.session_required_single_domain = session_required_single_domain
+        self.session_required_mfa = session_required_mfa
+        self.required_scopes = required_scopes
         self.extra_fields = extra or {}
 
-        # Enforce that the error contains at least one of the fields we expect
-        if not any(
-            (getattr(self, field_name) is not None)
-            for field_name in self.SUPPORTED_FIELDS.keys()
-        ):
-            raise ValueError(
-                "Must include at least one supported authorization parameter: "
-                + ", ".join(self.SUPPORTED_FIELDS.keys())
-            )
+        validators.run_annotated_validators(self, require_at_least_one=True)
 
     @classmethod
     def from_dict(cls, param_dict: dict[str, t.Any]) -> GlobusAuthorizationParameters:
@@ -95,12 +89,13 @@ class GlobusAuthorizationParameters:
         :param param_dict: The dictionary to create the error from.
         :type param_dict: dict
         """
+        supported_fields = validators.get_supported_fields(cls)
 
         # Extract any extra fields
-        extras = {k: v for k, v in param_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        extras = {k: v for k, v in param_dict.items() if k not in supported_fields}
         kwargs: dict[str, t.Any] = {"extra": extras}
         # Ensure required fields are supplied
-        for field_name in cls.SUPPORTED_FIELDS.keys():
+        for field_name in supported_fields:
             kwargs[field_name] = param_dict.get(field_name)
 
         return cls(**kwargs)
@@ -113,10 +108,12 @@ class GlobusAuthorizationParameters:
             the returned dictionary.
         :type include_extra: bool
         """
+        supported_fields = validators.get_supported_fields(self)
+
         error_dict = {}
 
         # Set any authorization parameters
-        for field in self.SUPPORTED_FIELDS.keys():
+        for field in supported_fields:
             if getattr(self, field) is not None:
                 error_dict[field] = getattr(self, field)
 
@@ -147,23 +144,17 @@ class GlobusAuthRequirementsError(GlobusError):
     :vartype extra_fields: dict
     """
 
-    code: str
-    authorization_parameters: GlobusAuthorizationParameters
-    extra_fields: dict[str, t.Any]
-
-    SUPPORTED_FIELDS = {
-        "code": validators.String,
-        "authorization_parameters": validators.ClassInstance(
-            GlobusAuthorizationParameters
-        ),
-    }
+    code: Annotated[str, validators.String]
+    authorization_parameters: Annotated[
+        GlobusAuthorizationParameters,
+        validators.ClassInstance(GlobusAuthorizationParameters),
+    ]
+    extra_fields: t.Dict[str, t.Any]
 
     def __init__(
         self,
-        code: str | None,  # pylint: disable=unused-argument
-        authorization_parameters: dict[str, t.Any]
-        | GlobusAuthorizationParameters
-        | None,
+        code: str,
+        authorization_parameters: dict[str, t.Any] | GlobusAuthorizationParameters,
         *,
         extra: dict[str, t.Any] | None = None,
     ):
@@ -173,16 +164,11 @@ class GlobusAuthRequirementsError(GlobusError):
                 param_dict=authorization_parameters
             )
 
-        # Validate and assign supported fields
-        for field_name, validator in self.SUPPORTED_FIELDS.items():
-            try:
-                field_value = validator(locals()[field_name])
-            except ValueError as e:
-                raise ValueError(f"Error validating field '{field_name}': {e}") from e
-
-            setattr(self, field_name, field_value)
-
+        self.code = code
+        self.authorization_parameters = authorization_parameters
         self.extra_fields = extra or {}
+
+        validators.run_annotated_validators(self)
 
     @classmethod
     def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusAuthRequirementsError:
@@ -192,12 +178,13 @@ class GlobusAuthRequirementsError(GlobusError):
         :param error_dict: The dictionary to create the error from.
         :type error_dict: dict
         """
+        supported_fields = validators.get_supported_fields(cls)
 
         # Extract any extra fields
-        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        extras = {k: v for k, v in error_dict.items() if k not in supported_fields}
         kwargs: dict[str, t.Any] = {"extra": extras}
         # Ensure required fields are supplied
-        for field_name in cls.SUPPORTED_FIELDS.keys():
+        for field_name in supported_fields:
             kwargs[field_name] = error_dict.get(field_name)
 
         return cls(**kwargs)

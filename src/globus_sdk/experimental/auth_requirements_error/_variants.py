@@ -198,8 +198,8 @@ class LegacyAuthorizationParameters:
             for field_name in self.SUPPORTED_FIELDS.keys()
         ):
             raise ValueError(
-                "Must include at least one supported authorization parameter: "
-                ", ".join(self.SUPPORTED_FIELDS.keys())
+                "Must include at least one supported parameter: "
+                + ", ".join(self.SUPPORTED_FIELDS.keys())
             )
 
     def to_authorization_parameters(
