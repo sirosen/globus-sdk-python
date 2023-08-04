@@ -12,7 +12,7 @@ GlobusAuthRequirementsError
 ---------------------------
 
 The ``GlobusAuthRequirementsError`` class provides a model for working with Globus
-Auth Requirements Error responses in the Python SDK. The shape of an instance closely
+Auth Requirements Error responses. The shape of an instance closely
 matches that of the JSON response, such that in order to access a
 response's required_scopes one could use, e.g.,:
 
