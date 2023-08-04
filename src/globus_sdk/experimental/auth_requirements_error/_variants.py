@@ -56,6 +56,7 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
 
     def __init__(
         self,
+        *,
         code: str | None,
         required_scopes: list[str] | None,
         extra: dict[str, t.Any] | None = None,
@@ -102,6 +103,7 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
 
     def __init__(
         self,
+        *,
         code: str | None,
         required_scope: str | None,
         extra: dict[str, t.Any] | None,
@@ -170,6 +172,7 @@ class LegacyAuthorizationParameters:
 
     def __init__(
         self,
+        *,
         session_message: str | None = None,
         session_required_identities: list[str] | None = None,
         session_required_policies: str | list[str] | None = None,
@@ -267,6 +270,7 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
 
     def __init__(
         self,
+        *,
         authorization_parameters: dict[str, t.Any]
         | LegacyAuthorizationParameters
         | None,

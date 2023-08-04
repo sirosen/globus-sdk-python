@@ -57,6 +57,7 @@ class GlobusAuthorizationParameters:
 
     def __init__(
         self,
+        *,
         session_message: str | None = None,
         session_required_identities: list[str] | None = None,
         session_required_policies: list[str] | None = None,
@@ -163,6 +164,7 @@ class GlobusAuthRequirementsError(GlobusError):
         authorization_parameters: dict[str, t.Any]
         | GlobusAuthorizationParameters
         | None,
+        *,
         extra: dict[str, t.Any] | None = None,
     ):
         # Convert authorization_parameters if it's a dict
