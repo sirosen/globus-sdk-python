@@ -39,9 +39,6 @@ class _String(Validator[str]):
         return value
 
 
-String = _String()
-
-
 class StringLiteral(Validator[T]):
     def __init__(self, literal: str) -> None:
         self._value = literal
@@ -76,9 +73,6 @@ class _ListOfStrings(Validator[t.List[str]]):
         return value
 
 
-ListOfStrings = _ListOfStrings()
-
-
 class _CommaDelimitedStrings(Validator[t.List[str]]):
     error_message = "must be a comma-delimited of string"
 
@@ -87,9 +81,6 @@ class _CommaDelimitedStrings(Validator[t.List[str]]):
             _fail(self, name)
 
         return value.split(",")
-
-
-CommaDelimitedStrings = _CommaDelimitedStrings()
 
 
 class _Boolean(Validator[bool]):
@@ -102,9 +93,6 @@ class _Boolean(Validator[bool]):
         return value
 
 
-Boolean = _Boolean()
-
-
 class _Null(Validator[None]):
     error_message = "must be null"
 
@@ -113,9 +101,6 @@ class _Null(Validator[None]):
             _fail(self, name)
 
         return None
-
-
-Null = _Null()
 
 
 class _AnyOf(Validator[t.Any]):
@@ -131,6 +116,11 @@ class _AnyOf(Validator[t.Any]):
         _fail(self, name)
 
 
+ListOfStrings = _ListOfStrings()
+String = _String()
+CommaDelimitedStrings = _CommaDelimitedStrings()
+Boolean = _Boolean()
+Null = _Null()
 OptionalString: Validator[str | None] = _AnyOf(
     String, Null, description="a string or null"
 )

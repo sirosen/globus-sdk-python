@@ -57,9 +57,7 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
         required_scopes: list[str] | None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.code: Literal["ConsentRequired"] = _consent_required_validator(
-            "code", code
-        )
+        self.code = _consent_required_validator("code", code)
         self.required_scopes = validators.ListOfStrings(
             "required_scopes", required_scopes
         )
@@ -93,9 +91,7 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
         required_scope: str,
         extra: dict[str, t.Any] | None,
     ):
-        self.code: Literal["ConsentRequired"] = _consent_required_validator(
-            "code", code
-        )
+        self.code = _consent_required_validator("code", code)
         self.required_scope = validators.String("required_scope", required_scope)
         self.extra = extra or {}
 
