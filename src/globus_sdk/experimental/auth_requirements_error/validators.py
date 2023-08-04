@@ -108,6 +108,15 @@ OptionalBool: t.Callable[[t.Any], bool | None] = _anyof(
     (_boolean, _null), description="a bool or null"
 )
 
+# a sentinel used to indicate default validator lookup behavior
+DEFAULT = object()
+DEFAULT_TYPE_MAP = {
+    str: String,
+    t.Optional[str]: OptionalString,
+    t.Optional[t.List[str]]: OptionalListOfStrings,
+    t.Optional[bool]: OptionalBool,
+}
+
 
 def run_annotated_validators(o: object, require_at_least_one: bool = False) -> None:
     found_non_null = False
@@ -149,6 +158,14 @@ def get_validator_annotations(
             continue
 
         maybe_validator = value.__metadata__[0]
+        if maybe_validator is DEFAULT:
+            maybe_validator = DEFAULT_TYPE_MAP.get(value.__origin__, None)
+            if maybe_validator is None:
+                raise NotImplementedError(
+                    "Internal SDK Error! An unsupported validator type was requested "
+                    "via DEFAULT. DEFAULT should only be used for supported types."
+                )
+
         if not callable(maybe_validator):
             continue
 

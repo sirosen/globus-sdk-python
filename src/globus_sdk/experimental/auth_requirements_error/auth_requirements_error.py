@@ -44,20 +44,14 @@ class GlobusAuthorizationParameters:
     :vartype extra_fields: dict
     """
 
-    session_message: Annotated[t.Optional[str], validators.OptionalString]
-    session_required_identities: Annotated[
-        t.Optional[t.List[str]], validators.OptionalListOfStrings
-    ]
-    session_required_policies: Annotated[
-        t.Optional[t.List[str]], validators.OptionalListOfStrings
-    ]
+    session_message: Annotated[t.Optional[str], validators.DEFAULT]
+    session_required_identities: Annotated[t.Optional[t.List[str]], validators.DEFAULT]
+    session_required_policies: Annotated[t.Optional[t.List[str]], validators.DEFAULT]
     session_required_single_domain: Annotated[
-        t.Optional[t.List[str]], validators.OptionalListOfStrings
+        t.Optional[t.List[str]], validators.DEFAULT
     ]
-    session_required_mfa: Annotated[t.Optional[bool], validators.OptionalBool]
-    required_scopes: Annotated[
-        t.Optional[t.List[str]], validators.OptionalListOfStrings
-    ]
+    session_required_mfa: Annotated[t.Optional[bool], validators.DEFAULT]
+    required_scopes: Annotated[t.Optional[t.List[str]], validators.DEFAULT]
     extra_fields: t.Dict[str, t.Any]
 
     def __init__(
@@ -144,7 +138,7 @@ class GlobusAuthRequirementsError(GlobusError):
     :vartype extra_fields: dict
     """
 
-    code: Annotated[str, validators.String]
+    code: Annotated[str, validators.DEFAULT]
     authorization_parameters: Annotated[
         GlobusAuthorizationParameters,
         validators.ClassInstance(GlobusAuthorizationParameters),
