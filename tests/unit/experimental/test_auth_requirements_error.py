@@ -1,3 +1,5 @@
+import inspect
+
 import pytest
 
 from globus_sdk._testing import construct_error
@@ -10,9 +12,6 @@ from globus_sdk.experimental.auth_requirements_error import (
     is_auth_requirements_error,
     to_auth_requirements_error,
     to_auth_requirements_errors,
-)
-from globus_sdk.experimental.auth_requirements_error.validators import (
-    derive_supported_fields,
 )
 
 
@@ -419,12 +418,12 @@ def test_backward_compatibility_consent_required_error():
         _variants.LegacyConsentRequiredAPError,
     ],
 )
-def test_supported_fields_excludes_extra_and_self(target_class):
-    supported_fields = derive_supported_fields(target_class)
-    assert isinstance(supported_fields, list)
-    assert len(supported_fields) > 0
-    assert "self" not in supported_fields
-    assert "extra" not in supported_fields
+def test_supported_fields_matches_init(target_class):
+    signature = inspect.signature(target_class.__init__)
+    derived_supported = {
+        k for k in signature.parameters.keys() if k not in ("extra", "self")
+    }
+    assert derived_supported == target_class.SUPPORTED_FIELDS
 
 
 @pytest.mark.parametrize(

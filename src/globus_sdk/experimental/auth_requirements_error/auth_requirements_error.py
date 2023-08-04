@@ -38,6 +38,15 @@ class GlobusAuthorizationParameters:
     :vartype extra: dict
     """
 
+    SUPPORTED_FIELDS = {
+        "session_message",
+        "session_required_identities",
+        "session_required_policies",
+        "session_required_single_domain",
+        "session_required_mfa",
+        "required_scopes",
+    }
+
     def __init__(
         self,
         *,
@@ -69,7 +78,11 @@ class GlobusAuthorizationParameters:
         )
         self.extra = extra or {}
 
-        validators.require_at_least_one_field(self, "supported authorization parameter")
+        validators.require_at_least_one_field(
+            self,
+            [f for f in self.SUPPORTED_FIELDS if f != "session_message"],
+            "supported authorization parameter",
+        )
 
     @classmethod
     def from_dict(cls, param_dict: dict[str, t.Any]) -> GlobusAuthorizationParameters:
@@ -79,13 +92,11 @@ class GlobusAuthorizationParameters:
         :param param_dict: The dictionary to create the error from.
         :type param_dict: dict
         """
-        supported_fields = validators.derive_supported_fields(cls)
-
         # Extract any extra fields
-        extras = {k: v for k, v in param_dict.items() if k not in supported_fields}
+        extras = {k: v for k, v in param_dict.items() if k not in cls.SUPPORTED_FIELDS}
         kwargs: dict[str, t.Any] = {"extra": extras}
         # Ensure required fields are supplied
-        for field_name in supported_fields:
+        for field_name in cls.SUPPORTED_FIELDS:
             kwargs[field_name] = param_dict.get(field_name)
 
         return cls(**kwargs)
@@ -98,12 +109,10 @@ class GlobusAuthorizationParameters:
             the returned dictionary.
         :type include_extra: bool
         """
-        supported_fields = validators.derive_supported_fields(self)
-
         error_dict = {}
 
         # Set any authorization parameters
-        for field in supported_fields:
+        for field in self.SUPPORTED_FIELDS:
             if getattr(self, field) is not None:
                 error_dict[field] = getattr(self, field)
 
@@ -133,6 +142,8 @@ class GlobusAuthRequirementsError(GlobusError):
         be used for forward/backward compatibility.
     :vartype extra: dict
     """
+
+    SUPPORTED_FIELDS = {"code", "authorization_parameters"}
 
     _authz_param_validator: validators.IsInstance[
         GlobusAuthorizationParameters
@@ -165,13 +176,11 @@ class GlobusAuthRequirementsError(GlobusError):
         :param error_dict: The dictionary to create the error from.
         :type error_dict: dict
         """
-        supported_fields = validators.derive_supported_fields(cls)
-
         # Extract any extra fields
-        extras = {k: v for k, v in error_dict.items() if k not in supported_fields}
+        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
         kwargs: dict[str, t.Any] = {"extra": extras}
         # Ensure required fields are supplied
-        for field_name in supported_fields:
+        for field_name in cls.SUPPORTED_FIELDS:
             kwargs[field_name] = error_dict.get(field_name)
 
         return cls(**kwargs)

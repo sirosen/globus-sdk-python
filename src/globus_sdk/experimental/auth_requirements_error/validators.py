@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import inspect
 import sys
 import typing as t
 from contextlib import suppress
@@ -141,18 +140,11 @@ OptionalBool: Validator[bool | None] = _AnyOf(
 )
 
 
-def require_at_least_one_field(o: object, field_description: str) -> None:
-    one_of_fields = set(derive_supported_fields(o))
+def require_at_least_one_field(
+    o: object, one_of_fields: list[str], field_description: str
+) -> None:
     if all((getattr(o, field_name) is None) for field_name in one_of_fields):
         raise ValueError(
             f"Must include at least one {field_description}: "
             + ", ".join(one_of_fields)
         )
-
-
-def derive_supported_fields(o_or_cls: object | type) -> list[str]:
-    # mypy warns here about `__init__` access being potnetially unsound, but the check
-    # is a false negative in this case since we're operating on a closed set of classes
-    # which we control
-    signature = inspect.signature(o_or_cls.__init__)  # type: ignore[misc]
-    return [k for k in signature.parameters.keys() if k not in ("extra", "self")]
