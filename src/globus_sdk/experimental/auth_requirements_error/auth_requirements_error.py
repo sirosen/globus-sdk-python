@@ -1,16 +1,10 @@
 from __future__ import annotations
 
-import sys
 import typing as t
 
 from globus_sdk.exc import GlobusError
 
 from . import validators
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
 
 
 class GlobusAuthorizationParameters:
@@ -39,20 +33,10 @@ class GlobusAuthorizationParameters:
     :ivar required_scopes: A list of scopes for which consent is required.
     :vartype required_scopes: list of str, optional
 
-    :ivar extra_fields: A dictionary of additional fields that were provided. May
+    :ivar extra: A dictionary of additional fields that were provided. May
         be used for forward/backward compatibility.
-    :vartype extra_fields: dict
+    :vartype extra: dict
     """
-
-    session_message: Annotated[t.Optional[str], validators.DEFAULT]
-    session_required_identities: Annotated[t.Optional[t.List[str]], validators.DEFAULT]
-    session_required_policies: Annotated[t.Optional[t.List[str]], validators.DEFAULT]
-    session_required_single_domain: Annotated[
-        t.Optional[t.List[str]], validators.DEFAULT
-    ]
-    session_required_mfa: Annotated[t.Optional[bool], validators.DEFAULT]
-    required_scopes: Annotated[t.Optional[t.List[str]], validators.DEFAULT]
-    extra_fields: t.Dict[str, t.Any]
 
     def __init__(
         self,
@@ -65,15 +49,27 @@ class GlobusAuthorizationParameters:
         required_scopes: list[str] | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message = session_message
-        self.session_required_identities = session_required_identities
-        self.session_required_policies = session_required_policies
-        self.session_required_single_domain = session_required_single_domain
-        self.session_required_mfa = session_required_mfa
-        self.required_scopes = required_scopes
-        self.extra_fields = extra or {}
+        self.session_message = validators.OptionalString(
+            "session_message", session_message
+        )
+        self.session_required_identities = validators.OptionalListOfStrings(
+            "session_required_identities", session_required_identities
+        )
+        self.session_required_policies = validators.OptionalListOfStrings(
+            "session_required_policies", session_required_policies
+        )
+        self.session_required_single_domain = validators.OptionalListOfStrings(
+            "session_required_single_domain", session_required_single_domain
+        )
+        self.session_required_mfa = validators.OptionalBool(
+            "session_required_mfa", session_required_mfa
+        )
+        self.required_scopes = validators.OptionalListOfStrings(
+            "required_scopes", required_scopes
+        )
+        self.extra = extra or {}
 
-        validators.run_annotated_validators(self, require_at_least_one=True)
+        validators.require_at_least_one_field(self, "supported authorization parameter")
 
     @classmethod
     def from_dict(cls, param_dict: dict[str, t.Any]) -> GlobusAuthorizationParameters:
@@ -83,7 +79,7 @@ class GlobusAuthorizationParameters:
         :param param_dict: The dictionary to create the error from.
         :type param_dict: dict
         """
-        supported_fields = validators.get_supported_fields(cls)
+        supported_fields = validators.derive_supported_fields(cls)
 
         # Extract any extra fields
         extras = {k: v for k, v in param_dict.items() if k not in supported_fields}
@@ -102,7 +98,7 @@ class GlobusAuthorizationParameters:
             the returned dictionary.
         :type include_extra: bool
         """
-        supported_fields = validators.get_supported_fields(self)
+        supported_fields = validators.derive_supported_fields(self)
 
         error_dict = {}
 
@@ -113,7 +109,7 @@ class GlobusAuthorizationParameters:
 
         # Set any extra fields
         if include_extra:
-            error_dict.update(self.extra_fields)
+            error_dict.update(self.extra)
 
         return error_dict
 
@@ -133,17 +129,14 @@ class GlobusAuthRequirementsError(GlobusError):
     :ivar authorization_parameters: The authorization parameters for this error.
     :vartype authorization_parameters: GlobusAuthorizationParameters
 
-    :ivar extra_fields: A dictionary of additional fields that were provided. May
+    :ivar extra: A dictionary of additional fields that were provided. May
         be used for forward/backward compatibility.
-    :vartype extra_fields: dict
+    :vartype extra: dict
     """
 
-    code: Annotated[str, validators.DEFAULT]
-    authorization_parameters: Annotated[
-        GlobusAuthorizationParameters,
-        validators.ClassInstance(GlobusAuthorizationParameters),
-    ]
-    extra_fields: t.Dict[str, t.Any]
+    _authz_param_validator: validators.IsInstance[
+        GlobusAuthorizationParameters
+    ] = validators.IsInstance(GlobusAuthorizationParameters)
 
     def __init__(
         self,
@@ -158,11 +151,11 @@ class GlobusAuthRequirementsError(GlobusError):
                 param_dict=authorization_parameters
             )
 
-        self.code = code
-        self.authorization_parameters = authorization_parameters
-        self.extra_fields = extra or {}
-
-        validators.run_annotated_validators(self)
+        self.code = validators.String("code", code)
+        self.authorization_parameters = self._authz_param_validator(
+            "authorization_parameters", authorization_parameters
+        )
+        self.extra = extra or {}
 
     @classmethod
     def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusAuthRequirementsError:
@@ -172,7 +165,7 @@ class GlobusAuthRequirementsError(GlobusError):
         :param error_dict: The dictionary to create the error from.
         :type error_dict: dict
         """
-        supported_fields = validators.get_supported_fields(cls)
+        supported_fields = validators.derive_supported_fields(cls)
 
         # Extract any extra fields
         extras = {k: v for k, v in error_dict.items() if k not in supported_fields}
@@ -200,6 +193,6 @@ class GlobusAuthRequirementsError(GlobusError):
 
         # Set any extra fields
         if include_extra:
-            error_dict.update(self.extra_fields)
+            error_dict.update(self.extra)
 
         return error_dict

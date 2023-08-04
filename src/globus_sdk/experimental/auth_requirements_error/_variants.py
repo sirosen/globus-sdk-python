@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import typing as t
 
 from . import validators
@@ -7,6 +8,11 @@ from .auth_requirements_error import (
     GlobusAuthorizationParameters,
     GlobusAuthRequirementsError,
 )
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 T = t.TypeVar("T", bound="LegacyAuthRequirementsErrorVariant")
 
@@ -17,8 +23,6 @@ class LegacyAuthRequirementsErrorVariant:
     Globus Auth Requirements Error.
     """
 
-    SUPPORTED_FIELDS: dict[str, t.Callable[[t.Any], t.Any]] = {}
-
     @classmethod
     def from_dict(cls: t.Type[T], error_dict: dict[str, t.Any]) -> T:
         """
@@ -27,11 +31,12 @@ class LegacyAuthRequirementsErrorVariant:
         :param error_dict: The dictionary to instantiate the error from.
         :type error_dict: dict
         """
+        supported_fields = validators.derive_supported_fields(cls)
         # Extract any extra fields
-        extras = {k: v for k, v in error_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        extras = {k: v for k, v in error_dict.items() if k not in supported_fields}
         kwargs: dict[str, t.Any] = {"extra": extras}
         # Ensure required fields are supplied
-        for field_name in cls.SUPPORTED_FIELDS.keys():
+        for field_name in supported_fields:
             kwargs[field_name] = error_dict.get(field_name)
 
         return cls(**kwargs)
@@ -45,32 +50,21 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
     The ConsentRequired error format emitted by the Globus Transfer service.
     """
 
-    code: str
-    required_scopes: list[str]
-    extra_fields: dict[str, t.Any]
-
-    SUPPORTED_FIELDS = {
-        "code": validators.StringLiteral("ConsentRequired"),
-        "required_scopes": validators.ListOfStrings,
-    }
-
     def __init__(
         self,
         *,
-        code: str | None,
+        code: Literal["ConsentRequired"],
         required_scopes: list[str] | None,
         extra: dict[str, t.Any] | None = None,
-    ):  # pylint: disable=unused-argument
-        # Validate and assign supported fields
-        for field_name, validator in self.SUPPORTED_FIELDS.items():
-            try:
-                field_value = validator(locals()[field_name])
-            except ValueError as e:
-                raise ValueError(f"Error validating field '{field_name}': {e}") from e
+    ):
+        self.code: Literal["ConsentRequired"] = _consent_required_validator(
+            "code", code
+        )
+        self.required_scopes = validators.ListOfStrings(
+            "required_scopes", required_scopes
+        )
 
-            setattr(self, field_name, field_value)
-
-        self.extra_fields = extra or {}
+        self.extra = extra or {}
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
@@ -80,9 +74,9 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
             code=self.code,
             authorization_parameters=GlobusAuthorizationParameters(
                 required_scopes=self.required_scopes,
-                session_message=self.extra_fields.get("message"),
+                session_message=self.extra.get("message"),
             ),
-            extra=self.extra_fields,
+            extra=self.extra,
         )
 
 
@@ -92,32 +86,18 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
     Action Providers.
     """
 
-    code: str
-    required_scope: str
-    extra_fields: dict[str, t.Any]
-
-    SUPPORTED_FIELDS = {
-        "code": validators.StringLiteral("ConsentRequired"),
-        "required_scope": validators.String,
-    }
-
     def __init__(
         self,
         *,
-        code: str | None,
-        required_scope: str | None,
+        code: Literal["ConsentRequired"],
+        required_scope: str,
         extra: dict[str, t.Any] | None,
-    ):  # pylint: disable=unused-argument
-        # Validate and assign supported fields
-        for field_name, validator in self.SUPPORTED_FIELDS.items():
-            try:
-                field_value = validator(locals()[field_name])
-            except ValueError as e:
-                raise ValueError(f"Error validating field '{field_name}': {e}") from e
-
-            setattr(self, field_name, field_value)
-
-        self.extra_fields = extra or {}
+    ):
+        self.code: Literal["ConsentRequired"] = _consent_required_validator(
+            "code", code
+        )
+        self.required_scope = validators.String("required_scope", required_scope)
+        self.extra = extra or {}
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
@@ -130,13 +110,11 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
             code=self.code,
             authorization_parameters=GlobusAuthorizationParameters(
                 required_scopes=[self.required_scope],
-                session_message=self.extra_fields.get("description"),
-                extra=self.extra_fields.get("authorization_parameters"),
+                session_message=self.extra.get("description"),
+                extra=self.extra.get("authorization_parameters"),
             ),
             extra={
-                k: v
-                for k, v in self.extra_fields.items()
-                if k != "authorization_parameters"
+                k: v for k, v in self.extra.items() if k != "authorization_parameters"
             },
         )
 
@@ -147,29 +125,6 @@ class LegacyAuthorizationParameters:
     Globus services.
     """
 
-    session_message: str | None
-    session_required_identities: list[str] | None
-    session_required_policies: str | list[str] | None
-    session_required_single_domain: str | list[str] | None
-    session_required_mfa: bool | None
-    # Declared here for compatibility with mixed legacy payloads
-    required_scopes: list[str] | None
-    extra_fields: dict[str, t.Any]
-
-    DEFAULT_CODE = "AuthorizationRequired"
-
-    SUPPORTED_FIELDS = {
-        "session_message": validators.OptionalString,
-        "session_required_identities": validators.OptionalListOfStrings,
-        "session_required_policies": (
-            validators.OptionalListOfStringsOrCommaDelimitedStrings
-        ),
-        "session_required_single_domain": (
-            validators.OptionalListOfStringsOrCommaDelimitedStrings
-        ),
-        "session_required_mfa": validators.OptionalBool,
-    }
-
     def __init__(
         self,
         *,
@@ -179,32 +134,37 @@ class LegacyAuthorizationParameters:
         session_required_single_domain: str | list[str] | None = None,
         session_required_mfa: bool | None = None,
         extra: dict[str, t.Any] | None = None,
-    ):  # pylint: disable=unused-argument
-        # Validate and assign supported fields
-        for field_name, validator in self.SUPPORTED_FIELDS.items():
-            try:
-                field_value = validator(locals()[field_name])
-            except ValueError as e:
-                raise ValueError(f"Error validating field '{field_name}': {e}") from e
+    ):
+        self.session_message = validators.OptionalString(
+            "session_message", session_message
+        )
+        self.session_required_identities = validators.OptionalListOfStrings(
+            "session_required_identities", session_required_identities
+        )
+        # note the types on these two for clarity; although they should be
+        # inferred correctly by most type checkers
+        #
+        # because the validator returns a list[str] from any input string,
+        # the type of the instance variables is narrower than the accepted
+        # type for the relevant __init__ parameters
+        self.session_required_policies: (
+            list[str] | None
+        ) = validators.OptionalListOfStringsOrCommaDelimitedStrings(
+            "session_required_policies", session_required_policies
+        )
+        self.session_required_single_domain: (
+            list[str] | None
+        ) = validators.OptionalListOfStringsOrCommaDelimitedStrings(
+            "session_required_single_domain", session_required_single_domain
+        )
+        self.session_required_mfa = validators.OptionalBool(
+            "session_required_mfa", session_required_mfa
+        )
+        self.extra = extra or {}
 
-            setattr(self, field_name, field_value)
+        validators.require_at_least_one_field(self, "supported authorization parameter")
 
-        # Retain any additional fields
-        self.extra_fields = extra or {}
-
-        # Enforce that the error contains at least one of the fields we expect
-        if not any(
-            (getattr(self, field_name) is not None)
-            for field_name in self.SUPPORTED_FIELDS.keys()
-        ):
-            raise ValueError(
-                "Must include at least one supported parameter: "
-                + ", ".join(self.SUPPORTED_FIELDS.keys())
-            )
-
-    def to_authorization_parameters(
-        self,
-    ) -> GlobusAuthorizationParameters:
+    def to_authorization_parameters(self) -> GlobusAuthorizationParameters:
         """
         Return a normalized GlobusAuthorizationParameters instance representing
         these parameters.
@@ -212,22 +172,13 @@ class LegacyAuthorizationParameters:
         Normalizes fields that may have been provided
         as comma-delimited strings to lists of strings.
         """
-        required_policies = self.session_required_policies
-        if isinstance(required_policies, str):
-            required_policies = required_policies.split(",")
-
-        # TODO: Unnecessary?
-        required_single_domain = self.session_required_single_domain
-        if isinstance(required_single_domain, str):
-            required_single_domain = required_single_domain.split(",")
-
         return GlobusAuthorizationParameters(
             session_message=self.session_message,
             session_required_identities=self.session_required_identities,
             session_required_mfa=self.session_required_mfa,
-            session_required_policies=required_policies,
-            session_required_single_domain=required_single_domain,
-            extra=self.extra_fields,
+            session_required_policies=self.session_required_policies,
+            session_required_single_domain=self.session_required_single_domain,
+            extra=self.extra,
         )
 
     @classmethod
@@ -238,12 +189,13 @@ class LegacyAuthorizationParameters:
         :param param_dict: The dictionary to create the AuthorizationParameters from.
         :type param_dict: dict
         """
+        supported_fields = validators.derive_supported_fields(cls)
 
         # Extract any extra fields
-        extras = {k: v for k, v in param_dict.items() if k not in cls.SUPPORTED_FIELDS}
+        extras = {k: v for k, v in param_dict.items() if k not in supported_fields}
         kwargs: dict[str, t.Any] = {"extra": extras}
         # Ensure required fields are supplied
-        for field_name in cls.SUPPORTED_FIELDS.keys():
+        for field_name in supported_fields:
             kwargs[field_name] = param_dict.get(field_name)
 
         return cls(**kwargs)
@@ -255,18 +207,10 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
     in use by Globus services.
     """
 
-    authorization_parameters: LegacyAuthorizationParameters
-    code: str
-    extra_fields: dict[str, t.Any]
-
     DEFAULT_CODE = "AuthorizationRequired"
-
-    SUPPORTED_FIELDS = {
-        "code": validators.String,
-        "authorization_parameters": validators.ClassInstance(
-            LegacyAuthorizationParameters
-        ),
-    }
+    _authz_param_validator: validators.IsInstance[
+        LegacyAuthorizationParameters
+    ] = validators.IsInstance(LegacyAuthorizationParameters)
 
     def __init__(
         self,
@@ -278,25 +222,17 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
         extra: dict[str, t.Any] | None = None,
     ):
         # Apply default, if necessary
-        code = code or self.DEFAULT_CODE
+        self.code: str = validators.String("code", code or self.DEFAULT_CODE)
 
         # Convert authorization_parameters if it's a dict
         if isinstance(authorization_parameters, dict):
             authorization_parameters = LegacyAuthorizationParameters.from_dict(
                 param_dict=authorization_parameters
             )
-
-        # Validate and assign supported fields
-        for field_name, validator in self.SUPPORTED_FIELDS.items():
-            try:
-                field_value = validator(locals()[field_name])
-            except ValueError as e:
-                raise ValueError(f"Error validating field '{field_name}': {e}") from e
-
-            setattr(self, field_name, field_value)
-
-        # Retain any additional fields
-        self.extra_fields = extra or {}
+        self.authorization_parameters = self._authz_param_validator(
+            "authorization_parameters", authorization_parameters
+        )
+        self.extra = extra or {}
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
@@ -308,5 +244,11 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
         return GlobusAuthRequirementsError(
             authorization_parameters=authorization_parameters,
             code=self.code,
-            extra=self.extra_fields,
+            extra=self.extra,
         )
+
+
+# construct with an explicit type to get the correct type for the validator
+_consent_required_validator: validators.Validator[
+    Literal["ConsentRequired"]
+] = validators.StringLiteral("ConsentRequired")

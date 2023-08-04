@@ -1,5 +1,3 @@
-import inspect
-
 import pytest
 
 from globus_sdk._testing import construct_error
@@ -14,7 +12,7 @@ from globus_sdk.experimental.auth_requirements_error import (
     to_auth_requirements_errors,
 )
 from globus_sdk.experimental.auth_requirements_error.validators import (
-    get_supported_fields,
+    derive_supported_fields,
 )
 
 
@@ -413,39 +411,20 @@ def test_backward_compatibility_consent_required_error():
 @pytest.mark.parametrize(
     "target_class",
     [
+        GlobusAuthRequirementsError,
+        GlobusAuthorizationParameters,
         _variants.LegacyAuthorizationParameters,
         _variants.LegacyAuthorizationParametersError,
         _variants.LegacyConsentRequiredTransferError,
         _variants.LegacyConsentRequiredAPError,
     ],
 )
-def test_constructors_include_all_supported_fields(target_class):
-    """
-    Test that all supported fields are included in the constructors.
-    """
-
-    method_sig = inspect.signature(target_class.__init__)
-    for field_name in target_class.SUPPORTED_FIELDS:
-        # Make sure the constructor has a parameter for this field
-        assert field_name in method_sig.parameters
-
-
-@pytest.mark.parametrize(
-    "target_class",
-    [
-        GlobusAuthRequirementsError,
-        GlobusAuthorizationParameters,
-    ],
-)
-def test_constructors_include_all_annotated_supported_fields(target_class):
-    """
-    Test that all supported fields are included in the constructors.
-    """
-    method_sig = inspect.signature(target_class.__init__)
-    supported_fields = get_supported_fields(target_class)
-    for field_name in supported_fields:
-        # Make sure the constructor has a parameter for this field
-        assert field_name in method_sig.parameters
+def test_supported_fields_excludes_extra_and_self(target_class):
+    supported_fields = derive_supported_fields(target_class)
+    assert isinstance(supported_fields, list)
+    assert len(supported_fields) > 0
+    assert "self" not in supported_fields
+    assert "extra" not in supported_fields
 
 
 @pytest.mark.parametrize(
@@ -477,4 +456,6 @@ def test_authorization_parameters_from_dict_insufficient_input(target_class):
     with pytest.raises(ValueError) as exc_info:
         target_class.from_dict({})
 
-    assert "Must include at least one supported parameter" in str(exc_info.value)
+    assert "Must include at least one supported authorization parameter" in str(
+        exc_info.value
+    )
