@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import sys
 import typing as t
 from contextlib import suppress
@@ -12,26 +13,46 @@ else:
 T = t.TypeVar("T", covariant=True)
 
 
+class _MissingType:
+    pass
+
+
+_Missing = _MissingType()
+
+
 # NB: the type parameter of a Validator is what it *produces*
 # meaning that a validator which converts `"foo,bar"` to `["foo", "bar"]` should
 # be typed with `T=list[str]`, not `T=str`
 class Validator(Protocol[T]):
-    def __call__(self, name: str, value: t.Any) -> T:
+    error_message: str
+
+    def __call__(self, name: str, value: t.Any = _Missing) -> T:
         ...
 
 
-class HasErrorMessage(Protocol):
-    error_message: str
-
-
-def _fail(o: HasErrorMessage, name: str) -> t.NoReturn:
+def _fail(o: Validator[t.Any], name: str) -> t.NoReturn:
     raise ValueError(f"Error validating field '{name}': {o.error_message}")
+
+
+def _get_calling_frame_local_from_name(name: str, *, stack_depth: int = 2) -> t.Any:
+    frame = inspect.currentframe()
+    assert frame is not None
+    for _ in range(stack_depth):
+        if frame.f_back is None:
+            raise RuntimeError("Could not find calling frame.")
+        frame = frame.f_back
+    assert frame is not None
+    if name in frame.f_locals:
+        return frame.f_locals[name]
+    raise LookupError(f"Could not find local variable '{name}' in outer frame.")
 
 
 class _String(Validator[str]):
     error_message = "must be a string"
 
-    def __call__(self, name: str, value: t.Any) -> str:
+    def __call__(self, name: str, value: t.Any = _Missing) -> str:
+        if value is _Missing:
+            value = _get_calling_frame_local_from_name(name)
         if not isinstance(value, str):
             _fail(self, name)
 
@@ -43,7 +64,9 @@ class StringLiteral(Validator[T]):
         self._value = literal
         self.error_message = f"must be '{literal}'"
 
-    def __call__(self, name: str, value: t.Any) -> T:
+    def __call__(self, name: str, value: t.Any = _Missing) -> T:
+        if value is _Missing:
+            value = _get_calling_frame_local_from_name(name)
         value = String(name, value)
         if value != self._value:
             _fail(self, name)
@@ -55,7 +78,9 @@ class IsInstance(Validator[T]):
         self._cls = cls
         self.error_message = f"must be an instance of {self._cls.__name__}"
 
-    def __call__(self, name: str, value: t.Any) -> T:
+    def __call__(self, name: str, value: t.Any = _Missing) -> T:
+        if value is _Missing:
+            value = _get_calling_frame_local_from_name(name)
         if not isinstance(value, self._cls):
             _fail(self, name)
 
@@ -65,7 +90,9 @@ class IsInstance(Validator[T]):
 class _ListOfStrings(Validator[t.List[str]]):
     error_message = "must be a list of strings"
 
-    def __call__(self, name: str, value: t.Any) -> t.List[str]:
+    def __call__(self, name: str, value: t.Any = _Missing) -> t.List[str]:
+        if value is _Missing:
+            value = _get_calling_frame_local_from_name(name)
         if not (isinstance(value, list) and all(isinstance(v, str) for v in value)):
             _fail(self, name)
 
@@ -75,7 +102,9 @@ class _ListOfStrings(Validator[t.List[str]]):
 class _CommaDelimitedStrings(Validator[t.List[str]]):
     error_message = "must be a comma-delimited of string"
 
-    def __call__(self, name: str, value: t.Any) -> t.List[str]:
+    def __call__(self, name: str, value: t.Any = _Missing) -> t.List[str]:
+        if value is _Missing:
+            value = _get_calling_frame_local_from_name(name)
         if not isinstance(value, str):
             _fail(self, name)
 
@@ -85,7 +114,9 @@ class _CommaDelimitedStrings(Validator[t.List[str]]):
 class _Boolean(Validator[bool]):
     error_message = "must be a bool"
 
-    def __call__(self, name: str, value: t.Any) -> bool:
+    def __call__(self, name: str, value: t.Any = _Missing) -> bool:
+        if value is _Missing:
+            value = _get_calling_frame_local_from_name(name)
         if not isinstance(value, bool):
             _fail(self, name)
 
@@ -95,7 +126,9 @@ class _Boolean(Validator[bool]):
 class _Null(Validator[None]):
     error_message = "must be null"
 
-    def __call__(self, name: str, value: t.Any) -> None:
+    def __call__(self, name: str, value: t.Any = _Missing) -> None:
+        if value is _Missing:
+            value = _get_calling_frame_local_from_name(name)
         if value is not None:
             _fail(self, name)
 
@@ -107,7 +140,9 @@ class _AnyOf(Validator[t.Any]):
         self._validators = validators
         self.error_message = f"must be one {description}"
 
-    def __call__(self, name: str, value: t.Any) -> t.Any:
+    def __call__(self, name: str, value: t.Any = _Missing) -> t.Any:
+        if value is _Missing:
+            value = _get_calling_frame_local_from_name(name)
         for validator in self._validators:
             with suppress(ValueError):
                 return validator(name, value)
@@ -148,3 +183,7 @@ def require_at_least_one_field(
             f"Must include at least one {field_description}: "
             + ", ".join(one_of_fields)
         )
+
+
+def derive_supported_fields(init_callable: t.Callable[..., t.Any]) -> set[str]:
+    return set(inspect.signature(init_callable).parameters.keys()) - {"self", "extra"}

@@ -38,15 +38,6 @@ class GlobusAuthorizationParameters:
     :vartype extra: dict
     """
 
-    SUPPORTED_FIELDS = {
-        "session_message",
-        "session_required_identities",
-        "session_required_policies",
-        "session_required_single_domain",
-        "session_required_mfa",
-        "required_scopes",
-    }
-
     def __init__(
         self,
         *,
@@ -58,24 +49,18 @@ class GlobusAuthorizationParameters:
         required_scopes: list[str] | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message = validators.OptionalString(
-            "session_message", session_message
-        )
+        self.session_message = validators.OptionalString("session_message")
         self.session_required_identities = validators.OptionalListOfStrings(
-            "session_required_identities", session_required_identities
+            "session_required_identities"
         )
         self.session_required_policies = validators.OptionalListOfStrings(
-            "session_required_policies", session_required_policies
+            "session_required_policies"
         )
         self.session_required_single_domain = validators.OptionalListOfStrings(
-            "session_required_single_domain", session_required_single_domain
+            "session_required_single_domain"
         )
-        self.session_required_mfa = validators.OptionalBool(
-            "session_required_mfa", session_required_mfa
-        )
-        self.required_scopes = validators.OptionalListOfStrings(
-            "required_scopes", required_scopes
-        )
+        self.session_required_mfa = validators.OptionalBool("session_required_mfa")
+        self.required_scopes = validators.OptionalListOfStrings("required_scopes")
         self.extra = extra or {}
 
         validators.require_at_least_one_field(
@@ -83,6 +68,8 @@ class GlobusAuthorizationParameters:
             [f for f in self.SUPPORTED_FIELDS if f != "session_message"],
             "supported authorization parameter",
         )
+
+    SUPPORTED_FIELDS: set[str] = validators.derive_supported_fields(__init__)
 
     @classmethod
     def from_dict(cls, param_dict: dict[str, t.Any]) -> GlobusAuthorizationParameters:
@@ -143,8 +130,6 @@ class GlobusAuthRequirementsError(GlobusError):
     :vartype extra: dict
     """
 
-    SUPPORTED_FIELDS = {"code", "authorization_parameters"}
-
     _authz_param_validator: validators.IsInstance[
         GlobusAuthorizationParameters
     ] = validators.IsInstance(GlobusAuthorizationParameters)
@@ -162,11 +147,13 @@ class GlobusAuthRequirementsError(GlobusError):
                 param_dict=authorization_parameters
             )
 
-        self.code = validators.String("code", code)
+        self.code = validators.String("code")
         self.authorization_parameters = self._authz_param_validator(
-            "authorization_parameters", authorization_parameters
+            "authorization_parameters"
         )
         self.extra = extra or {}
+
+    SUPPORTED_FIELDS: set[str] = validators.derive_supported_fields(__init__)
 
     @classmethod
     def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusAuthRequirementsError:

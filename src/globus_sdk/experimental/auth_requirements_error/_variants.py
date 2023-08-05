@@ -10,20 +10,22 @@ from .auth_requirements_error import (
 )
 
 if sys.version_info >= (3, 8):
-    from typing import Literal
+    from typing import Literal, Protocol
 else:
-    from typing_extensions import Literal
+    from typing_extensions import Literal, Protocol
 
 T = t.TypeVar("T", bound="LegacyAuthRequirementsErrorVariant")
 
 
-class LegacyAuthRequirementsErrorVariant:
+class HasSupportedFields(Protocol):
+    SUPPORTED_FIELDS: t.ClassVar[set[str]]
+
+
+class LegacyAuthRequirementsErrorVariant(HasSupportedFields):
     """
     Abstract base class for errors which can be converted to a
     Globus Auth Requirements Error.
     """
-
-    SUPPORTED_FIELDS: t.ClassVar[set[str]]
 
     @classmethod
     def from_dict(cls: t.Type[T], error_dict: dict[str, t.Any]) -> T:
@@ -51,8 +53,6 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
     The ConsentRequired error format emitted by the Globus Transfer service.
     """
 
-    SUPPORTED_FIELDS = {"code", "required_scopes"}
-
     def __init__(
         self,
         *,
@@ -60,12 +60,12 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
         required_scopes: list[str] | None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.code = _consent_required_validator("code", code)
-        self.required_scopes = validators.ListOfStrings(
-            "required_scopes", required_scopes
-        )
+        self.code = _consent_required_validator("code")
+        self.required_scopes = validators.ListOfStrings("required_scopes")
 
         self.extra = extra or {}
+
+    SUPPORTED_FIELDS: set[str] = validators.derive_supported_fields(__init__)
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
@@ -87,8 +87,6 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
     Action Providers.
     """
 
-    SUPPORTED_FIELDS = {"code", "required_scope"}
-
     def __init__(
         self,
         *,
@@ -96,9 +94,11 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
         required_scope: str,
         extra: dict[str, t.Any] | None,
     ):
-        self.code = _consent_required_validator("code", code)
-        self.required_scope = validators.String("required_scope", required_scope)
+        self.code = _consent_required_validator("code")
+        self.required_scope = validators.String("required_scope")
         self.extra = extra or {}
+
+    SUPPORTED_FIELDS: set[str] = validators.derive_supported_fields(__init__)
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
@@ -126,14 +126,6 @@ class LegacyAuthorizationParameters:
     Globus services.
     """
 
-    SUPPORTED_FIELDS = {
-        "session_message",
-        "session_required_identities",
-        "session_required_policies",
-        "session_required_single_domain",
-        "session_required_mfa",
-    }
-
     def __init__(
         self,
         *,
@@ -144,11 +136,9 @@ class LegacyAuthorizationParameters:
         session_required_mfa: bool | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message = validators.OptionalString(
-            "session_message", session_message
-        )
+        self.session_message = validators.OptionalString("session_message")
         self.session_required_identities = validators.OptionalListOfStrings(
-            "session_required_identities", session_required_identities
+            "session_required_identities"
         )
         # note the types on these two for clarity; although they should be
         # inferred correctly by most type checkers
@@ -159,16 +149,14 @@ class LegacyAuthorizationParameters:
         self.session_required_policies: (
             list[str] | None
         ) = validators.OptionalListOfStringsOrCommaDelimitedStrings(
-            "session_required_policies", session_required_policies
+            "session_required_policies"
         )
         self.session_required_single_domain: (
             list[str] | None
         ) = validators.OptionalListOfStringsOrCommaDelimitedStrings(
-            "session_required_single_domain", session_required_single_domain
+            "session_required_single_domain"
         )
-        self.session_required_mfa = validators.OptionalBool(
-            "session_required_mfa", session_required_mfa
-        )
+        self.session_required_mfa = validators.OptionalBool("session_required_mfa")
         self.extra = extra or {}
 
         validators.require_at_least_one_field(
@@ -176,6 +164,8 @@ class LegacyAuthorizationParameters:
             [f for f in self.SUPPORTED_FIELDS if f != "session_message"],
             "supported authorization parameter",
         )
+
+    SUPPORTED_FIELDS: set[str] = validators.derive_supported_fields(__init__)
 
     def to_authorization_parameters(self) -> GlobusAuthorizationParameters:
         """
@@ -218,7 +208,6 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
     in use by Globus services.
     """
 
-    SUPPORTED_FIELDS = {"authorization_parameters", "code"}
     DEFAULT_CODE = "AuthorizationRequired"
     _authz_param_validator: validators.IsInstance[
         LegacyAuthorizationParameters
@@ -242,9 +231,11 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
                 param_dict=authorization_parameters
             )
         self.authorization_parameters = self._authz_param_validator(
-            "authorization_parameters", authorization_parameters
+            "authorization_parameters"
         )
         self.extra = extra or {}
+
+    SUPPORTED_FIELDS: set[str] = validators.derive_supported_fields(__init__)
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
         """
