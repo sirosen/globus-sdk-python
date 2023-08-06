@@ -26,7 +26,7 @@ def to_auth_requirements_error(
 
     .. note::
 
-        a GlobusAPIError may contain multiple errors, and in this case only a single
+        A GlobusAPIError may contain multiple errors, and in this case only a single
         GlobusAuthRequirementsError is returned for the first error that matches
         a known format.
 
