@@ -427,18 +427,36 @@ def test_supported_fields_matches_init(target_class):
 
 
 @pytest.mark.parametrize(
-    "target_class, field_name",
+    "target_class, field_name, data",
     [
-        (GlobusAuthRequirementsError, "code"),
-        (_variants.LegacyAuthorizationParametersError, "authorization_parameters"),
-        (_variants.LegacyConsentRequiredTransferError, "code"),
-        (_variants.LegacyConsentRequiredAPError, "code"),
+        (
+            GlobusAuthRequirementsError,
+            "code",
+            {"authorization_parameters": {"required_scopes": []}},
+        ),
+        (
+            _variants.LegacyAuthorizationParametersError,
+            "authorization_parameters",
+            {"session_required_policies": "foo"},
+        ),
+        (_variants.LegacyConsentRequiredTransferError, "code", {"required_scopes": []}),
+        (
+            _variants.LegacyConsentRequiredTransferError,
+            "required_scopes",
+            {"code": "ConsentRequired"},
+        ),
+        (_variants.LegacyConsentRequiredAPError, "code", {"required_scope": "foo"}),
+        (
+            _variants.LegacyConsentRequiredAPError,
+            "required_scope",
+            {"code": "ConsentRequired"},
+        ),
     ],
 )
-def test_error_from_dict_insufficient_input(target_class, field_name):
+def test_error_from_dict_insufficient_input(target_class, field_name, data):
     """ """
     with pytest.raises(ValueError) as exc_info:
-        target_class.from_dict({})
+        target_class.from_dict(data)
 
     assert f"Error validating field '{field_name}'" in str(exc_info.value)
 

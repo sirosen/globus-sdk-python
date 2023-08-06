@@ -59,7 +59,7 @@ def to_auth_requirements_error(
     except ValueError as err:
         log.debug(f"Failed to parse error as 'GlobusAuthRequirementsError' ({err})")
 
-    supported_variants: list[t.Type[LegacyAuthRequirementsErrorVariant]] = [
+    supported_variants: list[type[LegacyAuthRequirementsErrorVariant]] = [
         LegacyAuthorizationParametersError,
         LegacyConsentRequiredTransferError,
         LegacyConsentRequiredAPError,

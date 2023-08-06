@@ -1,23 +1,15 @@
 from __future__ import annotations
 
-import inspect
 import sys
 import typing as t
 from contextlib import suppress
 
 if sys.version_info >= (3, 8):
-    from typing import Protocol
+    from typing import Literal, Protocol
 else:
-    from typing_extensions import Protocol
+    from typing_extensions import Literal, Protocol
 
 T = t.TypeVar("T", covariant=True)
-
-
-class _MissingType:
-    pass
-
-
-_Missing = _MissingType()
 
 
 # NB: the type parameter of a Validator is what it *produces*
@@ -26,7 +18,7 @@ _Missing = _MissingType()
 class Validator(Protocol[T]):
     error_message: str
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> T:
+    def __call__(self, name: str, value: t.Any) -> T:
         ...
 
 
@@ -34,25 +26,10 @@ def _fail(o: Validator[t.Any], name: str) -> t.NoReturn:
     raise ValueError(f"Error validating field '{name}': {o.error_message}")
 
 
-def _get_calling_frame_local_from_name(name: str, *, stack_depth: int = 2) -> t.Any:
-    frame = inspect.currentframe()
-    assert frame is not None
-    for _ in range(stack_depth):
-        if frame.f_back is None:
-            raise RuntimeError("Could not find calling frame.")
-        frame = frame.f_back
-    assert frame is not None
-    if name in frame.f_locals:
-        return frame.f_locals[name]
-    raise LookupError(f"Could not find local variable '{name}' in outer frame.")
-
-
 class _String(Validator[str]):
     error_message = "must be a string"
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> str:
-        if value is _Missing:
-            value = _get_calling_frame_local_from_name(name)
+    def __call__(self, name: str, value: t.Any) -> str:
         if not isinstance(value, str):
             _fail(self, name)
 
@@ -64,9 +41,7 @@ class StringLiteral(Validator[T]):
         self._value = literal
         self.error_message = f"must be '{literal}'"
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> T:
-        if value is _Missing:
-            value = _get_calling_frame_local_from_name(name)
+    def __call__(self, name: str, value: t.Any) -> T:
         value = String(name, value)
         if value != self._value:
             _fail(self, name)
@@ -78,9 +53,7 @@ class IsInstance(Validator[T]):
         self._cls = cls
         self.error_message = f"must be an instance of {self._cls.__name__}"
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> T:
-        if value is _Missing:
-            value = _get_calling_frame_local_from_name(name)
+    def __call__(self, name: str, value: t.Any) -> T:
         if not isinstance(value, self._cls):
             _fail(self, name)
 
@@ -90,9 +63,7 @@ class IsInstance(Validator[T]):
 class _ListOfStrings(Validator[t.List[str]]):
     error_message = "must be a list of strings"
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> t.List[str]:
-        if value is _Missing:
-            value = _get_calling_frame_local_from_name(name)
+    def __call__(self, name: str, value: t.Any) -> t.List[str]:
         if not (isinstance(value, list) and all(isinstance(v, str) for v in value)):
             _fail(self, name)
 
@@ -102,9 +73,7 @@ class _ListOfStrings(Validator[t.List[str]]):
 class _CommaDelimitedStrings(Validator[t.List[str]]):
     error_message = "must be a comma-delimited of string"
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> t.List[str]:
-        if value is _Missing:
-            value = _get_calling_frame_local_from_name(name)
+    def __call__(self, name: str, value: t.Any) -> t.List[str]:
         if not isinstance(value, str):
             _fail(self, name)
 
@@ -114,9 +83,7 @@ class _CommaDelimitedStrings(Validator[t.List[str]]):
 class _Boolean(Validator[bool]):
     error_message = "must be a bool"
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> bool:
-        if value is _Missing:
-            value = _get_calling_frame_local_from_name(name)
+    def __call__(self, name: str, value: t.Any) -> bool:
         if not isinstance(value, bool):
             _fail(self, name)
 
@@ -126,9 +93,7 @@ class _Boolean(Validator[bool]):
 class _Null(Validator[None]):
     error_message = "must be null"
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> None:
-        if value is _Missing:
-            value = _get_calling_frame_local_from_name(name)
+    def __call__(self, name: str, value: t.Any) -> None:
         if value is not None:
             _fail(self, name)
 
@@ -140,9 +105,7 @@ class _AnyOf(Validator[t.Any]):
         self._validators = validators
         self.error_message = f"must be one {description}"
 
-    def __call__(self, name: str, value: t.Any = _Missing) -> t.Any:
-        if value is _Missing:
-            value = _get_calling_frame_local_from_name(name)
+    def __call__(self, name: str, value: t.Any) -> t.Any:
         for validator in self._validators:
             with suppress(ValueError):
                 return validator(name, value)
@@ -185,5 +148,27 @@ def require_at_least_one_field(
         )
 
 
-def derive_supported_fields(init_callable: t.Callable[..., t.Any]) -> set[str]:
-    return set(inspect.signature(init_callable).parameters.keys()) - {"self", "extra"}
+_VALIDATOR_TYPE_MAP = {
+    str: String,
+    t.Optional[str]: OptionalString,
+    t.Optional[t.List[str]]: OptionalListOfStrings,
+    t.List[str]: ListOfStrings,
+    t.Optional[bool]: OptionalBool,
+}
+
+
+def validator_for_type(field_type: t.Any) -> Validator[t.Any]:
+    # an Annotated[...] annotation produces a special form "_AnnotatedAlias"
+    # rather than inspecting typing internals, check that the interface we want
+    # (`__metadata__` is present and is a tuple) is satisfied by the annotation
+    if isinstance(getattr(field_type, "__metadata__", None), tuple):
+        return t.cast(Validator[t.Any], field_type.__metadata__[0])
+    elif field_type in _VALIDATOR_TYPE_MAP:
+        return _VALIDATOR_TYPE_MAP[field_type]
+    elif field_type.__origin__ == Literal and len(field_type.__args__) == 1:
+        return StringLiteral(field_type.__args__[0])
+    else:
+        raise NotImplementedError(
+            "Internal SDK Error! "
+            "An unsupported validator type was requested for ValidatedStruct."
+        )
