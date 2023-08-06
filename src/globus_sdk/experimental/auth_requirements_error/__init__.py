@@ -2,7 +2,7 @@ from .auth_requirements_error import (
     GlobusAuthorizationParameters,
     GlobusAuthRequirementsError,
 )
-from .utils import (
+from .functional_interface import (
     has_auth_requirements_errors,
     is_auth_requirements_error,
     to_auth_requirements_error,

@@ -4,7 +4,7 @@ import typing as t
 
 from globus_sdk.exc import GlobusError
 
-from . import validators
+from . import _validators
 
 
 class GlobusAuthorizationParameters:
@@ -49,27 +49,27 @@ class GlobusAuthorizationParameters:
         required_scopes: list[str] | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message = validators.OptionalString("session_message")
-        self.session_required_identities = validators.OptionalListOfStrings(
+        self.session_message = _validators.OptionalString("session_message")
+        self.session_required_identities = _validators.OptionalListOfStrings(
             "session_required_identities"
         )
-        self.session_required_policies = validators.OptionalListOfStrings(
+        self.session_required_policies = _validators.OptionalListOfStrings(
             "session_required_policies"
         )
-        self.session_required_single_domain = validators.OptionalListOfStrings(
+        self.session_required_single_domain = _validators.OptionalListOfStrings(
             "session_required_single_domain"
         )
-        self.session_required_mfa = validators.OptionalBool("session_required_mfa")
-        self.required_scopes = validators.OptionalListOfStrings("required_scopes")
+        self.session_required_mfa = _validators.OptionalBool("session_required_mfa")
+        self.required_scopes = _validators.OptionalListOfStrings("required_scopes")
         self.extra = extra or {}
 
-        validators.require_at_least_one_field(
+        _validators.require_at_least_one_field(
             self,
             [f for f in self.SUPPORTED_FIELDS if f != "session_message"],
             "supported authorization parameter",
         )
 
-    SUPPORTED_FIELDS: set[str] = validators.derive_supported_fields(__init__)
+    SUPPORTED_FIELDS: set[str] = _validators.derive_supported_fields(__init__)
 
     @classmethod
     def from_dict(cls, param_dict: dict[str, t.Any]) -> GlobusAuthorizationParameters:
@@ -130,9 +130,9 @@ class GlobusAuthRequirementsError(GlobusError):
     :vartype extra: dict
     """
 
-    _authz_param_validator: validators.IsInstance[
+    _authz_param_validator: _validators.IsInstance[
         GlobusAuthorizationParameters
-    ] = validators.IsInstance(GlobusAuthorizationParameters)
+    ] = _validators.IsInstance(GlobusAuthorizationParameters)
 
     def __init__(
         self,
@@ -147,13 +147,13 @@ class GlobusAuthRequirementsError(GlobusError):
                 param_dict=authorization_parameters
             )
 
-        self.code = validators.String("code")
+        self.code = _validators.String("code")
         self.authorization_parameters = self._authz_param_validator(
             "authorization_parameters"
         )
         self.extra = extra or {}
 
-    SUPPORTED_FIELDS: set[str] = validators.derive_supported_fields(__init__)
+    SUPPORTED_FIELDS: set[str] = _validators.derive_supported_fields(__init__)
 
     @classmethod
     def from_dict(cls, error_dict: dict[str, t.Any]) -> GlobusAuthRequirementsError:
