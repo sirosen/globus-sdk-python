@@ -79,8 +79,7 @@ class GlobusAuthorizationParameters:
 
         # Enforce that the error contains at least one of the fields we expect
         if all(
-            getattr(self, field_name) is None
-            for field_name in self.SUPPORTED_FIELDS
+            getattr(self, field_name) is None for field_name in self.SUPPORTED_FIELDS
         ):
             raise ValueError(
                 "Must include at least one supported authorization parameter: "
