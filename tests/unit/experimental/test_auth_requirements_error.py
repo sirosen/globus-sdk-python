@@ -1,5 +1,3 @@
-import inspect
-
 import pytest
 
 from globus_sdk._testing import construct_error
@@ -408,42 +406,37 @@ def test_backward_compatibility_consent_required_error():
 
 
 @pytest.mark.parametrize(
-    "target_class",
+    "target_class, data, expect_message",
     [
-        GlobusAuthRequirementsError,
-        GlobusAuthorizationParameters,
-        _variants.LegacyAuthorizationParameters,
-        _variants.LegacyAuthorizationParametersError,
-        _variants.LegacyConsentRequiredTransferError,
-        _variants.LegacyConsentRequiredAPError,
+        (  # missing 'code'
+            GlobusAuthRequirementsError,
+            {"authorization_parameters": {"session_required_policies": "foo"}},
+            "'code' must be a string",
+        ),
+        (  # missing 'authorization_parameters'
+            _variants.LegacyAuthorizationParametersError,
+            {},
+            "'authorization_parameters' must be a 'LegacyAuthorizationParameters' "
+            "object or a dictionary",
+        ),
+        (  # missing 'code'
+            _variants.LegacyConsentRequiredTransferError,
+            {"required_scopes": []},
+            "'code' must be the string 'ConsentRequired'",
+        ),
+        (  # missing 'code'
+            _variants.LegacyConsentRequiredAPError,
+            {"required_scope": "foo"},
+            "'code' must be the string 'ConsentRequired'",
+        ),
     ],
 )
-def test_constructors_include_all_supported_fields(target_class):
-    """
-    Test that all supported fields are included in the constructors.
-    """
-
-    method_sig = inspect.signature(target_class.__init__)
-    for field_name in target_class.SUPPORTED_FIELDS:
-        # Make sure the constructor has a parameter for this field
-        assert field_name in method_sig.parameters
-
-
-@pytest.mark.parametrize(
-    "target_class, field_name",
-    [
-        (GlobusAuthRequirementsError, "code"),
-        (_variants.LegacyAuthorizationParametersError, "authorization_parameters"),
-        (_variants.LegacyConsentRequiredTransferError, "code"),
-        (_variants.LegacyConsentRequiredAPError, "code"),
-    ],
-)
-def test_error_from_dict_insufficient_input(target_class, field_name):
+def test_error_from_dict_insufficient_input(target_class, data, expect_message):
     """ """
     with pytest.raises(ValueError) as exc_info:
-        target_class.from_dict({})
+        target_class.from_dict(data)
 
-    assert f"Error validating field '{field_name}'" in str(exc_info.value)
+    assert str(exc_info.value) == expect_message
 
 
 @pytest.mark.parametrize(
