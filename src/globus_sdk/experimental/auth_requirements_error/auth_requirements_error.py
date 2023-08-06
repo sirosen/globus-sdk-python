@@ -159,10 +159,8 @@ class GlobusAuthRequirementsError(GlobusError):
 
     def __init__(
         self,
-        code: str | None,  # pylint: disable=unused-argument
-        authorization_parameters: dict[str, t.Any]
-        | GlobusAuthorizationParameters
-        | None,
+        code: str,  # pylint: disable=unused-argument
+        authorization_parameters: dict[str, t.Any] | GlobusAuthorizationParameters,
         *,
         extra: dict[str, t.Any] | None = None,
     ):

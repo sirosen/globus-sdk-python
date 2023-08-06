@@ -57,8 +57,8 @@ class LegacyConsentRequiredTransferError(LegacyAuthRequirementsErrorVariant):
     def __init__(
         self,
         *,
-        code: str | None,
-        required_scopes: list[str] | None,
+        code: str,
+        required_scopes: list[str],
         extra: dict[str, t.Any] | None = None,
     ):  # pylint: disable=unused-argument
         # Validate and assign supported fields
@@ -104,8 +104,8 @@ class LegacyConsentRequiredAPError(LegacyAuthRequirementsErrorVariant):
     def __init__(
         self,
         *,
-        code: str | None,
-        required_scope: str | None,
+        code: str,
+        required_scope: str,
         extra: dict[str, t.Any] | None,
     ):  # pylint: disable=unused-argument
         # Validate and assign supported fields
@@ -270,9 +270,7 @@ class LegacyAuthorizationParametersError(LegacyAuthRequirementsErrorVariant):
     def __init__(
         self,
         *,
-        authorization_parameters: dict[str, t.Any]
-        | LegacyAuthorizationParameters
-        | None,
+        authorization_parameters: dict[str, t.Any] | LegacyAuthorizationParameters,
         code: str | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
