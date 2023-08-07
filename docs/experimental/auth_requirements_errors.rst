@@ -62,7 +62,7 @@ by specifying ``include_extra=True`` when calling ``to_dict()``.
     error.to_dict(include_extra=True)
 
 These fields are stored by both the ``GlobusAuthRequirementsError`` and
-``GlobusAuthenticationParameters`` classes in an ``extra_fields`` attribute.
+``GlobusAuthenticationParameters`` classes in an ``extra`` attribute.
 
 .. note::
 
