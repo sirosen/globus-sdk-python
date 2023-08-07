@@ -12,6 +12,34 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.26.0:
+
+v3.26.0 (2023-08-07)
+--------------------
+
+Added
+~~~~~
+
+- New components are introduced to the experimental subpackage. See the SDK
+  Experimental documentation for more details.
+
+  - Add tools which manipulate Globus Auth Requirements error data.
+    ``globus_sdk.experimental.auth_requirements_error`` provides a data
+    container class, ``GlobusAuthRequirementsError``, and functions for
+    converting and validating data against this shape. (:pr:`768`)
+
+  - Introduce an experimental Globus Auth scope parser in
+    ``globus_sdk.experimental.scope_parser`` (:pr:`752`)
+
+Changed
+~~~~~~~
+
+- The ``scopes`` class attribute of ``SpecificFlowClient`` is now specialized
+  to ensure that type checkers will allow access to ``SpecificFlowClient``
+  scopes and ``resource_server`` values without ``cast``\ing. The value used is
+  a specialized stub which raises useful errors when class-based access is
+  performed. The ``scopes`` instance attribute is unchanged. (:pr:`793`)
+
 .. _changelog-3.25.0:
 
 v3.25.0 (2023-07-20)
