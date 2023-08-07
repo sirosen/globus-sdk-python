@@ -14,7 +14,9 @@ class Serializable:
     def _supported_fields(cls) -> list[str]:
         signature = inspect.signature(cls.__init__)
         return [
-            name for name in signature.parameters.keys() if name not in cls._EXCLUDE_VARS
+            name
+            for name in signature.parameters.keys()
+            if name not in cls._EXCLUDE_VARS
         ]
 
     @classmethod
