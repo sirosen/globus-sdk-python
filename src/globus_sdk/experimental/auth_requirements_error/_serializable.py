@@ -7,14 +7,14 @@ T = t.TypeVar("T", bound="Serializable")
 
 
 class Serializable:
-    _EXLUDE_VARS: t.ClassVar[tuple[str, ...]] = ("self", "extra_fields", "extra")
+    _EXCLUDE_VARS: t.ClassVar[tuple[str, ...]] = ("self", "extra")
     extra: dict[str, t.Any]
 
     @classmethod
     def _supported_fields(cls) -> list[str]:
         signature = inspect.signature(cls.__init__)
         return [
-            name for name in signature.parameters.keys() if name not in cls._EXLUDE_VARS
+            name for name in signature.parameters.keys() if name not in cls._EXCLUDE_VARS
         ]
 
     @classmethod
