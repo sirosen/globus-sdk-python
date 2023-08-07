@@ -4,7 +4,7 @@ import sys
 import typing as t
 
 from . import _serializable, _validators
-from .auth_requirements_error import (
+from ._auth_requirements_error import (
     GlobusAuthorizationParameters,
     GlobusAuthRequirementsError,
 )

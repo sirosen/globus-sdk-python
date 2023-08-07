@@ -6,13 +6,13 @@ import typing as t
 from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
 from . import _validators
+from ._auth_requirements_error import GlobusAuthRequirementsError
 from ._variants import (
     LegacyAuthorizationParametersError,
     LegacyAuthRequirementsErrorVariant,
     LegacyConsentRequiredAPError,
     LegacyConsentRequiredTransferError,
 )
-from .auth_requirements_error import GlobusAuthRequirementsError
 
 log = logging.getLogger(__name__)
 
