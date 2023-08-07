@@ -5,6 +5,7 @@ import typing as t
 
 from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
+from . import _validators
 from ._variants import (
     LegacyAuthorizationParametersError,
     LegacyAuthRequirementsErrorVariant,
@@ -56,10 +57,10 @@ def to_auth_requirements_error(
     # Prefer a proper auth requirements error, if possible
     try:
         return GlobusAuthRequirementsError.from_dict(error_dict)
-    except ValueError as err:
+    except _validators.ValidationError as err:
         log.debug(f"Failed to parse error as 'GlobusAuthRequirementsError' ({err})")
 
-    supported_variants: list[t.Type[LegacyAuthRequirementsErrorVariant]] = [
+    supported_variants: list[type[LegacyAuthRequirementsErrorVariant]] = [
         LegacyAuthorizationParametersError,
         LegacyConsentRequiredTransferError,
         LegacyConsentRequiredAPError,
@@ -67,7 +68,7 @@ def to_auth_requirements_error(
     for variant in supported_variants:
         try:
             return variant.from_dict(error_dict).to_auth_requirements_error()
-        except ValueError as err:
+        except _validators.ValidationError as err:
             log.debug(f"Failed to parse error as '{variant.__name__}' ({err})")
 
     return None
