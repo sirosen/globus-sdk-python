@@ -42,7 +42,7 @@ class LegacyConsentRequiredTransferError(_serializable.Serializable):
         required_scopes: list[str],
         extra: dict[str, t.Any] | None = None,
     ):
-        self.code = _validators.consent_required_literal("code", code)
+        self.code = _validate_consent_required_literal("code", code)
         self.required_scopes = _validators.str_list("required_scopes", required_scopes)
         self.extra = extra or {}
 
@@ -73,7 +73,7 @@ class LegacyConsentRequiredAPError(_serializable.Serializable):
         required_scope: str,
         extra: dict[str, t.Any] | None,
     ):
-        self.code = _validators.consent_required_literal("code", code)
+        self.code = _validate_consent_required_literal("code", code)
         self.required_scope = _validators.str_("required_scope", required_scope)
         self.extra = extra or {}
 
@@ -196,3 +196,13 @@ class LegacyAuthorizationParametersError(_serializable.Serializable):
             code=self.code,
             extra=self.extra,
         )
+
+
+def _validate_consent_required_literal(
+    name: str, value: t.Any
+) -> Literal["ConsentRequired"]:
+    if not isinstance(value, str) or value != "ConsentRequired":
+        raise _validators.ValidationError(
+            f"'{name}' must be the string 'ConsentRequired'"
+        )
+    return t.cast(Literal["ConsentRequired"], value)

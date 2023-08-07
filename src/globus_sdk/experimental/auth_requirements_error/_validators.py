@@ -1,14 +1,8 @@
 from __future__ import annotations
 
-import sys
 import typing as t
 
 from ._serializable import Serializable
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
 
 S = t.TypeVar("S", bound=Serializable)
 
@@ -29,12 +23,6 @@ def opt_str(name: str, value: t.Any) -> str | None:
     if not isinstance(value, str):
         raise ValidationError(f"'{name}' must be a string")
     return value
-
-
-def consent_required_literal(name: str, value: t.Any) -> Literal["ConsentRequired"]:
-    if not isinstance(value, str) or value != "ConsentRequired":
-        raise ValidationError(f"'{name}' must be the string 'ConsentRequired'")
-    return t.cast(Literal["ConsentRequired"], value)
 
 
 def opt_bool(name: str, value: t.Any) -> bool | None:
