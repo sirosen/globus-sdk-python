@@ -201,8 +201,6 @@ class LegacyAuthorizationParametersError(_serializable.Serializable):
 def _validate_consent_required_literal(
     name: str, value: t.Any
 ) -> Literal["ConsentRequired"]:
-    if not isinstance(value, str) or value != "ConsentRequired":
-        raise _validators.ValidationError(
-            f"'{name}' must be the string 'ConsentRequired'"
-        )
-    return t.cast(Literal["ConsentRequired"], value)
+    if value == "ConsentRequired":
+        return "ConsentRequired"
+    raise _validators.ValidationError(f"'{name}' must be the string 'ConsentRequired'")
