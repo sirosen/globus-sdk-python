@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing as t
 
+from globus_sdk import _guards
+
 from ._serializable import Serializable
 
 S = t.TypeVar("S", bound=Serializable)
@@ -18,40 +20,34 @@ def str_(name: str, value: t.Any) -> str:
 
 
 def opt_str(name: str, value: t.Any) -> str | None:
-    if value is None:
-        return None
-    if isinstance(value, str):
+    if _guards.is_optional(value, str):
         return value
     raise ValidationError(f"'{name}' must be a string or null")
 
 
 def opt_bool(name: str, value: t.Any) -> bool | None:
-    if value is None or isinstance(value, bool):
+    if _guards.is_optional(value, bool):
         return value
     raise ValidationError(f"'{name}' must be a bool or null")
 
 
 def str_list(name: str, value: t.Any) -> list[str]:
-    if isinstance(value, list) and all(isinstance(s, str) for s in value):
+    if _guards.is_list_of(value, str):
         return value
     raise ValidationError(f"'{name}' must be a list of strings")
 
 
 def opt_str_list(name: str, value: t.Any) -> list[str] | None:
-    if value is None:
-        return None
-    if isinstance(value, list) and all(isinstance(s, str) for s in value):
+    if _guards.is_optional_list_of(value, str):
         return value
     raise ValidationError(f"'{name}' must be a list of strings or null")
 
 
 def opt_str_list_or_commasep(name: str, value: t.Any) -> list[str] | None:
-    if value is None:
-        return None
-    if isinstance(value, str):
-        value = value.split(",")
-    if isinstance(value, list) and all(isinstance(s, str) for s in value):
+    if _guards.is_optional_list_of(value, str):
         return value
+    if isinstance(value, str):
+        return value.split(",")
     raise ValidationError(
         f"'{name}' must be a list of strings or a comma-delimited string or null"
     )
