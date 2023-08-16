@@ -1,6 +1,8 @@
-#!/usr/bin/env python
-# requires that a YAML implementation is available in order to extract github
-# workflows data
+# this script can only be called via
+#    tox -e check-min-python-is-tested
+#
+# no other usages are supported
+import os
 import pathlib
 import subprocess
 import sys
@@ -17,8 +19,18 @@ except ImportError:
 YAML = ruamel.yaml.YAML(typ="safe")
 REPO_ROOT = pathlib.Path(__file__).parent.parent
 
+try:
+    VENV_CACHE_DIR = os.environ["VENV_CACHE_DIR"]
+except KeyError:
+    raise RuntimeError(
+        "Cannot run ensure_min_python_is_tested.py without explicitly "
+        "setting VENV_CACHE dir. "
+        "Please ensure that you are invoking it with "
+        "'tox r -e check-min-python-is-tested'."
+    )
+
 proc = subprocess.run(
-    ["python", "scripts/get_python_requires.py"],
+    ["python", "scripts/get_python_requires.py", "--venv-cache-dir", VENV_CACHE_DIR],
     check=True,
     capture_output=True,
     cwd=REPO_ROOT,

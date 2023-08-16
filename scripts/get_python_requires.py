@@ -33,19 +33,26 @@ parser.add_argument(
     help="How to output the python_requires data. "
     "The default ('lower-bound') mode will print only the lower bound version number.",
 )
+parser.add_argument(
+    "--venv-cache-dir",
+    default=None,
+    help="A directory in which the 'build' virtualenv will be kept for reuse.",
+)
 args = parser.parse_args()
 
-if platform.system() == "Windows":
-    win_cache_dir = os.getenv("LOCALAPPDATA", os.getenv("APPDATA"))
-    assert win_cache_dir, "cannot find APPDATA dir, cannot cache, abort!"
-    cache_dir = pathlib.Path(win_cache_dir)
+if args.venv_cache_dir:
+    VENV_CACHE_DIR = pathlib.Path(args.venv_cache_dir)
 else:
-    cache_dir = pathlib.Path.home() / ".cache"
-
-VENV_CACHE_DIR = cache_dir / "get_python_requires"
+    if platform.system() == "Windows":
+        win_cache_dir = os.getenv("LOCALAPPDATA", os.getenv("APPDATA"))
+        assert win_cache_dir, "cannot find APPDATA dir, cannot cache, abort!"
+        cache_dir = pathlib.Path(win_cache_dir)
+    else:
+        cache_dir = pathlib.Path.home() / ".cache"
+    VENV_CACHE_DIR = cache_dir / "get_python_requires"
 VENV_CACHE_DIR.mkdir(exist_ok=True)
 
-BUILD_VENV = VENV_CACHE_DIR / "venv-build"
+BUILD_VENV = VENV_CACHE_DIR / "get-python-requires-build"
 BUILD_PYTHON = str(BUILD_VENV / "bin" / "python")
 if BUILD_VENV.exists():
     if args.verbose:
