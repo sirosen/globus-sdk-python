@@ -85,3 +85,5 @@ jobs:
         run: python -m pip install -U tox
       - name: check package metadata
         run: python -m tox -e twine-check,poetry-check
+      - name: check min version is tested in CI
+        run: python -m tox r -e check-min-python-is-tested
