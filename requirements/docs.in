@@ -1,10 +1,4 @@
-# New versions of Sphinx introduce a compatibility bug with Furo,
-# causing Furo to throw the following exception:
-#
-#   This documentation is not using `furo.css` as the stylesheet
-#
-# Sphinx 7.1.2 builds successfully.
-sphinx==7.1.2
+sphinx
 sphinx-copybutton
 sphinx-issues
 furo
