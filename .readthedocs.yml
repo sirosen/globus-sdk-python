@@ -5,14 +5,12 @@ sphinx:
   fail_on_warning: true
 
 build:
-  os: ubuntu-20.04
+  os: "ubuntu-22.04"
   tools:
-    # NOTE: make sure this matches the basepython in tox.ini for 'docs'
-    # TODO: update to py311 as soon as RTD stops using 3.11.0b3 instead of 3.11.0
-    python: "3.10"
+    python: "3.11"
 
 python:
   install:
     - method: pip
       path: .
-    - requirements: requirements/docs.txt
+    - requirements: "requirements/py3.11/docs.txt"
