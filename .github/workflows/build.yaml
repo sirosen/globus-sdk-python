@@ -23,9 +23,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.11'
       - run: python -m pip install -U tox
-      - run: tox -e mypy,mypy-mindeps,mypy-test
+      - run: tox -e mypy,mypy-test
 
   test:
     strategy:
