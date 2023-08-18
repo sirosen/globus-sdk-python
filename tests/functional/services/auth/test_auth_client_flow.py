@@ -37,46 +37,50 @@ def confidential_client(no_retry_transport):
     )
 
 
-# build a partial matrix over
+# build a nearly-diagonal matrix over
 #
 #   domain: str | list[str]
 #   identities: uuid | str | list[uuid] | list[str] | list[str | uuid]
 #   policies: uuid | str | list[uuid] | list[str] | list[str | uuid]
+#   prompt: Literal["prompt"] | None
 #
-# start by seeding a small set of combinations of params to test, then run some loops to
-# fill in the rest
-_ALL_SESSION_PARAM_COMBINATIONS = [
-    (None, None, None),
-    ("foo-id", "bar-id", "baz-id"),
-    (["foo-id", "bar-id"], None, ["quux-id", "snork-id"]),
-    (None, ["foo-id", "bar-id"], ["quux-id", "snork-id"]),
-]
-for domain_option in (None, "example.edu", ["example.edu", "example.org"]):
-    _ALL_SESSION_PARAM_COMBINATIONS.append((domain_option, None, None))
-for identity_option in (
-    None,
+# The order of these options is consequential.
+# They are declared in the same order they tuple-unpack in the parametrized test.
+# `None` values, though valid for each parameter, are omitted;
+# they will be tested exactly once by a single all-`None` option test.
+domain_options = ("example.edu", ["example.edu", "example.org"])
+identity_options = (
     uuid.UUID(int=0),
     "foo-id",
     [uuid.UUID(int=0), uuid.UUID(int=1)],
     ["foo-id", "bar-id"],
     ["foo-id", uuid.UUID(int=2)],
-):
-    _ALL_SESSION_PARAM_COMBINATIONS.append((None, identity_option, None))
-for policy_option in (
-    None,
+)
+policy_options = (
     uuid.UUID(int=3),
     "baz-id",
     [uuid.UUID(int=3), uuid.UUID(int=4)],
     ["baz-id", "quux-id"],
     ["baz-id", uuid.UUID(int=5)],
+)
+prompt_options = ("login",)
+# Seed an all-`None` option test, then use a loop to fill in the rest.
+# There must be 4 parameters so parametrized tuple unpacking works in the test.
+_ALL_SESSION_PARAM_COMBINATIONS = [(None,) * 4]
+for idx, options in enumerate(
+    (domain_options, identity_options, policy_options, prompt_options)
 ):
-    _ALL_SESSION_PARAM_COMBINATIONS.append((None, None, policy_option))
+    for option in options:
+        parameters = [None] * 4
+        parameters[idx] = option
+        _ALL_SESSION_PARAM_COMBINATIONS.append(tuple(parameters))
 
 
 @pytest.mark.parametrize("flow_type", ("native_app", "confidential_app"))
 # parametrize over both what is and what *is not* passed as a parameter
 @pytest.mark.parametrize(
-    "domain_option, identity_option, policy_option", _ALL_SESSION_PARAM_COMBINATIONS
+    "domain_option, identity_option, policy_option, prompt_option",
+    _ALL_SESSION_PARAM_COMBINATIONS,
 )
 def test_oauth2_get_authorize_url_supports_session_params(
     native_client,
@@ -85,6 +89,7 @@ def test_oauth2_get_authorize_url_supports_session_params(
     domain_option,
     identity_option,
     policy_option,
+    prompt_option,
 ):
     if flow_type == "native_app":
         client = native_client
@@ -99,9 +104,10 @@ def test_oauth2_get_authorize_url_supports_session_params(
         session_required_single_domain=domain_option,
         session_required_identities=identity_option,
         session_required_policies=policy_option,
+        prompt=prompt_option,
     )
 
-    # parse the result..
+    # parse the result...
     parsed_url = urllib.parse.urlparse(url_res)
     parsed_params = urllib.parse.parse_qs(parsed_url.query)
 
@@ -110,12 +116,14 @@ def test_oauth2_get_authorize_url_supports_session_params(
         "session_required_single_domain" if domain_option else None,
         "session_required_identities" if identity_option else None,
         "session_required_policies" if policy_option else None,
+        "prompt" if prompt_option else None,
     }
     expected_params_keys.discard(None)
     unexpected_query_params = {
         "session_required_single_domain",
         "session_required_identities",
         "session_required_policies",
+        "prompt",
     } - expected_params_keys
     parsed_params_keys = set(parsed_params.keys())
 
@@ -146,6 +154,9 @@ def test_oauth2_get_authorize_url_supports_session_params(
             else str(policy_option)
         )
         assert parsed_params["session_required_policies"] == [strized_option]
+
+    if prompt_option is not None:
+        assert parsed_params["prompt"] == [prompt_option]
 
 
 def test_oauth2_get_authorize_url_native_defaults(client):
