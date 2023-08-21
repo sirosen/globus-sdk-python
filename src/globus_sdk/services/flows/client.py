@@ -820,7 +820,7 @@ class SpecificFlowClient(client.BaseClient):
     Client for interacting with a specific Globus Flow through the Flows API.
 
     Unlike other client types, this must be provided with a specific flow id. All other
-        arguments are the same as those for `~globus_sdk.BaseClient`.
+        arguments are the same as those for :class:`~globus_sdk.BaseClient`.
 
     :param flow_id: The generated UUID associated with a flow
     :type flow_id: str or uuid
