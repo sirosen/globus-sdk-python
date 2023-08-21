@@ -541,6 +541,7 @@ class AuthClient(client.BaseClient):
         session_required_identities: UUIDLike | t.Iterable[UUIDLike] | None = None,
         session_required_single_domain: str | t.Iterable[str] | None = None,
         session_required_policies: UUIDLike | t.Iterable[UUIDLike] | None = None,
+        prompt: Literal["login"] | None = None,
         query_params: dict[str, t.Any] | None = None,
     ) -> str:
         """
@@ -557,6 +558,14 @@ class AuthClient(client.BaseClient):
         :param session_required_policies: A list of IDs for policies which must
             be satisfied by the user.
         :type session_required_policies: str or uuid or list of str or uuid, optional
+        :param prompt:
+            Control whether a user is required to log in before the authorization step.
+
+            If set to "login", the user must authenticate with an identity provider
+            even if they are already logged in. Setting this parameter can help ensure
+            that a user's session meets known or unknown session requirement policies
+            and avoid additional login flows.
+        :type prompt: ``"login"``, optional
         :param query_params: Additional query parameters to include in the
             authorize URL. Primarily for internal use
         :type query_params: dict, optional
@@ -583,6 +592,8 @@ class AuthClient(client.BaseClient):
             query_params["session_required_policies"] = _commasep(
                 session_required_policies
             )
+        if prompt is not None:
+            query_params["prompt"] = prompt
         auth_url = self.current_oauth2_flow_manager.get_authorize_url(
             query_params=query_params
         )
