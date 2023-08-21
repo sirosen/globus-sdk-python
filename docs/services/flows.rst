@@ -18,7 +18,7 @@ Globus Flows
 Client Errors
 -------------
 
-When an error occurs, a :class:`FlowsClient` will raise a `FlowsAPIError`.
+When an error occurs, a :class:`FlowsClient` will raise a ``FlowsAPIError``.
 
 .. autoclass:: FlowsAPIError
    :members:
