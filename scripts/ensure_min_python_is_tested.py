@@ -1,36 +1,18 @@
-# this script can only be called via
-#    tox -e check-min-python-is-tested
+# this script should only be called via
+#    tox run -e check-min-python-is-tested
 #
 # no other usages are supported
-import os
 import pathlib
 import subprocess
 import sys
 
-try:
-    import ruamel.yaml
-except ImportError:
-    raise ImportError(
-        "ruamel.yaml is required to run this script. "
-        "Please ensure that you are invoking it with "
-        "'tox r -e check-min-python-is-tested'."
-    )
+import ruamel.yaml
 
 YAML = ruamel.yaml.YAML(typ="safe")
 REPO_ROOT = pathlib.Path(__file__).parent.parent
 
-try:
-    VENV_CACHE_DIR = os.environ["VENV_CACHE_DIR"]
-except KeyError:
-    raise RuntimeError(
-        "Cannot run ensure_min_python_is_tested.py without explicitly "
-        "setting VENV_CACHE dir. "
-        "Please ensure that you are invoking it with "
-        "'tox r -e check-min-python-is-tested'."
-    )
-
 proc = subprocess.run(
-    ["python", "scripts/get_python_requires.py", "--venv-cache-dir", VENV_CACHE_DIR],
+    ["python", "-m", "mddj", "read", "requires-python", "--lower-bound"],
     check=True,
     capture_output=True,
     cwd=REPO_ROOT,
