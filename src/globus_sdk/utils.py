@@ -32,6 +32,11 @@ def slash_join(a: str, b: str | None) -> str:
     """
     Join a and b with a single slash, regardless of whether they already
     contain a trailing/leading slash or neither.
+
+    :param a: the first path component
+    :type a: str
+    :param b: the second path component
+    :type b: str, optional
     """
     if not b:  # "" or None, don't append a slash
         return a
@@ -49,6 +54,10 @@ def safe_strseq_iter(
 ) -> t.Iterator[str]:
     """
     Given an Iterable (typically of strings), produce an iterator over it of strings.
+
+    :param value: The stringifiable object or objects to iterate over
+    :type value: str, UUID, or iterable
+
     This is a passthrough with some caveats:
     - if the value is a solitary string, yield only that value
     - if the value is a solitary UUID, yield only that value (as a string)
@@ -70,6 +79,9 @@ def safe_strseq_iter(
 def render_enums_for_api(value: t.Any) -> t.Any:
     """
     Convert enum values to their underlying value.
+
+    :param value: The stringifiable value or values to convert.
+    :type value: str, enum member, or iterable of str or enum members
 
     If a value is an iterable type, it will be converted to a list and the values will
     also be converted if they are enum values.
