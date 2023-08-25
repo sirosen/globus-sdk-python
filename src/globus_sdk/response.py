@@ -135,6 +135,9 @@ class GlobusHTTPResponse:
         """
         ``get`` is just an alias for ``data.get(key, default)``, but with the added
         checks that if ``data`` is ``None`` or a list, it returns the default.
+
+        :param key: The string key to lookup in the response if it is a dict
+        :param default: The default value to be used if the data is null or a list
         """
         if _guards.is_optional(self.data, list):
             return default
