@@ -117,5 +117,8 @@ class MutableScope:
         Given a scope string, a collection of scope strings, a MutableScope object, a
         collection of MutableScope objects, or a mixed collection of strings and
         Scopes, convert to a string which can be used in a request.
+
+        :param obj: The object or collection to convert to a string
+        :type obj: str, MutableScope, iterable of str or MutableScope
         """
         return " ".join(_iter_scope_collection(obj))
