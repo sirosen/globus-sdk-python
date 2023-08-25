@@ -455,6 +455,9 @@ class ErrorSubdocument:
     def get(self, key: str, default: t.Any = None) -> t.Any | None:
         """
         A dict-like getter for the raw data.
+
+        :param key: The string key to use for lookup
+        :param default: The default value to use
         """
         return self.raw.get(key, default)
 
