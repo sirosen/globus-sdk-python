@@ -37,7 +37,11 @@ class GlobusConnectionError(NetworkError):
 
 
 def convert_request_exception(exc: requests.RequestException) -> GlobusError:
-    """Converts incoming requests.Exception to a Globus NetworkError"""
+    """
+    Converts incoming requests.Exception to a Globus NetworkError
+
+    :param exc: The exception to "convert" by wrapping it
+    """
 
     if isinstance(exc, requests.ConnectTimeout):
         return GlobusConnectionTimeoutError("ConnectTimeoutError on request", exc)
