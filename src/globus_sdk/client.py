@@ -114,7 +114,9 @@ class BaseClient:
         self._app_name = self.transport.user_agent = value
 
     @utils.classproperty
-    def resource_server(self_or_cls) -> str | None:
+    def resource_server(  # pylint: disable=missing-any-param-doc
+        self_or_cls,
+    ) -> str | None:
         """
         The resource_server name for the API and scopes associated with this client.
 
@@ -125,7 +127,7 @@ class BaseClient:
             return None
         return self_or_cls.scopes.resource_server
 
-    def get(
+    def get(  # pylint: disable=missing-param-doc
         self,
         path: str,
         *,
@@ -143,7 +145,7 @@ class BaseClient:
         log.debug(f"GET to {path} with query_params {query_params}")
         return self.request("GET", path, query_params=query_params, headers=headers)
 
-    def post(
+    def post(  # pylint: disable=missing-param-doc
         self,
         path: str,
         *,
@@ -170,7 +172,7 @@ class BaseClient:
             encoding=encoding,
         )
 
-    def delete(
+    def delete(  # pylint: disable=missing-param-doc
         self,
         path: str,
         *,
@@ -188,7 +190,7 @@ class BaseClient:
         log.debug(f"DELETE to {path} with query_params {query_params}")
         return self.request("DELETE", path, query_params=query_params, headers=headers)
 
-    def put(
+    def put(  # pylint: disable=missing-param-doc
         self,
         path: str,
         *,
@@ -215,7 +217,7 @@ class BaseClient:
             encoding=encoding,
         )
 
-    def patch(
+    def patch(  # pylint: disable=missing-param-doc
         self,
         path: str,
         *,
