@@ -123,11 +123,17 @@ class ListKnownScopes(AddContentDirective):
     has_content = False
     required_arguments = 1
     optional_arguments = 0
-    option_spec = {"example_scope": directives.unchanged}
+    option_spec = {
+        "example_scope": directives.unchanged,
+        # Allow overriding the base name to match how the ScopeBuilder will be accessed.
+        "base_name": directives.unchanged,
+    }
 
     def gen_rst(self):
         sb_name = self.arguments[0]
         sb_basename = sb_name.split(".")[-1]
+        if "base_name" in self.options:
+            sb_basename = self.options["base_name"]
 
         example_scope = None
         if "example_scope" in self.options:

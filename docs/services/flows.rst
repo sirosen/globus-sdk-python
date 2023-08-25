@@ -23,17 +23,23 @@ They differ in what scopes and user consents they require:
     Users must consent to allow the specific flow to perform actions on their behalf.
 
 
-.. autoclass:: FlowsClient
-   :members:
-   :member-order: bysource
-   :show-inheritance:
-   :exclude-members: error_class
 
-.. autoclass:: SpecificFlowClient
-   :members:
-   :member-order: bysource
-   :show-inheritance:
-   :exclude-members: error_class
+..  autoclass:: FlowsClient
+    :members:
+    :member-order: bysource
+    :show-inheritance:
+    :exclude-members: error_class, scopes
+
+    ..  attribute:: scopes
+
+        ..  listknownscopes:: globus_sdk.scopes.FlowsScopes
+            :base_name: FlowsClient.scopes
+
+..  autoclass:: SpecificFlowClient
+    :members:
+    :member-order: bysource
+    :show-inheritance:
+    :exclude-members: error_class
 
 Client Errors
 -------------
