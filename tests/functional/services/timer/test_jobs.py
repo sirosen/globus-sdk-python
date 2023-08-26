@@ -1,5 +1,5 @@
+import datetime
 import json
-from datetime import datetime, timedelta
 
 import pytest
 
@@ -39,9 +39,9 @@ def test_get_job_errors(timer_client):
     assert err.message == "Request failed terribly"
 
 
-@pytest.mark.parametrize("start", [datetime.utcnow(), "2022-04-05T06:00:00"])
+@pytest.mark.parametrize("start", [datetime.datetime.now(), "2022-04-05T06:00:00"])
 @pytest.mark.parametrize(
-    "interval", [timedelta(days=1), timedelta(minutes=60), 600, None]
+    "interval", [datetime.timedelta(days=1), datetime.timedelta(minutes=60), 600, None]
 )
 def test_create_job(timer_client, start, interval):
     meta = load_response(timer_client.create_job).metadata
@@ -57,11 +57,11 @@ def test_create_job(timer_client, start, interval):
     assert response.http_status == 201
     assert response.data["job_id"] == meta["job_id"]
     req_body = json.loads(get_last_request().body)
-    if isinstance(start, datetime):
+    if isinstance(start, datetime.datetime):
         assert req_body["start"] == start.isoformat()
     else:
         assert req_body["start"] == start
-    if isinstance(interval, timedelta):
+    if isinstance(interval, datetime.timedelta):
         assert req_body["interval"] == interval.total_seconds()
     else:
         assert req_body["interval"] == interval
