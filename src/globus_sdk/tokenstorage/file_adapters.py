@@ -87,6 +87,9 @@ class SimpleJSONFileAdapter(FileAdapter):
         Under the assumption that this may be running on a system with multiple
         local users, this sets the umask such that only the owner of the
         resulting file can read or write it.
+
+        :param token_response: The token data received from the refresh
+        :type token_response: :class:`~.OAuthTokenResponse`
         """
         to_write = self._load()
 
