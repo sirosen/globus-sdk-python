@@ -1,4 +1,4 @@
 Python Support
 ~~~~~~~~~~~~~~
 
-- Add support for Python 3.12. (:pr:`NUMBER`)
+- Add support for Python 3.12. (:pr:`808`)
