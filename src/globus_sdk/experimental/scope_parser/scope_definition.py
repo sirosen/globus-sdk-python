@@ -53,6 +53,9 @@ class Scope:
             However, this also means that the parsing does not allow for strings which
             represent consent trees with structures in which the same scope appears in
             multiple parts of the tree.
+
+        :param scope_string: The string to parse
+        :type scope_string: str
         """
         scope_graph = parse_scope_graph(scope_string)
 
@@ -79,7 +82,11 @@ class Scope:
         Deserialize a scope string to a scope object.
 
         This is the special case of parsing in which exactly one scope must be returned
-        by the parse.
+        by the parse. If more than one scope is returned by the parse, a ``ValueError``
+        will be raised.
+
+        :param scope_string: The string to parse
+        :type scope_string: str
         """
         data = Scope.parse(scope_string)
         if len(data) != 1:
