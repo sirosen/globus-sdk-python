@@ -110,6 +110,9 @@ class Paginator(t.Iterable[PageT], metaclass=abc.ABCMeta):
 
         Although the syntax is slightly more verbose, this allows `mypy` and other type
         checkers to more accurately infer the type of the paginator.
+
+        :param method: The method to convert to a paginator
+        :type method: callable
         """
         if not inspect.ismethod(method):
             raise TypeError(f"Paginator.wrap can only be used on methods, not {method}")
@@ -152,6 +155,13 @@ def has_paginator(
 
     >>> c = MyClient(...)
     >>> paginator = c.paginated.foo()
+
+    :param paginator_class: The type of paginator used by this method
+    :type paginator_class: Paginator subclass
+    :param items_key: The key to use within pages of results to get an array of items
+    :type items_key: str, optional
+    :param paginator_params: Additional parameters to pass to the paginator constructor
+    :type paginator_params: any
     """
 
     def decorate(func: C) -> C:
