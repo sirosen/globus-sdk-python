@@ -38,7 +38,7 @@ class StorageAdapter(metaclass=abc.ABCMeta):
         stores the token response.
 
         :param token_response: The token response received from the refresh
-        :type token_response: :class:`OAuthTokenResponse`
+        :type token_response: :class:`~.OAuthTokenResponse`
         """
         self.store(token_response)
 
