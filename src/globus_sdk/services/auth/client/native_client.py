@@ -126,6 +126,11 @@ class NativeAppAuthClient(AuthClient):
         its client ID as a parameter in the POST body.
         It needs this specialization because it cannot authenticate the refresh
         grant call with client credentials, as is normal.
+
+        :param refresh_token: The refresh token to use to get a new access token
+        :type refresh_token: str
+        :param body_params: Extra parameters to include in the POST body
+        :type body_params: dict, optional
         """
         log.info("Executing token refresh without client credentials")
         form_data = {
