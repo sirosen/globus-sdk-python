@@ -87,6 +87,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         """
         Accept invites for identities.  The identities must belong to
         the identity set of authenticated user.
+
+        :param identity_ids: The identities for whom to accept invites
+        :type identity_ids: iterable of UUIDs or strings
         """
         self.setdefault("accept", []).extend(
             {"identity_id": identity_id}
@@ -102,6 +105,11 @@ class BatchMembershipActions(utils.PayloadWrapper):
     ) -> BatchMembershipActions:
         """
         Add a list of identities to a group with the given role.
+
+        :param identity_ids: The identities to add to the group
+        :type identity_ids: iterable of UUIDs or strings
+        :param role: The role for the new group members
+        :type role: str or :class:`~.GroupRole`
         """
         self.setdefault("add", []).extend(
             {"identity_id": identity_id, "role": utils.render_enums_for_api(role)}
@@ -114,6 +122,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
     ) -> BatchMembershipActions:
         """
         Approve a list of identities with pending join requests.
+
+        :param identity_ids: The identities to approve as members of the group
+        :type identity_ids: iterable of UUIDs or strings
         """
         self.setdefault("approve", []).extend(
             {"identity_id": identity_id}
@@ -126,6 +137,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
     ) -> BatchMembershipActions:
         """
         Decline an invitation for a given set of identities.
+
+        :param identity_ids: The identities for whom invitations should be declined
+        :type identity_ids: iterable of UUIDs or strings
         """
         self.setdefault("decline", []).extend(
             {"identity_id": identity_id}
@@ -141,6 +155,11 @@ class BatchMembershipActions(utils.PayloadWrapper):
     ) -> BatchMembershipActions:
         """
         Invite a list of identities to a group with the given role.
+
+        :param identity_ids: The identities to invite to the group
+        :type identity_ids: iterable of UUIDs or strings
+        :param role: The role for the invited group members
+        :type role: str or :class:`~.GroupRole`
         """
         self.setdefault("invite", []).extend(
             {"identity_id": identity_id, "role": utils.render_enums_for_api(role)}
@@ -152,6 +171,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         """
         Join a group with the given identities.  The identities must be in the
         authenticated users identity set.
+
+        :param identity_ids: The identities to use to join the group
+        :type identity_ids: iterable of UUIDs or strings
         """
         self.setdefault("join", []).extend(
             {"identity_id": identity_id}
@@ -163,6 +185,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         """
         Leave a group that one of the identities in the authenticated user's
         identity set is a member of.
+
+        :param identity_ids: The identities to remove from the group
+        :type identity_ids: iterable of UUIDs or strings
         """
         self.setdefault("leave", []).extend(
             {"identity_id": identity_id}
@@ -174,7 +199,10 @@ class BatchMembershipActions(utils.PayloadWrapper):
         self, identity_ids: t.Iterable[UUIDLike]
     ) -> BatchMembershipActions:
         """
-        Reject a members that have requested to join the group.
+        Reject identities which have requested to join the group.
+
+        :param identity_ids: The identities to reject from the group
+        :type identity_ids: iterable of UUIDs or strings
         """
         self.setdefault("reject", []).extend(
             {"identity_id": identity_id}
@@ -188,6 +216,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
         """
         Remove members from a group.  This must be done as an admin or manager
         of the group.
+
+        :param identity_ids: The identities to remove from the group
+        :type identity_ids: iterable of UUIDs or strings
         """
         self.setdefault("remove", []).extend(
             {"identity_id": identity_id}
@@ -200,6 +231,9 @@ class BatchMembershipActions(utils.PayloadWrapper):
     ) -> BatchMembershipActions:
         """
         Request to join a group.
+
+        :param identity_ids: The identities to use to request membership in the group
+        :type identity_ids: iterable of UUIDs or strings
         """
         self.setdefault("request_join", []).extend(
             {"identity_id": identity_id}
