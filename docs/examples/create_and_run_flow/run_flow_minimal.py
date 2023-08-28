@@ -3,7 +3,6 @@
 import argparse
 import os
 import sys
-import time
 
 import globus_sdk
 from globus_sdk.tokenstorage import SimpleJSONFileAdapter
@@ -18,7 +17,7 @@ NATIVE_CLIENT = globus_sdk.NativeAppAuthClient(CLIENT_ID)
 
 
 def do_login_flow(scope):
-    NATIVE_CLIENT.oauth2_start_flow(requested_scopes=scope)
+    NATIVE_CLIENT.oauth2_start_flow(requested_scopes=scope, refresh_tokens=True)
     authorize_url = NATIVE_CLIENT.oauth2_get_authorize_url()
     print(f"Please go to this URL and login:\n\n{authorize_url}\n")
     auth_code = input("Please enter the code here: ").strip()
@@ -26,7 +25,7 @@ def do_login_flow(scope):
     return tokens
 
 
-def get_tokens(flow_id, force=False):
+def get_authorizer(flow_id):
     scopes = globus_sdk.SpecificFlowClient(flow_id).scopes
 
     # try to load the tokens from the file, possibly returning None
@@ -35,27 +34,25 @@ def get_tokens(flow_id, force=False):
     else:
         tokens = None
 
-    if tokens is None or force:
+    if tokens is None:
         # do a login flow, getting back initial tokens
         response = do_login_flow(scopes.user)
         # now store the tokens and pull out the correct token
         MY_FILE_ADAPTER.store(response)
         tokens = response.by_resource_server[flow_id]
 
-    # allow for 60 seconds of potential clock skew or delay
-    # if the call was not "force=True", potentially re-enter
-    leeway = 60
-    if not force and (time.time() > tokens["expires_at_seconds"] - leeway):
-        tokens = get_tokens(flow_id, force=True)
-
-    return tokens
+    return globus_sdk.RefreshTokenAuthorizer(
+        tokens["refresh_token"],
+        NATIVE_CLIENT,
+        access_token=tokens["access_token"],
+        expires_at=tokens["expires_at_seconds"],
+        on_refresh=MY_FILE_ADAPTER.on_refresh,
+    )
 
 
 def get_flow_client(flow_id):
-    tokens = get_tokens(flow_id)
-    return globus_sdk.SpecificFlowClient(
-        flow_id, authorizer=globus_sdk.AccessTokenAuthorizer(tokens["access_token"])
-    )
+    authorizer = get_authorizer(flow_id)
+    return globus_sdk.SpecificFlowClient(flow_id, authorizer=authorizer)
 
 
 def run_flow(args):
@@ -65,7 +62,7 @@ def run_flow(args):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("FLOW_ID", help="Flow ID for delete")
+    parser.add_argument("FLOW_ID", help="Flow ID to run")
     args = parser.parse_args()
 
     try:

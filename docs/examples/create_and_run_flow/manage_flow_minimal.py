@@ -3,7 +3,6 @@
 import argparse
 import os
 import sys
-import time
 
 import globus_sdk
 from globus_sdk.tokenstorage import SimpleJSONFileAdapter
@@ -21,7 +20,7 @@ NATIVE_CLIENT = globus_sdk.NativeAppAuthClient(CLIENT_ID)
 
 
 def do_login_flow():
-    NATIVE_CLIENT.oauth2_start_flow(requested_scopes=SCOPES)
+    NATIVE_CLIENT.oauth2_start_flow(requested_scopes=SCOPES, refresh_tokens=True)
     authorize_url = NATIVE_CLIENT.oauth2_get_authorize_url()
     print(f"Please go to this URL and login:\n\n{authorize_url}\n")
     auth_code = input("Please enter the code here: ").strip()
@@ -29,34 +28,31 @@ def do_login_flow():
     return tokens
 
 
-def get_tokens(force=False):
+def get_authorizer():
     # try to load the tokens from the file, possibly returning None
     if MY_FILE_ADAPTER.file_exists():
         tokens = MY_FILE_ADAPTER.get_token_data(RESOURCE_SERVER)
     else:
         tokens = None
 
-    if tokens is None or force:
+    if tokens is None:
         # do a login flow, getting back initial tokens
         response = do_login_flow()
         # now store the tokens and pull out the correct token
         MY_FILE_ADAPTER.store(response)
         tokens = response.by_resource_server[RESOURCE_SERVER]
 
-    # allow for 60 seconds of potential clock skew or delay
-    # if the call was not "force=True", potentially re-enter
-    leeway = 60
-    if not force and (time.time() > tokens["expires_at_seconds"] - leeway):
-        tokens = get_tokens(force=True)
-
-    return tokens
+    return globus_sdk.RefreshTokenAuthorizer(
+        tokens["refresh_token"],
+        NATIVE_CLIENT,
+        access_token=tokens["access_token"],
+        expires_at=tokens["expires_at_seconds"],
+        on_refresh=MY_FILE_ADAPTER.on_refresh,
+    )
 
 
 def get_flows_client():
-    tokens = get_tokens()
-    return globus_sdk.FlowsClient(
-        authorizer=globus_sdk.AccessTokenAuthorizer(tokens["access_token"])
-    )
+    return globus_sdk.FlowsClient(authorizer=get_authorizer())
 
 
 def create_flow(args):
