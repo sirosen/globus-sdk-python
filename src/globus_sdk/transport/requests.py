@@ -262,7 +262,7 @@ class RequestsTransport:
         ``max_sleep``.
 
         :param ctx: The context object which describes the state of the request and the
-            retries which may already have been attempted
+            retries which may already have been attempted.
         :type ctx: RetryContext
         """
         sleep_period = min(self.retry_backoff(ctx), self.max_sleep)
@@ -396,7 +396,7 @@ class RequestsTransport:
         Check if a network error was encountered
 
         :param ctx: The context object which describes the state of the request and the
-            retries which may already have been attempted
+            retries which may already have been attempted.
         :type ctx: RetryContext
         """
         if ctx.exception and isinstance(ctx.exception, requests.RequestException):
@@ -408,7 +408,7 @@ class RequestsTransport:
         Check for a retry-after header if the response had a matching status
 
         :param ctx: The context object which describes the state of the request and the
-            retries which may already have been attempted
+            retries which may already have been attempted.
         :type ctx: RetryContext
         """
         if (
@@ -427,7 +427,7 @@ class RequestsTransport:
         the request
 
         :param ctx: The context object which describes the state of the request and the
-            retries which may already have been attempted
+            retries which may already have been attempted.
         :type ctx: RetryContext
         """
         if ctx.response is not None and (
@@ -448,7 +448,7 @@ class RequestsTransport:
         The check is flagged to only run once per request.
 
         :param ctx: The context object which describes the state of the request and the
-            retries which may already have been attempted
+            retries which may already have been attempted.
         :type ctx: RetryContext
         """
         if (  # is the current check applicable?
