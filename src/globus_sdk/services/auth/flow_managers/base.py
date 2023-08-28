@@ -36,6 +36,10 @@ class GlobusOAuthFlowManager(abc.ABC):
         The authorize_url may be (usually is) parameterized over attributes of
         the specific flow manager instance which is generating it.
 
+        :param query_params: Any additional parameters to be passed through
+            as query params on the URL.
+        :type query_params: dict, optional
+
         :rtype: ``string``
         """
 

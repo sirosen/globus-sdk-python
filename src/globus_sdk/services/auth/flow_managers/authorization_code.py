@@ -119,6 +119,9 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         The second step of the Authorization Code flow, exchange an
         authorization code for access tokens (and refresh tokens if specified)
 
+        :param auth_code: The short-lived code to exchange for tokens
+        :type auth_code: str
+
         :rtype: :class:`OAuthTokenResponse <.OAuthTokenResponse>`
         """
         logger.debug(

@@ -7,10 +7,8 @@ from .client import AuthClient
 
 
 def is_username(val: str) -> bool:
-    """
-    If the value parses as a UUID, then it's an ID, not a username.
-    If it does not parse as such, then it must be a username.
-    """
+    # If the value parses as a UUID, then it's an ID, not a username.
+    # If it does not parse as such, then it must be a username.
     try:
         uuid.UUID(val)
         return False
@@ -232,6 +230,11 @@ class IdentityMap:
     def get(self, key: str, default: t.Any | None = None) -> t.Any:
         """
         A dict-like get() method which accepts a default value.
+
+        :param key: The username or ID to look up
+        :type key: str
+        :param default: The default value to return if the key is not found
+        :type default: any, optional
         """
         try:
             return self[key]
