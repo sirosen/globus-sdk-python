@@ -82,6 +82,9 @@ def set_retry_check_flags(flag: RetryCheckFlags) -> t.Callable[[C], C]:
 
     >>> @set_retry_check_flags(RetryCheckFlags.RUN_ONCE)
     >>> def foo(ctx): ...
+
+    :param flag: The flag to set on the check
+    :type flag: RetryCheckFlags
     """
 
     def decorator(func: C) -> C:

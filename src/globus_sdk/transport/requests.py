@@ -260,6 +260,10 @@ class RequestsTransport:
         Given a retry context, compute the amount of time to sleep and sleep that much
         This is always the minimum of the backoff (run on the context) and the
         ``max_sleep``.
+
+        :param ctx: The context object which describes the state of the request and the
+            retries which may already have been attempted.
+        :type ctx: RetryContext
         """
         sleep_period = min(self.retry_backoff(ctx), self.max_sleep)
         log.info("request retry_sleep(%s) [max=%s]", sleep_period, self.max_sleep)
@@ -362,6 +366,9 @@ class RequestsTransport:
 
         `check` should *not* perform any sleeps or delays.
         Multiple checks should be chainable and callable in any order.
+
+        :param func: The function or other callable to register as a retry check
+        :type func: callable
         """
         self.retry_checks.append(func)
         return func
@@ -385,13 +392,25 @@ class RequestsTransport:
         self.register_retry_check(self.default_check_transient_error)
 
     def default_check_request_exception(self, ctx: RetryContext) -> RetryCheckResult:
-        """check if a network error was encountered"""
+        """
+        Check if a network error was encountered
+
+        :param ctx: The context object which describes the state of the request and the
+            retries which may already have been attempted.
+        :type ctx: RetryContext
+        """
         if ctx.exception and isinstance(ctx.exception, requests.RequestException):
             return RetryCheckResult.do_retry
         return RetryCheckResult.no_decision
 
     def default_check_retry_after_header(self, ctx: RetryContext) -> RetryCheckResult:
-        """check for a retry-after header if the response had a matching status"""
+        """
+        Check for a retry-after header if the response had a matching status
+
+        :param ctx: The context object which describes the state of the request and the
+            retries which may already have been attempted.
+        :type ctx: RetryContext
+        """
         if (
             ctx.response is None
             or ctx.response.status_code not in self.RETRY_AFTER_STATUS_CODES
@@ -403,8 +422,14 @@ class RequestsTransport:
         return RetryCheckResult.do_retry
 
     def default_check_transient_error(self, ctx: RetryContext) -> RetryCheckResult:
-        """check for transient error status codes which could be resolved by retrying
-        the request"""
+        """
+        Check for transient error status codes which could be resolved by retrying
+        the request
+
+        :param ctx: The context object which describes the state of the request and the
+            retries which may already have been attempted.
+        :type ctx: RetryContext
+        """
         if ctx.response is not None and (
             ctx.response.status_code in self.TRANSIENT_ERROR_STATUS_CODES
         ):
@@ -421,6 +446,10 @@ class RequestsTransport:
         refresh for an expired access token.
 
         The check is flagged to only run once per request.
+
+        :param ctx: The context object which describes the state of the request and the
+            retries which may already have been attempted.
+        :type ctx: RetryContext
         """
         if (  # is the current check applicable?
             ctx.response is None
