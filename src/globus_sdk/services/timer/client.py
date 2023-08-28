@@ -39,6 +39,9 @@ class TimerClient(client.BaseClient):
         """
         ``GET /jobs/``
 
+        :param query_params: additional parameters to pass as query params
+        :type query_params: dict, optional
+
         **Examples**
 
         >>> timer_client = globus_sdk.TimerClient(...)
@@ -56,6 +59,11 @@ class TimerClient(client.BaseClient):
         """
         ``GET /jobs/<job_id>``
 
+        :param job_id: the ID of the timer ("job")
+        :type job_id: str or UUID
+        :param query_params: additional parameters to pass as query params
+        :type query_params: dict, optional
+
         **Examples**
 
         >>> timer_client = globus_sdk.TimerClient(...)
@@ -70,6 +78,9 @@ class TimerClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /jobs/``
+
+        :param data: a timer document used to create the new timer ("job")
+        :type data: dict or :class:`~.TimerJob`
 
         **Examples**
 
@@ -94,6 +105,11 @@ class TimerClient(client.BaseClient):
         """
         ``PATCH /jobs/<job_id>``
 
+        :param job_id: the ID of the timer ("job")
+        :type job_id: str or UUID
+        :param data: a partial timer document used to update the job
+        :type data: dict
+
         **Examples**
 
         >>> timer_client = globus_sdk.TimerClient(...)
@@ -108,6 +124,9 @@ class TimerClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /jobs/<job_id>``
+
+        :param job_id: the ID of the timer ("job")
+        :type job_id: str or UUID
 
         **Examples**
 
