@@ -101,6 +101,9 @@ class GCSClient(client.BaseClient):
 
         Note that it is possible for valid connector_ids to be unrecognized
         due to differing SDK and GCS versions.
+
+        :param connector_id: The ID of the connector
+        :type connector_id: UUID or str
         """
         connector_dict = {
             "7c100eae-40fe-11e9-95a3-9cb6d0d9fd63": "Box",
