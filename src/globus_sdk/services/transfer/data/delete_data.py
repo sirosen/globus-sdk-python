@@ -170,6 +170,11 @@ class DeleteData(utils.PayloadWrapper):
 
         Appends a delete_item document to the DATA key of the delete
         document.
+
+        :param path: Path to the directory or file to be deleted
+        :type path: str
+        :param additional_fields: additional fields to be added to the delete item
+        :type additional_fields: dict, optional
         """
         item_data = {"DATA_TYPE": "delete_item", "path": path}
         if additional_fields is not None:
