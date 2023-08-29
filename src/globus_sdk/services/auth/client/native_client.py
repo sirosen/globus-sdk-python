@@ -8,14 +8,14 @@ from globus_sdk.authorizers import NullAuthorizer
 
 from ..flow_managers import GlobusNativeAppFlowManager
 from ..response import OAuthTokenResponse
-from .base import AuthClient
+from .base_login_client import AuthLoginClient
 
 log = logging.getLogger(__name__)
 
 
-class NativeAppAuthClient(AuthClient):
+class NativeAppAuthClient(AuthLoginClient):
     """
-    This type of ``AuthClient`` is used to represent a Native App's
+    This type of ``AuthLoginClient`` is used to represent a Native App's
     communications with Globus Auth.
     It requires a Client ID, and cannot take an ``authorizer``.
 

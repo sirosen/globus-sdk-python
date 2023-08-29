@@ -52,11 +52,14 @@ _LAZY_IMPORT_TABLE = {
         "ArrayResponse",
     },
     "services.auth": {
-        "AuthAPIError",
+        "AuthBaseClient",
         "AuthClient",
-        "ConfidentialAppAuthClient",
-        "IdentityMap",
+        "AuthServiceClient",
+        "AuthLoginClient",
         "NativeAppAuthClient",
+        "ConfidentialAppAuthClient",
+        "AuthAPIError",
+        "IdentityMap",
         "GetIdentitiesResponse",
         "OAuthDependentTokenResponse",
         "OAuthTokenResponse",
@@ -149,11 +152,14 @@ if t.TYPE_CHECKING:
     from .response import GlobusHTTPResponse
     from .response import IterableResponse
     from .response import ArrayResponse
-    from .services.auth import AuthAPIError
+    from .services.auth import AuthBaseClient
     from .services.auth import AuthClient
-    from .services.auth import ConfidentialAppAuthClient
-    from .services.auth import IdentityMap
+    from .services.auth import AuthServiceClient
+    from .services.auth import AuthLoginClient
     from .services.auth import NativeAppAuthClient
+    from .services.auth import ConfidentialAppAuthClient
+    from .services.auth import AuthAPIError
+    from .services.auth import IdentityMap
     from .services.auth import GetIdentitiesResponse
     from .services.auth import OAuthDependentTokenResponse
     from .services.auth import OAuthTokenResponse
@@ -246,7 +252,10 @@ __all__ = (
     "ActiveScaleStoragePolicies",
     "ArrayResponse",
     "AuthAPIError",
+    "AuthBaseClient",
     "AuthClient",
+    "AuthLoginClient",
+    "AuthServiceClient",
     "AzureBlobStoragePolicies",
     "BaseClient",
     "BasicAuthorizer",

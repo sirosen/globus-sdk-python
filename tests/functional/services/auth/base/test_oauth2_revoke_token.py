@@ -14,7 +14,7 @@ def client_id():
 
 @pytest.fixture
 def base_client(client_id):
-    return globus_sdk.AuthClient(client_id=client_id)
+    return globus_sdk.AuthLoginClient(client_id=client_id)
 
 
 @pytest.fixture

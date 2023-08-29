@@ -12,14 +12,6 @@ CLIENT_ID = "d0f1d9b0-bd81-4108-be74-ea981664453a"
 
 
 @pytest.fixture
-def client(no_retry_transport):
-    class CustomAuthClient(globus_sdk.AuthClient):
-        transport_class = no_retry_transport
-
-    return CustomAuthClient(client_id=CLIENT_ID)
-
-
-@pytest.fixture
 def native_client(no_retry_transport):
     class CustomAuthClient(globus_sdk.NativeAppAuthClient):
         transport_class = no_retry_transport
@@ -159,22 +151,24 @@ def test_oauth2_get_authorize_url_supports_session_params(
         assert parsed_params["prompt"] == [prompt_option]
 
 
-def test_oauth2_get_authorize_url_native_defaults(client):
+def test_oauth2_get_authorize_url_native_defaults(native_client):
     # default parameters for starting auth flow
     # should warn because scopes were not specified
     with pytest.warns(globus_sdk.RemovedInV4Warning):
-        flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(client)
-    client.current_oauth2_flow_manager = flow_manager
+        flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(
+            native_client
+        )
+    native_client.current_oauth2_flow_manager = flow_manager
 
     # get url and validate results
-    url_res = client.oauth2_get_authorize_url()
+    url_res = native_client.oauth2_get_authorize_url()
     parsed_url = urllib.parse.urlparse(url_res)
-    assert f"https://{parsed_url.netloc}/" == client.base_url
+    assert f"https://{parsed_url.netloc}/" == native_client.base_url
     assert parsed_url.path == "/v2/oauth2/authorize"
     parsed_params = urllib.parse.parse_qs(parsed_url.query)
     assert parsed_params == {
-        "client_id": [client.client_id],
-        "redirect_uri": [client.base_url + "v2/web/auth-code"],
+        "client_id": [native_client.client_id],
+        "redirect_uri": [native_client.base_url + "v2/web/auth-code"],
         "scope": [f"openid profile email {TransferScopes.all}"],
         "state": ["_default"],
         "response_type": ["code"],
@@ -184,27 +178,27 @@ def test_oauth2_get_authorize_url_native_defaults(client):
     }
 
 
-def test_oauth2_get_authorize_url_native_custom_params(client):
+def test_oauth2_get_authorize_url_native_custom_params(native_client):
     # starting flow with custom parameters, should not warn because a scope is specified
     flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(
-        client,
+        native_client,
         requested_scopes="scopes",
         redirect_uri="uri",
         state="state",
         verifier=("a" * 43),
         refresh_tokens=True,
     )
-    client.current_oauth2_flow_manager = flow_manager
+    native_client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
-    url_res = client.oauth2_get_authorize_url()
+    url_res = native_client.oauth2_get_authorize_url()
     verifier, remade_challenge = make_native_app_challenge("a" * 43)
     parsed_url = urllib.parse.urlparse(url_res)
-    assert f"https://{parsed_url.netloc}/" == client.base_url
+    assert f"https://{parsed_url.netloc}/" == native_client.base_url
     assert parsed_url.path == "/v2/oauth2/authorize"
     parsed_params = urllib.parse.parse_qs(parsed_url.query)
     assert parsed_params == {
-        "client_id": [client.client_id],
+        "client_id": [native_client.client_id],
         "redirect_uri": ["uri"],
         "scope": ["scopes"],
         "state": ["state"],
@@ -215,23 +209,23 @@ def test_oauth2_get_authorize_url_native_custom_params(client):
     }
 
 
-def test_oauth2_get_authorize_url_confidential_defaults(client):
+def test_oauth2_get_authorize_url_confidential_defaults(confidential_client):
     # default parameters for starting auth flow
     # warns because no requested_scopes was passed
     with pytest.warns(globus_sdk.RemovedInV4Warning):
         flow_manager = globus_sdk.services.auth.GlobusAuthorizationCodeFlowManager(
-            client, "uri"
+            confidential_client, "uri"
         )
-    client.current_oauth2_flow_manager = flow_manager
+    confidential_client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
-    url_res = client.oauth2_get_authorize_url()
+    url_res = confidential_client.oauth2_get_authorize_url()
     parsed_url = urllib.parse.urlparse(url_res)
-    assert f"https://{parsed_url.netloc}/" == client.base_url
+    assert f"https://{parsed_url.netloc}/" == confidential_client.base_url
     assert parsed_url.path == "/v2/oauth2/authorize"
     parsed_params = urllib.parse.parse_qs(parsed_url.query)
     assert parsed_params == {
-        "client_id": [client.client_id],
+        "client_id": [confidential_client.client_id],
         "redirect_uri": ["uri"],
         "scope": [f"openid profile email {TransferScopes.all}"],
         "state": ["_default"],
@@ -240,25 +234,25 @@ def test_oauth2_get_authorize_url_confidential_defaults(client):
     }
 
 
-def test_oauth2_get_authorize_url_confidential_custom_params(client):
+def test_oauth2_get_authorize_url_confidential_custom_params(confidential_client):
     # starting flow with specified parameters
     flow_manager = globus_sdk.services.auth.GlobusAuthorizationCodeFlowManager(
-        client,
+        confidential_client,
         requested_scopes="scopes",
         redirect_uri="uri",
         state="state",
         refresh_tokens=True,
     )
-    client.current_oauth2_flow_manager = flow_manager
+    confidential_client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
-    url_res = client.oauth2_get_authorize_url()
+    url_res = confidential_client.oauth2_get_authorize_url()
     parsed_url = urllib.parse.urlparse(url_res)
-    assert f"https://{parsed_url.netloc}/" == client.base_url
+    assert f"https://{parsed_url.netloc}/" == confidential_client.base_url
     assert parsed_url.path == "/v2/oauth2/authorize"
     parsed_params = urllib.parse.parse_qs(parsed_url.query)
     assert parsed_params == {
-        "client_id": [client.client_id],
+        "client_id": [confidential_client.client_id],
         "redirect_uri": ["uri"],
         "scope": ["scopes"],
         "state": ["state"],
@@ -267,37 +261,39 @@ def test_oauth2_get_authorize_url_confidential_custom_params(client):
     }
 
 
-def test_oauth2_exchange_code_for_tokens_native(client):
+def test_oauth2_exchange_code_for_tokens_native(native_client):
     """
     Starts a NativeAppFlowManager, Confirms invalid code raises 401
     Further testing cannot be done without user login credentials
     """
-    load_response(client.oauth2_exchange_code_for_tokens, case="invalid_grant")
+    load_response(native_client.oauth2_exchange_code_for_tokens, case="invalid_grant")
 
     flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(
-        client, requested_scopes=TransferScopes.all
+        native_client, requested_scopes=TransferScopes.all
     )
-    client.current_oauth2_flow_manager = flow_manager
+    native_client.current_oauth2_flow_manager = flow_manager
 
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
-        client.oauth2_exchange_code_for_tokens("invalid_code")
+        native_client.oauth2_exchange_code_for_tokens("invalid_code")
     assert excinfo.value.http_status == 401
     assert excinfo.value.code == "Error"
 
 
-def test_oauth2_exchange_code_for_tokens_confidential(client):
+def test_oauth2_exchange_code_for_tokens_confidential(confidential_client):
     """
     Starts an AuthorizationCodeFlowManager, Confirms bad code raises 401
     Further testing cannot be done without user login credentials
     """
-    load_response(client.oauth2_exchange_code_for_tokens, case="invalid_grant")
+    load_response(
+        confidential_client.oauth2_exchange_code_for_tokens, case="invalid_grant"
+    )
 
     flow_manager = globus_sdk.services.auth.GlobusAuthorizationCodeFlowManager(
-        client, "uri", requested_scopes=TransferScopes.all
+        confidential_client, "uri", requested_scopes=TransferScopes.all
     )
-    client.current_oauth2_flow_manager = flow_manager
+    confidential_client.current_oauth2_flow_manager = flow_manager
 
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
-        client.oauth2_exchange_code_for_tokens("invalid_code")
+        confidential_client.oauth2_exchange_code_for_tokens("invalid_code")
     assert excinfo.value.http_status == 401
     assert excinfo.value.code == "Error"

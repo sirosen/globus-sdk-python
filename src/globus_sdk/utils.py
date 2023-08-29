@@ -10,6 +10,8 @@ import uuid
 from base64 import b64encode
 from enum import Enum
 
+from globus_sdk._types import UUIDLike
+
 T = t.TypeVar("T")
 R = t.TypeVar("R")
 
@@ -93,6 +95,14 @@ def render_enums_for_api(value: t.Any) -> t.Any:
     if isinstance(value, collections.abc.Iterable):
         return [render_enums_for_api(x) for x in value]
     return value.value if isinstance(value, Enum) else value
+
+
+def commajoin(val: UUIDLike | t.Iterable[UUIDLike]) -> str:
+    # note that this explicit handling of Iterable allows for string-like objects to be
+    # passed to this function and be stringified by the `str()` call
+    if isinstance(val, collections.abc.Iterable):
+        return ",".join(safe_strseq_iter(val))
+    return str(val)
 
 
 class PayloadWrapper(PayloadWrapperBase):

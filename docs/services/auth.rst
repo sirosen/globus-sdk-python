@@ -9,11 +9,13 @@ authentication and authorization flows), in which case the
 :class:`NativeAppAuthClient` or :class:`ConfidentialAppAuthClient` classes should
 generally be used.
 
-.. autoclass:: AuthClient
+Client Classes
+--------------
+
+.. autoclass:: AuthServiceClient
    :members:
    :member-order: bysource
    :show-inheritance:
-   :exclude-members: error_class
 
 .. autoclass:: NativeAppAuthClient
    :members:
@@ -26,6 +28,24 @@ generally be used.
    :member-order: bysource
    :show-inheritance:
    :exclude-members: error_class
+
+Client Bases
+~~~~~~~~~~~~
+
+The common base class for all Auth Client classes is the ``AuthBaseClient``.
+
+.. autoclass:: AuthBaseClient
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+   :exclude-members: error_class
+
+Clients providing login flow capabilities inherit from ``AuthLoginClient``.
+
+.. autoclass:: AuthLoginClient
+   :members:
+   :member-order: bysource
+   :show-inheritance:
 
 Helper Objects
 --------------

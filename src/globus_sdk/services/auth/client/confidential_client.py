@@ -3,34 +3,43 @@ from __future__ import annotations
 import logging
 import typing as t
 
+from globus_sdk import exc, utils
 from globus_sdk._types import ScopeCollectionType, UUIDLike
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 
 from .._common import stringify_requested_scopes
 from ..flow_managers import GlobusAuthorizationCodeFlowManager
-from ..response import OAuthDependentTokenResponse, OAuthTokenResponse
-from .base import AuthClient
+from ..response import (
+    GetIdentitiesResponse,
+    OAuthDependentTokenResponse,
+    OAuthTokenResponse,
+)
+from .base_login_client import AuthLoginClient
 
 log = logging.getLogger(__name__)
 
 
-class ConfidentialAppAuthClient(AuthClient):
+class ConfidentialAppAuthClient(AuthLoginClient):
     """
-    This is a specialized type of ``AuthClient`` used to represent an App with
+    This is a specialized type of ``AuthLoginClient`` used to represent an App with
     a Client ID and Client Secret wishing to communicate with Globus Auth.
     It must be given a Client ID and a Client Secret, and furthermore, these
     will be used to establish a :class:`BasicAuthorizer <globus_sdk.BasicAuthorizer>`
     for authorization purposes.
     Additionally, the Client ID is stored for use in various calls.
 
-    Confidential Applications (i.e. Applications which are not Native Apps) are
-    those like the `Sample Data Portal
-    <https://github.com/globus/globus-sample-data-portal>`_, which have their
-    own credentials for authenticating against Globus Auth.
+    Confidential Applications are those which have their own credentials for
+    authenticating against Globus Auth.
 
-    Any keyword arguments given are passed through to the ``AuthClient``
-    constructor.
+    :param client_id: The ID of the application provided by registration with
+        Globus Auth.
+    :type client_id: str or UUID
+    :param client_secret: The secret string to use for authentication. Secrets can be
+        generated via the Globus developers interface.
+    :type client_secret: str
+
+    All other initialization parameters are passed through to ``BaseClient``.
 
     .. automethodlist:: globus_sdk.ConfidentialAppAuthClient
     """
@@ -51,6 +60,56 @@ class ConfidentialAppAuthClient(AuthClient):
             base_url=base_url,
             app_name=app_name,
             transport_params=transport_params,
+        )
+
+    def get_identities(
+        self,
+        *,
+        usernames: t.Iterable[str] | str | None = None,
+        ids: t.Iterable[UUIDLike] | UUIDLike | None = None,
+        provision: bool = False,
+        query_params: dict[str, t.Any] | None = None,
+    ) -> GetIdentitiesResponse:
+        """
+        Perform a call to the Get Identities API using the direct client
+        credentials of this client.
+
+        This method is considered deprecated -- callers should instead use client
+        credentials to get a token and then use that token to call the API via a
+        :class:`~.AuthServiceClient`.
+
+        :param usernames: A username or list of usernames to lookup. Mutually exclusive
+            with ``ids``
+        :type usernames: str or iterable of str, optional
+        :param ids: An identity ID or list of IDs to lookup. Mutually exclusive
+            with ``usernames``
+        :type ids: str, UUID, or iterable of str or UUID, optional
+        :param provision: Create identities if they do not exist, allowing clients to
+            get username-to-identity mappings prior to the identity being used
+        :type provision: bool
+        :param query_params: Any additional parameters to be passed through
+            as query params.
+        :type query_params: dict, optional
+        """
+        exc.warn_deprecated(
+            "ConfidentialAuthClient.get_identities() is deprecated. "
+            "Get a token via `oauth2_client_credentials_tokens` "
+            "and use that to call the API instead."
+        )
+
+        if query_params is None:
+            query_params = {}
+
+        if usernames is not None:
+            query_params["usernames"] = utils.commajoin(usernames)
+            query_params["provision"] = (
+                "false" if str(provision).lower() == "false" else "true"
+            )
+        if ids is not None:
+            query_params["ids"] = utils.commajoin(ids)
+
+        return GetIdentitiesResponse(
+            self.get("/v2/api/identities", query_params=query_params)
         )
 
     def oauth2_client_credentials_tokens(
