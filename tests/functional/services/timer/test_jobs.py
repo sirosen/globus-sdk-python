@@ -99,3 +99,24 @@ def test_delete_job(timer_client):
     response = timer_client.delete_job(meta["job_id"])
     assert response.http_status == 200
     assert response.data["job_id"] == meta["job_id"]
+
+
+def test_pause_job(timer_client):
+    meta = load_response(timer_client.pause_job).metadata
+    response = timer_client.pause_job(meta["job_id"])
+    assert response.http_status == 200
+    assert "Successfully paused" in response.data["message"]
+
+
+@pytest.mark.parametrize("update_credentials", [True, False, None])
+def test_resume_job(update_credentials, timer_client):
+    meta = load_response(timer_client.resume_job).metadata
+
+    kwargs = {}
+    if update_credentials is not None:
+        kwargs["update_credentials"] = update_credentials
+
+    response = timer_client.resume_job(meta["job_id"], **kwargs)
+    assert response.http_status == 200
+    assert json.loads(response._raw_response.request.body) == kwargs
+    assert "Successfully resumed" in response.data["message"]
