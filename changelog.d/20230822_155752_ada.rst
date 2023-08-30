@@ -1,5 +1,0 @@
-Added
-~~~~~
-
-- Add ``TimerClient.pause_job`` and ``TimerClient.resume_job`` for pausing and
-  resuming timers. (:pr:`827`)
