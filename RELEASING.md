@@ -53,5 +53,5 @@ Generate the release body by running
 or create the release via the GitHub CLI
 ```
 ./scripts/changelog2md.py | \
-  gh release create $SDK_VERSION --title "v$SDK_VERSION" --notes -
+  gh release create $SDK_VERSION --title "v$SDK_VERSION" --notes-file -
 ```
