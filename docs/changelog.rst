@@ -12,6 +12,42 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.28.0:
+
+v3.28.0 (2023-08-30)
+--------------------
+
+Python Support
+~~~~~~~~~~~~~~
+
+- Add support for Python 3.12. (:pr:`808`)
+
+Added
+~~~~~
+
+- Add a ``prompt`` keyword parameter to ``AuthClient.oauth2_get_authorize_url()``. (:pr:`813`)
+
+  Setting this parameter requires users to authenticate with an identity provider,
+  even if they are already logged in. Doing so can help avoid errors caused by
+  unexpected session required policies, which would otherwise require a second,
+  follow-up login flow.
+
+  ``prompt`` could previously only be set via the ``query_params`` keyword parameter.
+  It is now more discoverable.
+
+- Add ``TimerClient.pause_job`` and ``TimerClient.resume_job`` for pausing and
+  resuming timers. (:pr:`827`)
+
+Documentation
+~~~~~~~~~~~~~
+
+- Add an example script which handles creating and running a **flow**. (:pr:`826`)
+
+Development
+~~~~~~~~~~~
+
+- Added responses to ``_testing`` reflecting an inactive Timers job (:pr:`828`)
+
 .. _changelog-3.27.0:
 
 v3.27.0 (2023-08-11)

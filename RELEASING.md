@@ -7,15 +7,19 @@
 
 ## Procedure
 
-- Make sure your repo is on `main` and up to date
-
-```
-git checkout main
-git pull
-```
+- Make sure your repo is on `main` and up to date;
+    `git checkout main; git pull`
 
 - Read `changelog.d/` and decide if the release is MINOR or PATCH
+
+- (optional) Set the version in the `SDK_VERSION` env var, for use in the
+  following steps. `SDK_VERSION=...`
+
+- Decide on the new version number and create a branch;
+   `git checkout -b release-$SDK_VERSION`
+
 - Update the version in `src/globus_sdk/version.py`
+
 - Update metadata and changelog, then verify changes in `changelog.rst`
 
 ```
@@ -23,25 +27,31 @@ make prepare-release
 $EDITOR changelog.rst
 ```
 
-- Add and commit changed files, then push to `main`
+- Add changed files;
+    `git add changelog.d/ docs/changelog.rst src/globus_sdk/version.py`
 
-```
-git add changelog.d/ docs/changelog.rst src/globus_sdk/version.py
-git commit -m 'Bump version and changelog for release'
-git push origin main
-```
+- Commit; `git commit -m 'Bump version and changelog for release'`
 
-- Tag the release. _This will run a workflow to publish to test-pypi._
+- Push the release branch; `git push -u origin release-$SDK_VERSION`
 
-```
-make tag-release
-```
+- Open a PR for review;
+    `gh pr create --base main --title "Release v$SDK_VERSION"`
 
-- Create a GitHub release with a copy of the changelog. _This will run a workflow to publish to pypi._
+- After any changes and approval, merge the PR, checkout `main`, and pull;
+    `git checkout main; git pull`
+
+- Tag the release; `make tag-release`
+    _This will run a workflow to publish to test-pypi._
+
+- Create a GitHub release with a copy of the changelog.
+    _This will run a workflow to publish to pypi._
 
 Generate the release body by running
 ```
 ./scripts/changelog2md.py
 ```
-
-The name of the GitHub release should be `v$SDK_VERSION`.
+or create the release via the GitHub CLI
+```
+./scripts/changelog2md.py | \
+  gh release create $SDK_VERSION --title "v$SDK_VERSION" --notes -
+```
