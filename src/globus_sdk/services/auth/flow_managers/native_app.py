@@ -78,7 +78,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
     Instead, a temporary secret is generated solely for this authentication
     attempt.
 
-    :param auth_client: The ``NativeAppAuthClient`` object on which this flow is based.
+    :param auth_client: The client object on which this flow is based.
         It is used to extract default values for the flow, and also to make calls to the
         Auth service.
     :type auth_client: :class:`NativeAppAuthClient <globus_sdk.NativeAppAuthClient>`
@@ -109,7 +109,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
 
     def __init__(
         self,
-        auth_client: globus_sdk.AuthClient,
+        auth_client: globus_sdk.NativeAppAuthClient,
         requested_scopes: ScopeCollectionType | None = None,
         redirect_uri: str | None = None,
         state: str = "_default",

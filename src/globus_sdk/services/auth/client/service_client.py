@@ -71,7 +71,7 @@ class AuthServiceClient(AuthBaseClient):
     # this attribute is preserved for compatibility, but will be removed in a
     # future release
     @property
-    def client_id(self) -> None:
+    def client_id(self) -> str | None:
         exc.warn_deprecated(
             "The client_id attribute on `AuthClient` / "
             "`AuthServiceClient` is deprecated. "

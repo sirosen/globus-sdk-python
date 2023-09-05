@@ -6,13 +6,13 @@ import typing as t
 from .renewing import RenewingAuthorizer
 
 if t.TYPE_CHECKING:
-    from globus_sdk.services.auth import AuthClient, OAuthTokenResponse
+    import globus_sdk
 
 log = logging.getLogger(__name__)
 
 
 class RefreshTokenAuthorizer(RenewingAuthorizer):
-    r"""
+    """
     Implements Authorization using a Refresh Token to periodically fetch
     renewed Access Tokens. It may be initialized with an Access Token, or it
     will fetch one the first time that ``get_authorization_header()`` is
@@ -20,17 +20,17 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
 
     Example usage looks something like this:
 
-    >>> import globus_sdk
-    >>> auth_client = globus_sdk.AuthClient(client_id=..., client_secret=...)
-    >>> # do some flow to get a refresh token from auth_client
-    >>> rt_authorizer = globus_sdk.RefreshTokenAuthorizer(
-    >>>     refresh_token, auth_client)
-    >>> # create a new client
-    >>> transfer_client = globus_sdk.TransferClient(authorizer=rt_authorizer)
+    .. code-block:: pycon
 
-    anything that inherits from :class:`BaseClient <globus_sdk.BaseClient>`, so
-    at least ``TransferClient`` and ``AuthClient`` will automatically handle
-    usage of the ``RefreshTokenAuthorizer``.
+        >>> import globus_sdk
+        >>> auth_client = globus_sdk.ConfidentialAppAuthClient(client_id=..., client_secret=...)
+        >>> # do some flow to get a refresh token from auth_client
+        >>> rt_authorizer = globus_sdk.RefreshTokenAuthorizer(refresh_token, auth_client)
+        >>> # create a new client
+        >>> transfer_client = globus_sdk.TransferClient(authorizer=rt_authorizer)
+
+    Anything which inherits from :class:`BaseClient <globus_sdk.BaseClient>`
+    will automatically handle usage of the ``RefreshTokenAuthorizer``.
 
     :param refresh_token: Refresh Token for Globus Auth
     :type refresh_token: str
@@ -51,16 +51,16 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         ``on_refresh`` callback can be used to update the Access Tokens and
         their expiration times.
     :type on_refresh: callable, optional
-    """
+    """  # noqa: E501
 
     def __init__(
         self,
         refresh_token: str,
-        auth_client: AuthClient,
+        auth_client: globus_sdk.AuthLoginClient,
         *,
         access_token: str | None = None,
         expires_at: int | None = None,
-        on_refresh: None | (t.Callable[[OAuthTokenResponse], t.Any]) = None,
+        on_refresh: None | t.Callable[[globus_sdk.OAuthTokenResponse], t.Any] = None,
     ):
         log.info(
             "Setting up RefreshTokenAuthorizer with auth_client="
@@ -73,13 +73,15 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
 
         super().__init__(access_token, expires_at, on_refresh)
 
-    def _get_token_response(self) -> OAuthTokenResponse:
+    def _get_token_response(self) -> globus_sdk.OAuthTokenResponse:
         """
         Make a refresh token grant
         """
         return self.auth_client.oauth2_refresh_token(self.refresh_token)
 
-    def _extract_token_data(self, res: OAuthTokenResponse) -> dict[str, t.Any]:
+    def _extract_token_data(
+        self, res: globus_sdk.OAuthTokenResponse
+    ) -> dict[str, t.Any]:
         """
         Get the tokens .by_resource_server,
         Ensure that only one token was gotten, and return that token.
