@@ -3,10 +3,9 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from .renewing import RenewingAuthorizer
+import globus_sdk
 
-if t.TYPE_CHECKING:
-    import globus_sdk
+from .renewing import RenewingAuthorizer
 
 log = logging.getLogger(__name__)
 
@@ -66,6 +65,17 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
             "Setting up RefreshTokenAuthorizer with auth_client="
             f"[instance:{id(auth_client)}]"
         )
+        if isinstance(auth_client, globus_sdk.AuthClient) and not isinstance(
+            auth_client, globus_sdk.AuthLoginClient
+        ):
+            raise globus_sdk.GlobusSDKUsageError(
+                "RefreshTokenAuthorizer requires an AuthLoginClient, not an "
+                "AuthClient. In past versions of the SDK, it was possible to "
+                "use an AuthClient if it was correctly authorized, but this is "
+                "no longer allowed. "
+                "Proper usage should typically use a NativeAppAuthClient or "
+                "ConfidentialAppAuthClient."
+            )
 
         # required for _get_token_data
         self.refresh_token = refresh_token
