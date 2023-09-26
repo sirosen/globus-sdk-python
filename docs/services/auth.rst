@@ -14,13 +14,11 @@ Client Classes
 
 .. autoclass:: AuthClient
    :members:
-   :inherited-members: BaseClient
    :member-order: bysource
    :show-inheritance:
 
 .. autoclass:: AuthLoginClient
    :members:
-   :inherited-members: BaseClient
    :member-order: bysource
    :show-inheritance:
 
