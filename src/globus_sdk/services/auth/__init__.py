@@ -1,5 +1,4 @@
 from .client import (
-    AuthBaseClient,
     AuthClient,
     AuthLoginClient,
     ConfidentialAppAuthClient,
@@ -19,13 +18,10 @@ from .response import (
 
 __all__ = (
     # client classes
-    "AuthBaseClient",
-    "AuthClient",
     "AuthClient",
     "AuthLoginClient",
     "NativeAppAuthClient",
     "ConfidentialAppAuthClient",
-    "AuthClient",
     # errors
     "AuthAPIError",
     # high-level helpers

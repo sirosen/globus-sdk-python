@@ -3,22 +3,24 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from globus_sdk import exc, utils
+from globus_sdk import client, exc, utils
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.response import GlobusHTTPResponse, IterableResponse
+from globus_sdk.scopes import AuthScopes
 
+from ..errors import AuthAPIError
 from ..response import (
     GetIdentitiesResponse,
     GetIdentityProvidersResponse,
     GetProjectsResponse,
 )
-from .base import AuthBaseClient
+from .oidc_mixin import GlobusAuthOIDCMixin
 
 log = logging.getLogger(__name__)
 
 
-class AuthClient(AuthBaseClient):
+class AuthClient(GlobusAuthOIDCMixin, client.BaseClient):
     """
     A client for using the
     `Globus Auth API <https://docs.globus.org/api/auth/>`_
@@ -41,6 +43,10 @@ class AuthClient(AuthBaseClient):
 
     .. automethodlist:: globus_sdk.AuthClient
     """
+
+    service_name = "auth"
+    error_class = AuthAPIError
+    scopes = AuthScopes
 
     def __init__(
         self,

@@ -16,7 +16,7 @@ from globus_sdk.response import GlobusHTTPResponse
 logger = logging.getLogger(__name__)
 
 if t.TYPE_CHECKING:
-    from ..client import AuthClient
+    from ..client import AuthClient, AuthLoginClient
 
 
 def _convert_token_info_dict(
@@ -196,7 +196,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         :type jwt_params: dict
         """
         logger.info('Decoding ID Token "%s"', self["id_token"])
-        auth_client = t.cast("AuthClient", self.client)
+        auth_client = t.cast("AuthClient | AuthLoginClient", self.client)
 
         jwt_params = jwt_params or {}
 

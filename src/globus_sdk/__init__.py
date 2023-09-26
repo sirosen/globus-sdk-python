@@ -52,7 +52,6 @@ _LAZY_IMPORT_TABLE = {
         "ArrayResponse",
     },
     "services.auth": {
-        "AuthBaseClient",
         "AuthClient",
         "AuthLoginClient",
         "NativeAppAuthClient",
@@ -151,7 +150,6 @@ if t.TYPE_CHECKING:
     from .response import GlobusHTTPResponse
     from .response import IterableResponse
     from .response import ArrayResponse
-    from .services.auth import AuthBaseClient
     from .services.auth import AuthClient
     from .services.auth import AuthLoginClient
     from .services.auth import NativeAppAuthClient
@@ -250,7 +248,6 @@ __all__ = (
     "ActiveScaleStoragePolicies",
     "ArrayResponse",
     "AuthAPIError",
-    "AuthBaseClient",
     "AuthClient",
     "AuthLoginClient",
     "AzureBlobStoragePolicies",

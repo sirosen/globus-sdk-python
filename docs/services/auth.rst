@@ -14,6 +14,13 @@ Client Classes
 
 .. autoclass:: AuthClient
    :members:
+   :inherited-members: BaseClient
+   :member-order: bysource
+   :show-inheritance:
+
+.. autoclass:: AuthLoginClient
+   :members:
+   :inherited-members: BaseClient
    :member-order: bysource
    :show-inheritance:
 
@@ -28,24 +35,6 @@ Client Classes
    :member-order: bysource
    :show-inheritance:
    :exclude-members: error_class
-
-Client Bases
-~~~~~~~~~~~~
-
-The common base class for all Auth Client classes is the ``AuthBaseClient``.
-
-.. autoclass:: AuthBaseClient
-   :members:
-   :member-order: bysource
-   :show-inheritance:
-   :exclude-members: error_class
-
-Clients providing login flow capabilities inherit from ``AuthLoginClient``.
-
-.. autoclass:: AuthLoginClient
-   :members:
-   :member-order: bysource
-   :show-inheritance:
 
 Helper Objects
 --------------

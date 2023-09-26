@@ -65,9 +65,9 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
             "Setting up RefreshTokenAuthorizer with auth_client="
             f"[instance:{id(auth_client)}]"
         )
-        if isinstance(auth_client, globus_sdk.AuthClient) and not isinstance(
-            auth_client, globus_sdk.AuthLoginClient
-        ):
+        # per type checkers, this is unreachable... but it is, of course, reachable...
+        # that's... the point
+        if isinstance(auth_client, globus_sdk.AuthClient):  # type: ignore[unreachable]
             raise globus_sdk.GlobusSDKUsageError(
                 "RefreshTokenAuthorizer requires an AuthLoginClient, not an "
                 "AuthClient. In past versions of the SDK, it was possible to "

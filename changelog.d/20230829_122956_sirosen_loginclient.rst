@@ -13,10 +13,6 @@ Changed
     methods were inherited by the ``AuthClient`` subclasses, but would never
     work.
 
-  - All of these client classes descend from a common base, ``AuthBaseClient``.
-    Users should not instantiate this class directly, but it provides
-    common functionality for all clients to Globus Auth.
-
 Deprecated
 ~~~~~~~~~~
 

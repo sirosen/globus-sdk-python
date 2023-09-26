@@ -4,14 +4,16 @@ import logging
 import sys
 import typing as t
 
-from globus_sdk import _guards, exc, utils
+from globus_sdk import _guards, client, exc, utils
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer, NullAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
+from globus_sdk.scopes import AuthScopes
 
+from ..errors import AuthAPIError
 from ..flow_managers import GlobusOAuthFlowManager
 from ..response import OAuthTokenResponse
-from .base import AuthBaseClient
+from .oidc_mixin import GlobusAuthOIDCMixin
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -23,7 +25,7 @@ log = logging.getLogger(__name__)
 RT = t.TypeVar("RT", bound=GlobusHTTPResponse)
 
 
-class AuthLoginClient(AuthBaseClient):
+class AuthLoginClient(GlobusAuthOIDCMixin, client.BaseClient):
     """
     This client class provides the common base for clients providing login
     functionality via
@@ -37,6 +39,10 @@ class AuthLoginClient(AuthBaseClient):
 
     .. automethodlist:: globus_sdk.AuthLoginClient
     """
+
+    service_name = "auth"
+    error_class = AuthAPIError
+    scopes = AuthScopes
 
     def __init__(
         self,

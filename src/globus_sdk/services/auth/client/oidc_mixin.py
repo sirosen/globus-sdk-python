@@ -8,11 +8,8 @@ import typing as t
 import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
-from globus_sdk import client
+from globus_sdk.client import BaseClient
 from globus_sdk.response import GlobusHTTPResponse
-from globus_sdk.scopes import AuthScopes
-
-from ..errors import AuthAPIError
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -22,20 +19,14 @@ else:
 log = logging.getLogger(__name__)
 
 
-class AuthBaseClient(client.BaseClient):
+class GlobusAuthOIDCMixin:
     """
-    Common base for all clients for
-    `Globus Auth <https://docs.globus.org/api/auth/>`_
+    This class is an internal mixin for client objects which are able to
+    - fetch the OpenID Connect config
+    - get (and optionally decode) the JWK
 
-    Users should not instantiate this class directly, but should instead use one
-    of the provided subclasses.
-
-    .. automethodlist:: globus_sdk.AuthBaseClient
+    It is used both by AuthClient and by AuthLoginClient.
     """
-
-    service_name = "auth"
-    error_class = AuthAPIError
-    scopes = AuthScopes
 
     def get_openid_configuration(self) -> GlobusHTTPResponse:
         """
@@ -43,12 +34,12 @@ class AuthBaseClient(client.BaseClient):
         Auth.
         """
         log.info("Fetching OIDC Config")
-        return self.get("/.well-known/openid-configuration")
+        return t.cast(BaseClient, self).get("/.well-known/openid-configuration")
 
     @t.overload
     def get_jwk(
         self,
-        openid_configuration: None | (GlobusHTTPResponse | dict[str, t.Any]),
+        openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
         as_pem: Literal[True],
     ) -> RSAPublicKey:
@@ -57,7 +48,7 @@ class AuthBaseClient(client.BaseClient):
     @t.overload
     def get_jwk(
         self,
-        openid_configuration: None | (GlobusHTTPResponse | dict[str, t.Any]),
+        openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
         as_pem: Literal[False],
     ) -> dict[str, t.Any]:
@@ -65,7 +56,7 @@ class AuthBaseClient(client.BaseClient):
 
     def get_jwk(
         self,
-        openid_configuration: None | (GlobusHTTPResponse | dict[str, t.Any]) = None,
+        openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any] = None,
         *,
         as_pem: bool = False,
     ) -> RSAPublicKey | dict[str, t.Any]:
@@ -88,7 +79,7 @@ class AuthBaseClient(client.BaseClient):
             jwks_uri = self.get_openid_configuration()["jwks_uri"]
 
         log.debug("jwks_uri=%s", jwks_uri)
-        jwk_data = self.get(jwks_uri).data
+        jwk_data = t.cast(BaseClient, self).get(jwks_uri).data
         if not as_pem:
             log.debug("returning jwk data where as_pem=False")
             return dict(jwk_data)
