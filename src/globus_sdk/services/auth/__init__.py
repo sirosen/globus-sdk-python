@@ -2,7 +2,6 @@ from .client import (
     AuthBaseClient,
     AuthClient,
     AuthLoginClient,
-    AuthServiceClient,
     ConfidentialAppAuthClient,
     NativeAppAuthClient,
 )
@@ -22,7 +21,7 @@ __all__ = (
     # client classes
     "AuthBaseClient",
     "AuthClient",
-    "AuthServiceClient",
+    "AuthClient",
     "AuthLoginClient",
     "NativeAppAuthClient",
     "ConfidentialAppAuthClient",

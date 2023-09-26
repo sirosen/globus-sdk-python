@@ -113,7 +113,6 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
             # client classes
             "AuthBaseClient",
             "AuthClient",
-            "AuthServiceClient",
             "AuthLoginClient",
             "NativeAppAuthClient",
             "ConfidentialAppAuthClient",

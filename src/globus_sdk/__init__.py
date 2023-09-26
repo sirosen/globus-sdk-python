@@ -54,7 +54,6 @@ _LAZY_IMPORT_TABLE = {
     "services.auth": {
         "AuthBaseClient",
         "AuthClient",
-        "AuthServiceClient",
         "AuthLoginClient",
         "NativeAppAuthClient",
         "ConfidentialAppAuthClient",
@@ -154,7 +153,6 @@ if t.TYPE_CHECKING:
     from .response import ArrayResponse
     from .services.auth import AuthBaseClient
     from .services.auth import AuthClient
-    from .services.auth import AuthServiceClient
     from .services.auth import AuthLoginClient
     from .services.auth import NativeAppAuthClient
     from .services.auth import ConfidentialAppAuthClient
@@ -255,7 +253,6 @@ __all__ = (
     "AuthBaseClient",
     "AuthClient",
     "AuthLoginClient",
-    "AuthServiceClient",
     "AzureBlobStoragePolicies",
     "BaseClient",
     "BasicAuthorizer",

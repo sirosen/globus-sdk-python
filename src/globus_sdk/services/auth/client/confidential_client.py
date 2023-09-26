@@ -76,7 +76,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
 
         This method is considered deprecated -- callers should instead use client
         credentials to get a token and then use that token to call the API via a
-        :class:`~.AuthServiceClient`.
+        :class:`~.AuthClient`.
 
         :param usernames: A username or list of usernames to lookup. Mutually exclusive
             with ``ids``

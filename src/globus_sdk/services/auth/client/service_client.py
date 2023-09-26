@@ -18,7 +18,7 @@ from .base import AuthBaseClient
 log = logging.getLogger(__name__)
 
 
-class AuthServiceClient(AuthBaseClient):
+class AuthClient(AuthBaseClient):
     """
     A client for using the
     `Globus Auth API <https://docs.globus.org/api/auth/>`_
@@ -34,12 +34,12 @@ class AuthServiceClient(AuthBaseClient):
     Initializing an ``AuthClient`` to authenticate a user making calls to the
     Globus Auth service with an access token takes the form
 
-    >>> from globus_sdk import AuthServiceClient, AccessTokenAuthorizer
+    >>> from globus_sdk import AuthClient, AccessTokenAuthorizer
     >>> ac = AuthClient(authorizer=AccessTokenAuthorizer('<token_string>'))
 
     Other authorizers, most notably ``RefreshTokenAuthorizer``, are also supported.
 
-    .. automethodlist:: globus_sdk.AuthServiceClient
+    .. automethodlist:: globus_sdk.AuthClient
     """
 
     def __init__(
@@ -63,7 +63,7 @@ class AuthServiceClient(AuthBaseClient):
         if client_id is not None:
             exc.warn_deprecated(
                 "The client_id parameter is no longer accepted by `AuthClient` / "
-                "`AuthServiceClient`. When creating a client which represents an "
+                "`AuthClient`. When creating a client which represents an "
                 "application, use `NativeAppAuthClient` or "
                 "`ConfidentialAppAuthClient` instead."
             )
@@ -74,7 +74,7 @@ class AuthServiceClient(AuthBaseClient):
     def client_id(self) -> str | None:
         exc.warn_deprecated(
             "The client_id attribute on `AuthClient` / "
-            "`AuthServiceClient` is deprecated. "
+            "`AuthClient` is deprecated. "
             "For clients with client IDs, use `NativeAppAuthClient` or "
             "`ConfidentialAppAuthClient` instead."
         )
@@ -84,7 +84,7 @@ class AuthServiceClient(AuthBaseClient):
     def client_id(self, value: UUIDLike) -> None:
         exc.warn_deprecated(
             "The client_id attribute on `AuthClient` / "
-            "`AuthServiceClient` is deprecated. "
+            "`AuthClient` is deprecated. "
             "For clients with client IDs, use `NativeAppAuthClient` or "
             "`ConfidentialAppAuthClient` instead."
         )
@@ -517,7 +517,3 @@ class AuthServiceClient(AuthBaseClient):
                     :ref: auth/reference/#delete_project
         """
         return self.delete(f"/v2/api/projects/{project_id}")
-
-
-# alias for backwards compatibility (for most usages)
-AuthClient = AuthServiceClient

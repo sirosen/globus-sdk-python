@@ -12,7 +12,7 @@ generally be used.
 Client Classes
 --------------
 
-.. autoclass:: AuthServiceClient
+.. autoclass:: AuthClient
    :members:
    :member-order: bysource
    :show-inheritance:
