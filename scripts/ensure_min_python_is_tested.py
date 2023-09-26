@@ -43,3 +43,21 @@ with open(REPO_ROOT / ".github" / "workflows" / "build.yaml") as f:
             file=sys.stderr,
         )
         sys.exit(1)
+
+
+proc = subprocess.run(
+    ["python", "-m", "mddj", "read", "tox", "min-version"],
+    check=True,
+    capture_output=True,
+    cwd=REPO_ROOT,
+)
+tox_min_python_version = proc.stdout.decode().strip()
+if tox_min_python_version != requires_python_version:
+    print("ERROR: ensure_min_python_is_tested.py failed!")
+    print(
+        f"\nPackage data sets 'Requires-Python: >={requires_python_version}', "
+        "but tox is configured to test with a minimum of "
+        f"'{tox_min_python_version}'.\n",
+        file=sys.stderr,
+    )
+    sys.exit(1)
