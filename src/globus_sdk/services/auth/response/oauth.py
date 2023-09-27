@@ -174,7 +174,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
 
     def decode_id_token(
         self,
-        openid_configuration: None | (GlobusHTTPResponse | dict[str, t.Any]) = None,
+        openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any] = None,
         jwk: RSAPublicKey | None = None,
         jwt_params: dict[str, t.Any] | None = None,
     ) -> dict[str, t.Any]:
