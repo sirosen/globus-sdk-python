@@ -136,7 +136,7 @@ Step 3: Use tokens to access the service
 Continuing from the example above, you have two credentials to Globus Services
 on hand: the ``AUTH_TOKEN`` and the ``TRANSFER_TOKEN``.
 
-We'll focus on the ``TRANSFER_TOKEN`` for now. It's used to access the Tansfer
+We'll focus on the ``TRANSFER_TOKEN`` for now. It's used to access the Transfer
 service.
 
 .. _authorizer_first_use:
