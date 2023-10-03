@@ -5,7 +5,7 @@ repos:
     - id: check-merge-conflict
     - id: trailing-whitespace
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.26.3
+  rev: 0.27.0
   hooks:
     - id: check-github-workflows
     - id: check-readthedocs
@@ -34,12 +34,12 @@ repos:
     - id: isort
       name: "Sort python imports"
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.13.0
+  rev: v3.14.0
   hooks:
     - id: pyupgrade
       args: ["--py37-plus"]
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.5
+  rev: v2.2.6
   hooks:
     - id: codespell
       args: ["--ignore-regex", "https://[^\\s]*"]
