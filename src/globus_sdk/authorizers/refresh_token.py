@@ -29,7 +29,7 @@ class RefreshTokenAuthorizer(RenewingAuthorizer):
         >>> transfer_client = globus_sdk.TransferClient(authorizer=rt_authorizer)
 
     Anything which inherits from :class:`BaseClient <globus_sdk.BaseClient>`
-    will automatically handle usage of the ``RefreshTokenAuthorizer``.
+    will automatically support usage of the ``RefreshTokenAuthorizer``.
 
     :param refresh_token: Refresh Token for Globus Auth
     :type refresh_token: str

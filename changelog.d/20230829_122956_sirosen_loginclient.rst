@@ -24,5 +24,4 @@ Deprecated
   - ``ConfidentialAppAuthClient.get_identities`` has been preserved as a valid
     call, but will emit a warning. Users wishing to access this API via client
     credentials should prefer to get an access token using a client credential
-    callout, and then use that token to call ``get_identities`` using an
-    ``AuthClient``.
+    callout, and then use that token to call ``AuthClient.get_identities()``.
