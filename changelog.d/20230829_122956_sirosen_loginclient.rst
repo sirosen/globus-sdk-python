@@ -6,12 +6,14 @@ Changed
 
   - A new class, ``AuthLoginClient``, is the base for ``NativeAppAuthClient``
     and ``ConfidentialAppAuthClient``. These classes no longer inherit from
-    ``AuthClient``.
+    ``AuthClient``, and therefore no longer inherit certain methods which would
+    never succeed if called.
 
   - ``AuthClient`` is now the only class which provides functionality
-    for accessing Globus Auth APIs. Previously, some of the API accessing
-    methods were inherited by the ``AuthClient`` subclasses, but would never
-    work.
+    for accessing Globus Auth APIs.
+
+  - ``AuthClient`` no longer includes methods for OAuth 2 login flows which
+    would only be valid to call on ``AuthLoginClient`` subclasses.
 
 Deprecated
 ~~~~~~~~~~
