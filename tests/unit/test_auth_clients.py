@@ -16,10 +16,13 @@ def test_service_client_does_not_require_client_id():
         assert client.client_id is None
 
 
-@pytest.mark.parametrize("pass_value_as", ("str", "uuid"))
-def test_service_client_allows_client_id_but_warns(pass_value_as):
-    pass_value = CLIENT_ID_UUID if pass_value_as == "uuid" else CLIENT_ID_STR
+pass_value_params = pytest.mark.parametrize(
+    "pass_value", (CLIENT_ID_STR, CLIENT_ID_UUID), ids=("str", "uuid")
+)
 
+
+@pass_value_params
+def test_service_client_allows_client_id_but_warns(pass_value):
     # init will warn because a value is being passed
     with pytest.warns(globus_sdk.RemovedInV4Warning):
         client = globus_sdk.AuthClient(client_id=pass_value)
@@ -29,10 +32,8 @@ def test_service_client_allows_client_id_but_warns(pass_value_as):
         assert client.client_id == CLIENT_ID_STR
 
 
-@pytest.mark.parametrize("pass_value_as", ("str", "uuid"))
-def test_service_client_allows_client_id_assignment(pass_value_as):
-    pass_value = CLIENT_ID_UUID if pass_value_as == "uuid" else CLIENT_ID_STR
-
+@pass_value_params
+def test_service_client_allows_client_id_assignment(pass_value):
     client = globus_sdk.AuthClient()
     with pytest.warns(globus_sdk.RemovedInV4Warning):
         client.client_id = pass_value
@@ -49,10 +50,8 @@ def test_service_client_allows_client_id_assignment(pass_value_as):
         globus_sdk.NativeAppAuthClient,
     ),
 )
-@pytest.mark.parametrize("pass_value_as", ("str", "uuid"))
-def test_can_use_uuid_or_str_for_client_id(client_type, pass_value_as):
-    pass_value = CLIENT_ID_UUID if pass_value_as == "uuid" else CLIENT_ID_STR
-
+@pass_value_params
+def test_can_use_uuid_or_str_for_client_id(client_type, pass_value):
     if client_type in (globus_sdk.AuthLoginClient, globus_sdk.NativeAppAuthClient):
         client = client_type(client_id=pass_value)
     elif client_type is globus_sdk.ConfidentialAppAuthClient:
