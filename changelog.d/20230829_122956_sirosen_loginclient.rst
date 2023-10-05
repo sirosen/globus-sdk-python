@@ -2,7 +2,7 @@ Changed
 ~~~~~~~
 
 - The inheritance structure used for Globus Auth client classes has changed.
-  (:pr:`NUMBER`)
+  (:pr:`849`)
 
   - A new class, ``AuthLoginClient``, is the base for ``NativeAppAuthClient``
     and ``ConfidentialAppAuthClient``. These classes no longer inherit from
@@ -18,7 +18,7 @@ Changed
 Deprecated
 ~~~~~~~~~~
 
-- Several features of Auth client classes are now deprecated. (:pr:`NUMBER`)
+- Several features of Auth client classes are now deprecated. (:pr:`849`)
 
   - Setting ``AuthClient.client_id`` or accessing it as an attribute
     is deprecated and will emit a warning.
