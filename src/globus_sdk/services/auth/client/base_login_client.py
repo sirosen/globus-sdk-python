@@ -75,8 +75,11 @@ class AuthLoginClient(client.BaseClient):
 
     # FYI: this get_openid_configuration method is duplicated in AuthClient
     # if this code is modified, please update that copy as well
-    # this will be resolved in SDK v4 by removing this copy and restructuring the
-    # LoginClients to contain AuthClient instances
+    #
+    # we would like to restructure code using this method to be calling the matching
+    # AuthClient method
+    # for example, a future SDK version may make an AuthLoginClient contain
+    # an AuthClient which it uses
     def get_openid_configuration(self) -> GlobusHTTPResponse:
         """
         Fetch the OpenID Connect configuration data from the well-known URI for Globus
@@ -105,8 +108,11 @@ class AuthLoginClient(client.BaseClient):
 
     # FYI: this get_jwk method is duplicated in AuthClient
     # if this code is modified, please update that copy as well
-    # this will be resolved in SDK v4 by removing this copy and restructuring the
-    # LoginClients to contain AuthClient instances
+    #
+    # we would like to restructure code using this method to be calling the matching
+    # AuthClient method
+    # for example, a future SDK version may make an AuthLoginClient contain
+    # an AuthClient which it uses
     def get_jwk(
         self,
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any] = None,
