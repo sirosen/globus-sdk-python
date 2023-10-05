@@ -11,11 +11,11 @@ def test_oauth2_userinfo():
 
 
 @pytest.mark.parametrize("casename", ("unauthorized", "forbidden"))
-def test_oauth2_error_handling(client, casename):
-    meta = load_response(client.oauth2_userinfo, case=casename).metadata
+def test_oauth2_error_handling(login_client, casename):
+    meta = load_response(login_client.oauth2_userinfo, case=casename).metadata
 
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
-        client.oauth2_userinfo()
+        login_client.oauth2_userinfo()
 
     err = excinfo.value
     assert err.http_status == meta["http_status"]

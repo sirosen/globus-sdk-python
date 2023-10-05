@@ -16,11 +16,11 @@ class StringWrapper:
         return self.s
 
 
-def test_get_identities_unauthorized(client):
-    data = load_response(client.get_identities, case="unauthorized")
+def test_get_identities_unauthorized(service_client):
+    data = load_response(service_client.get_identities, case="unauthorized")
 
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
-        client.get_identities(usernames="foobar@example.com")
+        service_client.get_identities(usernames="foobar@example.com")
 
     err = excinfo.value
     assert err.code == "UNAUTHORIZED"
@@ -37,9 +37,9 @@ def test_get_identities_unauthorized(client):
         ("globus@globus.org",),
     ],
 )
-def test_get_identities_success(usernames, client):
-    data = load_response(client.get_identities)
-    res = client.get_identities(usernames=usernames)
+def test_get_identities_success(usernames, service_client):
+    data = load_response(service_client.get_identities)
+    res = service_client.get_identities(usernames=usernames)
 
     assert [x["id"] for x in res] == [data.metadata["id"]]
 
@@ -61,9 +61,9 @@ def test_get_identities_success(usernames, client):
         ("true", "true"),
     ],
 )
-def test_get_identities_provision(inval, outval, client):
-    load_response(client.get_identities)
-    client.get_identities(usernames="globus@globus.org", provision=inval)
+def test_get_identities_provision(inval, outval, service_client):
+    load_response(service_client.get_identities)
+    service_client.get_identities(usernames="globus@globus.org", provision=inval)
     lastreq = get_last_request()
     assert "provision" in lastreq.params
     assert lastreq.params["provision"] == outval
@@ -77,14 +77,14 @@ def test_get_identities_provision(inval, outval, client):
         ["globus@globus.org", "sirosen@globus.org"],
     ],
 )
-def test_get_identities_multiple_usernames_success(usernames, client):
-    data = load_response(client.get_identities, case="multiple")
+def test_get_identities_multiple_usernames_success(usernames, service_client):
+    data = load_response(service_client.get_identities, case="multiple")
     if isinstance(usernames, str):
         expect_param = usernames
     else:
         expect_param = ",".join([str(x) for x in usernames])
 
-    res = client.get_identities(usernames=usernames)
+    res = service_client.get_identities(usernames=usernames)
 
     assert [x["username"] for x in res] == data.metadata["usernames"]
     assert [x["id"] for x in res] == data.metadata["ids"]
@@ -111,11 +111,11 @@ def test_get_identities_multiple_usernames_success(usernames, client):
         ],
     ],
 )
-def test_get_identities_multiple_ids_success(ids, client):
-    data = load_response(client.get_identities, case="multiple")
+def test_get_identities_multiple_ids_success(ids, service_client):
+    data = load_response(service_client.get_identities, case="multiple")
     expect_param = ",".join(data.metadata["ids"])
 
-    res = client.get_identities(ids=ids)
+    res = service_client.get_identities(ids=ids)
 
     assert [x["id"] for x in res] == data.metadata["ids"]
     assert [x["username"] for x in res] == data.metadata["usernames"]

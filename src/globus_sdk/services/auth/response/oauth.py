@@ -13,10 +13,9 @@ from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from globus_sdk import exc
 from globus_sdk.response import GlobusHTTPResponse
 
-logger = logging.getLogger(__name__)
+from .._common import SupportsJWKMethods
 
-if t.TYPE_CHECKING:
-    from ..client import AuthClient
+logger = logging.getLogger(__name__)
 
 
 def _convert_token_info_dict(
@@ -175,7 +174,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
 
     def decode_id_token(
         self,
-        openid_configuration: None | (GlobusHTTPResponse | dict[str, t.Any]) = None,
+        openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any] = None,
         jwk: RSAPublicKey | None = None,
         jwt_params: dict[str, t.Any] | None = None,
     ) -> dict[str, t.Any]:
@@ -196,7 +195,14 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         :type jwt_params: dict
         """
         logger.info('Decoding ID Token "%s"', self["id_token"])
-        auth_client = t.cast("AuthClient", self.client)
+        if not isinstance(self.client, SupportsJWKMethods):
+            raise exc.GlobusSDKUsageError(
+                "decode_id_token() requires a client which supports JWK methods. "
+                "This error suggests that an improper client type is attached to "
+                "the token response."
+            )
+        else:
+            auth_client: SupportsJWKMethods = self.client
 
         jwt_params = jwt_params or {}
 

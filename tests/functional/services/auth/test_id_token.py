@@ -79,7 +79,7 @@ def client():
     # this client ID is the audience for the above id_token
     # the client_id must match the audience in order for the decode to work (we pass it
     # as the audience during decoding)
-    return globus_sdk.AuthClient(client_id="7fb58e00-839d-44e3-8047-10a502612dca")
+    return globus_sdk.AuthLoginClient(client_id="7fb58e00-839d-44e3-8047-10a502612dca")
 
 
 @pytest.fixture(autouse=True)

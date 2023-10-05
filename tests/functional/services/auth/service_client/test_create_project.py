@@ -9,8 +9,8 @@ from globus_sdk._testing import get_last_request, load_response
 @pytest.mark.parametrize(
     "admin_id_style", ("string", "list", "set", "uuid", "uuid_list")
 )
-def test_create_project_admin_id_styles(client, admin_id_style):
-    meta = load_response(client.create_project).metadata
+def test_create_project_admin_id_styles(service_client, admin_id_style):
+    meta = load_response(service_client.create_project).metadata
 
     if admin_id_style == "string":
         admin_ids = meta["admin_id"]
@@ -25,7 +25,9 @@ def test_create_project_admin_id_styles(client, admin_id_style):
     else:
         raise NotImplementedError(f"unknown admin_id_style {admin_id_style}")
 
-    res = client.create_project("My Project", "support@globus.org", admin_ids=admin_ids)
+    res = service_client.create_project(
+        "My Project", "support@globus.org", admin_ids=admin_ids
+    )
 
     assert res["project"]["id"] == meta["id"]
 
@@ -41,8 +43,8 @@ def test_create_project_admin_id_styles(client, admin_id_style):
 @pytest.mark.parametrize(
     "group_id_style", ("string", "list", "set", "uuid", "uuid_list")
 )
-def test_create_project_group_id_styles(client, group_id_style):
-    meta = load_response(client.create_project, case="admin_group").metadata
+def test_create_project_group_id_styles(service_client, group_id_style):
+    meta = load_response(service_client.create_project, case="admin_group").metadata
 
     if group_id_style == "string":
         group_ids = meta["admin_group_id"]
@@ -57,7 +59,7 @@ def test_create_project_group_id_styles(client, group_id_style):
     else:
         raise NotImplementedError(f"unknown group_id_style {group_id_style}")
 
-    res = client.create_project(
+    res = service_client.create_project(
         "My Project", "support@globus.org", admin_group_ids=group_ids
     )
 

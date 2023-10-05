@@ -9,11 +9,18 @@ authentication and authorization flows), in which case the
 :class:`NativeAppAuthClient` or :class:`ConfidentialAppAuthClient` classes should
 generally be used.
 
+Client Classes
+--------------
+
 .. autoclass:: AuthClient
    :members:
    :member-order: bysource
    :show-inheritance:
-   :exclude-members: error_class
+
+.. autoclass:: AuthLoginClient
+   :members:
+   :member-order: bysource
+   :show-inheritance:
 
 .. autoclass:: NativeAppAuthClient
    :members:

@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from globus_sdk.authorizers import RefreshTokenAuthorizer
+import globus_sdk
 
 REFRESH_TOKEN = "refresh_token_1"
 ACCESS_TOKEN = "access_token_1"
@@ -34,7 +34,7 @@ def client(response):
 
 @pytest.fixture
 def authorizer(client):
-    return RefreshTokenAuthorizer(
+    return globus_sdk.RefreshTokenAuthorizer(
         REFRESH_TOKEN, client, access_token=ACCESS_TOKEN, expires_at=EXPIRES_AT
     )
 
@@ -79,3 +79,11 @@ def test_conditional_refresh_token_update(authorizer, response):
     else:  # otherwise, confirm no change
         assert authorizer.access_token == "access_token_2"
         assert authorizer.refresh_token == "refresh_token_1"
+
+
+def test_refresh_token_authorizer_rejects_auth_service_client():
+    with pytest.raises(
+        globus_sdk.GlobusSDKUsageError,
+        match="RefreshTokenAuthorizer requires an AuthLoginClient",
+    ):
+        globus_sdk.RefreshTokenAuthorizer(REFRESH_TOKEN, globus_sdk.AuthClient())

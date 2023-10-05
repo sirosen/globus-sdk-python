@@ -1,4 +1,9 @@
-from .client import AuthClient, ConfidentialAppAuthClient, NativeAppAuthClient
+from .client import (
+    AuthClient,
+    AuthLoginClient,
+    ConfidentialAppAuthClient,
+    NativeAppAuthClient,
+)
 from .errors import AuthAPIError
 from .flow_managers import (
     GlobusAuthorizationCodeFlowManager,
@@ -11,15 +16,21 @@ from .response import (
     OAuthTokenResponse,
 )
 
-__all__ = [
+__all__ = (
+    # client classes
     "AuthClient",
-    "AuthAPIError",
+    "AuthLoginClient",
     "NativeAppAuthClient",
     "ConfidentialAppAuthClient",
+    # errors
+    "AuthAPIError",
+    # high-level helpers
     "IdentityMap",
+    # flow managers
     "GlobusNativeAppFlowManager",
     "GlobusAuthorizationCodeFlowManager",
+    # responses
     "GetIdentitiesResponse",
     "OAuthDependentTokenResponse",
     "OAuthTokenResponse",
-]
+)

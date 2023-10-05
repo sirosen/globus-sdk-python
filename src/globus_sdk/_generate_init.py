@@ -110,11 +110,16 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
     (
         "services.auth",
         (
-            "AuthAPIError",
+            # client classes
             "AuthClient",
-            "ConfidentialAppAuthClient",
-            "IdentityMap",
+            "AuthLoginClient",
             "NativeAppAuthClient",
+            "ConfidentialAppAuthClient",
+            # errors
+            "AuthAPIError",
+            # high-level helpers
+            "IdentityMap",
+            # responses
             "GetIdentitiesResponse",
             "OAuthDependentTokenResponse",
             "OAuthTokenResponse",

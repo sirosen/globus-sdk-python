@@ -52,11 +52,12 @@ _LAZY_IMPORT_TABLE = {
         "ArrayResponse",
     },
     "services.auth": {
-        "AuthAPIError",
         "AuthClient",
-        "ConfidentialAppAuthClient",
-        "IdentityMap",
+        "AuthLoginClient",
         "NativeAppAuthClient",
+        "ConfidentialAppAuthClient",
+        "AuthAPIError",
+        "IdentityMap",
         "GetIdentitiesResponse",
         "OAuthDependentTokenResponse",
         "OAuthTokenResponse",
@@ -149,11 +150,12 @@ if t.TYPE_CHECKING:
     from .response import GlobusHTTPResponse
     from .response import IterableResponse
     from .response import ArrayResponse
-    from .services.auth import AuthAPIError
     from .services.auth import AuthClient
-    from .services.auth import ConfidentialAppAuthClient
-    from .services.auth import IdentityMap
+    from .services.auth import AuthLoginClient
     from .services.auth import NativeAppAuthClient
+    from .services.auth import ConfidentialAppAuthClient
+    from .services.auth import AuthAPIError
+    from .services.auth import IdentityMap
     from .services.auth import GetIdentitiesResponse
     from .services.auth import OAuthDependentTokenResponse
     from .services.auth import OAuthTokenResponse
@@ -247,6 +249,7 @@ __all__ = (
     "ArrayResponse",
     "AuthAPIError",
     "AuthClient",
+    "AuthLoginClient",
     "AzureBlobStoragePolicies",
     "BaseClient",
     "BasicAuthorizer",

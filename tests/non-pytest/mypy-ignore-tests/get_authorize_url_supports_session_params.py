@@ -3,7 +3,7 @@ import uuid
 
 import globus_sdk
 
-ac = globus_sdk.AuthClient()
+ac = globus_sdk.AuthLoginClient("someclientid")
 
 # base case
 url: str = ac.oauth2_get_authorize_url()
