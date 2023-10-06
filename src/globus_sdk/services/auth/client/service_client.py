@@ -161,6 +161,49 @@ class AuthClient(client.BaseClient):
         )
         return pem_decode_jwk_data(jwk_data=jwk_data) if as_pem else jwk_data
 
+    def userinfo(self) -> GlobusHTTPResponse:
+        """
+        Call the Userinfo endpoint of Globus Auth.
+        Userinfo is specified as part of the OpenID Connect (OIDC) standard,
+        and Globus Auth's Userinfo is OIDC-compliant.
+
+        The exact data returned will depend upon the set of OIDC-related scopes
+        which were used to acquire the token being used for this call. For
+        details, see the **API Info** below.
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: python
+
+                    ac = AuthClient(...)
+                    info = ac.oauth2_userinfo()
+                    print(
+                        'Effective Identity "{info["sub"]}" has '
+                        f'Full Name "{info["name"]}" and '
+                        f'Email "{info["email"]}"'
+                    )
+
+            .. tab-item:: API Info
+
+                ``GET /v2/oauth2/userinfo``
+
+                .. extdoclink:: Get Userinfo
+                    :ref: auth/reference/#get_or_post_v2_oauth2_userinfo_resource
+        """
+        log.info("Looking up OIDC-style Userinfo from Globus Auth")
+        return self.get("/v2/oauth2/userinfo")
+
+    def oauth2_userinfo(self) -> GlobusHTTPResponse:
+        """
+        A deprecated alias for ``userinfo``.
+        """
+        exc.warn_deprecated(
+            "The method `oauth2_userinfo` is deprecated. Use `userinfo` instead."
+        )
+        return self.userinfo()
+
     def get_identities(
         self,
         *,
