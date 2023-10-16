@@ -1210,6 +1210,8 @@ class TransferClient(client.BaseClient):
         *,
         show_hidden: bool | None = None,
         orderby: str | list[str] | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
         # note: filter is a soft keyword in python, so using this name is okay
         # pylint: disable=redefined-builtin
         filter: (
@@ -1226,6 +1228,11 @@ class TransferClient(client.BaseClient):
         :param show_hidden: Show hidden files (names beginning in dot).
             Defaults to true.
         :type show_hidden: bool, optional
+        :param limit: Limit the number of results returned. Defaults to 100,000 ,
+            which is also the maximum.
+        :type limit: int, optional
+        :param offset: Offset into the result list, which can be used to page results.
+        :type offset: int, optional
         :param orderby: One or more order-by options. Each option is
             either a field name or a field name followed by a space and 'ASC' or 'DESC'
             for ascending or descending.
@@ -1242,6 +1249,17 @@ class TransferClient(client.BaseClient):
         :type local_user: str, optional
         :param query_params: Additional passthrough query parameters
         :type query_params: dict, optional
+
+        .. note::
+
+            Pagination is not supported by the GridFTP protocol, and therefore
+            limit+offset pagination will result in the Transfer service repeatedly
+            fetching an entire directory listing from the server and filtering it before
+            retuning it to the client.
+
+            Such usage may still be more efficient than asking for a very large directory
+            listing, for latency-sensitive applications, as it reduces the size of the payload
+            passed between the Transfer service and the client.
 
         .. tab-set::
 
@@ -1289,6 +1307,10 @@ class TransferClient(client.BaseClient):
             query_params["path"] = path
         if show_hidden is not None:
             query_params["show_hidden"] = 1 if show_hidden else 0
+        if limit is not None:
+            query_params["limit"] = limit
+        if offset is not None:
+            query_params["offset"] = offset
         if orderby is not None:
             if isinstance(orderby, str):
                 query_params["orderby"] = orderby
