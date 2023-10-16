@@ -81,6 +81,11 @@ def test_operation_ls(client):
             {"local_user": "my-user"},
             {"local_user": ["my-user"]},
         ),
+        # limit+offset
+        (
+            {"limit": 10, "offset": 5},
+            {"limit": ["10"], "offset": ["5"]},
+        ),
     ],
 )
 def test_operation_ls_params(client, kwargs, expected_qs):
