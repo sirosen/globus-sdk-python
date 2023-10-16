@@ -1255,11 +1255,11 @@ class TransferClient(client.BaseClient):
             Pagination is not supported by the GridFTP protocol, and therefore
             limit+offset pagination will result in the Transfer service repeatedly
             fetching an entire directory listing from the server and filtering it before
-            retuning it to the client.
+            returning it to the client.
 
-            Such usage may still be more efficient than asking for a very large directory
-            listing, for latency-sensitive applications, as it reduces the size of the payload
-            passed between the Transfer service and the client.
+            For latency-sensitive applications, such usage may still be more efficient
+            than asking for a very large directory listing as it reduces the size of the
+            payload passed between the Transfer service and the client.
 
         .. tab-set::
 
