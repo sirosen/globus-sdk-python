@@ -416,8 +416,10 @@ def test_backward_compatibility_consent_required_error():
         (  # missing 'authorization_parameters'
             _variants.LegacyAuthorizationParametersError,
             {},
-            "'authorization_parameters' must be a 'LegacyAuthorizationParameters' "
-            "object or a dictionary",
+            (
+                "'authorization_parameters' must be a 'LegacyAuthorizationParameters' "
+                "object or a dictionary"
+            ),
         ),
         (  # missing 'code'
             _variants.LegacyConsentRequiredTransferError,
