@@ -10,7 +10,7 @@ charset-normalizer==3.3.0
     # via requests
 idna==3.4
     # via requests
-mypy==1.5.1
+mypy==1.6.0
     # via -r typing.in
 mypy-extensions==1.0.0
     # via mypy
@@ -28,13 +28,13 @@ types-jwt==0.1.3
     # via -r typing.in
 types-pyyaml==6.0.12.12
     # via responses
-types-requests==2.31.0.7
+types-requests==2.31.0.9
     # via -r typing.in
 typing-extensions==4.8.0
     # via
     #   -r typing.in
     #   mypy
-urllib3==2.0.6
+urllib3==2.0.7
     # via
     #   requests
     #   responses
