@@ -4,6 +4,7 @@ from .client import (
     ConfidentialAppAuthClient,
     NativeAppAuthClient,
 )
+from .data import DependentScopeSpec
 from .errors import AuthAPIError
 from .flow_managers import (
     GlobusAuthorizationCodeFlowManager,
@@ -26,6 +27,7 @@ __all__ = (
     "AuthAPIError",
     # high-level helpers
     "IdentityMap",
+    "DependentScopeSpec",
     # flow managers
     "GlobusNativeAppFlowManager",
     "GlobusAuthorizationCodeFlowManager",

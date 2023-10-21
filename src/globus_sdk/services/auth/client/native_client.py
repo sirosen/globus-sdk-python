@@ -5,6 +5,7 @@ import typing as t
 
 from globus_sdk._types import ScopeCollectionType, UUIDLike
 from globus_sdk.authorizers import NullAuthorizer
+from globus_sdk.response import GlobusHTTPResponse
 
 from ..flow_managers import GlobusNativeAppFlowManager
 from ..response import OAuthTokenResponse
@@ -139,3 +140,48 @@ class NativeAppAuthClient(AuthLoginClient):
             "client_id": self.client_id,
         }
         return self.oauth2_token(form_data, body_params=body_params)
+
+    def create_native_app_instance(
+        self,
+        template_id: UUIDLike,
+        name: str,
+    ) -> GlobusHTTPResponse:
+        """
+         Create a new native app instance. The new instance is a confidential client.
+
+         :param template_id: The client ID of the calling native app
+         :type template_id: str or uuid
+         :param name: The name given to the new app instance
+         :type name: str
+
+        .. tab-set::
+
+             .. tab-item:: Example Usage
+
+                 .. code-block:: pycon
+
+                     >>> ac = globus_sdk.NativeAppAuthClient(...)
+                     >>> template_id = ...
+                     >>> r = ac.create_native_app_instance(
+                     ...     template_id,
+                     ...     "My new native app instance",
+                     ... )
+                     >>> client_id = r["client"]["id"]
+
+             .. tab-item:: Example Response Data
+
+                 .. expandtestfixture:: auth.create_native_app_instance
+
+             .. tab-item:: API Info
+
+                 ``POST /v2/api/clients``
+
+                 .. extdoclink:: Create Client
+                     :ref: auth/reference/#create_client
+        """
+        body: dict[str, t.Any] = {
+            "name": name,
+            "template_id": str(template_id),
+        }
+
+        return self.post("/v2/api/clients", data={"client": body})
