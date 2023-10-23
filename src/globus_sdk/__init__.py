@@ -116,6 +116,7 @@ _LAZY_IMPORT_TABLE = {
     "services.timer": {
         "TimerAPIError",
         "TimerClient",
+        "TransferTimer",
         "TimerJob",
     },
     "services.transfer": {
@@ -208,6 +209,7 @@ if t.TYPE_CHECKING:
     from .services.search import SearchScrollQuery
     from .services.timer import TimerAPIError
     from .services.timer import TimerClient
+    from .services.timer import TransferTimer
     from .services.timer import TimerJob
     from .services.transfer import ActivationRequirementsResponse
     from .services.transfer import DeleteData
@@ -332,6 +334,7 @@ __all__ = (
     "TransferAPIError",
     "TransferClient",
     "TransferData",
+    "TransferTimer",
     "UserCredentialDocument",
 )
 

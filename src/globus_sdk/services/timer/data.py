@@ -5,27 +5,122 @@ import logging
 import typing as t
 
 from globus_sdk.config import get_service_url
+from globus_sdk.exc import warn_deprecated
 from globus_sdk.services.transfer import TransferData
 from globus_sdk.utils import PayloadWrapper, slash_join
 
 log = logging.getLogger(__name__)
 
 
+class TransferTimer(PayloadWrapper):
+    """
+    A helper for specifying the payload for Transfer Timer creation.
+    Use this along with :meth:`create_timer <globus_sdk.TimerClient.create_timer>` to
+    create a timer.
+
+    .. note::
+        ``TimerClient`` has two methods for creating timers, ``create_timer`` and
+        ``create_job``.
+        ``create_job`` uses a different API -- only ``create_timer`` will work with
+        this helper class.
+
+        Users are strongly recommended to use ``create_timer`` and this helper for
+        timer creation.
+
+    :param name: A name to identify this timer
+    :type name: str, optional
+    :param schedule: The schedule on which the timer runs
+    :type schedule: dict
+    :param body: A transfer payload for the timer to use. If it includes
+        ``submission_id`` or ``skip_activation_check``, these parameters will be
+        removed, as they are not supported in timers.
+    :type body: dict or :class:`~.TransferData`
+
+    The Schedule field encodes data which determines when the Timer will run.
+    Timers may be "run once" or "recurring", and "recurring" timers may specify an end
+    date or a number of executions after which the timer will stop.
+    Example schedules:
+
+    .. tab-set::
+
+        .. tab-item:: Run Once, Right Now
+
+            .. code-block:: python
+
+                schedule = {"type": "once"}
+
+        .. tab-item:: Run Once, At a Specific Time
+
+            .. code-block:: python
+
+                schedule = {"type": "once", "datetime": "2023-09-22T00:00:00Z"}
+
+        .. tab-item:: Run Every 5 Minutes, Until a Specific Time
+
+            .. code-block:: python
+
+                schedule = {
+                    "type": "recurring",
+                    "interval_seconds": 300,
+                    "end": {"condition": "time", "datetime": "2023-10-01T00:00:00Z"},
+                }
+
+        .. tab-item:: Run Every 30 Minutes, 10 Times
+
+            .. code-block:: python
+
+                schedule = {
+                    "type": "recurring",
+                    "interval_seconds": 1800,
+                    "end": {"condition": "iterations", "iterations": 10},
+                }
+
+        .. tab-item:: Run Every 10 Minutes, Indefinitedly
+
+            .. code-block:: python
+
+                schedule = {"type": "recurring", "interval_seconds": 600}
+    """
+
+    def __init__(
+        self,
+        *,
+        name: str | None = None,
+        schedule: dict[str, t.Any],
+        body: dict[str, t.Any] | TransferData,
+    ) -> None:
+        super().__init__()
+        self["timer_type"] = "transfer"
+        self["name"] = name
+        self["schedule"] = schedule
+        self["body"] = self._preprocess_body(body)
+
+    def _preprocess_body(
+        self, body: dict[str, t.Any] | TransferData
+    ) -> dict[str, t.Any]:
+        # shallow-copy for dicts, convert any TransferData to a dict
+        new_body = dict(body)
+        # remove the skip_activation_check and submission_id parameters unconditionally
+        # (not supported in timers, but often present in TransferData)
+        new_body.pop("submission_id", None)
+        new_body.pop("skip_activation_check", None)
+        return new_body
+
+
 class TimerJob(PayloadWrapper):
     r"""
-    Class for specifying parameters used to create a job in the Timer service. Used as
-    the ``data`` argument in
-    :meth:`create_job <globus_sdk.TimerClient.create_job>`.
-
-    Timer operates through the `Globus Automate API
-    <https://docs.globus.org/globus-automation-services/>`_. Crucially, the
-    ``callback_url`` parameter should always be the URL used to run an action provider.
-
     .. warning::
 
-        Currently the only supported action provider for this is for Transfer. Thus,
-        users should generally only use the :meth:`~from_transfer_data` method here. Any
-        other usage is meant for internal purposes; proceed with caution!
+        This method of specifying and creating Timers for data transfer is now
+        deprecated. Users should use ``TimerData`` instead.
+
+        ``TimerJob`` is still supported for non-transfer use-cases.
+
+    Helper for specifying a timer in the Timer service. Used as the ``data``
+    argument in :meth:`create_job <globus_sdk.TimerClient.create_job>`.
+
+    The ``callback_url`` parameter should always be the URL used to run an
+    action provider.
 
     :param callback_url: URL for the action which the Timer job will use.
     :type callback_url: str
@@ -125,6 +220,11 @@ class TimerJob(PayloadWrapper):
             environment the Timer job is sent to.
         :type environment: str, optional
         """
+        warn_deprecated(
+            "TimerJob.from_transfer_data(X, ...) is deprecated. "
+            "Prefer TransferTimer(body=X, ...) instead."
+        )
+
         transfer_action_url = slash_join(
             get_service_url("actions", environment=environment), "transfer/transfer/run"
         )

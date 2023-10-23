@@ -3,10 +3,16 @@ import json
 
 import pytest
 
-from globus_sdk import TimerAPIError, TimerClient, TimerJob, TransferData
+from globus_sdk import (
+    TimerAPIError,
+    TimerClient,
+    TimerJob,
+    TransferData,
+    config,
+    exc,
+    utils,
+)
 from globus_sdk._testing import get_last_request, load_response
-from globus_sdk.config import get_service_url
-from globus_sdk.utils import slash_join
 from tests.common import GO_EP1_ID, GO_EP2_ID
 
 
@@ -48,11 +54,13 @@ def test_create_job(timer_client, start, interval):
     transfer_data = TransferData(
         source_endpoint=GO_EP1_ID, destination_endpoint=GO_EP2_ID
     )
-    timer_job = TimerJob.from_transfer_data(transfer_data, start, interval)
+    with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
+        timer_job = TimerJob.from_transfer_data(transfer_data, start, interval)
     response = timer_client.create_job(timer_job)
     assert response.http_status == 201
     assert response.data["job_id"] == meta["job_id"]
-    timer_job = TimerJob.from_transfer_data(dict(transfer_data), start, interval)
+    with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
+        timer_job = TimerJob.from_transfer_data(dict(transfer_data), start, interval)
     response = timer_client.create_job(timer_job)
     assert response.http_status == 201
     assert response.data["job_id"] == meta["job_id"]
@@ -65,8 +73,8 @@ def test_create_job(timer_client, start, interval):
         assert req_body["interval"] == interval.total_seconds()
     else:
         assert req_body["interval"] == interval
-    assert req_body["callback_url"] == slash_join(
-        get_service_url("actions"), "/transfer/transfer/run"
+    assert req_body["callback_url"] == utils.slash_join(
+        config.get_service_url("actions"), "/transfer/transfer/run"
     )
 
 
@@ -75,7 +83,10 @@ def test_create_job_validation_error(timer_client):
     transfer_data = TransferData(
         source_endpoint=GO_EP1_ID, destination_endpoint=GO_EP2_ID
     )
-    timer_job = TimerJob.from_transfer_data(transfer_data, "2022-04-05T06:00:00", 1800)
+    with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
+        timer_job = TimerJob.from_transfer_data(
+            transfer_data, "2022-04-05T06:00:00", 1800
+        )
 
     with pytest.raises(TimerAPIError) as excinfo:
         timer_client.create_job(timer_job)

@@ -7,7 +7,7 @@ from globus_sdk import client, response
 from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import TimerScopes
 
-from .data import TimerJob
+from .data import TimerJob, TransferTimer
 from .errors import TimerAPIError
 
 log = logging.getLogger(__name__)
@@ -72,6 +72,48 @@ class TimerClient(client.BaseClient):
         """
         log.info(f"TimerClient.get_job({job_id})")
         return self.get(f"/jobs/{job_id}", query_params=query_params)
+
+    def create_timer(
+        self, timer: dict[str, t.Any] | TransferTimer
+    ) -> response.GlobusHTTPResponse:
+        """
+        :param timer: a document defining the new timer
+        :type timer: dict or :class:`~.TransferTimer`
+
+        A ``TransferTimer`` object can be constructed from a ``TransferData`` object,
+        which is the recommended way to create a Timer for data transfers.
+
+        **Examples**
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: pycon
+
+                    >>> transfer_client = TransferClient(...)
+                    >>> transfer_data = TransferData(transfer_client, ...)
+                    >>> timer_client = globus_sdk.TimerClient(...)
+                    >>> create_doc = globus_sdk.TransferTimer(
+                    ...     name="my-timer",
+                    ...     schedule={"type": "recurring", "interval": 1800},
+                    ...     body=transfer_data,
+                    ... )
+                    >>> response = timer_client.create_timer(timer=create_doc)
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: timers.create_timer
+
+            .. tab-item:: API Info
+
+                ``POST /v2/timer``
+        """
+        log.info("TimerClient.create_timer(...)")
+        return self.post(
+            "/v2/timer",
+            data={"timer": dict(timer) if isinstance(timer, TransferTimer) else timer},
+        )
 
     def create_job(
         self, data: TimerJob | dict[str, t.Any]
