@@ -39,6 +39,7 @@ class TransferTimer(PayloadWrapper):
     The Schedule field encodes data which determines when the Timer will run.
     Timers may be "run once" or "recurring", and "recurring" timers may specify an end
     date or a number of executions after which the timer will stop.
+
     Example schedules:
 
     .. tab-set::
@@ -75,11 +76,27 @@ class TransferTimer(PayloadWrapper):
                     "end": {"condition": "iterations", "iterations": 10},
                 }
 
-        .. tab-item:: Run Every 10 Minutes, Indefinitedly
+        .. tab-item:: Run Every 10 Minutes, Indefinitely
 
             .. code-block:: python
 
                 schedule = {"type": "recurring", "interval_seconds": 600}
+
+    Using these schedules, you can create a timer from a ``TransferData`` object:
+
+    .. code-block:: pycon
+
+        >>> from globus_sdk import TransferData, TransferTimer
+        >>> schedule = ...
+        >>> transfer_data = TransferData(...)
+        >>> timer = TransferTimer(
+        ...     name="my timer",
+        ...     schedule=schedule,
+        ...     body=transfer_data,
+        ... )
+
+    Submit the timer to the Timers service with
+    :meth:`create_timer <globus_sdk.TimerClient.create_timer>`.
     """
 
     def __init__(

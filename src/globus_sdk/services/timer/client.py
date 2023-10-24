@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from globus_sdk import client, response
+from globus_sdk import client, exc, response
 from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import TimerScopes
 
@@ -109,6 +109,11 @@ class TimerClient(client.BaseClient):
 
                 ``POST /v2/timer``
         """
+        if isinstance(timer, TimerJob):
+            raise exc.GlobusSDKUsageError(
+                "Cannot pass a TimerJob to create_timer(). "
+                "Create a TransferTimer instead."
+            )
         log.info("TimerClient.create_timer(...)")
         return self.post(
             "/v2/timer",
@@ -116,7 +121,7 @@ class TimerClient(client.BaseClient):
         )
 
     def create_job(
-        self, data: TimerJob | dict[str, t.Any]
+        self, data: dict[str, t.Any] | TimerJob
     ) -> response.GlobusHTTPResponse:
         """
         ``POST /jobs/``
@@ -138,6 +143,11 @@ class TimerClient(client.BaseClient):
         ... )
         >>> timer_result = timer_client.create_job(job)
         """
+        if isinstance(data, TransferTimer):
+            raise exc.GlobusSDKUsageError(
+                "Cannot pass a TransferTimer to create_job(). Use create_timer() "
+                "instead."
+            )
         log.info(f"TimerClient.create_job({data})")
         return self.post("/jobs/", data=data)
 
