@@ -263,7 +263,9 @@ class GroupPolicies(utils.PayloadWrapper):
         group_members_visibility: _GROUP_MEMBER_VISIBILITY_T,
         join_requests: bool,
         signup_fields: t.Iterable[_GROUP_REQUIRED_SIGNUP_FIELDS_T],
-        authentication_assurance_timeout: int | None = None,
+        authentication_assurance_timeout: int
+        | None
+        | utils.MissingType = utils.MISSING,
     ):
         super().__init__()
         self["is_high_assurance"] = is_high_assurance
@@ -273,5 +275,5 @@ class GroupPolicies(utils.PayloadWrapper):
         )
         self["join_requests"] = join_requests
         self["signup_fields"] = utils.render_enums_for_api(signup_fields)
-        if authentication_assurance_timeout is not None:
+        if authentication_assurance_timeout is not utils.MISSING:
             self["authentication_assurance_timeout"] = authentication_assurance_timeout
