@@ -275,5 +275,4 @@ class GroupPolicies(utils.PayloadWrapper):
         )
         self["join_requests"] = join_requests
         self["signup_fields"] = utils.render_enums_for_api(signup_fields)
-        if authentication_assurance_timeout is not utils.MISSING:
-            self["authentication_assurance_timeout"] = authentication_assurance_timeout
+        self["authentication_assurance_timeout"] = authentication_assurance_timeout

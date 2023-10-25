@@ -189,6 +189,38 @@ class PayloadWrapper(PayloadWrapperBase):
         for k, v in kwargs.items():
             self._set_value(k, v, callback=int)
 
+    @classmethod
+    def _prepare(
+        cls, data: str | None | dict[str, t.Any] | PayloadWrapper
+    ) -> str | None | dict[str, t.Any]:
+        """
+        Prepare a payload for serialization.
+
+        It may already be of one of the acceptable input types (str, None, dict),
+        but if it is a dict it will be recursively converted to
+
+        - remove instances of `MISSING`
+        - convert any `PayloadWrapper` instances to dicts
+        """
+        if data is None:
+            return None
+        if isinstance(data, str):
+            return data
+        return t.cast("dict[str, t.Any]", _recursively_prepare_payload(data))
+
+
+def _recursively_prepare_payload(data: t.Any) -> t.Any:
+    if isinstance(data, (dict, PayloadWrapper)):
+        return {
+            k: _recursively_prepare_payload(v)
+            for k, v in data.items()
+            if v is not MISSING
+        }
+    elif isinstance(data, (list, tuple)):
+        return [_recursively_prepare_payload(x) for x in data if x is not MISSING]
+    else:
+        return data
+
 
 def in_sphinx_build() -> bool:  # pragma: no cover
     # check if `sphinx-build` was used to invoke

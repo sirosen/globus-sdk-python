@@ -7,6 +7,7 @@ from globus_sdk import (
     GroupPolicies,
     GroupRequiredSignupFields,
     GroupVisibility,
+    utils,
 )
 from globus_sdk._testing import get_last_request, load_response
 
@@ -72,27 +73,30 @@ def test_set_group_policies(
 
 
 @pytest.mark.parametrize(
-    "group_vis, group_member_vis, signup_fields, signup_fields_str",
+    "group_vis, group_member_vis, signup_fields, signup_fields_str, auth_timeout",
     (
         (
             GroupVisibility.private,
             GroupMemberVisibility.members,
             [GroupRequiredSignupFields.address1],
             ["address1"],
+            28800,
         ),
         (
             GroupVisibility.authenticated,
             GroupMemberVisibility.managers,
             ["address1"],
             ["address1"],
+            utils.MISSING,
         ),
         (
             "private",
             "members",
             [GroupRequiredSignupFields.address1, "address2"],
             ["address1", "address2"],
+            0,
         ),
-        ("authenticated", "managers", ["address1"], ["address1"]),
+        ("authenticated", "managers", ["address1"], ["address1"], None),
     ),
 )
 @pytest.mark.parametrize("setter_usage", (False, "enum", "str"))
@@ -102,6 +106,7 @@ def test_set_group_policies_explicit_payload(
     group_member_vis,
     signup_fields,
     signup_fields_str,
+    auth_timeout,
     setter_usage,
 ):
     group_vis_str = group_vis if isinstance(group_vis, str) else group_vis.value
@@ -120,7 +125,7 @@ def test_set_group_policies_explicit_payload(
         group_members_visibility=group_member_vis,
         join_requests=False,
         signup_fields=signup_fields,
-        authentication_assurance_timeout=28800,
+        authentication_assurance_timeout=auth_timeout,
     )
     if setter_usage:
         # set a string in the payload directly
@@ -139,3 +144,10 @@ def test_set_group_policies_explicit_payload(
     assert req_body["group_visibility"] == group_vis_str
     assert req_body["group_members_visibility"] == group_member_vis_str
     assert req_body["signup_fields"] == signup_fields_str
+
+    # check the authentication_assurance_timeout
+    # it should be omitted if it's MISSING
+    if auth_timeout is utils.MISSING:
+        assert "authentication_assurance_timeout" not in req_body
+    else:
+        assert req_body["authentication_assurance_timeout"] == auth_timeout

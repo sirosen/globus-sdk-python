@@ -303,7 +303,7 @@ class BaseClient:
         r = self.transport.request(
             method=method,
             url=url,
-            data=data.data if isinstance(data, utils.PayloadWrapper) else data,
+            data=utils.PayloadWrapper._prepare(data),
             query_params=query_params,
             headers=rheaders,
             encoding=encoding,
