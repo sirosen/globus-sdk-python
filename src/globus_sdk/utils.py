@@ -53,7 +53,7 @@ class MissingType:
 # users should typically not use this value directly, but it is part of the public SDK
 # interfaces along with its type for annotation purposes
 #
-# *new after v3.29.0* (older methods do not use MISSING)
+# *new after v3.29.0*
 MISSING = MissingType()
 
 

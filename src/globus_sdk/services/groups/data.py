@@ -263,9 +263,9 @@ class GroupPolicies(utils.PayloadWrapper):
         group_members_visibility: _GROUP_MEMBER_VISIBILITY_T,
         join_requests: bool,
         signup_fields: t.Iterable[_GROUP_REQUIRED_SIGNUP_FIELDS_T],
-        authentication_assurance_timeout: int
-        | None
-        | utils.MissingType = utils.MISSING,
+        authentication_assurance_timeout: (
+            int | None | utils.MissingType
+        ) = utils.MISSING,
     ):
         super().__init__()
         self["is_high_assurance"] = is_high_assurance
