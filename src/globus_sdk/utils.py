@@ -57,6 +57,12 @@ class MissingType:
 MISSING = MissingType()
 
 
+def filter_missing(data: dict[str, t.Any] | None) -> dict[str, t.Any] | None:
+    if data is None:
+        return None
+    return {k: v for k, v in data.items() if v is not MISSING}
+
+
 def sha256_string(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
