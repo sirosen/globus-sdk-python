@@ -126,6 +126,10 @@ _LAZY_IMPORT_TABLE = {
         "TransferClient",
         "TransferData",
     },
+    "utils": {
+        "MISSING",
+        "MissingType",
+    },
 }
 
 if t.TYPE_CHECKING:
@@ -211,6 +215,8 @@ if t.TYPE_CHECKING:
     from .services.transfer import TransferAPIError
     from .services.transfer import TransferClient
     from .services.transfer import TransferData
+    from .utils import MISSING
+    from .utils import MissingType
 
 
 def __dir__() -> t.List[str]:
@@ -297,7 +303,9 @@ __all__ = (
     "IterableTransferResponse",
     "LocalGlobusConnectPersonal",
     "LocalGlobusConnectServer",
+    "MISSING",
     "MappedCollectionDocument",
+    "MissingType",
     "NativeAppAuthClient",
     "NetworkError",
     "NullAuthorizer",
