@@ -103,7 +103,7 @@ class TimerClient(client.BaseClient):
 
             .. tab-item:: Example Response Data
 
-                .. expandtestfixture:: timers.create_timer
+                .. expandtestfixture:: timer.create_timer
 
             .. tab-item:: API Info
 
