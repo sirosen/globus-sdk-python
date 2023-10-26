@@ -303,9 +303,9 @@ class BaseClient:
         r = self.transport.request(
             method=method,
             url=url,
-            data=data.data if isinstance(data, utils.PayloadWrapper) else data,
-            query_params=query_params,
-            headers=rheaders,
+            data=utils.PayloadWrapper._prepare(data),
+            query_params=utils.filter_missing(query_params),
+            headers=utils.filter_missing(rheaders),
             encoding=encoding,
             authorizer=self.authorizer,
             allow_redirects=allow_redirects,

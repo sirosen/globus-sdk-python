@@ -200,6 +200,13 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
             "TransferData",
         ),
     ),
+    (
+        "utils",
+        (
+            "MISSING",
+            "MissingType",
+        ),
+    ),
 ]
 
 

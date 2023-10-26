@@ -22,6 +22,47 @@ else:
     PayloadWrapperBase = collections.UserDict
 
 
+class MissingType:
+    def __init__(self) -> None:
+        # disable instantiation, but gated to be able to run once
+        # when this module is imported
+        if "MISSING" in globals():
+            raise TypeError("MissingType should not be instantiated")
+
+    def __bool__(self) -> bool:
+        return False
+
+    def __copy__(self) -> MissingType:
+        return self
+
+    def __deepcopy__(self, memo: dict[int, t.Any]) -> MissingType:
+        return self
+
+    # unpickling a MissingType should always return the "MISSING" sentinel
+    def __reduce__(self) -> str:
+        return "MISSING"
+
+    def __repr__(self) -> str:
+        return "<globus_sdk.MISSING>"
+
+
+# a sentinel value for "missing" values which are distinguished from `None` (null)
+# this is the default used to indicate that a parameter was not passed, so that
+# method calls passing `None` can be distinguished from those which did not pass any
+# value
+# users should typically not use this value directly, but it is part of the public SDK
+# interfaces along with its type for annotation purposes
+#
+# *new after v3.29.0*
+MISSING = MissingType()
+
+
+def filter_missing(data: dict[str, t.Any] | None) -> dict[str, t.Any] | None:
+    if data is None:
+        return None
+    return {k: v for k, v in data.items() if v is not MISSING}
+
+
 def sha256_string(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
@@ -153,6 +194,38 @@ class PayloadWrapper(PayloadWrapperBase):
     def _set_optints(self, **kwargs: t.Any) -> None:
         for k, v in kwargs.items():
             self._set_value(k, v, callback=int)
+
+    @classmethod
+    def _prepare(
+        cls, data: str | None | dict[str, t.Any] | PayloadWrapper
+    ) -> str | None | dict[str, t.Any]:
+        """
+        Prepare a payload for serialization.
+
+        It may already be of one of the acceptable input types (str, None, dict),
+        but if it is a dict it will be recursively converted to
+
+        - remove instances of `MISSING`
+        - convert any `PayloadWrapper` instances to dicts
+        """
+        if data is None:
+            return None
+        if isinstance(data, str):
+            return data
+        return t.cast("dict[str, t.Any]", _recursively_prepare_payload(data))
+
+
+def _recursively_prepare_payload(data: t.Any) -> t.Any:
+    if isinstance(data, (dict, PayloadWrapper)):
+        return {
+            k: _recursively_prepare_payload(v)
+            for k, v in data.items()
+            if v is not MISSING
+        }
+    elif isinstance(data, (list, tuple)):
+        return [_recursively_prepare_payload(x) for x in data if x is not MISSING]
+    else:
+        return data
 
 
 def in_sphinx_build() -> bool:  # pragma: no cover
