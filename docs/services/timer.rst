@@ -12,13 +12,29 @@ Globus Timer
 Helper Objects
 --------------
 
-The :class:`TimerJob` class is used to set up request data to send to Timer for
-creating a recurring job. Currently only recurring transfers are supported.
-Thus, a :class:`TimerJob` should not be initialized directly; use the
-:meth:`TimerJob.from_transfer_data` method to construct one to start a Timer job to run a
-transfer. This will require having a :class:`TransferClient`
-nstantiated first -- see the Transfer service docs
-for details and examples.
+The main helper users should use is the one for constructing Transfer Timers:
+
+.. autoclass:: TransferTimer
+   :members:
+   :show-inheritance:
+
+In order to schedule a timer, pass a ``schedule`` with relevant parameters.
+This can be done using the two schedule helper classes
+
+.. autoclass:: OnceTimerSchedule
+   :members:
+   :show-inheritance:
+
+.. autoclass:: RecurringTimerSchedule
+   :members:
+   :show-inheritance:
+
+TimerJob (legacy)
+~~~~~~~~~~~~~~~~~
+
+The ``TimerJob`` class is still supported for creating timer, but it is
+not recommended.
+New users should prefer the ``TransferTimer`` class.
 
 .. autoclass:: TimerJob
    :members:

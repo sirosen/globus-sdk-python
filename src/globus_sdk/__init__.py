@@ -118,6 +118,8 @@ _LAZY_IMPORT_TABLE = {
         "TimerClient",
         "TransferTimer",
         "TimerJob",
+        "OnceTimerSchedule",
+        "RecurringTimerSchedule",
     },
     "services.transfer": {
         "ActivationRequirementsResponse",
@@ -211,6 +213,8 @@ if t.TYPE_CHECKING:
     from .services.timer import TimerClient
     from .services.timer import TransferTimer
     from .services.timer import TimerJob
+    from .services.timer import OnceTimerSchedule
+    from .services.timer import RecurringTimerSchedule
     from .services.transfer import ActivationRequirementsResponse
     from .services.transfer import DeleteData
     from .services.transfer import IterableTransferResponse
@@ -313,11 +317,13 @@ __all__ = (
     "NullAuthorizer",
     "OAuthDependentTokenResponse",
     "OAuthTokenResponse",
+    "OnceTimerSchedule",
     "OneDriveStoragePolicies",
     "POSIXCollectionPolicies",
     "POSIXStagingCollectionPolicies",
     "POSIXStagingStoragePolicies",
     "POSIXStoragePolicies",
+    "RecurringTimerSchedule",
     "RefreshTokenAuthorizer",
     "RemovedInV4Warning",
     "S3StoragePolicies",

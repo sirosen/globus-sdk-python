@@ -188,7 +188,17 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
             "SearchScrollQuery",
         ),
     ),
-    ("services.timer", ("TimerAPIError", "TimerClient", "TransferTimer", "TimerJob")),
+    (
+        "services.timer",
+        (
+            "TimerAPIError",
+            "TimerClient",
+            "TransferTimer",
+            "TimerJob",
+            "OnceTimerSchedule",
+            "RecurringTimerSchedule",
+        ),
+    ),
     (
         "services.transfer",
         (

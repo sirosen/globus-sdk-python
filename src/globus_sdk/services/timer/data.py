@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-import datetime
+# the name "datetime" is used in this module, so use an alternative name
+# in order to avoid name shadowing
+import datetime as dt
 import logging
 import typing as t
 
 from globus_sdk.config import get_service_url
 from globus_sdk.exc import warn_deprecated
 from globus_sdk.services.transfer import TransferData
-from globus_sdk.utils import PayloadWrapper, slash_join
+from globus_sdk.utils import MISSING, MissingType, PayloadWrapper, slash_join
 
 log = logging.getLogger(__name__)
 
@@ -38,8 +40,9 @@ class TransferTimer(PayloadWrapper):
 
     The Schedule field encodes data which determines when the Timer will run.
     Timers may be "run once" or "recurring", and "recurring" timers may specify an end
-    date or a number of executions after which the timer will stop.
-
+    date or a number of executions after which the timer will stop. A ``schedule`` is
+    specified as a dict, but the SDK provides two useful helpers for constructing these
+    data.
     Example schedules:
 
     .. tab-set::
@@ -48,39 +51,37 @@ class TransferTimer(PayloadWrapper):
 
             .. code-block:: python
 
-                schedule = {"type": "once"}
+                schedule = OnceTimerSchedule()
 
         .. tab-item:: Run Once, At a Specific Time
 
             .. code-block:: python
 
-                schedule = {"type": "once", "datetime": "2023-09-22T00:00:00Z"}
+                schedule = OnceTimerSchedule(datetime="2023-09-22T00:00:00Z")
 
         .. tab-item:: Run Every 5 Minutes, Until a Specific Time
 
             .. code-block:: python
 
-                schedule = {
-                    "type": "recurring",
-                    "interval_seconds": 300,
-                    "end": {"condition": "time", "datetime": "2023-10-01T00:00:00Z"},
-                }
+                schedule = RecurringTimerSchedule(
+                    interval_seconds=300,
+                    end={"condition": "time", "datetime": "2023-10-01T00:00:00Z"},
+                )
 
         .. tab-item:: Run Every 30 Minutes, 10 Times
 
             .. code-block:: python
 
-                schedule = {
-                    "type": "recurring",
-                    "interval_seconds": 1800,
-                    "end": {"condition": "iterations", "iterations": 10},
-                }
+                schedule = RecurringTimerSchedule(
+                    interval_seconds=1800,
+                    end={"condition": "iterations", "iterations": 10},
+                )
 
         .. tab-item:: Run Every 10 Minutes, Indefinitely
 
             .. code-block:: python
 
-                schedule = {"type": "recurring", "interval_seconds": 600}
+                schedule = RecurringTimerSchedule(interval_seconds=600)
 
     Using these schedules, you can create a timer from a ``TransferData`` object:
 
@@ -102,8 +103,8 @@ class TransferTimer(PayloadWrapper):
     def __init__(
         self,
         *,
-        name: str | None = None,
-        schedule: dict[str, t.Any],
+        name: str | MissingType = MISSING,
+        schedule: dict[str, t.Any] | RecurringTimerSchedule | OnceTimerSchedule,
         body: dict[str, t.Any] | TransferData,
     ) -> None:
         super().__init__()
@@ -122,6 +123,42 @@ class TransferTimer(PayloadWrapper):
         new_body.pop("submission_id", None)
         new_body.pop("skip_activation_check", None)
         return new_body
+
+
+class RecurringTimerSchedule(PayloadWrapper):
+    """
+    A helper used as part of a *timer* to define the "schedule" for the *timer*.
+
+    A ``RecurringTimerSchedule`` is used to describe a *timer* which runs repeatedly
+    until some end condition is reached.
+    """
+
+    def __init__(
+        self,
+        interval_seconds: int,
+        start: str | dt.datetime | MissingType = MISSING,
+        end: dict[str, t.Any] | MissingType = MISSING,
+    ) -> None:
+        self["type"] = "recurring"
+        self["interval_seconds"] = interval_seconds
+        self["end"] = end
+        self["start"] = _format_date(start)
+
+
+class OnceTimerSchedule(PayloadWrapper):
+    """
+    A helper used as part of a *timer* to define the "schedule" for the *timer*.
+
+    A ``OnceTimerSchedule`` is used to describe a *timer* which runs exactly once.
+    It may be scheduled for a time in the future.
+    """
+
+    def __init__(
+        self,
+        datetime: str | dt.datetime | MissingType = MISSING,
+    ) -> None:
+        self["type"] = "once"
+        self["datetime"] = _format_date(datetime)
 
 
 class TimerJob(PayloadWrapper):
@@ -167,22 +204,22 @@ class TimerJob(PayloadWrapper):
         self,
         callback_url: str,
         callback_body: dict[str, t.Any],
-        start: datetime.datetime | str,
-        interval: datetime.timedelta | int | None,
+        start: dt.datetime | str,
+        interval: dt.timedelta | int | None,
         *,
         name: str | None = None,
-        stop_after: datetime.datetime | None = None,
+        stop_after: dt.datetime | None = None,
         stop_after_n: int | None = None,
         scope: str | None = None,
     ) -> None:
         super().__init__()
         self["callback_url"] = callback_url
         self["callback_body"] = callback_body
-        if isinstance(start, datetime.datetime):
+        if isinstance(start, dt.datetime):
             self["start"] = start.isoformat()
         else:
             self["start"] = start
-        if isinstance(interval, datetime.timedelta):
+        if isinstance(interval, dt.timedelta):
             self["interval"] = int(interval.total_seconds())
         else:
             self["interval"] = interval
@@ -199,11 +236,11 @@ class TimerJob(PayloadWrapper):
     def from_transfer_data(
         cls,
         transfer_data: TransferData | dict[str, t.Any],
-        start: datetime.datetime | str,
-        interval: datetime.timedelta | int | None,
+        start: dt.datetime | str,
+        interval: dt.timedelta | int | None,
         *,
         name: str | None = None,
-        stop_after: datetime.datetime | None = None,
+        stop_after: dt.datetime | None = None,
         stop_after_n: int | None = None,
         scope: str | None = None,
         environment: str | None = None,
@@ -265,3 +302,10 @@ class TimerJob(PayloadWrapper):
             stop_after_n=stop_after_n,
             scope=scope,
         )
+
+
+def _format_date(date: str | dt.datetime | MISSING) -> str | MISSING:
+    if isinstance(date, dt.datetime):
+        return date.astimezone(dt.timezone.utc).isoformat()
+    else:
+        return date
