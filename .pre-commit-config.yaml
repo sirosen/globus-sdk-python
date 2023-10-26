@@ -42,7 +42,7 @@ repos:
     - id: isort
       name: "Sort python imports"
 - repo: https://github.com/sirosen/slyp
-  rev: 0.1.1
+  rev: 0.1.2
   hooks:
     - id: slyp
 - repo: https://github.com/codespell-project/codespell
