@@ -1,6 +1,16 @@
+import datetime
+
 import pytest
 
-from globus_sdk import TimerJob, TransferData, TransferTimer, exc
+from globus_sdk import (
+    OnceTimerSchedule,
+    RecurringTimerSchedule,
+    TimerJob,
+    TransferData,
+    TransferTimer,
+    exc,
+    utils,
+)
 from tests.common import GO_EP1_ID, GO_EP2_ID
 
 
@@ -47,3 +57,45 @@ def test_transfer_timer_removes_disallowed_fields():
     # but the original dict is unchanged
     assert timer["body"] == {"foo": "bar"}
     assert set(tdata.keys()) == {"submission_id", "skip_activation_check", "foo"}
+
+
+@pytest.mark.parametrize(
+    "input_time, expected",
+    (
+        # even though this string is "obviously" not a valid datetime, we don't
+        # translate it when we create the schedule
+        ("tomorrow", "tomorrow"),
+        # use a fixed (known) timestamp and check how it's formatted
+        (datetime.datetime.fromtimestamp(1698385129.7044), "2023-10-27T05:38:49+00:00"),
+    ),
+)
+def test_once_timer_schedule_formats_datetime(input_time, expected):
+    schedule = OnceTimerSchedule(datetime=input_time)
+    assert schedule.data == {"type": "once", "datetime": expected}
+
+
+def test_recurring_timer_schedule_interval_only():
+    schedule = RecurringTimerSchedule(interval_seconds=600)
+    assert utils.filter_missing(schedule) == {
+        "type": "recurring",
+        "interval_seconds": 600,
+    }
+
+
+@pytest.mark.parametrize(
+    "input_time, expected",
+    (
+        # even though this string is "obviously" not a valid datetime, we don't
+        # translate it when we create the schedule
+        ("tomorrow", "tomorrow"),
+        # use a fixed (known) timestamp and check how it's formatted
+        (datetime.datetime.fromtimestamp(1698385129.7044), "2023-10-27T05:38:49+00:00"),
+    ),
+)
+def test_recurring_timer_schedule_formats_start(input_time, expected):
+    schedule = RecurringTimerSchedule(interval_seconds=600, start=input_time)
+    assert utils.filter_missing(schedule) == {
+        "type": "recurring",
+        "interval_seconds": 600,
+        "start": expected,
+    }
