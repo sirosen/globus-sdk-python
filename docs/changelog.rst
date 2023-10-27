@@ -12,6 +12,30 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.30.0:
+
+v3.30.0 (2023-10-27)
+--------------------
+
+Added
+~~~~~
+
+- ``TransferClient.operation_ls`` now supports the ``limit`` and ``offset``
+  parameters (:pr:`868`)
+
+- A new sentinel value, ``globus_sdk.MISSING``, has been introduced.
+  It is used for method calls which need to distinguish missing parameters from
+  an explicit ``None`` used to signify ``null`` (:pr:`885`)
+
+  - ``globus_sdk.MISSING`` is now supported in payload data for all methods, and
+    will be automatically removed from the payload before sending to the server
+
+Changed
+~~~~~~~
+
+- ``GroupPolicies`` objects now treat an explicit instantiation with
+  ``high_assurance_timeout=None`` as setting the timeout to ``null`` (:pr:`885`)
+
 .. _changelog-3.29.0:
 
 v3.29.0 (2023-10-12)
