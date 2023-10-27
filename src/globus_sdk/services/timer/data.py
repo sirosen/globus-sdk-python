@@ -350,7 +350,7 @@ class TimerJob(PayloadWrapper):
         )
 
 
-def _format_date(date: str | dt.datetime | MISSING) -> str | MISSING:
+def _format_date(date: str | dt.datetime | MissingType) -> str | MissingType:
     if isinstance(date, dt.datetime):
         return date.astimezone(dt.timezone.utc).replace(microsecond=0).isoformat()
     else:
