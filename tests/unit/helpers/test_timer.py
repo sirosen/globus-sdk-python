@@ -99,3 +99,16 @@ def test_recurring_timer_schedule_formats_start(input_time, expected):
         "interval_seconds": 600,
         "start": expected,
     }
+
+
+def test_recurring_timer_schedule_formats_datetime_for_end():
+    # use a fixed (known) timestamp and check how it's formatted
+    end_time = datetime.datetime.fromtimestamp(1698385129.7044)
+    schedule = RecurringTimerSchedule(
+        interval_seconds=600, end={"condition": "time", "datetime": end_time}
+    )
+    assert utils.filter_missing(schedule) == {
+        "type": "recurring",
+        "interval_seconds": 600,
+        "end": {"condition": "time", "datetime": "2023-10-27T05:38:49+00:00"},
+    }

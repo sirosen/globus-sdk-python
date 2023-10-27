@@ -131,6 +131,36 @@ class RecurringTimerSchedule(PayloadWrapper):
 
     A ``RecurringTimerSchedule`` is used to describe a *timer* which runs repeatedly
     until some end condition is reached.
+
+    :param interval_seconds: The number of seconds between each run of the timer.
+    :type interval_seconds: int
+    :param start: The time at which to start the timer, either as an ISO 8601 string
+        with timezone information, or as a ``datetime.datetime`` object.
+    :type start: str or datetime.datetime, optional
+    :param end: The end condition for the timer, as a dict. This either expresses a
+        number of iterations for the timer or an end date.
+    :type end: dict, optional
+
+    Example ``end`` conditions:
+
+    .. code-block:: python
+
+        # run 10 times
+        end = {"condition": "iterations", "iterations": 10}
+
+        # run until a specific date
+        end = {"condition": "time", "datetime": "2023-10-01T00:00:00Z"}
+
+    If the end condition is ``time``, then the ``datetime`` value can be expressed as a
+    python ``datetime`` type as well, e.g.
+
+    .. code-block:: python
+
+        # end in 10 days
+        end = {
+            "condition": "time",
+            "datetime": datetime.datetime.now() + datetime.timedelta(days=10),
+        }
     """
 
     def __init__(
@@ -142,8 +172,18 @@ class RecurringTimerSchedule(PayloadWrapper):
         super().__init__()
         self["type"] = "recurring"
         self["interval_seconds"] = interval_seconds
-        self["end"] = end
         self["start"] = _format_date(start)
+        self["end"] = end
+
+        # if a datetime is given for part of the end condition, format it (and
+        # shallow-copy the end condition)
+        # primarily, this handles
+        #    end={"condition": "time", "datetime": <some-datetime>}
+        if isinstance(end, dict):
+            self["end"] = {
+                k: (_format_date(v) if isinstance(v, dt.datetime) else v)
+                for k, v in end.items()
+            }
 
 
 class OnceTimerSchedule(PayloadWrapper):
@@ -152,6 +192,10 @@ class OnceTimerSchedule(PayloadWrapper):
 
     A ``OnceTimerSchedule`` is used to describe a *timer* which runs exactly once.
     It may be scheduled for a time in the future.
+
+    :param datetime: The time at which to run the timer, either as an ISO 8601
+        string with timezone information, or as a ``datetime.datetime`` object.
+    :type datetime: str or datetime.datetime, optional
     """
 
     def __init__(
