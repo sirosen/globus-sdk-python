@@ -5,7 +5,7 @@ from ._common import DEST_EP_ID, SOURCE_EP_ID, TIMER_ID, V2_TRANSFER_TIMER
 RESPONSES = ResponseSet(
     default=RegisteredResponse(
         service="timer",
-        path="/jobs/",
+        path="/v2/timer",
         method="POST",
         json={
             "timer": V2_TRANSFER_TIMER,

@@ -139,6 +139,7 @@ class RecurringTimerSchedule(PayloadWrapper):
         start: str | dt.datetime | MissingType = MISSING,
         end: dict[str, t.Any] | MissingType = MISSING,
     ) -> None:
+        super().__init__()
         self["type"] = "recurring"
         self["interval_seconds"] = interval_seconds
         self["end"] = end
@@ -157,6 +158,7 @@ class OnceTimerSchedule(PayloadWrapper):
         self,
         datetime: str | dt.datetime | MissingType = MISSING,
     ) -> None:
+        super().__init__()
         self["type"] = "once"
         self["datetime"] = _format_date(datetime)
 
