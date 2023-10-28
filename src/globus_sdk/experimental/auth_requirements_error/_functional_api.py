@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
-
 from . import _validators
 from ._auth_requirements_error import GlobusAuthRequirementsError
 from ._variants import (
@@ -13,6 +11,9 @@ from ._variants import (
     LegacyConsentRequiredAPError,
     LegacyConsentRequiredTransferError,
 )
+
+if t.TYPE_CHECKING:
+    from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
 log = logging.getLogger(__name__)
 
