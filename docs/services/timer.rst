@@ -12,7 +12,7 @@ Globus Timer
 Helper Objects
 --------------
 
-The main helper users should use is the one for constructing Transfer Timers:
+A helper is provided for constructing Transfer Timers:
 
 .. autoclass:: TransferTimer
    :members:
@@ -32,7 +32,7 @@ This can be done using the two schedule helper classes
 TimerJob (legacy)
 ~~~~~~~~~~~~~~~~~
 
-The ``TimerJob`` class is still supported for creating timer, but it is
+The ``TimerJob`` class is still supported for creating timers, but it is
 not recommended.
 New users should prefer the ``TransferTimer`` class.
 

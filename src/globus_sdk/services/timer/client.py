@@ -81,7 +81,7 @@ class TimerClient(client.BaseClient):
         :type timer: dict or :class:`~.TransferTimer`
 
         A ``TransferTimer`` object can be constructed from a ``TransferData`` object,
-        which is the recommended way to create a Timer for data transfers.
+        which is the recommended way to create a timer for data transfers.
 
         **Examples**
 

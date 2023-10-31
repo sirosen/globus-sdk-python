@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 class TransferTimer(PayloadWrapper):
     """
-    A helper for specifying the payload for Transfer Timer creation.
+    A helper for defining a payload for Transfer Timer creation.
     Use this along with :meth:`create_timer <globus_sdk.TimerClient.create_timer>` to
     create a timer.
 
@@ -38,12 +38,13 @@ class TransferTimer(PayloadWrapper):
         removed, as they are not supported in timers.
     :type body: dict or :class:`~.TransferData`
 
-    The Schedule field encodes data which determines when the Timer will run.
+    The ``schedule`` field determines when the timer will run.
     Timers may be "run once" or "recurring", and "recurring" timers may specify an end
     date or a number of executions after which the timer will stop. A ``schedule`` is
     specified as a dict, but the SDK provides two useful helpers for constructing these
     data.
-    Example schedules:
+
+    **Example Schedules**
 
     .. tab-set::
 
@@ -127,7 +128,7 @@ class TransferTimer(PayloadWrapper):
 
 class RecurringTimerSchedule(PayloadWrapper):
     """
-    A helper used as part of a *timer* to define the "schedule" for the *timer*.
+    A helper used as part of a *timer* to define when the *timer* will run.
 
     A ``RecurringTimerSchedule`` is used to describe a *timer* which runs repeatedly
     until some end condition is reached.
@@ -188,7 +189,7 @@ class RecurringTimerSchedule(PayloadWrapper):
 
 class OnceTimerSchedule(PayloadWrapper):
     """
-    A helper used as part of a *timer* to define the "schedule" for the *timer*.
+    A helper used as part of a *timer* to define when the *timer* will run.
 
     A ``OnceTimerSchedule`` is used to describe a *timer* which runs exactly once.
     It may be scheduled for a time in the future.
@@ -216,7 +217,7 @@ class TimerJob(PayloadWrapper):
 
         ``TimerJob`` is still supported for non-transfer use-cases.
 
-    Helper for specifying a timer in the Timer service. Used as the ``data``
+    Helper for creating a timer in the Timer service. Used as the ``data``
     argument in :meth:`create_job <globus_sdk.TimerClient.create_job>`.
 
     The ``callback_url`` parameter should always be the URL used to run an

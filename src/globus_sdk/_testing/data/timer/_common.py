@@ -37,6 +37,7 @@ V2_TRANSFER_TIMER = {
     "number_of_errors": 0,
     "number_of_runs": 0,
     "schedule": {
+        "type": "recurring",
         "end": {"count": 2},
         "interval_seconds": 604800,
         "start": "2023-10-27T05:00:00+00:00",
