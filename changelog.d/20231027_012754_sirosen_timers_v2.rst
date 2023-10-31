@@ -3,7 +3,7 @@ Added
 
 - Add support for the new Transfer Timer creation method, in the form of a
   client method, ``TimerClient.create_timer``, and a payload builder type,
-  ``TransferTimer`` (:pr:`NUMBER`)
+  ``TransferTimer`` (:pr:`887`)
 
   - ``create_timer`` only supports dict data and ``TransferTimer``, not the
     previous ``TimerJob`` type
@@ -16,4 +16,4 @@ Deprecated
 ~~~~~~~~~~
 
 - Creation of timers to run transfers using ``TimerJob`` is now
-  deprecated (:pr:`NUMBER`)
+  deprecated (:pr:`887`)
