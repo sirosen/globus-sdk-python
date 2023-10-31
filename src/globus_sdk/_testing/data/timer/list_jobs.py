@@ -1,13 +1,13 @@
 from globus_sdk._testing.models import RegisteredResponse, ResponseSet
 
-from .get_job import JOB_ID, JOB_JSON
+from ._common import TIMER_ID, V1_TIMER
 
 RESPONSES = ResponseSet(
-    metadata={"job_ids": [JOB_ID]},
+    metadata={"job_ids": [TIMER_ID]},
     default=RegisteredResponse(
         service="timer",
         path="/jobs/",
         method="GET",
-        json={"jobs": [JOB_JSON]},
+        json={"jobs": [V1_TIMER]},
     ),
 )
