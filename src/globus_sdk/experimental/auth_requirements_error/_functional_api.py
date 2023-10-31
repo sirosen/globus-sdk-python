@@ -38,6 +38,7 @@ def to_auth_requirements_error(
     :param error: The error to convert.
     :type error: a GlobusAPIError, ErrorSubdocument, or dict
     """
+    from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
     # GlobusAPIErrors may contain more than one error, so we consider all of them
     # even though we only return the first.
@@ -93,6 +94,8 @@ def to_auth_requirements_errors(
     :param errors: The errors to convert.
     :type errors: a list of GlobusAPIErrors, ErrorSubdocuments, or dicts
     """
+    from globus_sdk.exc import GlobusAPIError
+
     candidate_errors: list[ErrorSubdocument | dict[str, t.Any]] = []
     for error in errors:
         if isinstance(error, GlobusAPIError):
