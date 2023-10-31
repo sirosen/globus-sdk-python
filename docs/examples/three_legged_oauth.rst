@@ -63,7 +63,7 @@ Assuming you want to do so into a fresh virtualenv:
     $ virtualenv example-venv
     ...
     $ source example-venv/bin/activate
-    $ pip install Flask==0.11.1 globus-sdk
+    $ pip install flask globus-sdk
     ...
 
 You'll also want a shared function for loading the SDK ``AuthClient`` which
