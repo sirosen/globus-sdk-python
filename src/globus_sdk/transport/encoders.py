@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import typing as t
+import uuid
 
 import requests
+
+from globus_sdk import utils
 
 
 class RequestEncoder:
@@ -27,7 +30,73 @@ class RequestEncoder:
                 "Either manually encode the data or use `encoding=form|json` to "
                 "correctly format this data."
             )
-        return requests.Request(method, url, data=data, params=params, headers=headers)
+        return requests.Request(
+            method,
+            url,
+            data=self._prepare_data(data),
+            params=self._prepare_params(params),
+            headers=self._prepare_headers(headers),
+        )
+
+    def _format_primitive(self, value: t.Any) -> t.Any:
+        """
+        Transformations for primitive values (e.g. stringifiable items) for query
+        params, headers, and body elements.
+
+        Transforms data as follows:
+
+            x: UUID -> str(x)
+            x: _    -> x
+        """
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        return value
+
+    def _prepare_params(
+        self, params: dict[str, t.Any] | None
+    ) -> dict[str, t.Any] | None:
+        """
+        Prepare the query params for a request.
+
+        Filters out MISSING and formats primitives.
+        """
+        if params is None:
+            return None
+        return utils.filter_missing(
+            {k: self._format_primitive(v) for k, v in params.items()}
+        )
+
+    def _prepare_headers(
+        self, headers: dict[str, t.Any] | None
+    ) -> dict[str, t.Any] | None:
+        """
+        Prepare the headers for a request.
+
+        Filters out MISSING and formats primitives.
+        """
+        if headers is None:
+            return None
+        return utils.filter_missing(
+            {k: self._format_primitive(v) for k, v in headers.items()}
+        )
+
+    def _prepare_data(self, data: t.Any) -> t.Any:
+        """
+        Prepare the data (body) for a request.
+
+        If the body is a dict or PayloadWrapper, it will be recursively processed to
+        filter out MISSING and format primitives.
+
+        Otherwise, it is returned as-is.
+        """
+        if isinstance(data, (dict, utils.PayloadWrapper)):
+            return utils.filter_missing(
+                {k: self._prepare_data(v) for k, v in data.items()}
+            )
+        elif isinstance(data, (list, tuple)):
+            return [self._prepare_data(x) for x in data if x is not utils.MISSING]
+        else:
+            return self._format_primitive(data)
 
 
 class JSONRequestEncoder(RequestEncoder):
@@ -46,7 +115,13 @@ class JSONRequestEncoder(RequestEncoder):
     ) -> requests.Request:
         if data is not None:
             headers = {"Content-Type": "application/json", **headers}
-        return requests.Request(method, url, json=data, params=params, headers=headers)
+        return requests.Request(
+            method,
+            url,
+            json=self._prepare_data(data),
+            params=self._prepare_params(params),
+            headers=self._prepare_headers(headers),
+        )
 
 
 class FormRequestEncoder(RequestEncoder):
@@ -63,6 +138,12 @@ class FormRequestEncoder(RequestEncoder):
         data: t.Any,
         headers: dict[str, str],
     ) -> requests.Request:
-        if not isinstance(data, dict):
+        if not isinstance(data, (dict, utils.PayloadWrapper)):
             raise TypeError("FormRequestEncoder cannot encode non-dict data")
-        return requests.Request(method, url, data=data, params=params, headers=headers)
+        return requests.Request(
+            method,
+            url,
+            data=self._prepare_data(data),
+            params=self._prepare_params(params),
+            headers=self._prepare_headers(headers),
+        )
