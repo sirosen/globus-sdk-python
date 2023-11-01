@@ -224,7 +224,9 @@ class RequestsTransport:
         method: str,
         url: str,
         query_params: dict[str, t.Any] | None = None,
-        data: (dict[str, t.Any] | list[t.Any] | str | None) = None,
+        data: (
+            dict[str, t.Any] | list[t.Any] | utils.PayloadWrapper | str | None
+        ) = None,
         headers: dict[str, str] | None = None,
         encoding: str | None = None,
     ) -> requests.Request:
@@ -274,7 +276,7 @@ class RequestsTransport:
         method: str,
         url: str,
         query_params: dict[str, t.Any] | None = None,
-        data: dict[str, t.Any] | utils.PayloadWrapper | str | None = None,
+        data: dict[str, t.Any] | list[t.Any] | utils.PayloadWrapper | str | None = None,
         headers: dict[str, str] | None = None,
         encoding: str | None = None,
         authorizer: GlobusAuthorizer | None = None,
