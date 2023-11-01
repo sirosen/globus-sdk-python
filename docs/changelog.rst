@@ -12,6 +12,35 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.31.0:
+
+v3.31.0 (2023-11-01)
+--------------------
+
+Added
+~~~~~
+
+- Add support for the new Transfer Timer creation method, in the form of a
+  client method, ``TimerClient.create_timer``, and a payload builder type,
+  ``TransferTimer`` (:pr:`887`)
+
+  - ``create_timer`` only supports dict data and ``TransferTimer``, not the
+    previous ``TimerJob`` type
+
+  - Additional helper classes, ``RecurringTimerSchedule`` and
+    ``OneceTimerSchedule``, are provided to help build the ``TransferTimer``
+    payload
+
+- Request encoding in the SDK will now automatically convert any ``uuid.UUID``
+  objects into strings. Previously this was functionality provided by certain
+  methods, but now it is universal. (:pr:`892`)
+
+Deprecated
+~~~~~~~~~~
+
+- Creation of timers to run transfers using ``TimerJob`` is now
+  deprecated (:pr:`887`)
+
 .. _changelog-3.30.0:
 
 v3.30.0 (2023-10-27)
