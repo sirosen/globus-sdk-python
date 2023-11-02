@@ -61,6 +61,7 @@ _LAZY_IMPORT_TABLE = {
         "GetIdentitiesResponse",
         "OAuthDependentTokenResponse",
         "OAuthTokenResponse",
+        "DependentScopeSpec",
     },
     "services.gcs": {
         "CollectionDocument",
@@ -166,6 +167,7 @@ if t.TYPE_CHECKING:
     from .services.auth import GetIdentitiesResponse
     from .services.auth import OAuthDependentTokenResponse
     from .services.auth import OAuthTokenResponse
+    from .services.auth import DependentScopeSpec
     from .services.gcs import CollectionDocument
     from .services.gcs import GCSAPIError
     from .services.gcs import GCSClient
@@ -274,6 +276,7 @@ __all__ = (
     "CollectionPolicies",
     "ConfidentialAppAuthClient",
     "DeleteData",
+    "DependentScopeSpec",
     "ErrorSubdocument",
     "FlowsAPIError",
     "FlowsClient",

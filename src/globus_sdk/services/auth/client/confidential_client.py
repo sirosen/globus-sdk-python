@@ -294,3 +294,163 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         if include is not None:
             body["include"] = include
         return self.post("/v2/oauth2/token/introspect", data=body, encoding="form")
+
+    def create_child_client(
+        self,
+        name: str,
+        *,
+        public_client: bool | utils.MissingType = utils.MISSING,
+        visibility: t.Literal["public", "private"] | utils.MissingType = utils.MISSING,
+        redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
+        terms_and_conditions: str | utils.MissingType = utils.MISSING,
+        privacy_policy: str | utils.MissingType = utils.MISSING,
+        required_idp: UUIDLike | utils.MissingType = utils.MISSING,
+        preselect_idp: UUIDLike | utils.MissingType = utils.MISSING,
+        client_type: (
+            t.Literal[
+                "client_identity",
+                "confidential_client",
+                "globus_connect_server",
+                "public_installed_client",
+                "hybrid_confidential_client_resource_server",
+                "resource_server",
+            ]
+            | utils.MissingType
+        ) = utils.MISSING,
+        additional_fields: dict[str, t.Any] | utils.MissingType = utils.MISSING,
+    ) -> GlobusHTTPResponse:
+        """
+        Create a new client. Requires the ``manage_projects`` scope.
+
+        :param name: The display name shown to users on consents. May not contain
+            linebreaks.
+        :type name: str
+        :param public_client: This is used to infer which OAuth grant_types the client
+            will be able to use. Should be false if the client is capable of keeping
+            secret credentials (such as clients running on a server) and true if it is
+            not (such as native apps). After creation this value is immutable. This
+            option is mutually exclusive with ``client_type``, exactly one must be
+            given.
+        :type public_client: bool, optional
+        :param visibility: If set to "public", any authenticated entity can view it.
+            When set to "private", only entities in the same project as the client can
+            view it.
+        :type visibility: str, optional
+        :param redirect_uris: list of URIs that may be used in OAuth authorization
+            flows.
+        :type redirect_uris: iterable of str, optional
+        :param terms_and_conditions: URL of client's terms and conditions.
+        :type terms_and_conditions: str, optional
+        :param privacy_policy: URL of client's privacy policy.
+        :type privacy_policy: str, optional
+        :param required_idp: In order to use this client a user must have an identity
+            from this IdP in their identity set.
+        :type required_idp: str or uuid, optional
+        :param preselect_idp: This pre-selects the given IdP on the Globus Auth login
+            page if the user is not already authenticated.
+        :type preselect_idp: str or uuid, optional
+        :param additional_fields: Any additional parameters to be passed through.
+        :type additional_fields: dict, optional
+        :param client_type: Defines the type of client that will be created. This
+            option is mutually exclusive with ``public_client``, exactly one must
+            be given.
+        :type client_type: str, optional
+
+        ``client_type`` must be one of the following values:
+
+        "confidential_client": Applications that are OAuth confidential clients, and can
+        manage a client secret and requests for user consent.
+
+        "public_installed_client" : Applications that are OAuth public clients or native
+        applications that are distributed to users, and thus cannot manage a client
+        secret.
+
+        "client_identity": Applications that authenticate and act as the application
+        itself. These applications are used for automation and as service or community
+        accounts, and do NOT act on behalf of other users. Also known as a "Service
+        Account".
+
+        "resource_server":  A RESTful API (OAuth resource server) that uses Globus Auth
+        tokens for authentication. Users accessing the service login via Globus and
+        consent for the client to use your API.
+
+        "globus_connect_server": Create a client that will service as a Globus Connect
+        Server endpoint.
+
+        "hybrid_confidential_client_resource_server": Register any client with Globus
+        Auth - an application (confidential or public client), service account, or
+        service API.
+
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> project_id = ...
+                    >>> r = ac.create_child_client(
+                    ...     "My client",
+                    ...     True,
+                    ...     True,
+                    ... )
+                    >>> client_id = r["client"]["id"]
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.create_child_client
+
+            .. tab-item:: API Info
+
+                ``POST /v2/api/clients``
+
+                .. extdoclink:: Create Client
+                    :ref: auth/reference/#create_client
+        """
+        body: dict[str, t.Any] = {
+            "name": name,
+            "visibility": visibility,
+        }
+        if not isinstance(redirect_uris, utils.MissingType):
+            body["redirect_uris"] = list(utils.safe_strseq_iter(redirect_uris))
+        if required_idp is not utils.MISSING:
+            body["required_idp"] = str(required_idp)
+        if preselect_idp is not utils.MISSING:
+            body["preselect_idp"] = str(preselect_idp)
+
+        # Must specify exactly one of public_client or client_type
+        if public_client is not utils.MISSING and client_type is not utils.MISSING:
+            raise exc.GlobusSDKUsageError(
+                "AuthClient.create_client does not take both "
+                "'public_client' and 'client_type'. These are mutually exclusive."
+            )
+
+        if public_client is utils.MISSING and client_type is utils.MISSING:
+            raise exc.GlobusSDKUsageError(
+                "AuthClient.create_client requires either 'public_client' or "
+                "'client_type'."
+            )
+        if public_client is not utils.MISSING:
+            body["public_client"] = public_client
+        if client_type is not utils.MISSING:
+            body["client_type"] = client_type
+
+        # terms_and_conditions and privacy_policy must both be set or unset
+        if bool(terms_and_conditions) ^ bool(privacy_policy):
+            raise exc.GlobusSDKUsageError(
+                "terms_and_conditions and privacy_policy must both be set or unset"
+            )
+        links: dict[str, str] = {}
+        if not isinstance(terms_and_conditions, utils.MissingType):
+            links["terms_and_conditions"] = terms_and_conditions
+        if not isinstance(privacy_policy, utils.MissingType):
+            links["privacy_policy"] = privacy_policy
+
+        if links:
+            body["links"] = links
+
+        if not isinstance(additional_fields, utils.MissingType):
+            body.update(additional_fields)
+
+        return self.post("/v2/api/clients", data={"client": body})
