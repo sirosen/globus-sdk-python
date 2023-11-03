@@ -408,46 +408,39 @@ class ConfidentialAppAuthClient(AuthLoginClient):
                 .. extdoclink:: Create Client
                     :ref: auth/reference/#create_client
         """
-        body: dict[str, t.Any] = {
-            "name": name,
-            "visibility": visibility,
-        }
-        if not isinstance(redirect_uris, utils.MissingType):
-            body["redirect_uris"] = list(utils.safe_strseq_iter(redirect_uris))
-        if required_idp is not utils.MISSING:
-            body["required_idp"] = str(required_idp)
-        if preselect_idp is not utils.MISSING:
-            body["preselect_idp"] = str(preselect_idp)
-
         # Must specify exactly one of public_client or client_type
         if public_client is not utils.MISSING and client_type is not utils.MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.create_client does not take both "
                 "'public_client' and 'client_type'. These are mutually exclusive."
             )
-
         if public_client is utils.MISSING and client_type is utils.MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.create_client requires either 'public_client' or "
                 "'client_type'."
             )
-        if public_client is not utils.MISSING:
-            body["public_client"] = public_client
-        if client_type is not utils.MISSING:
-            body["client_type"] = client_type
+
+        body: dict[str, t.Any] = {
+            "name": name,
+            "visibility": visibility,
+            "required_idp": required_idp,
+            "preselect_idp": preselect_idp,
+            "public_client": public_client,
+            "client_type": client_type,
+        }
+        if not isinstance(redirect_uris, utils.MissingType):
+            body["redirect_uris"] = list(utils.safe_strseq_iter(redirect_uris))
 
         # terms_and_conditions and privacy_policy must both be set or unset
         if bool(terms_and_conditions) ^ bool(privacy_policy):
             raise exc.GlobusSDKUsageError(
                 "terms_and_conditions and privacy_policy must both be set or unset"
             )
-        links: dict[str, str] = {}
-        if not isinstance(terms_and_conditions, utils.MissingType):
-            links["terms_and_conditions"] = terms_and_conditions
-        if not isinstance(privacy_policy, utils.MissingType):
-            links["privacy_policy"] = privacy_policy
-
-        if links:
+        links: dict[str, str | utils.MissingType] = {
+            "terms_and_conditions": terms_and_conditions,
+            "privacy_policy": privacy_policy,
+        }
+        if terms_and_conditions or privacy_policy:
             body["links"] = links
 
         if not isinstance(additional_fields, utils.MissingType):
