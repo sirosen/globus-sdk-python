@@ -112,7 +112,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         :type role: str or :class:`~.GroupRole`
         """
         self.setdefault("add", []).extend(
-            {"identity_id": identity_id, "role": utils.render_enums_for_api(role)}
+            {"identity_id": identity_id, "role": role}
             for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
@@ -162,7 +162,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
         :type role: str or :class:`~.GroupRole`
         """
         self.setdefault("invite", []).extend(
-            {"identity_id": identity_id, "role": utils.render_enums_for_api(role)}
+            {"identity_id": identity_id, "role": role}
             for identity_id in utils.safe_strseq_iter(identity_ids)
         )
         return self
@@ -252,9 +252,6 @@ class GroupPolicies(utils.PayloadWrapper):
     <https://groups.api.globus.org/redoc#operation/update_policies_v2_groups__group_id__policies_put>`_
     """
 
-    def __setitem__(self, key: str, value: t.Any) -> None:
-        self.data[key] = utils.render_enums_for_api(value)
-
     def __init__(
         self,
         *,
@@ -269,10 +266,8 @@ class GroupPolicies(utils.PayloadWrapper):
     ):
         super().__init__()
         self["is_high_assurance"] = is_high_assurance
-        self["group_visibility"] = utils.render_enums_for_api(group_visibility)
-        self["group_members_visibility"] = utils.render_enums_for_api(
-            group_members_visibility
-        )
+        self["group_visibility"] = group_visibility
+        self["group_members_visibility"] = group_members_visibility
         self["join_requests"] = join_requests
-        self["signup_fields"] = utils.render_enums_for_api(signup_fields)
+        self["signup_fields"] = list(signup_fields)
         self["authentication_assurance_timeout"] = authentication_assurance_timeout
