@@ -3,9 +3,8 @@ from __future__ import annotations
 import logging
 import time
 import typing as t
-import uuid
 
-from globus_sdk import client, exc, paging, response
+from globus_sdk import client, exc, paging, response, utils
 from globus_sdk._types import DateLike, IntLike, UUIDLike
 from globus_sdk.scopes import TransferScopes
 
@@ -23,16 +22,10 @@ def _datelike_to_str(x: DateLike) -> str:
     return x if isinstance(x, str) else x.isoformat(timespec="seconds")
 
 
-def _format_filter_value(x: str | list[str]) -> str:
-    if isinstance(x, str):
-        return x
-    return ",".join(x)
-
-
 def _format_filter_item(x: str | TransferFilterDict) -> str:
     if isinstance(x, str):
         return x
-    return "/".join(f"{k}:{_format_filter_value(v)}" for k, v in x.items())
+    return "/".join(f"{k}:{utils.commajoin(v)}" for k, v in x.items())
 
 
 def _format_filter(
@@ -364,8 +357,8 @@ class TransferClient(client.BaseClient):
             query_params["filter_fulltext"] = filter_fulltext
         if filter_owner_id is not None:
             query_params["filter_owner_id"] = filter_owner_id
-        if filter_host_endpoint is not None:  # convert to str (may be UUID)
-            query_params["filter_host_endpoint"] = str(filter_host_endpoint)
+        if filter_host_endpoint is not None:
+            query_params["filter_host_endpoint"] = filter_host_endpoint
         if filter_non_functional is not None:  # convert to int (expect bool input)
             query_params["filter_non_functional"] = 1 if filter_non_functional else 0
         if limit is not None:
@@ -660,7 +653,7 @@ class TransferClient(client.BaseClient):
         if max_results is not None:
             query_params["max_results"] = str(max_results)
         if next_token is not None:
-            query_params["next_token"] = str(next_token)
+            query_params["next_token"] = next_token
         return IterableTransferResponse(
             self.get(
                 f"endpoint/{endpoint_id}/shared_endpoint_list",
@@ -2336,21 +2329,13 @@ class TransferClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         if filter_status is not None:
-            if isinstance(filter_status, str):
-                query_params["filter_status"] = filter_status
-            else:
-                query_params["filter_status"] = ",".join(filter_status)
+            query_params["filter_status"] = utils.commajoin(filter_status)
         if filter_task_id is not None:
-            if isinstance(filter_task_id, (uuid.UUID, str)):
-                query_params["filter_task_id"] = str(filter_task_id)
-            else:
-                query_params["filter_task_id"] = ",".join(
-                    [str(tid) for tid in filter_task_id]
-                )
+            query_params["filter_task_id"] = utils.commajoin(filter_task_id)
         if filter_owner_id is not None:
-            query_params["filter_owner_id"] = str(filter_owner_id)
+            query_params["filter_owner_id"] = filter_owner_id
         if filter_endpoint is not None:
-            query_params["filter_endpoint"] = str(filter_endpoint)
+            query_params["filter_endpoint"] = filter_endpoint
         if filter_is_paused is not None:
             query_params["filter_is_paused"] = filter_is_paused
         if filter_completion_time is not None:
@@ -2749,7 +2734,7 @@ class TransferClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         if filter_endpoint is not None:
-            query_params["filter_endpoint"] = str(filter_endpoint)
+            query_params["filter_endpoint"] = filter_endpoint
         return IterableTransferResponse(
             self.get("endpoint_manager/pause_rule_list", query_params=query_params)
         )
