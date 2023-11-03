@@ -65,8 +65,13 @@ def test_transfer_timer_removes_disallowed_fields():
         # even though this string is "obviously" not a valid datetime, we don't
         # translate it when we create the schedule
         ("tomorrow", "tomorrow"),
-        # use a fixed (known) timestamp and check how it's formatted
+        # use a fixed (known) timestamp and check how it's formatted as UTC
         (datetime.datetime.fromtimestamp(1698385129.7044), "2023-10-27T05:38:49+00:00"),
+        # use a non-UTC datetime and confirm that it is sent as non-UTC
+        (
+            datetime.datetime.fromisoformat("2023-10-27T05:38:49.999+01:00"),
+            "2023-10-27T05:38:49+01:00",
+        ),
     ),
 )
 def test_once_timer_schedule_formats_datetime(input_time, expected):
