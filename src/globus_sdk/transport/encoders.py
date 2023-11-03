@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 import typing as t
 import uuid
 
@@ -46,10 +47,13 @@ class RequestEncoder:
         Transforms data as follows:
 
             x: UUID -> str(x)
+            x: Enum -> x.value
             x: _    -> x
         """
         if isinstance(value, uuid.UUID):
             return str(value)
+        if isinstance(value, enum.Enum):
+            return value.value
         return value
 
     def _prepare_params(

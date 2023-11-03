@@ -8,7 +8,6 @@ import sys
 import typing as t
 import uuid
 from base64 import b64encode
-from enum import Enum
 
 from globus_sdk._types import UUIDLike
 
@@ -117,25 +116,6 @@ def safe_strseq_iter(
     else:
         for x in value:
             yield str(x)
-
-
-def render_enums_for_api(value: t.Any) -> t.Any:
-    """
-    Convert enum values to their underlying value.
-
-    :param value: The stringifiable value or values to convert.
-    :type value: str, enum member, or iterable of str or enum members
-
-    If a value is an iterable type, it will be converted to a list and the values will
-    also be converted if they are enum values.
-    """
-    # special-case: handle str and bytes because these types are technically iterable
-    # types (of bytes or str values) which could trip someone up
-    if isinstance(value, (str, bytes)):
-        return value
-    if isinstance(value, collections.abc.Iterable):
-        return [render_enums_for_api(x) for x in value]
-    return value.value if isinstance(value, Enum) else value
 
 
 def commajoin(val: UUIDLike | t.Iterable[UUIDLike]) -> str:

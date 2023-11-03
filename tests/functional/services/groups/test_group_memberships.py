@@ -1,9 +1,10 @@
 import json
+import uuid
 
 import pytest
 
 from globus_sdk import BatchMembershipActions, GroupRole
-from globus_sdk._testing import get_last_request
+from globus_sdk._testing import RegisteredResponse, get_last_request, load_response
 from tests.common import register_api_route_fixture_file
 
 
@@ -58,36 +59,29 @@ def test_add_member(groups_manager, role):
 
 
 @pytest.mark.parametrize("role", (GroupRole.admin, GroupRole.member, "member", "admin"))
-def test_batch_action_payload(role):
+def test_batch_action_payload(groups_client, role):
+    group_id = str(uuid.uuid1())
+    load_response(
+        RegisteredResponse(
+            service="groups", method="POST", path=f"/groups/{group_id}", json={}
+        )
+    )
     rolestr = role if isinstance(role, str) else role.value
 
     batch_action = (
         BatchMembershipActions()
-        .accept_invites("ae332d86-d274-11e5-b885-b31714a110e9")
+        .accept_invites(uuid.uuid1())
         .add_members(
-            [
-                "788e8a5e-da7f-11eb-9782-97fc8494b14e",
-                "79c411f0-da7f-11eb-a0e4-a3451dad6f05",
-            ],
+            [uuid.uuid1(), uuid.uuid1()],
             role=role,
         )
-        .invite_members(
-            [
-                "888e8a5e-da7f-11eb-9782-97fc8494b14e",
-                "89c411f0-da7f-11eb-a0e4-a3451dad6f05",
-            ]
-        )
-        .join(
-            [
-                "888e8a5e-da7f-11eb-9782-97fc8494b14e",
-                "89c411f0-da7f-11eb-a0e4-a3451dad6f05",
-            ]
-        )
+        .invite_members([uuid.uuid1(), uuid.uuid1()])
+        .join([uuid.uuid1(), uuid.uuid1()])
     )
 
     assert "add" in batch_action
     assert len(batch_action["add"]) == 2
-    assert all(member["role"] == rolestr for member in batch_action["add"])
+    assert all(member["role"] == role for member in batch_action["add"])
 
     assert "accept" in batch_action
     assert len(batch_action["accept"]) == 1
@@ -97,3 +91,13 @@ def test_batch_action_payload(role):
 
     assert "join" in batch_action
     assert len(batch_action["invite"]) == 2
+
+    # send the request and confirm that the data is serialized correctly
+    groups_client.batch_membership_action(group_id, batch_action)
+    req = get_last_request()
+    req_body = json.loads(req.body)
+    # role should be stringified if it was an enum member
+    assert all(member["role"] == rolestr for member in req_body["add"])
+    # UUIDs should have been stringified
+    for action in ["add", "accept", "invite", "join"]:
+        assert all(isinstance(value["identity_id"], str) for value in req_body[action])
