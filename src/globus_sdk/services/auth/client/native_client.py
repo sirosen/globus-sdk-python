@@ -181,7 +181,6 @@ class NativeAppAuthClient(AuthLoginClient):
         """
         body: dict[str, t.Any] = {
             "name": name,
-            "template_id": str(template_id),
+            "template_id": template_id,
         }
-
         return self.post("/v2/api/clients", data={"client": body})
