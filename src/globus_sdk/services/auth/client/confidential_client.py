@@ -300,12 +300,6 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         name: str,
         *,
         public_client: bool | utils.MissingType = utils.MISSING,
-        visibility: t.Literal["public", "private"] | utils.MissingType = utils.MISSING,
-        redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
-        terms_and_conditions: str | utils.MissingType = utils.MISSING,
-        privacy_policy: str | utils.MissingType = utils.MISSING,
-        required_idp: UUIDLike | utils.MissingType = utils.MISSING,
-        preselect_idp: UUIDLike | utils.MissingType = utils.MISSING,
         client_type: (
             t.Literal[
                 "client_identity",
@@ -317,6 +311,12 @@ class ConfidentialAppAuthClient(AuthLoginClient):
             ]
             | utils.MissingType
         ) = utils.MISSING,
+        visibility: t.Literal["public", "private"] | utils.MissingType = utils.MISSING,
+        redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
+        terms_and_conditions: str | utils.MissingType = utils.MISSING,
+        privacy_policy: str | utils.MissingType = utils.MISSING,
+        required_idp: UUIDLike | utils.MissingType = utils.MISSING,
+        preselect_idp: UUIDLike | utils.MissingType = utils.MISSING,
         additional_fields: dict[str, t.Any] | utils.MissingType = utils.MISSING,
     ) -> GlobusHTTPResponse:
         """
@@ -332,6 +332,39 @@ class ConfidentialAppAuthClient(AuthLoginClient):
             option is mutually exclusive with ``client_type``, exactly one must be
             given.
         :type public_client: bool, optional
+        :param client_type: Defines the type of client that will be created. This
+            option is mutually exclusive with ``public_client``, exactly one must
+            be given.
+
+            .. dropdown:: Values for ``client_type``
+
+                .. list-table::
+
+                    * - ``"confidential_client"``
+                      - Applications that are OAuth confidential clients, and can
+                        manage a client secret and requests for user consent.
+                    * - ``"public_installed_client"``
+                      - Applications that are OAuth public clients or native
+                        applications that are distributed to users, and thus cannot
+                        manage a client secret.
+                    * - ``"client_identity"``
+                      - Applications that authenticate and act as the application
+                        itself. These applications are used for automation and as
+                        service or community accounts, and do NOT act on behalf of
+                        other users. Also known as a "Service Account".
+                    * - ``"resource_server"``
+                      - An API (OAuth resource server) that uses Globus Auth tokens for
+                        authentication. Users accessing the service login via Globus and
+                        consent for the client to use your API.
+                    * - ``"globus_connect_server"``
+                      - Create a client that will service as a Globus Connect Server
+                        endpoint.
+                    * - ``"hybrid_confidential_client_resource_server"``
+                      - A client which can use any behavior with Globus Auth - an
+                        application (confidential or public client), service account,
+                        or API.
+
+        :type client_type: str, optional
         :param visibility: If set to "public", any authenticated entity can view it.
             When set to "private", only entities in the same project as the client can
             view it.
@@ -351,36 +384,6 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         :type preselect_idp: str or uuid, optional
         :param additional_fields: Any additional parameters to be passed through.
         :type additional_fields: dict, optional
-        :param client_type: Defines the type of client that will be created. This
-            option is mutually exclusive with ``public_client``, exactly one must
-            be given.
-        :type client_type: str, optional
-
-        ``client_type`` must be one of the following values:
-
-        "confidential_client": Applications that are OAuth confidential clients, and can
-        manage a client secret and requests for user consent.
-
-        "public_installed_client" : Applications that are OAuth public clients or native
-        applications that are distributed to users, and thus cannot manage a client
-        secret.
-
-        "client_identity": Applications that authenticate and act as the application
-        itself. These applications are used for automation and as service or community
-        accounts, and do NOT act on behalf of other users. Also known as a "Service
-        Account".
-
-        "resource_server":  A RESTful API (OAuth resource server) that uses Globus Auth
-        tokens for authentication. Users accessing the service login via Globus and
-        consent for the client to use your API.
-
-        "globus_connect_server": Create a client that will service as a Globus Connect
-        Server endpoint.
-
-        "hybrid_confidential_client_resource_server": Register any client with Globus
-        Auth - an application (confidential or public client), service account, or
-        service API.
-
 
         .. tab-set::
 
