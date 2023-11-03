@@ -842,7 +842,7 @@ class AuthClient(client.BaseClient):
                     :ref: auth/reference/#create_policy
         """
         body: dict[str, t.Any] = {
-            "project_id": str(project_id),
+            "project_id": project_id,
             "high_assurance": high_assurance,
             "authentication_assurance_timeout": authentication_assurance_timeout,
             "display_name": display_name,
@@ -917,11 +917,8 @@ class AuthClient(client.BaseClient):
             "description": description,
             "domain_constraints_include": domain_constraints_include,
             "domain_constraints_exclude": domain_constraints_exclude,
+            "project_id": project_id,
         }
-
-        if not isinstance(project_id, utils.MissingType):
-            body["project_id"] = str(project_id)
-
         return self.put(f"/v2/api/policies/{policy_id}", data={"policy": body})
 
     def delete_policy(self, policy_id: UUIDLike) -> GlobusHTTPResponse:
@@ -1222,47 +1219,38 @@ class AuthClient(client.BaseClient):
                 .. extdoclink:: Create Client
                     :ref: auth/reference/#create_client
         """
-        body: dict[str, t.Any] = {
-            "name": name,
-            "project": str(project),
-            "visibility": visibility,
-            "redirect_uris": redirect_uris,
-        }
-
-        if required_idp is not utils.MISSING:
-            body["required_idp"] = str(required_idp)
-        if preselect_idp is not utils.MISSING:
-            body["preselect_idp"] = str(preselect_idp)
-
         # Must specify exactly one of public_client or client_type
         if public_client is not utils.MISSING and client_type is not utils.MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.create_client does not take both "
                 "'public_client' and 'client_type'. These are mutually exclusive."
             )
-
         if public_client is utils.MISSING and client_type is utils.MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.create_client requires either 'public_client' or "
                 "'client_type'."
             )
-        if public_client is not utils.MISSING:
-            body["public_client"] = public_client
-        if client_type is not utils.MISSING:
-            body["client_type"] = client_type
 
+        body: dict[str, t.Any] = {
+            "name": name,
+            "project": project,
+            "visibility": visibility,
+            "redirect_uris": redirect_uris,
+            "required_idp": required_idp,
+            "preselect_idp": preselect_idp,
+            "public_client": public_client,
+            "client_type": client_type,
+        }
         # terms_and_conditions and privacy_policy must both be set or unset
         if bool(terms_and_conditions) ^ bool(privacy_policy):
             raise exc.GlobusSDKUsageError(
                 "terms_and_conditions and privacy_policy must both be set or unset"
             )
-        links: dict[str, str] = {}
-        if not isinstance(terms_and_conditions, utils.MissingType):
-            links["terms_and_conditions"] = terms_and_conditions
-        if not isinstance(privacy_policy, utils.MissingType):
-            links["privacy_policy"] = privacy_policy
-
-        if links:
+        links: dict[str, str | utils.MissingType] = {
+            "terms_and_conditions": terms_and_conditions,
+            "privacy_policy": privacy_policy,
+        }
+        if terms_and_conditions or privacy_policy:
             body["links"] = links
 
         if not isinstance(additional_fields, utils.MissingType):
@@ -1342,26 +1330,27 @@ class AuthClient(client.BaseClient):
             "name": name,
             "visibility": visibility,
             "redirect_uris": redirect_uris,
+            "required_idp": required_idp,
+            "preselect_idp": preselect_idp,
         }
 
-        if required_idp is not utils.MISSING:
-            body["required_idp"] = str(required_idp)
-        if preselect_idp is not utils.MISSING:
-            body["preselect_idp"] = str(preselect_idp)
-
-        # terms_and_conditions and privacy_policy must both be set or unset
+        # terms_and_conditions and privacy_policy must both be set or unset, and if one
+        # is set to `None` they both must be set to `None`
+        # note the subtle differences between this logic for "update" and the matching
+        # logic for "create"
+        # "create" does not need to handle `None` as a distinct and meaningful value
         if type(terms_and_conditions) is not type(privacy_policy):
             raise exc.GlobusSDKUsageError(
                 "terms_and_conditions and privacy_policy must both be set or unset"
             )
-
-        links: dict[str, str | None] = {}
-        if not isinstance(terms_and_conditions, utils.MissingType):
-            links["terms_and_conditions"] = terms_and_conditions
-        if not isinstance(privacy_policy, utils.MissingType):
-            links["privacy_policy"] = privacy_policy
-
-        if links:
+        links: dict[str, str | None | utils.MissingType] = {
+            "terms_and_conditions": terms_and_conditions,
+            "privacy_policy": privacy_policy,
+        }
+        if (
+            terms_and_conditions is not utils.MISSING
+            or privacy_policy is not utils.MISSING
+        ):
             body["links"] = links
 
         if not isinstance(additional_fields, utils.MissingType):
