@@ -71,7 +71,7 @@ OAuth2 Flow Managers
 These objects represent in-progress OAuth2 authentication flows.
 Most typically, you should not use these objects directly, but rather rely on the
 :class:`NativeAppAuthClient` or :class:`ConfidentialAppAuthClient` objects
-to manage one of these for you through their ``oauth2_*`` methods.
+to manage these for you through their ``oauth2_*`` methods.
 
 All Flow Managers inherit from the
 :class:`GlobusOAuthFlowManager \
