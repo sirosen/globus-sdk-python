@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
+import pathlib
 import typing as t
 
 log = logging.getLogger(__name__)
@@ -17,16 +18,6 @@ T = t.TypeVar("T")
 ENVNAME_VAR = "GLOBUS_SDK_ENVIRONMENT"
 HTTP_TIMEOUT_VAR = "GLOBUS_SDK_HTTP_TIMEOUT"
 SSL_VERIFY_VAR = "GLOBUS_SDK_VERIFY_SSL"
-
-
-def _str2bool(val: str) -> bool:
-    val = val.lower()
-    if val in ("y", "yes", "t", "true", "on", "1"):
-        return True
-    elif val in ("n", "no", "f", "false", "off", "0"):
-        return False
-    else:
-        raise ValueError(f"invalid truth value: {val}")
 
 
 @t.overload
@@ -70,12 +61,28 @@ def _load_var(
     return value
 
 
-def _bool_cast(value: t.Any, default: t.Any) -> bool:  # pylint: disable=unused-argument
+def _ssl_verify_cast(
+    value: t.Any, default: t.Any  # pylint: disable=unused-argument
+) -> bool | str:
     if isinstance(value, bool):
         return value
-    elif not isinstance(value, str):
-        raise ValueError(f"cannot cast value {value} of type {type(value)} to bool")
-    return _str2bool(value)
+    if not isinstance(value, (str, pathlib.Path)):
+        msg = f"Value {value} of type {type(value)} cannot be used for SSL verification"
+        raise ValueError(msg)
+    if isinstance(value, str):
+        if value.lower() in {"y", "yes", "t", "true", "on", "1"}:
+            return True
+        if value.lower() in {"n", "no", "f", "false", "off", "0"}:
+            return False
+        if os.path.isfile(value):
+            return value
+    if isinstance(value, pathlib.Path):
+        if value.is_file():
+            return str(value.absolute())
+    raise ValueError(
+        f"SSL verification {value} is not a valid boolean value "
+        "nor a path to a file that exists"
+    )
 
 
 def _optfloat_cast(value: t.Any, default: t.Any) -> float | None:
@@ -93,8 +100,10 @@ def get_environment_name(inputenv: str | None = None) -> str:
     return _load_var(ENVNAME_VAR, "production", explicit_value=inputenv)
 
 
-def get_ssl_verify(value: bool | None = None) -> bool:
-    return _load_var(SSL_VERIFY_VAR, True, explicit_value=value, convert=_bool_cast)
+def get_ssl_verify(value: bool | str | pathlib.Path | None = None) -> bool | str:
+    return _load_var(
+        SSL_VERIFY_VAR, default=True, explicit_value=value, convert=_ssl_verify_cast
+    )
 
 
 def get_http_timeout(value: float | None = None) -> float | None:
