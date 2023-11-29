@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import logging
+import pathlib
 import random
 import time
 import typing as t
@@ -64,11 +65,9 @@ class RequestsTransport:
     If the maximum number of retries is reached, the final response or exception will
     be returned or raised.
 
-    :param verify_ssl: Explicitly enable or disable SSL verification. This parameter
-        defaults to True, but can be set via the ``GLOBUS_SDK_VERIFY_SSL`` environment
-        variable. Any non-``None`` setting via this parameter takes precedence over the
-        environment variable.
-    :type verify_ssl: bool, optional
+    :param verify_ssl: Explicitly enable or disable SSL verification,
+        or configure the path to a CA certificate bundle to use for SSL verification
+    :type verify_ssl: bool, str, or pathlib.Path, optional
     :param http_timeout: Explicitly set an HTTP timeout value in seconds. This parameter
         defaults to 60s but can be set via the ``GLOBUS_SDK_HTTP_TIMEOUT`` environment
         variable. Any value set via this parameter takes precedence over the environment
@@ -110,7 +109,7 @@ class RequestsTransport:
 
     def __init__(
         self,
-        verify_ssl: bool | None = None,
+        verify_ssl: bool | str | pathlib.Path | None = None,
         http_timeout: float | None = None,
         retry_backoff: t.Callable[[RetryContext], float] = _exponential_backoff,
         retry_checks: list[RetryCheck] | None = None,
@@ -148,7 +147,7 @@ class RequestsTransport:
     def tune(
         self,
         *,
-        verify_ssl: bool | None = None,
+        verify_ssl: bool | str | pathlib.Path | None = None,
         http_timeout: float | None = None,
         retry_backoff: t.Callable[[RetryContext], float] | None = None,
         max_sleep: float | int | None = None,
@@ -162,8 +161,9 @@ class RequestsTransport:
         In particular, this can be used to temporarily adjust request-sending minutiae
         like the ``http_timeout`` used.
 
-        :param verify_ssl: Explicitly enable or disable SSL verification
-        :type verify_ssl: bool, optional
+        :param verify_ssl: Explicitly enable or disable SSL verification,
+            or configure the path to a CA certificate bundle to use for SSL verification
+        :type verify_ssl: bool, str, or pathlib.Path, optional
         :param http_timeout: Explicitly set an HTTP timeout value in seconds
         :type http_timeout: float, optional
         :param retry_backoff: A function which determines how long to sleep between
@@ -201,7 +201,10 @@ class RequestsTransport:
             self.max_retries,
         )
         if verify_ssl is not None:
-            self.verify_ssl = verify_ssl
+            if isinstance(verify_ssl, bool):
+                self.verify_ssl = verify_ssl
+            else:
+                self.verify_ssl = str(verify_ssl)
         if http_timeout is not None:
             self.http_timeout = http_timeout
         if retry_backoff is not None:

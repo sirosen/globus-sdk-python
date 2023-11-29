@@ -1,0 +1,2 @@
+This file exists to ensure that custom CA bundle files can be used.
+You can find references to this file by name in the test suite.

@@ -1,4 +1,5 @@
 import os
+import pathlib
 from unittest import mock
 
 import pytest
@@ -36,25 +37,48 @@ def test_get_service_url():
         globus_sdk.config.get_service_url("auth", environment="nonexistent")
 
 
+ca_bundle_file = pathlib.Path(__file__).parent.absolute() / "CA-Bundle.cert"
+ca_bundle_directory = pathlib.Path(__file__).parent.absolute()
+ca_bundle_non_existent = pathlib.Path(__file__).parent.absolute() / "bogus.bogus"
+
+
 @pytest.mark.parametrize(
     "value, expected_result",
-    [(x, True) for x in [str(True), "1", "YES", "true", "t", "True", "ON"]]
-    + [(x, False) for x in [str(False), "0", "NO", "false", "f", "False", "OFF"]]
-    + [(x, ValueError) for x in ["invalid", "1.0", "0.0"]],  # type: ignore
+    [(x, True) for x in ["1", "YES", "true", "t", "True", "ON"]]
+    + [(x, False) for x in ["0", "NO", "false", "f", "False", "OFF"]]
+    + [(str(ca_bundle_file), str(ca_bundle_file))]
+    + [
+        ("invalid", ValueError),
+        ("1.0", ValueError),
+        ("0.0", ValueError),
+        (str(ca_bundle_directory), ValueError),
+        (str(ca_bundle_non_existent), ValueError),
+    ],
 )
 def test_get_ssl_verify(value, expected_result, monkeypatch):
     """
     Confirms bool cast returns correct bools from sets of string values
     """
     monkeypatch.setenv("GLOBUS_SDK_VERIFY_SSL", value)
-    if isinstance(expected_result, bool):
+    if expected_result is not ValueError:
         assert globus_sdk.config.get_ssl_verify() == expected_result
     else:
         with pytest.raises(expected_result):
             globus_sdk.config.get_ssl_verify()
 
 
-@pytest.mark.parametrize("value", ["invalid", 1.0, object()])
+@pytest.mark.parametrize(
+    "value",
+    [
+        "invalid",
+        1.0,
+        object(),
+        ca_bundle_directory,
+        str(ca_bundle_directory),
+        ca_bundle_non_existent,
+        str(ca_bundle_non_existent),
+    ],
+)
 def test_get_ssl_verify_rejects_bad_explicit_value(value, monkeypatch):
     monkeypatch.delenv("GLOBUS_SDK_VERIFY_SSL", raising=False)
     with pytest.raises(ValueError):
@@ -66,9 +90,16 @@ def test_get_ssl_verify_with_explicit_value():
         os.environ["GLOBUS_SDK_VERIFY_SSL"] = "false"
         assert globus_sdk.config.get_ssl_verify(True) is True
         assert globus_sdk.config.get_ssl_verify(False) is False
+        assert globus_sdk.config.get_ssl_verify(ca_bundle_file) == str(ca_bundle_file)
+        assert globus_sdk.config.get_ssl_verify(str(ca_bundle_file)) == str(
+            ca_bundle_file
+        )
         os.environ["GLOBUS_SDK_VERIFY_SSL"] = "on"
         assert globus_sdk.config.get_ssl_verify(True) is True
         assert globus_sdk.config.get_ssl_verify(False) is False
+        assert globus_sdk.config.get_ssl_verify(str(ca_bundle_file)) == str(
+            ca_bundle_file
+        )
 
 
 @pytest.mark.parametrize(

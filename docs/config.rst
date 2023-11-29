@@ -23,9 +23,11 @@ created with ``verify_ssl=True``, the resulting client will have SSL
 verification turned on.
 
 ``GLOBUS_SDK_VERIFY_SSL``
-    Used to disable SSL verification, typically to handle SSL-intercepting
-    firewalls. By default, all connections to servers are verified. Set
-    ``GLOBUS_SDK_VERIFY_SSL="false"`` to disable verification.
+    Used to configure SSL/TLS verification, typically to handle SSL/TLS-intercepting firewalls.
+    By default, all connections to servers are verified.
+    Set ``GLOBUS_SDK_VERIFY_SSL="false"`` to disable verification,
+    or set ``GLOBUS_SDK_VERIFY_SSL="/path/to/ca-bundle.cert"``
+    to use an alternate certificate authority bundle file.
 
 ``GLOBUS_SDK_HTTP_TIMEOUT``
     Adjust the timeout when HTTP requests are made. By default, requests have a
