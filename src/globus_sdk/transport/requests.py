@@ -65,11 +65,9 @@ class RequestsTransport:
     If the maximum number of retries is reached, the final response or exception will
     be returned or raised.
 
-    :param verify_ssl: Explicitly enable or disable SSL verification. This parameter
-        defaults to True, but can be set via the ``GLOBUS_SDK_VERIFY_SSL`` environment
-        variable. Any non-``None`` setting via this parameter takes precedence over the
-        environment variable.
-    :type verify_ssl: bool, optional
+    :param verify_ssl: Explicitly enable or disable SSL verification,
+        or configure the path to a CA certificate bundle to use for SSL verification
+    :type verify_ssl: bool, str, or pathlib.Path, optional
     :param http_timeout: Explicitly set an HTTP timeout value in seconds. This parameter
         defaults to 60s but can be set via the ``GLOBUS_SDK_HTTP_TIMEOUT`` environment
         variable. Any value set via this parameter takes precedence over the environment
