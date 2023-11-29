@@ -76,9 +76,8 @@ def _ssl_verify_cast(
             return False
         if os.path.isfile(value):
             return value
-    if isinstance(value, pathlib.Path):
-        if value.is_file():
-            return str(value.absolute())
+    if isinstance(value, pathlib.Path) and value.is_file():
+        return str(value.absolute())
     raise ValueError(
         "SSL verification value must be a valid boolean value "
         f"or a path to a file that exists (got {value})"
