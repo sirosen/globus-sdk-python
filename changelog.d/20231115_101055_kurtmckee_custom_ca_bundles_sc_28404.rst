@@ -1,7 +1,7 @@
 Added
 ~~~~~
 
-- Support custom CA certificate bundles. (:pr:`NUMBER`)
+- Support custom CA certificate bundles. (:pr:`903`)
 
   Previously, SSL/TLS verification allowed only a boolean ``True`` or ``False`` value.
   It is now possible to specify a CA certificate bundle file
