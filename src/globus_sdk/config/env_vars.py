@@ -80,8 +80,8 @@ def _ssl_verify_cast(
         if value.is_file():
             return str(value.absolute())
     raise ValueError(
-        f"SSL verification {value} is not a valid boolean value "
-        "nor a path to a file that exists"
+        "SSL verification value must be a valid boolean value "
+        f"or a path to a file that exists (got {value})"
     )
 
 
