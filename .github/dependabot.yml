@@ -8,3 +8,11 @@ updates:
       github-actions:
         patterns:
           - "*"
+
+  # Prevent updates of requirements files used only for testing.
+  - package-ecosystem: "pip"
+    directory: "/requirements/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
