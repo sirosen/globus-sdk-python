@@ -144,6 +144,7 @@ def test_scope_parsing_catches_and_rejects_cycles(scopestring):
         Scope.parse(scopestring)
 
 
+@pytest.mark.flaky
 def test_scope_parsing_catches_and_rejects_very_large_cycles_quickly():
     """
     WARNING: this test is hardware speed dependent and could fail on slow systems.
