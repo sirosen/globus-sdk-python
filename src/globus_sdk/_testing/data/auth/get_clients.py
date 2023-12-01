@@ -19,7 +19,7 @@ FOO_CLIENT = {
     "userinfo_from_effective_identity": True,
     "preselect_idp": None,
     "public_client": False,
-}  # type: ignore [var-annotated]
+}
 
 BAR_CLIENT = {
     "required_idp": None,
@@ -38,7 +38,7 @@ BAR_CLIENT = {
     "userinfo_from_effective_identity": True,
     "preselect_idp": None,
     "public_client": False,
-}  # type: ignore [var-annotated]
+}
 
 RESPONSES = ResponseSet(
     default=RegisteredResponse(

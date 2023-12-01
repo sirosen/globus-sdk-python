@@ -26,7 +26,7 @@ def get_last_request(
         last_call = calls[-1]
     except IndexError:
         return None
-    return t.cast(requests.PreparedRequest, last_call.request)
+    return last_call.request
 
 
 @t.overload

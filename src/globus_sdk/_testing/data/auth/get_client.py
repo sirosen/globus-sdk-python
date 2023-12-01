@@ -21,7 +21,7 @@ CLIENT = {
     "userinfo_from_effective_identity": True,
     "preselect_idp": None,
     "public_client": False,
-}  # type: ignore [var-annotated]
+}
 
 RESPONSES = ResponseSet(
     default=RegisteredResponse(
