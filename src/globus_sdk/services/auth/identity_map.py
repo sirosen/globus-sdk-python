@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t
 import uuid
 
-from .client import AuthClient
+from .client import AuthClient, ConfidentialAppAuthClient
 
 
 def is_username(val: str) -> bool:
@@ -114,7 +114,8 @@ class IdentityMap:
         username = record["username"] if record is not None else "NO_SUCH_IDENTITY"
 
     :param auth_client: The client object which will be used for lookups against Globus Auth
-    :type auth_client: :class:`AuthClient <globus_sdk.AuthClient>`
+    :type auth_client: :class:`AuthClient <globus_sdk.AuthClient>` or
+        :class:`ConfidentialAppAuthClient <globus_sdk.ConfidentialAppAuthClient>`
     :param identity_ids: A list or other iterable of usernames or identity IDs (potentially
         mixed together) which will be used to seed the ``IdentityMap`` 's tracking of
         unresolved Identities.
@@ -135,7 +136,7 @@ class IdentityMap:
 
     def __init__(
         self,
-        auth_client: AuthClient,
+        auth_client: AuthClient | ConfidentialAppAuthClient,
         identity_ids: t.Iterable[str] | None = None,
         *,
         id_batch_size: int | None = None,
