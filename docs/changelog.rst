@@ -12,6 +12,29 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.33.0:
+
+v3.33.0 (2023-12-04)
+--------------------
+
+Added
+~~~~~
+
+- Support custom CA certificate bundles. (:pr:`903`)
+
+  Previously, SSL/TLS verification allowed only a boolean ``True`` or ``False`` value.
+  It is now possible to specify a CA certificate bundle file
+  using the existing ``verify_ssl`` parameter
+  or ``GLOBUS_SDK_VERIFY_SSL`` environment variable.
+
+  This may be useful for interacting with Globus through certain proxy firewalls.
+
+Fixed
+~~~~~
+
+- Fix the type annotation for ``globus_sdk.IdentityMap`` init,
+  which incorrectly rejected ``ConfidentialAppAuthClient``. (:pr:`912`)
+
 .. _changelog-3.32.0:
 
 v3.32.0 (2023-11-09)
