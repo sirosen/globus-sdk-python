@@ -12,6 +12,16 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.33.0.post0:
+
+v3.33.0.post0 (2023-12-05)
+--------------------------
+
+Documentation
+~~~~~~~~~~~~~
+
+- Remove references to the Tutorial Endpoints from documentation. (:pr:`915`)
+
 .. _changelog-3.33.0:
 
 v3.33.0 (2023-12-04)
