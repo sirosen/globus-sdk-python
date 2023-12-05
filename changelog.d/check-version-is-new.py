@@ -33,7 +33,7 @@ def get_header_re(version):
 
 def changelog_has_version(version):
     pattern = get_header_re(version)
-    with open(os.path.join(REPO_ROOT, "docs", "changelog.rst")) as f:
+    with open(os.path.join(REPO_ROOT, "changelog.rst")) as f:
         return bool(re.search(pattern, f.read(), flags=re.MULTILINE))
 
 

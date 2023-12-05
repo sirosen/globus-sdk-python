@@ -28,7 +28,7 @@ $EDITOR changelog.rst
 ```
 
 - Add changed files;
-    `git add changelog.d/ docs/changelog.rst src/globus_sdk/version.py`
+    `git add changelog.d/ changelog.rst src/globus_sdk/version.py`
 
 - Commit; `git commit -m 'Bump version and changelog for release'`
 
