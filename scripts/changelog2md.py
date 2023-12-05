@@ -16,7 +16,7 @@ import re
 import typing as t
 
 REPO_ROOT = pathlib.Path(__file__).parent.parent
-CHANGELOG_PATH = REPO_ROOT / "docs" / "changelog.rst"
+CHANGELOG_PATH = REPO_ROOT / "changelog.rst"
 
 CHANGELOG_ANCHOR_PATTERN = re.compile(r"^\.\. _changelog-\d+\.\d+\.\d+:$", re.MULTILINE)
 CHANGELOG_HEADER_PATTERN = re.compile(r"^v(\d+\.\d+\.\d+).*$", re.MULTILINE)
