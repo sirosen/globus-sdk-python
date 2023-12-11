@@ -236,6 +236,10 @@ class MappedCollectionDocument(CollectionDocument):
         guest collections
     :type sharing_users_deny: iterable of str, optional
 
+    :param delete_protected: Enable or disable deletion protection on this collection.
+        Defaults to ``True`` during creation.
+    :type delete_protected: bool, optional
+
     :param allow_guest_collections: Enable or disable creation and use of Guest
         Collections on this Mapped Collection
     :type allow_guest_collections: bool, optional
@@ -292,6 +296,7 @@ class MappedCollectionDocument(CollectionDocument):
         sharing_users_deny: t.Iterable[str] | None = None,
         sharing_restrict_paths: dict[str, t.Any] | None = None,
         # bools
+        delete_protected: bool | None = None,
         allow_guest_collections: bool | None = None,
         disable_anonymous_writes: bool | None = None,
         # dicts
@@ -337,6 +342,7 @@ class MappedCollectionDocument(CollectionDocument):
             sharing_users_deny=sharing_users_deny,
         )
         self._set_optbools(
+            delete_protected=delete_protected,
             allow_guest_collections=allow_guest_collections,
             disable_anonymous_writes=disable_anonymous_writes,
         )
