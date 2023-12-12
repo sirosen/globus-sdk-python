@@ -1,3 +1,4 @@
+import inspect
 import uuid
 
 import pytest
@@ -14,6 +15,10 @@ from globus_sdk import (
 STUB_SG_ID = uuid.uuid1()  # storage gateway
 STUB_MC_ID = uuid.uuid1()  # mapped collection
 STUB_UC_ID = uuid.uuid1()  # user credential
+
+
+MappedCollectionSignature = inspect.signature(MappedCollectionDocument)
+GuestCollectionSignature = inspect.signature(GuestCollectionDocument)
 
 
 def test_collection_base_abstract():
@@ -66,6 +71,17 @@ def test_datatype_version_deduction(use_kwargs, doc_version):
         ({"disable_anonymous_writes": True}, "1.5.0"),
         ({"disable_anonymous_writes": False}, "1.5.0"),
         ({"guest_auth_policy_id": str(uuid.uuid4())}, "1.6.0"),
+        ({"delete_protected": False}, "1.8.0"),
+        # combining a long user_message (which uses callback-based detection) with
+        # higher and lower bounding fields needs to apply correctly
+        (
+            {"force_verify": False, "user_message": "long message..." + "x" * 100},
+            "1.7.0",
+        ),
+        (
+            {"delete_protected": False, "user_message": "long message..." + "x" * 100},
+            "1.8.0",
+        ),
     ],
 )
 def test_datatype_version_deduction_mapped_specific_fields(use_kwargs, doc_version):
@@ -153,3 +169,57 @@ def test_collection_policies_field(policies_type):
         }
     else:
         raise NotImplementedError
+
+
+# these test cases enumerate parameters for Guest Collections and Mapped Collections
+# and ensure that they're defined on one class but not the other
+@pytest.mark.parametrize(
+    "fieldname",
+    (
+        "allow_guest_collections",
+        "delete_protected",
+        "disable_anonymous_writes",
+        "domain_name",
+        "guest_auth_policy_id",
+        "policies",
+        "sharing_restrict_paths",
+        "sharing_users_allow",
+        "sharing_users_deny",
+        "storage_gateway_id",
+    ),
+)
+def test_settings_which_are_only_supported_in_mapped_collections(fieldname):
+    assert fieldname in MappedCollectionSignature.parameters
+    assert fieldname not in GuestCollectionSignature.parameters
+
+
+@pytest.mark.parametrize(
+    "fieldname",
+    (
+        "mapped_collection_id",
+        "user_credential_id",
+    ),
+)
+def test_settings_which_are_only_supported_in_guest_collections(fieldname):
+    assert fieldname in GuestCollectionSignature.parameters
+    assert fieldname not in MappedCollectionSignature.parameters
+
+
+@pytest.mark.parametrize(
+    "fieldname",
+    (
+        "allow_guest_collections",
+        "delete_protected",
+        "disable_anonymous_writes",
+    ),
+)
+@pytest.mark.parametrize("value", (True, False, None))
+def test_mapped_collection_opt_bool(fieldname, value):
+    doc = MappedCollectionDocument(
+        storage_gateway_id=STUB_SG_ID, collection_base_path="/", **{fieldname: value}
+    )
+    if value is not None:
+        assert fieldname in doc
+        assert doc[fieldname] == value
+    else:
+        assert fieldname not in doc
