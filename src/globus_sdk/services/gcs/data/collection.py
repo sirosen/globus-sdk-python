@@ -126,6 +126,7 @@ class CollectionDocument(utils.PayloadWrapper, abc.ABC):
 
     DATATYPE_BASE: str = "collection"
     DATATYPE_VERSION_IMPLICATIONS: dict[str, tuple[int, int, int]] = {
+        "delete_protected": (1, 8, 0),
         "guest_auth_policy_id": (1, 6, 0),
         "disable_anonymous_writes": (1, 5, 0),
         "force_verify": (1, 4, 0),

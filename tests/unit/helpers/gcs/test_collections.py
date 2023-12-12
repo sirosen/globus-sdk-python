@@ -71,6 +71,17 @@ def test_datatype_version_deduction(use_kwargs, doc_version):
         ({"disable_anonymous_writes": True}, "1.5.0"),
         ({"disable_anonymous_writes": False}, "1.5.0"),
         ({"guest_auth_policy_id": str(uuid.uuid4())}, "1.6.0"),
+        ({"delete_protected": False}, "1.8.0"),
+        # combining a long user_message (which uses callback-based detection) with
+        # higher and lower bounding fields needs to apply correctly
+        (
+            {"force_verify": False, "user_message": "long message..." + "x" * 100},
+            "1.7.0",
+        ),
+        (
+            {"delete_protected": False, "user_message": "long message..." + "x" * 100},
+            "1.8.0",
+        ),
     ],
 )
 def test_datatype_version_deduction_mapped_specific_fields(use_kwargs, doc_version):
