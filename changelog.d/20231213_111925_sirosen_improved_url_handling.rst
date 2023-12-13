@@ -1,7 +1,7 @@
 Changed
 ~~~~~~~
 
-- Minor improvements to handling of paths and URLs. (:pr:`NUMBER`)
+- Minor improvements to handling of paths and URLs. (:pr:`922`)
 
   - Request paths which start with the ``base_path`` of a client are now
     normalized to avoid duplicating the ``base_path``.
