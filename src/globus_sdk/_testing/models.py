@@ -31,6 +31,10 @@ class RegisteredResponse:
         "timer": "https://timer.automate.globus.org/",
         "flows": "https://flows.automate.globus.org/",
     }
+    _base_path_map = {
+        "transfer": "/v0.10/",
+        "groups": "/v2/",
+    }
 
     def __init__(
         self,
@@ -45,11 +49,20 @@ class RegisteredResponse:
         **kwargs: t.Any,
     ) -> None:
         self.service = service
-        self.path = path
+
         if service:
+            # strip base_paths to match the behavior of clients
+            # this allows a registered response to use a path like `/v2/groups` with
+            # the GroupsClient, rather than *requiring* that it use `/groups`
+            base_path = self._base_path_map.get(service)
+            if base_path and path.startswith(base_path):
+                path = path[len(base_path) :]
+
             self.full_url = slash_join(self._url_map[service], path)
         else:
             self.full_url = path
+
+        self.path = path
 
         # convert the method to uppercase so that specifying `method="post"` will match
         # correctly -- method matching is case sensitive but we don't need to expose the

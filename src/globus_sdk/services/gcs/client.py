@@ -50,11 +50,14 @@ class GCSClient(client.BaseClient):
         transport_params: dict[str, t.Any] | None = None,
     ):
         # check if the provided address was a DNS name or an HTTPS URL
-        # if it was a URL, do not modify, but if it's a DNS name format it accordingly
-        # as a heuristic for this: just check if string starts with "https://" (this is
-        # sufficient to distinguish between the two for valid inputs)
         if not gcs_address.startswith("https://"):
+            # if it's a DNS name format it accordingly
             gcs_address = f"https://{gcs_address}/api/"
+        # if it was an HTTPS URL, check that it ends with /api/
+        elif not gcs_address.endswith(("/api/", "/api")):
+            # if it doesn't, add it
+            gcs_address = utils.slash_join(gcs_address, "/api/")
+
         super().__init__(
             base_url=gcs_address,
             environment=environment,

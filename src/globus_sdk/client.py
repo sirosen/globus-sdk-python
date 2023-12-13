@@ -296,6 +296,11 @@ class BaseClient:
         if path.startswith("https://") or path.startswith("http://"):
             url = path
         else:
+            # if passed a path which has a prefix matching the base_path, strip it
+            # this means that if a client has a base path of `/v1/`, a request for
+            # `/v1/foo` will hit `/v1/foo` rather than `/v1/v1/foo`
+            if path.startswith(self.base_path):
+                path = path[len(self.base_path) :]
             url = utils.slash_join(self.base_url, urllib.parse.quote(path))
 
         # make the request
