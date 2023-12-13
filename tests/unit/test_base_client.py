@@ -182,3 +182,30 @@ def test_access_resource_server_property_via_class(base_client_class):
         base_client_class.resource_server
         == globus_sdk.scopes.TransferScopes.resource_server
     )
+
+
+@pytest.mark.parametrize("leading_slash", (True, False))
+@pytest.mark.parametrize("test_fixture_uses_base_path", (True, False))
+def test_base_path_matching_prefix(
+    base_client, leading_slash, test_fixture_uses_base_path
+):
+    # self-check/sanity check
+    base_path = base_client.base_path
+    assert base_path == "/v0.10/"
+
+    # construct the path and confirm it (sanity check)
+    req_path = f"{base_client.base_path}foo"
+    if not leading_slash:
+        req_path.lstrip("/")
+
+    # register a response under the target path
+    # this is parametrized so that we are also testing the matching of our
+    # test fixtures against the same path construction
+    test_fixture_path = f"{base_path}foo" if test_fixture_uses_base_path else "foo"
+    RegisteredResponse(
+        service="transfer", path=test_fixture_path, json={"x": "y"}
+    ).add()
+
+    # confirm that a "GET" works
+    res = base_client.get(req_path)
+    assert res["x"] == "y"
