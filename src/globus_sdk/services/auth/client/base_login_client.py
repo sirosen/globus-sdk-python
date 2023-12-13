@@ -266,19 +266,10 @@ class AuthLoginClient(client.BaseClient):
         body_params: dict[str, t.Any] | None = None,
     ) -> GlobusHTTPResponse:
         """
-        Validate a token. It can be an Access Token or a Refresh token.
-
-        This call can be used to check tokens issued to your client,
-        confirming that they are or are not still valid. The resulting response
-        has the form ``{"active": True}`` when the token is valid, and
-        ``{"active": False}`` when it is not.
-
-        It is not necessary to validate tokens immediately after receiving them
-        from the service -- any tokens which you are issued will be valid at
-        that time. This is more for the purpose of doing checks like
-
-        - confirm that ``oauth2_revoke_token`` succeeded
-        - at application boot, confirm no need to do fresh login
+        Deprecated. Because the validity of a token may be dependent on policies
+        enforced both by Globus Auth and the resource server, this method is not
+        considered a reliable way to check token validity.
+        Users are encouraged to treat tokens as valid until proven otherwise instead.
 
         :param token: The token which should be validated. Can be a refresh token or an
             access token
@@ -286,31 +277,13 @@ class AuthLoginClient(client.BaseClient):
         :param body_params: Additional parameters to include in the validation
             body. Primarily for internal use
         :type body_params: dict, optional
-
-        **Examples**
-
-        Revoke a token and confirm that it is no longer active:
-
-        >>> from globus_sdk import ConfidentialAppAuthClient
-        >>> ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
-        >>> ac.oauth2_revoke_token('<token_string>')
-        >>> data = ac.oauth2_validate_token('<token_string>')
-        >>> assert not data['active']
-
-        During application boot, check if the user needs to do a login, even
-        if a token is present:
-
-        >>> from globus_sdk import ConfidentialAppAuthClient
-        >>> ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
-        >>> # this is not an SDK function, but a hypothetical function which
-        >>> # you use to load a token out of configuration data
-        >>> tok = load_token_from_config(...)
-        >>>
-        >>> if not tok or not ac.oauth2_validate_token(tok)['active']:
-        >>>     # do_new_login() is another hypothetical helper
-        >>>     tok = do_new_login()
-        >>> # at this point, tok is expected to be a valid token
         """
+        exc.warn_deprecated(
+            f"{self.__class__.__name__}.oauth2_validate_token() is deprecated. "
+            "This validation method gives non-definitive results. "
+            "Tokens should be treated as valid until they are used and their "
+            "validity can be assessed."
+        )
         log.info("Validating token")
         body = {"token": token}
 
