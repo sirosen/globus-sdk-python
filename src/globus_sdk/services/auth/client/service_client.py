@@ -778,12 +778,12 @@ class AuthClient(client.BaseClient):
 
     def create_policy(
         self,
+        *,
         project_id: UUIDLike,
-        high_assurance: bool,
-        authentication_assurance_timeout: int,
         display_name: str,
         description: str,
-        *,
+        high_assurance: bool | utils.MissingType = utils.MISSING,
+        authentication_assurance_timeout: int | utils.MissingType = utils.MISSING,
         domain_constraints_include: (
             t.Iterable[str] | None | utils.MissingType
         ) = utils.MISSING,

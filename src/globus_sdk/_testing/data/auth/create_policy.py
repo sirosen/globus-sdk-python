@@ -7,8 +7,6 @@ from globus_sdk._testing.models import RegisteredResponse, ResponseSet
 
 POLICY_REQUEST_ARGS = {
     "project_id": str(uuid.uuid1()),
-    "high_assurance": False,
-    "authentication_assurance_timeout": 35,
     "display_name": "Policy of Foo",
     "description": "Controls access to Foo",
 }
@@ -69,7 +67,9 @@ RESPONSES = ResponseSet(
     default=register_response({}),
     project_id_str=register_response({"project_id": str(uuid.uuid1())}),
     project_id_uuid=register_response({"project_id": uuid.uuid1()}),
-    high_assurance=register_response({"high_assurance": True}),
+    high_assurance=register_response(
+        {"high_assurance": True, "authentication_assurance_timeout": 35}
+    ),
     not_high_assurance=register_response({"high_assurance": False}),
     authentication_assurance_timeout=register_response(
         {"authentication_assurance_timeout": 23}
