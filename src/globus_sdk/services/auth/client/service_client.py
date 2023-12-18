@@ -26,11 +26,41 @@ from ..response import (
 )
 
 if sys.version_info >= (3, 8):
-    from typing import Literal
+    from typing import Literal, Protocol
 else:
-    from typing_extensions import Literal
+    from typing_extensions import Literal, Protocol
 
 log = logging.getLogger(__name__)
+
+
+# this protocol definition exists in order to allow us to coerce the type of
+# AuthClient.create_policy under type checkers to the "correct" type
+# (in which the required keyword arguments are required)
+# while also maintaining a backwards-compatible implementation which uses
+# positional arg unpacking to match the past valid call signatures
+class _CreatePolicyCallable(Protocol):
+    def __call__(
+        self,
+        *,
+        project_id: UUIDLike,
+        display_name: str,
+        description: str,
+        high_assurance: bool | utils.MissingType = utils.MISSING,
+        authentication_assurance_timeout: int | utils.MissingType = utils.MISSING,
+        domain_constraints_include: (
+            t.Iterable[str] | None | utils.MissingType
+        ) = utils.MISSING,
+        domain_constraints_exclude: (
+            t.Iterable[str] | None | utils.MissingType
+        ) = utils.MISSING,
+    ) -> GlobusHTTPResponse:
+        ...
+
+
+def _coerce_create_policy(
+    f: t.Callable[..., GlobusHTTPResponse]
+) -> _CreatePolicyCallable:
+    return t.cast(_CreatePolicyCallable, f)
 
 
 class AuthClient(client.BaseClient):
@@ -776,14 +806,16 @@ class AuthClient(client.BaseClient):
         """
         return GetPoliciesResponse(self.get("/v2/api/policies"))
 
+    # coerce the type of this method to be "correct"
+    @_coerce_create_policy
     def create_policy(
         self,
-        project_id: UUIDLike,
-        high_assurance: bool,
-        authentication_assurance_timeout: int,
-        display_name: str,
-        description: str,
-        *,
+        *args: t.Any,
+        project_id: UUIDLike | utils.MissingType = utils.MISSING,
+        display_name: str | utils.MissingType = utils.MISSING,
+        description: str | utils.MissingType = utils.MISSING,
+        high_assurance: bool | utils.MissingType = utils.MISSING,
+        authentication_assurance_timeout: int | utils.MissingType = utils.MISSING,
         domain_constraints_include: (
             t.Iterable[str] | None | utils.MissingType
         ) = utils.MISSING,
@@ -841,6 +873,40 @@ class AuthClient(client.BaseClient):
                 .. extdoclink:: Create Policy
                     :ref: auth/reference/#create_policy
         """
+        if args:
+            if len(args) > 5:
+                raise TypeError(
+                    "create_policy() takes 5 positional arguments "
+                    f"but {len(args)} were given"
+                )
+
+            exc.warn_deprecated(
+                "'AuthClient.create_policy' received positional arguments. "
+                "Use only keyword arguments instead."
+            )
+
+            (
+                project_id,
+                high_assurance,
+                authentication_assurance_timeout,
+                display_name,
+                description,
+            ) = utils.unpack_arg_list_to_match_keyword_only(
+                "create_policy",
+                list(args),
+                (
+                    "project_id",
+                    "high_assurance",
+                    "authentication_assurance_timeout",
+                    "display_name",
+                    "description",
+                ),
+            )
+
+        utils.simulate_required_keyword_only(
+            "create_policy", ("project_id", "display_name", "description")
+        )
+
         body: dict[str, t.Any] = {
             "project_id": project_id,
             "high_assurance": high_assurance,

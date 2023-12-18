@@ -98,3 +98,80 @@ def test_classproperty_prefers_instance():
 )
 def test_safe_strseq_iter(value, expected_result):
     assert list(utils.safe_strseq_iter(value)) == expected_result
+
+
+@pytest.mark.parametrize(
+    "pass_kwargs, num_missing, arglist",
+    (
+        ({"foo": 1, "bar": 1, "baz": 1}, 0, None),
+        ({"bar": 1, "baz": 1}, 1, "'foo'"),
+        ({"baz": 1}, 2, "'foo' and 'bar'"),
+        ({}, 3, "'foo', 'bar', and 'baz'"),
+    ),
+)
+def test_simulate_required_keyword_only(pass_kwargs, num_missing, arglist):
+    def somefunc(foo=utils.MISSING, bar=utils.MISSING, baz=utils.MISSING):
+        utils.simulate_required_keyword_only("somefunc", ("foo", "bar", "baz"))
+        return True
+
+    if num_missing == 0:
+        assert somefunc(**pass_kwargs)
+
+    else:
+        with pytest.raises(
+            TypeError,
+            match=(
+                f"somefunc\\(\\) missing {num_missing} required "
+                f"keyword-only argument{'s' if num_missing != 1 else ''}: {arglist}"
+            ),
+        ):
+            somefunc(**pass_kwargs)
+
+
+@pytest.mark.parametrize(
+    "posargs, keyword_args, expected",
+    (
+        ([1, 2, 3], {}, (1, 2, 3)),
+        ([1, 2], {"baz": 3}, (1, 2, 3)),
+        ([1], {"bar": 2, "baz": 3}, (1, 2, 3)),
+        ([], {"foo": 1, "bar": 2, "baz": 3}, (1, 2, 3)),
+        ([], {"foo": 1, "bar": 2}, (1, 2, utils.MISSING)),
+        ([], {"foo": 1}, (1, utils.MISSING, utils.MISSING)),
+        ([], {}, (utils.MISSING, utils.MISSING, utils.MISSING)),
+    ),
+)
+def test_unpack_arg_list_to_match_keyword_only(posargs, keyword_args, expected):
+    def somefunc(*args, foo=utils.MISSING, bar=utils.MISSING, baz=utils.MISSING):
+        (foo, bar, baz) = utils.unpack_arg_list_to_match_keyword_only(
+            "somefunc",
+            list(args),
+            ("foo", "bar", "baz"),
+        )
+        return foo, bar, baz
+
+    assert somefunc(*posargs, **keyword_args) == expected
+
+
+@pytest.mark.parametrize(
+    "posargs, keyword_args, argname",
+    (
+        ([1], {"foo": 0}, "foo"),
+        ([1, 2], {"bar": 0}, "bar"),
+        ([1, 2, 3], {"baz": 0}, "baz"),
+    ),
+)
+def test_unpack_arg_list_to_match_keyword_only_detects_multiple_use(
+    posargs, keyword_args, argname
+):
+    def somefunc(*args, foo=utils.MISSING, bar=utils.MISSING, baz=utils.MISSING):
+        (foo, bar, baz) = utils.unpack_arg_list_to_match_keyword_only(
+            "somefunc",
+            list(args),
+            ("foo", "bar", "baz"),
+        )
+        return foo, bar, baz
+
+    with pytest.raises(
+        TypeError, match=f"somefunc\\(\\) got multiple values for argument '{argname}'"
+    ):
+        somefunc(*posargs, **keyword_args)

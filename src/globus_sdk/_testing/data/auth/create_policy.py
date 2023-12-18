@@ -7,8 +7,6 @@ from globus_sdk._testing.models import RegisteredResponse, ResponseSet
 
 POLICY_REQUEST_ARGS = {
     "project_id": str(uuid.uuid1()),
-    "high_assurance": False,
-    "authentication_assurance_timeout": 35,
     "display_name": "Policy of Foo",
     "description": "Controls access to Foo",
 }
@@ -45,6 +43,7 @@ def make_response_body(request_args: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
 
 def register_response(
     args: t.Mapping[str, t.Any],
+    match: t.Any = None,
 ) -> RegisteredResponse:
     request_args = {**POLICY_REQUEST_ARGS, **args}
     request_body = make_request_body(request_args)
@@ -61,15 +60,19 @@ def register_response(
             # Test functions use 'response' to verify response
             "response": response_body,
         },
-        match=[json_params_matcher({"policy": request_body})],
+        match=(
+            [json_params_matcher({"policy": request_body})] if match is None else match
+        ),
     )
 
 
 RESPONSES = ResponseSet(
-    default=register_response({}),
+    default=register_response({}, match=[]),
     project_id_str=register_response({"project_id": str(uuid.uuid1())}),
     project_id_uuid=register_response({"project_id": uuid.uuid1()}),
-    high_assurance=register_response({"high_assurance": True}),
+    high_assurance=register_response(
+        {"high_assurance": True, "authentication_assurance_timeout": 35}
+    ),
     not_high_assurance=register_response({"high_assurance": False}),
     authentication_assurance_timeout=register_response(
         {"authentication_assurance_timeout": 23}

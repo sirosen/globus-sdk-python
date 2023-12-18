@@ -176,6 +176,69 @@ class PayloadWrapper(PayloadWrapperBase):
             self._set_value(k, v, callback=int)
 
 
+def _caller_locals() -> dict[str, t.Any]:
+    import inspect
+
+    current_frame = inspect.currentframe()
+    if current_frame is None:  # pragma: no cover
+        raise RuntimeError("couldn't get current frame")
+    f_back = current_frame.f_back
+    if f_back is None:  # pragma: no cover
+        raise RuntimeError("couldn't get caller frame (1)")
+    f_back = f_back.f_back
+    if f_back is None:  # pragma: no cover
+        raise RuntimeError("couldn't get caller frame (2)")
+    return f_back.f_locals
+
+
+def unpack_arg_list_to_match_keyword_only(
+    funcname: str, arglist: list[t.Any], argnames: tuple[str, ...]
+) -> list[t.Any]:
+    outer_locals = _caller_locals()
+
+    ret: list[t.Any] = []
+    for argname in argnames:
+        argvalue = outer_locals[argname]
+        if not arglist:
+            ret.append(argvalue)
+            continue
+
+        if argvalue is not MISSING:
+            raise TypeError(
+                f"{funcname}() got multiple values for argument '{argname}'"
+            )
+        ret.append(arglist.pop(0))
+
+    return ret
+
+
+def simulate_required_keyword_only(funcname: str, argnames: tuple[str, ...]) -> None:
+    outer_locals = _caller_locals()
+
+    # carefully recreate the TypeError which Python produces upon
+    # encountering missing required keyword-only arguments
+
+    missing_names: list[str] = []
+    for argname in argnames:
+        argvalue = outer_locals[argname]
+        if argvalue is MISSING:
+            missing_names.append(argname)
+
+    if missing_names:
+        argument_opt_s = "argument" if len(missing_names) == 1 else "arguments"
+        if len(missing_names) == 1:
+            arglist = f"'{missing_names[0]}'"
+        elif len(missing_names) == 2:
+            arglist = f"'{missing_names[0]}' and '{missing_names[1]}'"
+        else:
+            arglist = ", ".join(f"'{name}'" for name in missing_names[:-1])
+            arglist += f", and '{missing_names[-1]}'"
+        raise TypeError(
+            f"{funcname}() missing {len(missing_names)} required "
+            f"keyword-only {argument_opt_s}: {arglist}"
+        )
+
+
 def in_sphinx_build() -> bool:  # pragma: no cover
     # check if `sphinx-build` was used to invoke
     return os.path.basename(sys.argv[0]) in ["sphinx-build", "sphinx-build.exe"]
