@@ -310,6 +310,16 @@ class PaginatedUsage(AddContentDirective):
         yield ":ref:`how to make paginated calls <making_paginated_calls>`."
 
 
+def after_autodoc_signature_replace_MISSING_repr(
+    app, what, name, obj, options, signature, return_annotation
+):
+    if signature is not None:
+        signature = signature.replace("<globus_sdk.MISSING>", "MISSING")
+    if return_annotation is not None:
+        return_annotation = return_annotation.replace("<globus_sdk.MISSING>", "MISSING")
+    return signature, return_annotation
+
+
 def setup(app):
     app.add_directive("automethodlist", AutoMethodList)
     app.add_directive("listknownscopes", ListKnownScopes)
@@ -317,6 +327,11 @@ def setup(app):
     app.add_directive("expandtestfixture", ExpandTestingFixture)
     app.add_directive("extdoclink", ExternalDocLink)
     app.add_directive("paginatedusage", PaginatedUsage)
+
+    app.connect(
+        "autodoc-process-signature", after_autodoc_signature_replace_MISSING_repr
+    )
+
     return {
         "parallel_read_safe": True,
         "parallel_write_safe": True,
