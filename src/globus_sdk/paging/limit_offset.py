@@ -14,7 +14,7 @@ class _LimitOffsetBasedPaginator(Paginator[PageT]):  # pylint: disable=abstract-
         get_page_size: t.Callable[[dict[str, t.Any]], int],
         max_total_results: int,
         page_size: int,
-        client_args: list[t.Any],
+        client_args: tuple[t.Any, ...],
         client_kwargs: dict[str, t.Any],
     ):
         super().__init__(

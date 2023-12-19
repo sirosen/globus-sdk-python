@@ -35,18 +35,14 @@ class Paginator(t.Iterable[PageT], metaclass=abc.ABCMeta):
     Iterating on a Paginator is equivalent to iterating on its ``pages``.
 
     :param method: A bound method of an SDK client, used to generate a paginated variant
-    :type method: callable
     :param items_key: The key to use within pages of results to get an array of items
-    :type items_key: str
     :param client_args: Arguments to the underlying method which are passed when the
         paginator is instantiated. i.e. given ``client.paginated.foo(a, b, c=1)``, this
         will be ``(a, b)``. The paginator will pass these arguments to each call of the
         bound method as it pages.
-    :type client_args: tuple
     :param client_kwargs: Keyword arguments to the underlying method, like
         ``client_args`` above. ``client.paginated.foo(a, b, c=1)`` will pass this as
         ``{"c": 1}``. As with ``client_args``, it's passed to each paginated call.
-    :type client_kwargs: dict
     """
 
     def __init__(
@@ -54,7 +50,7 @@ class Paginator(t.Iterable[PageT], metaclass=abc.ABCMeta):
         method: t.Callable[..., t.Any],
         *,
         items_key: str | None = None,
-        client_args: list[t.Any],
+        client_args: tuple[t.Any, ...],
         client_kwargs: dict[str, t.Any],
         # the Base paginator must accept arbitrary additional kwargs to indicate that
         # its child classes could define and use additional kwargs
@@ -112,7 +108,6 @@ class Paginator(t.Iterable[PageT], metaclass=abc.ABCMeta):
         checkers to more accurately infer the type of the paginator.
 
         :param method: The method to convert to a paginator
-        :type method: callable
         """
         if not inspect.ismethod(method):
             raise TypeError(f"Paginator.wrap can only be used on methods, not {method}")
@@ -128,7 +123,7 @@ class Paginator(t.Iterable[PageT], metaclass=abc.ABCMeta):
         def paginated_method(*args: t.Any, **kwargs: t.Any) -> Paginator[PageT]:
             return paginator_class(
                 method,
-                client_args=list(args),
+                client_args=tuple(args),
                 client_kwargs=kwargs,
                 items_key=paginator_items_key,
                 **paginator_params,
@@ -157,11 +152,8 @@ def has_paginator(
     >>> paginator = c.paginated.foo()
 
     :param paginator_class: The type of paginator used by this method
-    :type paginator_class: Paginator subclass
     :param items_key: The key to use within pages of results to get an array of items
-    :type items_key: str, optional
     :param paginator_params: Additional parameters to pass to the paginator constructor
-    :type paginator_params: any
     """
 
     def decorate(func: C) -> C:

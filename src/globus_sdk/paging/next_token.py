@@ -19,7 +19,7 @@ class NextTokenPaginator(Paginator[PageT]):
         method: t.Callable[..., t.Any],
         *,
         items_key: str | None = None,
-        client_args: list[t.Any],
+        client_args: tuple[t.Any, ...],
         client_kwargs: dict[str, t.Any],
     ):
         super().__init__(
