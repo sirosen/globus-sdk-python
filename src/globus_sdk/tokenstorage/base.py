@@ -15,7 +15,6 @@ class StorageAdapter(metaclass=abc.ABCMeta):
         Store an `OAuthTokenResponse` in the underlying storage for this adapter.
 
         :param token_response: The token response to store
-        :type token_response: :class:`~.OAuthTokenResponse`
         """
 
     @abc.abstractmethod
@@ -29,7 +28,6 @@ class StorageAdapter(metaclass=abc.ABCMeta):
 
         :param resource_server: The resource_server string which uniquely identifies the
             token data to retriever from storage
-        :type resource_server: str
         """
 
     def on_refresh(self, token_response: OAuthTokenResponse) -> None:
@@ -38,7 +36,6 @@ class StorageAdapter(metaclass=abc.ABCMeta):
         stores the token response.
 
         :param token_response: The token response received from the refresh
-        :type token_response: :class:`~.OAuthTokenResponse`
         """
         self.store(token_response)
 

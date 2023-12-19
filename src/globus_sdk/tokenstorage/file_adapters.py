@@ -89,7 +89,6 @@ class SimpleJSONFileAdapter(FileAdapter):
         resulting file can read or write it.
 
         :param token_response: The token data received from the refresh
-        :type token_response: :class:`~.OAuthTokenResponse`
         """
         to_write = self._load()
 
