@@ -808,7 +808,7 @@ class AuthClient(client.BaseClient):
 
     # coerce the type of this method to be "correct"
     @_coerce_create_policy
-    def create_policy(
+    def create_policy(  # pylint: disable=missing-param-doc
         self,
         *args: t.Any,
         project_id: UUIDLike | utils.MissingType = utils.MISSING,
@@ -829,10 +829,10 @@ class AuthClient(client.BaseClient):
         :param project_id: ID of the project for the new policy
         :type project_id: str or uuid
         :param high_assurance: Whether or not this policy is applied to sessions.
-        :type high_assurance: bool
+        :type high_assurance: bool, optional
         :param authentication_assurance_timeout: Number of seconds within which someone
             must have authenticated to satisfy the policy
-        :type authentication_assurance_timeout: int
+        :type authentication_assurance_timeout: int, optional
         :param display_name: A user-friendly name for the policy
         :type display_name: str
         :param description: A user-friendly description to explain the purpose of the
@@ -843,6 +843,14 @@ class AuthClient(client.BaseClient):
         :param domain_constraints_exclude: A list of domains that cannot satisfy the
             policy
         :type domain_constraints_exclude: iterable of str or None
+
+        .. note:
+
+            ``project_id``, ``display_name``, and ``description`` are all required
+            arguments, although they are not declared as required in the function
+            signature. This is due to a backwards compatible behavior with earlier
+            versions of globus-sdk, and will be changed in a future release which
+            removes the compatible behavior.
 
         .. tab-set::
 
@@ -885,7 +893,7 @@ class AuthClient(client.BaseClient):
                 "Use only keyword arguments instead."
             )
 
-            (
+            (  # pylint: disable=unbalanced-tuple-unpacking
                 project_id,
                 high_assurance,
                 authentication_assurance_timeout,
