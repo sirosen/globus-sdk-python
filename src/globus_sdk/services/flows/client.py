@@ -46,19 +46,14 @@ class FlowsClient(client.BaseClient):
         Create a Flow
 
         :param title: A non-unique, human-friendly name used for displaying the
-            flow to end users.
-        :type title: str (1 - 128 characters)
+            flow to end users. (1 - 128 characters)
         :param definition: JSON object specifying flows states and execution order. For
             a more detailed explanation of the flow definition, see
             `Authoring Flows <https://docs.globus.org/api/flows/authoring-flows>`_
-        :type definition: dict
         :param input_schema: A JSON Schema to which Flow Invocation input must conform
-        :type input_schema: dict
-        :param subtitle: A concise summary of the flow’s purpose.
-        :type subtitle: str (0 - 128 characters), optional
+        :param subtitle: A concise summary of the flow’s purpose. (0 - 128 characters)
         :param description: A detailed description of the flow's purpose for end user
-            display.
-        :type description: str (0 - 4096 characters), optional
+            display. (0 - 4096 characters)
         :param flow_viewers: A set of Principal URN values, or the value "public",
             indicating entities who can view the flow
 
@@ -76,7 +71,6 @@ class FlowsClient(client.BaseClient):
                     ]
 
 
-        :type flow_viewers: list[str], optional
         :param flow_starters: A set of Principal URN values, or the value
             "all_authenticated_users", indicating entities who can initiate a *Run* of
             the flow
@@ -95,7 +89,6 @@ class FlowsClient(client.BaseClient):
                         "urn:globus:groups:id:c1dcd951-3f35-4ea3-9f28-a7cdeaf8b68f"
                     ]
 
-        :type flow_starters: list[str], optional
         :param flow_administrators: A set of Principal URN values indicating entities
             who can perform administrative operations on the flow (create, delete,
             update)
@@ -109,12 +102,9 @@ class FlowsClient(client.BaseClient):
                         "urn:globus:groups:id:c1dcd951-3f35-4ea3-9f28-a7cdeaf8b68f"
                     ]
 
-        :type flow_administrators: list[str], optional
         :param keywords: A set of terms used to categorize the flow used in query and
-            discovery operations
-        :type keywords: list[str] (0 - 1024 items), optional
+            discovery operations (0 - 1024 items)
         :param additional_fields: Additional Key/Value pairs sent to the create API
-        :type additional_fields: dict of str -> any, optional
 
         .. tab-set::
 
@@ -181,10 +171,8 @@ class FlowsClient(client.BaseClient):
         """Retrieve a Flow by ID
 
         :param flow_id: The ID of the Flow to fetch
-        :type flow_id: str or UUID
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -215,16 +203,11 @@ class FlowsClient(client.BaseClient):
 
         :param filter_role: A role name specifying the minimum permissions required for
             a Flow to be included in the response.
-        :type filter_role: str, optional
         :param filter_fulltext: A string to use in a full-text search to filter results
-        :type filter_fulltext: str, optional
         :param orderby: A criterion for ordering flows in the listing
-        :type orderby: str, optional
         :param marker: A marker for pagination
-        :type marker: str, optional
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         **Role Values**
 
@@ -345,24 +328,17 @@ class FlowsClient(client.BaseClient):
         Any fields omitted from the request will be unchanged
 
         :param flow_id: The ID of the Flow to fetch
-        :type flow_id: str or UUID
         :param title: A non-unique, human-friendly name used for displaying the
-            flow to end users.
-        :type title: str (1 - 128 characters), optional
+            flow to end users. (1 - 128 characters)
         :param definition: JSON object specifying flows states and execution order. For
             a more detailed explanation of the flow definition, see
             `Authoring Flows <https://docs.globus.org/api/flows/authoring-flows>`_
-        :type definition: dict, optional
         :param input_schema: A JSON Schema to which Flow Invocation input must conform
-        :type input_schema: dict, optional
-        :param subtitle: A concise summary of the flow’s purpose.
-        :type subtitle: str (0 - 128 characters), optional
+        :param subtitle: A concise summary of the flow’s purpose. (0 - 128 characters)
         :param description: A detailed description of the flow's purpose for end user
-            display.
-        :type description: str (0 - 4096 characters), optional
+            display. (0 - 4096 characters)
         :param flow_owner: An Auth Identity URN to set as flow owner; this must match
             the Identity URN of the entity calling `update_flow`
-        :type flow_owner: str, optional
         :param flow_viewers: A set of Principal URN values, or the value "public",
             indicating entities who can view the flow
 
@@ -379,7 +355,6 @@ class FlowsClient(client.BaseClient):
                         "urn:globus:groups:id:c1dcd951-3f35-4ea3-9f28-a7cdeaf8b68f"
                     ]
 
-        :type flow_viewers: list[str], optional
         :param flow_starters: A set of Principal URN values, or the value
             "all_authenticated_users", indicating entities who can initiate a *Run* of
             the flow
@@ -398,7 +373,6 @@ class FlowsClient(client.BaseClient):
                         "urn:globus:groups:id:c1dcd951-3f35-4ea3-9f28-a7cdeaf8b68f"
                     ]
 
-        :type flow_starters: list[str], optional
         :param flow_administrators: A set of Principal URN values indicating entities
             who can perform administrative operations on the flow (create, delete,
             update)
@@ -412,12 +386,9 @@ class FlowsClient(client.BaseClient):
                         "urn:globus:groups:id:c1dcd951-3f35-4ea3-9f28-a7cdeaf8b68f"
                     ]
 
-        :type flow_administrators: list[str], optional
         :param keywords: A set of terms used to categorize the flow used in query and
-            discovery operations
-        :type keywords: list[str] (0 - 1024 items), optional
+            discovery operations (0 - 1024 items)
         :param additional_fields: Additional Key/Value pairs sent to the create API
-        :type additional_fields: dict of str -> any, optional
 
         .. tab-set::
 
@@ -473,10 +444,8 @@ class FlowsClient(client.BaseClient):
         """Delete a Flow
 
         :param flow_id: The ID of the flow to delete
-        :type flow_id: str or UUID, optional
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -504,11 +473,8 @@ class FlowsClient(client.BaseClient):
         List all runs.
 
         :param filter_flow_id: One or more Flow IDs used to filter the results
-        :type filter_flow_id: str, UUID, or iterable of str or UUID, optional
         :param marker: A pagination marker, used to get the next page of results.
-        :type marker: str, optional
         :param query_params: Any additional parameters to be passed through
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -556,17 +522,12 @@ class FlowsClient(client.BaseClient):
         These logs describe state transitions and associated payloads for a run
 
         :param run_id: Run ID to retrieve logs for
-        :type run_id: str or UUID, optional
         :param limit: Maximum number of log entries to return (server default: 10)
              (value between 1 and 100 inclusive)
-        :type limit: int, optional
         :param reverse_order: Return results in reverse chronological order (server
             default: false)
-        :type reverse_order: bool
         :param marker: Marker for the next page of results (provided by the server)
-        :type marker: str, optional
         :param query_params: Any additional parameters to be passed through
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -608,13 +569,10 @@ class FlowsClient(client.BaseClient):
         Retrieve information about a particular Run of a Flow
 
         :param run_id: The ID of the run to get
-        :type run_id: str or UUID
         :param include_flow_description: If set to true, the lookup will attempt to
            attach metadata about the flow to the run to the run response under the key
            "flow_description" (default: False)
-        :type include_flow_description: bool, optional
         :param query_params: Any additional parameters to be passed through
-        :type query_params: dict, optional
 
 
         .. tab-set::
@@ -653,7 +611,6 @@ class FlowsClient(client.BaseClient):
         Get the flow definition and input schema at the time the run was started.
 
         :param run_id: The ID of the run to get
-        :type run_id: str or UUID
 
         .. tab-set::
 
@@ -684,7 +641,6 @@ class FlowsClient(client.BaseClient):
         Cancel a run.
 
         :param run_id: The ID of the run to cancel
-        :type run_id: str or UUID
 
 
         .. tab-set::
@@ -725,22 +681,16 @@ class FlowsClient(client.BaseClient):
         Update the metadata of a specific run.
 
         :param run_id: The ID of the run to update
-        :type run_id: str or UUID
-        :param label: A short human-readable title
-        :type label: Optional string (1 - 64 chars)
+        :param label: A short human-readable title (1 - 64 chars)
         :param tags: A collection of searchable tags associated with the run.
             Tags are normalized by stripping leading and trailing whitespace,
             and replacing all whitespace with a single space.
-        :type tags: Optional list of strings
         :param run_monitors: A list of authenticated entities (identified by URN)
             authorized to view this run in addition to the run owner
-        :type run_monitors: Optional list of strings
         :param run_managers: A list of authenticated entities (identified by URN)
             authorized to view & cancel this run in addition to the run owner
-        :type run_managers: Optional list of strings
         :param additional_fields: Additional Key/Value pairs sent to the run API
             (this parameter is used to bypass local sdk key validation helping)
-        :type additional_fields: Optional dictionary
 
 
         .. tab-set::
@@ -787,7 +737,6 @@ class FlowsClient(client.BaseClient):
         Delete a run.
 
         :param run_id: The ID of the run to delete
-        :type run_id: str or UUID
 
 
         .. tab-set::
@@ -823,7 +772,6 @@ class SpecificFlowClient(client.BaseClient):
         arguments are the same as those for :class:`~globus_sdk.BaseClient`.
 
     :param flow_id: The generated UUID associated with a flow
-    :type flow_id: str or uuid
 
     .. automethodlist:: globus_sdk.SpecificFlowClient
     """
@@ -867,22 +815,16 @@ class SpecificFlowClient(client.BaseClient):
         """
         :param body: The input json object handed to the first flow state. The flows
             service will validate this object against the flow's supplied input schema.
-        :type body: json dict
-        :param label: A short human-readable title
-        :type label: Optional string (1 - 64 chars)
+        :param label: A short human-readable title (1 - 64 chars)
         :param tags: A collection of searchable tags associated with the run. Tags are
             normalized by stripping leading and trailing whitespace, and replacing all
             whitespace with a single space.
-        :type tags: Optional list of strings
         :param run_monitors: A list of authenticated entities (identified by URN)
             authorized to view this run in addition to the run owner
-        :type run_monitors: Optional list of strings
         :param run_managers: A list of authenticated entities (identified by URN)
             authorized to view & cancel this run in addition to the run owner
-        :type run_managers: Optional list of strings
         :param additional_fields: Additional Key/Value pairs sent to the run API
             (this parameter is used to bypass local sdk key validation helping)
-        :type additional_fields: Optional dictionary
 
         .. tab-set::
 
@@ -910,7 +852,6 @@ class SpecificFlowClient(client.BaseClient):
     def resume_run(self, run_id: UUIDLike) -> GlobusHTTPResponse:
         """
         :param run_id: The ID of the run to resume
-        :type run_id: str or UUID
 
         .. tab-set::
 
