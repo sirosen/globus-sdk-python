@@ -25,7 +25,6 @@ class Serializable:
         Instantiate from a dictionary.
 
         :param data: The dictionary to create the error from.
-        :type data: dict
         """
 
         # Extract any extra fields
@@ -43,7 +42,6 @@ class Serializable:
 
         :param include_extra: Whether to include stored extra (non-standard) fields in
             the returned dictionary.
-        :type include_extra: bool
         """
         result = {}
 
