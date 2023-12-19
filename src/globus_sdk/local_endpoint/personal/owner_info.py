@@ -55,7 +55,6 @@ class GlobusConnectPersonalOwnerInfo:
     :vartype username: str or None
     :param config_dn: A DN value from GCP configuration, which will be parsed into
         username or ID
-    :type config_dn: str
     """
 
     _GRIDMAP_DN_START = '"/C=US/O=Globus Consortium/OU=Globus Connect User/CN='
