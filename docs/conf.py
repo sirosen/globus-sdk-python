@@ -26,6 +26,9 @@ intersphinx_mapping = {
 # pull signature docs from type hints, into body
 # and keep the signatures concise
 autodoc_typehints = "description"
+# do not generate doc stubs for inherited parameters from a superclass,
+# merely because they are type annotated
+autodoc_typehints_description_target = "documented_params"
 
 
 # sphinx extensions (minimally, we want autodoc and viewcode to build the site)

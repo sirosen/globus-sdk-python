@@ -8,7 +8,8 @@ from __future__ import annotations
 import typing as t
 import warnings
 
-from globus_sdk._types import ScopeCollectionType
+if t.TYPE_CHECKING:
+    from globus_sdk._types import ScopeCollectionType
 
 
 def _iter_scope_collection(obj: ScopeCollectionType) -> t.Iterator[str]:

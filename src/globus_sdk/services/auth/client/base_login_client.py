@@ -35,7 +35,6 @@ class AuthLoginClient(client.BaseClient):
 
     :param client_id: The ID of the application provided by registration with
         Globus Auth.
-    :type client_id: str or UUID
 
     All other initialization parameters are passed through to ``BaseClient``.
 
@@ -126,9 +125,7 @@ class AuthLoginClient(client.BaseClient):
 
         :param openid_configuration: The OIDC config as a GlobusHTTPResponse or dict.
             When not provided, it will be fetched automatically.
-        :type openid_configuration: dict or GlobusHTTPResponse
         :param as_pem: Decode the JWK to an RSA PEM key, typically for JWT decoding
-        :type as_pem: bool
         """
         if openid_configuration is None:
             log.debug("No OIDC Config provided, autofetching...")
@@ -154,13 +151,10 @@ class AuthLoginClient(client.BaseClient):
 
         :param session_required_identities: A list of identities must be
             added to the session.
-        :type session_required_identities: str or uuid or list of str or uuid, optional
         :param session_required_single_domain: A list of domain requirements
             which must be satisfied by identities added to the session.
-        :type session_required_single_domain: str or list of str, optional
         :param session_required_policies: A list of IDs for policies which must
             be satisfied by the user.
-        :type session_required_policies: str or uuid or list of str or uuid, optional
         :param prompt:
             Control whether a user is required to log in before the authorization step.
 
@@ -168,11 +162,8 @@ class AuthLoginClient(client.BaseClient):
             even if they are already logged in. Setting this parameter can help ensure
             that a user's session meets known or unknown session requirement policies
             and avoid additional login flows.
-        :type prompt: ``"login"``, optional
         :param query_params: Additional query parameters to include in the
             authorize URL. Primarily for internal use
-        :type query_params: dict, optional
-        :rtype: ``string``
         """
         if not self.current_oauth2_flow_manager:
             log.error("OutOfOrderOperations(get_authorize_url before start_flow)")
@@ -207,13 +198,10 @@ class AuthLoginClient(client.BaseClient):
         """
         Exchange an authorization code for a token or tokens.
 
-        :rtype: :class:`OAuthTokenResponse <.OAuthTokenResponse>`
-
         :param auth_code: An auth code typically obtained by sending the user to the
             authorize URL. The code is a very short-lived credential which this method
             is exchanging for tokens. Tokens are the credentials used to authenticate
             against Globus APIs.
-        :type auth_code: str
         """
         log.info(
             "Final Step of 3-legged OAuth2 Flows: "
@@ -250,10 +238,7 @@ class AuthLoginClient(client.BaseClient):
         plus any additional parameters you may specify.
 
         :param refresh_token: A Globus Refresh Token as a string
-        :type refresh_token: str
-
         :param body_params: A dict of extra params to encode in the refresh call.
-        :type body_params: dict, optional
         """
         log.info("Executing token refresh; typically requires client credentials")
         form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
@@ -273,10 +258,8 @@ class AuthLoginClient(client.BaseClient):
 
         :param token: The token which should be validated. Can be a refresh token or an
             access token
-        :type token: str
         :param body_params: Additional parameters to include in the validation
             body. Primarily for internal use
-        :type body_params: dict, optional
         """
         exc.warn_deprecated(
             f"{self.__class__.__name__}.oauth2_validate_token() is deprecated. "
@@ -317,11 +300,9 @@ class AuthLoginClient(client.BaseClient):
         want to confirm that it was revoked.
 
         :param token: The token which should be revoked
-        :type token: str
         :param body_params: Additional parameters to include in the revocation
             body, which can help speed the revocation process. Primarily for
             internal use
-        :type body_params: dict, optional
 
         **Examples**
 
@@ -385,7 +366,7 @@ class AuthLoginClient(client.BaseClient):
         form_data: dict[str, t.Any] | utils.PayloadWrapper,
         *,
         body_params: dict[str, t.Any] | None = None,
-        response_class: (type[OAuthTokenResponse] | type[RT]) = OAuthTokenResponse,
+        response_class: type[OAuthTokenResponse] | type[RT] = OAuthTokenResponse,
     ) -> OAuthTokenResponse | RT:
         """
         This is the generic form of calling the OAuth2 Token endpoint.
@@ -401,13 +382,11 @@ class AuthLoginClient(client.BaseClient):
             <globus_sdk.ConfidentialAppAuthClient.oauth2_get_dependent_tokens>`
             requires a specialize response class to handle the dramatically different
             format of the Dependent Token Grant response
-        :type response_class: class, optional
         :param form_data: The main body of the request
-        :type form_data: dict or `utils.PayloadWrapper`
         :param body_params: Any additional parameters to be passed through
             as body parameters.
-        :type body_params: dict, optional
-        :rtype: ``response_class``
+        :rtype: ``response_class`` if set, defaults to
+            :py:attr:`~globus_sdk.OAuthTokenResponse`
         """
         log.info("Fetching new token from Globus Auth")
         # use the fact that requests implicitly encodes the `data` parameter as

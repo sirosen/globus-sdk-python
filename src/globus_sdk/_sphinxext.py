@@ -313,6 +313,7 @@ class PaginatedUsage(AddContentDirective):
 def after_autodoc_signature_replace_MISSING_repr(
     app, what, name, obj, options, signature, return_annotation
 ):
+    """convert <globus_sdk.MISSING> to MISSING in autodoc signatures"""
     if signature is not None:
         signature = signature.replace("<globus_sdk.MISSING>", "MISSING")
     if return_annotation is not None:

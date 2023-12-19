@@ -114,19 +114,14 @@ class IdentityMap:
         username = record["username"] if record is not None else "NO_SUCH_IDENTITY"
 
     :param auth_client: The client object which will be used for lookups against Globus Auth
-    :type auth_client: :class:`AuthClient <globus_sdk.AuthClient>` or
-        :class:`ConfidentialAppAuthClient <globus_sdk.ConfidentialAppAuthClient>`
     :param identity_ids: A list or other iterable of usernames or identity IDs (potentially
         mixed together) which will be used to seed the ``IdentityMap`` 's tracking of
         unresolved Identities.
-    :type identity_ids: iterable of str, optional
     :param id_batch_size: A non-default batch size to use when communicating with Globus
         Auth. Leaving this set to the default is strongly recommended.
-    :type id_batch_size: int, optional
     :param cache:  A dict or other mapping object which will be used to cache results.
         The default is that results are cached once per IdentityMap object. If you want
         multiple IdentityMaps to share data, explicitly pass the same ``cache`` to both.
-    :type cache: MutableMapping, optional
 
     .. automethodlist:: globus_sdk.IdentityMap
         :include_methods: __getitem__,__delitem__
@@ -140,7 +135,7 @@ class IdentityMap:
         identity_ids: t.Iterable[str] | None = None,
         *,
         id_batch_size: int | None = None,
-        cache: None | (t.MutableMapping[str, dict[str, t.Any]]) = None,
+        cache: None | t.MutableMapping[str, dict[str, t.Any]] = None,
     ):
         self.auth_client = auth_client
         self.id_batch_size = id_batch_size or self._default_id_batch_size
@@ -213,7 +208,6 @@ class IdentityMap:
 
         :param identity_id: A string Identity ID or Identity Name (a.k.a. "username") to
             add
-        :type identity_id: str
         """
         if identity_id in self._cache:
             return False
@@ -233,9 +227,7 @@ class IdentityMap:
         A dict-like get() method which accepts a default value.
 
         :param key: The username or ID to look up
-        :type key: str
         :param default: The default value to return if the key is not found
-        :type default: any, optional
         """
         try:
             return self[key]

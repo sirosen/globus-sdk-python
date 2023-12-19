@@ -34,10 +34,8 @@ class ConfidentialAppAuthClient(AuthLoginClient):
 
     :param client_id: The ID of the application provided by registration with
         Globus Auth.
-    :type client_id: str or UUID
     :param client_secret: The secret string to use for authentication. Secrets can be
         generated via the Globus developers interface.
-    :type client_secret: str
 
     All other initialization parameters are passed through to ``BaseClient``.
 
@@ -80,16 +78,12 @@ class ConfidentialAppAuthClient(AuthLoginClient):
 
         :param usernames: A username or list of usernames to lookup. Mutually exclusive
             with ``ids``
-        :type usernames: str or iterable of str, optional
         :param ids: An identity ID or list of IDs to lookup. Mutually exclusive
             with ``usernames``
-        :type ids: str, UUID, or iterable of str or UUID, optional
         :param provision: Create identities if they do not exist, allowing clients to
             get username-to-identity mappings prior to the identity being used
-        :type provision: bool
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
         """
         exc.warn_deprecated(
             "ConfidentialAuthClient.get_identities() is deprecated. "
@@ -125,9 +119,6 @@ class ConfidentialAppAuthClient(AuthLoginClient):
 
         :param requested_scopes: The scopes on the token(s) being requested. Defaults to
             ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-        :type requested_scopes: str, MutableScope, or iterable of str or MutableScope,
-            optional
-        :rtype: :class:`OAuthTokenResponse <.OAuthTokenResponse>`
 
         For example, with a Client ID of "CID1001" and a Client Secret of
         "RAND2002", you could use this grant type like so:
@@ -161,20 +152,14 @@ class ConfidentialAppAuthClient(AuthLoginClient):
 
         :param redirect_uri: The page that users should be directed to after
             authenticating at the authorize URL.
-        :type redirect_uri: str
-            ``redirect_uri`` (*string*)
         :param requested_scopes: The scopes on the token(s) being requested. Defaults to
             ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-        :type requested_scopes: str, MutableScope, or iterable of str or MutableScope,
-            optional
         :param state: This string allows an application to pass information back to
             itself in the course of the OAuth flow. Because the user will navigate away
             from the application to complete the flow, this parameter lets the app pass
             an arbitrary string from the starting page to the ``redirect_uri``
-        :type state: str, optional
         :param refresh_tokens: When True, request refresh tokens in addition to access
             tokens. [Default: ``False``]
-        :type refresh_tokens: bool, optional
 
         .. tab-set::
 
@@ -227,13 +212,9 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         this Grant to get those "Dependent" or "Downstream" tokens for Service B.
 
         :param token: A Globus Access Token as a string
-        :type token: str
         :param refresh_tokens: When True, request dependent refresh tokens in addition
             to access tokens. [Default: ``False``]
-        :type refresh_tokens: bool, optional
         :param additional_params: Additional parameters to include in the request body
-        :type additional_params: dict, optional
-        :rtype: :class:`OAuthDependentTokenResponse <.OAuthDependentTokenResponse>`
         """
         log.info("Getting dependent tokens from access token")
         log.debug(f"additional_params={additional_params}")
@@ -258,10 +239,8 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         Get information about a Globus Auth token.
 
         :param token: An Access Token as a raw string, being evaluated
-        :type token: str
         :param include: A value for the ``include`` parameter in the request body.
             Default is to omit the parameter.
-        :type include: str, optional
 
         .. tab-set::
 
@@ -324,14 +303,12 @@ class ConfidentialAppAuthClient(AuthLoginClient):
 
         :param name: The display name shown to users on consents. May not contain
             linebreaks.
-        :type name: str
         :param public_client: This is used to infer which OAuth grant_types the client
             will be able to use. Should be false if the client is capable of keeping
             secret credentials (such as clients running on a server) and true if it is
             not (such as native apps). After creation this value is immutable. This
             option is mutually exclusive with ``client_type``, exactly one must be
             given.
-        :type public_client: bool, optional
         :param client_type: Defines the type of client that will be created. This
             option is mutually exclusive with ``public_client``, exactly one must
             be given.
@@ -364,26 +341,18 @@ class ConfidentialAppAuthClient(AuthLoginClient):
                         application (confidential or public client), service account,
                         or API.
 
-        :type client_type: str, optional
         :param visibility: If set to "public", any authenticated entity can view it.
             When set to "private", only entities in the same project as the client can
             view it.
-        :type visibility: str, optional
         :param redirect_uris: list of URIs that may be used in OAuth authorization
             flows.
-        :type redirect_uris: iterable of str, optional
         :param terms_and_conditions: URL of client's terms and conditions.
-        :type terms_and_conditions: str, optional
         :param privacy_policy: URL of client's privacy policy.
-        :type privacy_policy: str, optional
         :param required_idp: In order to use this client a user must have an identity
             from this IdP in their identity set.
-        :type required_idp: str or uuid, optional
         :param preselect_idp: This pre-selects the given IdP on the Globus Auth login
             page if the user is not already authenticated.
-        :type preselect_idp: str or uuid, optional
         :param additional_fields: Any additional parameters to be passed through.
-        :type additional_fields: dict, optional
 
         .. tab-set::
 

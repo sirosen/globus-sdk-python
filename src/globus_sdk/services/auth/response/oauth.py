@@ -185,14 +185,11 @@ class OAuthTokenResponse(GlobusHTTPResponse):
 
         :param openid_configuration: The OIDC config as a GlobusHTTPResponse or dict.
             When not provided, it will be fetched automatically.
-        :type openid_configuration: dict or GlobusHTTPResponse
         :param jwk: The JWK as a cryptography public key object. When not provided, it
             will be fetched and parsed automatically.
-        :type jwk: RSAPublicKey
         :param jwt_params: An optional dict of parameters to pass to the jwt decode
             step. If ``"leeway"`` is included, it will be passed as the ``leeway``
             parameter, and all other values are passed as ``options``.
-        :type jwt_params: dict
         """
         logger.info('Decoding ID Token "%s"', self["id_token"])
         if not isinstance(self.client, SupportsJWKMethods):

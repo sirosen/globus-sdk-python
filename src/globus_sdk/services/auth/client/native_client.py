@@ -69,8 +69,6 @@ class NativeAppAuthClient(AuthLoginClient):
 
         :param requested_scopes: The scopes on the token(s) being requested. Defaults to
             ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-        :type requested_scopes: str, MutableScope, or iterable of str or MutableScope,
-            optional
         :param redirect_uri: The page that users should be directed to after
             authenticating at the authorize URL. Defaults to
             'https://auth.globus.org/v2/web/auth-code', which displays the resulting
@@ -79,16 +77,12 @@ class NativeAppAuthClient(AuthLoginClient):
         :param state: The ``redirect_uri`` page will have this included in a query
             parameter, so you can use it to pass information to that page if you use a
             custom page. It defaults to the string '_default'
-        :type state: str, optional
         :param verifier: A secret used for the Native App flow. It will by default be a
             freshly generated random string, known only to this
             ``GlobusNativeAppFlowManager`` instance
-        :type verifier: str, optional
         :param refresh_tokens: When True, request refresh tokens in addition to access
             tokens. [Default: ``False``]
-        :type refresh_tokens: bool, optional
         :param prefill_named_grant: Prefill the named grant label on the consent page
-        :type prefill_named_grant: str, optional
 
         .. tab-set::
 
@@ -129,9 +123,7 @@ class NativeAppAuthClient(AuthLoginClient):
         grant call with client credentials, as is normal.
 
         :param refresh_token: The refresh token to use to get a new access token
-        :type refresh_token: str
         :param body_params: Extra parameters to include in the POST body
-        :type body_params: dict, optional
         """
         log.info("Executing token refresh without client credentials")
         form_data = {
@@ -150,9 +142,7 @@ class NativeAppAuthClient(AuthLoginClient):
          Create a new native app instance. The new instance is a confidential client.
 
          :param template_id: The client ID of the calling native app
-         :type template_id: str or uuid
          :param name: The name given to the new app instance
-         :type name: str
 
         .. tab-set::
 

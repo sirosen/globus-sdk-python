@@ -32,7 +32,8 @@ request, it will be removed before the request is sent to the service.
 As a result, where ``MISSING`` is used as the default for a value, ``None`` can
 be used to explicitly pass the value ``null``.
 
-.. autoclass:: globus_sdk.MissingType
+.. class:: globus_sdk.MissingType
+    :canonical: globus_sdk.utils.MissingType
 
     This is the type of ``MISSING``.
 

@@ -5,13 +5,13 @@ import sys
 import typing as t
 import uuid
 
+from globus_sdk.scopes import MutableScope
+
 if sys.version_info < (3, 8):
     from typing_extensions import Protocol
 else:
     from typing import Protocol
 
-if t.TYPE_CHECKING:
-    from globus_sdk.scopes import MutableScope
 
 # these types are aliases meant for internal use
 IntLike = t.Union[int, str]
@@ -20,10 +20,8 @@ DateLike = t.Union[str, datetime.datetime]
 
 ScopeCollectionType = t.Union[
     str,
-    "MutableScope",
-    t.Iterable[str],
-    t.Iterable["MutableScope"],
-    t.Iterable[t.Union[str, "MutableScope"]],
+    MutableScope,
+    t.Iterable[t.Union[str, MutableScope]],
 ]
 
 

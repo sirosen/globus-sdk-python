@@ -1072,7 +1072,8 @@ class AuthClient(client.BaseClient):
         *,
         public_client: bool | utils.MissingType = utils.MISSING,
         client_type: (
-            t.Literal[
+            utils.MissingType
+            | t.Literal[
                 "client_identity",
                 "confidential_client",
                 "globus_connect_server",
@@ -1080,9 +1081,8 @@ class AuthClient(client.BaseClient):
                 "hybrid_confidential_client_resource_server",
                 "resource_server",
             ]
-            | utils.MissingType
         ) = utils.MISSING,
-        visibility: t.Literal["public", "private"] | utils.MissingType = utils.MISSING,
+        visibility: utils.MissingType | t.Literal["public", "private"] = utils.MISSING,
         redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
         terms_and_conditions: str | utils.MissingType = utils.MISSING,
         privacy_policy: str | utils.MissingType = utils.MISSING,
@@ -1219,7 +1219,7 @@ class AuthClient(client.BaseClient):
         client_id: UUIDLike,
         *,
         name: str | utils.MissingType = utils.MISSING,
-        visibility: t.Literal["public", "private"] | utils.MissingType = utils.MISSING,
+        visibility: utils.MissingType | t.Literal["public", "private"] = utils.MISSING,
         redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
         terms_and_conditions: str | None | utils.MissingType = utils.MISSING,
         privacy_policy: str | None | utils.MissingType = utils.MISSING,
