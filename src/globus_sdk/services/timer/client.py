@@ -115,10 +115,7 @@ class TimerClient(client.BaseClient):
                 "Create a TransferTimer instead."
             )
         log.info("TimerClient.create_timer(...)")
-        return self.post(
-            "/v2/timer",
-            data={"timer": dict(timer) if isinstance(timer, TransferTimer) else timer},
-        )
+        return self.post("/v2/timer", data={"timer": timer})
 
     def create_job(
         self, data: dict[str, t.Any] | TimerJob

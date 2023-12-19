@@ -75,8 +75,8 @@ class StorageGatewayDocument(utils.PayloadWrapper):
         display_name: str | None = None,
         connector_id: UUIDLike | None = None,
         root: str | None = None,
-        identity_mappings: None | (t.Iterable[dict[str, t.Any]]) = None,
-        policies: (StorageGatewayPolicies | dict[str, t.Any] | None) = None,
+        identity_mappings: None | t.Iterable[dict[str, t.Any]] = None,
+        policies: StorageGatewayPolicies | dict[str, t.Any] | None = None,
         allowed_domains: t.Iterable[str] | None = None,
         high_assurance: bool | None = None,
         require_mfa: bool | None = None,
@@ -100,7 +100,7 @@ class StorageGatewayDocument(utils.PayloadWrapper):
         self._set_optbools(high_assurance=high_assurance, require_mfa=require_mfa)
         self._set_optints(authentication_timeout_mins=authentication_timeout_mins)
         self._set_value("identity_mappings", identity_mappings, callback=list)
-        self._set_value("policies", policies, callback=dict)
+        self._set_value("policies", policies)
         if additional_fields is not None:
             self.update(additional_fields)
         ensure_datatype(self)
