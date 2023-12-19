@@ -67,25 +67,19 @@ class RequestsTransport:
 
     :param verify_ssl: Explicitly enable or disable SSL verification,
         or configure the path to a CA certificate bundle to use for SSL verification
-    :type verify_ssl: bool, str, or pathlib.Path, optional
     :param http_timeout: Explicitly set an HTTP timeout value in seconds. This parameter
         defaults to 60s but can be set via the ``GLOBUS_SDK_HTTP_TIMEOUT`` environment
         variable. Any value set via this parameter takes precedence over the environment
         variable.
-    :type http_timeout: float, optional
     :param retry_backoff: A function which determines how long to sleep between calls
         based on the RetryContext. Defaults to exponential backoff with jitter based on
         the context ``attempt`` number.
-    :type retry_backoff: callable, optional
     :param retry_checks: A list of initial retry checks. Any hooks registered,
         including the default hooks, will run after these checks.
-    :type retry_checks: list of callable, optional
     :param max_sleep: The maximum sleep time between retries (in seconds). If the
         computed sleep time or the backoff requested by a retry check exceeds this
         value, this amount of time will be used instead
-    :type max_sleep: float or int, optional
     :param max_retries: The maximum number of retries allowed by this transport
-    :type max_retries: int, optional
     """
 
     #: default maximum number of retries
@@ -163,18 +157,13 @@ class RequestsTransport:
 
         :param verify_ssl: Explicitly enable or disable SSL verification,
             or configure the path to a CA certificate bundle to use for SSL verification
-        :type verify_ssl: bool, str, or pathlib.Path, optional
         :param http_timeout: Explicitly set an HTTP timeout value in seconds
-        :type http_timeout: float, optional
         :param retry_backoff: A function which determines how long to sleep between
             calls based on the RetryContext
-        :type retry_backoff: callable, optional
         :param max_sleep: The maximum sleep time between retries (in seconds). If the
             computed sleep time or the backoff requested by a retry check exceeds this
             value, this amount of time will be used instead
-        :type max_sleep: float or int, optional
         :param max_retries: The maximum number of retries allowed by this transport
-        :type max_retries: int, optional
 
         **Examples**
 
@@ -268,7 +257,6 @@ class RequestsTransport:
 
         :param ctx: The context object which describes the state of the request and the
             retries which may already have been attempted.
-        :type ctx: RetryContext
         """
         sleep_period = min(self.retry_backoff(ctx), self.max_sleep)
         log.info("request retry_sleep(%s) [max=%s]", sleep_period, self.max_sleep)
@@ -290,29 +278,20 @@ class RequestsTransport:
         Send an HTTP request
 
         :param url: URL for the request
-        :type url: str
         :param method: HTTP request method, as an all caps string
-        :type method: str
         :param query_params: Parameters to be encoded as a query string
-        :type query_params: dict, optional
         :param headers: HTTP headers to add to the request
-        :type headers: dict
         :param data: Data to send as the request body. May pass through encoding.
-        :type data: dict or str
         :param encoding: A way to encode request data. "json", "form", and "text"
             are all valid values. Custom encodings can be used only if they are
             registered with the transport. By default, strings get "text" behavior and
             all other objects get "json".
-        :type encoding: str
         :param authorizer: The authorizer which is used to get or update authorization
             information for the request
-        :type authorizer: GlobusAuthorizer, optional
         :param allow_redirects: Follow Location headers on redirect response
             automatically. Defaults to ``True``
-        :type allow_redirects: bool
         :param stream: Do not immediately download the response content. Defaults to
             ``False``
-        :type stream: bool
 
         :return: ``requests.Response`` object
         """
@@ -373,7 +352,6 @@ class RequestsTransport:
         Multiple checks should be chainable and callable in any order.
 
         :param func: The function or other callable to register as a retry check
-        :type func: callable
         """
         self.retry_checks.append(func)
         return func
@@ -402,7 +380,6 @@ class RequestsTransport:
 
         :param ctx: The context object which describes the state of the request and the
             retries which may already have been attempted.
-        :type ctx: RetryContext
         """
         if ctx.exception and isinstance(ctx.exception, requests.RequestException):
             return RetryCheckResult.do_retry
@@ -414,7 +391,6 @@ class RequestsTransport:
 
         :param ctx: The context object which describes the state of the request and the
             retries which may already have been attempted.
-        :type ctx: RetryContext
         """
         if (
             ctx.response is None
@@ -433,7 +409,6 @@ class RequestsTransport:
 
         :param ctx: The context object which describes the state of the request and the
             retries which may already have been attempted.
-        :type ctx: RetryContext
         """
         if ctx.response is not None and (
             ctx.response.status_code in self.TRANSIENT_ERROR_STATUS_CODES
@@ -454,7 +429,6 @@ class RequestsTransport:
 
         :param ctx: The context object which describes the state of the request and the
             retries which may already have been attempted.
-        :type ctx: RetryContext
         """
         if (  # is the current check applicable?
             ctx.response is None
