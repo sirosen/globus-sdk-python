@@ -21,18 +21,13 @@ class BaseClient:
     Abstract base class for clients with error handling for Globus APIs.
 
     :param authorizer: A ``GlobusAuthorizer`` which will generate Authorization headers
-    :type authorizer: :class:`GlobusAuthorizer\
-        <globus_sdk.authorizers.base.GlobusAuthorizer>`
     :param app_name: Optional "nice name" for the application. Has no bearing on the
         semantics of client actions. It is just passed as part of the User-Agent
         string, and may be useful when debugging issues with the Globus Team
-    :type app_name: str
     :param base_url: The URL for the service. Most client types initialize this value
         intelligently by default. Set it when inheriting from BaseClient or
         communicating through a proxy.
-    :type base_url: str
     :param transport_params: Options to pass to the transport for this client
-    :type transport_params: dict
 
     All other parameters are for internal use and should be ignored.
     """
@@ -138,9 +133,6 @@ class BaseClient:
         Make a GET request to the specified path.
 
         See :py:meth:`~.BaseClient.request` for details on the various parameters.
-
-        :return: :class:`GlobusHTTPResponse \
-        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"GET to {path} with query_params {query_params}")
         return self.request("GET", path, query_params=query_params, headers=headers)
@@ -158,9 +150,6 @@ class BaseClient:
         Make a POST request to the specified path.
 
         See :py:meth:`~.BaseClient.request` for details on the various parameters.
-
-        :return: :class:`GlobusHTTPResponse \
-        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"POST to {path} with query_params {query_params}")
         return self.request(
@@ -183,9 +172,6 @@ class BaseClient:
         Make a DELETE request to the specified path.
 
         See :py:meth:`~.BaseClient.request` for details on the various parameters.
-
-        :return: :class:`GlobusHTTPResponse \
-        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"DELETE to {path} with query_params {query_params}")
         return self.request("DELETE", path, query_params=query_params, headers=headers)
@@ -203,9 +189,6 @@ class BaseClient:
         Make a PUT request to the specified path.
 
         See :py:meth:`~.BaseClient.request` for details on the various parameters.
-
-        :return: :class:`GlobusHTTPResponse \
-        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"PUT to {path} with query_params {query_params}")
         return self.request(
@@ -230,9 +213,6 @@ class BaseClient:
         Make a PATCH request to the specified path.
 
         See :py:meth:`~.BaseClient.request` for details on the various parameters.
-
-        :return: :class:`GlobusHTTPResponse \
-        <globus_sdk.response.GlobusHTTPResponse>` object
         """
         log.debug(f"PATCH to {path} with query_params {query_params}")
         return self.request(
@@ -260,29 +240,18 @@ class BaseClient:
         Send an HTTP request
 
         :param method: HTTP request method, as an all caps string
-        :type method: str
         :param path: Path for the request, with or without leading slash
-        :type path: str
         :param query_params: Parameters to be encoded as a query string
-        :type query_params: dict, optional
         :param headers: HTTP headers to add to the request
-        :type headers: dict
         :param data: Data to send as the request body. May pass through encoding.
-        :type data: dict or str
         :param encoding: A way to encode request data. "json", "form", and "text"
             are all valid values. Custom encodings can be used only if they are
             registered with the transport. By default, strings get "text" behavior and
             all other objects get "json".
-        :type encoding: str
         :param allow_redirects: Follow Location headers on redirect response
             automatically. Defaults to ``True``
-        :type allow_redirects: bool
         :param stream: Do not immediately download the response content. Defaults to
             ``False``
-        :type stream: bool
-
-        :return: :class:`GlobusHTTPResponse \
-        <globus_sdk.response.GlobusHTTPResponse>` object
 
         :raises GlobusAPIError: a `GlobusAPIError` will be raised if the response to the
             request is received and has a status code in the 4xx or 5xx categories
