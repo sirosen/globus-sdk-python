@@ -11,6 +11,7 @@ from globus_sdk import (
     POSIXCollectionPolicies,
     POSIXStagingCollectionPolicies,
 )
+from globus_sdk.transport import JSONRequestEncoder
 
 STUB_SG_ID = uuid.uuid1()  # storage gateway
 STUB_MC_ID = uuid.uuid1()  # mapped collection
@@ -119,7 +120,7 @@ def test_datatype_version_deduction_add_custom(monkeypatch):
         GoogleCloudStorageCollectionPolicies,
     ),
 )
-def test_collection_policies_field(policies_type):
+def test_collection_policies_field_encoded(policies_type):
     if policies_type is dict:
         policy_data = {"spam": "eggs"}
     elif policies_type in (POSIXCollectionPolicies, POSIXStagingCollectionPolicies):
@@ -143,26 +144,29 @@ def test_collection_policies_field(policies_type):
     )
 
     assert "policies" in doc
-    assert isinstance(doc["policies"], dict)
+    assert isinstance(doc["policies"], policies_type)
+
+    encoder = JSONRequestEncoder()
+    request_data = encoder.encode("POST", "bogus.url.example", {}, doc, {}).json
 
     if policies_type is dict:
-        assert doc["policies"] == {"spam": "eggs"}
+        assert request_data["policies"] == {"spam": "eggs"}
     elif policies_type is POSIXCollectionPolicies:
-        assert doc["policies"] == {
+        assert request_data["policies"] == {
             "DATA_TYPE": "posix_collection_policies#1.0.0",
             "spam": "eggs",
             "sharing_groups_allow": ["foo", "bar"],
             "sharing_groups_deny": ["baz"],
         }
     elif policies_type is POSIXStagingCollectionPolicies:
-        assert doc["policies"] == {
+        assert request_data["policies"] == {
             "DATA_TYPE": "posix_staging_collection_policies#1.0.0",
             "spam": "eggs",
             "sharing_groups_allow": ["foo", "bar"],
             "sharing_groups_deny": ["baz"],
         }
     elif policies_type is GoogleCloudStorageCollectionPolicies:
-        assert doc["policies"] == {
+        assert request_data["policies"] == {
             "DATA_TYPE": "google_cloud_storage_collection_policies#1.0.0",
             "spam": "eggs",
             "project": "foo",

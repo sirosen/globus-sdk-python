@@ -16,6 +16,7 @@ from globus_sdk import (
     S3StoragePolicies,
     StorageGatewayDocument,
 )
+from globus_sdk.transport import JSONRequestEncoder
 
 
 @pytest.mark.parametrize(
@@ -37,8 +38,12 @@ def test_storage_gateway_policy_document_conversion():
     )
     sg = StorageGatewayDocument(policies=policies)
     assert "policies" in sg
-    assert isinstance(sg["policies"], dict)
-    assert sg["policies"] == {
+    assert isinstance(sg["policies"], POSIXStoragePolicies)
+
+    encoder = JSONRequestEncoder()
+    request_data = encoder.encode("POST", "bogus.url.example", {}, sg, {}).json
+
+    assert request_data["policies"] == {
         "DATA_TYPE": "posix_storage_policies#1.0.0",
         "groups_allow": ["jedi", "wookies"],
         "groups_deny": ["sith", "stormtroopers"],

@@ -301,7 +301,7 @@ class MappedCollectionDocument(CollectionDocument):
         allow_guest_collections: bool | None = None,
         disable_anonymous_writes: bool | None = None,
         # dicts
-        policies: (CollectionPolicies | dict[str, t.Any] | None) = None,
+        policies: CollectionPolicies | dict[str, t.Any] | None = None,
         # > specific args end <
         # additional fields
         additional_fields: dict[str, t.Any] | None = None,
@@ -348,7 +348,7 @@ class MappedCollectionDocument(CollectionDocument):
             disable_anonymous_writes=disable_anonymous_writes,
         )
         self._set_value("sharing_restrict_paths", sharing_restrict_paths)
-        self._set_value("policies", policies, callback=dict)
+        self._set_value("policies", policies)
         ensure_datatype(self)
 
 
