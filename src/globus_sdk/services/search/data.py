@@ -31,7 +31,6 @@ class SearchQueryBase(utils.PayloadWrapper):
         Set the query string for the query document.
 
         :param query: the new query string
-        :type query: str
         """
         self["q"] = query
         return self
@@ -41,7 +40,6 @@ class SearchQueryBase(utils.PayloadWrapper):
         Set the limit for the query document.
 
         :param limit: a limit on the number of results returned in a single page
-        :type limit: int
         """
         self["limit"] = limit
         return self
@@ -51,7 +49,6 @@ class SearchQueryBase(utils.PayloadWrapper):
         Enable or disable advanced query string processing.
 
         :param advanced: whether to enable (``True``) or not (``False``)
-        :type advanced: bool
         """
         self["advanced"] = advanced
         return self
@@ -69,13 +66,9 @@ class SearchQueryBase(utils.PayloadWrapper):
         Add a filter subdocument to the query.
 
         :param field_name: the field on which to filter
-        :type field_name: str
         :param values: the values to use in the filter
-        :type values: list of str
         :param type: the type of filter to apply, defaults to "match_all"
-        :type type: str
         :param additional_fields: additional data to include in the filter document
-        :type additional_fields: dict, optional
         """
         self["filters"] = self.get("filters", [])
         new_filter = {
@@ -94,17 +87,12 @@ class SearchQuery(SearchQueryBase):
     Query document.
 
     :param q: The query string. Required unless filters are used.
-    :type q: str, optional
     :param limit: A limit on the number of results returned in a single page
-    :type limit: int
     :param offset: An offset into the set of all results for the query
-    :type offset: int
     :param advanced: Whether to enable (``True``) or not to enable (``False``) advanced
         parsing of query strings. The default of ``False`` is robust and guarantees that
         the query will not error with "bad query string" errors
-    :type advanced: bool, optional
     :param additional_fields: additional data to include in the query document
-    :type additional_fields: dict, optional
 
     Example usage:
 
@@ -143,7 +131,6 @@ class SearchQuery(SearchQueryBase):
         Set the offset for the query document.
 
         :param offset: an offset into the set of all results for the query
-        :type offset: int
         """
         self["offset"] = offset
         return self
@@ -164,19 +151,12 @@ class SearchQuery(SearchQueryBase):
         Add a facet subdocument to the query.
 
         :param name: the name for the facet in the result
-        :type name: str
         :param field_name: the field on which to build the facet
-        :type field_name: str
         :param type: the type of facet to apply, defaults to "terms"
-        :type type: str
         :param size: the size parameter for the facet
-        :type size: int, optional
         :param date_interval: the date interval for a date histogram facet
-        :type date_interval: str, optional
         :param histogram_range: a low and high bound for a numeric histogram facet
-        :type histogram_range: tuple, optional
         :param additional_fields: additional data to include in the facet document
-        :type additional_fields: dict, optional
         """
         self["facets"] = self.get("facets", [])
         facet: dict[str, t.Any] = {
@@ -206,12 +186,9 @@ class SearchQuery(SearchQueryBase):
         Add a boost subdocument to the query.
 
         :param field_name: the field to boost in result weighting
-        :type field_name: str
         :param factor: the factor by which to adjust the field weight (where ``1.0`` is
             the default weight)
-        :type factor: str, int, or float
         :param additional_fields: additional data to include in the boost document
-        :type additional_fields: dict, optional
         """
         self["boosts"] = self.get("boosts", [])
         boost = {
@@ -233,11 +210,8 @@ class SearchQuery(SearchQueryBase):
         Add a sort subdocument to the query.
 
         :param field_name: the field on which to sort
-        :type field_name: str
         :param order: ascending or descending order, given as ``"asc"`` or ``"desc"``
-        :type order: str, optional
         :param additional_fields: additional data to include in the sort document
-        :type additional_fields: dict, optional
         """
         self["sort"] = self.get("sort", [])
         sort = {"field_name": field_name, **(additional_fields or {})}
@@ -259,17 +233,12 @@ class SearchScrollQuery(SearchQueryBase):
     used to paginate results.
 
     :param q: The query string
-    :type q: str, optional
     :param limit: A limit on the number of results returned in a single page
-    :type limit: int
     :param advanced: Whether to enable (``True``) or not to enable (``False``) advanced
         parsing of query strings. The default of ``False`` is robust and guarantees that
         the query will not error with "bad query string" errors
-    :type advanced: bool, optional
     :param marker: the marker value
-    :type marker: str, optional
     :param additional_fields: additional data to include in the query document
-    :type additional_fields: dict, optional
     """
 
     def __init__(
@@ -298,7 +267,6 @@ class SearchScrollQuery(SearchQueryBase):
         Set the marker on a scroll query.
 
         :param marker: the marker value
-        :type marker: str
         """
         self["marker"] = marker
         return self

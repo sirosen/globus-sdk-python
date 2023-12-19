@@ -22,11 +22,6 @@ class SearchClient(client.BaseClient):
     API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
     from the base client that can be used to access any API resource.
 
-    :param authorizer: An authorizer instance used for all calls to
-                       Globus Search
-    :type authorizer: :class:`GlobusAuthorizer \
-                      <globus_sdk.authorizers.base.GlobusAuthorizer>`
-
     **Methods**
 
     .. automethodlist:: globus_sdk.SearchClient
@@ -46,9 +41,7 @@ class SearchClient(client.BaseClient):
         Create a new index.
 
         :param display_name: the name of the index
-        :type display_name: str
         :param description: a description of the index
-        :type description: str
 
         New indices default to trial status. For subscribers with a subscription ID,
         indices can be converted to non-trial by sending a request to support@globus.org
@@ -97,7 +90,6 @@ class SearchClient(client.BaseClient):
         use with the ``reopen`` API (see :meth:`~.reopen_index`) during that time.
 
         :param index_id: the ID of the index
-        :type index_id: str or UUID
 
         .. tab-set::
 
@@ -127,7 +119,6 @@ class SearchClient(client.BaseClient):
         Reopen an index that has been marked for deletion, cancelling the deletion.
 
         :param index_id: the ID of the index
-        :type index_id: str or UUID
 
         .. tab-set::
 
@@ -163,9 +154,7 @@ class SearchClient(client.BaseClient):
         and how much data it contains.
 
         :param index_id: the ID of the index
-        :type index_id: str or UUID
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -213,18 +202,12 @@ class SearchClient(client.BaseClient):
         Execute a simple Search Query, described by the query string ``q``.
 
         :param index_id: the ID of the index
-        :type index_id: str or UUID
         :param q: the query string
-        :type q: str
         :param offset: an offset for pagination
-        :type offset: int
         :param limit: the size of a page of results
-        :type limit: int
         :param advanced: enable 'advanced' query mode, which has sophisticated syntax
             but may result in BadRequest errors when used if the query is invalid
-        :type advanced: bool
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -285,13 +268,9 @@ class SearchClient(client.BaseClient):
         facets, sorting, field boostring, and other behaviors.
 
         :param index_id: The index on which to search
-        :type index_id: str or UUID
         :param data: A Search Query document containing the query and any other fields
-        :type data: dict or SearchQuery
         :param offset: offset used in paging (overwrites any offset in ``data``)
-        :type offset: int, optional
         :param limit: limit the number of results (overwrites any limit in ``data``)
-        :type limit: int, optional
 
         .. tab-set::
 
@@ -358,11 +337,8 @@ class SearchClient(client.BaseClient):
         scrolling to not include results or show other unexpected behaviors.
 
         :param index_id: The index on which to search
-        :type index_id: str or UUID
         :param data: A Search Scroll Query document
-        :type data: dict or SearchScrollQuery
         :param marker: marker used in paging (overwrites any marker in ``data``)
-        :type marker: str, optional
 
         .. tab-set::
 
@@ -405,9 +381,7 @@ class SearchClient(client.BaseClient):
         ``task_id`` value will be included in the response.
 
         :param index_id: The index into which to write data
-        :type index_id: str or UUID
         :param data: an ingest document
-        :type data: dict
 
         .. tab-set::
 
@@ -477,9 +451,7 @@ class SearchClient(client.BaseClient):
         A ``task_id`` value will be included in the response.
 
         :param index_id: The index in which to delete data
-        :type index_id: str or UUID
         :param data: a query document for documents to delete
-        :type data: dict
 
         .. tab-set::
 
@@ -523,11 +495,8 @@ class SearchClient(client.BaseClient):
         A ``task_id`` value will be included in the response.
 
         :param index_id: The index in which to delete data
-        :type index_id: str or UUID
         :param subjects: The subjects to delete, as an iterable of strings
-        :type subjects: iterable of str
         :param additional_params: Additional parameters to include in the request body
-        :type additional_params: dict, optional
 
         .. tab-set::
 
@@ -580,11 +549,8 @@ class SearchClient(client.BaseClient):
         Fetch exactly one Subject document from Search, containing one or more Entries.
 
         :param index_id: the index containing this Subject
-        :type index_id: str or UUID
         :param subject: the subject string to fetch
-        :type subject: str
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -625,11 +591,8 @@ class SearchClient(client.BaseClient):
         A ``task_id`` value will be included in the response.
 
         :param index_id: the index in which data will be deleted
-        :type index_id: str or UUID
         :param subject: the subject string for the Subject document to delete
-        :type subject: str
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -675,14 +638,10 @@ class SearchClient(client.BaseClient):
         ``subject`` string and ``entry_id``, which defaults to ``null``.
 
         :param index_id: the index containing this Entry
-        :type index_id: str or UUID
         :param subject: the subject string for the Subject document containing this
             Entry
-        :type subject: str
         :param entry_id: the entry_id for this Entry, which defaults to ``null``
-        :type entry_id: str, optional
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -737,9 +696,7 @@ class SearchClient(client.BaseClient):
         any existing data.
 
         :param index_id: the index containing this Entry
-        :type index_id: str or UUID
         :param data: the entry document to write
-        :type data: dict
 
         .. tab-set::
 
@@ -802,9 +759,7 @@ class SearchClient(client.BaseClient):
         This does not do a partial update, but replaces the existing document.
 
         :param index_id: the index containing this Entry
-        :type index_id: str or UUID
         :param data: the entry document to write
-        :type data: dict
 
         .. tab-set::
 
@@ -853,13 +808,9 @@ class SearchClient(client.BaseClient):
         A ``task_id`` value will be included in the response.
 
         :param index_id: the index in which data will be deleted
-        :type index_id: str or UUID
         :param subject: the subject string for the Subject of the document to delete
-        :type subject: str
         :param entry_id: the ID string for the Entry to delete
-        :type entry_id: str
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -914,9 +865,7 @@ class SearchClient(client.BaseClient):
         Fetch a Task document by ID, getting task details and status.
 
         :param task_id: the task ID from the original task submission
-        :type task_id: str or UUID
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -950,9 +899,7 @@ class SearchClient(client.BaseClient):
         status.
 
         :param index_id: the index to query
-        :type index_id: str or UUID
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -995,11 +942,8 @@ class SearchClient(client.BaseClient):
         <https://docs.globus.org/api/search/overview/#principal_urns>`_.
 
         :param index_id: The index on which to create the role
-        :type index_id: uuid or str
         :param data: The partial role document to use for creation
-        :type data: dict
         :param query_params: Any additional query params to pass
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1037,9 +981,7 @@ class SearchClient(client.BaseClient):
         role on an index to list roles.
 
         :param index_id: The index on which to list roles
-        :type index_id: uuid or str
         :param query_params: Any additional query params to pass
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1066,11 +1008,8 @@ class SearchClient(client.BaseClient):
         index.
 
         :param index_id: The index from which to delete a role
-        :type index_id: uuid or str
         :param role_id: The role to delete
-        :type role_id: str
         :param query_params: Any additional query params to pass
-        :type query_params: dict, optional
 
         .. tab-set::
 
