@@ -17,16 +17,6 @@ class TimerClient(client.BaseClient):
     r"""
     Client for the Globus Timer API.
 
-    :param authorizer: An authorizer instance used for all calls to Timer
-    :type authorizer: :class:`GlobusAuthorizer\
-                      <globus_sdk.authorizers.base.GlobusAuthorizer>`
-    :param app_name: Optional "nice name" for the application. Has no bearing on the
-        semantics of client actions. It is just passed as part of the User-Agent
-        string, and may be useful when debugging issues with the Globus team
-    :type app_name: str
-    :param transport_params: Options to pass to the transport for this client
-    :type transport_params: dict
-
     .. automethodlist:: globus_sdk.TimerClient
     """
     error_class = TimerAPIError
@@ -40,7 +30,6 @@ class TimerClient(client.BaseClient):
         ``GET /jobs/``
 
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         **Examples**
 
@@ -60,9 +49,7 @@ class TimerClient(client.BaseClient):
         ``GET /jobs/<job_id>``
 
         :param job_id: the ID of the timer ("job")
-        :type job_id: str or UUID
         :param query_params: additional parameters to pass as query params
-        :type query_params: dict, optional
 
         **Examples**
 
@@ -78,7 +65,6 @@ class TimerClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param timer: a document defining the new timer
-        :type timer: dict or :class:`~.TransferTimer`
 
         A ``TransferTimer`` object can be constructed from a ``TransferData`` object,
         which is the recommended way to create a timer for data transfers.
@@ -127,7 +113,6 @@ class TimerClient(client.BaseClient):
         ``POST /jobs/``
 
         :param data: a timer document used to create the new timer ("job")
-        :type data: dict or :class:`~.TimerJob`
 
         **Examples**
 
@@ -158,9 +143,7 @@ class TimerClient(client.BaseClient):
         ``PATCH /jobs/<job_id>``
 
         :param job_id: the ID of the timer ("job")
-        :type job_id: str or UUID
         :param data: a partial timer document used to update the job
-        :type data: dict
 
         **Examples**
 
@@ -178,7 +161,6 @@ class TimerClient(client.BaseClient):
         ``DELETE /jobs/<job_id>``
 
         :param job_id: the ID of the timer ("job")
-        :type job_id: str or UUID
 
         **Examples**
 
@@ -196,7 +178,6 @@ class TimerClient(client.BaseClient):
         Make a timer job inactive, preventing it from running until it is resumed.
 
         :param job_id: The ID of the timer to pause
-        :type job_id: str or UUID
 
         **Examples**
 
@@ -217,7 +198,6 @@ class TimerClient(client.BaseClient):
         issues with insufficient authorization.
 
         :param job_id: The ID of the timer to resume
-        :type job_id: str or UUID
         :param update_credentials: When true, replace the credentials for the timer
             using the credentials for this resume call. This can be used to resolve
             authorization errors (such as session and consent errors), but it also
@@ -226,7 +206,6 @@ class TimerClient(client.BaseClient):
             replacing. If not supplied, the Timers service will determine whether to
             replace credentials according to the reason why the timer job
             became inactive.
-        :type update_credentials: bool, optional
 
         **Examples**
 
