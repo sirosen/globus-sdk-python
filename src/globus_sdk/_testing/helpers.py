@@ -19,7 +19,6 @@ def get_last_request(
     Get the last request which was received, or None if there were no requests.
 
     :param requests_mock: A non-default ``RequestsMock`` object to use.
-    :type requests_mock: responses.RequestsMock
     """
     calls = requests_mock.calls if requests_mock is not None else responses.calls
     try:
@@ -74,21 +73,13 @@ def construct_error(
 
     :param error_class: The class of the error to construct. Defaults to
         GlobusAPIError.
-    :type error_class: type[GlobusAPIError]
     :param http_status: The HTTP status code to use in the response.
-    :type http_status: int
     :param body: The body of the response. If a dict, will be JSON-encoded.
-    :type body: bytes | str | dict
     :param method: The HTTP method to set on the underlying request.
-    :type method: str, optional
     :param response_headers: The headers of the response.
-    :type response_headers: dict, optional
     :param request_headers: The headers of the request.
-    :type request_headers: dict, optional
     :param response_encoding: The encoding to use for the response body.
-    :type response_encoding: str, optional
     :param url: The URL to set on the underlying request.
-    :type url: str, optional
     """
     raw_response = requests.Response()
     raw_response.status_code = http_status

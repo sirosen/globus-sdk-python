@@ -120,7 +120,6 @@ class RegisteredResponse:
 
         :param requests_mock: The mocked requests object to use. Defaults to the default
             provided by the ``responses`` library
-        :type requests_mock: responses.RequestsMock, optional
         """
         return self._add_or_replace("add", requests_mock=requests_mock)
 
@@ -133,7 +132,6 @@ class RegisteredResponse:
 
         :param requests_mock: The mocked requests object to use. Defaults to the default
             provided by the ``responses`` library
-        :type requests_mock: responses.RequestsMock, optional
         """
         return self._add_or_replace("replace", requests_mock=requests_mock)
 
