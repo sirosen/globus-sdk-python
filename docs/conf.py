@@ -23,6 +23,10 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
 
+# pull signature docs from type hints, into body
+# and keep the signatures concise
+autodoc_typehints = "description"
+
 
 # sphinx extensions (minimally, we want autodoc and viewcode to build the site)
 # plus, we have our own custom extension in the SDK to include
