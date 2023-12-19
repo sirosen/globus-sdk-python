@@ -36,20 +36,15 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
     the client itself.
 
     :param confidential_client: client object with a valid id and client secret
-    :type confidential_client: :class:`ConfidentialAppAuthClient\
-        <globus_sdk.ConfidentialAppAuthClient>`
     :param scopes: A string of space-separated scope names being requested for the
         access tokens that will be used for the Authorization header. These scopes must
         all be for the same resource server, or else the token response will have
         multiple access tokens.
-    :type scopes: str, MutableScope, or iterable of str or MutableScope
     :param access_token: Initial Access Token to use, only used if ``expires_at`` is
         also set. Must be requested with the same set of scopes passed to this
         authorizer.
-    :type access_token: str
     :param expires_at: Expiration time for the starting ``access_token`` expressed as a
         POSIX timestamp (i.e. seconds since the epoch)
-    :type expires_at: int, optional
     :param on_refresh: A callback which is triggered any time this authorizer fetches a
         new access_token. The ``on_refresh`` callable is invoked on the
         :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
@@ -58,7 +53,6 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         This is useful for implementing storage for Access Tokens, as the
         ``on_refresh`` callback can be used to update the Access Tokens and
         their expiration times.
-    :type on_refresh: callable, optional
     """
 
     def __init__(
