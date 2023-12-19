@@ -14,3 +14,7 @@ To customize client methods with additional detail, the SDK uses subclasses of
 .. autoclass:: globus_sdk.response.IterableResponse
    :members:
    :show-inheritance:
+
+.. autoclass:: globus_sdk.response.ArrayResponse
+   :members:
+   :show-inheritance:

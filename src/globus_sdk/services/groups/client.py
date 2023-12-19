@@ -34,7 +34,6 @@ class GroupsClient(client.BaseClient):
         Return a list of groups your identity belongs to.
 
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -61,13 +60,10 @@ class GroupsClient(client.BaseClient):
         Get details about a specific group
 
         :param group_id: the ID of the group
-        :type group_id: str or UUID
         :param include: list of additional fields to include (allowed fields are
             ``memberships``, ``my_memberships``, ``policies``, ``allowed_actions``, and
             ``child_ids``)
-        :type include: str or iterable of str, optional
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -95,9 +91,7 @@ class GroupsClient(client.BaseClient):
         Delete a group.
 
         :param group_id: the ID of the group
-        :type group_id: str or UUID
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -121,9 +115,7 @@ class GroupsClient(client.BaseClient):
         Create a group.
 
         :param data: the group document to create
-        :type data: dict
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -148,11 +140,8 @@ class GroupsClient(client.BaseClient):
         Update a given group.
 
         :param group_id: the ID of the group
-        :type group_id: str or UUID
         :param data: the group document to use for update
-        :type data: dict
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -176,9 +165,7 @@ class GroupsClient(client.BaseClient):
         Get policies for the given group
 
         :param group_id: the ID of the group
-        :type group_id: str or UUID
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -203,11 +190,8 @@ class GroupsClient(client.BaseClient):
         Set policies for the group.
 
         :param group_id: the ID of the group
-        :type group_id: str or UUID
         :param data: the group policy document to set
-        :type data: dict or ``GroupPolicies``
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -231,7 +215,6 @@ class GroupsClient(client.BaseClient):
         user allows themselves to be added to groups.
 
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -256,9 +239,7 @@ class GroupsClient(client.BaseClient):
         user allows themselves to be added to groups.
 
         :param data: the identity set preferences document
-        :type data: dict
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -289,9 +270,7 @@ class GroupsClient(client.BaseClient):
         Get membership fields for your identities.
 
         :param group_id: the ID of the group
-        :type group_id: str or UUID
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -318,11 +297,8 @@ class GroupsClient(client.BaseClient):
         Set membership fields for your identities.
 
         :param group_id: the ID of the group
-        :type group_id: str or UUID
         :param data: the membership fields document
-        :type data: dict
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -351,12 +327,9 @@ class GroupsClient(client.BaseClient):
         Execute a batch of actions against several group memberships.
 
         :param group_id: the ID of the group
-        :type group_id: str or UUID
         :param actions: the batch of membership actions to perform, modifying, creating,
             and removing memberships in the group
-        :type actions: dict or BatchMembershipActions
         :param query_params: additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 

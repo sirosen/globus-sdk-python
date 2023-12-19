@@ -39,11 +39,8 @@ class GroupsManager:
         group will be a subgroup of the given parent group.
 
         :param name: The name of the group
-        :type name: str
         :param description: A description of the group
-        :type description: str
         :param parent_id: The ID of the parent group, if there is one
-        :type parent_id: str or UUID, optional
         """
         data = {
             "name": name,
@@ -67,21 +64,14 @@ class GroupsManager:
         Set the group policies for the given group.
 
         :param group_id: The ID of the group on which to set policies
-        :type group_id: str or UUID
         :param is_high_assurance: Whether the group can provide a High Assurance
             guarantee when used for access controls
-        :type is_high_assurance: bool
         :param group_visibility: The visibility of the group
-        :type group_visibility: str or :class:`~.GroupVisibility`
         :param group_members_visibility: The visibility of memberships within the group
-        :type group_members_visibility: str or :class:`~.GroupMemberVisibility`
         :param join_requests: Whether the group allows users to request to join
-        :type join_requests: bool
         :param signup_fields: The required fields for a user to sign up for the group
-        :type signup_fields: iterable of str or :class:`~.GroupRequiredSignupFields`
         :param authentication_assurance_timeout: The timeout used when this group is
             used to apply a High Assurance authentication guarantee
-        :type authentication_assurance_timeout: int, optional
         """
         data = GroupPolicies(
             is_high_assurance=is_high_assurance,
@@ -101,9 +91,7 @@ class GroupsManager:
         the identity set of the authenticated user.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity for whom to accept the invite
-        :type identity_id: str or UUID
         """
         actions = BatchMembershipActions().accept_invites([identity_id])
         return self.client.batch_membership_action(group_id, actions)
@@ -119,11 +107,8 @@ class GroupsManager:
         Add an identity to a group with the given role.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity to add to the group
-        :type identity_id: str or UUID
         :param role: The role for the new group member
-        :type role: str or :class:`~.GroupRole`
         """
         actions = BatchMembershipActions().add_members([identity_id], role=role)
         return self.client.batch_membership_action(group_id, actions)
@@ -135,9 +120,7 @@ class GroupsManager:
         Approve an identity with a pending join request.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity to approve as a member of the group
-        :type identity_id: str or UUID
         """
         actions = BatchMembershipActions().approve_pending([identity_id])
         return self.client.batch_membership_action(group_id, actions)
@@ -149,9 +132,7 @@ class GroupsManager:
         Decline an invitation for a given identity.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity for whom to decline the invitation
-        :type identity_id: str or UUID
         """
         actions = BatchMembershipActions().decline_invites([identity_id])
         return self.client.batch_membership_action(group_id, actions)
@@ -167,11 +148,8 @@ class GroupsManager:
         Invite an identity to a group with the given role.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity to invite as a new group member
-        :type identity_id: str or UUID
         :param role: The role for the invited group member
-        :type role: str or :class:`~.GroupRole`
         """
         actions = BatchMembershipActions().invite_members([identity_id], role=role)
         return self.client.batch_membership_action(group_id, actions)
@@ -184,9 +162,7 @@ class GroupsManager:
         authenticated users identity set.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity to use to join the group
-        :type identity_id: str or UUID
         """
         actions = BatchMembershipActions().join([identity_id])
         return self.client.batch_membership_action(group_id, actions)
@@ -199,9 +175,7 @@ class GroupsManager:
         identity set is a member of.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity to remove from the group
-        :type identity_id: str or UUID
         """
         actions = BatchMembershipActions().leave([identity_id])
         return self.client.batch_membership_action(group_id, actions)
@@ -213,9 +187,7 @@ class GroupsManager:
         Reject a member that has requested to join the group.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity to reject from the group
-        :type identity_id: str or UUID
         """
         actions = BatchMembershipActions().reject_join_requests([identity_id])
         return self.client.batch_membership_action(group_id, actions)
@@ -228,9 +200,7 @@ class GroupsManager:
         of the group.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity to remove from the group
-        :type identity_id: str or UUID
         """
         actions = BatchMembershipActions().remove_members([identity_id])
         return self.client.batch_membership_action(group_id, actions)
@@ -242,9 +212,7 @@ class GroupsManager:
         Request to join a group.
 
         :param group_id: The ID of the group
-        :type group_id: str or UUID
         :param identity_id: The identity to use to request membership in the group
-        :type identity_id: str or UUID
         """
         actions = BatchMembershipActions().request_join([identity_id])
         return self.client.batch_membership_action(group_id, actions)
