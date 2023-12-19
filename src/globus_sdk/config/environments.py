@@ -69,10 +69,8 @@ def get_service_url(service: str, environment: str | None = None) -> str:
 
 
     :param service: The short name of the service to get the URL for
-    :type service: str
     :param environment: The name of the environment to use. If unspecified, this will
         use the ``GLOBUS_SDK_ENVIRONMENT`` environment variable.
-    :type environment: str, optional
     """
     log.debug(f'Service URL Lookup for "{service}" under env "{environment}"')
     environment = environment or get_environment_name()
@@ -101,7 +99,6 @@ def get_webapp_url(environment: str | None = None) -> str:
 
     :param environment: The name of the environment to use. If unspecified, this will
         use the ``GLOBUS_SDK_ENVIRONMENT`` environment variable.
-    :type environment: str, optional
     """
     environment = environment or get_environment_name()
     return get_service_url("app", environment=environment)
