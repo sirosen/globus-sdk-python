@@ -57,88 +57,67 @@ class TransferData(utils.PayloadWrapper):
     :param transfer_client: A ``TransferClient`` instance which will be used to get a
         submission ID if one is not supplied. Should be the same instance that is used
         to submit the transfer.
-    :type transfer_client: :class:`TransferClient <globus_sdk.TransferClient>` or None
     :param source_endpoint: The endpoint ID of the source endpoint
-    :type source_endpoint: str or UUID
     :param destination_endpoint: The endpoint ID of the destination endpoint
-    :type destination_endpoint: str or UUID
     :param label: A string label for the Task
-    :type label: str, optional
     :param submission_id: A submission ID value fetched via :meth:`get_submission_id \
         <globus_sdk.TransferClient.get_submission_id>`. Defaults to using
         ``transfer_client.get_submission_id``
-    :type submission_id: str or UUID, optional
     :param sync_level: The method used to compare items between the source and
         destination. One of  ``"exists"``, ``"size"``, ``"mtime"``, or ``"checksum"``
         See the section below on sync-level for an explanation of values.
-    :type sync_level: int or str, optional
     :param verify_checksum: When true, after transfer verify that the source and
         destination file checksums match. If they don't, re-transfer the entire file and
         keep trying until it succeeds. This will create CPU load on both the origin and
         destination of the transfer, and may even be a bottleneck if the network speed
         is high enough.
         [default: ``False``]
-    :type verify_checksum: bool, optional
     :param preserve_timestamp: When true, Globus Transfer will attempt to set file
         timestamps on the destination to match those on the origin. [default: ``False``]
-    :type preserve_timestamp: bool, optional
     :param encrypt_data: When true, all files will be TLS-protected during transfer.
         [default: ``False``]
-    :type encrypt_data: bool, optional
     :param deadline: An ISO-8601 timestamp (as a string) or a datetime object which
         defines a deadline for the transfer. At the deadline, even if the data transfer
         is not complete, the job will be canceled. We recommend ensuring that the
         timestamp is in UTC to avoid confusion and ambiguity. Examples of ISO-8601
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
-    :type deadline: str or datetime, optional
     :param recursive_symlinks: Specify the behavior of recursive directory transfers
         when encountering symlinks. One of ``"ignore"``, ``"keep"``, or ``"copy"``.
         ``"ignore"`` skips symlinks, ``"keep"`` creates symlinks at the destination
         matching the source (without modifying the link path at all), and
         ``"copy"`` follows symlinks on the source, failing if the link is invalid.
         [default: ``"ignore"``]
-    :type recursive_symlinks: str
     :param skip_activation_check: When true, allow submission even if the endpoints
         aren't currently activated
-    :type skip_activation_check: bool, optional
     :param skip_source_errors: When true, source permission denied and file
         not found errors from the source endpoint will cause the offending
         path to be skipped.
         [default: ``False``]
-    :type skip_source_errors: bool, optional
     :param fail_on_quota_errors: When true, quota exceeded errors will cause the
         task to fail.
         [default: ``False``]
-    :type fail_on_quota_errors: bool, optional
     :param delete_destination_extra: Delete files, directories, and symlinks on the
         destination endpoint which don’t exist on the source endpoint or are a
         different type. Only applies for recursive directory transfers.
         [default: ``False``]
-    :type delete_destination_extra: bool, optional
     :param notify_on_succeeded: Send a notification email when the transfer completes
         with a status of SUCCEEDED.
         [default: ``True``]
-    :type notify_on_succeeded: bool, optional
     :param notify_on_failed: Send a notification email when the transfer completes
         with a status of FAILED.
         [default: ``True``]
-    :type notify_on_failed: bool, optional
     :param notify_on_inactive: Send a notification email when the transfer changes
         status to INACTIVE. e.g. From credentials expiring.
         [default: ``True``]
-    :type notify_on_inactive: bool, optional
     :param source_local_user: Optional value passed to the source's identity mapping
         specifying which local user account to map to. Only usable with Globus Connect
         Server v5 mapped collections.
-    :type source_local_user: string, optional
     :param destination_local_user: Optional value passed to the destination's identity
         mapping specifying which local user account to map to. Only usable with Globus
         Connect Server v5 mapped collections.
-    :type destination_local_user: string, optional
     :param additional_fields: additional fields to be added to the transfer
         document. Mostly intended for internal use
-    :type additional_fields: dict, optional
 
     **Sync Levels**
 
@@ -290,23 +269,17 @@ class TransferData(utils.PayloadWrapper):
             for more details.
 
         :param source_path: Path to the source directory or file to be transferred
-        :type source_path: str
         :param destination_path: Path to the destination directory or file will be
             transferred to
-        :type destination_path: str
         :param recursive: Set to True if the target at source path is a directory
-        :type recursive: bool, optional
         :param external_checksum: A checksum to verify both source file and destination
             file integrity. The checksum will be verified after the data transfer and a
             failure will cause the entire task to fail. Cannot be used with directories.
             Assumed to be an MD5 checksum unless checksum_algorithm is also given.
-        :type external_checksum: str, optional
         :param checksum_algorithm: Specifies the checksum algorithm to be used when
             verify_checksum is True, sync_level is "checksum" or 3, or an
             external_checksum is given.
-        :type checksum_algorithm: str, optional
         :param additional_fields: additional fields to be added to the transfer item
-        :type additional_fields: dict, optional
         """
         item_data: dict[str, t.Any] = {
             "DATA_TYPE": "transfer_item",
@@ -341,9 +314,7 @@ class TransferData(utils.PayloadWrapper):
         transfer document.
 
         :param source_path: Path to the source symlink
-        :type source_path: str
         :param destination_path: Path to which the source symlink will be transferred
-        :type destination_path: str
         """
         item_data = {
             "DATA_TYPE": "transfer_symlink_item",
@@ -385,16 +356,13 @@ class TransferData(utils.PayloadWrapper):
             are character groups: ``*`` matches everything, ``?`` matches any single
             character, ``[]`` matches any single character within the brackets, and
             ``[!]`` matches any single character not within the brackets.
-        :type name: str
         :param method: The method to use for filtering. If "exclude" (the default)
             items matching this rule will not be included in the transfer. If
             "include" items matching this rule will be included in the transfer.
-        :type method: str, optional
         :param type: The types of items on which to apply this filter rule. Either
             ``"file"`` or ``"dir"``. If unspecified, the rule applies to both.
             Note that if a ``"dir"`` is excluded then all items within it will
             also be excluded regardless if they would have matched any include rules.
-        :type type: str, optional
 
         Example Usage:
 

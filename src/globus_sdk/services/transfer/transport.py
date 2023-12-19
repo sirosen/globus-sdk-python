@@ -14,7 +14,6 @@ class TransferRequestsTransport(RequestsTransport):
 
         :param ctx: The context object which describes the state of the request and the
             retries which may already have been attempted
-        :type ctx: RetryContext
         """
         if ctx.response is not None and (
             ctx.response.status_code in self.TRANSIENT_ERROR_STATUS_CODES

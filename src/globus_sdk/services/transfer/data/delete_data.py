@@ -30,55 +30,41 @@ class DeleteData(utils.PayloadWrapper):
     :param transfer_client: A ``TransferClient`` instance which will be used to get a
         submission ID if one is not supplied. Should be the same instance that is used
         to submit the deletion.
-    :type transfer_client: :class:`TransferClient <globus_sdk.TransferClient>` or None
     :param endpoint: The endpoint ID which is targeted by this deletion Task
-    :type endpoint: str or UUID
     :param label: A string label for the Task
-    :type label: str, optional
     :param submission_id: A submission ID value fetched via
         :meth:`get_submission_id <globus_sdk.TransferClient.get_submission_id>`.
         Defaults to using ``transfer_client.get_submission_id`` if a ``transfer_client``
         is provided
-    :type submission_id: str or UUID, optional
     :param recursive: Recursively delete subdirectories on the target endpoint
       [default: ``False``]
-    :type recursive: bool
     :param ignore_missing: Ignore nonexistent files and directories instead of treating
         them as errors. [default: ``False``]
-    :type ignore_missing: bool
     :param interpret_globs: Enable expansion of ``\*?[]`` characters in the last
         component of paths, unless they are escaped with a preceding backslash, ``\\``
         [default: ``False``]
-    :type interpret_globs: bool
     :param deadline: An ISO-8601 timestamp (as a string) or a datetime object which
         defines a deadline for the deletion. At the deadline, even if the data deletion
         is not complete, the job will be canceled. We recommend ensuring that the
         timestamp is in UTC to avoid confusion and ambiguity. Examples of ISO-8601
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
-    :type deadline: str or datetime, optional
     :param skip_activation_check: When true, allow submission even if the endpoint
         isn't currently activated
-    :type skip_activation_check: bool, optional
     :param notify_on_succeeded: Send a notification email when the delete task
         completes with a status of SUCCEEDED.
         [default: ``True``]
-    :type notify_on_succeeded: bool, optional
     :param notify_on_failed: Send a notification email when the delete task completes
         with a status of FAILED.
         [default: ``True``]
-    :type notify_on_failed: bool, optional
     :param notify_on_inactive: Send a notification email when the delete task changes
         status to INACTIVE. e.g. From credentials expiring.
         [default: ``True``]
-    :type notify_on_inactive: bool, optional
     :param local_user: Optional value passed to identity mapping specifying which local
         user account to map to. Only usable with Globus Connect Server v5 mapped
         collections.
-    :type local_user: string, optional
     :param additional_fields: additional fields to be added to the delete
         document. Mostly intended for internal use
-    :type additional_fields: dict, optional
 
     **Examples**
 
@@ -172,9 +158,7 @@ class DeleteData(utils.PayloadWrapper):
         document.
 
         :param path: Path to the directory or file to be deleted
-        :type path: str
         :param additional_fields: additional fields to be added to the delete item
-        :type additional_fields: dict, optional
         """
         item_data = {"DATA_TYPE": "delete_item", "path": path}
         if additional_fields is not None:
