@@ -67,7 +67,6 @@ class CollectionDocument(utils.PayloadWrapper, abc.ABC):
         Normally ``DATA_TYPE`` is deduced from the provided parameters and should not be
         set. To maximize compatibility with different versions of GCS, only set this
         value when necessary.
-    :type data_type: str, optional
 
     :param collection_base_path: The location of the collection on its underlying
         storage. For a mapped collection, this is an absolute path on the storage system
@@ -75,53 +74,34 @@ class CollectionDocument(utils.PayloadWrapper, abc.ABC):
         relative to the value of the ``root_path`` attribute on the mapped collection
         identified by the ``mapped_collection_id``. This parameter is optional for
         updates but required when creating a new collection.
-    :type collection_base_path: str, optional
     :param contact_email: Email address of the support contact for the collection
-    :type contact_email: str, optional
     :param contact_info: Other contact information for the collection, e.g. phone number
         or mailing address
-    :type contact_info: str, optional
     :param default_directory: Default directory when using the collection
-    :type default_directory: str, optional
     :param department: The department which operates the collection
-    :type department: str, optional
     :param description: A text description of the collection
-    :type description: str, optional
     :param display_name: Friendly name for the collection
-    :type display_name: str, optional
     :param identity_id: The Globus Auth identity which acts as the owner of the
         collection
-    :type identity_id: str or UUID, optional
     :param info_link: Link for more info about the collection
-    :type info_link: str, optional
     :param organization: The organization which maintains the collection
-    :type organization: str, optional
     :param user_message: A message to display to users when interacting with this
         collection
-    :type user_message: str, optional
     :param user_message_link: A link to additional messaging for users when interacting
         with this collection
-    :type user_message_link: str, optional
 
     :param keywords: A list of keywords used to help searches for the collection
-    :type keywords: iterable of str, optional
 
     :param disable_verify: Disable verification checksums on transfers to and from this
         collection
-    :type disable_verify: bool, optional
     :param enable_https: Enable or disable HTTPS support (requires a managed endpoint)
-    :type enable_https: bool, optional
     :param force_encryption: When set to True, all transfers to and from the collection
         are always encrypted
-    :type force_encryption: bool, optional
     :param force_verify: Force verification checksums on transfers to and from this
         collection
-    :type force_verify: bool, optional
     :param public: If True, the collection will be visible to other Globus users
-    :type public: bool, optional
 
     :param additional_fields: Additional data for inclusion in the collection document
-    :type additional_fields: dict, optional
     """
 
     DATATYPE_BASE: str = "collection"
@@ -222,37 +202,27 @@ class MappedCollectionDocument(CollectionDocument):
 
     :param storage_gateway_id: The ID of the storage gateway which hosts this mapped
         collection. This parameter is required when creating a collection.
-    :type storage_gateway_id: str or UUID, optional
 
     :param domain_name: DNS name of the virtual host serving this collection
-    :type domain_name: str, optional
     :param guest_auth_policy_id: Globus Auth policy ID to set on a mapped collection
         which is then inherited by its guest collections.
-    :type guest_auth_policy_id: UUID or str, optional
 
     :param sharing_users_allow: Connector-specific usernames allowed to create guest
         collections
-    :type sharing_users_allow: iterable of str, optional
     :param sharing_users_deny: Connector-specific usernames forbidden from creating
         guest collections
-    :type sharing_users_deny: iterable of str, optional
 
     :param delete_protected: Enable or disable deletion protection on this collection.
         Defaults to ``True`` during creation.
-    :type delete_protected: bool, optional
 
     :param allow_guest_collections: Enable or disable creation and use of Guest
         Collections on this Mapped Collection
-    :type allow_guest_collections: bool, optional
     :param disable_anonymous_writes: Allow anonymous write ACLs on Guest Collections
         attached to this Mapped Collection. This option is only usable on non
         high-assurance collections
-    :type disable_anonymous_writes: bool, optional
 
     :param policies: Connector-specific collection policies
-    :type policies: dict, optional
     :param sharing_restrict_paths: A PathRestrictions document
-    :type sharing_restrict_paths: dict, optional
     """
 
     @property
@@ -370,11 +340,9 @@ class GuestCollectionDocument(CollectionDocument):
 
     :param mapped_collection_id: The ID of the mapped collection which hosts this guest
         collection
-    :type mapped_collection_id: str or UUID
     :param user_credential_id: The ID of the User Credential which is used to access
         data on this collection. This credential must be owned by the collection’s
         ``identity_id``.
-    :type user_credential_id: str or UUID
     """
 
     @property
@@ -465,15 +433,11 @@ class POSIXCollectionPolicies(CollectionPolicies):
 
     :param DATA_TYPE: Versioned document type. Defaults to the appropriate type for
         this class.
-    :type DATA_TYPE: str, optional
     :param sharing_groups_allow: POSIX groups which are allowed to create guest
         collections.
-    :type sharing_groups_allow: iterable of str, optional
     :param sharing_groups_deny: POSIX groups which are not allowed to create guest
         collections.
-    :type sharing_groups_deny: iterable of str, optional
     :param additional_fields: Additional data for inclusion in the policy document
-    :type additional_fields: dict, optional
     """
 
     def __init__(
@@ -501,15 +465,11 @@ class POSIXStagingCollectionPolicies(CollectionPolicies):
 
     :param DATA_TYPE: Versioned document type. Defaults to the appropriate type for
         this class.
-    :type DATA_TYPE: str, optional
     :param sharing_groups_allow: POSIX groups which are allowed to create guest
         collections.
-    :type sharing_groups_allow: iterable of str, optional
     :param sharing_groups_deny: POSIX groups which are not allowed to create guest
         collections.
-    :type sharing_groups_deny: iterable of str, optional
     :param additional_fields: Additional data for inclusion in the policy document
-    :type additional_fields: dict, optional
     """
 
     def __init__(
@@ -536,11 +496,8 @@ class GoogleCloudStorageCollectionPolicies(CollectionPolicies):
 
     :param DATA_TYPE: Versioned document type. Defaults to the appropriate type for
         this class.
-    :type DATA_TYPE: str, optional
     :param project: Google Cloud Platform project ID that is used by this collection
-    :type project: str, optional
     :param additional_fields: Additional data for inclusion in the policy document
-    :type additional_fields: dict, optional
     """
 
     def __init__(

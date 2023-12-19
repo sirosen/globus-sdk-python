@@ -31,7 +31,6 @@ class GCSClient(client.BaseClient):
     :class:`~globus_sdk.BaseClient`.
 
     :param gcs_address: The FQDN (DNS name) or HTTPS URL for the GCS Manager API.
-    :type gcs_address: str
 
     .. automethodlist:: globus_sdk.GCSClient
     """
@@ -74,7 +73,6 @@ class GCSClient(client.BaseClient):
         scopes for that Endpoint.
 
         :param endpoint_id: The ID of the Endpoint
-        :type endpoint_id: UUID or str
 
         See documentation for :class:`globus_sdk.scopes.GCSEndpointScopeBuilder` for
         more information.
@@ -89,7 +87,6 @@ class GCSClient(client.BaseClient):
         scopes for that Collection.
 
         :param collection_id: The ID of the Collection
-        :type collection_id: UUID or str
 
         See documentation for :class:`globus_sdk.scopes.GCSCollectionScopeBuilder` for
         more information.
@@ -106,7 +103,6 @@ class GCSClient(client.BaseClient):
         due to differing SDK and GCS versions.
 
         :param connector_id: The ID of the connector
-        :type connector_id: UUID or str
         """
         connector_dict = {
             "7c100eae-40fe-11e9-95a3-9cb6d0d9fd63": "Box",
@@ -144,20 +140,14 @@ class GCSClient(client.BaseClient):
 
         :param mapped_collection_id: Filter collections which were created using this
             mapped collection ID.
-        :type mapped_collection_id: str or UUID
         :param filter: Filter the returned set to any combination of the following:
             ``mapped_collections``, ``guest_collections``, ``managed_by_me``,
             ``created_by_me``.
-        :type filter: str or iterable of str, optional
         :param include: Names of additional documents to include in the response
-        :type include: str or iterable of str, optional
         :param page_size: Number of results to return per page
-        :type page_size: int, optional
         :param marker: Pagination marker supplied by previous API calls in the event
             a request returns more values than the page size
-        :type marker: str, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -195,9 +185,7 @@ class GCSClient(client.BaseClient):
         Lookup a Collection on an Endpoint
 
         :param collection_id: The ID of the collection to lookup
-        :type collection_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -230,7 +218,6 @@ class GCSClient(client.BaseClient):
         ``endpoint:administrator`` or ``endpoint:owner`` role.
 
         :param collection_data: The collection document for the new collection
-        :type collection_data: dict or CollectionDocument
 
         .. tab-set::
 
@@ -257,11 +244,8 @@ class GCSClient(client.BaseClient):
         Update a Collection
 
         :param collection_id: The ID of the collection to update
-        :type collection_id: str or UUID
         :param collection_data: The collection document for the modified collection
-        :type collection_data: dict or CollectionDocument
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -292,9 +276,7 @@ class GCSClient(client.BaseClient):
         Delete a Collection
 
         :param collection_id: The ID of the collection to delete
-        :type collection_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -331,14 +313,10 @@ class GCSClient(client.BaseClient):
             'private_policies' is included, then include private storage gateway
             policies in the attached storage_gateways document. This requires an
             ``administrator`` role on the Endpoint.
-        :type include: str or iterable of str, optional
         :param page_size: Number of results to return per page
-        :type page_size: int, optional
         :param marker: Pagination marker supplied by previous API calls in the event
             a request returns more values than the page size
-        :type marker: str, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -377,9 +355,7 @@ class GCSClient(client.BaseClient):
 
         :param data: Data in the format of a Storage Gateway document, it is recommended
             to use the ``StorageGatewayDocument`` class to construct this data.
-        :type data: dict or StorageGatewayDocument
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -407,14 +383,11 @@ class GCSClient(client.BaseClient):
         Lookup a Storage Gateway by ID
 
         :param storage_gateway_id: UUID for the Storage Gateway to be gotten
-        :type storage_gateway_id: str or UUID
         :param include: Optional document types to include in the response. If
             'private_policies' is included, then include private storage gateway
             policies in the attached storage_gateways document. This requires an
             ``administrator`` role on the Endpoint.
-        :type include: str or iterable of str, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -450,12 +423,9 @@ class GCSClient(client.BaseClient):
         Update a Storage Gateway
 
         :param storage_gateway_id: UUID for the Storage Gateway to be updated
-        :type storage_gateway_id: str or UUID
         :param data: Data in the format of a Storage Gateway document, it is recommended
             to use the ``StorageGatewayDocument`` class to construct this data.
-        :type data: dict or StorageGatewayDocument
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -483,9 +453,7 @@ class GCSClient(client.BaseClient):
         Delete a Storage Gateway
 
         :param storage_gateway_id: UUID for the Storage Gateway to be deleted
-        :type storage_gateway_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -523,18 +491,13 @@ class GCSClient(client.BaseClient):
         :param collection_id: UUID of a Collection. If given then only roles
             related to that Collection are returned, otherwise only Endpoint
             roles are returned.
-        :type collection_id: str or UUID, optional
         :param include: Pass "all_roles" to request all roles all roles
             relevant to the resource instead of only those the caller has on
             the resource
         :param page_size: Number of results to return per page
-        :type page_size: int, optional
         :param marker: Pagination marker supplied by previous API calls in the event
             a request returns more values than the page size
-        :type marker: str, optional
-        :type include: str, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -570,9 +533,7 @@ class GCSClient(client.BaseClient):
 
         :param data: Data in the format of a Role document, it is recommended
             to use the `GCSRoleDocument` class to construct this data.
-        :type data: dict
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -599,9 +560,7 @@ class GCSClient(client.BaseClient):
         Get a Role by ID
 
         :param role_id: UUID for the Role to be gotten
-        :type role_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -625,9 +584,7 @@ class GCSClient(client.BaseClient):
         Delete a Role
 
         :param role_id: UUID for the Role to be deleted
-        :type role_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -657,14 +614,10 @@ class GCSClient(client.BaseClient):
         List User Credentials
 
         :param storage_gateway: UUID of a storage gateway to limit results to
-        :type storage_gateway: str or UUID, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
         :param page_size: Number of results to return per page
-        :type page_size: int, optional
         :param marker: Pagination marker supplied by previous API calls in the event
             a request returns more values than the page size
-        :type marker: str, optional
 
         .. tab-set::
 
@@ -698,9 +651,7 @@ class GCSClient(client.BaseClient):
 
         :param data: Data in the format of a UserCredential document, it is
             recommended to use the `UserCredential` class to construct this
-        :type data: dict
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -727,9 +678,7 @@ class GCSClient(client.BaseClient):
         Get a User Credential by ID
 
         :param user_credential_id: UUID for the UserCredential to be gotten
-        :type user_credential_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -756,12 +705,9 @@ class GCSClient(client.BaseClient):
         Update a User Credential
 
         :param user_credential_id: UUID for the UserCredential to be updated
-        :type user_credential_id: str or UUID
         :param data: Data in the format of a UserCredential document, it is
             recommended to use the `UserCredential` class to construct this
-        :type data: dict
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -787,9 +733,7 @@ class GCSClient(client.BaseClient):
         Delete a User Credential
 
         :param user_credential_id: UUID for the UserCredential to be deleted
-        :type user_credential_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
