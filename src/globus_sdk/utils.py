@@ -76,9 +76,7 @@ def slash_join(a: str, b: str | None) -> str:
     contain a trailing/leading slash or neither.
 
     :param a: the first path component
-    :type a: str
     :param b: the second path component
-    :type b: str, optional
     """
     if not b:  # "" or None, don't append a slash
         return a
@@ -98,7 +96,6 @@ def safe_strseq_iter(
     Given an Iterable (typically of strings), produce an iterator over it of strings.
 
     :param value: The stringifiable object or objects to iterate over
-    :type value: str, UUID, or iterable
 
     This is a passthrough with some caveats:
     - if the value is a solitary string, yield only that value

@@ -18,13 +18,10 @@ class ScopeBuilder:
 
     :param resource_server: The identifier, usually a domain name or a UUID, for the
         resource server to return scopes for.
-    :type resource_server: str
     :param known_scopes: A list of scope names to pre-populate on this instance. This
         will set attributes on the instance using the URN scope format.
-    :type known_scopes: list of str, optional
     :param known_url_scopes: A list of scope names to pre-populate on this instance.
         This will set attributes on the instance using the URL scope format.
-    :type known_url_scopes: list of str, optional
     """
 
     _classattr_scope_names: list[str] = []
@@ -111,7 +108,6 @@ class ScopeBuilder:
         "urn:globus:auth:scope:transfer.api.globus.org:all"
 
         :param scope_name: The short name for the scope involved.
-        :type scope_name: str
         """
         return f"urn:globus:auth:scope:{self.resource_server}:{scope_name}"
 
@@ -127,7 +123,6 @@ class ScopeBuilder:
         "https://auth.globus.org/scopes/actions.globus.org/hello_world"
 
         :param scope_name: The short name for the scope involved.
-        :type scope_name: str
         """
         return f"https://auth.globus.org/scopes/{self.resource_server}/{scope_name}"
 
@@ -154,10 +149,8 @@ class ScopeBuilder:
         Scope('urn:globus:auth:scope:transfer.api.globus.org:all')
 
         :param scope: The name of the scope to convert to a MutableScope
-        :type scope: str
         :param optional: If true, the created MutableScope object will be marked
             optional
-        :type optional: bool
         """
         return MutableScope(getattr(self, scope), optional=optional)
 

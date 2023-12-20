@@ -36,7 +36,6 @@ def to_auth_requirements_error(
     If the provided error does not match a known format, None is returned.
 
     :param error: The error to convert.
-    :type error: a GlobusAPIError, ErrorSubdocument, or dict
     """
     from globus_sdk.exc import ErrorSubdocument, GlobusAPIError
 
@@ -92,7 +91,6 @@ def to_auth_requirements_errors(
     If no errors match any known formats, an empty list is returned.
 
     :param errors: The errors to convert.
-    :type errors: a list of GlobusAPIErrors, ErrorSubdocuments, or dicts
     """
     from globus_sdk.exc import GlobusAPIError
 
@@ -119,7 +117,6 @@ def is_auth_requirements_error(
     Globus Auth Requirements Error format.
 
     :param error: The error to check.
-    :type error: a GlobusAPIError, ErrorSubdocument, or dict
     """
     return to_auth_requirements_error(error) is not None
 
@@ -132,6 +129,5 @@ def has_auth_requirements_errors(
     Globus Auth Requirements Error format.
 
     :param errors: The errors to check.
-    :type errors: a list of GlobusAPIErrors, ErrorSubdocuments, or dicts
     """
     return any(is_auth_requirements_error(error) for error in errors)

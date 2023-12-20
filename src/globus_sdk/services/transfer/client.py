@@ -54,11 +54,6 @@ class TransferClient(client.BaseClient):
     that allow arbitrary keyword arguments will pass the extra arguments as
     query parameters.
 
-    :param authorizer: An authorizer instance used for all calls to
-                       Globus Transfer
-    :type authorizer: :class:`GlobusAuthorizer\
-                      <globus_sdk.authorizers.base.GlobusAuthorizer>`
-
     .. _transfer_filter_formatting:
 
     **Filter Formatting**
@@ -70,6 +65,7 @@ class TransferClient(client.BaseClient):
     list, each item of the list is parsed and passed as separate params.
 
     dict parsing rules:
+
     - each (key, value) pair in the dict is a clause in the resulting filter string
     - clauses are each formatted to ``key:value``
     - when the value is a list, it is comma-separated, as in ``key:value1,value2``
@@ -123,10 +119,8 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: ID of endpoint to lookup
-        :type endpoint_id: str or UUID
         :param query_params: Any additional parameters will be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -157,12 +151,9 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: ID of endpoint to lookup
-        :type endpoint_id: str or UUID
         :param data: A partial endpoint document with fields to update
-        :type data: dict
         :param query_params: Any additional parameters will be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -202,7 +193,6 @@ class TransferClient(client.BaseClient):
     def create_endpoint(self, data: dict[str, t.Any]) -> response.GlobusHTTPResponse:
         """
         :param data: An endpoint document with fields for the new endpoint
-        :type data: dict
 
         .. tab-set::
 
@@ -244,7 +234,6 @@ class TransferClient(client.BaseClient):
     def delete_endpoint(self, endpoint_id: UUIDLike) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: ID of endpoint to delete
-        :type endpoint_id: str or UUID
 
         .. tab-set::
 
@@ -288,30 +277,22 @@ class TransferClient(client.BaseClient):
         :param filter_fulltext: The string to use in a full text search on endpoints.
             Effectively, the "search query" which is being requested. May be omitted
             with specific ``filter_scope`` values.
-        :type filter_fulltext: str, optional
         :param filter_scope: A "scope" within which to search for endpoints. This must
             be one of the limited and known names known to the service, which can be
             found documented in the **External Documentation** below. Defaults to
             searching all endpoints (in which case ``filter_fulltext`` is required)
-        :type filter_scope: str, optional
         :param filter_owner_id: Limit search to endpoints owned by the specified Globus
             Auth identity. Conflicts with scopes 'my-endpoints', 'my-gcp-endpoints', and
             'shared-by-me'.
-        :type filter_owner_id: str, optional
         :param filter_host_endpoint: Limit search to endpoints hosted by the specified
             endpoint. May cause BadRequest or PermissionDenied errors if the endpoint ID
             given is not valid for this operation.
-        :type filter_host_endpoint: str, optional
         :param filter_non_functional: Limit search to endpoints which have the
             'non_functional' flag set to True or False.
-        :type filter_non_functional: bool, optional
         :param limit: limit the number of results
-        :type limit: int, optional
         :param offset: offset used in paging
-        :type offset: int, optional
         :param query_params: Any additional parameters will be passed through
             as query params.
-        :type query_params: dict, optional
 
         It is important to be aware that the Endpoint Search API limits
         you to 1000 results for any search query.
@@ -379,14 +360,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         r"""
         :param endpoint_id: The ID of the endpoint to autoactivate
-        :type endpoint_id: str or UUID
         :param if_expires_in: A number of seconds. Autoactivation will only be attempted
             if the current activation expires within this timeframe. Otherwise,
             autoactivation will succeed with a code of 'AlreadyActivated'
-        :type if_expires_in: int, optional
         :param query_params: Any additional parameters will be passed through
             as query params.
-        :type query_params: dict, optional
 
         The following example will try to "auto" activate the endpoint
         using a credential available from another endpoint or sign in by
@@ -460,10 +438,8 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The ID of the endpoint to deactivate
-        :type endpoint_id: str or UUID
         :param query_params: Any additional parameters will be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -488,16 +464,12 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The ID of the endpoint to activate
-        :type endpoint_id: str or UUID
         :pram requirements_data: Filled in activation requirements data, as can be
             fetched from :meth:`~endpoint_get_activation_requirements`. Only the fields
             for the activation type being used need to be filled in.
-        :type requirements_data: dict
         :param requirements_data: An optional body for the request
-        :type requirements_data: dict, optional
         :param query_params: Any additional parameters will be passed through
             as query params.
-        :type query_params: dict, optional
 
         Consider using autoactivate and web activation instead, described
         in the example for :meth:`~endpoint_autoactivate`.
@@ -527,10 +499,8 @@ class TransferClient(client.BaseClient):
         """
         :param endpoint_id: The ID of the endpoint whose activation requirements data is
             being looked up
-        :type endpoint_id: str or UUID
         :param query_params: Any additional parameters will be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -557,9 +527,7 @@ class TransferClient(client.BaseClient):
         """
         :param endpoint_id: the endpoint on which the current user's effective pause
             rules are fetched
-        :type endpoint_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -588,9 +556,7 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         :param endpoint_id: the host endpoint whose shares are listed
-        :type endpoint_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         Get a list of shared endpoints for which the user has ``administrator`` or
         ``access_manager`` on a given host endpoint.
@@ -623,14 +589,10 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         :param endpoint_id: the host endpoint whose shares are listed
-        :type endpoint_id: str or UUID
         :param max_results: cap to the number of results
-        :type max_results: int, optional
         :param next_token: token used for paging
-        :type next_token: str, optional
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         Get a list of all shared endpoints on a given host endpoint.
 
@@ -667,7 +629,6 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param data: A python dict representation of a ``shared_endpoint`` document
-        :type data: dict
 
         .. tab-set::
 
@@ -707,10 +668,8 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         :param endpoint_id: The endpoint whose servers are being listed
-        :type endpoint_id: str or UUID
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -735,11 +694,8 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint under which the server is registered
-        :type endpoint_id: str or UUID
         :param server_id: The ID of the server
-        :type server_id: str or int
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -762,9 +718,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint under which the server is being registered
-        :type endpoint_id: str or UUID
         :param server_data: Fields for the new server, as a server document
-        :type server_data: dict
 
         .. tab-set::
 
@@ -786,11 +740,8 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint under which the server is registered
-        :type endpoint_id: str or UUID
         :param server_id: The ID of the server to update
-        :type server_id: str or int
         :param server_data: Fields on the server to update, as a partial server document
-        :type server_data: dict
 
         .. tab-set::
 
@@ -813,9 +764,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint under which the server is registered
-        :type endpoint_id: str or UUID
         :param server_id: The ID of the server to delete
-        :type server_id: str or int
 
         .. tab-set::
 
@@ -843,10 +792,8 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         :param endpoint_id: The endpoint whose roles are being listed
-        :type endpoint_id: str or UUID
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -867,9 +814,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the role is being added
-        :type endpoint_id: str or UUID
         :param role_data: A role document for the new role
-        :type role_data: dict
 
         .. tab-set::
 
@@ -892,11 +837,8 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the role applies
-        :type endpoint_id: str or UUID
         :param role_id: The ID of the role
-        :type role_id: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -917,9 +859,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the role applies
-        :type endpoint_id: str or UUID
         :param role_id: The ID of the role to delete
-        :type role_id: str
 
         .. tab-set::
 
@@ -945,9 +885,7 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         :param endpoint_id: The endpoint whose ACLs are being listed
-        :type endpoint_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -972,11 +910,8 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the access rule applies
-        :type endpoint_id: str or UUID
         :param rule_id: The ID of the rule to fetch
-        :type rule_id: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -999,9 +934,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: ID of endpoint to which to add the acl
-        :type endpoint_id: str
         :param rule_data: A python dict representation of an ``access`` document
-        :type rule_data: dict
 
         .. tab-set::
 
@@ -1041,11 +974,8 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the access rule applies
-        :type endpoint_id: str or UUID
         :param rule_id: The ID of the access rule to modify
-        :type rule_id: str
         :param rule_data: A partial ``access`` document containing fields to update
-        :type rule_data: dict
 
         .. tab-set::
 
@@ -1068,9 +998,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the access rule applies
-        :type endpoint_id: str or UUID
         :param rule_id: The ID of the access rule to remove
-        :type rule_id: str
 
         .. tab-set::
 
@@ -1095,7 +1023,6 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1116,7 +1043,6 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param bookmark_data: A bookmark document for the bookmark to create
-        :type bookmark_data: dict
 
         .. tab-set::
 
@@ -1138,9 +1064,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param bookmark_id: The ID of the bookmark to lookup
-        :type bookmark_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1159,9 +1083,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param bookmark_id: The ID of the bookmark to modify
-        :type bookmark_id: str or UUID
         :param bookmark_data: A partial bookmark document with fields to update
-        :type bookmark_data: dict
 
         .. tab-set::
 
@@ -1178,7 +1100,6 @@ class TransferClient(client.BaseClient):
     def delete_bookmark(self, bookmark_id: UUIDLike) -> response.GlobusHTTPResponse:
         """
         :param bookmark_id: The ID of the bookmark to delete
-        :type bookmark_id: str or UUID
 
         .. tab-set::
 
@@ -1215,33 +1136,24 @@ class TransferClient(client.BaseClient):
     ) -> IterableTransferResponse:
         """
         :param endpoint_id: The ID of the endpoint on which to do a dir listing
-        :type endpoint_id: str or UUID
         :param path: Path to a directory on the endpoint to list
-        :type path: str, optional
         :param show_hidden: Show hidden files (names beginning in dot).
             Defaults to true.
-        :type show_hidden: bool, optional
         :param limit: Limit the number of results returned. Defaults to 100,000 ,
             which is also the maximum.
-        :type limit: int, optional
         :param offset: Offset into the result list, which can be used to page results.
-        :type offset: int, optional
         :param orderby: One or more order-by options. Each option is
             either a field name or a field name followed by a space and 'ASC' or 'DESC'
             for ascending or descending.
-        :type orderby: str, optional
         :param filter: Only return file documents which match these filter clauses. For
             the filter syntax, see the **External Documentation** linked below. If a
             dict is supplied as the filter, it is formatted as a set of filter clauses.
             If a list is supplied, it is passed as multiple params.
             See :ref:`filter formatting <transfer_filter_formatting>` for details.
-        :type filter: str or dict, optional
         :param local_user: Optional value passed to identity mapping specifying which
             local user account to map to. Only usable with Globus Connect Server v5
             mapped collections.
-        :type local_user: str, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. note::
 
@@ -1329,15 +1241,11 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The ID of the endpoint on which to create a directory
-        :type endpoint_id: str or UUID
         :param path: Path to the new directory to create
-        :type path: str
         :param local_user: Optional value passed to identity mapping specifying which
             local user account to map to. Only usable with Globus Connect Server v5
             mapped collections.
-        :type local_user: str, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1380,17 +1288,12 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The ID of the endpoint on which to rename a file
-        :type endpoint_id: str or UUID
         :param oldpath: Path to the old filename
-        :type oldpath: str
         :param newpath: Path to the new filename
-        :type newpath: str
         :param local_user: Optional value passed to identity mapping specifying which
             local user account to map to. Only usable with Globus Connect Server v5
             mapped collections.
-        :type local_user: str, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1436,13 +1339,9 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The ID of the endpoint on which to create a symlink
-        :type endpoint_id: str or UUID
         :param symlink_target: The path referenced by the new symlink
-        :type symlink_target: str
         :param path: The name of (path to) the new symlink
-        :type path: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1485,7 +1384,6 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         Submission IDs are required to submit tasks to the Transfer service
         via the :meth:`submit_transfer <.submit_transfer>` and
@@ -1518,7 +1416,6 @@ class TransferClient(client.BaseClient):
         :param data: A transfer task document listing files and directories, and setting
             various options. See :class:`TransferData <globus_sdk.TransferData>` for
             details
-        :type data: dict or TransferData
 
         Submit a Transfer Task.
 
@@ -1568,7 +1465,6 @@ class TransferClient(client.BaseClient):
         :param data: A delete task document listing files and directories, and setting
             various options. See :class:`DeleteData <globus_sdk.DeleteData>` for
             details
-        :type data: dict or DeleteData
 
         Submit a Delete Task.
 
@@ -1629,16 +1525,12 @@ class TransferClient(client.BaseClient):
         Get an iterable of task documents owned by the current user.
 
         :param limit: limit the number of results
-        :type limit: int, optional
         :param offset: offset used in paging
-        :type offset: int, optional
         :param filter: Only return task documents which match these filter clauses. For
             the filter syntax, see the **External Documentation** linked below. If a
             dict is supplied as the filter, it is formatted as a set of filter clauses.
             See :ref:`filter formatting <transfer_filter_formatting>` for details.
-        :type filter: str or dict, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1714,13 +1606,9 @@ class TransferClient(client.BaseClient):
         List events (for example, faults and errors) for a given Task.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param limit: limit the number of results
-        :type limit: int, optional
         :param offset: offset used in paging
-        :type offset: int, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1765,9 +1653,7 @@ class TransferClient(client.BaseClient):
     ) -> response.GlobusHTTPResponse:
         """
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1793,11 +1679,8 @@ class TransferClient(client.BaseClient):
         ``label`` and ``deadline`` fields can be updated.
 
         :param task_id: The ID of the task to modify
-        :type task_id: str or UUID
         :param data: A partial task document with fields to update
-        :type data: dict
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1816,7 +1699,6 @@ class TransferClient(client.BaseClient):
         Cancel a task which is still running.
 
         :param task_id: The ID of the task to cancel
-        :type task_id: str or UUID
 
         .. tab-set::
 
@@ -1839,12 +1721,9 @@ class TransferClient(client.BaseClient):
         ``True``.
 
         :param task_id: ID of the Task to wait on for completion
-        :type task_id: str or UUID
         :param timeout: Number of seconds to wait in total. Minimum 1. [Default: ``10``]
-        :type timeout: int, optional
         :param polling_interval: Number of seconds between queries to Globus about the
             Task status. Minimum 1. [Default: ``10``]
-        :type polling_interval: int, optional
 
         .. tab-set::
 
@@ -1946,9 +1825,7 @@ class TransferClient(client.BaseClient):
         Get info about why a task is paused or about to be paused.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1983,11 +1860,8 @@ class TransferClient(client.BaseClient):
             skip_source_errors being set on the task.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param marker: A marker for pagination
-        :type marker: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2037,11 +1911,8 @@ class TransferClient(client.BaseClient):
         to skip_source_errors being set on a completed transfer Task.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param marker: A marker for pagination
-        :type marker: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2087,7 +1958,6 @@ class TransferClient(client.BaseClient):
         Get endpoints the current user is a monitor or manager on.
 
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2113,9 +1983,7 @@ class TransferClient(client.BaseClient):
         Get shared endpoints hosted on the given endpoint.
 
         :param endpoint_id: The ID of the host endpoint
-        :type endpoint_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2144,9 +2012,7 @@ class TransferClient(client.BaseClient):
         Get endpoint details as an admin.
 
         :param endpoint_id: The ID of the endpoint
-        :type endpoint_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2172,9 +2038,7 @@ class TransferClient(client.BaseClient):
         Get a list of access control rules on specified endpoint as an admin.
 
         :param endpoint_id: The ID of the endpoint
-        :type endpoint_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2225,13 +2089,11 @@ class TransferClient(client.BaseClient):
         :param filter_status: Return only tasks with any of the specified statuses
             Note that in-progress tasks will have status ``"ACTIVE"`` or ``"INACTIVE"``,
             and completed tasks will have status ``"SUCCEEDED"`` or ``"FAILED"``.
-        :type filter_status: str or iterable of str, optional
         :param filter_task_id: Return only tasks with any of the specified ids. If any
             of the specified tasks do not involve an endpoint the user has an
             appropriate role for, a ``PermissionDenied`` error will be returned. This
             filter can't be combined with any other filter.  If another filter is
             passed, a ``BadRequest`` will be returned. (limit: 50 task IDs)
-        :type filter_task_id: str, UUID, or iterable of str or UUID, optional
         :param filter_owner_id: A Globus Auth identity id. Limit results to tasks
             submitted by the specified identity, or linked to the specified identity,
             at submit time.  Returns ``UserNotFound`` if the identity does not exist or
@@ -2240,11 +2102,9 @@ class TransferClient(client.BaseClient):
             empty result set will be returned. Unless filtering for running tasks (i.e.
             ``filter_status`` is a subset of ``("ACTIVE", "INACTIVE")``,
             ``filter_endpoint`` is required when using ``filter_owner_id``.
-        :type filter_owner_id: str or UUID, optional
         :param filter_endpoint: Single endpoint id. Return only tasks with a matching
             source or destination endpoint or matching source or destination host
             endpoint.
-        :type filter_endpoint: str or UUID, optional
         :param filter_is_paused: Return only tasks with the specified ``is_paused``
             value. Requires that ``filter_status`` is also passed and contains a subset
             of ``"ACTIVE"`` and ``"INACTIVE"``. Completed tasks always have
@@ -2253,7 +2113,6 @@ class TransferClient(client.BaseClient):
             after a pause rule is inserted it will take time before the ``is_paused``
             flag is set on all affected tasks. Tasks paused by id will have the
             ``is_paused`` flag set immediately.
-        :type filter_is_paused: bool, optional
         :param filter_completion_time: Start and end date-times separated by a comma, or
             provided as a tuple of strings or datetime objects.  Returns only completed
             tasks with ``completion_time`` in the specified range. Date strings should
@@ -2264,23 +2123,18 @@ class TransferClient(client.BaseClient):
             may be used for either the start or end (but not both) to indicate no limit
             on that side. If the end date is blank, the filter will also include all
             active tasks, since they will complete some time in the future.
-        :type filter_completion_time: str, tuple of str, or tuple of datetime, optional
         :param filter_min_faults:  Minimum number of cumulative faults, inclusive.
             Return only tasks with ``faults >= N``, where ``N`` is the filter value.
             Use ``filter_min_faults=1`` to find all tasks with at least one fault.
             Note that many errors are not fatal and the task may still be successful
             even if ``faults >= 1``.
-        :type filter_min_faults: int, optional
         :param filter_local_user: A valid username for the target system running the
             endpoint, as a utf8 encoded string. Requires that ``filter_endpoint`` is
             also set. Return only tasks that have successfully fetched the local user
             from the endpoint, and match the values of ``filter_endpoint`` and
             ``filter_local_user`` on the source or on the destination.
-        :type filter_local_user: str, optional
         :param last_key: the last key, for paging
-        :type last_key: str, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2366,9 +2220,7 @@ class TransferClient(client.BaseClient):
         the destination endpoint of the task.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2404,16 +2256,12 @@ class TransferClient(client.BaseClient):
         endpoint of the task.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param limit: limit the number of results
-        :type limit: int, optional
         :param offset: offset used in paging
         :param filter_is_error: Return only events that are errors. A value of ``False``
             (returning only non-errors) is not supported. By default all events are
             returned.
-        :type filter_is_error: bool, optional
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2454,9 +2302,7 @@ class TransferClient(client.BaseClient):
         monitor effective role on the destination endpoint of the task.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2486,11 +2332,8 @@ class TransferClient(client.BaseClient):
         Get the successful file transfers for a completed Task as an admin.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str or UUID
         :param marker: A marker for pagination
-        :type marker: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2535,11 +2378,8 @@ class TransferClient(client.BaseClient):
         Get skipped errors for a completed Task as an admin.
 
         :param task_id: The ID of the task to inspect
-        :type task_id: str
         :param marker: A marker for pagination
-        :type marker: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2579,11 +2419,8 @@ class TransferClient(client.BaseClient):
         role on the task(s) source or destination endpoint(s).
 
         :param task_ids: List of task ids to cancel
-        :type task_ids: iterable of str or UUID
         :param message: Message given to all users whose tasks have been canceled
-        :type message: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2614,9 +2451,7 @@ class TransferClient(client.BaseClient):
         endpoint_manager_cancel_tasks).
 
         :param admin_cancel_id: The ID of the the cancel job to inspect
-        :type admin_cancel_id: str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2645,11 +2480,8 @@ class TransferClient(client.BaseClient):
         role on the task(s) source or destination endpoint(s).
 
         :param task_ids: List of task ids to pause
-        :type task_ids: iterable of str or UUID
         :param message: Message given to all users whose tasks have been paused
-        :type message: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2680,9 +2512,7 @@ class TransferClient(client.BaseClient):
         role on the task(s) source or destination endpoint(s).
 
         :param task_ids: List of task ids to resume
-        :type task_ids: iterable of str or UUID
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2717,9 +2547,7 @@ class TransferClient(client.BaseClient):
         :param filter_endpoint: An endpoint ID. Limit results to rules on endpoints
             hosted by this endpoint. Must be activity monitor on this endpoint, not just
             the hosted endpoints.
-        :type filter_endpoint: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2747,7 +2575,6 @@ class TransferClient(client.BaseClient):
         on the endpoint defined in the rule.
 
         :param data: A pause rule document describing the rule to create
-        :type data: dict
 
         .. tab-set::
 
@@ -2787,9 +2614,7 @@ class TransferClient(client.BaseClient):
         effective role on the endpoint defined in the rule.
 
         :param pause_rule_id: ID of pause rule to get
-        :type pause_rule_id: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -2816,9 +2641,7 @@ class TransferClient(client.BaseClient):
         Note that non update-able fields in data will be ignored.
 
         :param pause_rule_id: The ID of the pause rule to update
-        :type pause_rule_id: str
         :param data: A partial pause rule document with fields to update
-        :type data: dict
 
         .. tab-set::
 
@@ -2856,9 +2679,7 @@ class TransferClient(client.BaseClient):
         will no longer be once it is deleted.
 
         :param pause_rule_id: The ID of the pause rule to delete
-        :type pause_rule_id: str
         :param query_params: Additional passthrough query parameters
-        :type query_params: dict, optional
 
         .. tab-set::
 

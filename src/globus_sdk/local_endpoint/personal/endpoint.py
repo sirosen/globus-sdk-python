@@ -31,7 +31,6 @@ class LocalGlobusConnectPersonal:
     :param config_dir: Path to a non-default configuration directory. On Linux, this is
         the same as the value passed to Globus Connect Personal's `-dir` flag
         (i.e. the default value is ``~/.globusonline``).
-    :type config_dir: str, optional
     """
 
     def __init__(self, *, config_dir: str | None = None) -> None:
@@ -110,7 +109,6 @@ class LocalGlobusConnectPersonal:
 
         :param auth_client: An AuthClient to use to lookup the full identity information
             for the GCP owner
-        :type auth_client: globus_sdk.AuthClient
 
         **Examples**
 
@@ -164,8 +162,6 @@ class LocalGlobusConnectPersonal:
     @property
     def endpoint_id(self) -> str | None:
         """
-        :type: str
-
         The endpoint ID of the local Globus Connect Personal endpoint
         installation.
 

@@ -15,10 +15,8 @@ class Scope:
     `str(Scope(...))` produces a valid scope string for use in various methods.
 
     :param scope_string: The string which will be used as the basis for this Scope
-    :type scope_string: str
     :param optional: The scope may be marked as optional. This means that the scope can
         be declined by the user without declining consent for other scopes
-    :type optional: bool
     """
 
     def __init__(
@@ -55,7 +53,6 @@ class Scope:
             multiple parts of the tree.
 
         :param scope_string: The string to parse
-        :type scope_string: str
         """
         scope_graph = parse_scope_graph(scope_string)
 
@@ -86,7 +83,6 @@ class Scope:
         will be raised.
 
         :param scope_string: The string to parse
-        :type scope_string: str
         """
         data = Scope.parse(scope_string)
         if len(data) != 1:
@@ -112,11 +108,9 @@ class Scope:
         Scope and will be evident in its string representation.
 
         :param scope: The scope upon which the current scope depends
-        :type scope: str
         :param optional: Mark the dependency an optional one. By default it is not. An
             optional scope dependency can be declined by the user without declining
             consent for the primary scope
-        :type optional: bool, optional
         """
         if optional is not None:
             if isinstance(scope, Scope):

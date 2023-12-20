@@ -53,8 +53,6 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
         >>>           .format(endpoint_id), file=sys.stderr)
         >>>     # py3 calls it `input()` in py2, use `raw_input()`
         >>>     input("Please Hit Enter When You Are Done")
-
-        :rtype: ``bool``
         """
         return t.cast(bool, self["auto_activation_supported"])
 
@@ -83,8 +81,6 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
         >>>     print("Sending user to web anyway, just in case.",
         >>>           file=sys.stderr)
         >>> ...
-
-        :rtype: ``bool``
         """
         return (
             self.supports_auto_activation
@@ -124,15 +120,12 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
         >>> ...
 
         :param time_seconds: Number of seconds into the future.
-        :type time_seconds: int
         :param relative_time: Defaults to True. When False, ``time_seconds`` is treated
             as a POSIX timestamp (i.e. seconds since epoch as an integer) instead of
             its ordinary behavior.
-        :type relative_time: bool
 
 
         :return: True if the Endpoint will be active until the deadline, False otherwise
-        :rtype: ``bool``
         """
         # inactive endpoint
         if not self["activated"]:
@@ -151,7 +144,5 @@ class ActivationRequirementsResponse(GlobusHTTPResponse):
         """
         Returns True if the endpoint activation never expires
         (e.g. shared endpoints, globus connect personal endpoints).
-
-        :rtype: ``bool``
         """
         return t.cast(int, self["expires_in"]) == -1

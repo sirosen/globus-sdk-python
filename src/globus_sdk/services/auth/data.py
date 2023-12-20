@@ -10,13 +10,10 @@ class DependentScopeSpec(utils.PayloadWrapper):
     :meth:`AuthClient.update_scope <globus_sdk.AuthClient.update_scope>`.
 
     :param scope: The ID of the dependent scope
-    :type scope: str or uuid
     :param optional: Whether or not the user can decline this specific scope without
         declining the whole consent.
-    :type optional: bool
     :param requires_refresh_token: Whether or not the dependency requires a refresh
         token.
-    :type requires_refresh_token: bool
     """
 
     def __init__(

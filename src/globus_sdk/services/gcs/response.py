@@ -35,7 +35,6 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
 
     :param match: Either a string containing a DATA_TYPE prefix, or an arbitrary
         callable which does the matching
-    :type match: str or callable
     """
 
     def _default_unpacking_match(

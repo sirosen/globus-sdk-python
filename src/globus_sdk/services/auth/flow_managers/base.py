@@ -38,9 +38,6 @@ class GlobusOAuthFlowManager(abc.ABC):
 
         :param query_params: Any additional parameters to be passed through
             as query params on the URL.
-        :type query_params: dict, optional
-
-        :rtype: ``string``
         """
 
     @abc.abstractmethod
@@ -56,7 +53,4 @@ class GlobusOAuthFlowManager(abc.ABC):
 
         :param auth_code: The authorization code which was produced from the
             authorization flow
-        :type auth_code: str
-
-        :rtype: :class:`OAuthTokenResponse <globus_sdk.OAuthTokenResponse>`
         """

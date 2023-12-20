@@ -310,6 +310,29 @@ class PaginatedUsage(AddContentDirective):
         yield ":ref:`how to make paginated calls <making_paginated_calls>`."
 
 
+def after_autodoc_signature_replace_MISSING_repr(  # pylint: disable=missing-param-doc,missing-type-doc  # noqa: E501
+    app,  # pylint: disable=unused-argument
+    what,  # pylint: disable=unused-argument
+    name,  # pylint: disable=unused-argument
+    obj,  # pylint: disable=unused-argument
+    options,  # pylint: disable=unused-argument
+    signature: str,
+    return_annotation: str,
+):
+    """
+    convert <globus_sdk.MISSING> to MISSING in autodoc signatures
+
+    :param signature: the signature after autodoc parsing/rendering
+    :param return_annotation: the return type annotation, including the leading `->`,
+        after autodoc parsing/rendering
+    """
+    if signature is not None:
+        signature = signature.replace("<globus_sdk.MISSING>", "MISSING")
+    if return_annotation is not None:
+        return_annotation = return_annotation.replace("<globus_sdk.MISSING>", "MISSING")
+    return signature, return_annotation
+
+
 def setup(app):
     app.add_directive("automethodlist", AutoMethodList)
     app.add_directive("listknownscopes", ListKnownScopes)
@@ -317,6 +340,11 @@ def setup(app):
     app.add_directive("expandtestfixture", ExpandTestingFixture)
     app.add_directive("extdoclink", ExternalDocLink)
     app.add_directive("paginatedusage", PaginatedUsage)
+
+    app.connect(
+        "autodoc-process-signature", after_autodoc_signature_replace_MISSING_repr
+    )
+
     return {
         "parallel_read_safe": True,
         "parallel_write_safe": True,

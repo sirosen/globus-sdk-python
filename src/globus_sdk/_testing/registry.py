@@ -23,12 +23,9 @@ def register_response_set(
     The response set may be specified as a dict or a ResponseSet object.
 
     :param set_id: The ID used to retrieve the response set later
-    :type set_id: any
     :param rset: The response set to register
-    :type rset: dict or ResponseSet
     :param metadata: Metadata dict to assign to the response set when it is specified
         as a dict. If the response set is an object, this argument is ignored.
-    :type metadata: dict, optional
     """
     if isinstance(rset, dict):
         rset = ResponseSet.from_dict(rset, metadata=metadata)
@@ -66,7 +63,6 @@ def get_response_set(set_id: t.Any) -> ResponseSet:
 
     :param set_id: The ID used to retrieve the response set. Typically a string, but
         could be any key used to register a response set.
-    :type set_id: any
     """
     # first priority: check the explicit registry
     if set_id in _RESPONSE_SET_REGISTRY:
@@ -106,10 +102,8 @@ def load_response_set(
 
     :param set_id: The ID used to retrieve the response set. Typically a string, but
         could be any key used to register a response set.
-    :type set_id: any
     :param requests_mock: A ``responses`` library mock to use for response mocking,
         defaults to the ``responses`` default
-    :type requests_mock: ``responses.RequestsMock``, optional
     """
     if isinstance(set_id, ResponseSet):
         return set_id.activate_all(requests_mock=requests_mock)
@@ -132,13 +126,10 @@ def load_response(
 
     :param set_id: The ID used to retrieve the response set. Typically a string, but
         could be any key used to register a response set.
-    :type set_id: any
     :param case: The name of a case within the response set to load, ignoring all other
         registered mocks in the response set
-    :type case: str, optional
     :param requests_mock: A ``responses`` library mock to use for response mocking,
         defaults to the ``responses`` default
-    :type requests_mock: ``responses.RequestsMock``, optional
     """
     if isinstance(set_id, RegisteredResponse):
         return set_id.add(requests_mock=requests_mock)

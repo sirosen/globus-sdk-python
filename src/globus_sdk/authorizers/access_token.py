@@ -14,7 +14,6 @@ class AccessTokenAuthorizer(StaticGlobusAuthorizer):
     unadorned.
 
     :param access_token: An access token for Globus Auth
-    :type access_token: str
     """
 
     def __init__(self, access_token: str):

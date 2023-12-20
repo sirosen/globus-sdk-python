@@ -24,14 +24,9 @@ class RetryContext:
     or ``exception`` will be present.
 
     :param attempt: The request attempt number, starting at 0.
-    :type attempt: int
     :param response: The response on a successful request
-    :type response: requests.Response
     :param exception: The error raised when trying to send the request
-    :type exception: Exception
     :param authorizer: The authorizer object from the client making the request
-    :type authorizer: :class:`GlobusAuthorizer \
-        <globus_sdk.authorizers.GlobusAuthorizer>`
     """
 
     def __init__(
@@ -84,7 +79,6 @@ def set_retry_check_flags(flag: RetryCheckFlags) -> t.Callable[[C], C]:
     >>> def foo(ctx): ...
 
     :param flag: The flag to set on the check
-    :type flag: RetryCheckFlags
     """
 
     def decorator(func: C) -> C:

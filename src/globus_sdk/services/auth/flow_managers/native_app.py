@@ -39,7 +39,6 @@ def make_native_app_challenge(
     :param verifier: The code verifier string used to construct the code challenge. Must
         be at least 43 characters long and not longer than 128 characters. Must only
         contain the following characters: [a-zA-Z0-9~_.-].
-    :type verifier: str, optional
     """
 
     if verifier:
@@ -81,30 +80,22 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
     :param auth_client: The client object on which this flow is based.
         It is used to extract default values for the flow, and also to make calls to the
         Auth service.
-    :type auth_client: :class:`NativeAppAuthClient <globus_sdk.NativeAppAuthClient>`
     :param requested_scopes: The scopes on the token(s) being requested. Defaults to
         ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-    :type requested_scopes: str, MutableScope, or iterable of str or MutableScope,
-        optional
     :param redirect_uri: The page that users should be directed to after authenticating
         at the authorize URL. Defaults to 'https://auth.globus.org/v2/web/auth-code',
         which displays the resulting ``auth_code`` for users to copy-paste back into
         your application (and thereby be passed back to the
         ``GlobusNativeAppFlowManager``)
-    :type redirect_uri: str, optional
     :param state: The ``redirect_uri`` page will have this included in a query
         parameter, so you can use it to pass information to that page if you use a
         custom page. It defaults to the string '_default'
-    :type state: str, optional
     :param verifier: A secret used for the Native App flow. It will by default be a
         freshly generated random string, known only to this
         ``GlobusNativeAppFlowManager`` instance
-    :type verifier: str, optional
     :param refresh_tokens: When True, request refresh tokens in addition to access
         tokens. [Default: ``False``]
-    :type refresh_tokens: bool, optional
     :param prefill_named_grant: Prefill the named grant label on the consent page
-    :type prefill_named_grant: str, optional
     """
 
     def __init__(
@@ -169,8 +160,6 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
 
         :param query_params: Additional query parameters to include in the
             authorize URL. Primarily for internal use
-        :type query_params: dict, optional
-        :rtype: ``string``
 
         The returned URL string is encoded to be suitable to display to users
         in a link or to copy into their browser. Users will be redirected
@@ -207,9 +196,6 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         for access tokens (and refresh tokens if specified).
 
         :param auth_code: The short-lived code to exchange for tokens
-        :type auth_code: str
-
-        :rtype: :class:`OAuthTokenResponse <.OAuthTokenResponse>`
         """
         logger.debug(
             "Performing Native App auth_code exchange. "

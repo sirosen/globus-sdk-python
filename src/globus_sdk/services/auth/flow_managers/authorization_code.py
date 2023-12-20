@@ -34,23 +34,16 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
 
     :param auth_client: The client used to extract default values for the flow,
         and also to make calls to the Auth service.
-    :type auth_client: :class:`ConfidentialAppAuthClient \
-        <globus_sdk.ConfidentialAppAuthClient>`
     :param redirect_uri: The page that users should be directed to after authenticating
         at the authorize URL.
-    :type redirect_uri: str
     :param requested_scopes: The scopes on the token(s) being requested. Defaults to
         ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
-    :type requested_scopes: str, MutableScope, or iterable of str or MutableScope,
-        optional
     :param state: This string allows an application to pass information back to itself
         in the course of the OAuth flow. Because the user will navigate away from the
         application to complete the flow, this parameter lets the app pass an arbitrary
         string from the starting page to the ``redirect_uri``
-    :type state: str, optional
     :param refresh_tokens: When True, request refresh tokens in addition to access
         tokens. [Default: ``False``]
-    :type refresh_tokens: bool, optional
     """
 
     def __init__(
@@ -86,8 +79,6 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
 
         :param query_params: Additional parameters to include in the authorize URL.
             Primarily for internal use
-        :type query_params: dict, optional
-        :rtype: ``string``
 
         The returned URL string is encoded to be suitable to display to users
         in a link or to copy into their browser. Users will be redirected
@@ -120,9 +111,6 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         authorization code for access tokens (and refresh tokens if specified)
 
         :param auth_code: The short-lived code to exchange for tokens
-        :type auth_code: str
-
-        :rtype: :class:`OAuthTokenResponse <.OAuthTokenResponse>`
         """
         logger.debug(
             "Performing Authorization Code auth_code exchange. "

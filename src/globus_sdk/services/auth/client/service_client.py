@@ -154,7 +154,7 @@ class AuthClient(client.BaseClient):
 
         :param openid_configuration: The OIDC config as a GlobusHTTPResponse or dict.
             When not provided, it will be fetched automatically.
-        :type openid_configuration: dict or GlobusHTTPResponse
+        :type openid_configuration: None | GlobusHTTPResponse | dict[str, typing.Any]
         :param as_pem: Decode the JWK to an RSA PEM key, typically for JWT decoding
         :type as_pem: bool
         """
@@ -232,16 +232,12 @@ class AuthClient(client.BaseClient):
 
         :param usernames: A username or list of usernames to lookup. Mutually exclusive
             with ``ids``
-        :type usernames: str or iterable of str, optional
         :param ids: An identity ID or list of IDs to lookup. Mutually exclusive
             with ``usernames``
-        :type ids: str, UUID, or iterable of str or UUID, optional
         :param provision: Create identities if they do not exist, allowing clients to
             get username-to-identity mappings prior to the identity being used
-        :type provision: bool
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -338,13 +334,10 @@ class AuthClient(client.BaseClient):
 
         :param domains: A domain or iterable of domains to lookup. Mutually exclusive
             with ``ids``.
-        :type domains: str or iterable of str, optional
         :param ids: An identity provider ID or iterable of IDs to lookup. Mutually exclusive
             with ``domains``.
-        :type ids: str, UUID, or iterable of str or UUID, optional
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -434,7 +427,6 @@ class AuthClient(client.BaseClient):
         Look up a project. Requires the ``manage_projects`` scope.
 
         :param project_id: The ID of the project to lookup
-        :type project_id: str or uuid
 
         .. tab-set::
 
@@ -540,13 +532,9 @@ class AuthClient(client.BaseClient):
         At least one of ``admin_ids`` or ``admin_group_ids`` must be provided.
 
         :param display_name: The name of the project
-        :type display_name: str
         :param contact_email: The email address of the project's point of contact
-        :type contact_email: str
         :param admin_ids: A list of user IDs to be added as admins of the project
-        :type admin_ids: str or uuid or iterable of str or uuid, optional
         :param admin_group_ids: A list of group IDs to be added as admins of the project
-        :type admin_group_ids: str or uuid or iterable of str or uuid, optional
 
         .. tab-set::
 
@@ -604,15 +592,10 @@ class AuthClient(client.BaseClient):
         Update a project. Requires the ``manage_projects`` scope.
 
         :param project_id: The ID of the project to update
-        :type project_id: str or uuid
         :param display_name: The name of the project
-        :type display_name: str
         :param contact_email: The email address of the project's point of contact
-        :type contact_email: str
         :param admin_ids: A list of user IDs to be set as admins of the project
-        :type admin_ids: str or uuid or iterable of str or uuid, optional
         :param admin_group_ids: A list of group IDs to be set as admins of the project
-        :type admin_group_ids: str or uuid or iterable of str or uuid, optional
 
         .. tab-set::
 
@@ -657,7 +640,6 @@ class AuthClient(client.BaseClient):
         Delete a project. Requires the ``manage_projects`` scope.
 
         :param project_id: The ID of the project to delete
-        :type project_id: str or uuid
 
         .. tab-set::
 
@@ -687,7 +669,6 @@ class AuthClient(client.BaseClient):
         Look up a policy. Requires the ``manage_projects`` scope.
 
         :param policy_id: The ID of the policy to lookup
-        :type policy_id: str or uuid
 
         .. tab-set::
 
@@ -795,22 +776,15 @@ class AuthClient(client.BaseClient):
         Create a new Auth policy. Requires the ``manage_projects`` scope.
 
         :param project_id: ID of the project for the new policy
-        :type project_id: str or uuid
         :param high_assurance: Whether or not this policy is applied to sessions.
-        :type high_assurance: bool
         :param authentication_assurance_timeout: Number of seconds within which someone
             must have authenticated to satisfy the policy
-        :type authentication_assurance_timeout: int
         :param display_name: A user-friendly name for the policy
-        :type display_name: str
         :param description: A user-friendly description to explain the purpose of the
             policy
-        :type description: str
         :param domain_constraints_include: A list of domains that can satisfy the policy
-        :type domain_constraints_include: iterable of str or None
         :param domain_constraints_exclude: A list of domains that cannot satisfy the
             policy
-        :type domain_constraints_exclude: iterable of str or None
 
         .. tab-set::
 
@@ -872,23 +846,15 @@ class AuthClient(client.BaseClient):
         Update a policy. Requires the ``manage_projects`` scope.
 
         :param policy_id: ID of the policy to update
-        :type policy_id: str or uuid
-
         :param project_id: ID of the project for the new policy
-        :type project_id: str or uuid
         :param authentication_assurance_timeout: Number of seconds within which someone
             must have authenticated to satisfy the policy
-        :type authentication_assurance_timeout: int
         :param display_name: A user-friendly name for the policy
-        :type display_name: str
         :param description: A user-friendly description to explain the purpose of the
             policy
-        :type description: str
         :param domain_constraints_include: A list of domains that can satisfy the policy
-        :type domain_constraints_include: iterable of str or None
         :param domain_constraints_exclude: A list of domains that can not satisfy the
             policy
-        :type domain_constraints_exclude: iterable of str or None
 
         .. tab-set::
 
@@ -926,7 +892,6 @@ class AuthClient(client.BaseClient):
         Delete a policy. Requires the ``manage_projects`` scope.
 
         :param policy_id: The ID of the policy to delete
-        :type policy_id: str or uuid
 
         .. tab-set::
 
@@ -962,9 +927,7 @@ class AuthClient(client.BaseClient):
         Requires the ``manage_projects`` scope.
 
         :param client_id: The ID of the client to look up
-        :type client_id: str or uuid
         :param fqdn: The fully-qualified domain name of the client to look up
-        :type fqdn: str
 
         .. tab-set::
 
@@ -1109,7 +1072,8 @@ class AuthClient(client.BaseClient):
         *,
         public_client: bool | utils.MissingType = utils.MISSING,
         client_type: (
-            t.Literal[
+            utils.MissingType
+            | t.Literal[
                 "client_identity",
                 "confidential_client",
                 "globus_connect_server",
@@ -1117,9 +1081,8 @@ class AuthClient(client.BaseClient):
                 "hybrid_confidential_client_resource_server",
                 "resource_server",
             ]
-            | utils.MissingType
         ) = utils.MISSING,
-        visibility: t.Literal["public", "private"] | utils.MissingType = utils.MISSING,
+        visibility: utils.MissingType | t.Literal["public", "private"] = utils.MISSING,
         redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
         terms_and_conditions: str | utils.MissingType = utils.MISSING,
         privacy_policy: str | utils.MissingType = utils.MISSING,
@@ -1132,9 +1095,7 @@ class AuthClient(client.BaseClient):
 
         :param name: The display name shown to users on consents. May not contain
             linebreaks.
-        :type name: str
         :param project: ID representing the project this client belongs to.
-        :type project: str or uuid
 
         :param public_client: This is used to infer which OAuth grant_types the client
             will be able to use. Should be false if the client is capable of keeping
@@ -1142,7 +1103,6 @@ class AuthClient(client.BaseClient):
             not (such as native apps). After creation this value is immutable. This
             option is mutually exclusive with ``client_type``, exactly one must be
             given.
-        :type public_client: bool, optional
         :param client_type: Defines the type of client that will be created. This
             option is mutually exclusive with ``public_client``, exactly one must
             be given.
@@ -1175,27 +1135,18 @@ class AuthClient(client.BaseClient):
                         application (confidential or public client), service account,
                         or API.
 
-        :type client_type: str, optional
-
         :param visibility: If set to "public", any authenticated entity can view it.
             When set to "private", only entities in the same project as the client can
             view it.
-        :type visibility: str, optional
         :param redirect_uris: list of URIs that may be used in OAuth authorization
             flows.
-        :type redirect_uris: iterable of str, optional
         :param terms_and_conditions: URL of client's terms and conditions.
-        :type terms_and_conditions: str, optional
         :param privacy_policy: URL of client's privacy policy.
-        :type privacy_policy: str, optional
         :param required_idp: In order to use this client a user must have an identity
             from this IdP in their identity set.
-        :type required_idp: str or uuid, optional
         :param preselect_idp: This pre-selects the given IdP on the Globus Auth login
             page if the user is not already authenticated.
-        :type preselect_idp: str or uuid, optional
         :param additional_fields: Any additional parameters to be passed through.
-        :type additional_fields: dict, optional
 
         .. tab-set::
 
@@ -1268,7 +1219,7 @@ class AuthClient(client.BaseClient):
         client_id: UUIDLike,
         *,
         name: str | utils.MissingType = utils.MISSING,
-        visibility: t.Literal["public", "private"] | utils.MissingType = utils.MISSING,
+        visibility: utils.MissingType | t.Literal["public", "private"] = utils.MISSING,
         redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
         terms_and_conditions: str | None | utils.MissingType = utils.MISSING,
         privacy_policy: str | None | utils.MissingType = utils.MISSING,
@@ -1280,29 +1231,20 @@ class AuthClient(client.BaseClient):
         Update a client. Requires the ``manage_projects`` scope.
 
         :param client_id: ID of the client to update
-        :type client_id: str or uuid
         :param name: The display name shown to users on consents. May not contain
             linebreaks.
-        :type name: str
         :param visibility: If set to "public", any authenticated entity can view it.
             When set to "private", only entities in the same project as the client can
             view it.
-        :type visibility: str
         :param redirect_uris: list of URIs that may be used in OAuth authorization
             flows.
-        :type redirect_uris: iterable of str
         :param terms_and_conditions: URL of client's terms and conditions.
-        :type terms_and_conditions: str
         :param privacy_policy: URL of client's privacy policy.
-        :type privacy_policy: str
         :param required_idp: In order to use this client a user must have an identity
             from this IdP in their identity set.
-        :type required_idp: str or uuid
         :param preselect_idp: This pre-selects the given IdP on the Globus Auth login
             page if the user is not already authenticated.
-        :type preselect_idp: str or uuid
         :param additional_fields: Any additional parameters to be passed through.
-        :type additional_fields: dict
 
 
         .. tab-set::
@@ -1368,7 +1310,6 @@ class AuthClient(client.BaseClient):
         Delete a client. Requires the ``manage_projects`` scope.
 
         :param client_id: The ID of the client to delete
-        :type client_id: str or uuid
 
         .. tab-set::
 
@@ -1399,7 +1340,6 @@ class AuthClient(client.BaseClient):
         ``manage_projects`` scope.
 
         :param client_id: The ID of the client that owns the credentials
-        :type client_id: str or uuid
 
         .. tab-set::
 
@@ -1444,9 +1384,7 @@ class AuthClient(client.BaseClient):
         Create a new client credential. Requires the ``manage_projects`` scope.
 
         :param client_id: ID for the client
-        :type client_id: str or uuid
         :param name: The display name of the new credential.
-        :type name: str
 
         .. tab-set::
 
@@ -1495,9 +1433,7 @@ class AuthClient(client.BaseClient):
         Delete a credential. Requires the ``manage_projects`` scope.
 
         :param client_id: The ID of the client that owns the credential to delete
-        :type client_id: str or uuid
         :param credential_id: The ID of the credential to delete
-        :type credential_id: str or uuid
 
         .. tab-set::
 
@@ -1528,7 +1464,6 @@ class AuthClient(client.BaseClient):
         Look up a scope by ``scope_id``.  Requires the ``manage_projects`` scope.
 
         :param scope_id: The ID of the scope to look up
-        :type scope_id: str or uuid
 
         .. tab-set::
 
@@ -1579,12 +1514,9 @@ class AuthClient(client.BaseClient):
         ``ids``.  Requires the ``manage_projects`` scope.
 
         :param scope_strings: The scope_strings of the scopes to look up
-        :type scope_strings: iterable of str
         :param ids: The ID of the scopes to look up
-        :type ids: iterable of str or uuid
         :param query_params: Any additional parameters to be passed through
             as query params.
-        :type query_params: dict, optional
 
         .. tab-set::
 
@@ -1678,27 +1610,19 @@ class AuthClient(client.BaseClient):
         Create a new scope. Requires the ``manage_projects`` scope.
 
         :param client_id: ID of the client for the new scope
-        :type client_id: str or uuid
         :param name: A display name used to display consents to users,
             along with description
-        :type name: str
         :param description: A description used to display consents to users, along with
             name
-        :type description: str
         :param scope_suffix: String consisting of lowercase letters, number, and
             underscores. This will be the final part of the scope_string
-        :type scope_suffix: str
         :param required_domains: Domains the user must have linked identities in in
             order to make use of the scope
-        :type required_domains: iterable of str
         :param dependent_scopes: Scopes included in the consent for this new scope
-        :type dependent_scopes: iterable of DependentScopeSpec
         :param advertised: If True, scope is visible to anyone regardless of client
             visibility, otherwise, scope visibility is based on client visibility.
-        :type advertised: bool
         :param allows_refresh_token: Whether or not the scope allows refresh tokens
             to be issued.
-        :type allows_refresh_token: bool
 
         .. tab-set::
 
@@ -1757,27 +1681,19 @@ class AuthClient(client.BaseClient):
         Update a scope. Requires the ``manage_projects`` scope.
 
         :param scope_id: ID of the scope to update
-        :type scope_id: str or uuid
         :param name: A display name used to display consents to users,
             along with description
-        :type name: str
         :param description: A description used to display consents to users, along with
             name
-        :type description: str
         :param scope_suffix: String consisting of lowercase letters, number, and
             underscores. This will be the final part of the scope_string
-        :type scope_suffix: str
         :param required_domains: Domains the user must have linked identities in in
             order to make use of the scope
-        :type required_domains: iterable of str
         :param dependent_scopes: Scopes included in the consent for this new scope
-        :type dependent_scopes: iterable of DependentScope
         :param advertised: If True, scope is visible to anyone regardless of client
             visibility, otherwise, scope visibility is based on client visibility.
-        :type advertised: bool
         :param allows_refresh_token: Whether or not the scope allows refresh tokens
             to be issued.
-        :type allows_refresh_token: bool
 
         .. tab-set::
 
@@ -1817,7 +1733,6 @@ class AuthClient(client.BaseClient):
         Delete a scope. Requires the ``manage_projects`` scope.
 
         :param scope_id: The ID of the scope to delete
-        :type scope_id: str or uuid
 
         .. tab-set::
 

@@ -8,7 +8,8 @@ from __future__ import annotations
 import typing as t
 import warnings
 
-from globus_sdk._types import ScopeCollectionType
+if t.TYPE_CHECKING:
+    from globus_sdk._types import ScopeCollectionType
 
 
 def _iter_scope_collection(obj: ScopeCollectionType) -> t.Iterator[str]:
@@ -31,10 +32,8 @@ class MutableScope:
     `str(MutableScope(...))` produces a valid scope string for use in various methods.
 
     :param scope_string: The string which will be used as the basis for this Scope
-    :type scope_string: str
     :param optional: The scope may be marked as optional. This means that the scope can
         be declined by the user without declining consent for other scopes
-    :type optional: bool
     """
 
     def __init__(
@@ -73,11 +72,9 @@ class MutableScope:
         Scope and will be evident in its string representation.
 
         :param scope: The scope upon which the current scope depends
-        :type scope: str
         :param optional: Mark the dependency an optional one. By default it is not. An
             optional scope dependency can be declined by the user without declining
             consent for the primary scope
-        :type optional: bool, optional
         """
         if optional is not None:
             if isinstance(scope, MutableScope):
@@ -119,6 +116,5 @@ class MutableScope:
         Scopes, convert to a string which can be used in a request.
 
         :param obj: The object or collection to convert to a string
-        :type obj: str, MutableScope, iterable of str or MutableScope
         """
         return " ".join(_iter_scope_collection(obj))

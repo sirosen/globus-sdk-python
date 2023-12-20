@@ -15,7 +15,6 @@ class LocalGlobusConnectServer:
     for interacting with any Globus Service APIs.
 
     :param info_path: The path to the info file used to inspect the local system
-    :type info_path: str, optional
     """
 
     def __init__(
@@ -36,8 +35,6 @@ class LocalGlobusConnectServer:
         one, it cannot be used or examined by the SDK. For example, containerized
         applications using the SDK may not be able to interact with Globus Connect
         Server on the container host.
-
-        :type: dict or None
         """
         if self._loaded_info is None:
             if self.info_path.is_file():
@@ -60,8 +57,6 @@ class LocalGlobusConnectServer:
         """
         The endpoint ID of the local Globus Connect Server endpoint.
         None if the data cannot be loaded or is malformed.
-
-        :type: str or None
         """
         if self.info_dict is not None:
             epid = self.info_dict.get("endpoint_id")
@@ -74,8 +69,6 @@ class LocalGlobusConnectServer:
         """
         The domain name of the local Globus Connect Server endpoint.
         None if the data cannot be loaded or is malformed.
-
-        :type: str or None
         """
         if self.info_dict is not None:
             domain = self.info_dict.get("domain_name")

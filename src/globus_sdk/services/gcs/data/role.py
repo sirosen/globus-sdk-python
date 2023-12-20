@@ -12,17 +12,13 @@ class GCSRoleDocument(utils.PayloadWrapper):
     to use as the `data` parameter to `create_role`
 
     :param DATA_TYPE: Versioned document type.
-    :type DATA_TYPE: str
     :param collection: Collection ID for the collection the role will apply to.
         This value is omitted when creating an endpoint
         role or when creating role definitions when creating collections.
-    :type collection: str or UUID, optional
     :param principal: Auth identity or group id URN. Should be in the format
         urn:globus:auth:[identity|group]:{uuid of identity or group}
-    :type principal: str, optional
     :param role: Role assigned to the principal. Known values are owner,
         administrator, access_manager, activity_manager, and activity_monitor
-    :type role: str, optional
     """
 
     def __init__(

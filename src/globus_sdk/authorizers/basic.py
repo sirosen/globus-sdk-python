@@ -14,9 +14,7 @@ class BasicAuthorizer(StaticGlobusAuthorizer):
     header.
 
     :param username: Username component for Basic Auth
-    :type username: str
     :param password: Password component for Basic Auth
-    :type password: str
     """
 
     def __init__(self, username: str, password: str) -> None:
