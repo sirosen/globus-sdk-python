@@ -310,10 +310,22 @@ class PaginatedUsage(AddContentDirective):
         yield ":ref:`how to make paginated calls <making_paginated_calls>`."
 
 
-def after_autodoc_signature_replace_MISSING_repr(
-    app, what, name, obj, options, signature, return_annotation
+def after_autodoc_signature_replace_MISSING_repr(  # pylint: disable=missing-param-doc,missing-type-doc  # noqa: E501
+    app,  # pylint: disable=unused-argument
+    what,  # pylint: disable=unused-argument
+    name,  # pylint: disable=unused-argument
+    obj,  # pylint: disable=unused-argument
+    options,  # pylint: disable=unused-argument
+    signature: str,
+    return_annotation: str,
 ):
-    """convert <globus_sdk.MISSING> to MISSING in autodoc signatures"""
+    """
+    convert <globus_sdk.MISSING> to MISSING in autodoc signatures
+
+    :param signature: the signature after autodoc parsing/rendering
+    :param return_annotation: the return type annotation, including the leading `->`,
+        after autodoc parsing/rendering
+    """
     if signature is not None:
         signature = signature.replace("<globus_sdk.MISSING>", "MISSING")
     if return_annotation is not None:
