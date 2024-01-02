@@ -18,7 +18,9 @@ import typing as t
 REPO_ROOT = pathlib.Path(__file__).parent.parent
 CHANGELOG_PATH = REPO_ROOT / "changelog.rst"
 
-CHANGELOG_ANCHOR_PATTERN = re.compile(r"^\.\. _changelog-\d+\.\d+\.\d+:$", re.MULTILINE)
+CHANGELOG_ANCHOR_PATTERN = re.compile(
+    r"^\.\. _changelog-\d+\.\d+\.\d+(?:\.?(?:post|a|b|dev)\d+)?:$", re.MULTILINE
+)
 CHANGELOG_HEADER_PATTERN = re.compile(r"^v(\d+\.\d+\.\d+).*$", re.MULTILINE)
 
 H2_RST_PATTERN = re.compile(r"-+")
