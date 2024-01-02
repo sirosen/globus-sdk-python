@@ -12,6 +12,44 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.34.0:
+
+v3.34.0 (2024-01-02)
+--------------------
+
+Added
+~~~~~
+
+- Add the ``delete_protected`` field to ``MappedCollectionDocument``. (:pr:`920`)
+
+Changed
+~~~~~~~
+
+- Minor improvements to handling of paths and URLs. (:pr:`922`)
+
+  - Request paths which start with the ``base_path`` of a client are now
+    normalized to avoid duplicating the ``base_path``.
+
+  - When a ``GCSClient`` is initialized with an HTTPS URL, if the URL does not
+    end with the ``/api`` suffix, that suffix will automatically be appended.
+    This allows the ``gcs_manager_url`` field from Globus Transfer to be used
+    verbatim as the address for a ``GCSClient``.
+
+Deprecated
+~~~~~~~~~~
+
+- ``NativeAppAuthClient.oauth2_validate_token`` and
+  ``ConfidentialAppAuthClient.oauth2_validate_token`` have been deprecated, as
+  their usage is discouraged by the Auth service. (:pr:`921`)
+
+Development
+~~~~~~~~~~~
+
+- Migrate from a CHANGELOG symlink to the RST ``.. include`` directive. (:pr:`918`)
+
+- Tutorial endpoint references are removed from tests and replaced with
+  bogus values. (:pr:`919`)
+
 .. _changelog-3.33.0.post0:
 
 v3.33.0.post0 (2023-12-05)
