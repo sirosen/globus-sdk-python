@@ -6,6 +6,8 @@ from .base import PageT, Paginator
 
 
 class LastKeyPaginator(Paginator[PageT]):
+    _REQUIRES_METHOD_KWARGS = ("last_key",)
+
     def __init__(
         self,
         method: t.Callable[..., t.Any],

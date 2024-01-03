@@ -45,6 +45,10 @@ class Paginator(t.Iterable[PageT], metaclass=abc.ABCMeta):
         ``{"c": 1}``. As with ``client_args``, it's passed to each paginated call.
     """
 
+    # the arguments which must be supported on the paginated method in order
+    # for the paginator to pass them
+    _REQUIRES_METHOD_KWARGS: tuple[str, ...] = ()
+
     def __init__(
         self,
         method: t.Callable[..., t.Any],

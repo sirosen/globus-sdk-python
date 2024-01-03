@@ -7,35 +7,14 @@ import inspect
 import pytest
 
 import globus_sdk
-from globus_sdk.paging import (
-    HasNextPaginator,
-    LastKeyPaginator,
-    LimitOffsetTotalPaginator,
-    MarkerPaginator,
-    NextTokenPaginator,
-    NullableMarkerPaginator,
-)
 
-_CLIENTS_TO_CHECK = (
-    # alphabetical by service name
-    # Auth
-    globus_sdk.AuthClient,
-    globus_sdk.NativeAppAuthClient,
-    globus_sdk.ConfidentialAppAuthClient,
-    # Flows
-    globus_sdk.FlowsClient,
-    globus_sdk.SpecificFlowClient,
-    # GCS
-    globus_sdk.GCSClient,
-    # Groups
-    globus_sdk.GroupsClient,
-    # Search
-    globus_sdk.SearchClient,
-    # Timers
-    globus_sdk.TimerClient,
-    # Transfer
-    globus_sdk.TransferClient,
-)
+_CLIENTS_TO_CHECK = []
+for attrname in dir(globus_sdk):
+    obj = getattr(globus_sdk, attrname)
+    if obj is globus_sdk.BaseClient:
+        continue
+    if isinstance(obj, type) and issubclass(obj, globus_sdk.BaseClient):
+        _CLIENTS_TO_CHECK.append(obj)
 
 _METHODS_TO_CHECK = []
 for cls in _CLIENTS_TO_CHECK:
@@ -61,21 +40,5 @@ def test_paginated_method_matches_paginator_requirements(method):
         if p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)
     }
 
-    if (
-        paginator_class is HasNextPaginator
-        or paginator_class is LimitOffsetTotalPaginator
-    ):
-        expect_params = ("limit", "offset")
-    elif (
-        paginator_class is MarkerPaginator or paginator_class is NullableMarkerPaginator
-    ):
-        expect_params = ("marker",)
-    elif paginator_class is LastKeyPaginator:
-        expect_params = ("last_key",)
-    elif paginator_class is NextTokenPaginator:
-        expect_params = ("next_token",)
-    else:
-        raise NotImplementedError(f"unrecognized paginator class: {paginator_class}")
-
-    for param_name in expect_params:
+    for param_name in paginator_class._REQUIRES_METHOD_KWARGS:
         assert param_name in kwarg_names, method.__qualname__
