@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import logging
 import sys
 import typing as t
@@ -31,6 +32,45 @@ else:
     from typing_extensions import Literal
 
 log = logging.getLogger(__name__)
+
+F = t.TypeVar("F", bound=t.Callable[..., GlobusHTTPResponse])
+
+
+def _create_policy_compat(f: F) -> F:
+    @functools.wraps(f)
+    def wrapper(self: t.Any, *args: t.Any, **kwargs: t.Any) -> t.Any:
+        if args:
+            if len(args) > 5:
+                raise TypeError(
+                    "create_policy() takes 5 positional arguments "
+                    f"but {len(args)} were given"
+                )
+
+            exc.warn_deprecated(
+                "'AuthClient.create_policy' received positional arguments. "
+                "Use only keyword arguments instead."
+            )
+
+            for argname, argvalue in zip(
+                (
+                    "project_id",
+                    "high_assurance",
+                    "authentication_assurance_timeout",
+                    "display_name",
+                    "description",
+                ),
+                args,
+            ):
+                if argname in kwargs:
+                    raise TypeError(
+                        f"create_policy() got multiple values for argument '{argname}'"
+                    )
+                else:
+                    kwargs[argname] = argvalue
+
+        return f(self, **kwargs)
+
+    return t.cast(F, wrapper)
 
 
 class AuthClient(client.BaseClient):
@@ -757,14 +797,15 @@ class AuthClient(client.BaseClient):
         """
         return GetPoliciesResponse(self.get("/v2/api/policies"))
 
-    def create_policy(
+    @_create_policy_compat
+    def create_policy(  # pylint: disable=missing-param-doc
         self,
+        *,
         project_id: UUIDLike,
-        high_assurance: bool,
-        authentication_assurance_timeout: int,
         display_name: str,
         description: str,
-        *,
+        high_assurance: bool | utils.MissingType = utils.MISSING,
+        authentication_assurance_timeout: int | utils.MissingType = utils.MISSING,
         domain_constraints_include: (
             t.Iterable[str] | None | utils.MissingType
         ) = utils.MISSING,
@@ -785,6 +826,14 @@ class AuthClient(client.BaseClient):
         :param domain_constraints_include: A list of domains that can satisfy the policy
         :param domain_constraints_exclude: A list of domains that cannot satisfy the
             policy
+
+        .. note:
+
+            ``project_id``, ``display_name``, and ``description`` are all required
+            arguments, although they are not declared as required in the function
+            signature. This is due to a backwards compatible behavior with earlier
+            versions of globus-sdk, and will be changed in a future release which
+            removes the compatible behavior.
 
         .. tab-set::
 
