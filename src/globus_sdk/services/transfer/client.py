@@ -472,7 +472,7 @@ class TransferClient(client.BaseClient):
 
                 .. extdoclink:: Get my guest collection list
                     :ref: transfer/endpoints_and_collections/#get_my_guest_collection_list
-        """
+        """  # noqa: E501
         log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(
@@ -582,7 +582,7 @@ class TransferClient(client.BaseClient):
 
                 .. extdoclink:: Get endpoint or collection server list
                     :ref: transfer/endpoints_and_collections/#get_endpoint_or_collection_server_list
-        """
+        """  # noqa: E501
         log.info(f"TransferClient.endpoint_server_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(f"endpoint/{endpoint_id}/server_list", query_params=query_params)
@@ -1838,7 +1838,7 @@ class TransferClient(client.BaseClient):
 
                 .. extdoclink:: Get monitored endpoints and collections
                     :ref: transfer/advanced_collection_management/#get_monitored_endpoints_and_collections
-        """
+        """  # noqa: E501
         log.info(f"TransferClient.endpoint_manager_monitored_endpoints({query_params})")
         return IterableTransferResponse(
             self.get("endpoint_manager/monitored_endpoints", query_params=query_params)
@@ -1893,7 +1893,7 @@ class TransferClient(client.BaseClient):
 
                 .. extdoclink:: Get endpoint as admin
                     :ref: transfer/advanced_collection_management/#mc_get_endpoint_or_collection
-        """
+        """  # noqa: E501
         log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id})")
         return self.get(
             f"endpoint_manager/endpoint/{endpoint_id}", query_params=query_params
@@ -2332,7 +2332,7 @@ class TransferClient(client.BaseClient):
 
                 .. extdoclink:: Get cancel status by ID
                     :ref: transfer/advanced_collection_management/#get_cancel_status_by_id
-        """
+        """  # noqa: E501
         log.info(f"TransferClient.endpoint_manager_cancel_status({admin_cancel_id})")
         return self.get(
             f"endpoint_manager/admin_cancel/{admin_cancel_id}",
