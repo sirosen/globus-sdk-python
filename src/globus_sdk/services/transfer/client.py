@@ -192,10 +192,12 @@ class TransferClient(client.BaseClient):
 
     def create_endpoint(self, data: dict[str, t.Any]) -> response.GlobusHTTPResponse:
         """
-        :param data: An endpoint document with fields for the new endpoint
+        .. warning::
 
-        DEPRECATION WARNING: this helper is deprecated with the end of Globus Connect
-        Server v4 support and may no longer function with the Transfer API.
+            This method is deprecated with the end of Globus Connect Server v4
+            support and may no longer function with the Transfer API.
+
+        :param data: An endpoint document with fields for the new endpoint
         """
         if data.get("myproxy_server") and data.get("oauth_server"):
             raise exc.GlobusSDKUsageError(
@@ -335,15 +337,17 @@ class TransferClient(client.BaseClient):
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
         r"""
+        .. warning::
+
+            This method is deprecated with the end of Globus Connect Server v4
+            support and may no longer function with the Transfer API.
+
         :param endpoint_id: The ID of the endpoint to autoactivate
         :param if_expires_in: A number of seconds. Autoactivation will only be attempted
             if the current activation expires within this timeframe. Otherwise,
             autoactivation will succeed with a code of 'AlreadyActivated'
         :param query_params: Any additional parameters will be passed through
             as query params.
-
-        DEPRECATION WARNING: this helper is deprecated with the end of Globus Connect
-        Server v4 support and may no longer function with the Transfer API.
         """  # noqa: E501
         if query_params is None:
             query_params = {}
@@ -361,12 +365,14 @@ class TransferClient(client.BaseClient):
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
         """
+        .. warning::
+
+            This method is deprecated with the end of Globus Connect Server v4
+            support and may no longer function with the Transfer API.
+
         :param endpoint_id: The ID of the endpoint to deactivate
         :param query_params: Any additional parameters will be passed through
             as query params.
-
-        DEPRECATION WARNING: this helper is deprecated with the end of Globus Connect
-        Server v4 support and may no longer function with the Transfer API.
         """
         log.info(f"TransferClient.endpoint_deactivate({endpoint_id})")
         return self.post(
@@ -381,6 +387,11 @@ class TransferClient(client.BaseClient):
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
         """
+        .. warning::
+
+            This method is deprecated with the end of Globus Connect Server v4
+            support and may no longer function with the Transfer API.
+
         :param endpoint_id: The ID of the endpoint to activate
         :pram requirements_data: Filled in activation requirements data, as can be
             fetched from :meth:`~endpoint_get_activation_requirements`. Only the fields
@@ -388,9 +399,6 @@ class TransferClient(client.BaseClient):
         :param requirements_data: An optional body for the request
         :param query_params: Any additional parameters will be passed through
             as query params.
-
-        DEPRECATION WARNING: this helper is deprecated with the end of Globus Connect
-        Server v4 support and may no longer function with the Transfer API.
         """
         log.info(f"TransferClient.endpoint_activate({endpoint_id})")
         return self.post(
@@ -406,13 +414,15 @@ class TransferClient(client.BaseClient):
         query_params: dict[str, t.Any] | None = None,
     ) -> ActivationRequirementsResponse:
         """
+        .. warning::
+
+            This method is deprecated with the end of Globus Connect Server v4
+            support and may no longer function with the Transfer API.
+
         :param endpoint_id: The ID of the endpoint whose activation requirements data is
             being looked up
         :param query_params: Any additional parameters will be passed through
             as query params.
-
-        DEPRECATION WARNING: this helper is deprecated with the end of Globus Connect
-        Server v4 support and may no longer function with the Transfer API.
         """
         return ActivationRequirementsResponse(
             self.get(
@@ -620,11 +630,13 @@ class TransferClient(client.BaseClient):
         self, endpoint_id: UUIDLike, server_data: dict[str, t.Any]
     ) -> response.GlobusHTTPResponse:
         """
+        .. warning::
+
+            This method is deprecated with the end of Globus Connect Server v4
+            support and may no longer function with the Transfer API.
+
         :param endpoint_id: The endpoint under which the server is being registered
         :param server_data: Fields for the new server, as a server document
-
-        DEPRECATION WARNING: this helper is deprecated with the end of Globus Connect
-        Server v4 support and may no longer function with the Transfer API.
         """
         log.info(f"TransferClient.add_endpoint_server({endpoint_id}, ...)")
         return self.post(f"endpoint/{endpoint_id}/server", data=server_data)
@@ -636,12 +648,14 @@ class TransferClient(client.BaseClient):
         server_data: dict[str, t.Any],
     ) -> response.GlobusHTTPResponse:
         """
+        .. warning::
+
+            This method is deprecated with the end of Globus Connect Server v4
+            support and may no longer function with the Transfer API.
+
         :param endpoint_id: The endpoint under which the server is registered
         :param server_id: The ID of the server to update
         :param server_data: Fields on the server to update, as a partial server document
-
-        DEPRECATION WARNING: this helper is deprecated with the end of Globus Connect
-        Server v4 support and may no longer function with the Transfer API.
         """
         log.info(
             "TransferClient.update_endpoint_server(%s, %s, ...)",
@@ -654,11 +668,13 @@ class TransferClient(client.BaseClient):
         self, endpoint_id: UUIDLike, server_id: IntLike
     ) -> response.GlobusHTTPResponse:
         """
+        .. warning::
+
+            This method is deprecated with the end of Globus Connect Server v4
+            support and may no longer function with the Transfer API.
+
         :param endpoint_id: The endpoint under which the server is registered
         :param server_id: The ID of the server to delete
-
-        DEPRECATION WARNING: this helper is deprecated with the end of Globus Connect
-        Server v4 support and may no longer function with the Transfer API.
         """
         log.info(
             "TransferClient.delete_endpoint_server(%s, %s)", endpoint_id, server_id
