@@ -1248,6 +1248,10 @@ class TransferClient(client.BaseClient):
 
             This method is not currently supported by any collections.
         """  # noqa: E501
+        exc.warn_deprecated(
+            "operation_symlink is not currently supported by any collections. "
+            "To reduce confusion, this method will be removed."
+        )
         log.info(
             "TransferClient.operation_symlink({}, {}, {}, {})".format(
                 endpoint_id, symlink_target, path, query_params
