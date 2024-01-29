@@ -1244,7 +1244,9 @@ class TransferClient(client.BaseClient):
         :param path: The name of (path to) the new symlink
         :param query_params: Additional passthrough query parameters
 
-        WARNING: This helper is not currently supported by any collections.
+        .. warning::
+
+            This method is not currently supported by any collections.
         """  # noqa: E501
         log.info(
             "TransferClient.operation_symlink({}, {}, {}, {})".format(
