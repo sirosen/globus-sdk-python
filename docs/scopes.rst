@@ -143,12 +143,14 @@ alias for ``serialize``. For example, the following is valid usage to demonstrat
     >>> bar = MutableScope("bar")
     >>> bar.add_dependency("baz")
     >>> foo.add_dependency(bar)
-    >>> print(str(MutableScope("foo")))
-    foo[bar *baz]
+    >>> print(str(foo))
+    foo[bar[baz]]
     >>> print(bar.serialize())
     bar[baz]
     >>> alpha = MutableScope("alpha")
     >>> alpha.add_dependency(MutableScope("beta", optional=True))
+    >>> print(str(alpha))
+    alpha[*beta]
     >>> print(repr(alpha))
     MutableScope("alpha", dependencies=[MutableScope("beta", optional=True)])
 
