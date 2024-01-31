@@ -209,6 +209,9 @@ class SearchClient(client.BaseClient):
             but may result in BadRequest errors when used if the query is invalid
         :param query_params: additional parameters to pass as query params
 
+        For details on query syntax, including the ``advanced`` query behavior, see
+        the :extdoclink:`Search Query Syntax <search/query#query_syntax>` documentation.
+
         .. tab-set::
 
             .. tab-item:: Example Usage
@@ -271,6 +274,9 @@ class SearchClient(client.BaseClient):
         :param data: A Search Query document containing the query and any other fields
         :param offset: offset used in paging (overwrites any offset in ``data``)
         :param limit: limit the number of results (overwrites any limit in ``data``)
+
+        For details on query syntax, including the ``advanced`` query behavior, see
+        the :extdoclink:`Search Query Syntax <search/query#query_syntax>` documentation.
 
         .. tab-set::
 
@@ -339,6 +345,9 @@ class SearchClient(client.BaseClient):
         :param index_id: The index on which to search
         :param data: A Search Scroll Query document
         :param marker: marker used in paging (overwrites any marker in ``data``)
+
+        For details on query syntax, including the ``advanced`` query behavior, see
+        the :extdoclink:`Search Query Syntax <search/query#query_syntax>` documentation.
 
         .. tab-set::
 

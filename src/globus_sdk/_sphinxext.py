@@ -203,6 +203,31 @@ class EnumerateTestingFixtures(AddContentDirective):
         yield ""
 
 
+def _derive_doc_url_base(service: str | None) -> str:
+    if service is None:
+        return "https://docs.globus.org/api"
+    elif service == "groups":
+        return "https://groups.api.globus.org/redoc#operation"
+    elif service == "gcs":
+        return "https://docs.globus.org/globus-connect-server/v5/api"
+    elif service == "flows":
+        return "https://globusonline.github.io/globus-flows#tag"
+    else:
+        raise ValueError(f"Unsupported extdoclink service '{service}'")
+
+
+def extdoclink_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+    if " " not in text:
+        raise ValueError("extdoclink role must contain space-separated text")
+    linktext, _, ref = text.rpartition(" ")
+    if not ref.startswith("<") and ref.endswith(">"):
+        raise ValueError("extdoclink role reference must be in angle brackets")
+    ref = ref[1:-1]
+    base_url = _derive_doc_url_base(None)
+    node = nodes.reference(rawtext, linktext, refuri=f"{base_url}/{ref}")
+    return [node], []
+
+
 class ExternalDocLink(AddContentDirective):
     has_content = False
     required_arguments = 1
@@ -219,17 +244,7 @@ class ExternalDocLink(AddContentDirective):
         message = self.arguments[0].strip()
 
         service: str | None = self.options.get("service")
-
-        if service is None:
-            default_base_url = "https://docs.globus.org/api"
-        elif service == "groups":
-            default_base_url = "https://groups.api.globus.org/redoc#operation"
-        elif service == "gcs":
-            default_base_url = "https://docs.globus.org/globus-connect-server/v5/api"
-        elif service == "flows":
-            default_base_url = "https://globusonline.github.io/globus-flows#tag"
-        else:
-            raise ValueError(f"Unsupported extdoclink service '{service}'")
+        default_base_url: str = _derive_doc_url_base(service)
 
         base_url = self.options.get("base_url", default_base_url)
         relative_link = self.options["ref"]
@@ -340,6 +355,8 @@ def setup(app):
     app.add_directive("expandtestfixture", ExpandTestingFixture)
     app.add_directive("extdoclink", ExternalDocLink)
     app.add_directive("paginatedusage", PaginatedUsage)
+
+    app.add_role("extdoclink", extdoclink_role)
 
     app.connect(
         "autodoc-process-signature", after_autodoc_signature_replace_MISSING_repr
