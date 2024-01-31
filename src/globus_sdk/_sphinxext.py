@@ -216,7 +216,15 @@ def _derive_doc_url_base(service: str | None) -> str:
         raise ValueError(f"Unsupported extdoclink service '{service}'")
 
 
-def extdoclink_role(name, rawtext, text, lineno, inliner, options=None, content=None):
+def extdoclink_role(
+    name,  # pylint: disable=unused-argument
+    rawtext,
+    text,
+    lineno,  # pylint: disable=unused-argument
+    inliner,  # pylint: disable=unused-argument
+    options=None,  # pylint: disable=unused-argument
+    content=None,  # pylint: disable=unused-argument
+):
     if " " not in text:
         raise ValueError("extdoclink role must contain space-separated text")
     linktext, _, ref = text.rpartition(" ")
