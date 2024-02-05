@@ -2,6 +2,7 @@
 Custom Transport class for the TransferClient that overrides
 default_check_transient_error
 """
+
 from globus_sdk.transport import RequestsTransport, RetryCheckResult, RetryContext
 
 

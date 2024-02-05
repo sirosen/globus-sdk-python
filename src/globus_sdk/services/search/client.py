@@ -26,6 +26,7 @@ class SearchClient(client.BaseClient):
 
     .. automethodlist:: globus_sdk.SearchClient
     """
+
     error_class = SearchAPIError
     service_name = "search"
     scopes = SearchScopes

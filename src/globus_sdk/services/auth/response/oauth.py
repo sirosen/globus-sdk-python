@@ -214,9 +214,9 @@ class OAuthTokenResponse(GlobusHTTPResponse):
                     "passing jwk without openid configuration is not allowed"
                 )
             logger.debug("No OIDC Config provided, autofetching...")
-            oidc_config: (
-                GlobusHTTPResponse | dict[str, t.Any]
-            ) = auth_client.get_openid_configuration()
+            oidc_config: GlobusHTTPResponse | dict[str, t.Any] = (
+                auth_client.get_openid_configuration()
+            )
         else:
             oidc_config = openid_configuration
 

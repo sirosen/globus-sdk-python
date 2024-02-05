@@ -31,6 +31,7 @@ class BaseClient:
 
     All other parameters are for internal use and should be ignored.
     """
+
     # service name is used to lookup a service URL from config
     service_name: str = "_base"
     # path under the client base URL

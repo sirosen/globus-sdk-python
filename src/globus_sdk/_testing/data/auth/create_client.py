@@ -78,9 +78,9 @@ def register_response(
             **request_body,
         }
         if "client_type" not in client_response_record:
-            client_response_record[
-                "client_type"
-            ] = "hybrid_confidential_client_resource_server"
+            client_response_record["client_type"] = (
+                "hybrid_confidential_client_resource_server"
+            )
 
     return RegisteredResponse(
         service="auth",

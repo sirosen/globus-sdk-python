@@ -93,8 +93,7 @@ class AuthLoginClient(client.BaseClient):
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
         as_pem: Literal[True],
-    ) -> RSAPublicKey:
-        ...
+    ) -> RSAPublicKey: ...
 
     @t.overload
     def get_jwk(
@@ -102,8 +101,7 @@ class AuthLoginClient(client.BaseClient):
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
         as_pem: Literal[False],
-    ) -> dict[str, t.Any]:
-        ...
+    ) -> dict[str, t.Any]: ...
 
     # FYI: this get_jwk method is duplicated in AuthClient
     # if this code is modified, please update that copy as well
@@ -334,8 +332,7 @@ class AuthLoginClient(client.BaseClient):
     def oauth2_token(
         self,
         form_data: dict[str, t.Any] | utils.PayloadWrapper,
-    ) -> OAuthTokenResponse:
-        ...
+    ) -> OAuthTokenResponse: ...
 
     @t.overload
     def oauth2_token(
@@ -343,8 +340,7 @@ class AuthLoginClient(client.BaseClient):
         form_data: dict[str, t.Any] | utils.PayloadWrapper,
         *,
         body_params: dict[str, t.Any] | None,
-    ) -> OAuthTokenResponse:
-        ...
+    ) -> OAuthTokenResponse: ...
 
     @t.overload
     def oauth2_token(
@@ -352,8 +348,7 @@ class AuthLoginClient(client.BaseClient):
         form_data: dict[str, t.Any] | utils.PayloadWrapper,
         *,
         response_class: type[RT],
-    ) -> RT:
-        ...
+    ) -> RT: ...
 
     @t.overload
     def oauth2_token(
@@ -362,8 +357,7 @@ class AuthLoginClient(client.BaseClient):
         *,
         body_params: dict[str, t.Any] | None,
         response_class: type[RT],
-    ) -> RT:
-        ...
+    ) -> RT: ...
 
     def oauth2_token(
         self,

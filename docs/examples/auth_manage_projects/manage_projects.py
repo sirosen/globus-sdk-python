@@ -99,19 +99,19 @@ def main():
         session_params = {}
         if err_params.session_required_identities:
             print("session required identities detected")
-            session_params[
-                "session_required_identities"
-            ] = err_params.session_required_identities
+            session_params["session_required_identities"] = (
+                err_params.session_required_identities
+            )
         if err_params.session_required_single_domain:
             print("session required single domain detected")
-            session_params[
-                "session_required_single_domain"
-            ] = err_params.session_required_single_domain
+            session_params["session_required_single_domain"] = (
+                err_params.session_required_single_domain
+            )
         if err_params.session_required_policies:
             print("session required policies detected")
-            session_params[
-                "session_required_policies"
-            ] = err_params.session_required_policies
+            session_params["session_required_policies"] = (
+                err_params.session_required_policies
+            )
         print(session_params)
         print(err_params)
         response = do_login_flow(session_params=session_params)

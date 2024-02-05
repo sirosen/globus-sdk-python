@@ -14,7 +14,7 @@ RESPONSES = ResponseSet(
     default=RegisteredResponse(
         service="auth",
         method="DELETE",
-        path=(f"/v2/api/clients/{CREDENTIAL['client']}/credentials/{CREDENTIAL['id']}"),
+        path=f"/v2/api/clients/{CREDENTIAL['client']}/credentials/{CREDENTIAL['id']}",
         json={"credential": CREDENTIAL},
         metadata={
             "credential_id": CREDENTIAL["id"],

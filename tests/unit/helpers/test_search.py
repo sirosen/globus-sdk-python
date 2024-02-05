@@ -1,6 +1,7 @@
 """
 Unit tests for globus_sdk.SearchQuery
 """
+
 import pytest
 
 from globus_sdk import SearchQuery

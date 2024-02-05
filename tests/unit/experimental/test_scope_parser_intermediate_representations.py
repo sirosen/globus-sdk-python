@@ -68,7 +68,7 @@ def test_treenode_repr():
 
     t = ScopeTreeNode("foo", optional=False)
     t.dependencies = [ScopeTreeNode("bar", optional=False)]
-    assert (repr(t)) == "ScopeTreeNode('foo', dependencies=[ScopeTreeNode('bar')])"
+    assert repr(t) == "ScopeTreeNode('foo', dependencies=[ScopeTreeNode('bar')])"
 
 
 def _blank_lines_removed(s: str) -> str:

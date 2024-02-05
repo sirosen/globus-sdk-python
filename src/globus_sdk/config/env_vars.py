@@ -4,6 +4,7 @@ and parsing values.
 
 This does not include service URL env vars (see environments.py for loading of those)
 """
+
 from __future__ import annotations
 
 import logging
@@ -26,8 +27,7 @@ def _load_var(
     default: t.Any,
     explicit_value: t.Any | None,
     convert: t.Callable[[t.Any, t.Any], T],
-) -> T:
-    ...
+) -> T: ...
 
 
 @t.overload
@@ -35,8 +35,7 @@ def _load_var(
     varname: str,
     default: str,
     explicit_value: str | None,
-) -> str:
-    ...
+) -> str: ...
 
 
 def _load_var(

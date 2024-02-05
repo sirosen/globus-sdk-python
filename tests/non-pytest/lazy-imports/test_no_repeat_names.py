@@ -1,6 +1,7 @@
 """
 Make sure the generated data does not duplicate names
 """
+
 import globus_sdk
 
 

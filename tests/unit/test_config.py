@@ -193,9 +193,9 @@ def test_service_url_from_env_var():
             == "https://transfer.example.org/"
         )
         # also try with a made up service
-        os.environ[
-            "GLOBUS_SDK_SERVICE_URL_ION_CANNON"
-        ] = "https://ion-cannon.example.org/"
+        os.environ["GLOBUS_SDK_SERVICE_URL_ION_CANNON"] = (
+            "https://ion-cannon.example.org/"
+        )
         assert (
             globus_sdk.config.get_service_url("ion_cannon", environment="production")
             == "https://ion-cannon.example.org/"

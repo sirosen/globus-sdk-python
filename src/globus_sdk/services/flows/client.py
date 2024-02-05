@@ -25,6 +25,7 @@ class FlowsClient(client.BaseClient):
 
     .. automethodlist:: globus_sdk.FlowsClient
     """
+
     error_class = FlowsAPIError
     service_name = "flows"
     scopes = scopes.FlowsScopes

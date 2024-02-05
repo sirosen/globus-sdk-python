@@ -166,8 +166,7 @@ class AuthClient(client.BaseClient):
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
         as_pem: Literal[True],
-    ) -> RSAPublicKey:
-        ...
+    ) -> RSAPublicKey: ...
 
     @t.overload
     def get_jwk(
@@ -175,8 +174,7 @@ class AuthClient(client.BaseClient):
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
         as_pem: Literal[False],
-    ) -> dict[str, t.Any]:
-        ...
+    ) -> dict[str, t.Any]: ...
 
     # FYI: this get_jwk method is duplicated in AuthLoginBaseClient
     # if this code is modified, please update that copy as well

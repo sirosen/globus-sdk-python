@@ -74,17 +74,17 @@ class AuthorizationParameterInfo(ErrorInfo):
 
         self.session_message: str | None = self._parse_session_message(data)
 
-        self.session_required_identities: (
-            list[str] | None
-        ) = self._parse_session_required_identities(data)
+        self.session_required_identities: list[str] | None = (
+            self._parse_session_required_identities(data)
+        )
 
-        self.session_required_single_domain: (
-            list[str] | None
-        ) = self._parse_session_required_single_domain(data)
+        self.session_required_single_domain: list[str] | None = (
+            self._parse_session_required_single_domain(data)
+        )
 
-        self.session_required_policies: (
-            list[str] | None
-        ) = self._parse_session_required_policies(data)
+        self.session_required_policies: list[str] | None = (
+            self._parse_session_required_policies(data)
+        )
 
         self.session_required_mfa = self._parse_session_required_mfa(data)
 
