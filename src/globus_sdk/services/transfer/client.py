@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import time
 import typing as t
 
@@ -12,6 +13,11 @@ from .data import DeleteData, TransferData
 from .errors import TransferAPIError
 from .response import ActivationRequirementsResponse, IterableTransferResponse
 from .transport import TransferRequestsTransport
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 log = logging.getLogger(__name__)
 
@@ -1963,6 +1969,7 @@ class TransferClient(client.BaseClient):
         filter_task_id: None | UUIDLike | t.Iterable[UUIDLike] = None,
         filter_owner_id: UUIDLike | None = None,
         filter_endpoint: UUIDLike | None = None,
+        filter_endpoint_use: Literal["source", "destination"] | None = None,
         filter_is_paused: bool | None = None,
         filter_completion_time: None | str | tuple[DateLike, DateLike] = None,
         filter_min_faults: int | None = None,
@@ -1997,6 +2004,9 @@ class TransferClient(client.BaseClient):
         :param filter_endpoint: Single endpoint id. Return only tasks with a matching
             source or destination endpoint or matching source or destination host
             endpoint.
+        :param filter_endpoint_use: In combination with ``filter_endpoint``, filter to
+            tasks where the endpoint or collection was used specifically as the source or
+            destination of the transfer.
         :param filter_is_paused: Return only tasks with the specified ``is_paused``
             value. Requires that ``filter_status`` is also passed and contains a subset
             of ``"ACTIVE"`` and ``"INACTIVE"``. Completed tasks always have
@@ -2072,6 +2082,12 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/advanced_collection_management/#get_tasks
         """  # noqa: E501
         log.info("TransferClient.endpoint_manager_task_list(...)")
+        if filter_endpoint is None and filter_endpoint_use is not None:
+            raise exc.GlobusSDKUsageError(
+                "`filter_endpoint_use` is only valid when `filter_endpoint` is "
+                "also supplied."
+            )
+
         if query_params is None:
             query_params = {}
         if filter_status is not None:
@@ -2082,6 +2098,8 @@ class TransferClient(client.BaseClient):
             query_params["filter_owner_id"] = filter_owner_id
         if filter_endpoint is not None:
             query_params["filter_endpoint"] = filter_endpoint
+        if filter_endpoint_use is not None:
+            query_params["filter_endpoint_use"] = filter_endpoint_use
         if filter_is_paused is not None:
             query_params["filter_is_paused"] = filter_is_paused
         if filter_completion_time is not None:
