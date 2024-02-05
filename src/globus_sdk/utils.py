@@ -153,22 +153,54 @@ class PayloadWrapper(PayloadWrapperBase):
         val: t.Any,
         callback: t.Callable[[t.Any], t.Any] | None = None,
     ) -> None:
+        """
+        Internal helper for setting an omittable value on the payload.
+
+        If the value is non-None, it will be set and the callback (if provided) will be
+        invoked on it.
+        Otherwise, it will be ignored and the callback will not be invoked.
+
+        :param key: The key to set.
+        :param val: The value to set.
+        :param callback: An optional callback to apply to the value immediately
+            before it is set.
+        """
         if val is not None:
             self[key] = callback(val) if callback else val
 
     def _set_optstrs(self, **kwargs: t.Any) -> None:
+        """
+        Convenience function for setting a collection of omittable string values.
+
+        Values are converted to strings prior to assignment.
+        """
         for k, v in kwargs.items():
             self._set_value(k, v, callback=str)
 
     def _set_optstrlists(self, **kwargs: t.Iterable[t.Any] | None) -> None:
+        """
+        Convenience function for setting a collection of omittable string list values.
+
+        Values are converted to lists of strings prior to assignment.
+        """
         for k, v in kwargs.items():
             self._set_value(k, v, callback=lambda x: list(safe_strseq_iter(x)))
 
     def _set_optbools(self, **kwargs: bool | None) -> None:
+        """
+        Convenience function for setting a collection of omittable bool values.
+
+        Values are converted to bools prior to assignment.
+        """
         for k, v in kwargs.items():
             self._set_value(k, v, callback=bool)
 
     def _set_optints(self, **kwargs: t.Any) -> None:
+        """
+        Convenience function for setting a collection of omittable int values.
+
+        Values are converted to ints prior to assignment.
+        """
         for k, v in kwargs.items():
             self._set_value(k, v, callback=int)
 
