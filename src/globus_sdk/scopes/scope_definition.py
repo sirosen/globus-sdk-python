@@ -3,6 +3,7 @@ This defines the Scope object and the scope parser.
 Because these components are mutually dependent, it's easiest if they're kept in a
 single module.
 """
+
 from __future__ import annotations
 
 import typing as t

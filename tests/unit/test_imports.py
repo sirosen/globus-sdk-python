@@ -7,6 +7,7 @@ interpreter's state, invoke these via subprocess check_call() calls.
 These should all be using `shell=True` (the subprocess invoked interpreter
 doesn't behave correctly without it).
 """
+
 import os
 import subprocess
 import sys

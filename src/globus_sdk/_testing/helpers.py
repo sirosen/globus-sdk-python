@@ -38,8 +38,7 @@ def construct_error(
     request_headers: t.Dict[str, str] | None = None,
     response_encoding: str = "utf-8",
     url: str = "https://bogus-url/",
-) -> GlobusAPIError:
-    ...
+) -> GlobusAPIError: ...
 
 
 @t.overload
@@ -53,8 +52,7 @@ def construct_error(
     request_headers: t.Dict[str, str] | None = None,
     response_encoding: str = "utf-8",
     url: str = "https://bogus-url/",
-) -> E:
-    ...
+) -> E: ...
 
 
 def construct_error(

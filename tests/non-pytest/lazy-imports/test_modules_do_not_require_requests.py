@@ -4,6 +4,7 @@ Test that various modules do not rely on `requests` at import-time.
 This means that these modules are safe to import in highly latency-sensitive
 applications like globus-cli.
 """
+
 import os
 import subprocess
 import sys

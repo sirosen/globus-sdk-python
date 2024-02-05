@@ -62,7 +62,7 @@ class ClientCredentialsAuthorizer(RenewingAuthorizer):
         *,
         access_token: str | None = None,
         expires_at: int | None = None,
-        on_refresh: None | (t.Callable[[OAuthTokenResponse], t.Any]) = None,
+        on_refresh: None | t.Callable[[OAuthTokenResponse], t.Any] = None,
     ):
         # values for _get_token_data
         self.confidential_client = confidential_client

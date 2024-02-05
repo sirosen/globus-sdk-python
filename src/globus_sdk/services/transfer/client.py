@@ -29,7 +29,7 @@ def _format_filter_item(x: str | TransferFilterDict) -> str:
 
 
 def _format_filter(
-    x: (str | TransferFilterDict | list[str | TransferFilterDict]),
+    x: str | TransferFilterDict | list[str | TransferFilterDict],
 ) -> str | list[str]:
     if isinstance(x, list):
         return [_format_filter_item(y) for y in x]
@@ -98,6 +98,7 @@ class TransferClient(client.BaseClient):
 
     .. automethodlist:: globus_sdk.TransferClient
     """
+
     service_name = "transfer"
     base_path = "/v0.10/"
     transport_class: type[TransferRequestsTransport] = TransferRequestsTransport
@@ -1029,9 +1030,7 @@ class TransferClient(client.BaseClient):
         offset: int | None = None,
         # note: filter is a soft keyword in python, so using this name is okay
         # pylint: disable=redefined-builtin
-        filter: (
-            str | TransferFilterDict | list[str | TransferFilterDict] | None
-        ) = None,
+        filter: str | TransferFilterDict | list[str | TransferFilterDict] | None = None,
         local_user: str | None = None,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
@@ -1965,7 +1964,7 @@ class TransferClient(client.BaseClient):
         filter_owner_id: UUIDLike | None = None,
         filter_endpoint: UUIDLike | None = None,
         filter_is_paused: bool | None = None,
-        filter_completion_time: (None | str | tuple[DateLike, DateLike]) = None,
+        filter_completion_time: None | str | tuple[DateLike, DateLike] = None,
         filter_min_faults: int | None = None,
         filter_local_user: str | None = None,
         last_key: str | None = None,

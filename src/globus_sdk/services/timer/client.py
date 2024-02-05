@@ -19,6 +19,7 @@ class TimerClient(client.BaseClient):
 
     .. automethodlist:: globus_sdk.TimerClient
     """
+
     error_class = TimerAPIError
     service_name = "timer"
     scopes = TimerScopes

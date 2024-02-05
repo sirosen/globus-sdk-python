@@ -70,20 +70,17 @@ class LocalGlobusConnectPersonal:
     @t.overload
     def get_owner_info(
         self,
-    ) -> globus_sdk.GlobusConnectPersonalOwnerInfo | None:
-        ...
+    ) -> globus_sdk.GlobusConnectPersonalOwnerInfo | None: ...
 
     @t.overload
     def get_owner_info(
         self, auth_client: None
-    ) -> globus_sdk.GlobusConnectPersonalOwnerInfo | None:
-        ...
+    ) -> globus_sdk.GlobusConnectPersonalOwnerInfo | None: ...
 
     @t.overload
     def get_owner_info(
         self, auth_client: globus_sdk.AuthClient
-    ) -> dict[str, t.Any] | None:
-        ...
+    ) -> dict[str, t.Any] | None: ...
 
     def get_owner_info(
         self, auth_client: globus_sdk.AuthClient | None = None

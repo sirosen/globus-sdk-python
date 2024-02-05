@@ -26,8 +26,7 @@ class LegacyAuthRequirementsErrorVariant(Protocol):
     def from_dict(cls: type[V], data: dict[str, t.Any]) -> V:
         pass
 
-    def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
-        ...
+    def to_auth_requirements_error(self) -> GlobusAuthRequirementsError: ...
 
 
 class LegacyConsentRequiredTransferError(_serializable.Serializable):

@@ -1,6 +1,7 @@
 """
 Test that globus_sdk._testing can accept a non-default requests mock
 """
+
 import sys
 
 import pytest

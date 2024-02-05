@@ -20,7 +20,7 @@ class LocalGlobusConnectServer:
     def __init__(
         self,
         *,
-        info_path: (str | pathlib.Path) = "/var/lib/globus-connect-server/info.json",
+        info_path: str | pathlib.Path = "/var/lib/globus-connect-server/info.json",
     ) -> None:
         self.info_path = pathlib.Path(info_path)
         self._loaded_info: dict[str, t.Any] | None = None

@@ -2,6 +2,7 @@
 Inspect the signatures of paginated methods and compare them against their
 attached paginator requirements.
 """
+
 import inspect
 
 import pytest

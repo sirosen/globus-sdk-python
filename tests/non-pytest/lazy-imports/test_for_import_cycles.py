@@ -7,6 +7,7 @@ Note that testing all permutations is infeasibly expensive.
 This is kept in the non-pytest dir because it may be written in pytest but it is not
 part of the normal testsuite.
 """
+
 import itertools
 import os
 import subprocess

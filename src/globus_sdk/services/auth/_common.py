@@ -54,8 +54,7 @@ class _JWKGetCallbackProto(Protocol):
         *,
         query_params: dict[str, t.Any] | None = None,
         headers: dict[str, str] | None = None,
-    ) -> GlobusHTTPResponse:
-        ...
+    ) -> GlobusHTTPResponse: ...
 
 
 def get_jwk_data(
@@ -96,8 +95,7 @@ def pem_decode_jwk_data(
 class SupportsJWKMethods(Protocol):
     client_id: str | None
 
-    def get_openid_configuration(self) -> GlobusHTTPResponse:
-        ...
+    def get_openid_configuration(self) -> GlobusHTTPResponse: ...
 
     @t.overload
     def get_jwk(
@@ -105,8 +103,7 @@ class SupportsJWKMethods(Protocol):
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
         as_pem: Literal[True],
-    ) -> RSAPublicKey:
-        ...
+    ) -> RSAPublicKey: ...
 
     @t.overload
     def get_jwk(
@@ -114,13 +111,11 @@ class SupportsJWKMethods(Protocol):
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
         as_pem: Literal[False],
-    ) -> dict[str, t.Any]:
-        ...
+    ) -> dict[str, t.Any]: ...
 
     def get_jwk(
         self,
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any] = None,
         *,
         as_pem: bool = False,
-    ) -> RSAPublicKey | dict[str, t.Any]:
-        ...
+    ) -> RSAPublicKey | dict[str, t.Any]: ...
