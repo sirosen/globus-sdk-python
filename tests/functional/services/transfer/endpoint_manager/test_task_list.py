@@ -3,20 +3,14 @@ import uuid
 
 import pytest
 
-from globus_sdk._testing import get_last_request
-from tests.common import register_api_route
+import globus_sdk
+from globus_sdk._testing import get_last_request, load_response
 
 ZERO_ID = uuid.UUID(int=0)
 
 
 def get_last_params():
     return get_last_request().params
-
-
-# stub in empty data, this can be explicitly replaced if a test wants specific data
-@pytest.fixture(autouse=True)
-def empty_response():
-    register_api_route("transfer", "/endpoint_manager/task_list", json={"DATA": []})
 
 
 @pytest.mark.parametrize(
@@ -38,6 +32,7 @@ def empty_response():
     ],
 )
 def test_strsafe_params(client, paramname, paramvalue):
+    load_response(client.endpoint_manager_task_list)
     paramstr = str(paramvalue)
     client.endpoint_manager_task_list(**{paramname: paramvalue})
     params = get_last_params()
@@ -46,6 +41,7 @@ def test_strsafe_params(client, paramname, paramvalue):
 
 
 def test_filter_status_list(client):
+    load_response(client.endpoint_manager_task_list)
     client.endpoint_manager_task_list(filter_status=["ACTIVE", "INACTIVE"])
     params = get_last_params()
     assert "filter_status" in params
@@ -53,6 +49,7 @@ def test_filter_status_list(client):
 
 
 def test_filter_task_id_list(client):
+    load_response(client.endpoint_manager_task_list)
     # mixed list of str and UUID
     client.endpoint_manager_task_list(filter_task_id=["foo", ZERO_ID, "bar"])
     params = get_last_params()
@@ -65,6 +62,8 @@ def _fromisoformat(datestr):  # for py3.6, datetime.fromisoformat was added in p
 
 
 def test_filter_completion_time_datetime_tuple(client):
+    load_response(client.endpoint_manager_task_list)
+
     dt1 = _fromisoformat("2020-08-25T00:00:00")
     dt2 = _fromisoformat("2021-08-25T16:05:28")
 
@@ -82,3 +81,32 @@ def test_filter_completion_time_datetime_tuple(client):
     params = get_last_params()
     assert "filter_completion_time" in params
     assert params["filter_completion_time"] == ",2020-08-25T00:00:00"
+
+
+@pytest.mark.parametrize("ep_use", ("source", "destination"))
+def test_filter_by_endpoint_use(client, ep_use):
+    meta = load_response(client.endpoint_manager_task_list).metadata
+    if ep_use == "source":
+        ep_id = meta["source"]
+    else:
+        ep_id = meta["destination"]
+
+    client.endpoint_manager_task_list(filter_endpoint=ep_id, filter_endpoint_use=ep_use)
+    params = get_last_params()
+
+    assert "filter_endpoint" in params
+    assert params["filter_endpoint"] == str(ep_id)
+    assert "filter_endpoint_use" in params
+    assert params["filter_endpoint_use"] == ep_use
+
+
+@pytest.mark.parametrize("ep_use", ("source", "destination"))
+def test_usage_error_on_filter_endpoint_use_without_endpoint(client, ep_use):
+    with pytest.raises(
+        globus_sdk.GlobusSDKUsageError,
+        match=(
+            "`filter_endpoint_use` is only valid when `filter_endpoint` is "
+            r"also supplied\."
+        ),
+    ):
+        client.endpoint_manager_task_list(filter_endpoint_use=ep_use)
