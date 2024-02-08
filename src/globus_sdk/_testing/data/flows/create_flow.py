@@ -27,7 +27,11 @@ RESPONSES = ResponseSet(
         path="/flows",
         method="POST",
         json=TWO_HOP_TRANSFER_FLOW_DOC,
-        match=[matchers.json_params_matcher(params=_two_hop_transfer_create_request)],
+        match=[
+            matchers.json_params_matcher(
+                params=_two_hop_transfer_create_request, strict_match=False
+            )
+        ],
     ),
     bad_admin_principal_error=RegisteredResponse(
         service="flows",

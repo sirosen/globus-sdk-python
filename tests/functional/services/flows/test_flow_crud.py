@@ -1,14 +1,26 @@
+import json
+
 import pytest
 
 from globus_sdk import FlowsAPIError
-from globus_sdk._testing import load_response
+from globus_sdk._testing import get_last_request, load_response
 
 
-def test_create_flow(flows_client):
+@pytest.mark.parametrize("subscription_id", [None, "dummy_subscription_id"])
+def test_create_flow(flows_client, subscription_id):
     metadata = load_response(flows_client.create_flow).metadata
 
-    resp = flows_client.create_flow(**metadata["params"])
+    resp = flows_client.create_flow(
+        **metadata["params"], subscription_id=subscription_id
+    )
     assert resp.data["title"] == "Multi Step Transfer"
+
+    last_req = get_last_request()
+    req_body = json.loads(last_req.body)
+    if subscription_id:
+        assert req_body["subscription_id"] == subscription_id
+    else:
+        assert "subscription_id" not in req_body
 
 
 def test_create_flow_error_parsing(flows_client):
