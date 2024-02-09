@@ -6,6 +6,8 @@ from .base import PageT, Paginator
 
 
 class _LimitOffsetBasedPaginator(Paginator[PageT]):  # pylint: disable=abstract-method
+    _REQUIRES_METHOD_KWARGS = ("limit", "offset")
+
     def __init__(
         self,
         method: t.Callable[..., t.Any],

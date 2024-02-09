@@ -14,6 +14,8 @@ class NextTokenPaginator(Paginator[PageT]):
     get_shared_endpoint_list
     """
 
+    _REQUIRES_METHOD_KWARGS = ("next_token",)
+
     def __init__(
         self,
         method: t.Callable[..., t.Any],

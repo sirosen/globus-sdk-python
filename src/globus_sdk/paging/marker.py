@@ -13,6 +13,8 @@ class MarkerPaginator(Paginator[PageT]):
     This is the default method for GCS pagination, so it's very simple.
     """
 
+    _REQUIRES_METHOD_KWARGS = ("marker",)
+
     def __init__(
         self,
         method: t.Callable[..., t.Any],
