@@ -13,7 +13,7 @@ from globus_sdk.transport import RequestsTransport
 
 log = logging.getLogger(__name__)
 
-DataParamType = t.Union[None, str, t.Dict[str, t.Any], utils.PayloadWrapper]
+_DataParamType = t.Union[None, str, bytes, t.Dict[str, t.Any], utils.PayloadWrapper]
 
 
 class BaseClient:
@@ -143,7 +143,7 @@ class BaseClient:
         path: str,
         *,
         query_params: dict[str, t.Any] | None = None,
-        data: DataParamType = None,
+        data: _DataParamType = None,
         headers: dict[str, str] | None = None,
         encoding: str | None = None,
     ) -> GlobusHTTPResponse:
@@ -182,7 +182,7 @@ class BaseClient:
         path: str,
         *,
         query_params: dict[str, t.Any] | None = None,
-        data: DataParamType = None,
+        data: _DataParamType = None,
         headers: dict[str, str] | None = None,
         encoding: str | None = None,
     ) -> GlobusHTTPResponse:
@@ -206,7 +206,7 @@ class BaseClient:
         path: str,
         *,
         query_params: dict[str, t.Any] | None = None,
-        data: DataParamType = None,
+        data: _DataParamType = None,
         headers: dict[str, str] | None = None,
         encoding: str | None = None,
     ) -> GlobusHTTPResponse:
@@ -231,7 +231,7 @@ class BaseClient:
         path: str,
         *,
         query_params: dict[str, t.Any] | None = None,
-        data: DataParamType = None,
+        data: _DataParamType = None,
         headers: dict[str, str] | None = None,
         encoding: str | None = None,
         allow_redirects: bool = True,

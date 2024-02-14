@@ -6,6 +6,19 @@ from globus_sdk.transport import FormRequestEncoder, JSONRequestEncoder, Request
 from globus_sdk.utils import MISSING, PayloadWrapper
 
 
+@pytest.mark.parametrize("data", ("foo", b"bar"))
+def test_text_request_encoder_accepts_string_data(data):
+    encoder = RequestEncoder()
+    request = encoder.encode(
+        "GET",
+        "http://bogus/foo",
+        data=data,
+        params={},
+        headers={},
+    )
+    assert request.data == data
+
+
 @pytest.mark.parametrize(
     "encoder_class",
     [FormRequestEncoder, JSONRequestEncoder, RequestEncoder],
