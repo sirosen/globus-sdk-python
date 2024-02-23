@@ -81,6 +81,39 @@ class GroupsClient(client.BaseClient):
             query_params["include"] = ",".join(utils.safe_strseq_iter(include))
         return self.get(f"/groups/{group_id}", query_params=query_params)
 
+    def get_group_by_subscription_id(
+        self, subscription_id: UUIDLike
+    ) -> response.GlobusHTTPResponse:
+        """
+        Using a subscription ID, find the group which provides that subscription.
+
+        :param subscription_id: the subscription ID of the group
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: python
+
+                    from globus_sdk import GroupsClient
+
+                    groups = GroupsClient(...)
+                    group_id = groups.get_group_by_subscription_id(subscription_id)["group_id"]
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: groups.get_group_by_subscription_id
+
+            .. tab-item:: API Info
+
+                ``GET /v2/subscription_info/<subscription_id>``
+
+                .. extdoclink:: Get Group by Subscription ID
+                    :service: groups
+                    :ref: get_group_by_subscription_id_v2_subscription_info__subscription_id__get
+        """  # noqa: E501
+        return self.get(f"/subscription_info/{subscription_id}")
+
     def delete_group(
         self,
         group_id: UUIDLike,
