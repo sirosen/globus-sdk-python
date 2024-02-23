@@ -160,6 +160,8 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
             "UserCredentialDocument",
             "IterableGCSResponse",
             "UnpackingGCSResponse",
+            "GlobusConnectServerConnector",
+            "ConnectorTable",
         ),
     ),
     (
