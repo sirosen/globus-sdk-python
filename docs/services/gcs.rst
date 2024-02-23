@@ -26,14 +26,114 @@ The primary interface for the GCS Manager API is the :class:`GCSClient` class.
 Helper Objects
 --------------
 
-.. automodule:: globus_sdk.services.gcs.data
+.. autoclass:: EndpointDocument
+   :members:
+   :show-inheritance:
+
+.. autoclass:: GCSRoleDocument
+   :members:
+   :show-inheritance:
+
+.. autoclass:: StorageGatewayDocument
+   :members:
+   :show-inheritance:
+
+.. autoclass:: UserCredentialDocument
+   :members:
+   :show-inheritance:
+
+Collections
+~~~~~~~~~~~
+
+.. autoclass:: CollectionDocument
+   :members:
+   :show-inheritance:
+
+.. autoclass:: MappedCollectionDocument
+   :members:
+   :show-inheritance:
+
+.. autoclass:: GuestCollectionDocument
+   :members:
+   :show-inheritance:
+
+Storage Gateway Policies
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: StorageGatewayPolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: ActiveScaleStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: AzureBlobStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: BlackPearlStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: BoxStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: CephStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: CollectionPolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: GoogleCloudStorageCollectionPolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: GoogleCloudStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: GoogleDriveStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: HPSSStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: IrodsStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: OneDriveStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: POSIXCollectionPolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: POSIXStagingCollectionPolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: POSIXStagingStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: POSIXStoragePolicies
+   :members:
+   :show-inheritance:
+
+.. autoclass:: S3StoragePolicies
    :members:
    :show-inheritance:
 
 Client Errors
 -------------
-
-.. currentmodule:: globus_sdk
 
 When an error occurs, a :class:`GCSClient` will raise this specialized type of
 error, rather than a generic :class:`GlobusAPIError`.
@@ -45,6 +145,10 @@ error, rather than a generic :class:`GlobusAPIError`.
 GCS Responses
 -------------
 
-.. automodule:: globus_sdk.services.gcs.response
+.. autoclass:: IterableGCSResponse
+   :members:
+   :show-inheritance:
+
+.. autoclass:: UnpackingGCSResponse
    :members:
    :show-inheritance:
