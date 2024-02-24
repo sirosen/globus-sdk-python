@@ -65,3 +65,9 @@ repos:
       types_or: [python,rst]
       language: pygrep
       entry: "\\.\\. +code-block::$"
+    - id: ensure-all-exports-documented
+      name: "Check that all public symbols are documented"
+      entry: ./scripts/ensure_exports_are_documented.py
+      language: python
+      always_run: true
+      pass_filenames: false

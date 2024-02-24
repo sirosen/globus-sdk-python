@@ -42,6 +42,10 @@ error, rather than a generic :class:`GlobusAPIError`.
 Transfer Responses
 ------------------
 
-.. automodule:: globus_sdk.services.transfer.response
+.. autoclass:: ActivationRequirementsResponse
+   :members:
+   :show-inheritance:
+
+.. autoclass:: IterableTransferResponse
    :members:
    :show-inheritance:

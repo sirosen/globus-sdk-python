@@ -57,3 +57,9 @@ When an error occurs, a :class:`FlowsClient` will raise a ``FlowsAPIError``.
    :members:
    :show-inheritance:
 
+Responses
+---------
+
+.. autoclass:: IterableFlowsResponse
+   :members:
+   :show-inheritance:

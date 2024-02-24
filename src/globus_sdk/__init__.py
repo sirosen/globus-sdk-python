@@ -91,6 +91,8 @@ _LAZY_IMPORT_TABLE = {
         "IrodsStoragePolicies",
         "HPSSStoragePolicies",
         "UserCredentialDocument",
+        "IterableGCSResponse",
+        "UnpackingGCSResponse",
     },
     "services.flows": {
         "FlowsClient",
@@ -196,6 +198,8 @@ if t.TYPE_CHECKING:
     from .services.gcs import IrodsStoragePolicies
     from .services.gcs import HPSSStoragePolicies
     from .services.gcs import UserCredentialDocument
+    from .services.gcs import IterableGCSResponse
+    from .services.gcs import UnpackingGCSResponse
     from .services.flows import FlowsClient
     from .services.flows import FlowsAPIError
     from .services.flows import IterableFlowsResponse
@@ -311,6 +315,7 @@ __all__ = (
     "IdentityMap",
     "IrodsStoragePolicies",
     "IterableFlowsResponse",
+    "IterableGCSResponse",
     "IterableResponse",
     "IterableTransferResponse",
     "LocalGlobusConnectPersonal",
@@ -347,6 +352,7 @@ __all__ = (
     "TransferClient",
     "TransferData",
     "TransferTimer",
+    "UnpackingGCSResponse",
     "UserCredentialDocument",
 )
 

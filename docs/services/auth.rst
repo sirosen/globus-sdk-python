@@ -65,6 +65,10 @@ Auth Responses
    :members:
    :show-inheritance:
 
+.. autoclass:: GetIdentitiesResponse
+   :members:
+   :show-inheritance:
+
 OAuth2 Flow Managers
 --------------------
 
