@@ -12,6 +12,24 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.38.0:
+
+v3.38.0 (2024-03-01)
+--------------------
+
+Added
+~~~~~
+
+- ``IterableGCSResponse`` and ``UnpackingGCSResponse`` are now available as
+  top-level exported names. (:pr:`956`)
+
+- Add ``GroupsClient.get_group_by_subscription_id`` for resolving subscriptions
+  to groups. This also expands the ``_testing`` data for ``get_group`` to
+  include a subscription group case. (:pr:`957`)
+
+- Added ``prompt`` to the recognized *Globus Authorization Requirements Error*
+  ``authorization_parameters`` fields. (:pr:`958`)
+
 .. _changelog-3.37.0:
 
 v3.37.0 (2024-02-14)
