@@ -12,6 +12,16 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.39.0:
+
+v3.39.0 (2024-03-06)
+--------------------
+
+Added
+~~~~~
+
+- Added ``TransferClient.operation_stat`` helper method for getting the status of a path on a collection (:pr:`961`)
+
 .. _changelog-3.38.0:
 
 v3.38.0 (2024-03-01)
