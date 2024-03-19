@@ -83,12 +83,16 @@ Adapter Types
 .. module:: globus_sdk.tokenstorage
 
 ``globus_sdk.tokenstorage`` provides base classes for building your own storage
-adapters, and two complete adapters.
+adapters, and several complete adapters.
 
-The :class:`SimpleJSONFileAdapter` is good for the "simplest possible" storage, using a
-JSON file to store token data.
+The :class:`SimpleJSONFileAdapter` is good for the "simplest possible"
+persistent storage, using a JSON file to store token data.
 
-The :class:`SQLiteAdapter` is the next step up in complexity, for applications like the
+:class:`MemoryAdapter` is even simpler still, and is great for writing and
+testing code which uses the `StorageAdapter` interface backed by an in-memory
+structure.
+
+The :class:`SQLiteAdapter` is more complex, for applications like the
 globus-cli which need to store various tokens and additional configuration. In
 addition to basic token storage, the :class:`SQLiteAdapter` provides for namespacing
 of the token data, and for additional configuration storage.
@@ -97,6 +101,11 @@ Reference
 ---------
 
 .. autoclass:: StorageAdapter
+   :members:
+   :member-order: bysource
+   :show-inheritance:
+
+.. autoclass:: MemoryAdapter
    :members:
    :member-order: bysource
    :show-inheritance:
