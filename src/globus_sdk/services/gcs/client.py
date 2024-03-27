@@ -559,7 +559,7 @@ class GCSClient(client.BaseClient):
         :param collection_id: UUID of a Collection. If given then only roles
             related to that Collection are returned, otherwise only Endpoint
             roles are returned.
-        :param include: Pass "all_roles" to request all roles all roles
+        :param include: Pass "all_roles" to request all roles
             relevant to the resource instead of only those the caller has on
             the resource
         :param page_size: Number of results to return per page
