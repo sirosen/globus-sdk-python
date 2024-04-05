@@ -7,6 +7,7 @@ from ._common import TWO_HOP_TRANSFER_FLOW_DOC, TWO_HOP_TRANSFER_FLOW_ID
 _two_hop_transfer_update_request = {
     "subtitle": "Specifically, in two steps",
     "description": "Transfer from source to destination, stopping off at staging",
+    "subscription_id": "00000000-3ba7-456e-9df7-fc40028f3331",
 }
 
 
