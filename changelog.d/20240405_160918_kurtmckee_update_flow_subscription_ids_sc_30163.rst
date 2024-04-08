@@ -1,4 +1,4 @@
 Added
 ~~~~~
 
-- Support updating subscriptions assigned to flows in the Flows service. (:pr:`NUMBER`)
+- Support updating subscriptions assigned to flows in the Flows service. (:pr:`974`)
