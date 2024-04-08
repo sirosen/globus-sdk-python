@@ -7,6 +7,7 @@ from globus_sdk import GlobusHTTPResponse, client, paging, scopes, utils
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.scopes import ScopeBuilder
+from globus_sdk.utils import MISSING, MissingType
 
 from .errors import FlowsAPIError
 from .response import (
@@ -324,6 +325,7 @@ class FlowsClient(client.BaseClient):
         flow_starters: list[str] | None = None,
         flow_administrators: list[str] | None = None,
         keywords: list[str] | None = None,
+        subscription_id: UUIDLike | t.Literal["DEFAULT"] | MissingType = MISSING,
         additional_fields: dict[str, t.Any] | None = None,
     ) -> GlobusHTTPResponse:
         """
@@ -393,6 +395,7 @@ class FlowsClient(client.BaseClient):
 
         :param keywords: A set of terms used to categorize the flow used in query and
             discovery operations (0 - 1024 items)
+        :param subscription_id: A subscription ID to assign to the flow.
         :param additional_fields: Additional Key/Value pairs sent to the create API
 
         .. tab-set::
@@ -433,8 +436,9 @@ class FlowsClient(client.BaseClient):
                 "flow_starters": flow_starters,
                 "flow_administrators": flow_administrators,
                 "keywords": keywords,
+                "subscription_id": subscription_id,
             }.items()
-            if v is not None
+            if v is not None and v is not MISSING
         }
         data.update(additional_fields or {})
 
