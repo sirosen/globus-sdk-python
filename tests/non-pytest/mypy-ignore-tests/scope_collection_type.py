@@ -1,6 +1,6 @@
 import globus_sdk
 from globus_sdk._types import ScopeCollectionType
-from globus_sdk.scopes import MutableScope
+from globus_sdk.scopes import MutableScope, scopes_to_str
 from globus_sdk.services.auth import (
     GlobusAuthorizationCodeFlowManager,
     GlobusNativeAppFlowManager,
@@ -21,9 +21,13 @@ cc_client = globus_sdk.ConfidentialAppAuthClient(
 )
 
 
-# this function should type-check okay
+# these functions should type-check okay
 def foo(x: ScopeCollectionType) -> str:
     return MutableScope.scopes2str(x)
+
+
+def foo2(x: ScopeCollectionType) -> str:
+    return scopes_to_str(x)
 
 
 foo("somestring")

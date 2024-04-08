@@ -16,16 +16,6 @@ if t.TYPE_CHECKING:
     from globus_sdk._types import ScopeCollectionType
 
 
-def _iter_scope_collection(obj: ScopeCollectionType) -> t.Iterator[str]:
-    if isinstance(obj, str):
-        yield obj
-    elif isinstance(obj, MutableScope):
-        yield str(obj)
-    else:
-        for item in obj:
-            yield str(item)
-
-
 class MutableScope:
     """
     A scope object is a representation of a scope which allows modifications to be
@@ -114,10 +104,16 @@ class MutableScope:
     @staticmethod
     def scopes2str(obj: ScopeCollectionType) -> str:
         """
+        .. warning::
+
+            Deprecated. Prefer ``globus_sdk.scopes.scopes_to_str``.
+
         Given a scope string, a collection of scope strings, a MutableScope object, a
         collection of MutableScope objects, or a mixed collection of strings and
         Scopes, convert to a string which can be used in a request.
 
         :param obj: The object or collection to convert to a string
         """
-        return " ".join(_iter_scope_collection(obj))
+        from ._normalize import scopes_to_str
+
+        return scopes_to_str(obj)
