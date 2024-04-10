@@ -1,3 +1,4 @@
+from ._normalize import scopes_to_str
 from .builder import ScopeBuilder
 from .data import (
     AuthScopes,
@@ -29,4 +30,5 @@ __all__ = (
     "SearchScopes",
     "TimerScopes",
     "TransferScopes",
+    "scopes_to_str",
 )

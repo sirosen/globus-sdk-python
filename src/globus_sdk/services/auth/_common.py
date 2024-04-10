@@ -12,7 +12,7 @@ from globus_sdk._types import ScopeCollectionType
 from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.exc.warnings import warn_deprecated
 from globus_sdk.response import GlobusHTTPResponse
-from globus_sdk.scopes import AuthScopes, MutableScope, TransferScopes
+from globus_sdk.scopes import AuthScopes, TransferScopes, scopes_to_str
 
 if sys.version_info >= (3, 8):
     from typing import Literal, Protocol, runtime_checkable
@@ -39,7 +39,7 @@ def stringify_requested_scopes(requested_scopes: ScopeCollectionType | None) -> 
         )
         requested_scopes = _DEFAULT_REQUESTED_SCOPES
 
-    requested_scopes_string: str = MutableScope.scopes2str(requested_scopes)
+    requested_scopes_string: str = scopes_to_str(requested_scopes)
     if requested_scopes_string == "":
         raise GlobusSDKUsageError(
             "requested_scopes cannot be the empty string or empty collection"
