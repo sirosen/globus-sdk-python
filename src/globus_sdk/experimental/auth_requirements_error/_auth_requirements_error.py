@@ -7,8 +7,12 @@ from . import _serializable, _validators
 
 class GlobusAuthorizationParameters(_serializable.Serializable):
     """
-    Represents authorization parameters that can be used to instruct a client
-    which additional authorizations are needed in order to complete a request.
+    Data class containing authorization parameters that can be passed during
+    an authentication flow to control how the user will authenticate.
+
+    When used with a GlobusAuthRequirementsError this represents the additional
+    authorization parameters needed in order to complete a request that had
+    insufficient authorization state.
 
     :ivar session_message: A message to be displayed to the user.
     :vartype session_message: str, optional
