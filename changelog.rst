@@ -12,6 +12,30 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.40.0:
+
+v3.40.0 (2024-04-15)
+--------------------
+
+Added
+~~~~~
+
+- Add ``globus_sdk.tokenstorage.MemoryAdapter`` for the simplest possible
+  in-memory token storage mechanism. (:pr:`964`)
+
+- ``ConfidentialAppAuthClient.oauth2_get_dependent_tokens`` now supports the
+  ``scope`` parameter as a string or iterable of strings. (:pr:`965`)
+
+- Moved scope parsing out of experimental. The ``Scope`` construct is now importable from
+  the top level `globus_sdk` module. (:pr:`966`)
+
+- Support updating subscriptions assigned to flows in the Flows service. (:pr:`974`)
+
+Development
+~~~~~~~~~~~
+
+- Fix concurrency problems in the test suite caused by isort's `.isorted` temporary files. (:pr:`973`)
+
 .. _changelog-3.39.0:
 
 v3.39.0 (2024-03-06)
