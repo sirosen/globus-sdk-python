@@ -1,4 +1,4 @@
 Added
 ~~~~~
 
-- Added ``LoginFlowManager`` and ``CommandLineLoginFLowManager`` to experimental (:pr:`NUMBER`)
+- Added ``LoginFlowManager`` and ``CommandLineLoginFLowManager`` to experimental (:pr:`972`)
