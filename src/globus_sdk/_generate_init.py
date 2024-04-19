@@ -120,6 +120,7 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
             # high-level helpers
             "IdentityMap",
             # responses
+            "GetConsentsResponse",
             "GetIdentitiesResponse",
             "OAuthDependentTokenResponse",
             "OAuthTokenResponse",

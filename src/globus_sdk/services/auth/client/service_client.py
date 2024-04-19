@@ -19,6 +19,7 @@ from ..errors import AuthAPIError
 from ..response import (
     GetClientCredentialsResponse,
     GetClientsResponse,
+    GetConsentsResponse,
     GetIdentitiesResponse,
     GetIdentityProvidersResponse,
     GetPoliciesResponse,
@@ -1789,7 +1790,7 @@ class AuthClient(client.BaseClient):
 
                     >>> ac = globus_sdk.AuthClient(...)
                     >>> scope_id = ...
-                    >>> r = ac.delete_policy(scope_id)
+                    >>> r = ac.delete_scope(scope_id)
 
             .. tab-item:: Example Response Data
 
@@ -1803,3 +1804,44 @@ class AuthClient(client.BaseClient):
                     :ref: auth/reference/#delete_scope
         """
         return self.delete(f"/v2/api/scopes/{scope_id}")
+
+    def get_consents(
+        self,
+        identity_id: UUIDLike,
+        *,
+        # pylint: disable=redefined-builtin
+        all: bool = False,
+    ) -> GetConsentsResponse:
+        """
+        Look up consents for a user.
+
+        If requesting "all" consents, the view_consents scope is required.
+
+        :param identity_id: The ID of the identity to look up consents for
+        :param all: If true, return all consents, including those that have
+            been issued to other clients. If false, return only consents rooted at this
+            client id for the requested identity. Most clients should pass False.
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: pycon
+
+                    >>> ac = globus_sdk.AuthClient(...)
+                    >>> identity_id = ...
+                    >>> forest = ac.get_consents(identity_id).to_forest()
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: auth.get_consents
+
+            .. tab-item:: API Info
+
+                ``GET /v2/api/identities/{identity_id}/consents``
+        """
+        return GetConsentsResponse(
+            self.get(
+                f"/v2/api/identities/{identity_id}/consents", query_params={"all": all}
+            )
+        )

@@ -58,6 +58,7 @@ _LAZY_IMPORT_TABLE = {
         "ConfidentialAppAuthClient",
         "AuthAPIError",
         "IdentityMap",
+        "GetConsentsResponse",
         "GetIdentitiesResponse",
         "OAuthDependentTokenResponse",
         "OAuthTokenResponse",
@@ -172,6 +173,7 @@ if t.TYPE_CHECKING:
     from .services.auth import ConfidentialAppAuthClient
     from .services.auth import AuthAPIError
     from .services.auth import IdentityMap
+    from .services.auth import GetConsentsResponse
     from .services.auth import GetIdentitiesResponse
     from .services.auth import OAuthDependentTokenResponse
     from .services.auth import OAuthTokenResponse
@@ -298,6 +300,7 @@ __all__ = (
     "GCSAPIError",
     "GCSClient",
     "GCSRoleDocument",
+    "GetConsentsResponse",
     "GetIdentitiesResponse",
     "GlobusAPIError",
     "GlobusConnectPersonalOwnerInfo",

@@ -65,9 +65,18 @@ Auth Responses
    :members:
    :show-inheritance:
 
+.. autoclass:: GetConsentsResponse
+   :members:
+   :show-inheritance:
+
 .. autoclass:: GetIdentitiesResponse
    :members:
    :show-inheritance:
+
+Errors
+------
+
+.. autoexception:: AuthAPIError
 
 OAuth2 Flow Managers
 --------------------

@@ -12,6 +12,7 @@ from .flow_managers import (
 )
 from .identity_map import IdentityMap
 from .response import (
+    GetConsentsResponse,
     GetIdentitiesResponse,
     OAuthDependentTokenResponse,
     OAuthTokenResponse,
@@ -26,12 +27,13 @@ __all__ = (
     # errors
     "AuthAPIError",
     # high-level helpers
-    "IdentityMap",
     "DependentScopeSpec",
+    "IdentityMap",
     # flow managers
     "GlobusNativeAppFlowManager",
     "GlobusAuthorizationCodeFlowManager",
     # responses
+    "GetConsentsResponse",
     "GetIdentitiesResponse",
     "OAuthDependentTokenResponse",
     "OAuthTokenResponse",
