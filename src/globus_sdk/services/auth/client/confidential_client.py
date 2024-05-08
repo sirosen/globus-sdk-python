@@ -269,7 +269,11 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         return self.oauth2_token(form_data, response_class=OAuthDependentTokenResponse)
 
     def oauth2_token_introspect(
-        self, token: str, *, include: str | None = None
+        self,
+        token: str,
+        *,
+        include: str | None = None,
+        query_params: dict[str, t.Any] | None = None,
     ) -> GlobusHTTPResponse:
         """
         Get information about a Globus Auth token.
@@ -277,6 +281,8 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         :param token: An Access Token as a raw string, being evaluated
         :param include: A value for the ``include`` parameter in the request body.
             Default is to omit the parameter.
+        :param query_params: Any additional parameters to be passed through
+            as query params.
 
         .. tab-set::
 
@@ -308,7 +314,12 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         body = {"token": token}
         if include is not None:
             body["include"] = include
-        return self.post("/v2/oauth2/token/introspect", data=body, encoding="form")
+        return self.post(
+            "/v2/oauth2/token/introspect",
+            data=body,
+            encoding="form",
+            query_params=query_params,
+        )
 
     def create_child_client(
         self,
