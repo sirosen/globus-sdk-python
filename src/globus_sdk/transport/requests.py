@@ -18,6 +18,7 @@ from globus_sdk.transport.encoders import (
 )
 from globus_sdk.version import __version__
 
+from ._clientinfo import DefaultGlobusClientInfo, GlobusClientInfo
 from .retry import (
     RetryCheck,
     RetryCheckFlags,
@@ -114,6 +115,7 @@ class RequestsTransport:
         self.verify_ssl = config.get_ssl_verify(verify_ssl)
         self.http_timeout = config.get_http_timeout(http_timeout)
         self._user_agent = self.BASE_USER_AGENT
+        self.globus_clientinfo: GlobusClientInfo = DefaultGlobusClientInfo()
 
         # retry parameters
         self.retry_backoff = retry_backoff
@@ -135,7 +137,10 @@ class RequestsTransport:
 
     @property
     def _headers(self) -> dict[str, str]:
-        return {"Accept": "application/json", "User-Agent": self.user_agent}
+        headers = {"Accept": "application/json", "User-Agent": self.user_agent}
+        if self.globus_clientinfo:
+            headers["X-Globus-ClientInfo"] = self.globus_clientinfo.format()
+        return headers
 
     @contextlib.contextmanager
     def tune(
