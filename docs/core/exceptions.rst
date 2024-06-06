@@ -165,6 +165,10 @@ Warnings
 The following warnings can be emitted by the Globus SDK to indicate a
 problem which is not necessarily an error.
 
+..  seealso::
+
+    :ref:`managing-warnings`
+
 .. autoclass:: globus_sdk.RemovedInV4Warning
     :members:
     :show-inheritance:
