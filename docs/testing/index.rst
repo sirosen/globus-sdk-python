@@ -19,5 +19,4 @@ Globus SDK _testing
 
     getting_started
     reference
-    warnings
     methods/index

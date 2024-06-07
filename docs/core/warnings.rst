@@ -1,9 +1,13 @@
-..  _managing-warnings:
+Warnings
+========
 
-Managing warnings
-=================
+The following warnings can be emitted by the Globus SDK to indicate a
+problem, or a future change, which is not necessarily an error.
 
-The Globus SDK issues deprecation warnings to notify developers of upcoming changes.
+.. autoclass:: globus_sdk.RemovedInV4Warning
+    :members:
+    :show-inheritance:
+
 
 By default, Python will not display deprecation warnings to end users,
 but testing frameworks like pytest will enable deprecation warnings for developers.
