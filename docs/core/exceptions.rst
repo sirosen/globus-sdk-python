@@ -158,13 +158,3 @@ attributes should be tested before use, as in
 .. autoclass:: globus_sdk.exc.ConsentRequiredInfo
     :members:
     :show-inheritance:
-
-Warnings
---------
-
-The following warnings can be emitted by the Globus SDK to indicate a
-problem which is not necessarily an error.
-
-.. autoclass:: globus_sdk.RemovedInV4Warning
-    :members:
-    :show-inheritance:
