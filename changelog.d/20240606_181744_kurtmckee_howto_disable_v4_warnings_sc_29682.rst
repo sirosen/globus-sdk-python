@@ -1,4 +1,4 @@
 Documentation
 ~~~~~~~~~~~~~
 
-- Document how to manage Globus SDK warnings. (:pr:`NUMBER`)
+- Document how to manage Globus SDK warnings. (:pr:`988`)
