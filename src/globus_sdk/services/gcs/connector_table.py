@@ -136,7 +136,7 @@ class ConnectorTable:
     ) -> GlobusConnectServerConnector | None:
         """
         Convert a connector_id into a connector object (containing name and ID).
-        Returns None if the id is not recognized.
+        Returns None if the ID is not recognized.
 
         :param connector_id: The ID of the connector
         """
