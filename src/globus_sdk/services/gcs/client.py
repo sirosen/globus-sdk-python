@@ -103,7 +103,7 @@ class GCSClient(client.BaseClient):
             This method is deprecated -- use
             ``ConnectorTable.lookup_by_id`` instead.
 
-        Helper that converts a given connector_id into a human readable
+        Helper that converts a given connector ID into a human-readable
         connector name string.
 
         :param connector_id: The ID of the connector
