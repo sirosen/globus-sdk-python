@@ -50,66 +50,50 @@ class ConnectorTable:
         '9436da0c-a444-11eb-af93-12704e0d6a4d'
     """
 
-    POSIX: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="POSIX", connector_id="145812c8-decc-41f1-83cf-bb2a85a2a70b"
+    _connectors: tuple[tuple[str, str, str], ...] = (
+        ("POSIX", "POSIX", "145812c8-decc-41f1-83cf-bb2a85a2a70b"),
+        ("AZURE_BLOB", "Azure Blob", "9436da0c-a444-11eb-af93-12704e0d6a4d"),
+        ("BLACKPEARL", "BlackPearl", "7e3f3f5e-350c-4717-891a-2f451c24b0d4"),
+        ("BOX", "Box", "7c100eae-40fe-11e9-95a3-9cb6d0d9fd63"),
+        ("CEPH", "Ceph", "1b6374b0-f6a4-4cf7-a26f-f262d9c6ca72"),
+        ("DROPBOX", "Dropbox", "49b00fd6-63f1-48ae-b27f-d8af4589f876"),
+        ("ONEDRIVE", "OneDrive", "28ef55da-1f97-11eb-bdfd-12704e0d6a4d"),
+        ("GOOGLE_DRIVE", "Google Drive", "976cf0cf-78c3-4aab-82d2-7c16adbcc281"),
+        (
+            "GOOGLE_CLOUD_STORAGE",
+            "Google Cloud Storage",
+            "56366b96-ac98-11e9-abac-9cb6d0d9fd63",
+        ),
+        ("ACTIVESCALE", "ActiveScale", "7251f6c8-93c9-11eb-95ba-12704e0d6a4d"),
+        ("S3", "S3", "7643e831-5f6c-4b47-a07f-8ee90f401d23"),
+        ("POSIX_STAGING", "POSIX Staging", "052be037-7dda-4d20-b163-3077314dc3e6"),
+        ("IRODS", "iRODS", "e47b6920-ff57-11ea-8aaa-000c297ab3c2"),
+        ("HPSS", "HPSS", "fb656a17-0f69-4e59-95ff-d0a62ca7bdf5"),
     )
-    AZURE_BLOB: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="Azure Blob", connector_id="9436da0c-a444-11eb-af93-12704e0d6a4d"
-    )
-    BLACKPEARL: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="BlackPearl", connector_id="7e3f3f5e-350c-4717-891a-2f451c24b0d4"
-    )
-    BOX: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="Box", connector_id="7c100eae-40fe-11e9-95a3-9cb6d0d9fd63"
-    )
-    CEPH: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="Ceph", connector_id="1b6374b0-f6a4-4cf7-a26f-f262d9c6ca72"
-    )
-    DROPBOX: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="Dropbox", connector_id="49b00fd6-63f1-48ae-b27f-d8af4589f876"
-    )
-    ONEDRIVE: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="OneDrive", connector_id="28ef55da-1f97-11eb-bdfd-12704e0d6a4d"
-    )
-    GOOGLE_DRIVE: t.ClassVar[GlobusConnectServerConnector] = (
-        GlobusConnectServerConnector(
-            name="Google Drive", connector_id="976cf0cf-78c3-4aab-82d2-7c16adbcc281"
-        )
-    )
-    GOOGLE_CLOUD_STORAGE: t.ClassVar[GlobusConnectServerConnector] = (
-        GlobusConnectServerConnector(
-            name="Google Cloud Storage",
-            connector_id="56366b96-ac98-11e9-abac-9cb6d0d9fd63",
-        )
-    )
-    ACTIVESCALE: t.ClassVar[GlobusConnectServerConnector] = (
-        GlobusConnectServerConnector(
-            name="ActiveScale", connector_id="7251f6c8-93c9-11eb-95ba-12704e0d6a4d"
-        )
-    )
-    S3: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="S3", connector_id="7643e831-5f6c-4b47-a07f-8ee90f401d23"
-    )
-    POSIX_STAGING: t.ClassVar[GlobusConnectServerConnector] = (
-        GlobusConnectServerConnector(
-            name="POSIX Staging", connector_id="052be037-7dda-4d20-b163-3077314dc3e6"
-        )
-    )
-    IRODS: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="iRODS", connector_id="e47b6920-ff57-11ea-8aaa-000c297ab3c2"
-    )
-    HPSS: t.ClassVar[GlobusConnectServerConnector] = GlobusConnectServerConnector(
-        name="HPSS", connector_id="fb656a17-0f69-4e59-95ff-d0a62ca7bdf5"
-    )
+
+    POSIX: t.ClassVar[GlobusConnectServerConnector]
+    AZURE_BLOB: t.ClassVar[GlobusConnectServerConnector]
+    BLACKPEARL: t.ClassVar[GlobusConnectServerConnector]
+    BOX: t.ClassVar[GlobusConnectServerConnector]
+    CEPH: t.ClassVar[GlobusConnectServerConnector]
+    DROPBOX: t.ClassVar[GlobusConnectServerConnector]
+    ONEDRIVE: t.ClassVar[GlobusConnectServerConnector]
+    GOOGLE_DRIVE: t.ClassVar[GlobusConnectServerConnector]
+    GOOGLE_CLOUD_STORAGE: t.ClassVar[GlobusConnectServerConnector]
+    ACTIVESCALE: t.ClassVar[GlobusConnectServerConnector]
+    S3: t.ClassVar[GlobusConnectServerConnector]
+    POSIX_STAGING: t.ClassVar[GlobusConnectServerConnector]
+    IRODS: t.ClassVar[GlobusConnectServerConnector]
+    HPSS: t.ClassVar[GlobusConnectServerConnector]
 
     @classmethod
     def all_connectors(cls) -> t.Iterable[GlobusConnectServerConnector]:
         """
         Return an iterator of all known connectors.
         """
-        for item in vars(cls).values():
-            if isinstance(item, GlobusConnectServerConnector):
-                yield item
+        for attribute, _, _ in cls._connectors:
+            item: GlobusConnectServerConnector = getattr(cls, attribute)
+            yield item
 
     @classmethod
     def lookup(cls, name: str) -> GlobusConnectServerConnector | None:
@@ -145,3 +129,13 @@ class ConnectorTable:
             if item.connector_id == connector_id_s:
                 return item
         return None
+
+
+# "render" the _connectors to live attributes of the ConnectorTable
+for _attribute, _name, _id in ConnectorTable._connectors:
+    setattr(
+        ConnectorTable,
+        _attribute,
+        GlobusConnectServerConnector(name=_name, connector_id=_id),
+    )
+del _attribute, _name, _id
