@@ -29,14 +29,14 @@ class ConnectorTable:
     This class defines the known Globus Connect Server Connectors in a mapping
     structure.
 
-    It supports access by attribute or via helper methods for doing lookups.
+    It supports access by attribute or via a helper method for doing lookups.
     For example, all of the following three usages retrieve the Azure Blob connector:
 
     .. code-block:: pycon
 
         >>> ConnectorTable.AZURE_BLOB
         >>> ConnectorTable.lookup("Azure Blob")
-        >>> ConnectorTable.lookup_by_id("9436da0c-a444-11eb-af93-12704e0d6a4d")
+        >>> ConnectorTable.lookup("9436da0c-a444-11eb-af93-12704e0d6a4d")
 
     Given the results of such a lookup, you can retrieve the canonical name and ID for
     a connector like so:
@@ -96,38 +96,24 @@ class ConnectorTable:
             yield item
 
     @classmethod
-    def lookup(cls, name: str) -> GlobusConnectServerConnector | None:
+    def lookup(cls, name_or_id: str | UUIDLike) -> GlobusConnectServerConnector | None:
         """
-        Convert a name into a connector object (containing name and ID).
-        Returns None if the name is not recognized.
+        Convert a name or ID into a connector object.
+        Returns None if the name or ID is not recognized.
 
         Names are normalized before lookup so that they are case-insensitive and
         spaces, dashes, and underscores are all treated equivalently. For
         example, ``Google Drive``, ``google-drive``, and ``gOOgle_dRiVe`` are
         all equivalent.
 
-        :param name: The name of the connector
+        :param name_or_id: The name or ID of the connector
         """
-        normed_name = _normalize_name(name)
-        for item in cls.all_connectors():
-            if _normalize_name(item.name) == normed_name:
-                return item
-        return None
-
-    @classmethod
-    def lookup_by_id(
-        cls, connector_id: UUIDLike
-    ) -> GlobusConnectServerConnector | None:
-        """
-        Convert a connector_id into a connector object (containing name and ID).
-        Returns None if the ID is not recognized.
-
-        :param connector_id: The ID of the connector
-        """
-        connector_id_s = str(connector_id)
-        for item in cls.all_connectors():
-            if item.connector_id == connector_id_s:
-                return item
+        normalized = _normalize_name(str(name_or_id))
+        for connector in cls.all_connectors():
+            if normalized == connector.connector_id or normalized == _normalize_name(
+                connector.name
+            ):
+                return connector
         return None
 
 

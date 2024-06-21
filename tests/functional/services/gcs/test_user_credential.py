@@ -28,7 +28,7 @@ def test_get_user_credential(client):
     assert res["id"] == uc_id
     assert res["display_name"] == "posix_credential"
 
-    connector = ConnectorTable.lookup_by_id(res["connector_id"])
+    connector = ConnectorTable.lookup(res["connector_id"])
     assert connector is not None
     assert connector.name == "POSIX"
 

@@ -101,7 +101,7 @@ class GCSClient(client.BaseClient):
         .. warning::
 
             This method is deprecated -- use
-            ``ConnectorTable.lookup_by_id`` instead.
+            ``ConnectorTable.lookup`` instead.
 
         Helper that converts a given connector ID into a human-readable
         connector name string.
@@ -110,10 +110,10 @@ class GCSClient(client.BaseClient):
         """
         exc.warn_deprecated(
             "`connector_id_to_name` has been replaced with "
-            "`ConnectorTable.lookup_by_id`. Use that instead, "
+            "`ConnectorTable.lookup`. Use that instead, "
             "and retrieve the `name` attribute from the result."
         )
-        connector_obj = ConnectorTable.lookup_by_id(connector_id)
+        connector_obj = ConnectorTable.lookup(connector_id)
         if connector_obj is None:
             return None
         name = connector_obj.name

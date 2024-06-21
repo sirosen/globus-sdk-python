@@ -9,4 +9,4 @@ Deprecated
 ~~~~~~~~~~
 
 - ``GCSClient.connector_id_to_name`` has been deprecated. Use
-  ``ConnectorTable.lookup_by_id`` instead. (:pr:`NUMBER`)
+  ``ConnectorTable.lookup`` instead. (:pr:`NUMBER`)

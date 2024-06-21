@@ -31,7 +31,7 @@ def test_lookup_by_id(connector_data, as_uuid):
     if as_uuid:
         connector_id = uuid.UUID(connector_id)
 
-    connector = ConnectorTable.lookup_by_id(connector_id)
+    connector = ConnectorTable.lookup(connector_id)
     assert connector.name == connector_name
 
 
