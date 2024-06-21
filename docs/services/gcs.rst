@@ -132,6 +132,14 @@ Storage Gateway Policies
    :members:
    :show-inheritance:
 
+.. autoclass:: ConnectorTable
+   :members:
+   :show-inheritance:
+
+.. autoclass:: GlobusConnectServerConnector
+   :members:
+   :show-inheritance:
+
 Client Errors
 -------------
 
