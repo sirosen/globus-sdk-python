@@ -2,21 +2,8 @@
 This module models a read-write object representation of the
 X-Globus-ClientInfo header.
 
-The spec for X-Globus-ClientInfo is as follows:
-
-Header Name: X-Globus-Client-Info
-Header Value
-  - A semicolon (;) separated list of client information.
-  - Client information is a comma-separated list of `=` delimited key-value pairs.
-    Well-known values for client-information are:
-        product - A unique identifier of the product.
-        version - Relevant version information for the product.
-  - Based on the above, the characters `;,=` should be considered reserved and
-    should NOT be included in client information values to ensure proper parsing.
-
-Examples:
-  X-Globus-ClientInfo: product=python-sdk,version=3.32.1
-  X-Globus-ClientInfo: product=python-sdk,version=3.32.1;product=cli,version=4.0.0a1
+The spec for X-Globus-ClientInfo is documented, in brief, in the GlobusClientInfo class
+docstring.
 """
 
 from __future__ import annotations
@@ -31,8 +18,41 @@ _RESERVED_CHARS = ";,="
 
 class GlobusClientInfo:
     """
-    An implementation of X-Globus-Client-Info as an object model.
-    """
+    An implementation of X-Globus-Client-Info as an object. This header encodes a
+    mapping of multiple products to versions and potentially other information.
+
+    Values can be added to a clientinfo object via the ``add()`` method.
+
+    .. rubric:: ``X-Globus-Client-Info`` Specification
+
+    Header Name: ``X-Globus-Client-Info``
+
+    Header Value:
+
+    - A semicolon (``;``) separated list of client information.
+
+    - Client information is a comma-separated list of ``=`` delimited key-value pairs.
+      Well-known values for client-information are:
+
+      - ``product``: A unique identifier of the product.
+      - ``version``: Relevant version information for the product.
+
+    - Based on the above, the characters ``;,=`` should be considered reserved and
+      should NOT be included in client information values to ensure proper parsing.
+
+    .. rubric:: Example Headers
+
+    .. code-block:: none
+
+        X-Globus-ClientInfo: product=python-sdk,version=3.32.1
+        X-Globus-ClientInfo: product=python-sdk,version=3.32.1;product=cli,version=4.0.0a1
+
+    .. note::
+
+        The ``GlobusClientInfo`` object is not guaranteed to reject all invalid usages.
+        For example, ``product`` is required to be unique per header, and users are
+        expected to enforce this in their usage.
+    """  # noqa: E501
 
     def __init__(self) -> None:
         self.infos: list[str] = []
@@ -52,7 +72,7 @@ class GlobusClientInfo:
 
         :param value: The element to add to the client-info. If it is a dict,
             it may not contain reserved characters in any keys or values. If it is a
-            string, it cannot contain the ';' separator.
+            string, it cannot contain the ``;`` separator.
         """
         if not isinstance(value, str):
             value = ",".join(_format_items(value))

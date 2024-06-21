@@ -1,3 +1,4 @@
+from ._clientinfo import GlobusClientInfo
 from .encoders import FormRequestEncoder, JSONRequestEncoder, RequestEncoder
 from .requests import RequestsTransport
 from .retry import (
@@ -20,4 +21,5 @@ __all__ = (
     "RequestEncoder",
     "JSONRequestEncoder",
     "FormRequestEncoder",
+    "GlobusClientInfo",
 )
