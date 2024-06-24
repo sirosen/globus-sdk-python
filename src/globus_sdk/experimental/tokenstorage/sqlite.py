@@ -55,7 +55,9 @@ class SQLiteTokenStorage(FileTokenStorage):
         connect_params = connect_params or {}
         if init_tables and not self._is_memory_db():  # real file needs to be created
             with self.user_only_umask():
-                conn = sqlite3.connect(self.dbname, **connect_params)
+                conn: sqlite3.Connection = sqlite3.connect(
+                    self.dbname, **connect_params
+                )
         else:
             conn = sqlite3.connect(self.dbname, **connect_params)
         if init_tables:
