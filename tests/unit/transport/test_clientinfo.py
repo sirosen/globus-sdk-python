@@ -1,7 +1,7 @@
 import pytest
 
 from globus_sdk import __version__
-from globus_sdk.transport._clientinfo import GlobusClientInfo
+from globus_sdk.transport import GlobusClientInfo
 
 
 def make_empty_clientinfo():
