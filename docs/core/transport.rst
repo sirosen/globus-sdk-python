@@ -14,10 +14,9 @@ Transport
    :members:
    :member-order: bysource
 
-``RequestsTransport`` objects include an attribute, ``globus_clientinfo`` which
+``RequestsTransport`` objects include an attribute, ``globus_client_info`` which
 provides the ``X-Globus-Client-Info`` header which is sent to Globus services.
-It is an instance of ``GlobusClientInfo`` pre-populated with ``globus-sdk``
-information.
+It is an instance of ``GlobusClientInfo``:
 
 .. autoclass:: globus_sdk.transport.GlobusClientInfo
    :members:

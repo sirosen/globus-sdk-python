@@ -1,8 +1,8 @@
 """
 This module models a read-write object representation of the
-X-Globus-ClientInfo header.
+X-Globus-Client-Info header.
 
-The spec for X-Globus-ClientInfo is documented, in brief, in the GlobusClientInfo class
+The spec for X-Globus-Client-Info is documented, in brief, in the GlobusClientInfo class
 docstring.
 """
 
@@ -22,6 +22,12 @@ class GlobusClientInfo:
     mapping of multiple products to versions and potentially other information.
 
     Values can be added to a clientinfo object via the ``add()`` method.
+
+    The object always initializes itself to start with
+
+        product=python-sdk,version=...
+
+    using the current package version information.
 
     .. rubric:: ``X-Globus-Client-Info`` Specification
 
@@ -44,8 +50,8 @@ class GlobusClientInfo:
 
     .. code-block:: none
 
-        X-Globus-ClientInfo: product=python-sdk,version=3.32.1
-        X-Globus-ClientInfo: product=python-sdk,version=3.32.1;product=cli,version=4.0.0a1
+        X-Globus-Client-Info: product=python-sdk,version=3.32.1
+        X-Globus-Client-Info: product=python-sdk,version=3.32.1;product=cli,version=4.0.0a1
 
     .. note::
 
@@ -56,6 +62,7 @@ class GlobusClientInfo:
 
     def __init__(self) -> None:
         self.infos: list[str] = []
+        self.add({"product": "python-sdk", "version": __version__})
 
     def __bool__(self) -> bool:
         """Check if there are any values present."""
@@ -83,20 +90,6 @@ class GlobusClientInfo:
                 f"Bad usage: '{value}'"
             )
         self.infos.append(value)
-
-
-class DefaultGlobusClientInfo(GlobusClientInfo):
-    """
-    A variant of GlobusClientInfo which always initializes itself to start with
-
-        product=python-sdk,version=...
-
-    using the current package version information.
-    """
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.add({"product": "python-sdk", "version": __version__})
 
 
 def _format_items(info: dict[str, str]) -> t.Iterable[str]:

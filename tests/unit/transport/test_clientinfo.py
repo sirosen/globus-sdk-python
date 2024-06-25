@@ -1,7 +1,14 @@
 import pytest
 
 from globus_sdk import __version__
-from globus_sdk.transport._clientinfo import DefaultGlobusClientInfo, GlobusClientInfo
+from globus_sdk.transport._clientinfo import GlobusClientInfo
+
+
+def make_empty_clientinfo():
+    # create a clientinfo with no contents, as a starting point for tests
+    obj = GlobusClientInfo()
+    obj.infos = []
+    return obj
 
 
 def parse_clientinfo(header):
@@ -36,26 +43,26 @@ def parse_clientinfo(header):
             segment_dict[key] = value
         if "product" not in segment_dict:
             raise ValueError(
-                "Bad X-GlobusClientInfo segment missing product: "
+                "Bad X-Globus-Client-Info segment missing product: "
                 f"'{segment}' in '{header}'"
             )
         product = segment_dict["product"]
         if product in mappings:
             raise ValueError(
-                "Bad X-GlobusClientInfo header repeats product: "
+                "Bad X-Globus-Client-Info header repeats product: "
                 f"'{product}' in '{header}'"
             )
         mappings[product] = segment_dict
     return mappings
 
 
-def test_clientinfo_bool_after_init():
-    # base clientinfo starts empty and should bool false
-    base = GlobusClientInfo()
-    assert bool(base) is False
-    # default clientinfo starts with the SDK version and should bool true
-    default = DefaultGlobusClientInfo()
-    assert bool(default) is True
+def test_clientinfo_bool():
+    # base clientinfo starts with the SDK version and should bool true
+    info = GlobusClientInfo()
+    assert bool(info) is True
+    # but we can clear it and it will bool False
+    info.infos = []
+    assert bool(info) is False
 
 
 @pytest.mark.parametrize(
@@ -68,7 +75,7 @@ def test_clientinfo_bool_after_init():
     ),
 )
 def test_format_of_simple_item(value, expect_str):
-    info = GlobusClientInfo()
+    info = make_empty_clientinfo()
     info.add(value)
     assert info.format() == expect_str
 
@@ -81,16 +88,16 @@ def test_format_of_simple_item(value, expect_str):
     ),
 )
 def test_format_of_multiple_items(values, expect_str):
-    info = GlobusClientInfo()
+    info = make_empty_clientinfo()
     for value in values:
         info.add(value)
     assert info.format() == expect_str
 
 
 def test_clientinfo_parses_as_expected():
-    default = DefaultGlobusClientInfo()
-    default.add("alpha=b01,product=my-cool-tool")
-    header_str = default.format()
+    info = GlobusClientInfo()
+    info.add("alpha=b01,product=my-cool-tool")
+    header_str = info.format()
 
     parsed = parse_clientinfo(header_str)
     assert parsed == {
