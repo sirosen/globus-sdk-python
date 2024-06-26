@@ -72,6 +72,20 @@ class Scope:
 
         return results
 
+    @staticmethod
+    def merge_scopes(scopes_a: list[Scope], scopes_b: list[Scope]) -> list[Scope]:
+        """
+        Given two lists of Scopes, merge them into one list of Scopes by parsing
+        them as one combined scope string.
+
+        :param scopes_a: list of Scopes to be merged with scopes_b
+        :param scopes_b: list of Scopes to be merged with scopes_a
+        """
+        # dict of base scope_string: list of scopes with that base scope_string
+        return Scope.parse(
+            " ".join([str(s) for s in scopes_a] + [str(s) for s in scopes_b])
+        )
+
     @classmethod
     def deserialize(cls, scope_string: str) -> Scope:
         """
