@@ -244,7 +244,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         """
         for resource_server, scopes in scope_requirements.items():
             if resource_server not in self.scope_requirements:
-                self.scope_requirements[resource_server] = scopes
+                self.scope_requirements[resource_server] = scopes[:]
             else:
                 self.scope_requirements[resource_server].extend(scopes)
 
@@ -266,13 +266,14 @@ class UserApp(GlobusApp):
 
     .. tab-set::
 
-        .. tab-item:: Future Example Usage
+        .. tab-item:: Example Usage
 
             .. code-block:: python
 
                 app = UserApp("myapp", client_id=NATIVE_APP_CLIENT_ID)
                 client = TransferClient(app=app)
-                res = client.operation_ls(COLLECTION_ID)
+                app.run_login_flow()
+                res = client.endpoint_search("Tutorial Collection")
 
     """
 
@@ -381,13 +382,14 @@ class ClientApp(GlobusApp):
 
     .. tab-set::
 
-        .. tab-item:: Future Example Usage
+        .. tab-item:: Example Usage
 
             .. code-block:: python
 
                 app = UserApp("myapp", CLIENT_ID, CLIENT_SECRET)
                 client = TransferClient(app=app)
-                res = client.operation_ls(COLLECTION_ID)
+                app.run_login_flow()
+                res = client.endpoint_search("Tutorial Collection")
 
     """
 

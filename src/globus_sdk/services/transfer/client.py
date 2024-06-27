@@ -7,7 +7,7 @@ import typing as t
 
 from globus_sdk import client, exc, paging, response, utils
 from globus_sdk._types import DateLike, IntLike, UUIDLike
-from globus_sdk.scopes import TransferScopes
+from globus_sdk.scopes import GCSCollectionScopeBuilder, Scope, TransferScopes
 
 from .data import DeleteData, TransferData
 from .errors import TransferAPIError
@@ -110,6 +110,46 @@ class TransferClient(client.BaseClient):
     transport_class: type[TransferRequestsTransport] = TransferRequestsTransport
     error_class = TransferAPIError
     scopes = TransferScopes
+    default_scope_requirements = [Scope(TransferScopes.all)]
+
+    def add_app_data_access_scope(self, collection_id: UUIDLike) -> TransferClient:
+        """
+        Add a dependent ``data_access`` scope for a given ``collection_id`` to this
+        client's ``GlobusApp``. Useful for resolving ``ConsentRequired`` errors
+        when using standard Globus Connect Server mapped collections.
+        ``collection_id`` must be for a standard Globus Connect Server mapped
+        collection or app driven authentication flows will hit unknown scope errors.
+
+        Returns ``self`` for chaining.
+
+        Raises ``GlobusSDKUsageError`` if this client was not initialized with an app.
+
+        :param collection_id: UUID for a standard Globus Connect Server mapped
+            collection.
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: python
+
+                    app = UserApp("myapp", client_id=NATIVE_APP_CLIENT_ID)
+                    client = (
+                        TransferClient(app=app)
+                        .add_app_data_access_scope(COLLECTION_ID_1)
+                        .add_app_data_access_scope(COLLECTION_ID_1)
+                    )
+                    app.run_login_flow()
+
+                    res = client.operation_ls(COLLECTION_ID)
+        """
+        base_scope = Scope(TransferScopes.all)
+        data_access_scope = Scope(
+            GCSCollectionScopeBuilder(str(collection_id)).data_access,
+            optional=True,
+        )
+        self.add_app_scope(base_scope.add_dependency(data_access_scope))
+        return self
 
     # Convenience methods, providing more pythonic access to common REST
     # resources
