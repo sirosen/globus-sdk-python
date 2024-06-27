@@ -81,6 +81,8 @@ class RequestsTransport:
         computed sleep time or the backoff requested by a retry check exceeds this
         value, this amount of time will be used instead
     :param max_retries: The maximum number of retries allowed by this transport
+    :param automatic_authorization: Use ``GlobusAuthorizer`` objects, when present, to
+        provide an Authorization header
     """
 
     #: default maximum number of retries
@@ -110,6 +112,8 @@ class RequestsTransport:
         retry_checks: list[RetryCheck] | None = None,
         max_sleep: float | int = 10,
         max_retries: int | None = None,
+        *,
+        automatic_authorization: bool = True,
     ):
         self.session = requests.Session()
         self.verify_ssl = config.get_ssl_verify(verify_ssl)
@@ -126,6 +130,8 @@ class RequestsTransport:
         self.retry_checks = list(retry_checks if retry_checks else [])  # copy
         # register internal checks
         self.register_default_retry_checks()
+
+        self.automatic_authorization = automatic_authorization
 
     @property
     def user_agent(self) -> str:
@@ -151,6 +157,7 @@ class RequestsTransport:
         retry_backoff: t.Callable[[RetryContext], float] | None = None,
         max_sleep: float | int | None = None,
         max_retries: int | None = None,
+        automatic_authorization: bool | None = None,
     ) -> t.Iterator[None]:
         """
         Temporarily adjust some of the request sending settings of the transport.
@@ -169,6 +176,8 @@ class RequestsTransport:
             computed sleep time or the backoff requested by a retry check exceeds this
             value, this amount of time will be used instead
         :param max_retries: The maximum number of retries allowed by this transport
+        :param automatic_authorization: Enable or disable use of ``GlobusAuthorizer``
+            objects to provide ``Authorization`` headers
 
         **Examples**
 
@@ -193,6 +202,7 @@ class RequestsTransport:
             self.retry_backoff,
             self.max_sleep,
             self.max_retries,
+            self.automatic_authorization,
         )
         if verify_ssl is not None:
             if isinstance(verify_ssl, bool):
@@ -207,6 +217,8 @@ class RequestsTransport:
             self.max_sleep = max_sleep
         if max_retries is not None:
             self.max_retries = max_retries
+        if automatic_authorization is not None:
+            self.automatic_authorization = automatic_authorization
         yield
         (
             self.verify_ssl,
@@ -214,6 +226,7 @@ class RequestsTransport:
             self.retry_backoff,
             self.max_sleep,
             self.max_retries,
+            self.automatic_authorization,
         ) = saved_settings
 
     def _encode(
@@ -247,6 +260,8 @@ class RequestsTransport:
     def _set_authz_header(
         self, authorizer: GlobusAuthorizer | None, req: requests.Request
     ) -> None:
+        if not self.automatic_authorization:
+            return
         if authorizer:
             authz_header = authorizer.get_authorization_header()
             if authz_header:
