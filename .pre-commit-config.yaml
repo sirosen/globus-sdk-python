@@ -3,32 +3,32 @@ ci:
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
+  rev: v4.6.0
   hooks:
     - id: check-merge-conflict
     - id: trailing-whitespace
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.28.1
+  rev: 0.28.6
   hooks:
     - id: check-github-workflows
     - id: check-readthedocs
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.15.2
+  rev: v3.16.0
   hooks:
     - id: pyupgrade
       args: ["--py37-plus"]
 - repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 24.3.0
+  rev: 24.4.2
   hooks:
     - id: black
       name: "Autoformat python files"
 - repo: https://github.com/adamchainz/blacken-docs
-  rev: 1.16.0
+  rev: 1.18.0
   hooks:
     - id: blacken-docs
       additional_dependencies: ['black==23.9.1']
 - repo: https://github.com/PyCQA/flake8
-  rev: 7.0.0
+  rev: 7.1.0
   hooks:
     - id: flake8
       name: "Lint python files"
@@ -42,11 +42,11 @@ repos:
     - id: isort
       name: "Sort python imports"
 - repo: https://github.com/sirosen/slyp
-  rev: 0.6.0
+  rev: 0.6.1
   hooks:
     - id: slyp
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.6
+  rev: v2.3.0
   hooks:
     - id: codespell
       args: ["--ignore-regex", "https://[^\\s]*"]
