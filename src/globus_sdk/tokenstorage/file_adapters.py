@@ -8,6 +8,16 @@ from globus_sdk.services.auth import OAuthTokenResponse
 from globus_sdk.tokenstorage.base import FileAdapter
 from globus_sdk.version import __version__
 
+# use the non-annotation form of TypedDict to apply a non-identifier key
+_JSONFileData_0 = t.TypedDict("_JSONFileData_0", {"globus-sdk.version": str})
+
+
+# then inherit from that TypedDict to build the "real" TypedDict with the advantages of
+# the annotation-based syntax
+class _JSONFileData(_JSONFileData_0):  # pylint: disable=inherit-non-class
+    by_rs: dict[str, t.Any]
+    format_version: str
+
 
 class SimpleJSONFileAdapter(FileAdapter):
     """
@@ -27,6 +37,11 @@ class SimpleJSONFileAdapter(FileAdapter):
     def __init__(self, filename: pathlib.Path | str):
         self.filename = str(filename)
 
+    def _invalid(self, msg: str) -> t.NoReturn:
+        raise ValueError(
+            f"{msg} while loading from '{self.filename}' for JSON File Adapter"
+        )
+
     def _raw_load(self) -> dict[str, t.Any]:
         """
         Load the file contents as JSON and return the resulting dict
@@ -35,10 +50,10 @@ class SimpleJSONFileAdapter(FileAdapter):
         with open(self.filename, encoding="utf-8") as f:
             val = json.load(f)
         if not isinstance(val, dict):
-            raise ValueError("reading from json file got non-dict data")
+            self._invalid("Found non-dict root data")
         return val
 
-    def _handle_formats(self, read_data: dict[str, t.Any]) -> dict[str, t.Any]:
+    def _handle_formats(self, read_data: dict[str, t.Any]) -> _JSONFileData:
         """Handle older data formats supported by globus_sdk.tokenstorage
 
         if the data is not in a known/recognized format, this will error
@@ -56,9 +71,22 @@ class SimpleJSONFileAdapter(FileAdapter):
                 f"cannot store data using SimpleJSONFileAdapter({self.filename} "
                 "existing data file is malformed"
             )
-        return read_data
+        if any(
+            k not in read_data
+            for k in ("by_rs", "format_version", "globus-sdk.version")
+        ):
+            self._invalid("Missing required keys")
+        if not isinstance(by_rs_dict := read_data["by_rs"], dict) or any(
+            not isinstance(k, str) for k in by_rs_dict
+        ):
+            self._invalid("Invalid 'by_rs'")
+        if not isinstance(read_data["format_version"], str):
+            self._invalid("Invalid 'format_version'")
+        if not isinstance(read_data["globus-sdk.version"], str):
+            self._invalid("Invalid 'globus-sdk.version'")
+        return read_data  # type: ignore[return-value]
 
-    def _load(self) -> dict[str, t.Any]:
+    def _load(self) -> _JSONFileData:
         """
         Load data from the file and ensure that the data is in a modern format which can
         be handled by the rest of the adapter.
@@ -114,10 +142,7 @@ class SimpleJSONFileAdapter(FileAdapter):
         This returns a dict in the same format as
         ``OAuthTokenResponse.by_resource_server``
         """
-        # TODO: when the Globus SDK drops support for py3.6 and py3.7, we can update
-        # `_load` to return a TypedDict which guarantees that `by_rs` is a dict
-        # see: https://www.python.org/dev/peps/pep-0589/
-        return t.cast(t.Dict[str, t.Any], self._load()["by_rs"])
+        return self._load()["by_rs"]
 
     def get_token_data(self, resource_server: str) -> dict[str, t.Any] | None:
         return self.get_by_resource_server().get(resource_server)

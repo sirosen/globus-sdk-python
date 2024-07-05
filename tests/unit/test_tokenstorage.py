@@ -46,7 +46,7 @@ def test_simplejson_reading_bad_data(tmp_path):
     foo_file.write_text('["foobar"]')
     foo_adapter = SimpleJSONFileAdapter(str(foo_file))
 
-    with pytest.raises(ValueError, match="reading from json file got non-dict data"):
+    with pytest.raises(ValueError, match="Found non-dict root data while loading"):
         foo_adapter.get_by_resource_server()
 
     # non-dict data in 'by_rs'
