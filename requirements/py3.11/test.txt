@@ -4,11 +4,11 @@
 #
 #    tox p -m freezedeps
 #
-certifi==2024.6.2
+certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
     # via requests
-coverage==7.5.3
+coverage==7.5.4
     # via -r test.in
 execnet==2.1.1
     # via pytest-xdist
