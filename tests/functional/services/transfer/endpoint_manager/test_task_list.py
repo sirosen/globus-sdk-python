@@ -57,15 +57,11 @@ def test_filter_task_id_list(client):
     assert params["filter_task_id"] == f"foo,{str(ZERO_ID)},bar"
 
 
-def _fromisoformat(datestr):  # for py3.6, datetime.fromisoformat was added in py3.7
-    return datetime.datetime.strptime(datestr, "%Y-%m-%dT%H:%M:%S")
-
-
 def test_filter_completion_time_datetime_tuple(client):
     load_response(client.endpoint_manager_task_list)
 
-    dt1 = _fromisoformat("2020-08-25T00:00:00")
-    dt2 = _fromisoformat("2021-08-25T16:05:28")
+    dt1 = datetime.datetime.fromisoformat("2020-08-25T00:00:00")
+    dt2 = datetime.datetime.fromisoformat("2021-08-25T16:05:28")
 
     client.endpoint_manager_task_list(filter_completion_time=(dt1, dt2))
     params = get_last_params()

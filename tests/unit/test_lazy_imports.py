@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 
 import globus_sdk
@@ -15,7 +13,6 @@ def test_force_eager_imports_can_run():
     globus_sdk._force_eager_imports()
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires py3.7+")
 def test_attribute_error_on_bad_name():
     with pytest.raises(AttributeError) as excinfo:
         globus_sdk.DEIMOS_DOWN_REMOVE_ALL_PLANTS

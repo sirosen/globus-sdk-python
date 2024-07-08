@@ -9,6 +9,16 @@ from globus_sdk.version import __version__
 
 from .token_data import TokenData
 
+# use the non-annotation form of TypedDict to apply a non-identifier key
+_JSONFileData_0 = t.TypedDict("_JSONFileData_0", {"globus-sdk.version": str})
+
+
+# then inherit from that TypedDict to build the "real" TypedDict with the advantages of
+# the annotation-based syntax
+class _JSONFileData(_JSONFileData_0):  # pylint: disable=inherit-non-class
+    data: dict[str, dict[str, t.Any]]
+    format_version: str
+
 
 class JSONTokenStorage(FileTokenStorage):
     """
@@ -32,6 +42,11 @@ class JSONTokenStorage(FileTokenStorage):
         self.filename = str(filename)
         super().__init__(namespace=namespace)
 
+    def _invalid(self, msg: str) -> t.NoReturn:
+        raise ValueError(
+            f"{msg} while loading from '{self.filename}' for JSON Token Storage"
+        )
+
     def _raw_load(self) -> dict[str, t.Any]:
         """
         Load the file contents as JSON and return the resulting dict
@@ -40,10 +55,10 @@ class JSONTokenStorage(FileTokenStorage):
         with open(self.filename, encoding="utf-8") as f:
             val = json.load(f)
         if not isinstance(val, dict):
-            raise ValueError("reading from json file got non-dict data")
+            self._invalid("Found non-dict root data")
         return val
 
-    def _handle_formats(self, read_data: dict[str, t.Any]) -> dict[str, t.Any]:
+    def _handle_formats(self, read_data: dict[str, t.Any]) -> _JSONFileData:
         """Handle older data formats supported by this class
 
         if the data is not in a known/recognized format, this will error
@@ -52,7 +67,7 @@ class JSONTokenStorage(FileTokenStorage):
         format_version = read_data.get("format_version")
         if format_version not in self.supported_versions:
             raise ValueError(
-                f"cannot store data using SimpleJSONFileAdapter({self.filename} "
+                f"cannot store data using SimpleJSONTokenStorage({self.filename}) "
                 "existing data file is in an unknown format "
                 f"(format_version={format_version})"
             )
@@ -60,6 +75,8 @@ class JSONTokenStorage(FileTokenStorage):
         # 1.0 data was stored under a "by_rs" key without namespaces, to upgrade we
         # move everything under the "DEFAULT" key and remove the "by_rs" key.
         if format_version == "1.0":
+            if "by_rs" not in read_data:
+                self._invalid("Invalid v1.0 data (missing 'by_rs')")
             read_data = {
                 "data": {
                     "DEFAULT": read_data["by_rs"],
@@ -68,9 +85,27 @@ class JSONTokenStorage(FileTokenStorage):
                 "globus-sdk.version": __version__,
             }
 
-        return read_data
+        if not isinstance(read_data.get("data"), dict):
+            raise ValueError(
+                f"cannot store data using SimpleJSONTokenStorage({self.filename}) "
+                "existing data file is malformed"
+            )
+        if any(
+            k not in read_data for k in ("data", "format_version", "globus-sdk.version")
+        ):
+            self._invalid("Missing required keys")
+        if not isinstance(data_dict := read_data["data"], dict) or any(
+            not isinstance(k, str) for k in data_dict
+        ):
+            self._invalid("Invalid 'data'")
+        if not isinstance(read_data["format_version"], str):
+            self._invalid("Invalid 'format_version'")
+        if not isinstance(read_data["globus-sdk.version"], str):
+            self._invalid("Invalid 'globus-sdk.version'")
 
-    def _load(self) -> dict[str, t.Any]:
+        return read_data  # type: ignore[return-value]
+
+    def _load(self) -> _JSONFileData:
         """
         Load data from the file and ensure that the data is in a modern format which can
         be handled by the rest of the adapter.
@@ -126,13 +161,8 @@ class JSONTokenStorage(FileTokenStorage):
 
         Returns a dict of ``TokenData`` objects indexed by their resource server.
         """
-        # TODO: when the Globus SDK drops support for py3.6 and py3.7, we can update
-        # `_load` to return a TypedDict which guarantees the response is a dict
-        # see: https://www.python.org/dev/peps/pep-0589/
         ret = {}
-        dicts_by_resource_server = t.cast(
-            t.Dict[str, t.Any], self._load()["data"].get(self.namespace, {})
-        )
+        dicts_by_resource_server = self._load()["data"].get(self.namespace, {})
         for resource_server, token_data_dict in dicts_by_resource_server.items():
             ret[resource_server] = TokenData.from_dict(token_data_dict)
         return ret
