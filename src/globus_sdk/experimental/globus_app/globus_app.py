@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import dataclasses
 import os
 import sys
 from dataclasses import dataclass
@@ -12,6 +13,7 @@ from globus_sdk import (
     NativeAppAuthClient,
     Scope,
 )
+from globus_sdk import config as sdk_config
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.exc import GlobusSDKUsageError
@@ -40,7 +42,7 @@ else:
     from typing import Protocol
 
 
-def _default_filename(app_name: str) -> str:
+def _default_filename(app_name: str, environment: str) -> str:
     r"""
     construct the filename for the default JSONTokenStorage to use
 
@@ -50,15 +52,20 @@ def _default_filename(app_name: str) -> str:
     on Linux and macOS, we use
         ~/.globus/app/{app_name}/tokens.json
     """
+    environment_prefix = f"{environment}-"
+    if environment == "production":
+        environment_prefix = ""
+    filename = f"{environment_prefix}tokens.json"
+
     if sys.platform == "win32":
         # try to get the app data dir, preferring the local appdata
         datadir = os.getenv("LOCALAPPDATA", os.getenv("APPDATA"))
         if not datadir:
             home = os.path.expanduser("~")
             datadir = os.path.join(home, "AppData", "Local")
-        return os.path.join(datadir, "globus", "app", app_name, "tokens.json")
+        return os.path.join(datadir, "globus", "app", app_name, filename)
     else:
-        return os.path.expanduser(f"~/.globus/app/{app_name}/tokens.json")
+        return os.path.expanduser(f"~/.globus/app/{app_name}/{filename}")
 
 
 class TokenValidationErrorHandler(Protocol):
@@ -99,6 +106,8 @@ class GlobusAppConfig:
     :param token_validation_error_handler: A callable that will be called when a
         token validation error is encountered. The default behavior is to retry the
         login flow automatically.
+    :param environment: The Globus environment being targeted by this app. This is
+        predominately for internal use and can be ignored in most cases.
     """
 
     login_flow_manager: LoginFlowManager | type[LoginFlowManager] | None = None
@@ -106,6 +115,9 @@ class GlobusAppConfig:
     request_refresh_tokens: bool = False
     token_validation_error_handler: TokenValidationErrorHandler | None = (
         resolve_by_login_flow
+    )
+    environment: str = dataclasses.field(
+        default_factory=sdk_config.get_environment_name
     )
 
 
@@ -160,10 +172,18 @@ class GlobusApp(metaclass=abc.ABCMeta):
         self.app_name = app_name
         self.config = config
 
-        if login_client and (client_id or client_secret):
-            raise GlobusSDKUsageError(
-                "login_client is mutually exclusive with client_id and client_secret."
-            )
+        if login_client:
+            if client_id or client_secret:
+                raise GlobusSDKUsageError(
+                    "login_client is mutually exclusive with client_id and "
+                    "client_secret."
+                )
+            if login_client.environment != self.config.environment:
+                raise GlobusSDKUsageError(
+                    f"[Environment Mismatch] The login_client's environment "
+                    f"({login_client.environment}) does not match the GlobusApp's "
+                    f"configured environment ({self.config.environment})."
+                )
 
         self.client_id: UUIDLike | None
         if login_client:
@@ -180,7 +200,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
             self._token_storage = self.config.token_storage
         else:
             self._token_storage = JSONTokenStorage(
-                filename=_default_filename(self.app_name)
+                filename=_default_filename(self.app_name, self.config.environment)
             )
 
         # construct ValidatingTokenStorage around the TokenStorage and
@@ -264,7 +284,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
             if self.config.token_validation_error_handler:
                 # Dispatch to the configured error handler if one is set then retry.
                 self.config.token_validation_error_handler(self, e)
-                return self.get_authorizer(resource_server)
+                return self._authorizer_factory.get_authorizer(resource_server)
             raise e
 
     def add_scope_requirements(
@@ -378,11 +398,13 @@ class UserApp(GlobusApp):
                 app_name=self.app_name,
                 client_id=self.client_id,
                 client_secret=client_secret,
+                environment=self.config.environment,
             )
         else:
             self._login_client = NativeAppAuthClient(
                 app_name=self.app_name,
                 client_id=self.client_id,
+                environment=self.config.environment,
             )
 
     def _initialize_authorizer_factory(self) -> None:
@@ -479,6 +501,7 @@ class ClientApp(GlobusApp):
             client_id=self.client_id,
             client_secret=client_secret,
             app_name=self.app_name,
+            environment=self.config.environment,
         )
 
     def _initialize_authorizer_factory(self) -> None:

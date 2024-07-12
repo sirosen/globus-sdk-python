@@ -71,11 +71,22 @@ class BaseClient:
         app_name: str | None = None,
         transport_params: dict[str, t.Any] | None = None,
     ):
-        # if an environment was passed, it will be used, but otherwise lookup
-        # the env var -- and in the special case of `production` translate to
-        # `default`, regardless of the source of that value
-        # logs the environment when it isn't `default`
-        self.environment = config.get_environment_name(environment)
+        # Determine the client's environment.
+        if app is not None:
+            # If we're using a GlobusApp, the client's environment must either match the
+            # app's or be omitted.
+            if environment is not None and environment != app.config.environment:
+                raise exc.GlobusSDKUsageError(
+                    f"[Environment Mismatch] {type(self).__name__}'s environment "
+                    f"({environment}) does not match the GlobusApp's configured"
+                    f"environment ({app.config.environment})."
+                )
+
+            self.environment = app.config.environment
+        else:
+            # Otherwise, figure out the environment from the provided kwarg or the
+            # GLOBUS_SDK_ENVIRONMENT environment variable.
+            self.environment = config.get_environment_name(environment)
 
         if self.service_name == "_base":
             # service_name=="_base" means that either there was no inheritance (direct
@@ -101,7 +112,7 @@ class BaseClient:
                 )
 
         # append the base_path to the base URL
-        self.base_url = utils.slash_join(base_url, self.base_path)
+        self.base_url: str = utils.slash_join(base_url, self.base_path)
 
         self.transport = self.transport_class(**(transport_params or {}))
         log.debug(f"initialized transport of type {type(self.transport)}")
@@ -123,7 +134,7 @@ class BaseClient:
 
         # set application name if available from app_name or app with app_name
         # taking precedence if both are present
-        self._app_name = None
+        self._app_name: str | None = None
         if app_name is not None:
             self.app_name = app_name
         elif app is not None:
