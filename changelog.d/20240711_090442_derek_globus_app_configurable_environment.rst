@@ -2,5 +2,5 @@
 Added
 ~~~~~
 
-- Added the configuration parameter ``GlobusAppConfig.environment``. (:pr:`NUMBER`)
+- Added the configuration parameter ``GlobusAppConfig.environment``. (:pr:`1001`)
 
