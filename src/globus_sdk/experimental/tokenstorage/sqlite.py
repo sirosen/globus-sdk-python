@@ -64,12 +64,6 @@ class SQLiteTokenStorage(FileTokenStorage):
             conn.executescript(
                 textwrap.dedent(
                     """
-                    CREATE TABLE config_storage (
-                        namespace VARCHAR NOT NULL,
-                        config_name VARCHAR NOT NULL,
-                        config_data_json VARCHAR NOT NULL,
-                        PRIMARY KEY (namespace, config_name)
-                    );
                     CREATE TABLE token_storage (
                         namespace VARCHAR NOT NULL,
                         resource_server VARCHAR NOT NULL,
@@ -103,62 +97,6 @@ class SQLiteTokenStorage(FileTokenStorage):
         Close the underlying database connection.
         """
         self._connection.close()
-
-    def store_config(
-        self, config_name: str, config_dict: t.Mapping[str, t.Any]
-    ) -> None:
-        """
-        Store a config dict under the current namespace in the config table.
-        Allows arbitrary configuration data to be namespaced under the namespace, so
-        that application config may be associated with the stored token data.
-
-        Uses sqlite "REPLACE" to perform the operation.
-
-        :param config_name: A string name for the configuration value
-        :param config_dict: A dict of config which will be stored serialized as JSON
-        """
-        self._connection.execute(
-            "REPLACE INTO config_storage(namespace, config_name, config_data_json) "
-            "VALUES (?, ?, ?)",
-            (self.namespace, config_name, json.dumps(config_dict)),
-        )
-        self._connection.commit()
-
-    def read_config(self, config_name: str) -> dict[str, t.Any] | None:
-        """
-        Load a config dict under the current namespace in the config table.
-        If no value is found, returns None
-
-        :param config_name: A string name for the configuration value
-        """
-        row = self._connection.execute(
-            "SELECT config_data_json FROM config_storage "
-            "WHERE namespace=? AND config_name=?",
-            (self.namespace, config_name),
-        ).fetchone()
-
-        if row is None:
-            return None
-        config_data_json = row[0]
-        val = json.loads(config_data_json)
-        if not isinstance(val, dict):
-            raise ValueError("reading config data and got non-dict result")
-        return val
-
-    def remove_config(self, config_name: str) -> bool:
-        """
-        Delete a previously stored configuration value.
-
-        Returns True if data was deleted, False if none was found to delete.
-
-        :param config_name: A string name for the configuration value
-        """
-        rowcount = self._connection.execute(
-            "DELETE FROM config_storage WHERE namespace=? AND config_name=?",
-            (self.namespace, config_name),
-        ).rowcount
-        self._connection.commit()
-        return rowcount != 0
 
     def store_token_data_by_resource_server(
         self, token_data_by_resource_server: dict[str, TokenData]
@@ -219,17 +157,11 @@ class SQLiteTokenStorage(FileTokenStorage):
         self._connection.commit()
         return rowcount != 0
 
-    def iter_namespaces(
-        self, *, include_config_namespaces: bool = False
-    ) -> t.Iterator[str]:
+    def iter_namespaces(self) -> t.Iterator[str]:
         """
         Iterate over the namespaces which are in use in this storage adapter's database.
         The presence of tokens for a namespace does not indicate that those tokens are
         valid, only that they have been stored and have not been removed.
-
-        :param include_config_namespaces: Include namespaces which appear only in the
-            configuration storage section of the sqlite database. By default, only
-            namespaces which were used for token storage will be returned
         """
         seen: set[str] = set()
         for row in self._connection.execute(
@@ -238,11 +170,3 @@ class SQLiteTokenStorage(FileTokenStorage):
             namespace = row[0]
             seen.add(namespace)
             yield namespace
-
-        if include_config_namespaces:
-            for row in self._connection.execute(
-                "SELECT DISTINCT namespace FROM config_storage;"
-            ):
-                namespace = row[0]
-                if namespace not in seen:
-                    yield namespace

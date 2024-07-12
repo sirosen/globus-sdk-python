@@ -57,15 +57,6 @@ def test_constructor(success, use_file, kwargs, db_file, make_adapter):
                 make_adapter(**kwargs)
 
 
-def test_store_and_retrieve_simple_config(make_adapter):
-    adapter = make_adapter(MEMORY_DBNAME)
-    store_val = {"val1": True, "val2": None, "val3": 1.4}
-    adapter.store_config("myconf", store_val)
-    read_val = adapter.read_config("myconf")
-    assert read_val == store_val
-    assert read_val is not store_val
-
-
 def test_store_and_get_token_data_by_resource_server(
     mock_token_data_by_resource_server, make_adapter
 ):
@@ -101,11 +92,6 @@ def test_multiple_adapters_store_and_retrieve_different_namespaces(
     assert data == {}
 
 
-def test_load_missing_config_data(make_adapter):
-    adapter = make_adapter(MEMORY_DBNAME)
-    assert adapter.read_config("foo") is None
-
-
 def test_load_missing_token_data(make_adapter):
     adapter = make_adapter(MEMORY_DBNAME)
     assert adapter.get_token_data_by_resource_server() == {}
@@ -125,55 +111,22 @@ def test_remove_tokens(mock_response, make_adapter):
     assert not removed
 
 
-def test_remove_config(make_adapter):
-    adapter = make_adapter(MEMORY_DBNAME)
-    store_val = {"val1": True, "val2": None, "val3": 1.4}
-    adapter.store_config("myconf", store_val)
-    adapter.store_config("myconf2", store_val)
-    removed = adapter.remove_config("myconf")
-    assert removed
-    read_val = adapter.read_config("myconf")
-    assert read_val is None
-    read_val = adapter.read_config("myconf2")
-    assert read_val == store_val
-
-    removed = adapter.remove_config("myconf")
-    assert not removed
-
-
 def test_iter_namespaces(mock_response, db_file, make_adapter):
     foo_adapter = make_adapter(db_file, namespace="foo")
     bar_adapter = make_adapter(db_file, namespace="bar")
-    baz_adapter = make_adapter(db_file, namespace="baz")
 
-    for adapter in [foo_adapter, bar_adapter, baz_adapter]:
+    for adapter in [foo_adapter, bar_adapter]:
         assert list(adapter.iter_namespaces()) == []
-        assert list(adapter.iter_namespaces(include_config_namespaces=True)) == []
 
     foo_adapter.store_token_response(mock_response)
 
-    for adapter in [foo_adapter, bar_adapter, baz_adapter]:
+    for adapter in [foo_adapter, bar_adapter]:
         assert list(adapter.iter_namespaces()) == ["foo"]
-        assert list(adapter.iter_namespaces(include_config_namespaces=True)) == ["foo"]
 
     bar_adapter.store_token_response(mock_response)
 
-    for adapter in [foo_adapter, bar_adapter, baz_adapter]:
+    for adapter in [foo_adapter, bar_adapter]:
         assert set(adapter.iter_namespaces()) == {"foo", "bar"}
-        assert set(adapter.iter_namespaces(include_config_namespaces=True)) == {
-            "foo",
-            "bar",
-        }
-
-    baz_adapter.store_config("some_conf", {})
-
-    for adapter in [foo_adapter, bar_adapter, baz_adapter]:
-        assert set(adapter.iter_namespaces()) == {"foo", "bar"}
-        assert set(adapter.iter_namespaces(include_config_namespaces=True)) == {
-            "foo",
-            "bar",
-            "baz",
-        }
 
 
 def test_backwards_compatible_storage(mock_response, db_file, make_adapter):
