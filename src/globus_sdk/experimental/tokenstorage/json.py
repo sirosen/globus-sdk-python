@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
-import pathlib
 import typing as t
 
 from globus_sdk.experimental.tokenstorage.base import FileTokenStorage
@@ -34,21 +32,6 @@ class JSONTokenStorage(FileTokenStorage):
 
     # the supported versions (data not in these versions causes an error)
     supported_versions = ("1.0", "2.0")
-
-    def __init__(self, filename: pathlib.Path | str, *, namespace: str = "DEFAULT"):
-        """
-        :param filename: the name of the file to write to and read from
-        :param namespace: A user-supplied namespace for partitioning token data
-        """
-        self.filename = str(filename)
-        self._ensure_containing_dir_exists()
-        super().__init__(namespace=namespace)
-
-    def _ensure_containing_dir_exists(self) -> None:
-        """
-        Ensure that the directory containing the given filename exists.
-        """
-        os.makedirs(os.path.dirname(self.filename), exist_ok=True)
 
     def _invalid(self, msg: str) -> t.NoReturn:
         raise ValueError(

@@ -46,9 +46,9 @@ class SQLiteTokenStorage(FileTokenStorage):
                 "If you want memory-backed TokenStorage, use MemoryTokenStorage "
                 "instead."
             )
-        self.filename = str(filename)
+
+        super().__init__(filename, namespace=namespace)
         self._connection = self._init_and_connect(connect_params)
-        super().__init__(namespace=namespace)
 
     def _init_and_connect(
         self,
