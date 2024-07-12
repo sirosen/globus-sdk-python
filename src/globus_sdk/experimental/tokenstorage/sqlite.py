@@ -6,6 +6,7 @@ import sqlite3
 import textwrap
 import typing as t
 
+from globus_sdk import exc
 from globus_sdk.experimental.tokenstorage.base import FileTokenStorage
 from globus_sdk.version import __version__
 
@@ -28,39 +29,37 @@ class SQLiteTokenStorage(FileTokenStorage):
 
     def __init__(
         self,
-        dbname: pathlib.Path | str,
+        filename: pathlib.Path | str,
         *,
         connect_params: dict[str, t.Any] | None = None,
         namespace: str = "DEFAULT",
     ):
         """
-        :param dbname: The name of the DB file to write to and read from. If the string
-            ":memory:" is used, an in-memory database will be used instead.
+        :param filename: The name of the DB file to write to and read from.
         :param connect_params: A pass-through dictionary for fine-tuning the SQLite
              connection.
         :param namespace: A user-supplied namespace for partitioning token data.
         """
-        self.filename = self.dbname = str(dbname)
+        if filename == ":memory:":
+            raise exc.GlobusSDKUsageError(
+                "SQLiteTokenStorage cannot be used with a ':memory:' database. "
+                "If you want memory-backed TokenStorage, use MemoryTokenStorage "
+                "instead."
+            )
+        self.filename = str(filename)
         self._connection = self._init_and_connect(connect_params)
         super().__init__(namespace=namespace)
-
-    def _is_memory_db(self) -> bool:
-        return self.dbname == ":memory:"
 
     def _init_and_connect(
         self,
         connect_params: dict[str, t.Any] | None,
     ) -> sqlite3.Connection:
-        init_tables = self._is_memory_db() or not self.file_exists()
         connect_params = connect_params or {}
-        if init_tables and not self._is_memory_db():  # real file needs to be created
+        if not self.file_exists():
             with self.user_only_umask():
                 conn: sqlite3.Connection = sqlite3.connect(
-                    self.dbname, **connect_params
+                    self.filename, **connect_params
                 )
-        else:
-            conn = sqlite3.connect(self.dbname, **connect_params)
-        if init_tables:
             conn.executescript(
                 textwrap.dedent(
                     """
@@ -86,10 +85,18 @@ class SQLiteTokenStorage(FileTokenStorage):
                 "VALUES (?, ?)",
                 [
                     ("globus-sdk.version", __version__),
-                    ("globus-sdk.database_schema_version", "1"),
+                    # schema_version=1 indicates a schema built with the original
+                    # SQLiteAdapter
+                    # schema_version=2 indicates one built with SQLiteTokenStorage
+                    #
+                    # a schema_version of 1 therefore indicates that there should be
+                    # a 'config_storage' table present
+                    ("globus-sdk.database_schema_version", "2"),
                 ],
             )
             conn.commit()
+        else:
+            conn = sqlite3.connect(self.filename, **connect_params)
         return conn
 
     def close(self) -> None:
@@ -103,7 +110,7 @@ class SQLiteTokenStorage(FileTokenStorage):
     ) -> None:
         """
         Given a dict of token data indexed by resource server, convert the data into
-        JSON dicts and write it to ``self.dbname`` under the current namespace
+        JSON dicts and write it to ``self.filename`` under the current namespace
 
         :param token_data_by_resource_server: a ``dict`` of ``TokenData`` objects
             indexed by their ``resource_server``.

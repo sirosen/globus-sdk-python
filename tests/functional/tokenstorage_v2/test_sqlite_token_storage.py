@@ -1,5 +1,6 @@
 import pytest
 
+from globus_sdk import exc
 from globus_sdk.experimental.tokenstorage import SQLiteTokenStorage
 from globus_sdk.tokenstorage import SQLiteAdapter
 
@@ -7,9 +8,6 @@ from globus_sdk.tokenstorage import SQLiteAdapter
 @pytest.fixture
 def db_file(tmp_path):
     return tmp_path / "test.db"
-
-
-MEMORY_DBNAME = ":memory:"
 
 
 @pytest.fixture
@@ -21,8 +19,10 @@ def adapters_to_close():
 
 
 @pytest.fixture
-def make_adapter(adapters_to_close):
+def make_adapter(adapters_to_close, db_file):
     def func(*args, **kwargs):
+        if len(args) == 0 and "filename" not in kwargs:
+            args = (db_file,)
         ret = SQLiteTokenStorage(*args, **kwargs)
         adapters_to_close.add(ret)
         return ret
@@ -30,37 +30,24 @@ def make_adapter(adapters_to_close):
     return func
 
 
-@pytest.mark.parametrize(
-    "success, use_file, kwargs",
-    [
-        (False, False, {}),
-        (False, False, {"namespace": "foo"}),
-        (True, False, {"dbname": MEMORY_DBNAME}),
-        (True, False, {"dbname": MEMORY_DBNAME, "namespace": "foo"}),
-        (True, True, {}),
-        (True, True, {"namespace": "foo"}),
-        (False, True, {"dbname": MEMORY_DBNAME}),
-        (False, True, {"dbname": MEMORY_DBNAME, "namespace": "foo"}),
-    ],
-)
-def test_constructor(success, use_file, kwargs, db_file, make_adapter):
-    if success:
-        if use_file:
-            make_adapter(db_file, **kwargs)
-        else:
-            make_adapter(**kwargs)
-    else:
-        with pytest.raises(TypeError):
-            if use_file:
-                make_adapter(db_file, **kwargs)
-            else:
-                make_adapter(**kwargs)
+@pytest.mark.parametrize("kwargs", [{}, {"namespace": "foo"}])
+def test_constructor(kwargs, db_file, make_adapter):
+    make_adapter(db_file, **kwargs)
+    assert db_file.exists()
+
+
+def test_constructor_rejects_memory_db(make_adapter):
+    with pytest.raises(
+        exc.GlobusSDKUsageError,
+        match="SQLiteTokenStorage cannot be used with a ':memory:' database",
+    ):
+        make_adapter(":memory:")
 
 
 def test_store_and_get_token_data_by_resource_server(
     mock_token_data_by_resource_server, make_adapter
 ):
-    adapter = make_adapter(MEMORY_DBNAME)
+    adapter = make_adapter()
     adapter.store_token_data_by_resource_server(mock_token_data_by_resource_server)
 
     gotten = adapter.get_token_data_by_resource_server()
@@ -93,13 +80,13 @@ def test_multiple_adapters_store_and_retrieve_different_namespaces(
 
 
 def test_load_missing_token_data(make_adapter):
-    adapter = make_adapter(MEMORY_DBNAME)
+    adapter = make_adapter()
     assert adapter.get_token_data_by_resource_server() == {}
     assert adapter.get_token_data("resource_server_1") is None
 
 
 def test_remove_tokens(mock_response, make_adapter):
-    adapter = make_adapter(MEMORY_DBNAME)
+    adapter = make_adapter()
     adapter.store_token_response(mock_response)
 
     removed = adapter.remove_token_data("resource_server_1")
