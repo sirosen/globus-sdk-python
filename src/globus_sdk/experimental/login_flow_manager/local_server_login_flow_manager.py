@@ -56,14 +56,23 @@ def _open_webbrowser(url: str) -> None:
     """
     try:
         browser = webbrowser.get()
-        if browser.name in BROWSER_BLACKLIST:
+        if hasattr(browser, "name"):
+            browser_name = browser.name
+        elif hasattr(browser, "_name"):
+            # MacOSXOSAScript only supports a public name attribute in py311 and later.
+            # https://github.com/python/cpython/issues/82828
+            browser_name = browser._name
+        else:
+            raise LocalServerLoginFlowError("Unable to determine local browser name.")
+
+        if browser_name in BROWSER_BLACKLIST:
             raise LocalServerLoginFlowError(
                 "Cannot use LocalServerLoginFlowManager with "
-                f"text-only browser '{browser.name}'"
+                f"text-only browser '{browser_name}'"
             )
 
         if not browser.open(url, new=1):
-            raise LocalServerLoginFlowError("Failed to open browser '{browser.name}'")
+            raise LocalServerLoginFlowError(f"Failed to open browser '{browser_name}'")
     except webbrowser.Error as exc:
         raise LocalServerLoginFlowError("Failed to open browser") from exc
 
