@@ -1,7 +1,6 @@
 import base64
 import os
 import shutil
-import tempfile
 import uuid
 
 import pytest
@@ -41,37 +40,29 @@ def normalize_config_dir_argument(config_dir):
     return config_dir if _IS_WINDOWS else os.path.dirname(config_dir)
 
 
+@pytest.fixture
+def mocked_confdir(tmp_path):
+    confdir = _compute_confdir(tmp_path)
+    os.makedirs(confdir)
+    return confdir
+
+
+@pytest.fixture
+def mocked_alternate_confdir(tmp_path):
+    altconfdir = _compute_confdir(tmp_path, alt=True)
+    os.makedirs(altconfdir)
+    return altconfdir
+
+
 @pytest.fixture(autouse=True)
-def mocked_homedir(monkeypatch):
-    tempdir = tempfile.mkdtemp()
-
+def mocked_homedir(monkeypatch, tmp_path, mocked_confdir, mocked_alternate_confdir):
     def mock_expanduser(path):
-        return os.path.join(tempdir, path.replace("~/", ""))
+        return str(tmp_path / path.replace("~/", ""))
 
-    try:
-        confdir = _compute_confdir(tempdir)
-        altconfdir = _compute_confdir(tempdir, alt=True)
-        os.makedirs(confdir)
-        os.makedirs(altconfdir)
-
-        if _IS_WINDOWS:
-            monkeypatch.setitem(os.environ, "LOCALAPPDATA", tempdir)
-        else:
-            monkeypatch.setattr(os.path, "expanduser", mock_expanduser)
-        yield tempdir
-
-    finally:
-        shutil.rmtree(tempdir)
-
-
-@pytest.fixture
-def mocked_confdir(mocked_homedir):
-    return _compute_confdir(mocked_homedir)
-
-
-@pytest.fixture
-def mocked_alternate_confdir(mocked_homedir):
-    return _compute_confdir(mocked_homedir, alt=True)
+    if _IS_WINDOWS:
+        monkeypatch.setitem(os.environ, "LOCALAPPDATA", str(tmp_path))
+    else:
+        monkeypatch.setattr(os.path, "expanduser", mock_expanduser)
 
 
 @pytest.fixture

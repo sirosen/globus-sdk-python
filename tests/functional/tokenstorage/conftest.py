@@ -1,16 +1,7 @@
-import shutil
-import tempfile
 import time
 from unittest import mock
 
 import pytest
-
-
-@pytest.fixture
-def tempdir():
-    d = tempfile.mkdtemp()
-    yield d
-    shutil.rmtree(d)
 
 
 @pytest.fixture

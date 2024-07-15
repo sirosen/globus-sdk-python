@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from globus_sdk.experimental.tokenstorage import SQLiteTokenStorage
@@ -7,8 +5,8 @@ from globus_sdk.tokenstorage import SQLiteAdapter
 
 
 @pytest.fixture
-def db_filename(tempdir):
-    return os.path.join(tempdir, "test.db")
+def db_file(tmp_path):
+    return tmp_path / "test.db"
 
 
 MEMORY_DBNAME = ":memory:"
@@ -45,16 +43,16 @@ def make_adapter(adapters_to_close):
         (False, True, {"dbname": MEMORY_DBNAME, "namespace": "foo"}),
     ],
 )
-def test_constructor(success, use_file, kwargs, db_filename, make_adapter):
+def test_constructor(success, use_file, kwargs, db_file, make_adapter):
     if success:
         if use_file:
-            make_adapter(db_filename, **kwargs)
+            make_adapter(db_file, **kwargs)
         else:
             make_adapter(**kwargs)
     else:
         with pytest.raises(TypeError):
             if use_file:
-                make_adapter(db_filename, **kwargs)
+                make_adapter(db_file, **kwargs)
             else:
                 make_adapter(**kwargs)
 
@@ -83,9 +81,9 @@ def test_store_and_get_token_data_by_resource_server(
         )
 
 
-def test_multiple_adapters_store_and_retrieve(mock_response, db_filename, make_adapter):
-    adapter1 = make_adapter(db_filename)
-    adapter2 = make_adapter(db_filename)
+def test_multiple_adapters_store_and_retrieve(mock_response, db_file, make_adapter):
+    adapter1 = make_adapter(db_file)
+    adapter2 = make_adapter(db_file)
     adapter1.store_token_response(mock_response)
 
     assert adapter2.get_token_data("resource_server_1").access_token == "access_token_1"
@@ -93,10 +91,10 @@ def test_multiple_adapters_store_and_retrieve(mock_response, db_filename, make_a
 
 
 def test_multiple_adapters_store_and_retrieve_different_namespaces(
-    mock_response, db_filename, make_adapter
+    mock_response, db_file, make_adapter
 ):
-    adapter1 = make_adapter(db_filename, namespace="foo")
-    adapter2 = make_adapter(db_filename, namespace="bar")
+    adapter1 = make_adapter(db_file, namespace="foo")
+    adapter2 = make_adapter(db_file, namespace="bar")
     adapter1.store_token_response(mock_response)
 
     data = adapter2.get_token_data_by_resource_server()
@@ -143,10 +141,10 @@ def test_remove_config(make_adapter):
     assert not removed
 
 
-def test_iter_namespaces(mock_response, db_filename, make_adapter):
-    foo_adapter = make_adapter(db_filename, namespace="foo")
-    bar_adapter = make_adapter(db_filename, namespace="bar")
-    baz_adapter = make_adapter(db_filename, namespace="baz")
+def test_iter_namespaces(mock_response, db_file, make_adapter):
+    foo_adapter = make_adapter(db_file, namespace="foo")
+    bar_adapter = make_adapter(db_file, namespace="bar")
+    baz_adapter = make_adapter(db_file, namespace="baz")
 
     for adapter in [foo_adapter, bar_adapter, baz_adapter]:
         assert list(adapter.iter_namespaces()) == []
@@ -178,14 +176,14 @@ def test_iter_namespaces(mock_response, db_filename, make_adapter):
         }
 
 
-def test_backwards_compatible_storage(mock_response, db_filename, make_adapter):
+def test_backwards_compatible_storage(mock_response, db_file, make_adapter):
     # store data with SQLiteAdapter
-    old_adapter = SQLiteAdapter(db_filename)
+    old_adapter = SQLiteAdapter(db_file)
     old_adapter.store(mock_response)
     old_adapter.close()
 
     # retrieve data with SQLiteTokenStorage using the same file
-    new_adapter = make_adapter(db_filename)
+    new_adapter = make_adapter(db_file)
     assert (
         new_adapter.get_token_data("resource_server_1").access_token == "access_token_1"
     )

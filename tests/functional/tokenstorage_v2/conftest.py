@@ -1,18 +1,9 @@
-import shutil
-import tempfile
 import time
 from unittest import mock
 
 import pytest
 
 from globus_sdk.experimental.tokenstorage import TokenData
-
-
-@pytest.fixture
-def tempdir():
-    d = tempfile.mkdtemp()
-    yield d
-    shutil.rmtree(d)
 
 
 @pytest.fixture
