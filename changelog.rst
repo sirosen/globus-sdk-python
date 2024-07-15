@@ -28,32 +28,58 @@ Added
 - Add ``globus_sdk.ConnectorTable`` which provides information on supported
   Globus Connect Server connectors. This object maps names to IDs and vice versa. (:pr:`955`)
 
-- A new experimental storage adapter (``ValidatingStorageAdapter``) which validates that
-  identity is maintained and scope requirements are met on token storage/retrieval.
-  (:pr:`978`)
-
-- Add ``TokenStorage`` to experimental along with ``FileTokenStorage``,
-  ``JSONTokenStorage``, ``MemoryTokenStorage`` and ``SQLiteTokenStorage`` which
-  implement it. ``TokenStorage`` expands the functionality of ``StorageAdapter``
-  but is not fully backwards compatible. (:pr:`980`)
-
-- Add ``AuthorizerFactory``, an interface for getting a ``GlobusAuthorizer``
-  from a ``ValidatingTokenStorage`` to experimental along with
-  ``AccessTokenAuthorizerFactory``, ``RefreshTokenAuthorizerFactory``, and
-  ``ClientCredentialsAuthorizerFactory`` that implement it. (:pr:`985`)
-
 - Support adding query parameters to ``ConfidentialAppAuthClient.oauth2_token_introspect``
   via a ``query_params`` argument. (:pr:`984`)
 
-- Add ``GlobusApp`` to experimental along with ``UserApp`` and ``ClientApp``
-  that implement it and ``GlobusAppConfig`` that allows configuring behavior. (:pr:`986`)
+- Add ``get_gcs_info`` as a helper method to ``GCSClient`` for getting information
+  from a Globus Connect Server's ``info`` API route.
+
+- Add ``endpoint_client_id`` as a property to ``GCSClient``.
+
+- Clients will now emit a ``X-Globus-Client-Info`` header which reports the
+  version of the ``globus-sdk`` which was used to send a request. Users may
+  customize this header further by modifying the ``globus_client_info`` object
+  attached to the transport object. (:pr:`990`)
+
+.. rubric:: Experimental
+
+- Add a new abstract class, ``TokenStorage``, to ``experimental``.
+  ``TokenStorage`` expands the functionality of ``StorageAdapter`` but is not
+  fully backwards compatible. (:pr:`980`)
+
+    - ``FileTokenStorage``, ``JSONTokenStorage``, ``MemoryTokenStorage`` and
+      ``SQLiteTokenStorage`` are new concrete implementations of ``TokenStorage``.
+
+- Add ``ValidatingStorageAdapter`` to ``experimental``, which validates that
+  identity is maintained and scope requirements are met on token
+  storage/retrieval. (:pr:`978`, :pr:`980`)
+
+- Add a new abstract class, ``AuthorizerFactory`` to ``experimental``.
+  ``AuthorizerFactory`` provides an interface for getting a
+  ``GlobusAuthorizer`` from a ``ValidatingTokenStorage``. (:pr:`985`)
+
+    - ``AccessTokenAuthorizerFactory``, ``RefreshTokenAuthorizerFactory``, and
+      ``ClientCredentialsAuthorizerFactory`` are new concrete implementations
+      of ``AuthorizerFactory``.
+
+- Add a new abstract class, ``GlobusApp`` to ``experimental``. A ``GlobusApp``
+  is an abstraction which allows users to define their authorization
+  requirements implicitly and explicitly, attach that state to their
+  various clients, and drive login flows. (:pr:`986`)
+
+    - ``UserApp`` and ``ClientApp`` are new implementations of ``GlobusApp``
+      which handle authentications for user-login and client-credentials.
+
+   - ``GlobusAppConfig`` is an object which can be used to control
+     ``GlobusApp`` behaviors.
 
 - Add ``app`` as an optional argument to ``BaseClient`` which will accept a
   ``GlobusApp`` to handle authentication, token validation, and token storage when
   using the client.
 
-- Add ``default_scope_requirements`` as an abstract property to ``BaseClient``
-  for subclasses to define scopes to automatically be used with an ``app``.
+- Add ``default_scope_requirements`` as a property to ``BaseClient``
+  for subclasses to define scopes to automatically be used with a ``GlobusApp``. The
+  default implementation raises a ``NotImplementedError``.
 
 - Add ``add_app_scope`` to ``BaseClient`` as an interface for adding additional
   scope requirements to its ``app``.
@@ -66,26 +92,12 @@ Added
   for adding a dependent data access scope requirements needed for interacting
   with standard Globus Connect Server mapped collections to its ``app``.
 
-- Add ``get_gcs_info`` as a helper method to ``GCSClient`` for getting information
-  from a Globus Connect Server's ``info`` API route.
-
-- Add ``endpoint_client_id`` as a property to ``GCSClient``.
-
-- Clients will now emit a ``X-Globus-Client-Info`` header which reports the
-  version of the ``globus-sdk`` which was used to send a request. Users may
-  customize this header further by modifying the ``globus_client_info`` object
-  attached to the transport object. (:pr:`990`)
-
 - Auto-login (overridable in config) GlobusApp login retry on token validation error. (:pr:`994`)
 
 - Added the configuration parameter ``GlobusAppConfig.environment``. (:pr:`1001`)
 
 Changed
 ~~~~~~~
-
-- The experimental class ``ValidatingStorageAdapter`` has been renamed to
-  ``ValidatingTokenStorage`` and now implements ``TokenStorage`` instead of
-  ``StorageAdapter``. (:pr:`980`)
 
 - ``GCSClient`` instances now have a non-None ``resource_server`` property.
 
@@ -105,21 +117,25 @@ Deprecated
 Fixed
 ~~~~~
 
-- When a JSONTokenStorage is used, the containing directory will be automatically be
+.. rubric:: Experimental
+
+- When a ``JSONTokenStorage`` is used, the containing directory will be automatically be
   created if it doesn't exist. (:pr:`998`)
 
 - ``GlobusApp.add_scope_requirements`` now has the side effect of clearing the
   authorizer cache for any referenced resource servers. (:pr:`1000`)
+
 - ``GlobusAuthorizer.scope_requirements`` was made private and a new method for
   accessing scope requirements was added at ``GlobusAuthorizer.get_scope_requirements``.
   (:pr:`1000`)
+
 - A ``GlobusApp`` will now auto-create an Auth consent client for dependent scope
   evaluation against consents as a part of instantiation. (:pr:`1000`)
 
-- Fixed a bug where specifying dependent tokens in a new GlobusApp would cause the app
+- Fixed a bug where specifying dependent tokens in a new ``GlobusApp`` would cause the app
   to infinitely prompt for log in. (:pr:`1002`)
 
-- Fixed a GlobusApp bug which would cause LocalServerLoginFlowManager to error on
+- Fixed a ``GlobusApp`` bug which would cause LocalServerLoginFlowManager to error on
   MacOS when versions earlier than Python 3.11. (:pr:`1003`)
 
 Documentation
