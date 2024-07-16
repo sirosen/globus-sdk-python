@@ -20,7 +20,7 @@ def test_file_does_not_exist(json_file):
 
 
 def test_file_exists(json_file):
-    open(json_file, "w").close()  # open and close to touch
+    json_file.touch()
     adapter = SimpleJSONFileAdapter(json_file)
     assert adapter.file_exists()
 
@@ -30,8 +30,7 @@ def test_store(json_file, mock_response):
     assert not adapter.file_exists()
     adapter.store(mock_response)
 
-    with open(json_file) as f:
-        data = json.load(f)
+    data = json.loads(json_file.read_text())
     assert data["globus-sdk.version"] == __version__
     assert data["by_rs"]["resource_server_1"]["access_token"] == "access_token_1"
     assert data["by_rs"]["resource_server_2"]["access_token"] == "access_token_2"
@@ -73,5 +72,5 @@ def test_store_perms(json_file, mock_response):
 
     # mode|0600 should be 0600 -- meaning that those are the maximal
     # permissions given
-    st_mode = os.stat(json_file).st_mode & 0o777  # & 777 to remove extra bits
+    st_mode = json_file.stat().st_mode & 0o777  # & 777 to remove extra bits
     assert st_mode | 0o600 == 0o600
