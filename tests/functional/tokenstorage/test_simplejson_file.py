@@ -10,35 +10,34 @@ IS_WINDOWS = os.name == "nt"
 
 
 @pytest.fixture
-def filename(tempdir):
-    return os.path.join(tempdir, "mydata.json")
+def json_file(tmp_path):
+    return tmp_path / "mydata.json"
 
 
-def test_file_does_not_exist(filename):
-    adapter = SimpleJSONFileAdapter(filename)
+def test_file_does_not_exist(json_file):
+    adapter = SimpleJSONFileAdapter(json_file)
     assert not adapter.file_exists()
 
 
-def test_file_exists(filename):
-    open(filename, "w").close()  # open and close to touch
-    adapter = SimpleJSONFileAdapter(filename)
+def test_file_exists(json_file):
+    json_file.touch()
+    adapter = SimpleJSONFileAdapter(json_file)
     assert adapter.file_exists()
 
 
-def test_store(filename, mock_response):
-    adapter = SimpleJSONFileAdapter(filename)
+def test_store(json_file, mock_response):
+    adapter = SimpleJSONFileAdapter(json_file)
     assert not adapter.file_exists()
     adapter.store(mock_response)
 
-    with open(filename) as f:
-        data = json.load(f)
+    data = json.loads(json_file.read_text())
     assert data["globus-sdk.version"] == __version__
     assert data["by_rs"]["resource_server_1"]["access_token"] == "access_token_1"
     assert data["by_rs"]["resource_server_2"]["access_token"] == "access_token_2"
 
 
-def test_get_token_data(filename, mock_response):
-    adapter = SimpleJSONFileAdapter(filename)
+def test_get_token_data(json_file, mock_response):
+    adapter = SimpleJSONFileAdapter(json_file)
     assert not adapter.file_exists()
     adapter.store(mock_response)
 
@@ -46,8 +45,8 @@ def test_get_token_data(filename, mock_response):
     assert data["access_token"] == "access_token_1"
 
 
-def test_store_and_refresh(filename, mock_response, mock_refresh_response):
-    adapter = SimpleJSONFileAdapter(filename)
+def test_store_and_refresh(json_file, mock_response, mock_refresh_response):
+    adapter = SimpleJSONFileAdapter(json_file)
     assert not adapter.file_exists()
     adapter.store(mock_response)
 
@@ -66,12 +65,12 @@ def test_store_and_refresh(filename, mock_response, mock_refresh_response):
 
 
 @pytest.mark.xfail(IS_WINDOWS, reason="cannot set umask perms on Windows")
-def test_store_perms(filename, mock_response):
-    adapter = SimpleJSONFileAdapter(filename)
+def test_store_perms(json_file, mock_response):
+    adapter = SimpleJSONFileAdapter(json_file)
     assert not adapter.file_exists()
     adapter.store(mock_response)
 
     # mode|0600 should be 0600 -- meaning that those are the maximal
     # permissions given
-    st_mode = os.stat(filename).st_mode & 0o777  # & 777 to remove extra bits
+    st_mode = json_file.stat().st_mode & 0o777  # & 777 to remove extra bits
     assert st_mode | 0o600 == 0o600

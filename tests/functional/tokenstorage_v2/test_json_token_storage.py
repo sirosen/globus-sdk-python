@@ -11,25 +11,25 @@ IS_WINDOWS = os.name == "nt"
 
 
 @pytest.fixture
-def filename(tempdir):
-    return os.path.join(tempdir, "mydata.json")
+def json_file(tmp_path):
+    return tmp_path / "mydata.json"
 
 
-def test_file_does_not_exist(filename):
-    adapter = JSONTokenStorage(filename)
+def test_file_does_not_exist(json_file):
+    adapter = JSONTokenStorage(json_file)
     assert not adapter.file_exists()
 
 
-def test_file_exists(filename):
-    open(filename, "w").close()  # open and close to touch
-    adapter = JSONTokenStorage(filename)
+def test_file_exists(json_file):
+    json_file.touch()
+    adapter = JSONTokenStorage(json_file)
     assert adapter.file_exists()
 
 
 def test_store_and_get_token_data_by_resource_server(
-    filename, mock_token_data_by_resource_server
+    json_file, mock_token_data_by_resource_server
 ):
-    adapter = JSONTokenStorage(filename)
+    adapter = JSONTokenStorage(json_file)
     assert not adapter.file_exists()
     adapter.store_token_data_by_resource_server(mock_token_data_by_resource_server)
 
@@ -42,28 +42,27 @@ def test_store_and_get_token_data_by_resource_server(
         )
 
 
-def test_store_token_response_with_namespace(filename, mock_response):
-    adapter = JSONTokenStorage(filename, namespace="foo")
+def test_store_token_response_with_namespace(json_file, mock_response):
+    adapter = JSONTokenStorage(json_file, namespace="foo")
     assert not adapter.file_exists()
     adapter.store_token_response(mock_response)
 
-    with open(filename) as f:
-        data = json.load(f)
+    data = json.loads(json_file.read_text())
     assert data["globus-sdk.version"] == __version__
     assert data["data"]["foo"]["resource_server_1"]["access_token"] == "access_token_1"
     assert data["data"]["foo"]["resource_server_2"]["access_token"] == "access_token_2"
 
 
-def test_get_token_data(filename, mock_response):
-    adapter = JSONTokenStorage(filename)
+def test_get_token_data(json_file, mock_response):
+    adapter = JSONTokenStorage(json_file)
     assert not adapter.file_exists()
     adapter.store_token_response(mock_response)
 
     assert adapter.get_token_data("resource_server_1").access_token == "access_token_1"
 
 
-def test_remove_token_data(filename, mock_response):
-    adapter = JSONTokenStorage(filename)
+def test_remove_token_data(json_file, mock_response):
+    adapter = JSONTokenStorage(json_file)
     assert not adapter.file_exists()
     adapter.store_token_response(mock_response)
 
@@ -80,30 +79,29 @@ def test_remove_token_data(filename, mock_response):
 
 
 @pytest.mark.xfail(IS_WINDOWS, reason="cannot set umask perms on Windows")
-def test_store_perms(filename, mock_response):
-    adapter = JSONTokenStorage(filename)
+def test_store_perms(json_file, mock_response):
+    adapter = JSONTokenStorage(json_file)
     assert not adapter.file_exists()
     adapter.store_token_response(mock_response)
 
     # mode|0600 should be 0600 -- meaning that those are the maximal
     # permissions given
-    st_mode = os.stat(filename).st_mode & 0o777  # & 777 to remove extra bits
+    st_mode = json_file.stat().st_mode & 0o777  # & 777 to remove extra bits
     assert st_mode | 0o600 == 0o600
 
 
-def test_migrate_from_simple(filename, mock_response):
+def test_migrate_from_simple(json_file, mock_response):
     # write with a SimpleJSONFileAdapter
-    old_adapter = SimpleJSONFileAdapter(filename)
+    old_adapter = SimpleJSONFileAdapter(json_file)
     old_adapter.store(mock_response)
 
     # confirm able to read with JSONTokenStorage
-    new_adapter = JSONTokenStorage(filename)
+    new_adapter = JSONTokenStorage(json_file)
     assert (
         new_adapter.get_token_data("resource_server_1").access_token == "access_token_1"
     )
 
     # confirm version is overwritten on next store
     new_adapter.store_token_response(mock_response)
-    with open(filename) as f:
-        data = json.load(f)
+    data = json.loads(json_file.read_text())
     assert data["format_version"] == "2.0"
