@@ -2,7 +2,7 @@ Changed
 ~~~~~~~
 
 - The ``SQLiteTokenStorage`` component in ``globus_sdk.experimental`` has been
-  changed in several ways to improve its interface. (:pr:`NUMBER`)
+  changed in several ways to improve its interface. (:pr:`1004`)
 
   - ``:memory:`` is no longer accepted as a database name. Attempts to use it
     will trigger errors directing users to use ``MemoryTokenStorage`` instead.
