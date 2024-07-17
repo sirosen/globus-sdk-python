@@ -43,8 +43,7 @@ class SQLiteTokenStorage(FileTokenStorage):
         if filename == ":memory:":
             raise exc.GlobusSDKUsageError(
                 "SQLiteTokenStorage cannot be used with a ':memory:' database. "
-                "If you want memory-backed TokenStorage, use MemoryTokenStorage "
-                "instead."
+                "If you want to store tokens in memory, use MemoryTokenStorage instead."
             )
 
         super().__init__(filename, namespace=namespace)
