@@ -1503,6 +1503,7 @@ class TransferClient(client.BaseClient):
         *,
         limit: int | None = None,
         offset: int | None = None,
+        orderby: str | list[str] | None = None,
         # pylint: disable=redefined-builtin
         filter: str | TransferFilterDict | None = None,
         query_params: dict[str, t.Any] | None = None,
@@ -1512,6 +1513,9 @@ class TransferClient(client.BaseClient):
 
         :param limit: limit the number of results
         :param offset: offset used in paging
+        :param orderby: One or more order-by options. Each option is
+            either a field name or a field name followed by a space and 'ASC' or 'DESC'
+            for ascending or descending.
         :param filter: Only return task documents which match these filter clauses. For
             the filter syntax, see the **External Documentation** linked below. If a
             dict is supplied as the filter, it is formatted as a set of filter clauses.
@@ -1567,6 +1571,11 @@ class TransferClient(client.BaseClient):
             query_params["limit"] = limit
         if offset is not None:
             query_params["offset"] = offset
+        if orderby is not None:
+            if isinstance(orderby, str):
+                query_params["orderby"] = orderby
+            else:
+                query_params["orderby"] = ",".join(orderby)
         if filter is not None:
             query_params["filter"] = _format_filter_item(filter)
         return IterableTransferResponse(
