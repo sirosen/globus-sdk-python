@@ -1515,7 +1515,7 @@ class TransferClient(client.BaseClient):
         :param offset: offset used in paging
         :param orderby: One or more order-by options. Each option is
             either a field name or a field name followed by a space and 'ASC' or 'DESC'
-            for ascending or descending.
+            for ascending or descending. See example usage for details.
         :param filter: Only return task documents which match these filter clauses. For
             the filter syntax, see the **External Documentation** linked below. If a
             dict is supplied as the filter, it is formatted as a set of filter clauses.
@@ -1552,6 +1552,20 @@ class TransferClient(client.BaseClient):
                             f"Task({task['task_id']}): "
                             f"{task['source_endpoint']} -> {task['destination_endpoint']}"
                         )
+
+                Fetch the last 5 failed tasks by submission time:
+
+                    tc = TransferClient(...)
+                    for task in tc.task_list(
+                        limit=5,
+                        orderby="request_time DESC",
+                        filter={"status": "FAILED"}
+                    ):
+                        print(
+                            f"Task({task['task_id']}) failed: "
+                            f"{task['source_endpoint']} -> {task['destination_endpoint']}"
+                        )
+
 
             .. tab-item:: Paginated Usage
 
