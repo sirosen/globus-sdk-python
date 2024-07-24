@@ -1555,6 +1555,8 @@ class TransferClient(client.BaseClient):
 
                 Fetch the last 5 failed tasks by submission time:
 
+                ..  code-block:: python
+
                     tc = TransferClient(...)
                     for task in tc.task_list(
                         limit=5,
