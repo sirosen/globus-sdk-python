@@ -126,7 +126,7 @@ _DEFAULT_CONFIG = GlobusAppConfig()
 
 class GlobusApp(metaclass=abc.ABCMeta):
     """
-    ``GlobusApp` is an abstract base class providing an interface for simplifying
+    ``GlobusApp`` is an abstract base class providing an interface for simplifying
     authentication with Globus services.
 
     A ``GlobusApp`` manages scope requirements across multiple resource servers,
@@ -134,9 +134,9 @@ class GlobusApp(metaclass=abc.ABCMeta):
     validation through its ``ValidatingTokenStorage``, and provides up-to-date
     authorizers from its ``AuthorizerFactory`` through ``get_authorizer``.
 
-    In the near future, a ``GlobusApp`` will be accepted as an initialization parameter
-    to any Globus service client, automatically handling the client's default
-    scope requirements and providing the client an authorizer.
+    A ``GlobusApp`` is accepted as an initialization parameter to any SDK-provided
+    service client, automatically handling the client's default scope requirements and
+    providing the client with an authorizer.
     """
 
     _login_client: AuthLoginClient
@@ -319,7 +319,7 @@ class UserApp(GlobusApp):
     """
     A ``GlobusApp`` for login methods that require an interactive flow with a user.
 
-    ``UserApp`s are most commonly used with native application clients by passing a
+    ``UserApp``\\s are most commonly used with native application clients by passing a
     ``NativeAppAuthClient`` as ``login_client`` or the native application's
     ``client_id``.
 
@@ -338,7 +338,6 @@ class UserApp(GlobusApp):
 
                 app = UserApp("myapp", client_id=NATIVE_APP_CLIENT_ID)
                 client = TransferClient(app=app)
-                app.run_login_flow()
                 res = client.endpoint_search("Tutorial Collection")
 
     """
@@ -366,6 +365,13 @@ class UserApp(GlobusApp):
             scope_requirements=scope_requirements,
             config=config,
         )
+
+        if client_secret or isinstance(self._login_client, ConfidentialAppAuthClient):
+            # UserApps need more information to be accepted to properly support
+            # Confidential Clients. Raise an error to avoid a confusing failure later.
+            raise GlobusSDKUsageError(
+                "UserApps don't currently support Confidential Clients"
+            )
 
         # get or instantiate config's login_flow_manager
         if self.config.login_flow_manager:
@@ -441,11 +447,11 @@ class ClientApp(GlobusApp):
     A ``GlobusApp`` using client credentials - useful for service accounts and
     automation use cases.
 
-    ``ClientApp``s are always used with confidential clients either by passing
+    ``ClientApp``\\s are always used with confidential clients either by passing
     a ``ConfidentialAppAuthClient`` as ``login_client`` or providing the client's
     ``client_id`` and ``client_secret`` pair.
 
-    ``ClientApp``s do not use a ``LoginFlowManager`` and will raise an error
+    ``ClientApp``\\s do not use a ``LoginFlowManager`` and will raise an error
     if given one through ``config``.
 
     .. tab-set::
@@ -454,9 +460,8 @@ class ClientApp(GlobusApp):
 
             .. code-block:: python
 
-                app = UserApp("myapp", CLIENT_ID, CLIENT_SECRET)
+                app = ClientApp("myapp", CLIENT_ID, CLIENT_SECRET)
                 client = TransferClient(app=app)
-                app.run_login_flow()
                 res = client.endpoint_search("Tutorial Collection")
 
     """
