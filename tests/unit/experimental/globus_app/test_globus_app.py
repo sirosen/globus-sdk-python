@@ -35,6 +35,7 @@ from globus_sdk.experimental.login_flow_manager import (
 from globus_sdk.experimental.tokenstorage import (
     JSONTokenStorage,
     MemoryTokenStorage,
+    SQLiteTokenStorage,
     TokenData,
 )
 from globus_sdk.scopes import AuthScopes, Scope
@@ -86,23 +87,22 @@ def test_user_app_login_client():
 
     assert user_app.app_name == "test-app"
     assert user_app._login_client == mock_client
+    assert user_app.client_id == "mock-client_id"
 
 
 def test_user_app_no_client_or_id():
-    with pytest.raises(GlobusSDKUsageError) as exc:
+    msg = (
+        "Could not set up a globus login client. One of client_id or login_client is "
+        "required."
+    )
+    with pytest.raises(GlobusSDKUsageError, match=msg):
         UserApp("test-app")
-    assert str(exc.value) == "One of either client_id or login_client is required."
 
 
 def test_user_app_both_client_and_id():
-    client_id = "mock_client_id"
-    mock_client = mock.Mock()
-
-    with pytest.raises(GlobusSDKUsageError) as exc:
-        UserApp("test-app", login_client=mock_client, client_id=client_id)
-
-    expected = "login_client is mutually exclusive with client_id and client_secret."
-    assert str(exc.value) == expected
+    msg = "Mutually exclusive parameters: client_id and login_client."
+    with pytest.raises(GlobusSDKUsageError, match=msg):
+        UserApp("test-app", login_client=mock.Mock(), client_id="client_id")
 
 
 def test_user_app_login_client_environment_mismatch():
@@ -122,14 +122,39 @@ def test_user_app_default_token_storage():
 
     token_storage = user_app._authorizer_factory.token_storage._token_storage
     assert isinstance(token_storage, JSONTokenStorage)
+
     if os.name == "nt":
         # on the windows-latest run this was
-        # C:\Users\runneradmin\AppData\Roaming\globus\app\test-app\tokens.json
-        assert "\\globus\\app\\test-app\\tokens.json" in token_storage.filename
+        # C:\Users\runneradmin\AppData\Roaming\globus\app\mock_client_id\test-app\tokens.json
+        expected = "\\globus\\app\\mock_client_id\\test-app\\tokens.json"
+        assert token_storage.filepath.endswith(expected)
     else:
-        assert token_storage.filename == os.path.expanduser(
-            "~/.globus/app/test-app/tokens.json"
-        )
+        expected = "~/.globus/app/mock_client_id/test-app/tokens.json"
+        assert token_storage.filepath == os.path.expanduser(expected)
+
+
+class CustomMemoryTokenStorage(MemoryTokenStorage):
+    pass
+
+
+@pytest.mark.parametrize(
+    "token_storage_value, token_storage_class",
+    (
+        # Named token storage types
+        ("json", JSONTokenStorage),
+        ("sqlite", SQLiteTokenStorage),
+        ("memory", MemoryTokenStorage),
+        # Custom token storage class (instantiated or class)
+        (CustomMemoryTokenStorage(), CustomMemoryTokenStorage),
+        (CustomMemoryTokenStorage, CustomMemoryTokenStorage),
+    ),
+)
+def test_user_app_token_storage_configuration(token_storage_value, token_storage_class):
+    client_id = "mock_client_id"
+    config = GlobusAppConfig(token_storage=token_storage_value)
+
+    user_app = UserApp("test-app", client_id=client_id, config=config)
+    assert isinstance(user_app._token_storage, token_storage_class)
 
 
 def test_user_app_creates_consent_client():
@@ -214,12 +239,9 @@ def test_client_app():
 def test_client_app_no_secret():
     client_id = "mock_client_id"
 
-    with pytest.raises(GlobusSDKUsageError) as exc:
+    msg = "A ClientApp requires a client_secret to initialize its own login client"
+    with pytest.raises(GlobusSDKUsageError, match=msg):
         ClientApp("test-app", client_id=client_id)
-    assert (
-        str(exc.value)
-        == "Either login_client or both client_id and client_secret are required"
-    )
 
 
 def test_add_scope_requirements_and_auth_params_with_required_scopes():
