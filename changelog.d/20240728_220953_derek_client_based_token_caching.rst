@@ -2,7 +2,7 @@
 Changed
 ~~~~~~~
 
--   Changed the experimental ``GlobusApp`` class in the following way (:pr:`NUMBER`):
+-   Changed the experimental ``GlobusApp`` class in the following way (:pr:`1017`):
 
     -   ``app_name`` is no longer required (defaults to "DEFAULT")
 
