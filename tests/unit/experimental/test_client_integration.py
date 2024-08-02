@@ -29,7 +29,7 @@ def test_client_environment_does_not_match_the_globus_app_environment():
     with pytest.raises(GlobusSDKUsageError) as exc:
         globus_sdk.AuthClient(app=app, environment="preview")
 
-    expected = "[Environment Mismatch] AuthClient's environment (preview) does not match the GlobusApp's configuredenvironment (sandbox)."  # noqa
+    expected = "[Environment Mismatch] AuthClient's environment (preview) does not match the GlobusApp's configured environment (sandbox)."  # noqa: E501
     assert str(exc.value) == expected
 
 
