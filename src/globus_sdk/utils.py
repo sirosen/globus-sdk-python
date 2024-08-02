@@ -74,8 +74,20 @@ def check_uuid(s: UUIDLike, *, name: str) -> t.Literal[True]:
     """
     Raise an error if the input is not a UUID
 
+    :param s: the UUID|str value
+    :param name: the name for this value to use in error messages
+
     :raises TypeError: if the input is not a UUID|str
     :raises ValueError: if the input is a non-UUID str
+
+    Example usage:
+
+    .. code-block:: python
+
+        def frob_it(collection_id: UUIDLike) -> Frob:
+            utils.check_uuid(collection_id, name="collection_id")
+            return Frob(collection_id)
+
     """
     if isinstance(s, uuid.UUID):
         return True
