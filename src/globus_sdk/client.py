@@ -78,7 +78,7 @@ class BaseClient:
             if environment is not None and environment != app.config.environment:
                 raise exc.GlobusSDKUsageError(
                     f"[Environment Mismatch] {type(self).__name__}'s environment "
-                    f"({environment}) does not match the GlobusApp's configured"
+                    f"({environment}) does not match the GlobusApp's configured "
                     f"environment ({app.config.environment})."
                 )
 
