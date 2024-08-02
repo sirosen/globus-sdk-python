@@ -2,7 +2,7 @@
 Changed
 ~~~~~~~
 
--   Changed the experimental ``GlobusApp`` class in the following ways (:pr:`NUMBER`):
+-   Changed the experimental ``GlobusApp`` class in the following ways (:pr:`1018`):
 
     -   ``LoginFlowManagers`` now insert ``GlobusApp.app_name`` into any native
         client login flows as the ``prefill_named_grant``.
