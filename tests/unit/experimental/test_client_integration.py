@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 
 import globus_sdk
@@ -44,22 +46,25 @@ def test_transfer_client_default_scopes(app):
 def test_transfer_client_add_app_data_access_scope(app):
     client = globus_sdk.TransferClient(app=app)
 
-    client.add_app_data_access_scope("collection_id")
+    collection_id = str(uuid.UUID(int=0))
+    client.add_app_data_access_scope(collection_id)
     str_list = [str(s) for s in app.get_scope_requirements("transfer.api.globus.org")]
-    expected = "urn:globus:auth:scope:transfer.api.globus.org:all[*https://auth.globus.org/scopes/collection_id/data_access]"  # noqa
+    expected = f"urn:globus:auth:scope:transfer.api.globus.org:all[*https://auth.globus.org/scopes/{collection_id}/data_access]"  # noqa: E501
     assert expected in str_list
 
 
 def test_transfer_client_add_app_data_access_scope_chaining(app):
+    collection_id_1 = str(uuid.UUID(int=1))
+    collection_id_2 = str(uuid.UUID(int=2))
     (
         globus_sdk.TransferClient(app=app)
-        .add_app_data_access_scope("collection_id_1")
-        .add_app_data_access_scope("collection_id_2")
+        .add_app_data_access_scope(collection_id_1)
+        .add_app_data_access_scope(collection_id_2)
     )
 
     str_list = [str(s) for s in app.get_scope_requirements("transfer.api.globus.org")]
-    expected_1 = "urn:globus:auth:scope:transfer.api.globus.org:all[*https://auth.globus.org/scopes/collection_id_1/data_access]"  # noqa
-    expected_2 = "urn:globus:auth:scope:transfer.api.globus.org:all[*https://auth.globus.org/scopes/collection_id_2/data_access]"  # noqa
+    expected_1 = f"urn:globus:auth:scope:transfer.api.globus.org:all[*https://auth.globus.org/scopes/{collection_id_1}/data_access]"  # noqa: E501
+    expected_2 = f"urn:globus:auth:scope:transfer.api.globus.org:all[*https://auth.globus.org/scopes/{collection_id_2}/data_access]"  # noqa: E501
     assert expected_1 in str_list
     assert expected_2 in str_list
 

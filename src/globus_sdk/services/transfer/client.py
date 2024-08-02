@@ -143,6 +143,7 @@ class TransferClient(client.BaseClient):
 
                     res = client.operation_ls(COLLECTION_ID)
         """
+        utils.check_uuid(collection_id, name="collection_id")
         base_scope = Scope(TransferScopes.all)
         data_access_scope = Scope(
             GCSCollectionScopeBuilder(str(collection_id)).data_access,
