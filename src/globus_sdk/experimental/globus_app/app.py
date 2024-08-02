@@ -195,11 +195,21 @@ class GlobusApp(metaclass=abc.ABCMeta):
             return token_storage
 
         elif isinstance(token_storage, TokenStorageProvider):
-            return token_storage.for_globus_app(client_id, app_name, config, namespace)
+            return token_storage.for_globus_app(
+                app_name=app_name,
+                config=config,
+                client_id=client_id,
+                namespace=namespace,
+            )
 
         elif token_storage in KNOWN_TOKEN_STORAGES:
             provider = KNOWN_TOKEN_STORAGES[token_storage]
-            return provider.for_globus_app(client_id, app_name, config, namespace)
+            return provider.for_globus_app(
+                app_name=app_name,
+                config=config,
+                client_id=client_id,
+                namespace=namespace,
+            )
 
         raise GlobusSDKUsageError(
             f"Unsupported token_storage value: {token_storage}. Must be a "

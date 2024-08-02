@@ -102,7 +102,9 @@ class UserApp(GlobusApp):
                 f"<LoginFlowManager>."
             )
 
-        return provider.for_globus_app(app_name, login_client, config)
+        return provider.for_globus_app(
+            app_name=app_name, config=config, login_client=login_client
+        )
 
     def _initialize_login_client(
         self,
