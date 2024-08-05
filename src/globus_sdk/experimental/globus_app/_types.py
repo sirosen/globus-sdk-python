@@ -23,7 +23,12 @@ if t.TYPE_CHECKING:
 class TokenStorageProvider(Protocol):
     @classmethod
     def for_globus_app(
-        cls, client_id: UUIDLike, app_name: str, config: GlobusAppConfig, namespace: str
+        cls,
+        *,
+        app_name: str,
+        config: GlobusAppConfig,
+        client_id: UUIDLike,
+        namespace: str,
     ) -> TokenStorage: ...
 
 
@@ -31,7 +36,7 @@ class TokenStorageProvider(Protocol):
 class LoginFlowManagerProvider(Protocol):
     @classmethod
     def for_globus_app(
-        cls, app_name: str, login_client: AuthLoginClient, config: GlobusAppConfig
+        cls, *, app_name: str, config: GlobusAppConfig, login_client: AuthLoginClient
     ) -> LoginFlowManager: ...
 
 
