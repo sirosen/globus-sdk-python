@@ -179,6 +179,10 @@ ScopeBuilder Types
     :members:
     :show-inheritance:
 
+.. autoclass:: SpecificFlowScopeBuilder
+    :members:
+    :show-inheritance:
+
 ScopeBuilder Constants
 ~~~~~~~~~~~~~~~~~~~~~~
 

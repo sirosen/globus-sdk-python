@@ -92,6 +92,20 @@ def _raise_attr_error(name: str) -> t.NoReturn:
 
 
 class SpecificFlowScopeBuilder(ScopeBuilder):
+    """
+    This defines the scopes for a single flow (as distinct from the Flows service).
+
+    It primarily provides the `user` scope which is typically needed to start a run of
+    a flow.
+
+    Example usage:
+
+    .. code-block:: python
+
+        sb = SpecificFlowScopeBuilder("my-flow-id-here")
+        flow_scope = sb.user
+    """
+
     _CLASS_STUB = _SpecificFlowScopesClassStub()
 
     def __init__(self, flow_id: UUIDLike) -> None:
