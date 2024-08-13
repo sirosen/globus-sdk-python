@@ -1,3 +1,9 @@
+from __future__ import annotations
+
+import typing as t
+
+from globus_sdk._types import UUIDLike
+
 from ..builder import ScopeBuilder, ScopeBuilderScopes
 
 
@@ -45,3 +51,53 @@ FlowsScopes = _FlowsScopeBuilder(
 
 .. listknownscopes:: globus_sdk.scopes.FlowsScopes
 """
+
+
+class _SpecificFlowScopesClassStub(ScopeBuilder):
+    """
+    This stub object ensures that the type deductions for type checkers (e.g. mypy) on
+    SpecificFlowClient.scopes are correct.
+
+    Primarily, it should be possible to access the `scopes` attribute, the `user`
+    scope, and the `resource_server`, but these usages should raise specific and
+    informative runtime errors.
+
+    Our types are therefore less accurate for class-var access, but more accurate for
+    instance-var access.
+    """
+
+    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
+        super().__init__("<stub>")
+
+    def __getattr__(self, name: str) -> t.Any:
+        if name == "user":
+            _raise_attr_error("scopes")
+        elif name == "resource_server":
+            _raise_attr_error("resource_server")
+        return super().__getattr__(name)
+
+    def __getattribute__(self, name: str) -> t.Any:
+        if name == "resource_server":
+            _raise_attr_error("resource_server")
+        return object.__getattribute__(self, name)
+
+
+def _raise_attr_error(name: str) -> t.NoReturn:
+    raise AttributeError(
+        f"It is not valid to attempt to access the {name} of the "
+        "SpecificFlowClient class. "
+        f"Instead, instantiate a SpecificFlowClient and access the {name} "
+        "from that instance."
+    )
+
+
+class SpecificFlowScopeBuilder(ScopeBuilder):
+    _CLASS_STUB = _SpecificFlowScopesClassStub()
+
+    def __init__(self, flow_id: UUIDLike) -> None:
+        self._flow_id = flow_id
+        str_flow_id = str(flow_id)
+        super().__init__(
+            resource_server=str_flow_id,
+            known_url_scopes=[("user", f"flow_{str_flow_id.replace('-', '_')}_user")],
+        )

@@ -8,6 +8,7 @@ from .data import (
     GroupsScopes,
     NexusScopes,
     SearchScopes,
+    SpecificFlowScopeBuilder,
     TimerScopes,
     TransferScopes,
 )
@@ -25,6 +26,7 @@ __all__ = (
     "GCSEndpointScopeBuilder",
     "AuthScopes",
     "FlowsScopes",
+    "SpecificFlowScopeBuilder",
     "GroupsScopes",
     "NexusScopes",
     "SearchScopes",
