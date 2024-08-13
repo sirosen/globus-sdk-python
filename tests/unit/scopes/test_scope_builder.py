@@ -94,3 +94,17 @@ def test_flows_scopes_creation():
         FlowsScopes.run
         == "https://auth.globus.org/scopes/eec9b274-0c81-4334-bdc2-54e90e689b9a/run"
     )
+
+
+def test_stringify_scope_builder():
+    class MyScopeBuilder(ScopeBuilder):
+        pass
+
+    sb = MyScopeBuilder("foo", known_scopes=["sc1"])
+    assert (
+        str(sb)
+        == """\
+MyScopeBuilder[foo]
+  sc1:
+    urn:globus:auth:scope:foo:sc1"""
+    )
