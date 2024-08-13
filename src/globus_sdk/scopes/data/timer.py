@@ -1,0 +1,12 @@
+from ..builder import ScopeBuilder
+
+TimerScopes = ScopeBuilder(
+    "524230d7-ea86-4a52-8312-86065a9e0417",
+    known_url_scopes=[
+        "timer",
+    ],
+)
+"""Globus Timer scopes.
+
+.. listknownscopes:: globus_sdk.scopes.TimerScopes
+"""
