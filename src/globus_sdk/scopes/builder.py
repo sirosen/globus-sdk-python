@@ -155,6 +155,6 @@ class ScopeBuilder:
         return MutableScope(getattr(self, scope), optional=optional)
 
     def __str__(self) -> str:
-        return f"ScopeBuilder[{self.resource_server}]\n" + "\n".join(
+        return f"{self.__class__.__name__}[{self.resource_server}]\n" + "\n".join(
             f"  {name}:\n    {getattr(self, name)}" for name in self.scope_names
         )

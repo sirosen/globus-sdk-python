@@ -13,7 +13,7 @@ def test_specific_flow_client_class_errors_on_scope_access():
 
     err = excinfo.value
     assert (
-        "It is not valid to attempt to access the scopes of the "
+        "It is not valid to attempt to access the 'scopes' attribute of the "
         "SpecificFlowClient class."
     ) in str(err)
 
@@ -35,7 +35,7 @@ def test_specific_flow_client_class_errors_on_resource_server_access():
 
     err = excinfo.value
     assert (
-        "It is not valid to attempt to access the resource_server of the "
+        "It is not valid to attempt to access the 'resource_server' attribute of the "
         "SpecificFlowClient class."
     ) in str(err)
 
@@ -45,7 +45,7 @@ def test_specific_flow_client_class_errors_on_resource_server_access():
 
     err = excinfo.value
     assert (
-        "It is not valid to attempt to access the resource_server of the "
+        "It is not valid to attempt to access the 'resource_server' attribute of the "
         "SpecificFlowClient class."
     ) in str(err)
 

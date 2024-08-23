@@ -7,7 +7,7 @@ from globus_sdk import GlobusHTTPResponse, client, paging, utils
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.experimental.globus_app import GlobusApp
-from globus_sdk.scopes import FlowsScopes, Scope, ScopeBuilder
+from globus_sdk.scopes import FlowsScopes, Scope, ScopeBuilder, SpecificFlowScopeBuilder
 from globus_sdk.utils import MISSING, MissingType
 
 from .errors import FlowsAPIError
@@ -16,7 +16,6 @@ from .response import (
     IterableRunLogsResponse,
     IterableRunsResponse,
 )
-from .scopes import SpecificFlowScopesClassStub
 
 log = logging.getLogger(__name__)
 
@@ -841,7 +840,7 @@ class SpecificFlowClient(client.BaseClient):
 
     error_class = FlowsAPIError
     service_name = "flows"
-    scopes: ScopeBuilder = SpecificFlowScopesClassStub()
+    scopes: ScopeBuilder = SpecificFlowScopeBuilder._CLASS_STUB
 
     def __init__(
         self,
@@ -855,11 +854,7 @@ class SpecificFlowClient(client.BaseClient):
         transport_params: dict[str, t.Any] | None = None,
     ):
         self._flow_id = flow_id
-        user_scope_value = f"flow_{str(flow_id).replace('-', '_')}_user"
-        self.scopes = ScopeBuilder(
-            resource_server=str(self._flow_id),
-            known_url_scopes=[("user", user_scope_value)],
-        )
+        self.scopes = SpecificFlowScopeBuilder(flow_id)
         super().__init__(
             app=app,
             app_scopes=app_scopes,
