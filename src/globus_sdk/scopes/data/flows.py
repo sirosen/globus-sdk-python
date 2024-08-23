@@ -9,11 +9,12 @@ from ..builder import ScopeBuilder, ScopeBuilderScopes
 
 class _FlowsScopeBuilder(ScopeBuilder):
     """
-    The Flows Service breaks the scopes/resource server convention:
-      its resource server is a domain name but its scopes are built around the client id
-    Given that there isn't a simple way to support this more generally
-      (and we shouldn't encourage supporting this more generally), this class serves to
-      build out the scopes accurately specifically for Flows
+    The Flows service breaks the scopes/resource server convention: its resource server
+    is a domain name but its scopes are built around the client ID.
+
+    Given that there isn't a simple way to support this more generally (and we
+    shouldn't encourage supporting this more generally), this class serves to
+    build out the scopes accurately specifically for Flows.
     """
 
     def __init__(
@@ -84,9 +85,9 @@ class _SpecificFlowScopesClassStub(ScopeBuilder):
 
 def _raise_attr_error(name: str) -> t.NoReturn:
     raise AttributeError(
-        f"It is not valid to attempt to access the {name} of the "
+        f"It is not valid to attempt to access the '{name}' attribute of the "
         "SpecificFlowClient class. "
-        f"Instead, instantiate a SpecificFlowClient and access the {name} "
+        f"Instead, instantiate a SpecificFlowClient and access the '{name}' attribute "
         "from that instance."
     )
 

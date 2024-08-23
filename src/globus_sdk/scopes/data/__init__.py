@@ -3,7 +3,7 @@ from .flows import FlowsScopes, SpecificFlowScopeBuilder
 from .gcs import GCSCollectionScopeBuilder, GCSEndpointScopeBuilder
 from .groups import GroupsScopes, NexusScopes
 from .search import SearchScopes
-from .timer import TimerScopes
+from .timers import TimerScopes
 from .transfer import TransferScopes
 
 __all__ = (

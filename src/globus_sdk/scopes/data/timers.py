@@ -6,7 +6,7 @@ TimerScopes = ScopeBuilder(
         "timer",
     ],
 )
-"""Globus Timer scopes.
+"""Globus Timers scopes.
 
 .. listknownscopes:: globus_sdk.scopes.TimerScopes
 """
