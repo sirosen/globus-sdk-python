@@ -2,7 +2,7 @@ Changed
 ~~~~~~~
 
 - The client for Globus Timers has been renamed to ``TimersClient``. The prior
-  name, ``TimerClient``, has been retained as an alias. (:pr:`NUMBER`)
+  name, ``TimerClient``, has been retained as an alias. (:pr:`1032`)
 
   - Similarly, the error and scopes classes have been renamed and aliased:
     ``TimersAPIError`` replaces ``TimerAPIError`` and ``TimersScopes`` replaces
@@ -18,10 +18,10 @@ Changed
 Deprecated
 ~~~~~~~~~~
 
-- ``TimerScopes`` is now a deprecated name. Use ``TimersScopes`` instead. (:pr:`NUMBER`)
+- ``TimerScopes`` is now a deprecated name. Use ``TimersScopes`` instead. (:pr:`1032`)
 
 Documentation
 ~~~~~~~~~~~~~
 
 - The Globus Timers examples have been significantly enhanced and now leverage
-  more modern usage patterns. (:pr:`NUMBER`)
+  more modern usage patterns. (:pr:`1032`)
