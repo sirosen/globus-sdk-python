@@ -116,7 +116,7 @@ class JSONTokenStorage(FileTokenStorage):
         return self._handle_formats(data)
 
     def store_token_data_by_resource_server(
-        self, token_data_by_resource_server: dict[str, TokenData]
+        self, token_data_by_resource_server: t.Mapping[str, TokenData]
     ) -> None:
         """
         Store token data as JSON data in ``self.filepath`` under the current namespace

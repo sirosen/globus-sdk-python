@@ -106,7 +106,7 @@ class LocalServerLoginFlowManager(LoginFlowManager):
         native_prefill_named_grant: str | None = None,
         server_address: tuple[str, int] = ("127.0.0.1", 0),
         html_template: Template = DEFAULT_HTML_TEMPLATE,
-    ):
+    ) -> None:
         """
         :param login_client: The ``AuthLoginClient`` that will be making the Globus
             Auth API calls needed for the authentication flow. Note that this

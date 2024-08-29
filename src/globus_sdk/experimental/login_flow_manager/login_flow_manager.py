@@ -27,7 +27,7 @@ class LoginFlowManager(metaclass=abc.ABCMeta):
         *,
         request_refresh_tokens: bool = False,
         native_prefill_named_grant: str | None = None,
-    ):
+    ) -> None:
         """
         :param login_client: The client to use for login flows.
         :param request_refresh_tokens: Control whether refresh tokens will be requested.

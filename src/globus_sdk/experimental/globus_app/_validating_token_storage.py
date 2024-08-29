@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing as t
+
 from globus_sdk import AuthClient, Scope
 from globus_sdk.experimental.consents import ConsentForest
 from globus_sdk.experimental.tokenstorage import TokenData, TokenStorage
@@ -14,7 +16,7 @@ from .errors import (
 
 
 def _get_identity_id_from_token_data_by_resource_server(
-    token_data_by_resource_server: dict[str, TokenData]
+    token_data_by_resource_server: t.Mapping[str, TokenData]
 ) -> str | None:
     """
     Get the identity_id attribute from all TokenData objects by resource server
@@ -62,7 +64,7 @@ class ValidatingTokenStorage(TokenStorage):
         scope_requirements: dict[str, list[Scope]],
         *,
         consent_client: AuthClient | None = None,
-    ):
+    ) -> None:
         """
         :param token_storage: The token storage being wrapped.
         :param scope_requirements: A collection of resource-server keyed scope
@@ -103,7 +105,7 @@ class ValidatingTokenStorage(TokenStorage):
         self._consent_client = consent_client
 
     def store_token_data_by_resource_server(
-        self, token_data_by_resource_server: dict[str, TokenData]
+        self, token_data_by_resource_server: t.Mapping[str, TokenData]
     ) -> None:
         """
         :param token_data_by_resource_server: A dict of TokenData objects indexed by
@@ -168,7 +170,7 @@ class ValidatingTokenStorage(TokenStorage):
         return self._token_storage.remove_token_data(resource_server)
 
     def _validate_token_data_by_resource_server_meets_identity_requirements(
-        self, token_data_by_resource_server: dict[str, TokenData]
+        self, token_data_by_resource_server: t.Mapping[str, TokenData]
     ) -> None:
         """
         Validate that the identity info in the token data matches the stored identity
