@@ -4,6 +4,7 @@ import logging
 import sys
 import time
 import typing as t
+import uuid
 
 from globus_sdk import client, exc, paging, response, utils
 from globus_sdk._types import DateLike, IntLike, UUIDLike
@@ -112,44 +113,76 @@ class TransferClient(client.BaseClient):
     scopes = TransferScopes
     default_scope_requirements = [Scope(TransferScopes.all)]
 
-    def add_app_data_access_scope(self, collection_id: UUIDLike) -> TransferClient:
+    def add_app_data_access_scope(
+        self, collection_id: UUIDLike | t.Iterable[UUIDLike]
+    ) -> TransferClient:
         """
-        Add a dependent ``data_access`` scope for a given ``collection_id`` to this
-        client's ``GlobusApp``. Useful for resolving ``ConsentRequired`` errors
+        Add a dependent ``data_access`` scope for one or more given ``collection_id``
+        to this client's ``GlobusApp``. Useful for resolving ``ConsentRequired`` errors
         when using standard Globus Connect Server mapped collections.
-        ``collection_id`` must be for a standard Globus Connect Server mapped
-        collection or app driven authentication flows will hit unknown scope errors.
+
+        ``collection_id`` must be for standard Globus Connect Server mapped
+        collections or app driven authentication flows will hit unknown scope errors.
 
         Returns ``self`` for chaining.
 
         Raises ``GlobusSDKUsageError`` if this client was not initialized with an app.
 
-        :param collection_id: UUID for a standard Globus Connect Server mapped
-            collection.
+        :param collection_id: an ID for a standard Globus Connect Server mapped
+            collection, or an iterable of IDs
 
         .. tab-set::
 
             .. tab-item:: Example Usage
 
+                Usage for ``ls`` or a similar operation which points at a single
+                collection:
+
                 .. code-block:: python
 
                     app = UserApp("myapp", client_id=NATIVE_APP_CLIENT_ID)
-                    client = (
-                        TransferClient(app=app)
-                        .add_app_data_access_scope(COLLECTION_ID_1)
-                        .add_app_data_access_scope(COLLECTION_ID_1)
-                    )
+                    client = TransferClient(app=app).add_app_data_access_scope(COLLECTION_ID)
                     app.run_login_flow()
 
                     res = client.operation_ls(COLLECTION_ID)
-        """
-        utils.check_uuid(collection_id, name="collection_id")
+
+                Usage for ``submit_transfer`` or a similar operation which points at
+                multiple collections:
+
+                .. code-block:: python
+
+                    app = UserApp("myapp", client_id=NATIVE_APP_CLIENT_ID)
+                    client = TransferClient(app=app).add_app_data_access_scope(
+                        (COLLECTION_ID_1, COLLECTION_ID_2)
+                    )
+                    app.run_login_flow()
+
+                    transfer_data = TransferData(
+                        source_endpoint=COLLECTION_ID_1,
+                        destination_endpoint=COLLECTION_ID_2,
+                    )
+                    transfer_data.add_item("/foo", "bar/baz")
+                    ...
+                    res = client.submit_transfer({})
+        """  # noqa: E501
+        if isinstance(collection_id, (str, uuid.UUID)):
+            utils.check_uuid(collection_id, name="collection_id")
+            # wrap the collection_ids input in a list for consistent iteration below
+            collection_ids = [collection_id]
+        else:
+            # copy to a list so that ephemeral iterables can be iterated multiple times
+            collection_ids = list(collection_id)
+            for i, c in enumerate(collection_ids):
+                utils.check_uuid(c, name=f"collection_id[{i}]")
+
         base_scope = Scope(TransferScopes.all)
-        data_access_scope = Scope(
-            GCSCollectionScopeBuilder(str(collection_id)).data_access,
-            optional=True,
-        )
-        self.add_app_scope(base_scope.add_dependency(data_access_scope))
+        for coll_id in collection_ids:
+            data_access_scope = Scope(
+                GCSCollectionScopeBuilder(str(coll_id)).data_access,
+                optional=True,
+            )
+            base_scope.add_dependency(data_access_scope)
+        self.add_app_scope(base_scope)
         return self
 
     # Convenience methods, providing more pythonic access to common REST
