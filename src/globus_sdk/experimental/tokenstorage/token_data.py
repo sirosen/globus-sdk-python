@@ -49,7 +49,7 @@ class TokenData(_serializable.Serializable):
         expires_at_seconds: int,
         token_type: str | None,
         extra: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         self.resource_server = _validators.str_("resource_server", resource_server)
         self.identity_id = _validators.opt_str("identity_id", identity_id)
         self.scope = _validators.str_("scope", scope)

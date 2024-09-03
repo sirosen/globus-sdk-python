@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import typing as t
 
 from globus_sdk import AuthClient, AuthLoginClient, GlobusSDKUsageError, Scope
 from globus_sdk._types import ScopeCollectionType, UUIDLike
@@ -43,7 +44,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         login_client: AuthLoginClient | None = None,
         client_id: UUIDLike | None = None,
         client_secret: str | None = None,
-        scope_requirements: dict[str, ScopeCollectionType] | None = None,
+        scope_requirements: t.Mapping[str, ScopeCollectionType] | None = None,
         config: GlobusAppConfig = DEFAULT_CONFIG,
     ):
         """
@@ -99,7 +100,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         self._validating_token_storage.set_consent_client(consent_client)
 
     def _resolve_scope_requirements(
-        self, scope_requirements: dict[str, ScopeCollectionType] | None
+        self, scope_requirements: t.Mapping[str, ScopeCollectionType] | None
     ) -> dict[str, list[Scope]]:
         if scope_requirements is None:
             return {}
@@ -278,7 +279,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
             raise e
 
     def add_scope_requirements(
-        self, scope_requirements: dict[str, ScopeCollectionType]
+        self, scope_requirements: t.Mapping[str, ScopeCollectionType]
     ) -> None:
         """
         Add given scope requirements to the app's scope requirements. Any duplicate

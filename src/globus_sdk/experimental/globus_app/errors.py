@@ -24,7 +24,7 @@ class MissingIdentityError(IdentityValidationError):
 class IdentityMismatchError(IdentityValidationError):
     """The identity in a token response did not match the expected identity."""
 
-    def __init__(self, message: str, stored_id: UUIDLike, new_id: UUIDLike):
+    def __init__(self, message: str, stored_id: UUIDLike, new_id: UUIDLike) -> None:
         super().__init__(message)
         self.stored_id = stored_id
         self.new_id = new_id
@@ -33,7 +33,7 @@ class IdentityMismatchError(IdentityValidationError):
 class MissingTokenError(TokenValidationError):
     """No token stored for a given resource server."""
 
-    def __init__(self, message: str, resource_server: str):
+    def __init__(self, message: str, resource_server: str) -> None:
         super().__init__(message)
         self.resource_server = resource_server
 
@@ -41,7 +41,7 @@ class MissingTokenError(TokenValidationError):
 class ExpiredTokenError(TokenValidationError):
     """The token stored for a given resource server has expired."""
 
-    def __init__(self, expires_at_seconds: int):
+    def __init__(self, expires_at_seconds: int) -> None:
         expiration = datetime.fromtimestamp(expires_at_seconds)
         super().__init__(f"Token expired at {expiration.isoformat()}")
         self.expiration = expiration
@@ -50,7 +50,9 @@ class ExpiredTokenError(TokenValidationError):
 class UnmetScopeRequirementsError(TokenValidationError):
     """The token stored for a given resource server is missing required scopes."""
 
-    def __init__(self, message: str, scope_requirements: dict[str, list[Scope]]):
+    def __init__(
+        self, message: str, scope_requirements: dict[str, list[Scope]]
+    ) -> None:
         super().__init__(message)
         # The full set of scope requirements which were evaluated.
         #   Notably this is not exclusively the unmet scope requirements.

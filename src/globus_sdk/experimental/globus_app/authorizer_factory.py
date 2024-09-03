@@ -32,7 +32,7 @@ class AuthorizerFactory(
     re-used until its ``store_token_response`` method is called.
     """
 
-    def __init__(self, token_storage: ValidatingTokenStorage):
+    def __init__(self, token_storage: ValidatingTokenStorage) -> None:
         """
         :param token_storage: The ``ValidatingTokenStorage`` used
         for defining and validating the set of authorization requirements that
@@ -107,7 +107,7 @@ class AccessTokenAuthorizerFactory(AuthorizerFactory[AccessTokenAuthorizer]):
     An ``AuthorizerFactory`` that constructs ``AccessTokenAuthorizer``.
     """
 
-    def __init__(self, token_storage: ValidatingTokenStorage):
+    def __init__(self, token_storage: ValidatingTokenStorage) -> None:
         super().__init__(token_storage)
         self._cached_authorizer_expiration: dict[str, int] = {}
 
@@ -176,7 +176,7 @@ class RefreshTokenAuthorizerFactory(AuthorizerFactory[RefreshTokenAuthorizer]):
         self,
         token_storage: ValidatingTokenStorage,
         auth_login_client: AuthLoginClient,
-    ):
+    ) -> None:
         """
         :param token_storage: The ``ValidatingTokenStorage`` used
         for defining and validating the set of authorization requirements that

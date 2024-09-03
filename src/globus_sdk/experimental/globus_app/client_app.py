@@ -47,7 +47,7 @@ class ClientApp(GlobusApp):
         client_secret: str | None = None,
         scope_requirements: dict[str, ScopeCollectionType] | None = None,
         config: GlobusAppConfig = DEFAULT_CONFIG,
-    ):
+    ) -> None:
         if config.login_flow_manager is not None:
             raise GlobusSDKUsageError("A ClientApp cannot use a login_flow_manager")
 

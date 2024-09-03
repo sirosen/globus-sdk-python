@@ -35,7 +35,7 @@ class MemoryTokenStorage(TokenStorage):
         return cls(namespace=namespace)
 
     def store_token_data_by_resource_server(
-        self, token_data_by_resource_server: dict[str, TokenData]
+        self, token_data_by_resource_server: t.Mapping[str, TokenData]
     ) -> None:
         if self.namespace not in self._tokens:
             self._tokens[self.namespace] = {}

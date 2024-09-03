@@ -35,7 +35,7 @@ class SQLiteTokenStorage(FileTokenStorage):
         *,
         connect_params: dict[str, t.Any] | None = None,
         namespace: str = "DEFAULT",
-    ):
+    ) -> None:
         """
         :param filepath: The path of the DB file to write to and read from.
         :param connect_params: A pass-through dictionary for fine-tuning the SQLite
@@ -107,7 +107,7 @@ class SQLiteTokenStorage(FileTokenStorage):
         self._connection.close()
 
     def store_token_data_by_resource_server(
-        self, token_data_by_resource_server: dict[str, TokenData]
+        self, token_data_by_resource_server: t.Mapping[str, TokenData]
     ) -> None:
         """
         Given a dict of token data indexed by resource server, convert the data into

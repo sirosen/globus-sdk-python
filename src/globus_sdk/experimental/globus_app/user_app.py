@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing as t
+
 from globus_sdk import (
     AuthLoginClient,
     ConfidentialAppAuthClient,
@@ -63,9 +65,9 @@ class UserApp(GlobusApp):
         login_client: AuthLoginClient | None = None,
         client_id: UUIDLike | None = None,
         client_secret: str | None = None,
-        scope_requirements: dict[str, ScopeCollectionType] | None = None,
+        scope_requirements: t.Mapping[str, ScopeCollectionType] | None = None,
         config: GlobusAppConfig = DEFAULT_CONFIG,
-    ):
+    ) -> None:
         super().__init__(
             app_name,
             login_client=login_client,

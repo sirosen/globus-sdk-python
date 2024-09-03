@@ -43,7 +43,7 @@ class CommandLineLoginFlowManager(LoginFlowManager):
         native_prefill_named_grant: str | None = None,
         login_prompt: str = "Please authenticate with Globus here:",
         code_prompt: str = "Enter the resulting Authorization Code here:",
-    ):
+    ) -> None:
         """
         :param login_client: The ``AuthLoginClient`` that will be making the Globus
             Auth API calls needed for the authentication flow. Note that this

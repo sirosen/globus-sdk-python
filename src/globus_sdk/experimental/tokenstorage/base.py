@@ -37,7 +37,7 @@ class TokenStorage(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def store_token_data_by_resource_server(
-        self, token_data_by_resource_server: dict[str, TokenData]
+        self, token_data_by_resource_server: t.Mapping[str, TokenData]
     ) -> None:
         """
         Store token data in underlying storage partitioned by the resource server
