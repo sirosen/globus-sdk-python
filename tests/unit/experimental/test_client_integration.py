@@ -91,13 +91,13 @@ def test_transfer_client_add_app_data_access_scope_in_iterable(app):
 
 
 def test_transfer_client_add_app_data_access_scope_catches_bad_uuid(app):
-    with pytest.raises(ValueError, match="'collection_id' must be a valid UUID"):
+    with pytest.raises(ValueError, match="'collection_ids' must be a valid UUID"):
         globus_sdk.TransferClient(app=app).add_app_data_access_scope("foo")
 
 
 def test_transfer_client_add_app_data_access_scope_catches_bad_uuid_in_iterable(app):
     collection_id_1 = str(uuid.UUID(int=1))
-    with pytest.raises(ValueError, match=r"'collection_id\[1\]' must be a valid UUID"):
+    with pytest.raises(ValueError, match=r"'collection_ids\[1\]' must be a valid UUID"):
         globus_sdk.TransferClient(app=app).add_app_data_access_scope(
             [collection_id_1, "foo"]
         )

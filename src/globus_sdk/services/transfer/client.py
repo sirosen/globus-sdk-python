@@ -114,22 +114,27 @@ class TransferClient(client.BaseClient):
     default_scope_requirements = [Scope(TransferScopes.all)]
 
     def add_app_data_access_scope(
-        self, collection_id: UUIDLike | t.Iterable[UUIDLike]
+        self, collection_ids: UUIDLike | t.Iterable[UUIDLike]
     ) -> TransferClient:
         """
-        Add a dependent ``data_access`` scope for one or more given ``collection_id``
+        Add a dependent ``data_access`` scope for one or more given ``collection_ids``
         to this client's ``GlobusApp``. Useful for resolving ``ConsentRequired`` errors
         when using standard Globus Connect Server mapped collections.
 
-        ``collection_id`` must be for standard Globus Connect Server mapped
-        collections or app driven authentication flows will hit unknown scope errors.
+        .. warning::
+
+            This method must only be used on ``collection_ids`` for non-High-Assurance
+            GCS Mapped Collections.
+
+            Use on other collection types, e.g., on GCP Mapped Collections or any form
+            of Guest Collection, will result in "Unknown Scope" errors during the login
+            flow.
 
         Returns ``self`` for chaining.
 
         Raises ``GlobusSDKUsageError`` if this client was not initialized with an app.
 
-        :param collection_id: an ID for a standard Globus Connect Server mapped
-            collection, or an iterable of IDs
+        :param collection_ids: a collection ID or an iterable of IDs.
 
         .. tab-set::
 
@@ -165,18 +170,18 @@ class TransferClient(client.BaseClient):
                     ...
                     res = client.submit_transfer({})
         """  # noqa: E501
-        if isinstance(collection_id, (str, uuid.UUID)):
-            utils.check_uuid(collection_id, name="collection_id")
+        if isinstance(collection_ids, (str, uuid.UUID)):
+            utils.check_uuid(collection_ids, name="collection_ids")
             # wrap the collection_ids input in a list for consistent iteration below
-            collection_ids = [collection_id]
+            collection_ids_ = [collection_ids]
         else:
             # copy to a list so that ephemeral iterables can be iterated multiple times
-            collection_ids = list(collection_id)
-            for i, c in enumerate(collection_ids):
-                utils.check_uuid(c, name=f"collection_id[{i}]")
+            collection_ids_ = list(collection_ids)
+            for i, c in enumerate(collection_ids_):
+                utils.check_uuid(c, name=f"collection_ids[{i}]")
 
         base_scope = Scope(TransferScopes.all)
-        for coll_id in collection_ids:
+        for coll_id in collection_ids_:
             data_access_scope = Scope(
                 GCSCollectionScopeBuilder(str(coll_id)).data_access,
                 optional=True,
