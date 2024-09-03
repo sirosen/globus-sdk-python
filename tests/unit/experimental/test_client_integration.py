@@ -69,6 +69,40 @@ def test_transfer_client_add_app_data_access_scope_chaining(app):
     assert expected_2 in str_list
 
 
+def test_transfer_client_add_app_data_access_scope_in_iterable(app):
+    collection_id_1 = str(uuid.UUID(int=1))
+    collection_id_2 = str(uuid.UUID(int=2))
+    globus_sdk.TransferClient(app=app).add_app_data_access_scope(
+        (collection_id_1, collection_id_2)
+    )
+
+    expected_1 = f"https://auth.globus.org/scopes/{collection_id_1}/data_access"
+    expected_2 = f"https://auth.globus.org/scopes/{collection_id_2}/data_access"
+
+    transfer_dependencies = []
+    for scope in app.get_scope_requirements("transfer.api.globus.org"):
+        if scope.scope_string != globus_sdk.TransferClient.scopes.all:
+            continue
+        for dep in scope.dependencies:
+            transfer_dependencies.append((dep.scope_string, dep.optional))
+
+    assert (expected_1, True) in transfer_dependencies
+    assert (expected_2, True) in transfer_dependencies
+
+
+def test_transfer_client_add_app_data_access_scope_catches_bad_uuid(app):
+    with pytest.raises(ValueError, match="'collection_ids' must be a valid UUID"):
+        globus_sdk.TransferClient(app=app).add_app_data_access_scope("foo")
+
+
+def test_transfer_client_add_app_data_access_scope_catches_bad_uuid_in_iterable(app):
+    collection_id_1 = str(uuid.UUID(int=1))
+    with pytest.raises(ValueError, match=r"'collection_ids\[1\]' must be a valid UUID"):
+        globus_sdk.TransferClient(app=app).add_app_data_access_scope(
+            [collection_id_1, "foo"]
+        )
+
+
 def test_auth_client_default_scopes(app):
     globus_sdk.AuthClient(app=app)
 
