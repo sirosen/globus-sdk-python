@@ -132,12 +132,11 @@ class UserApp(GlobusApp):
     def _initialize_authorizer_factory(self) -> None:
         if self.config.request_refresh_tokens:
             self._authorizer_factory = RefreshTokenAuthorizerFactory(
-                token_storage=self._validating_token_storage,
-                auth_login_client=self._login_client,
+                token_storage=self.token_storage, auth_login_client=self._login_client
             )
         else:
             self._authorizer_factory = AccessTokenAuthorizerFactory(
-                token_storage=self._validating_token_storage,
+                token_storage=self.token_storage
             )
 
     def run_login_flow(

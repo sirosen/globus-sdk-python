@@ -161,7 +161,7 @@ def test_user_app_creates_consent_client():
     client_id = "mock_client_id"
     user_app = UserApp("test-app", client_id=client_id)
 
-    assert user_app._validating_token_storage._consent_client is not None
+    assert user_app.token_storage._consent_client is not None
 
 
 class MockLoginFlowManager(LoginFlowManager):

@@ -32,6 +32,27 @@ class GlobusApp(metaclass=abc.ABCMeta):
     A ``GlobusApp`` is accepted as an initialization parameter to any SDK-provided
     service client, automatically handling the client's default scope requirements and
     providing the client with an authorizer.
+
+    :param app_name: A string to identify this app. Used for default tokenstorage
+        location and in the future will be used to set user-agent when this app is
+        attached to a service client
+    :param login_client: An ``AuthLoginCLient`` that will be used for running
+        authentication flows. Different classes of ``GlobusApp`` may require
+        specific classes of ``AuthLoginClient``. ``Mutually exclusive with
+        ``client_id`` and ``client_secret``.
+    :param client_id: A client UUID used to construct an ``AuthLoginCLient`` for running
+        authentication flows. The type of ``AuthLoginCLient`` will depend on the
+        type of ``GlobusApp``. Mutually exclusive with ``login_client``.
+    :param client_secret: The value of the client secret for ``client_id`` if it uses
+        secrets. Mutually exclusive with ``login_client``.
+    :param scope_requirements: A dictionary of scope requirements indexed by
+        resource server. The dict value may be a scope, scope string, or list of
+        scopes or scope strings.
+    :param config: A ``GlobusAppConfig`` used to control various behaviors of this app.
+
+    :ivar token_storage: The ``ValidatingTokenStorage`` containing tokens for the app.
+        Authorization mediated by the app will use this object, so modifying this will
+        impact clients which are defined to use the app whenever they fetch tokens.
     """
 
     _login_client: AuthLoginClient
@@ -46,25 +67,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         client_secret: str | None = None,
         scope_requirements: t.Mapping[str, ScopeCollectionType] | None = None,
         config: GlobusAppConfig = DEFAULT_CONFIG,
-    ):
-        """
-        :param app_name: A string to identify this app. Used for default tokenstorage
-            location and in the future will be used to set user-agent when this app is
-            attached to a service client
-        :param login_client: An ``AuthLoginCLient`` that will be used for running
-            authentication flows. Different classes of ``GlobusApp`` may require
-            specific classes of ``AuthLoginClient``. ``Mutually exclusive with
-            ``client_id`` and ``client_secret``.
-        :client_id: A client UUID used to construct an ``AuthLoginCLient`` for running
-            authentication flows. The type of ``AuthLoginCLient`` will depend on the
-            type of ``GlobusApp``. Mutually exclusive with ``login_client``.
-        :client_secret: The value of the client secret for ``client_id`` if it uses
-            secrets. Mutually exclusive with ``login_client``.
-        :param scope_requirements: A dictionary of scope requirements indexed by
-            resource server. The dict value may be a scope, scope string, or list of
-            scopes or scope strings.
-        :config: A ``GlobusAppConfig`` used to control various behaviors of this app.
-        """
+    ) -> None:
         self.app_name = app_name
         self.config = config
 
@@ -84,7 +87,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
 
         # construct ValidatingTokenStorage around the TokenStorage and
         # our initial scope requirements
-        self._validating_token_storage = ValidatingTokenStorage(
+        self.token_storage = ValidatingTokenStorage(
             token_storage=self._token_storage,
             scope_requirements=self._scope_requirements,
         )
@@ -97,7 +100,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         # additionally, this will ensure that openid scope requirement is always
         # registered (it's required for token identity validation).
         consent_client = AuthClient(app=self, app_scopes=[Scope(AuthScopes.openid)])
-        self._validating_token_storage.set_consent_client(consent_client)
+        self.token_storage.set_consent_client(consent_client)
 
     def _resolve_scope_requirements(
         self, scope_requirements: t.Mapping[str, ScopeCollectionType] | None

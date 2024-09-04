@@ -87,7 +87,7 @@ class ClientApp(GlobusApp):
 
     def _initialize_authorizer_factory(self) -> None:
         self._authorizer_factory = ClientCredentialsAuthorizerFactory(
-            token_storage=self._validating_token_storage,
+            token_storage=self.token_storage,
             confidential_client=self._login_client,
         )
 
