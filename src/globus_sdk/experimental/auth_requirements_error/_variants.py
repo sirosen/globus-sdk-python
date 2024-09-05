@@ -3,7 +3,9 @@ from __future__ import annotations
 import sys
 import typing as t
 
-from . import _serializable, _validators
+from globus_sdk._guards import validators
+from globus_sdk._serializable import Serializable
+
 from ._auth_requirements_error import (
     GlobusAuthorizationParameters,
     GlobusAuthRequirementsError,
@@ -29,7 +31,7 @@ class LegacyAuthRequirementsErrorVariant(Protocol):
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError: ...
 
 
-class LegacyConsentRequiredTransferError(_serializable.Serializable):
+class LegacyConsentRequiredTransferError(Serializable):
     """
     The ConsentRequired error format emitted by the Globus Transfer service.
     """
@@ -42,7 +44,7 @@ class LegacyConsentRequiredTransferError(_serializable.Serializable):
         extra: dict[str, t.Any] | None = None,
     ):
         self.code = _validate_consent_required_literal("code", code)
-        self.required_scopes = _validators.str_list("required_scopes", required_scopes)
+        self.required_scopes = validators.str_list("required_scopes", required_scopes)
         self.extra = extra or {}
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
@@ -59,7 +61,7 @@ class LegacyConsentRequiredTransferError(_serializable.Serializable):
         )
 
 
-class LegacyConsentRequiredAPError(_serializable.Serializable):
+class LegacyConsentRequiredAPError(Serializable):
     """
     The ConsentRequired error format emitted by the legacy Globus Transfer
     Action Providers.
@@ -73,7 +75,7 @@ class LegacyConsentRequiredAPError(_serializable.Serializable):
         extra: dict[str, t.Any] | None,
     ):
         self.code = _validate_consent_required_literal("code", code)
-        self.required_scope = _validators.str_("required_scope", required_scope)
+        self.required_scope = validators.str_("required_scope", required_scope)
         self.extra = extra or {}
 
     def to_auth_requirements_error(self) -> GlobusAuthRequirementsError:
@@ -96,7 +98,7 @@ class LegacyConsentRequiredAPError(_serializable.Serializable):
         )
 
 
-class LegacyAuthorizationParameters(_serializable.Serializable):
+class LegacyAuthorizationParameters(Serializable):
     """
     An Authorization Parameters object that describes all known variants in use by
     Globus services.
@@ -113,23 +115,23 @@ class LegacyAuthorizationParameters(_serializable.Serializable):
         prompt: Literal["login"] | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message = _validators.opt_str("session_message", session_message)
-        self.session_required_identities = _validators.opt_str_list(
+        self.session_message = validators.opt_str("session_message", session_message)
+        self.session_required_identities = validators.opt_str_list(
             "session_required_identities", session_required_identities
         )
-        self.session_required_policies = _validators.opt_str_list_or_commasep(
+        self.session_required_policies = validators.opt_str_list_or_commasep(
             "session_required_policies", session_required_policies
         )
-        self.session_required_single_domain = _validators.opt_str_list_or_commasep(
+        self.session_required_single_domain = validators.opt_str_list_or_commasep(
             "session_required_single_domain", session_required_single_domain
         )
-        self.session_required_mfa = _validators.opt_bool(
+        self.session_required_mfa = validators.opt_bool(
             "session_required_mfa", session_required_mfa
         )
         if prompt in [None, "login"]:
             self.prompt = prompt
         else:
-            raise _validators.ValidationError("'prompt' must be 'login' or null")
+            raise validators.ValidationError("'prompt' must be 'login' or null")
         self.extra = extra or {}
 
     def to_authorization_parameters(
@@ -153,7 +155,7 @@ class LegacyAuthorizationParameters(_serializable.Serializable):
         )
 
 
-class LegacyAuthorizationParametersError(_serializable.Serializable):
+class LegacyAuthorizationParametersError(Serializable):
     """
     Defines an Authorization Parameters error that describes all known variants
     in use by Globus services.
@@ -169,8 +171,8 @@ class LegacyAuthorizationParametersError(_serializable.Serializable):
         extra: dict[str, t.Any] | None = None,
     ):
         # Apply default, if necessary
-        self.code = _validators.str_("code", code or self.DEFAULT_CODE)
-        self.authorization_parameters = _validators.instance_or_dict(
+        self.code = validators.str_("code", code or self.DEFAULT_CODE)
+        self.authorization_parameters = validators.instance_or_dict(
             "authorization_parameters",
             authorization_parameters,
             LegacyAuthorizationParameters,
@@ -196,4 +198,4 @@ def _validate_consent_required_literal(
 ) -> Literal["ConsentRequired"]:
     if value == "ConsentRequired":
         return "ConsentRequired"
-    raise _validators.ValidationError(f"'{name}' must be the string 'ConsentRequired'")
+    raise validators.ValidationError(f"'{name}' must be the string 'ConsentRequired'")
