@@ -41,8 +41,6 @@ class CommandLineLoginFlowManager(LoginFlowManager):
         redirect_uri: str | None = None,
         request_refresh_tokens: bool = False,
         native_prefill_named_grant: str | None = None,
-        login_prompt: str = "Please authenticate with Globus here:",
-        code_prompt: str = "Enter the resulting Authorization Code here:",
     ) -> None:
         """
         :param login_client: The ``AuthLoginClient`` that will be making the Globus
@@ -55,18 +53,12 @@ class CommandLineLoginFlowManager(LoginFlowManager):
         :param request_refresh_tokens: Control whether refresh tokens will be requested.
         :param native_prefill_named_grant: The named grant label to prefill on the
             consent page when using a NativeAppAuthClient.
-        :param login_prompt: The string that will be output to the command line
-            prompting the user to authenticate.
-        :param code_prompt: The string that will be output to the command line
-            prompting the user to enter their authorization code.
         """
         super().__init__(
             login_client,
             request_refresh_tokens=request_refresh_tokens,
             native_prefill_named_grant=native_prefill_named_grant,
         )
-        self.login_prompt = login_prompt
-        self.code_prompt = code_prompt
 
         if redirect_uri is None:
             # Confidential clients must always define their own custom redirect URI.
@@ -111,22 +103,33 @@ class CommandLineLoginFlowManager(LoginFlowManager):
             to the authentication flow to control how the user will authenticate.
         """
         authorize_url = self._get_authorize_url(auth_parameters, self.redirect_uri)
-        auth_code = self._print_and_prompt(authorize_url)
+        self.print_authorize_url(authorize_url)
+        auth_code = self.prompt_for_code()
 
         return self.login_client.oauth2_exchange_code_for_tokens(auth_code)
 
-    def _print_and_prompt(self, authorize_url: str) -> str:
-        # Prompt the user to authenticate
+    def print_authorize_url(self, authorize_url: str) -> None:
+        """
+        Prompt the user to authenticate using the provided ``authorize_url``.
+
+        :param authorize_url: The URL at which the user will login and consent to
+            application accesses.
+        """
+        login_prompt = "Please authenticate with Globus here:"
         print(
             textwrap.dedent(
                 f"""
-                {self.login_prompt}
-                {"-" * len(self.login_prompt)}
+                {login_prompt}
+                {"-" * len(login_prompt)}
                 {authorize_url}
-                {"-" * len(self.login_prompt)}
+                {"-" * len(login_prompt)}
                 """
             )
         )
 
-        # Request they to enter the auth code
-        return input(f"{self.code_prompt}\n").strip()
+    def prompt_for_code(self) -> str:
+        """
+        Prompt the user to enter an authorization code.
+        """
+        code_prompt = "Enter the resulting Authorization Code here: "
+        return input(code_prompt).strip()

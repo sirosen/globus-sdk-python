@@ -24,13 +24,7 @@ def test_command_line_login_flower_manager_native(monkeypatch, capsys):
     load_response(login_client.oauth2_exchange_code_for_tokens)
     monkeypatch.setattr("builtins.input", _mock_input)
 
-    custom_login_prompt = "Login:"
-    custom_code_prompt = "Code:"
-    login_flow_manager = CommandLineLoginFlowManager(
-        login_client,
-        login_prompt=custom_login_prompt,
-        code_prompt=custom_code_prompt,
-    )
+    login_flow_manager = CommandLineLoginFlowManager(login_client)
     auth_params = GlobusAuthorizationParameters(
         required_scopes=["urn:globus:auth:scope:transfer.api.globus.org:all"],
         session_required_identities=["user@org.edu"],
@@ -42,11 +36,34 @@ def test_command_line_login_flower_manager_native(monkeypatch, capsys):
     )
 
     captured_output = capsys.readouterr().out
-    assert custom_login_prompt in captured_output
-    assert custom_code_prompt in captured_output
     assert "https://auth.globus.org/v2/oauth2/authorize" in captured_output
     assert "client_id=mock_client_id" in captured_output
     assert "&session_required_identities=user%40org.edu" in captured_output
+
+
+def test_command_line_login_flower_manager_with_custom_prompts(capsys):
+    """
+    test CommandLineLoginFlowManager with a NativeAppAuthClient
+    """
+    login_client = NativeAppAuthClient("mock_client_id")
+    load_response(login_client.oauth2_exchange_code_for_tokens)
+
+    class CustomizedLoginFlowManager(CommandLineLoginFlowManager):
+        def print_authorize_url(self, authorize_url):
+            print("MyCustomLoginPrompt:", authorize_url)
+
+        def prompt_for_code(self):
+            return "mock_code_input"
+
+    login_flow_manager = CustomizedLoginFlowManager(login_client)
+    auth_params = GlobusAuthorizationParameters(
+        required_scopes=["urn:globus:auth:scope:transfer.api.globus.org:all"]
+    )
+    login_flow_manager.run_login_flow(auth_params)
+
+    captured_output = capsys.readouterr().out
+    assert "MyCustomLoginPrompt" in captured_output
+    assert "https://auth.globus.org/v2/oauth2/authorize" in captured_output
 
 
 def test_command_line_login_flower_manager_confidential(monkeypatch, capsys):
