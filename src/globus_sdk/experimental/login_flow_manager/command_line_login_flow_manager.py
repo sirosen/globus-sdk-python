@@ -110,7 +110,7 @@ class CommandLineLoginFlowManager(LoginFlowManager):
 
     def print_authorize_url(self, authorize_url: str) -> None:
         """
-        Prompt the user to authenticate, using the computed ``authorize_url``.
+        Prompt the user to authenticate using the provided ``authorize_url``.
 
         :param authorize_url: The URL at which the user will login and consent to
             application accesses.
@@ -129,8 +129,7 @@ class CommandLineLoginFlowManager(LoginFlowManager):
 
     def prompt_for_code(self) -> str:
         """
-        After the authorization URL is printed, ask the user to enter the
-        authorization code.
+        Prompt the user to enter an authorization code.
         """
         code_prompt = "Enter the resulting Authorization Code here: "
         return input(code_prompt).strip()
