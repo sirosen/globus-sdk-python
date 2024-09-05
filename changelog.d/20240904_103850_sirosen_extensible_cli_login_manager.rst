@@ -7,7 +7,7 @@ Changed
     ``prompt_for_code`` as methods, which replace the ``login_prompt`` and
     ``code_prompt`` parameters. Users who wish to customize prompting behavior
     now have a greater degree of control, and can effect this by subclassing the
-    ``CommandLineLoginFlowManager``. (:pr:`NUMBER`)
+    ``CommandLineLoginFlowManager``. (:pr:`1039`)
 
     Example usage, which uses the popular ``click`` library to handle the
     prompts:
