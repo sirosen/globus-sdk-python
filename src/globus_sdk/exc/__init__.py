@@ -1,5 +1,5 @@
 from .api import ErrorSubdocument, GlobusAPIError
-from .base import GlobusError, GlobusSDKUsageError
+from .base import GlobusError, GlobusSDKUsageError, ValidationError
 from .convert import (
     GlobusConnectionError,
     GlobusConnectionTimeoutError,
@@ -18,6 +18,7 @@ from .warnings import RemovedInV4Warning, warn_deprecated
 __all__ = (
     "GlobusError",
     "GlobusSDKUsageError",
+    "ValidationError",
     "GlobusAPIError",
     "ErrorSubdocument",
     "NetworkError",

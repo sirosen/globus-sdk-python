@@ -89,6 +89,7 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
             "GlobusTimeoutError",
             "NetworkError",
             "RemovedInV4Warning",
+            "ValidationError",
         ),
     ),
     (

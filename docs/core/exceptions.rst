@@ -76,6 +76,10 @@ Error Classes
    :members:
    :show-inheritance:
 
+.. autoclass:: globus_sdk.ValidationError
+   :members:
+   :show-inheritance:
+
 .. autoclass:: globus_sdk.GlobusAPIError
    :members:
    :show-inheritance:

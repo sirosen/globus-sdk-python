@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import typing as t
 
+from globus_sdk import exc
 from globus_sdk._guards import validators
 from globus_sdk._serializable import Serializable
 
@@ -131,7 +132,7 @@ class LegacyAuthorizationParameters(Serializable):
         if prompt in [None, "login"]:
             self.prompt = prompt
         else:
-            raise validators.ValidationError("'prompt' must be 'login' or null")
+            raise exc.ValidationError("'prompt' must be 'login' or null")
         self.extra = extra or {}
 
     def to_authorization_parameters(
@@ -198,4 +199,4 @@ def _validate_consent_required_literal(
 ) -> Literal["ConsentRequired"]:
     if value == "ConsentRequired":
         return "ConsentRequired"
-    raise validators.ValidationError(f"'{name}' must be the string 'ConsentRequired'")
+    raise exc.ValidationError(f"'{name}' must be the string 'ConsentRequired'")

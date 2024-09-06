@@ -70,38 +70,6 @@ def b64str(s: str) -> str:
     return b64encode(s.encode("utf-8")).decode("utf-8")
 
 
-def check_uuid(s: UUIDLike, *, name: str) -> t.Literal[True]:
-    """
-    Raise an error if the input is not a UUID
-
-    :param s: the UUID|str value
-    :param name: the name for this value to use in error messages
-
-    :raises TypeError: if the input is not a UUID|str
-    :raises ValueError: if the input is a non-UUID str
-
-    Example usage:
-
-    .. code-block:: python
-
-        def frob_it(collection_id: UUIDLike) -> Frob:
-            utils.check_uuid(collection_id, name="collection_id")
-            return Frob(collection_id)
-
-    """
-    if isinstance(s, uuid.UUID):
-        return True
-    elif not isinstance(s, str):
-        raise TypeError(f"'{name}' must be a UUID or str (value='{s}')")
-
-    try:
-        uuid.UUID(s)
-    except ValueError as e:
-        raise ValueError(f"'{name}' must be a valid UUID (value='{s}')") from e
-
-    return True
-
-
 def slash_join(a: str, b: str | None) -> str:
     """
     Join a and b with a single slash, regardless of whether they already

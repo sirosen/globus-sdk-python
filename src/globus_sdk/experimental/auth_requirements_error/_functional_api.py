@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from globus_sdk._guards import validators
+from globus_sdk import exc
 
 from ._auth_requirements_error import GlobusAuthRequirementsError
 from ._variants import (
@@ -59,7 +59,7 @@ def to_auth_requirements_error(
     # Prefer a proper auth requirements error, if possible
     try:
         return GlobusAuthRequirementsError.from_dict(error_dict)
-    except validators.ValidationError as err:
+    except exc.ValidationError as err:
         log.debug(f"Failed to parse error as 'GlobusAuthRequirementsError' ({err})")
 
     supported_variants: list[type[LegacyAuthRequirementsErrorVariant]] = [
@@ -70,7 +70,7 @@ def to_auth_requirements_error(
     for variant in supported_variants:
         try:
             return variant.from_dict(error_dict).to_auth_requirements_error()
-        except validators.ValidationError as err:
+        except exc.ValidationError as err:
             log.debug(f"Failed to parse error as '{variant.__name__}' ({err})")
 
     return None

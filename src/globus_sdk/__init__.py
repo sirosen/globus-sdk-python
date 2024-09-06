@@ -40,6 +40,7 @@ _LAZY_IMPORT_TABLE = {
         "GlobusTimeoutError",
         "NetworkError",
         "RemovedInV4Warning",
+        "ValidationError",
     },
     "local_endpoint": {
         "GlobusConnectPersonalOwnerInfo",
@@ -167,6 +168,7 @@ if t.TYPE_CHECKING:
     from .exc import GlobusTimeoutError
     from .exc import NetworkError
     from .exc import RemovedInV4Warning
+    from .exc import ValidationError
     from .local_endpoint import GlobusConnectPersonalOwnerInfo
     from .local_endpoint import LocalGlobusConnectPersonal
     from .local_endpoint import LocalGlobusConnectServer
@@ -382,6 +384,7 @@ __all__ = (
     "TransferTimer",
     "UnpackingGCSResponse",
     "UserCredentialDocument",
+    "ValidationError",
 )
 
 
