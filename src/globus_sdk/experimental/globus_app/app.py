@@ -228,16 +228,76 @@ class GlobusApp(metaclass=abc.ABCMeta):
         authorize requests.
         """
 
+    def login(
+        self,
+        *,
+        auth_params: GlobusAuthorizationParameters | None = None,
+        force: bool = False,
+    ) -> None:
+        """
+        Log an auth entity into the app, if needed, storing the resulting tokens.
+
+        A login flow will be performed if any of the following are true:
+            * The kwarg ``auth_params`` is provided.
+            * The kwarg ``force`` is set to True.
+            * The method ``self.login_required()`` evaluates to True.
+
+        :param auth_params: An optional set of authorization parameters to establish
+            requirements and controls for the login flow.
+        :param force: If True, perform a login flow even if one does not appear to
+            be necessary.
+        """
+        if auth_params or force or self.login_required():
+            self._run_login_flow(auth_params)
+
+    def login_required(self) -> bool:
+        """
+        Determine if a login flow will be required to interact with resource servers
+        under the current scope requirements.
+
+        This will return false if any of the following are true:
+            * Access tokens have never been issued.
+            * Access tokens have been issued but have insufficient scopes.
+            * Access tokens have expired and wouldn't be resolved with refresh tokens.
+
+        :returns: True if a login flow appears to be required, False otherwise.
+        """
+        for resource_server in self._scope_requirements.keys():
+            try:
+                self.get_authorizer(resource_server, skip_error_handling=True)
+            except TokenValidationError:
+                return True
+        return False
+
+    def logout(self) -> None:
+        """
+        Logout an auth entity from the app.
+
+        This will remove and revoke all tokens stored for the current app user.
+        """
+        # Revoke all tokens, removing them from the underlying token storage
+        inner_token_storage = self.token_storage.token_storage
+        for resource_server in self._scope_requirements.keys():
+            token_data = inner_token_storage.get_token_data(resource_server)
+            if token_data:
+                self._login_client.oauth2_revoke_token(token_data.access_token)
+                if token_data.refresh_token:
+                    self._login_client.oauth2_revoke_token(token_data.refresh_token)
+                inner_token_storage.remove_token_data(resource_server)
+
+        # Invalidate any cached authorizers
+        self._authorizer_factory.clear_cache()
+
     @abc.abstractmethod
-    def run_login_flow(
+    def _run_login_flow(
         self, auth_params: GlobusAuthorizationParameters | None = None
     ) -> None:
         """
         Run an authorization flow to get new tokens which are stored and available
         for the next authorizer gotten by get_authorizer.
 
-        :param auth_params: A GlobusAuthorizationParameters to control how the user
-            will authenticate. If not passed
+        :param auth_params: An optional set of authorization parameters to establish
+            requirements and controls for the login flow.
         """
 
     def _auth_params_with_required_scopes(
@@ -265,18 +325,25 @@ class GlobusApp(metaclass=abc.ABCMeta):
 
         return auth_params
 
-    def get_authorizer(self, resource_server: str) -> GlobusAuthorizer:
+    def get_authorizer(
+        self,
+        resource_server: str,
+        *,
+        skip_error_handling: bool = False,
+    ) -> GlobusAuthorizer:
         """
         Get a ``GlobusAuthorizer`` from the app's authorizer factory for a specified
         resource server. The type of authorizer is dependent on the app.
 
-        :param resource_server: the resource server the Authorizer will provide
-            authorization headers for
+        :param resource_server: The resource server for which the requested Authorizer
+            should provide authorization headers.
+        :param skip_error_handling: If True, skip the configured token validation error
+            handler when a ``TokenValidationError`` is raised. Default: False.
         """
         try:
             return self._authorizer_factory.get_authorizer(resource_server)
         except TokenValidationError as e:
-            if self.config.token_validation_error_handler:
+            if not skip_error_handling and self.config.token_validation_error_handler:
                 # Dispatch to the configured error handler if one is set then retry.
                 self.config.token_validation_error_handler(self, e)
                 return self._authorizer_factory.get_authorizer(resource_server)
