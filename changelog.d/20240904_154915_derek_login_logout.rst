@@ -3,7 +3,7 @@ Added
 ~~~~~
 
 -   Added ``login(...)``, ``logout(...)``, and ``login_required(...)`` to the
-    experimental ``GlobusApp`` construct. (:pr:`NUMBER`)
+    experimental ``GlobusApp`` construct. (:pr:`1041`)
 
     -   ``login(...)`` initiates a login flow if:
 
@@ -20,7 +20,7 @@ Removed
 
 -   Made ``run_login_flow`` private in the experimental ``GlobusApp`` construct.
     Usage sites should be replaced with either ``app.login()`` or
-    ``app.login(force=True)``. (:pr:`NUMBER`)
+    ``app.login(force=True)``. (:pr:`1041`)
 
     -   **Old Usage**
 
