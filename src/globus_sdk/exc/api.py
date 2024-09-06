@@ -4,13 +4,14 @@ import enum
 import logging
 import typing as t
 
-import requests
-
 from globus_sdk import _guards
 
 from .base import GlobusError
 from .err_info import ErrorInfoContainer
 from .warnings import warn_deprecated
+
+if t.TYPE_CHECKING:
+    import requests
 
 log = logging.getLogger(__name__)
 
