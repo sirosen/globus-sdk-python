@@ -2,7 +2,7 @@ import uuid
 
 import pytest
 
-from globus_sdk import _guards, exc
+from globus_sdk import _guards, _serializable, exc
 
 
 @pytest.mark.parametrize(
@@ -113,12 +113,12 @@ def test_uuidlike_fails_type(value):
         pytest.param(
             _guards.validators.opt_str_list_or_commasep,
             [],
-            id="opt_str_list_or_commasep-empty",
+            id="opt_str_list_or_commasep-emptylist",
         ),
         pytest.param(
             _guards.validators.opt_str_list_or_commasep,
             ["foo"],
-            id="opt_str_list_or_commasep-onestr",
+            id="opt_str_list_or_commasep-list",
         ),
         pytest.param(
             _guards.validators.opt_str_list_or_commasep,
@@ -146,8 +146,73 @@ def test_simple_validator_passing(validator, value):
         pytest.param(
             _guards.validators.int_, "bar", "'foo' must be an int", id="int-str"
         ),
+        pytest.param(
+            _guards.validators.opt_str,
+            0,
+            "'foo' must be a string or null",
+            id="opt_str-int",
+        ),
+        pytest.param(
+            _guards.validators.opt_bool,
+            0,
+            "'foo' must be a bool or null",
+            id="opt_bool-int",
+        ),
+        pytest.param(
+            _guards.validators.str_list,
+            "x",
+            "'foo' must be a list of strings",
+            id="str_list-str",
+        ),
+        pytest.param(
+            _guards.validators.opt_str_list,
+            "x",
+            "'foo' must be a list of strings or null",
+            id="opt_str_list-str",
+        ),
+        pytest.param(
+            _guards.validators.opt_str_list_or_commasep,
+            0,
+            "'foo' must be a list of strings or a comma-delimited string or null",
+            id="opt_str_list_or_commasep-int",
+        ),
     ),
 )
 def test_simple_validator_failing(validator, value, match_message):
     with pytest.raises(exc.ValidationError, match=match_message):
         validator("foo", value)
+
+
+def test_instance_or_dict_validator_failing():
+    class MyObj(_serializable.Serializable):
+        def __init__(self, *, extra=None):
+            pass
+
+    with pytest.raises(
+        exc.ValidationError, match="'foo' must be a 'MyObj' object or a dictionary"
+    ):
+        _guards.validators.instance_or_dict("foo", object(), MyObj)
+
+
+def test_instance_or_dict_validator_pass_on_simple_instance():
+    class MyObj(_serializable.Serializable):
+        def __init__(self, *, extra=None):
+            pass
+
+    x = MyObj()
+    y = _guards.validators.instance_or_dict("foo", x, MyObj)
+    assert x is y
+
+
+def test_instance_or_dict_validator_pass_on_simple_dict():
+    class MyObj(_serializable.Serializable):
+        def __init__(self, *, extra=None):
+            pass
+
+    x = _guards.validators.instance_or_dict("foo", {}, MyObj)
+    assert isinstance(x, MyObj)
+
+
+def test_strlist_or_commasep_splits_str():
+    x = _guards.validators.opt_str_list_or_commasep("foo", "foo,bar,baz")
+    assert x == ["foo", "bar", "baz"]
