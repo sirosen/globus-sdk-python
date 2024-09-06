@@ -24,6 +24,8 @@ PYTHON_BINARY = os.environ.get("GLOBUS_TEST_PY", sys.executable)
         # parts which are expected to be standalone
         "scopes",
         "config",
+        # the top-level of the 'exc' subpackage (but not necessarily its contents)
+        "exc",
         # internal bits and bobs
         "_guards",
         "_types",
