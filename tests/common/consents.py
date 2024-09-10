@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from globus_sdk import Scope
 from globus_sdk._types import UUIDLike
-from globus_sdk.experimental.consents import Consent, ConsentForest
+from globus_sdk.scopes.consents import Consent, ConsentForest
 
 ScopeRepr = namedtuple("Scope", ["id", "name"])
 

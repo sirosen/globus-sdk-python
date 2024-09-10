@@ -30,9 +30,9 @@ import typing as t
 from dataclasses import dataclass
 from datetime import datetime
 
-from globus_sdk import Scope
 from globus_sdk._types import UUIDLike
 
+from ..representation import Scope
 from ._errors import ConsentParseError, ConsentTreeConstructionError
 
 

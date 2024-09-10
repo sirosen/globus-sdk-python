@@ -9,7 +9,6 @@ import pytest
 
 import globus_sdk
 from globus_sdk import MISSING, MissingType, OAuthTokenResponse, Scope
-from globus_sdk.experimental.consents import ConsentForest
 from globus_sdk.experimental.globus_app import ValidatingTokenStorage
 from globus_sdk.experimental.globus_app.errors import (
     IdentityMismatchError,
@@ -18,6 +17,7 @@ from globus_sdk.experimental.globus_app.errors import (
     UnmetScopeRequirementsError,
 )
 from globus_sdk.experimental.tokenstorage import MemoryTokenStorage
+from globus_sdk.scopes.consents import ConsentForest
 from tests.common import make_consent_forest
 
 

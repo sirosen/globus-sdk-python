@@ -1,5 +1,5 @@
 
-.. py:currentmodule:: globus_sdk.experimental.consents
+.. py:currentmodule:: globus_sdk.scopes.consents
 
 Consents
 ========
@@ -11,6 +11,23 @@ Consents are modeled as a ``ConsentForest`` full of ``ConsentTrees`` containing 
 ``Consents``. These consents detail a path of authorization grants that have been
 provided by a user to client applications for token grants under certain scoped
 contexts.
+
+Consent objects are provided from ``globus_sdk.scopes.consents``.
+
+They are typically produced by calling
+:meth:`globus_sdk.AuthClient.get_consents` and invoking ``to_forest()`` on
+the response. Example usage:
+
+.. code-block:: python
+
+    import globus_sdk
+    from globus_sdk.scopes.consents import ConsentForest
+
+    my_identity_id = ...
+    client = globus_sdk.AuthClient(...)
+    response = client.get_consents(my_identity_id)
+
+    consent_forest: ConsentForest = response.to_forest()
 
 Reference
 =========
