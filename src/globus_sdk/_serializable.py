@@ -7,6 +7,16 @@ T = t.TypeVar("T", bound="Serializable")
 
 
 class Serializable:
+    """
+    This is a base class for helpers which represent data which can be
+    loaded to or from a dictionary.
+
+    Serializable classes:
+    - know what fields they have, based on their initializer signatures
+    - support `to_dict()` and `from_dict()` conversions
+    - typically use `globus_sdk._guards.validators` to check attribute types
+    """
+
     _EXCLUDE_VARS: t.ClassVar[tuple[str, ...]] = ("self", "extra")
     extra: dict[str, t.Any]
 

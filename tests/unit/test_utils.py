@@ -98,27 +98,3 @@ def test_classproperty_prefers_instance():
 )
 def test_safe_strseq_iter(value, expected_result):
     assert list(utils.safe_strseq_iter(value)) == expected_result
-
-
-@pytest.mark.parametrize("value", (uuid.UUID(int=0), str(uuid.UUID(int=1))))
-def test_check_uuid_ok(value):
-    # no error and returns True
-    assert utils.check_uuid(value, name="foo")
-
-
-@pytest.mark.parametrize("value", (str(uuid.UUID(int=0))[:-1], ""))
-def test_check_uuid_fails_value(value):
-    with pytest.raises(ValueError, match="'foo' must be a valid UUID") as excinfo:
-        utils.check_uuid(value, name="foo")
-
-    err = excinfo.value
-    assert f"value='{value}'" in str(err)
-
-
-@pytest.mark.parametrize("value", (object(), None, ["bar"]))
-def test_check_uuid_fails_type(value):
-    with pytest.raises(TypeError, match="'foo' must be a UUID or str") as excinfo:
-        utils.check_uuid(value, name="foo")
-
-    err = excinfo.value
-    assert f"value='{value}'" in str(err)

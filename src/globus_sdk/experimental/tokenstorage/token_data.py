@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import typing as t
 
-from globus_sdk.experimental.auth_requirements_error import _serializable, _validators
+from globus_sdk._guards import validators
+from globus_sdk._serializable import Serializable
 
 
-class TokenData(_serializable.Serializable):
+class TokenData(Serializable):
     """
     Data class containing tokens and metadata for a specific resource server used
     as the python interface for ``TokenStorage``.
@@ -50,13 +51,13 @@ class TokenData(_serializable.Serializable):
         token_type: str | None,
         extra: dict[str, t.Any] | None = None,
     ) -> None:
-        self.resource_server = _validators.str_("resource_server", resource_server)
-        self.identity_id = _validators.opt_str("identity_id", identity_id)
-        self.scope = _validators.str_("scope", scope)
-        self.access_token = _validators.str_("access_token", access_token)
-        self.refresh_token = _validators.opt_str("refresh_token", refresh_token)
-        self.expires_at_seconds = _validators.int_(
+        self.resource_server = validators.str_("resource_server", resource_server)
+        self.identity_id = validators.opt_str("identity_id", identity_id)
+        self.scope = validators.str_("scope", scope)
+        self.access_token = validators.str_("access_token", access_token)
+        self.refresh_token = validators.opt_str("refresh_token", refresh_token)
+        self.expires_at_seconds = validators.int_(
             "expires_at_seconds", expires_at_seconds
         )
-        self.token_type = _validators.opt_str("token_type", token_type)
+        self.token_type = validators.opt_str("token_type", token_type)
         self.extra = extra or {}

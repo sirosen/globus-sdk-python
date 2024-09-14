@@ -6,7 +6,7 @@ import time
 import typing as t
 import uuid
 
-from globus_sdk import client, exc, paging, response, utils
+from globus_sdk import _guards, client, exc, paging, response, utils
 from globus_sdk._types import DateLike, IntLike, UUIDLike
 from globus_sdk.scopes import GCSCollectionScopeBuilder, Scope, TransferScopes
 
@@ -169,14 +169,14 @@ class TransferClient(client.BaseClient):
                     res = client.submit_transfer({})
         """  # noqa: E501
         if isinstance(collection_ids, (str, uuid.UUID)):
-            utils.check_uuid(collection_ids, name="collection_ids")
+            _guards.validators.uuidlike("collection_ids", collection_ids)
             # wrap the collection_ids input in a list for consistent iteration below
             collection_ids_ = [collection_ids]
         else:
             # copy to a list so that ephemeral iterables can be iterated multiple times
             collection_ids_ = list(collection_ids)
             for i, c in enumerate(collection_ids_):
-                utils.check_uuid(c, name=f"collection_ids[{i}]")
+                _guards.validators.uuidlike(f"collection_ids[{i}]", c)
 
         base_scope = Scope(TransferScopes.all)
         for coll_id in collection_ids_:

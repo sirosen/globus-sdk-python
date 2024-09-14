@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import typing as t
 
-from . import _serializable, _validators
+from globus_sdk._guards import validators
+from globus_sdk._serializable import Serializable
 
 
-class GlobusAuthorizationParameters(_serializable.Serializable):
+class GlobusAuthorizationParameters(Serializable):
     """
     Data class containing authorization parameters that can be passed during
     an authentication flow to control how the user will authenticate.
@@ -56,27 +57,27 @@ class GlobusAuthorizationParameters(_serializable.Serializable):
         prompt: str | None = None,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.session_message = _validators.opt_str("session_message", session_message)
-        self.session_required_identities = _validators.opt_str_list(
+        self.session_message = validators.opt_str("session_message", session_message)
+        self.session_required_identities = validators.opt_str_list(
             "session_required_identities", session_required_identities
         )
-        self.session_required_policies = _validators.opt_str_list(
+        self.session_required_policies = validators.opt_str_list(
             "session_required_policies", session_required_policies
         )
-        self.session_required_single_domain = _validators.opt_str_list(
+        self.session_required_single_domain = validators.opt_str_list(
             "session_required_single_domain", session_required_single_domain
         )
-        self.session_required_mfa = _validators.opt_bool(
+        self.session_required_mfa = validators.opt_bool(
             "session_required_mfa", session_required_mfa
         )
-        self.required_scopes = _validators.opt_str_list(
+        self.required_scopes = validators.opt_str_list(
             "required_scopes", required_scopes
         )
-        self.prompt = _validators.opt_str("prompt", prompt)
+        self.prompt = validators.opt_str("prompt", prompt)
         self.extra = extra or {}
 
 
-class GlobusAuthRequirementsError(_serializable.Serializable):
+class GlobusAuthRequirementsError(Serializable):
     """
     Represents a Globus Auth Requirements Error.
 
@@ -103,8 +104,8 @@ class GlobusAuthRequirementsError(_serializable.Serializable):
         *,
         extra: dict[str, t.Any] | None = None,
     ):
-        self.code = _validators.str_("code", code)
-        self.authorization_parameters = _validators.instance_or_dict(
+        self.code = validators.str_("code", code)
+        self.authorization_parameters = validators.instance_or_dict(
             "authorization_parameters",
             authorization_parameters,
             GlobusAuthorizationParameters,

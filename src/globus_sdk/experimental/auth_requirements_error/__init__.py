@@ -8,10 +8,8 @@ from ._functional_api import (
     to_auth_requirements_error,
     to_auth_requirements_errors,
 )
-from ._validators import ValidationError
 
 __all__ = [
-    "ValidationError",
     "GlobusAuthRequirementsError",
     "GlobusAuthorizationParameters",
     "to_auth_requirements_error",
