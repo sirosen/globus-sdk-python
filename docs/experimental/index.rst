@@ -16,7 +16,6 @@ Globus SDK Experimental Components
 
     auth_requirements_errors
     scope_parser
-    consents
     globus_app
 
 

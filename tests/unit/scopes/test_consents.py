@@ -5,7 +5,7 @@ from uuid import UUID
 
 import pytest
 
-from globus_sdk.experimental.consents import ConsentForest, ConsentTreeConstructionError
+from globus_sdk.scopes.consents import ConsentForest, ConsentTreeConstructionError
 from tests.common import ConsentTest, ScopeRepr
 
 _zero_uuid = str(UUID(int=0))

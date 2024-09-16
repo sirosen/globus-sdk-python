@@ -3,8 +3,8 @@ from __future__ import annotations
 import typing as t
 
 from globus_sdk import AuthClient, Scope
-from globus_sdk.experimental.consents import ConsentForest
 from globus_sdk.experimental.tokenstorage import TokenData, TokenStorage
+from globus_sdk.scopes.consents import ConsentForest
 
 from ..._types import UUIDLike
 from .errors import (
