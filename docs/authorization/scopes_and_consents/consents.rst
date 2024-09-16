@@ -12,11 +12,8 @@ Consents are modeled as a ``ConsentForest`` full of ``ConsentTrees`` containing 
 provided by a user to client applications for token grants under certain scoped
 contexts.
 
-Consent objects are provided from ``globus_sdk.scopes.consents``.
-
-They are typically produced by calling
-:meth:`globus_sdk.AuthClient.get_consents` and invoking ``to_forest()`` on
-the response. Example usage:
+While the consent model classes themselves are exposed here in ``globus_sdk.scopes.consents``,
+most objects are actually loaded from a :meth:`globus_sdk.AuthClient.get_consents` response, using the attached :meth:`globus_sdk.GetConsentsResponse.to_forest()` method:
 
 .. code-block:: python
 
