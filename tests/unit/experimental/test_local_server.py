@@ -10,6 +10,13 @@ from globus_sdk.experimental.login_flow_manager.local_server_login_flow_manager.
 )
 
 
+def test_default_html_template_contains_expected_text():
+    # basic integrity test
+    assert "<h1>Globus Login Result</h1>" in DEFAULT_HTML_TEMPLATE.substitute(
+        post_login_message="", login_result="Login successful"
+    )
+
+
 @pytest.mark.parametrize(
     "url,expected_result",
     [
