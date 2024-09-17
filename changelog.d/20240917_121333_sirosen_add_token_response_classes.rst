@@ -4,7 +4,7 @@ Changed
 - The response types for different OAuth2 token grants now vary by the grant
   type. For example, a ``refresh_token`` grant will now produce a
   ``OAuthRefreshTokenResponse``. This allows code handling responses to identify
-  which grant type was used to produce a response. (:pr:`NUMBER`)
+  which grant type was used to produce a response. (:pr:`1051`)
 
   - The following new types have been introduced:
     ``globus_sdk.OAuthRefreshTokenResponse``,
