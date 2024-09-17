@@ -61,7 +61,10 @@ _LAZY_IMPORT_TABLE = {
         "IdentityMap",
         "GetConsentsResponse",
         "GetIdentitiesResponse",
+        "OAuthAuthorizationCodeResponse",
+        "OAuthClientCredentialsResponse",
         "OAuthDependentTokenResponse",
+        "OAuthRefreshTokenResponse",
         "OAuthTokenResponse",
         "DependentScopeSpec",
     },
@@ -183,7 +186,10 @@ if t.TYPE_CHECKING:
     from .services.auth import IdentityMap
     from .services.auth import GetConsentsResponse
     from .services.auth import GetIdentitiesResponse
+    from .services.auth import OAuthAuthorizationCodeResponse
+    from .services.auth import OAuthClientCredentialsResponse
     from .services.auth import OAuthDependentTokenResponse
+    from .services.auth import OAuthRefreshTokenResponse
     from .services.auth import OAuthTokenResponse
     from .services.auth import DependentScopeSpec
     from .services.gcs import CollectionDocument
@@ -351,7 +357,10 @@ __all__ = (
     "NativeAppAuthClient",
     "NetworkError",
     "NullAuthorizer",
+    "OAuthAuthorizationCodeResponse",
+    "OAuthClientCredentialsResponse",
     "OAuthDependentTokenResponse",
+    "OAuthRefreshTokenResponse",
     "OAuthTokenResponse",
     "OnceTimerSchedule",
     "OneDriveStoragePolicies",

@@ -14,7 +14,10 @@ from .identity_map import IdentityMap
 from .response import (
     GetConsentsResponse,
     GetIdentitiesResponse,
+    OAuthAuthorizationCodeResponse,
+    OAuthClientCredentialsResponse,
     OAuthDependentTokenResponse,
+    OAuthRefreshTokenResponse,
     OAuthTokenResponse,
 )
 
@@ -35,6 +38,9 @@ __all__ = (
     # responses
     "GetConsentsResponse",
     "GetIdentitiesResponse",
+    "OAuthAuthorizationCodeResponse",
+    "OAuthClientCredentialsResponse",
     "OAuthDependentTokenResponse",
+    "OAuthRefreshTokenResponse",
     "OAuthTokenResponse",
 )
