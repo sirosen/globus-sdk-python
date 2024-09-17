@@ -3,7 +3,7 @@ Changed
 
 - Globus Auth Requirements errors are no longer ``experimental``. They have
   been moved to the ``globus_sdk.gare`` module and the primary document type
-  has been renamed from ``GlobusAuthRequirementsError`` to ``GARE``. (:pr:`NUMBER`)
+  has been renamed from ``GlobusAuthRequirementsError`` to ``GARE``. (:pr:`1048`)
 
   - The functions provided by this interface have also been renamed to use
     ``gare`` in their naming: ``to_gare``, ``is_gare``, ``has_gares``, and
