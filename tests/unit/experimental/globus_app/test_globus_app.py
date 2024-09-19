@@ -152,6 +152,8 @@ def test_user_app_token_storage_configuration(token_storage_value, token_storage
     config = GlobusAppConfig(token_storage=token_storage_value)
 
     user_app = UserApp("test-app", client_id=client_id, config=config)
+    if hasattr(user_app._token_storage, "close"):
+        user_app._token_storage.close()  # Prevent a ResourceWarning on Python 3.13
     assert isinstance(user_app._token_storage, token_storage_class)
 
 
