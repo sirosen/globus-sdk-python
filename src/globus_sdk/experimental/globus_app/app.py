@@ -12,7 +12,7 @@ from globus_sdk.gare import GlobusAuthorizationParameters
 from globus_sdk.scopes import AuthScopes, scopes_to_scope_list
 
 from ._types import TokenStorageProvider
-from ._validating_token_storage import ValidatingTokenStorage
+from ._validating_token_storage import ScopeAndIdentityValidatingTokenStorage
 from .authorizer_factory import AuthorizerFactory
 from .config import DEFAULT_CONFIG, KNOWN_TOKEN_STORAGES, GlobusAppConfig
 from .errors import TokenValidationError
@@ -49,7 +49,8 @@ class GlobusApp(metaclass=abc.ABCMeta):
         scopes or scope strings.
     :param config: A ``GlobusAppConfig`` used to control various behaviors of this app.
 
-    :ivar token_storage: The ``ValidatingTokenStorage`` containing tokens for the app.
+    :ivar token_storage: The ``TokenStorage`` containing tokens for the app and
+        capable of validating identity and scope requirements.
         Authorization mediated by the app will use this object, so modifying this will
         impact clients which are defined to use the app whenever they fetch tokens.
     """
@@ -86,7 +87,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
 
         # construct ValidatingTokenStorage around the TokenStorage and
         # our initial scope requirements
-        self.token_storage = ValidatingTokenStorage(
+        self.token_storage = ScopeAndIdentityValidatingTokenStorage(
             token_storage=self._token_storage,
             scope_requirements=self._scope_requirements,
         )
