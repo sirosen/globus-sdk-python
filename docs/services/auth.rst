@@ -52,6 +52,11 @@ batching, and other functionality.
    :exclude-members: __dict__,__weakref__
    :show-inheritance:
 
+.. autoclass:: IDTokenDecoder
+
+.. autoclass:: DefaultIDTokenDecoder
+   :show-inheritance:
+
 .. autoclass:: DependentScopeSpec
 
 Auth Responses

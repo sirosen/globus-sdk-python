@@ -10,6 +10,7 @@ from .flow_managers import (
     GlobusAuthorizationCodeFlowManager,
     GlobusNativeAppFlowManager,
 )
+from .id_token_decoder import DefaultIDTokenDecoder, IDTokenDecoder
 from .identity_map import IdentityMap
 from .response import (
     GetConsentsResponse,
@@ -32,6 +33,8 @@ __all__ = (
     # high-level helpers
     "DependentScopeSpec",
     "IdentityMap",
+    "IDTokenDecoder",
+    "DefaultIDTokenDecoder",
     # flow managers
     "GlobusNativeAppFlowManager",
     "GlobusAuthorizationCodeFlowManager",
