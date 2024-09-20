@@ -11,6 +11,7 @@ from globus_sdk.authorizers import (
     GlobusAuthorizer,
     RefreshTokenAuthorizer,
 )
+from globus_sdk.experimental.tokenstorage import TokenStorageData
 from globus_sdk.services.auth import OAuthTokenResponse
 
 from ._validating_token_storage import ValidatingTokenStorage
@@ -110,6 +111,9 @@ class AccessTokenAuthorizerFactory(AuthorizerFactory[AccessTokenAuthorizer]):
     def __init__(self, token_storage: ValidatingTokenStorage) -> None:
         super().__init__(token_storage)
         self._cached_authorizer_expiration: dict[str, int] = {}
+        self.token_storage.hooks.register_before_validate_scope_requirements(
+            self._check_expires_at_seconds
+        )
 
     def store_token_response_and_clear_cache(
         self, token_res: OAuthTokenResponse
@@ -151,6 +155,17 @@ class AccessTokenAuthorizerFactory(AuthorizerFactory[AccessTokenAuthorizer]):
 
         return super().get_authorizer(resource_server)
 
+    def _check_expires_at_seconds(
+        self, resource_server: str, token_data: TokenStorageData
+    ) -> None:
+        """
+        This is the before-validation hook set on the inner ValidatingTokenStorage.
+
+        It confirms that `expires_at_seconds` is in the past.
+        """
+        if token_data.expires_at_seconds < time.time():
+            raise ExpiredTokenError(token_data.expires_at_seconds)
+
     def _make_authorizer(self, resource_server: str) -> AccessTokenAuthorizer:
         """
         Construct an ``AccessTokenAuthorizer`` for the given resource server.
@@ -161,9 +176,6 @@ class AccessTokenAuthorizerFactory(AuthorizerFactory[AccessTokenAuthorizer]):
             resource server has expired
         """
         token_data = self.token_storage.get_token_data(resource_server)
-        if token_data.expires_at_seconds < time.time():
-            raise ExpiredTokenError(token_data.expires_at_seconds)
-
         return AccessTokenAuthorizer(token_data.access_token)
 
 
@@ -184,8 +196,23 @@ class RefreshTokenAuthorizerFactory(AuthorizerFactory[RefreshTokenAuthorizer]):
         :auth_login_client: The ``AuthLoginCLient` used for refreshing tokens with
             Globus Auth
         """
-        self.auth_login_client = auth_login_client
         super().__init__(token_storage)
+        self.auth_login_client = auth_login_client
+        self.token_storage.hooks.register_before_validate_scope_requirements(
+            self._check_has_refresh_token
+        )
+
+    def _check_has_refresh_token(
+        self, resource_server: str, token_data: TokenStorageData
+    ) -> None:
+        """
+        This is the before-validation hook set on the inner ValidatingTokenStorage.
+
+        It confirms that `refresh_token` is present.
+        """
+        if token_data.refresh_token is None:
+            msg = f"No refresh_token for {resource_server}"
+            raise MissingTokenError(msg, resource_server=resource_server)
 
     def _make_authorizer(self, resource_server: str) -> RefreshTokenAuthorizer:
         """
@@ -197,10 +224,12 @@ class RefreshTokenAuthorizerFactory(AuthorizerFactory[RefreshTokenAuthorizer]):
             resource server does not have a refresh token
         """
         token_data = self.token_storage.get_token_data(resource_server)
-        if token_data.refresh_token is None:
-            msg = f"No refresh_token for {resource_server}"
-            raise MissingTokenError(msg, resource_server=resource_server)
-
+        # this condition should be unreachable -- `get_token_data` will invoke the
+        # `_check_has_refresh_token` hook
+        # the only way to reach it would be to manipulate the hooks such that the check
+        # is removed
+        if token_data.refresh_token is None:  # pragma: no cover
+            raise ValueError("token data missing required field refresh_token")
         return RefreshTokenAuthorizer(
             refresh_token=token_data.refresh_token,
             auth_client=self.auth_login_client,

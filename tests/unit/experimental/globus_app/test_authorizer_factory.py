@@ -8,6 +8,9 @@ from globus_sdk.experimental.globus_app import (
     ClientCredentialsAuthorizerFactory,
     RefreshTokenAuthorizerFactory,
 )
+from globus_sdk.experimental.globus_app._validating_token_storage import (
+    ValidatingTokenStorageHooks,
+)
 from globus_sdk.experimental.globus_app.errors import (
     ExpiredTokenError,
     MissingTokenError,
@@ -34,13 +37,18 @@ class MockValidatingTokenStorage:
     def __init__(self):
         self.token_data = {}
         self.scope_requirements = {"rs1": "rs1:all"}
+        self.hooks = ValidatingTokenStorageHooks()
 
     def get_token_data(self, resource_server):
         if resource_server not in self.token_data:
             msg = f"No token data for {resource_server}"
             raise MissingTokenError(msg, resource_server=resource_server)
 
-        return TokenStorageData.from_dict(self.token_data[resource_server])
+        token_data = TokenStorageData.from_dict(self.token_data[resource_server])
+
+        self.hooks.before_validate_scope_requirements(resource_server, token_data)
+
+        return token_data
 
     def store_token_response(self, mock_token_response):
         self.token_data = mock_token_response.by_resource_server

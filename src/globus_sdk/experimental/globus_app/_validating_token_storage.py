@@ -45,6 +45,7 @@ class ValidatingTokenStorage(TokenStorage):
 
     ValidatingTokenStorage is not concerned with the actual storage location of tokens
         but rather validating that they meet certain requirements:
+
         1) Identity Requirements
             a) Identity info is present in the token data (this requires that the
                 token data was retrieved with the "openid" scope in addition to any
@@ -55,6 +56,9 @@ class ValidatingTokenStorage(TokenStorage):
             a) Each newly polled resource server's token meets the root scope
                 requirements for that resource server.
             b) Polled consents meets all dependent scope requirements.
+
+    Additionally, the calling context can define validation criteria in
+    ``ValidatingTokenStorage.hooks``.
     """
 
     def __init__(
@@ -77,6 +81,8 @@ class ValidatingTokenStorage(TokenStorage):
 
         self.identity_id = self._lookup_stored_identity_id()
         self._cached_consent_forest = self._poll_and_cache_consents()
+
+        self.hooks = ValidatingTokenStorageHooks()
 
         super().__init__(namespace=token_storage.namespace)
 
@@ -226,6 +232,8 @@ class ValidatingTokenStorage(TokenStorage):
             attached root or dependent scope requirements for the resource server.
         :returns: None if all scope requirements are met (or indeterminable).
         """
+        self.hooks.before_validate_scope_requirements(resource_server, token_data)
+
         required_scopes = self.scope_requirements.get(resource_server)
 
         # Short circuit - No scope requirements are, by definition, met.
@@ -287,3 +295,29 @@ class ValidatingTokenStorage(TokenStorage):
             return self.identity_id
         else:
             return self.token_storage._extract_identity_id(token_response)
+
+
+class ValidatingTokenStorageHooks:
+    """
+    A simple hook registry for running various hooks before and after certain known
+    events.
+
+    For now, only one event is supported:
+    - before_validate_scope_requirements
+    """
+
+    def __init__(self) -> None:
+        self._hooks_before_validate_scope_requirements: list[
+            t.Callable[[str, TokenStorageData], t.Any]
+        ] = []
+
+    def before_validate_scope_requirements(
+        self, resource_server: str, token_data: TokenStorageData
+    ) -> None:
+        for hook in self._hooks_before_validate_scope_requirements:
+            hook(resource_server, token_data)
+
+    def register_before_validate_scope_requirements(
+        self, hook: t.Callable[[str, TokenStorageData], t.Any]
+    ) -> None:
+        self._hooks_before_validate_scope_requirements.append(hook)
