@@ -7,13 +7,13 @@ import textwrap
 import time
 import typing as t
 
-import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 from globus_sdk import exc
 from globus_sdk.response import GlobusHTTPResponse
 
 from .._common import SupportsJWKMethods
+from ..id_token_decoder import DefaultIDTokenDecoder
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +191,8 @@ class OAuthTokenResponse(GlobusHTTPResponse):
             step. If ``"leeway"`` is included, it will be passed as the ``leeway``
             parameter, and all other values are passed as ``options``.
         """
-        logger.info('Decoding ID Token "%s"', self["id_token"])
+        id_token = self["id_token"]
+        logger.info('Decoding ID Token "%s"', id_token)
         if not isinstance(self.client, SupportsJWKMethods):
             raise exc.GlobusSDKUsageError(
                 "decode_id_token() requires a client which supports JWK methods. "
@@ -201,41 +202,25 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         else:
             auth_client: SupportsJWKMethods = self.client
 
-        jwt_params = jwt_params or {}
+        decoder = DefaultIDTokenDecoder(auth_client)
 
+        if openid_configuration:
+            decoder.store_openid_configuration(openid_configuration)
+        else:
+            if jwk:
+                raise exc.GlobusSDKUsageError(
+                    "passing jwk without openid configuration is not allowed"
+                )
+        if jwk:
+            decoder.store_jwk(jwk)
+
+        jwt_params = jwt_params or {}
         jwt_leeway: float | datetime.timedelta = 0.5
         if "leeway" in jwt_params:
             jwt_params = jwt_params.copy()
             jwt_leeway = jwt_params.pop("leeway")
 
-        if not openid_configuration:
-            if jwk:
-                raise exc.GlobusSDKUsageError(
-                    "passing jwk without openid configuration is not allowed"
-                )
-            logger.debug("No OIDC Config provided, autofetching...")
-            oidc_config: GlobusHTTPResponse | dict[str, t.Any] = (
-                auth_client.get_openid_configuration()
-            )
-        else:
-            oidc_config = openid_configuration
-
-        if not jwk:
-            logger.debug("No JWK provided, autofetching + decoding...")
-            jwk = auth_client.get_jwk(openid_configuration=oidc_config, as_pem=True)
-
-        logger.debug("final step: decode with JWK")
-        signing_algos = oidc_config["id_token_signing_alg_values_supported"]
-        decoded = jwt.decode(
-            self["id_token"],
-            key=jwk,
-            algorithms=signing_algos,
-            audience=auth_client.client_id,
-            options=jwt_params,
-            leeway=jwt_leeway,
-        )
-        logger.debug("decode ID token finished successfully")
-        return decoded
+        return decoder.decode(id_token, jwt_params=jwt_params, leeway=jwt_leeway)
 
     def __str__(self) -> str:
         by_rs = json.dumps(self.by_resource_server, indent=2, separators=(",", ": "))

@@ -59,6 +59,8 @@ _LAZY_IMPORT_TABLE = {
         "ConfidentialAppAuthClient",
         "AuthAPIError",
         "IdentityMap",
+        "IDTokenDecoder",
+        "DefaultIDTokenDecoder",
         "GetConsentsResponse",
         "GetIdentitiesResponse",
         "OAuthAuthorizationCodeResponse",
@@ -184,6 +186,8 @@ if t.TYPE_CHECKING:
     from .services.auth import ConfidentialAppAuthClient
     from .services.auth import AuthAPIError
     from .services.auth import IdentityMap
+    from .services.auth import IDTokenDecoder
+    from .services.auth import DefaultIDTokenDecoder
     from .services.auth import GetConsentsResponse
     from .services.auth import GetIdentitiesResponse
     from .services.auth import OAuthAuthorizationCodeResponse
@@ -310,6 +314,7 @@ __all__ = (
     "CollectionPolicies",
     "ConfidentialAppAuthClient",
     "ConnectorTable",
+    "DefaultIDTokenDecoder",
     "DeleteData",
     "DependentScopeSpec",
     "EndpointDocument",
@@ -343,6 +348,7 @@ __all__ = (
     "GroupsManager",
     "GuestCollectionDocument",
     "HPSSStoragePolicies",
+    "IDTokenDecoder",
     "IdentityMap",
     "IrodsStoragePolicies",
     "IterableFlowsResponse",

@@ -119,6 +119,8 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
             "AuthAPIError",
             # high-level helpers
             "IdentityMap",
+            "IDTokenDecoder",
+            "DefaultIDTokenDecoder",
             # responses
             "GetConsentsResponse",
             "GetIdentitiesResponse",
