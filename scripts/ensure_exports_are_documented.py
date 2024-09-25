@@ -1,38 +1,70 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
+import functools
 import glob
 import os
 import pathlib
 import re
 import sys
+import typing as t
 
 REPO_ROOT = pathlib.Path(__file__).parent.parent
 
-_NAME_PAT = re.compile(r'\s+"(\w+)",?')
+_ALL_NAME_PATTERN = re.compile(r'\s+"(\w+)",?')
 
-
-_DOC_CACHE: dict[str, str] = {}
+DEPRECATED_NAMES = {
+    "TimerAPIError",
+    "TimerClient",
+    "TimerScopes",
+}
 
 
 def load_docs() -> dict[str, str]:
-    if _DOC_CACHE:
-        return _DOC_CACHE
+    all_docs = {}
     for file in glob.glob("docs/**/*.rst", recursive=True):
         with open(file) as f:
-            _DOC_CACHE[file] = f.read()
-    return _DOC_CACHE
+            all_docs[file] = f.read()
+    return all_docs
 
 
-# TODO: is there a better way to test that a name is documented?
-# should we check that it appears in a class, autoclass, or similar directive?
-def is_documented(name: str) -> bool:
+def iter_all_documented_names() -> t.Iterable[str]:
+    # names under these directives
+    #
+    #   .. autoclass:: <name>
+    #   .. autofunction:: <name>
+    #   .. autoexception:: <name>
+    #   .. autodata:: <name>
+    autodoc_pattern = re.compile(
+        r"^\.\.\s+auto(?:class|function|exception|data)\:\:\s+(?:\w+\.)*(\w+)$",
+        flags=re.MULTILINE,
+    )
+    # names under these directives
+    #
+    #   .. class:: <name>
+    #   .. py:data:: <name>
+    pydoc_pattern = re.compile(
+        r"^\.\.\s+(?:py\:data|class)\:\:\s+(?:\w+\.)*(\w+)$",
+        flags=re.MULTILINE,
+    )
     for data in load_docs().values():
-        if name in data:
-            return True
-    return False
+        for match in autodoc_pattern.finditer(data):
+            yield match.group(1)
+        for match in pydoc_pattern.finditer(data):
+            yield match.group(1)
 
 
-def get_names_from_all_list() -> list[str]:
-    with open("src/globus_sdk/__init__.py") as fp:
+@functools.lru_cache
+def all_documented_names() -> frozenset[str]:
+    return frozenset(iter_all_documented_names())
+
+
+def is_documented(name: str) -> bool:
+    return name in all_documented_names()
+
+
+def get_names_from_all_list(package_dir) -> list[str]:
+    with open(f"src/{package_dir}/__init__.py") as fp:
         contents = fp.readlines()
 
     names: list[str] = []
@@ -41,7 +73,7 @@ def get_names_from_all_list() -> list[str]:
         if found_all:
             if line.strip() == ")":
                 break
-            names.append(_NAME_PAT.match(line).group(1))
+            names.append(_ALL_NAME_PATTERN.match(line).group(1))
         else:
             if line.strip() == "__all__ = (":
                 found_all = True
@@ -52,10 +84,18 @@ def get_names_from_all_list() -> list[str]:
 
 def ensure_exports_are_documented() -> bool:
     success = True
-    for name in get_names_from_all_list():
-        if not is_documented(name):
-            print(f"{name} is not documented")
-            success = False
+    used_deprecations = set()
+    for package_dir in ("globus_sdk", "globus_sdk/scopes"):
+        for name in get_names_from_all_list(package_dir):
+            if name in DEPRECATED_NAMES:
+                used_deprecations.add(name)
+                continue
+            if not is_documented(name):
+                print(f"{name} is not documented")
+                success = False
+    if unused_deprecations := (DEPRECATED_NAMES - used_deprecations):
+        print(f"unused deprecations: {unused_deprecations}")
+        success = False
     return success
 
 

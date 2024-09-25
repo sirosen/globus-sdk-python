@@ -195,6 +195,10 @@ Scope Reference
 
 .. autoclass:: ScopeCycleError
 
+.. autofunction:: scopes_to_str
+
+.. autofunction:: scopes_to_scope_list
+
 ScopeBuilders
 -------------
 
