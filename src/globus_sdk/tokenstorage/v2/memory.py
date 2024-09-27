@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import typing as t
 
-from globus_sdk.experimental.tokenstorage.base import TokenStorage
-
+from .base import TokenStorage
 from .token_data import TokenStorageData
 
 if t.TYPE_CHECKING:
@@ -13,9 +12,12 @@ if t.TYPE_CHECKING:
 
 class MemoryTokenStorage(TokenStorage):
     """
-    A token storage adapter which stores token data in process memory.
+    A token storage which holds tokens in-memory.
+    All token data is lost when the process exits.
 
-    Tokens are lost when the process exits.
+    See :class:`TokenStorage` for common interface details.
+
+    :param namespace: A unique string for partitioning token data (Default: "DEFAULT").
     """
 
     def __init__(self, *, namespace: str = "DEFAULT") -> None:
