@@ -13,6 +13,11 @@ REPO_ROOT = pathlib.Path(__file__).parent.parent
 
 _ALL_NAME_PATTERN = re.compile(r'\s+"(\w+)",?')
 
+PACKAGE_DIRS_TO_SCAN = (
+    "globus_sdk",
+    "globus_sdk/scopes",
+)
+
 DEPRECATED_NAMES = {
     "TimerAPIError",
     "TimerClient",
@@ -85,13 +90,16 @@ def get_names_from_all_list(package_dir) -> list[str]:
 def ensure_exports_are_documented() -> bool:
     success = True
     used_deprecations = set()
-    for package_dir in ("globus_sdk", "globus_sdk/scopes"):
+    for package_dir in PACKAGE_DIRS_TO_SCAN:
         for name in get_names_from_all_list(package_dir):
             if name in DEPRECATED_NAMES:
                 used_deprecations.add(name)
                 continue
             if not is_documented(name):
-                print(f"{name} is not documented")
+                print(
+                    f"'src/{package_dir}/__init__.py::{name}' "
+                    "was not found in doc directives"
+                )
                 success = False
     if unused_deprecations := (DEPRECATED_NAMES - used_deprecations):
         print(f"unused deprecations: {unused_deprecations}")
