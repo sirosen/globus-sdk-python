@@ -13,12 +13,13 @@ REPO_ROOT = pathlib.Path(__file__).parent.parent
 
 _ALL_NAME_PATTERN = re.compile(r'\s+"(\w+)",?')
 
-PACKAGE_DIRS_TO_SCAN = (
-    "globus_sdk",
-    "globus_sdk/scopes",
-    "globus_sdk/gare",
-    "globus_sdk/login_flows",
-    "globus_sdk/_testing",
+PACKAGE_LOCS_TO_SCAN = (
+    "globus_sdk/",
+    "globus_sdk/response.py",
+    "globus_sdk/scopes/",
+    "globus_sdk/gare/",
+    "globus_sdk/login_flows/",
+    "globus_sdk/_testing/",
 )
 
 DEPRECATED_NAMES = {
@@ -71,8 +72,8 @@ def is_documented(name: str) -> bool:
     return name in all_documented_names()
 
 
-def get_names_from_all_list(package_dir) -> list[str]:
-    with open(f"src/{package_dir}/__init__.py") as fp:
+def get_names_from_all_list(file_path: str) -> list[str]:
+    with open(f"src/{file_path}") as fp:
         contents = fp.readlines()
 
     names: list[str] = []
@@ -93,16 +94,15 @@ def get_names_from_all_list(package_dir) -> list[str]:
 def ensure_exports_are_documented() -> bool:
     success = True
     used_deprecations = set()
-    for package_dir in PACKAGE_DIRS_TO_SCAN:
-        for name in get_names_from_all_list(package_dir):
+    for loc in PACKAGE_LOCS_TO_SCAN:
+        if loc.endswith("/"):
+            loc = f"{loc}/__init__.py"
+        for name in get_names_from_all_list(loc):
             if name in DEPRECATED_NAMES:
                 used_deprecations.add(name)
                 continue
             if not is_documented(name):
-                print(
-                    f"'src/{package_dir}/__init__.py::{name}' "
-                    "was not found in doc directives"
-                )
+                print(f"'src/{loc}::{name}' was not found in doc directives")
                 success = False
     if unused_deprecations := (DEPRECATED_NAMES - used_deprecations):
         print(f"unused deprecations: {unused_deprecations}")
