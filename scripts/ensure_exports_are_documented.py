@@ -16,6 +16,9 @@ _ALL_NAME_PATTERN = re.compile(r'\s+"(\w+)",?')
 PACKAGE_DIRS_TO_SCAN = (
     "globus_sdk",
     "globus_sdk/scopes",
+    "globus_sdk/gare",
+    "globus_sdk/login_flows",
+    "globus_sdk/_testing",
 )
 
 DEPRECATED_NAMES = {
