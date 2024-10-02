@@ -7,12 +7,7 @@ import webbrowser
 from contextlib import contextmanager
 from string import Template
 
-from globus_sdk import (
-    AuthLoginClient,
-    GlobusSDKUsageError,
-    NativeAppAuthClient,
-    OAuthTokenResponse,
-)
+import globus_sdk
 from globus_sdk.gare import GlobusAuthorizationParameters
 from globus_sdk.login_flows.login_flow_manager import LoginFlowManager
 
@@ -96,7 +91,7 @@ class LocalServerLoginFlowManager(LoginFlowManager):
 
     def __init__(
         self,
-        login_client: AuthLoginClient,
+        login_client: globus_sdk.AuthLoginClient,
         *,
         request_refresh_tokens: bool = False,
         native_prefill_named_grant: str | None = None,
@@ -113,7 +108,10 @@ class LocalServerLoginFlowManager(LoginFlowManager):
 
     @classmethod
     def for_globus_app(
-        cls, app_name: str, login_client: AuthLoginClient, config: GlobusAppConfig
+        cls,
+        app_name: str,
+        login_client: globus_sdk.AuthLoginClient,
+        config: GlobusAppConfig,
     ) -> LocalServerLoginFlowManager:
         """
         Create a ``LocalServerLoginFlowManager`` for use in a GlobusApp.
@@ -127,14 +125,14 @@ class LocalServerLoginFlowManager(LoginFlowManager):
             # A "local server" relies on the user being redirected back to the server
             # running on the local machine, so it can't use a custom redirect URI.
             msg = "Cannot define a custom redirect_uri for LocalServerLoginFlowManager."
-            raise GlobusSDKUsageError(msg)
-        if not isinstance(login_client, NativeAppAuthClient):
+            raise globus_sdk.GlobusSDKUsageError(msg)
+        if not isinstance(login_client, globus_sdk.NativeAppAuthClient):
             # Globus Auth has special provisions for native clients which allow implicit
             # redirect url grant to localhost:<any-port>. This is required for the
             # LocalServerLoginFlowManager to work and is not reproducible in
             # confidential clients.
             msg = "LocalServerLoginFlowManager is only supported for Native Apps."
-            raise GlobusSDKUsageError(msg)
+            raise globus_sdk.GlobusSDKUsageError(msg)
 
         return cls(
             login_client,
@@ -145,7 +143,7 @@ class LocalServerLoginFlowManager(LoginFlowManager):
     def run_login_flow(
         self,
         auth_parameters: GlobusAuthorizationParameters,
-    ) -> OAuthTokenResponse:
+    ) -> globus_sdk.OAuthTokenResponse:
         """
         Run an interactive login flow using a locally hosted server to get tokens
         for the user.

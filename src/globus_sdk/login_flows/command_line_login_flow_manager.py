@@ -3,12 +3,7 @@ from __future__ import annotations
 import textwrap
 import typing as t
 
-from globus_sdk import (
-    AuthLoginClient,
-    ConfidentialAppAuthClient,
-    GlobusSDKUsageError,
-    OAuthTokenResponse,
-)
+import globus_sdk
 from globus_sdk.gare import GlobusAuthorizationParameters
 
 from .login_flow_manager import LoginFlowManager
@@ -39,7 +34,7 @@ class CommandLineLoginFlowManager(LoginFlowManager):
 
     def __init__(
         self,
-        login_client: AuthLoginClient,
+        login_client: globus_sdk.AuthLoginClient,
         *,
         redirect_uri: str | None = None,
         request_refresh_tokens: bool = False,
@@ -53,9 +48,9 @@ class CommandLineLoginFlowManager(LoginFlowManager):
 
         if redirect_uri is None:
             # Confidential clients must always define their own custom redirect URI.
-            if isinstance(login_client, ConfidentialAppAuthClient):
+            if isinstance(login_client, globus_sdk.ConfidentialAppAuthClient):
                 msg = "Use of a Confidential client requires an explicit redirect_uri."
-                raise GlobusSDKUsageError(msg)
+                raise globus_sdk.GlobusSDKUsageError(msg)
 
             # Native clients may infer the globus-provided helper page if omitted.
             redirect_uri = login_client.base_url + "v2/web/auth-code"
@@ -63,7 +58,10 @@ class CommandLineLoginFlowManager(LoginFlowManager):
 
     @classmethod
     def for_globus_app(
-        cls, app_name: str, login_client: AuthLoginClient, config: GlobusAppConfig
+        cls,
+        app_name: str,
+        login_client: globus_sdk.AuthLoginClient,
+        config: GlobusAppConfig,
     ) -> CommandLineLoginFlowManager:
         """
         Create a ``CommandLineLoginFlowManager`` for use in a GlobusApp.
@@ -84,7 +82,7 @@ class CommandLineLoginFlowManager(LoginFlowManager):
     def run_login_flow(
         self,
         auth_parameters: GlobusAuthorizationParameters,
-    ) -> OAuthTokenResponse:
+    ) -> globus_sdk.OAuthTokenResponse:
         """
         Run an interactive login flow on the command line to get tokens for the user.
 
