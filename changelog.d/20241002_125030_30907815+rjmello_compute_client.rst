@@ -1,7 +1,7 @@
 Added
 ~~~~~
 
--   Added an initial Globus Compute client class, ``globus_sdk.ComputeClient``. (:pr:`NUMBER`)
+-   Added an initial Globus Compute client class, ``globus_sdk.ComputeClient``. (:pr:`1071`)
 
     -   ``globus_sdk.ComputeAPIError`` is the error class for this client.
 
