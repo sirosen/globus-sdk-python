@@ -289,7 +289,7 @@ class TransferClient(client.BaseClient):
         cannot have a ``subscription_id`` directly set in this way.
 
         :param collection_id: The collection ID which is having its subscription set.
-        :param subscription_id: The ID of the subscription which is being assigned.
+        :param subscription_id: The ID of the subscription to assign.
 
         .. tab-set::
 
