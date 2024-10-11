@@ -275,7 +275,9 @@ class TransferClient(client.BaseClient):
         return self.put(f"endpoint/{endpoint_id}", data=data, query_params=query_params)
 
     def set_subscription_id(
-        self, collection_id: UUIDLike, subscription_id: UUIDLike
+        self,
+        collection_id: UUIDLike,
+        subscription_id: UUIDLike | Literal["DEFAULT"] | None,
     ) -> response.GlobusHTTPResponse:
         """
         Set the ``subscription_id`` on a mapped collection.
@@ -289,7 +291,18 @@ class TransferClient(client.BaseClient):
         cannot have a ``subscription_id`` directly set in this way.
 
         :param collection_id: The collection ID which is having its subscription set.
-        :param subscription_id: The ID of the subscription to assign.
+        :param subscription_id: The ID of the subscription to assign, the special
+            string ``"DEFAULT"``, or ``None``.
+
+        .. note::
+
+            Setting ``subscription_id="DEFAULT"`` results in the service choosing your
+            subscription ID, but requires that you only have one subscription.
+            If you have multiple subscriptions, using ``"DEFAULT"`` will result in an
+            error.
+
+            Setting ``subscription_id=None`` clears any existing subscription from the
+            collection.
 
         .. tab-set::
 
