@@ -838,7 +838,7 @@ class AuthClient(client.BaseClient):
         :param domain_constraints_exclude: A list of domains that cannot satisfy the
             policy
 
-        .. note:
+        .. note::
 
             ``project_id``, ``display_name``, and ``description`` are all required
             arguments, although they are not declared as required in the function
