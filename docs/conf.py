@@ -4,21 +4,6 @@ import datetime
 
 import globus_sdk
 
-# running `tox -e docs -- -n` will pick up "nitpick" warning which we convert to build
-# errors with `-W`
-# load ignores from file
-nitpick_ignore = []
-nitpick_ignore_regex = []
-with open("nitpick_ignore.txt") as fp:
-    for line in fp:
-        line = line.strip()
-        if line == "" or line.startswith("#"):
-            continue
-        if line.startswith("re: "):
-            nitpick_ignore_regex.append(tuple(line.split()[1:]))
-        else:
-            nitpick_ignore.append(tuple(line.split()))
-
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
