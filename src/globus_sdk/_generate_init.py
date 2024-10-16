@@ -204,7 +204,9 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
         (
             "SearchAPIError",
             "SearchClient",
+            # legacy class (remove in the future)
             "SearchQuery",
+            "SearchQueryV1",
             "SearchScrollQuery",
         ),
     ),
