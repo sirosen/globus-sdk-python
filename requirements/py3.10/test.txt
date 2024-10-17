@@ -9,13 +9,13 @@ certifi==2024.8.30
 charset-normalizer==3.4.0
     # via requests
 coverage==7.6.3
-    # via -r test.in
+    # via -r .test.in
 exceptiongroup==1.2.2
     # via pytest
 execnet==2.1.1
     # via pytest-xdist
 flaky==3.8.1
-    # via -r test.in
+    # via -r .test.in
 idna==3.10
     # via requests
 iniconfig==2.0.0
@@ -26,19 +26,19 @@ pluggy==1.5.0
     # via pytest
 pytest==8.3.3
     # via
-    #   -r test.in
+    #   -r .test.in
     #   pytest-randomly
     #   pytest-xdist
 pytest-randomly==3.15.0
-    # via -r test.in
+    # via -r .test.in
 pytest-xdist==3.6.1
-    # via -r test.in
+    # via -r .test.in
 pyyaml==6.0.2
     # via responses
 requests==2.32.3
     # via responses
 responses==0.25.3
-    # via -r test.in
+    # via -r .test.in
 tomli==2.0.2
     # via pytest
 urllib3==2.2.3
