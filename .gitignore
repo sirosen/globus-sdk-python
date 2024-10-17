@@ -20,3 +20,6 @@ env/
 .pytest_cache
 .coverage
 .coverage.*
+
+# intermediary requirements files
+/requirements/*.in
