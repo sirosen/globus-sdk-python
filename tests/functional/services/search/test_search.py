@@ -56,10 +56,12 @@ def test_search_post_query_simple(search_client, query_doc):
     assert req_body == dict(query_doc)
 
 
-@pytest.mark.filterwarnings("ignore:'SearchQuery'*:DeprecationWarning")
 def test_search_post_query_with_legacy_helper(search_client):
     meta = load_response(search_client.post_search).metadata
-    query_doc = globus_sdk.SearchQuery("foo")
+    with pytest.warns(
+        globus_sdk.exc.RemovedInV4Warning, match="'SearchQuery' is deprecated"
+    ):
+        query_doc = globus_sdk.SearchQuery("foo")
 
     res = search_client.post_search(meta["index_id"], query_doc)
     assert res.http_status == 200
@@ -114,10 +116,12 @@ def test_search_post_query_arg_overrides(search_client):
     assert query_doc["offset"] == 0
 
 
-@pytest.mark.filterwarnings("ignore:'SearchQuery'*:DeprecationWarning")
 def test_search_post_query_arg_overrides_with_legacy_helper(search_client):
     meta = load_response(search_client.post_search).metadata
-    query_doc = globus_sdk.SearchQuery("foo", limit=10, offset=0)
+    with pytest.warns(
+        globus_sdk.exc.RemovedInV4Warning, match="'SearchQuery' is deprecated"
+    ):
+        query_doc = globus_sdk.SearchQuery("foo", limit=10, offset=0)
 
     res = search_client.post_search(meta["index_id"], query_doc, limit=100, offset=150)
     assert res.http_status == 200
