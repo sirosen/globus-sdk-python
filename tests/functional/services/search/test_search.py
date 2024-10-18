@@ -59,7 +59,7 @@ def test_search_post_query_simple(search_client, query_doc):
 def test_search_post_query_with_legacy_helper(search_client):
     meta = load_response(search_client.post_search).metadata
     with pytest.warns(
-        globus_sdk.exc.RemovedInV4Warning, match="'SearchQuery' is deprecated"
+        globus_sdk.RemovedInV4Warning, match="'SearchQuery' is deprecated"
     ):
         query_doc = globus_sdk.SearchQuery("foo")
 
@@ -119,7 +119,7 @@ def test_search_post_query_arg_overrides(search_client):
 def test_search_post_query_arg_overrides_with_legacy_helper(search_client):
     meta = load_response(search_client.post_search).metadata
     with pytest.warns(
-        globus_sdk.exc.RemovedInV4Warning, match="'SearchQuery' is deprecated"
+        globus_sdk.RemovedInV4Warning, match="'SearchQuery' is deprecated"
     ):
         query_doc = globus_sdk.SearchQuery("foo", limit=10, offset=0)
 
