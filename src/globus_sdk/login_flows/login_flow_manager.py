@@ -29,9 +29,7 @@ class LoginFlowManager(metaclass=abc.ABCMeta):
         request_refresh_tokens: bool = False,
         native_prefill_named_grant: str | None = None,
     ) -> None:
-        if not isinstance(
-            login_client, globus_sdk.NativeAppAuthClient
-        ) and not isinstance(login_client, globus_sdk.ConfidentialAppAuthClient):
+        if not isinstance(login_client, (globus_sdk.NativeAppAuthClient, globus_sdk.ConfidentialAppAuthClient)):
             raise globus_sdk.GlobusSDKUsageError(
                 f"{type(self).__name__} requires a NativeAppAuthClient or "
                 f"ConfidentialAppAuthClient, but got a {type(login_client).__name__}."
