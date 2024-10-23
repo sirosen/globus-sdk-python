@@ -2,11 +2,17 @@ from __future__ import annotations
 
 from globus_sdk import utils
 from globus_sdk._types import UUIDLike
+from globus_sdk.exc import warn_deprecated
 from globus_sdk.utils import MISSING, MissingType
 
 
 class ComputeFunctionMetadata(utils.PayloadWrapper):
-    """A wrapper for function metadata.
+    """
+    .. warning::
+
+        This class is deprecated.
+
+    A wrapper for function metadata.
 
     :param python_version: The Python version used to serialize the function.
     :param sdk_version: The Globus Compute SDK version used to serialize the function.
@@ -18,13 +24,19 @@ class ComputeFunctionMetadata(utils.PayloadWrapper):
         python_version: str | MissingType = MISSING,
         sdk_version: str | MissingType = MISSING,
     ):
+        warn_deprecated("ComputeFunctionMetadata is deprecated.")
         super().__init__()
         self["python_version"] = python_version
         self["sdk_version"] = sdk_version
 
 
 class ComputeFunctionDocument(utils.PayloadWrapper):
-    """A function registration document.
+    """
+    .. warning::
+
+        This class is deprecated.
+
+    A function registration document.
 
     :param function_name: The name of the function.
     :param function_code: The serialized function source code.
@@ -44,6 +56,7 @@ class ComputeFunctionDocument(utils.PayloadWrapper):
         group: UUIDLike | MissingType = MISSING,
         public: bool = False,
     ):
+        warn_deprecated("ComputeFunctionDocument is deprecated.")
         super().__init__()
         self["function_name"] = function_name
         self["function_code"] = function_code
