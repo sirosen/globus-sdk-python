@@ -7,7 +7,6 @@ from globus_sdk import GlobusHTTPResponse, client
 from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import ComputeScopes, Scope
 
-from .data import ComputeFunctionDocument
 from .errors import ComputeAPIError
 
 log = logging.getLogger(__name__)
@@ -27,7 +26,7 @@ class ComputeClient(client.BaseClient):
 
     def register_function(
         self,
-        function_data: ComputeFunctionDocument | dict[str, t.Any],
+        function_data: dict[str, t.Any],
     ) -> GlobusHTTPResponse:
         """Register a new function.
 
