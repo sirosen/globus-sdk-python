@@ -169,6 +169,7 @@ known_first_party = ["tests", "globus_sdk"]
 
 [tool.mypy]
 strict = true
+sqlite_cache = true
 warn_unreachable = true
 warn_no_return = true
 
