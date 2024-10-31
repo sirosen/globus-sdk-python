@@ -70,6 +70,8 @@ _LAZY_IMPORT_TABLE = {
     },
     "services.compute": {
         "ComputeClient",
+        "ComputeClientV2",
+        "ComputeClientV3",
         "ComputeAPIError",
         "ComputeFunctionDocument",
         "ComputeFunctionMetadata",
@@ -206,6 +208,8 @@ if t.TYPE_CHECKING:
     from .services.auth import OAuthTokenResponse
     from .services.auth import DependentScopeSpec
     from .services.compute import ComputeClient
+    from .services.compute import ComputeClientV2
+    from .services.compute import ComputeClientV3
     from .services.compute import ComputeAPIError
     from .services.compute import ComputeFunctionDocument
     from .services.compute import ComputeFunctionMetadata
@@ -333,6 +337,8 @@ __all__ = (
     "CollectionPolicies",
     "ComputeAPIError",
     "ComputeClient",
+    "ComputeClientV2",
+    "ComputeClientV3",
     "ComputeFunctionDocument",
     "ComputeFunctionMetadata",
     "ConfidentialAppAuthClient",

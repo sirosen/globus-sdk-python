@@ -1,6 +1,6 @@
 from globus_sdk._testing.models import RegisteredResponse, ResponseSet
 
-from ._common import FUNCTION_CODE, FUNCTION_ID, FUNCTION_NAME
+from .._common import FUNCTION_CODE, FUNCTION_ID, FUNCTION_NAME
 
 RESPONSES = ResponseSet(
     metadata={

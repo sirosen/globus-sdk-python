@@ -12,11 +12,11 @@ from .errors import ComputeAPIError
 log = logging.getLogger(__name__)
 
 
-class ComputeClient(client.BaseClient):
+class ComputeClientV2(client.BaseClient):
     r"""
-    Client for the Globus Compute API.
+    Client for the Globus Compute API, version 2.
 
-    .. automethodlist:: globus_sdk.ComputeClient
+    .. automethodlist:: globus_sdk.ComputeClientV2
     """
 
     error_class = ComputeAPIError
@@ -71,3 +71,25 @@ class ComputeClient(client.BaseClient):
                     :ref: Functions/operation/delete_function_v2_functions__function_uuid__delete
         """  # noqa: E501
         return self.delete(f"/v2/functions/{function_id}")
+
+
+class ComputeClientV3(client.BaseClient):
+    r"""
+    Client for the Globus Compute API, version 3.
+
+    .. automethodlist:: globus_sdk.ComputeClientV3
+    """
+
+    error_class = ComputeAPIError
+    service_name = "compute"
+    scopes = ComputeScopes
+    default_scope_requirements = [Scope(ComputeScopes.all)]
+
+
+class ComputeClient(ComputeClientV2):
+    r"""
+    Canonical client for the Globus Compute API, with support exclusively for
+    API version 2.
+
+    .. automethodlist:: globus_sdk.ComputeClient
+    """

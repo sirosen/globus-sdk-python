@@ -4,8 +4,8 @@ import globus_sdk
 
 
 @pytest.fixture
-def compute_client(no_retry_transport):
-    class CustomComputeClient(globus_sdk.ComputeClient):
+def compute_client_v2(no_retry_transport):
+    class CustomComputeClientV2(globus_sdk.ComputeClientV2):
         transport_class = no_retry_transport
 
-    return CustomComputeClient()
+    return CustomComputeClientV2()
