@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import re
 import typing as t
 
 import responses
@@ -8,6 +9,10 @@ import responses
 import globus_sdk
 
 from .models import RegisteredResponse, ResponseList, ResponseSet
+
+# matches "V2", "V11", etc as a string suffix
+# see usage in _resolve_qualname for details
+_SUFFIX_VERSION_MATCH_PATTERN = re.compile(r"V\d+$")
 
 _RESPONSE_SET_REGISTRY: dict[t.Any, ResponseSet] = {}
 
@@ -53,6 +58,16 @@ def _resolve_qualname(name: str) -> str:
 
     assert issubclass(maybe_client, globus_sdk.BaseClient)
     service_name = maybe_client.service_name
+
+    # TODO: Consider alternative strategies for mapping versioned clients
+    # to subdirs. For now, we do it by name matching.
+    #
+    # 'prefix' is the client name, and it may end in `V2`, `V3`, etc.
+    # in which case we want to map it to a subdir
+    suffix_version_match = _SUFFIX_VERSION_MATCH_PATTERN.search(prefix)
+    if suffix_version_match:
+        suffix = f"{suffix_version_match.group(0).lower()}.{suffix}"
+
     return f"{service_name}.{suffix}"
 
 
