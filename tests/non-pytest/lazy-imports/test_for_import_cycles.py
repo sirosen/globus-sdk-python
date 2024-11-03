@@ -16,10 +16,17 @@ import sys
 import pytest
 
 import globus_sdk
+from globus_sdk._lazy_import import find_source_module
 
 PYTHON_BINARY = os.environ.get("GLOBUS_TEST_PY", sys.executable)
 
-MODULE_NAMES = sorted(globus_sdk._LAZY_IMPORT_TABLE.keys())
+MODULE_NAMES = sorted(
+    {
+        find_source_module("globus_sdk", attr).lstrip(".")
+        for attr in globus_sdk.__all__
+        if not attr.startswith("_")
+    }
+)
 
 
 @pytest.mark.parametrize(
