@@ -39,4 +39,4 @@ if [ -z "$(find changelog.d -name '*.rst')" ]; then
     exit 0
 fi
 
-scriv collect --keep --version "$VERSION" -v DEBUG
+uv run scriv collect --keep --version "$VERSION" -v DEBUG
