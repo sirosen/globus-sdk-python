@@ -8,12 +8,12 @@ build:
   os: "ubuntu-22.04"
   tools:
     python: "3.11"
-  jobs:
-    pre_build:
-      - bash ./scripts/rtd-pre-sphinx-build.sh
-
-python:
-  install:
-    - method: pip
-      path: .
-    - requirements: "requirements/py3.11/docs.txt"
+  # use 'uv pip install' to apply build customization in a pip-compatible way
+  # see: https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-uv
+  commands:
+    - bash ./scripts/rtd-pre-sphinx-build.sh
+    - asdf plugin add uv
+    - asdf install uv latest
+    - asdf global uv latest
+    - uv pip install . -r "requirements/py3.11/docs.txt"
+    - uv run -m sphinx -T -b html -d docs/_build/doctrees -D language=en docs $READTHEDOCS_OUTPUT/html
