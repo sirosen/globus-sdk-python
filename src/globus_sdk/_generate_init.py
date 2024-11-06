@@ -135,6 +135,8 @@ _LAZY_IMPORT_TABLE: list[tuple[str, tuple[str, ...]]] = [
         "services.compute",
         (
             "ComputeClient",
+            "ComputeClientV2",
+            "ComputeClientV3",
             "ComputeAPIError",
             "ComputeFunctionDocument",
             "ComputeFunctionMetadata",
