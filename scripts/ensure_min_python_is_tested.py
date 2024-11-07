@@ -19,23 +19,23 @@ proc = subprocess.run(
 )
 requires_python_version = proc.stdout.decode().strip()
 
-with open(REPO_ROOT / ".github" / "workflows" / "build.yaml") as f:
+with open(REPO_ROOT / ".github" / "workflows" / "test.yaml") as f:
     workflow = YAML.load(f)
-    try:
-        test_mindeps_job = workflow["jobs"]["test-mindeps"]
-    except KeyError:
-        raise ValueError("Could not find the test-mindeps job. Perhaps it has moved?")
-
-    job_steps = test_mindeps_job["steps"]
-    for step in job_steps:
-        if "uses" in step and "actions/setup-python" in step["uses"]:
-            setup_python_step = step
+    includes = workflow["jobs"]["test"]["strategy"]["matrix"]["include"]
+    for include in includes:
+        if include["name"] == "Linux":
             break
     else:
-        raise ValueError("Could not find the setup-python step.")
+        raise ValueError("Could not find 'Linux' in the test matrix.")
 
-    python_version = setup_python_step["with"]["python-version"]
-    if python_version != requires_python_version:
+    for environment in include["tox-post-environments"]:
+        if environment.endswith("-mindeps"):
+            break
+    else:
+        raise ValueError("Could not find a '-mindeps' tox-post-environment.")
+
+    python_version, _, _ = environment.partition("-")
+    if python_version != f"py{requires_python_version}":
         print("ERROR: ensure_min_python_is_tested.py failed!")
         print(
             f"\nPackage data sets 'Requires-Python: >={requires_python_version}', "

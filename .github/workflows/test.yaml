@@ -1,0 +1,80 @@
+name: "🧪 Test"
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request: null
+  # build weekly at 4:00 AM UTC
+  schedule:
+    - cron: '0 4 * * 1'
+
+jobs:
+  test:
+    name: "${{ matrix.name }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        # The `include` array below will match against these names
+        # and add additional keys and values to the JSON object.
+        name:
+          - "Linux"
+          - "macOS"
+          - "Windows"
+          - "Quality"
+
+        # The `include` array below will also inherit these values,
+        # which are critical for effective cache-busting.
+        # The nested list syntax ensures that the full array of values is inherited.
+        cache-key-hash-files:
+          -
+            - "requirements/*/*.txt"
+            - "pyproject.toml"
+            - "toxfile.py"
+
+        include:
+          - name: "Linux"
+            runner: "ubuntu-latest"
+            cpythons:
+              - "3.8"
+              - "3.9"
+              - "3.10"
+              - "3.11"
+              - "3.12"
+              - "3.13"
+            tox-post-environments:
+              - "py3.8-mindeps"
+              - "coverage_report"
+
+          - name: "macOS"
+            runner: "macos-latest"
+            cpythons:
+              - "3.11"
+            tox-post-environments:
+              - "coverage_report"
+
+          - name: "Windows"
+            runner: "windows-latest"
+            cpythons:
+              - "3.11"
+            tox-post-environments:
+              - "coverage_report"
+
+          - name: "Quality"
+            runner: "ubuntu-latest"
+            cpythons:
+              - "3.13"
+            tox-environments:
+              - "check-min-python-is-tested"
+              - "mypy"
+              - "mypy-test"
+              - "poetry-check"
+              - "pylint"
+              - "test-lazy-imports"
+              - "twine-check"
+            cache-paths:
+              - ".mypy_cache/"
+
+    uses: "globus/workflows/.github/workflows/tox.yaml@04b4abd6fcb9b4be7263bc9d6994ae2ada220739" # v1.1
+    with:
+      config: "${{ toJSON(matrix) }}"

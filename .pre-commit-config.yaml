@@ -54,6 +54,10 @@ repos:
   rev: 0.6.7
   hooks:
     - id: alphabetize-codeowners
+- repo: https://github.com/rhysd/actionlint
+  rev: v1.7.4
+  hooks:
+    - id: actionlint
 
 # custom local hooks
 - repo: local
