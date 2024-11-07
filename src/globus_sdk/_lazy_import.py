@@ -35,8 +35,7 @@ def load_all_tuple(modname: str, pyi_filename: str) -> tuple[str, ...]:
         ``importlib.resources`` will use both of these fields to load the ``pyi``
         data, so the file must be in package metadata.
     """
-    pyi_ast = _parse_pyi(modname, pyi_filename)
-    return tuple(_extract_all_tuple_names(modname, pyi_filename, pyi_ast))
+    return _ParsedPYIData.load(modname, pyi_filename).all_names
 
 
 def default_getattr_implementation(
@@ -131,69 +130,83 @@ def find_source_module(modname: str, pyi_filename: str, attrname: str) -> str:
         data, so the file must be in package metadata.
     :param attrname: The name of the attribute to load.
     """
-    pyi_ast = _parse_pyi(modname, pyi_filename)
-    import_from = _find_import_from(modname, pyi_ast, attrname)
-    # type ignore the possibility of 'import_from.module == None'
-    # as it's not possible from parsed code
-    return ("." * import_from.level) + import_from.module  # type: ignore[operator]
+    parsed = _ParsedPYIData.load(modname, pyi_filename)
+    return parsed.module_for_attr(attrname)
 
 
-def _find_import_from(
-    modname: str, pyi_ast: ast.Module, attrname: str
-) -> ast.ImportFrom:
-    for statement in pyi_ast.body:
-        if not isinstance(statement, ast.ImportFrom):
-            continue
+class _ParsedPYIData:
+    _CACHE: dict[tuple[str, str], _ParsedPYIData] = {}
 
-        if attrname in [alias.name for alias in statement.names]:
-            return statement
+    @classmethod
+    def load(cls, module_name: str, pyi_filename: str) -> _ParsedPYIData:
+        if (module_name, pyi_filename) not in cls._CACHE:
+            cls._CACHE[(module_name, pyi_filename)] = cls(module_name, pyi_filename)
+        return cls._CACHE[(module_name, pyi_filename)]
 
-    raise LookupError(f"Could not find import of '{attrname}' in '{modname}'.")
+    def __init__(self, module_name: str, pyi_filename: str):
+        self.module_name = module_name
+        self.pyi_filename = pyi_filename
+        self._ast = _parse_pyi_ast(module_name, pyi_filename)
+
+        self._import_attr_map: dict[str, str] = {}
+        self._all_names: list[str] = []
+
+        self._load()
+
+    @property
+    def all_names(self) -> tuple[str, ...]:
+        return tuple(self._all_names)
+
+    def module_for_attr(self, attrname: str) -> str:
+        if attrname not in self._import_attr_map:
+            raise LookupError(
+                f"Could not find import of '{attrname}' in '{self.module_name}'."
+            )
+        return self._import_attr_map[attrname]
+
+    def _load(self) -> None:
+        for statement in self._ast.body:
+            self._load_statement(statement)
+
+    def _load_statement(self, statement: ast.AST) -> None:
+        if isinstance(statement, ast.ImportFrom):
+            # type ignore the possibility of 'import_from.module == None'
+            # as it's not possible from parsed code
+            module_name = (  # type: ignore[operator]
+                "." * statement.level
+            ) + statement.module
+
+            for alias in statement.names:
+                attr_name = alias.name if alias.asname is None else alias.asname
+                self._import_attr_map[attr_name] = module_name
+        elif isinstance(statement, ast.Assign):
+            if len(statement.targets) != 1:
+                return
+            target = statement.targets[0]
+            if not isinstance(target, ast.Name):
+                return
+            if target.id != "__all__":
+                return
+            if not isinstance(statement.value, ast.Tuple):
+                raise ValueError(
+                    f"While reading '__all__' for '{self.module_name}' from "
+                    f"'{self.pyi_filename}', '__all__' was not a tuple "
+                )
+            for element in statement.value.elts:
+                if not isinstance(element, ast.Constant):
+                    continue
+                self._all_names.append(element.value)
 
 
-def _parse_pyi(anchor_module_name: str, pyi_filename: str) -> ast.Module:
+def _parse_pyi_ast(anchor_module_name: str, pyi_filename: str) -> ast.Module:
     import importlib.resources
 
-    if (anchor_module_name, pyi_filename) not in _parsed_module_cache:
-        if sys.version_info >= (3, 9):
-            source = (
-                importlib.resources.files(anchor_module_name)
-                .joinpath(pyi_filename)
-                .read_bytes()
-            )
-        else:
-            source = importlib.resources.read_binary(anchor_module_name, pyi_filename)
-        _parsed_module_cache[(anchor_module_name, pyi_filename)] = ast.parse(source)
-    return _parsed_module_cache[(anchor_module_name, pyi_filename)]
-
-
-_parsed_module_cache: dict[tuple[str, str], ast.Module] = {}
-
-
-def _extract_all_tuple_names(
-    modname: str, pyi_filename: str, pyi_ast: ast.Module
-) -> t.Iterator[str]:
-    all_value = _find_all_value(modname, pyi_filename, pyi_ast)
-    for element in all_value.elts:
-        if not isinstance(element, ast.Constant):
-            continue
-        yield element.value
-
-
-def _find_all_value(modname: str, pyi_filename: str, pyi_ast: ast.Module) -> ast.Tuple:
-    for statement in pyi_ast.body:
-        if not isinstance(statement, ast.Assign):
-            continue
-        if len(statement.targets) != 1:
-            continue
-        target = statement.targets[0]
-        if not isinstance(target, ast.Name):
-            continue
-        if target.id != "__all__":
-            continue
-        if not isinstance(statement.value, ast.Tuple):
-            break
-        return statement.value
-    raise LookupError(
-        f"Could not load '__all__' tuple from '{pyi_filename}' for '{modname}'."
-    )
+    if sys.version_info >= (3, 9):
+        source = (
+            importlib.resources.files(anchor_module_name)
+            .joinpath(pyi_filename)
+            .read_bytes()
+        )
+    else:
+        source = importlib.resources.read_binary(anchor_module_name, pyi_filename)
+    return ast.parse(source)
