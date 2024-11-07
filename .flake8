@@ -2,3 +2,6 @@
 exclude = .git,.tox,__pycache__,.eggs,dist,.venv*,docs,build
 max-line-length = 88
 extend-ignore = W503,W504,E203
+
+# in pyi stubs, spacing rules are different (black handles this)
+per-file-ignores = *.pyi:E302,E305

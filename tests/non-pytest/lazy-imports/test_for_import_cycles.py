@@ -22,7 +22,7 @@ PYTHON_BINARY = os.environ.get("GLOBUS_TEST_PY", sys.executable)
 
 MODULE_NAMES = sorted(
     {
-        find_source_module("globus_sdk", attr).lstrip(".")
+        find_source_module("globus_sdk", "__init__.pyi", attr).lstrip(".")
         for attr in globus_sdk.__all__
         if not attr.startswith("_")
     }

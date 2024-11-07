@@ -92,7 +92,10 @@ where = ["src"]
 namespaces = false
 
 [tool.setuptools.package-data]
-globus_sdk = ["py.typed"]
+globus_sdk = [
+  "py.typed",
+  "__init__.pyi",
+]
 "globus_sdk.login_flows.local_server_login_flow_manager.html_files" = ["*.html"]
 
 [tool.setuptools.dynamic.version]
@@ -189,6 +192,9 @@ disable = [
     "import-error",
     # "disallowed" usage of our own classes and objects gets underfoot
     "protected-access",
+    # incorrect mis-reporting of lazily loaded attributes makes this lint
+    # unusable
+    "no-name-in-module",
     # objections to log messages doing eager (vs lazy) string formatting
     # the perf benefit of deferred logging doesn't always outweigh the readability cost
     "logging-fstring-interpolation", "logging-format-interpolation",

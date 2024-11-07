@@ -14,7 +14,7 @@ REPO_ROOT = pathlib.Path(__file__).parent.parent
 _ALL_NAME_PATTERN = re.compile(r'\s+"(\w+)",?')
 
 PACKAGE_LOCS_TO_SCAN = (
-    "globus_sdk/",
+    "globus_sdk/__init__.pyi",
     "globus_sdk/login_flows/",
     "globus_sdk/gare/",
     "globus_sdk/globus_app/",
