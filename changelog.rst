@@ -12,6 +12,52 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.47.0:
+
+v3.47.0 (2024-11-08)
+--------------------
+
+Added
+~~~~~
+
+- Add ``TimersClient.add_app_transfer_data_access_scope`` for ``TimersClient``
+  instances which are integrated with ``GlobusApp``. This method registers the
+  nested scope dependency for a ``data_access`` requirement for a transfer
+  timer. (:pr:`1074`)
+
+- ``SearchQueryV1`` is a new class for submitting complex queries replacing
+  the legacy ``SearchQuery`` class. A deprecation warning has been added to the
+  ``SearchQuery`` class. (:pr:`1079`)
+
+- Created ``ComputeClientV2`` and ``ComputeClientV3`` classes to support Globus Compute
+  API versions 2 and 3, respectively. The canonical ``ComputeClient`` is now a subclass
+  of ``ComputeClientV2``, preserving backward compatibility. (:pr:`1096`)
+
+- Added the ``ComputeClientV3.submit()``, ``ComputeClientV2.submit()``,
+  ``ComputeClientV2.get_task()``, ``ComputeClientV2.get_task_batch()``,
+  and ``ComputeClientV2.get_task_group()`` methods. (:pr:`1094`)
+
+Changed
+~~~~~~~
+
+- Improved error messaging around EOF errors when prompting for code during a command
+  line login flow (:pr:`1093`)
+
+Deprecated
+~~~~~~~~~~
+
+- Deprecated the ``ComputeFunctionDocument`` and ``ComputeFunctionMetadata`` classes.
+  This change reflects an early design adjustment to better align with the existing
+  Globus Compute SDK. (:pr:`1092`)
+
+Development
+~~~~~~~~~~~
+
+- Introduce a ``toxfile.py`` to ensure clean builds during development. (:pr:`1098`)
+
+- The lazy importer used for the top-level ``globus_sdk`` module has been rewritten.
+  It produces identical results to the previous system. (:pr:`1100`)
+
 .. _changelog-3.46.0:
 
 v3.46.0 (2024-10-15)
