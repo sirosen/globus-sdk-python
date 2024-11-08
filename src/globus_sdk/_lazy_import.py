@@ -14,6 +14,25 @@ i.e. Given
 then if `foo.pyi` has an import `from .bar import BarType`, it is possible to
 *read* `foo.pyi` at runtime and use that information to load
 `BarType` from `bar`.
+
+
+Rationale
+---------
+
+Why use this type of lazy importer?
+
+The major goals are:
+- type information is still available to type checkers (and other tools like IDEs)
+- we minimize manual duplication of names
+- we minimize specialized knowledge needed to update our package exports
+- the lazy importer itself is easy to maintain and update
+
+``.pyi`` type stubs are designed for use with type checkers. The data format choice here
+is "regular type stubs". We treat it as runtime data, which is a bit unusual, but we
+are guaranteed that `mypy` and other tools can understand it without issue.
+
+We reduce duplication with this technique, and the content in the ``.pyi`` file should
+be easy for most developers to read and modify.
 """
 
 from __future__ import annotations
