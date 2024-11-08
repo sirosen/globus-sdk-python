@@ -62,7 +62,7 @@ guide for detail.
 
 Links
 -----
-| Full Documentation: http://globus-sdk-python.readthedocs.io/
+| Full Documentation: https://globus-sdk-python.readthedocs.io/
 | Source Code: https://github.com/globus/globus-sdk-python
 | API Documentation: https://docs.globus.org/api/
 | Release History + Changelog: https://github.com/globus/globus-sdk-python/releases
