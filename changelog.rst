@@ -43,6 +43,9 @@ Changed
 - Improved error messaging around EOF errors when prompting for code during a command
   line login flow (:pr:`1093`)
 
+- The lazy importer used for the top-level ``globus_sdk`` module has been
+  rewritten. It produces identical results to the previous system. (:pr:`1100`)
+
 Deprecated
 ~~~~~~~~~~
 
