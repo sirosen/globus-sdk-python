@@ -4,7 +4,7 @@ Installation
 The Globus SDK requires `Python 3 <https://www.python.org/>`_.
 If a supported version of Python is not already installed on your system, see
 this `Python installation guide \
-<http://docs.python-guide.org/en/latest/starting/installation/>`_.
+<https://docs.python-guide.org/starting/installation/>`_.
 
 The simplest way to install the Globus SDK is using the ``pip`` package manager
 (https://pypi.python.org/pypi/pip), which is included in most Python
