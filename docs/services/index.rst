@@ -24,7 +24,7 @@ very simply::
 
     print("My Last 25 Tasks:")
     # `filter` to get Delete Tasks (default is just Transfer Tasks)
-    for task in tc.task_list(num_results=25, filter="type:TRANSFER,DELETE"):
+    for task in tc.task_list(limit=25, filter="type:TRANSFER,DELETE"):
         print(task["task_id"], task["type"], task["status"])
 
 .. note:: Multi-Thread and Multi-Process Safety
