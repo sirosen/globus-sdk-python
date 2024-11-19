@@ -24,6 +24,94 @@ class ComputeClientV2(client.BaseClient):
     scopes = ComputeScopes
     default_scope_requirements = [Scope(ComputeScopes.all)]
 
+    def register_endpoint(self, data: dict[str, t.Any]) -> GlobusHTTPResponse:
+        """Register a new endpoint.
+
+        :param data: An endpoint registration document.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Register Endpoint
+                    :service: compute
+                    :ref: Endpoints/operation/register_endpoint_v2_endpoints_post
+        """
+        return self.post("/v2/endpoints", data=data)
+
+    def get_endpoint(self, endpoint_id: UUIDLike) -> GlobusHTTPResponse:
+        """Get information about a registered endpoint.
+
+        :param endpoint_id: The ID of the Globus Compute endpoint.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Get Endpoint
+                    :service: compute
+                    :ref: Endpoints/operation/get_endpoint_v2_endpoints__endpoint_uuid__get
+        """  # noqa: E501
+        return self.get(f"/v2/endpoints/{endpoint_id}")
+
+    def get_endpoint_status(self, endpoint_id: UUIDLike) -> GlobusHTTPResponse:
+        """Get the status of a registered endpoint.
+
+        :param endpoint_id: The ID of the Globus Compute endpoint.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Get Endpoint Status
+                    :service: compute
+                    :ref: Endpoints/operation/get_endpoint_status_v2_endpoints__endpoint_uuid__status_get
+        """  # noqa: E501
+        return self.get(f"/v2/endpoints/{endpoint_id}/status")
+
+    def get_endpoints(self) -> GlobusHTTPResponse:
+        """Get a list of registered endpoints associated with the authenticated user.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Get Endpoints
+                    :service: compute
+                    :ref: Endpoints/operation/get_endpoints_v2_endpoints_get
+        """  # noqa: E501
+        return self.get("/v2/endpoints")
+
+    def delete_endpoint(self, endpoint_id: UUIDLike) -> GlobusHTTPResponse:
+        """Delete a registered endpoint.
+
+        :param endpoint_id: The ID of the Globus Compute endpoint.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Delete Endpoint
+                    :service: compute
+                    :ref: Endpoints/operation/delete_endpoint_v2_endpoints__endpoint_uuid__delete
+        """  # noqa: E501
+        return self.delete(f"/v2/endpoints/{endpoint_id}")
+
+    def lock_endpoint(self, endpoint_id: UUIDLike) -> GlobusHTTPResponse:
+        """Temporarily block registration requests for the endpoint.
+
+        :param endpoint_id: The ID of the Globus Compute endpoint.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Delete Endpoint
+                    :service: compute
+                    :ref: Endpoints/operation/lock_endpoint_v2_endpoints__endpoint_uuid__lock_post
+        """  # noqa: E501
+        return self.post(f"/v2/endpoints/{endpoint_id}/lock")
+
     def register_function(
         self,
         function_data: dict[str, t.Any],

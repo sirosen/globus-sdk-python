@@ -1,6 +1,11 @@
 import uuid
 
+USER_ID = str(uuid.uuid1())
+
+SUBSCRIPTION_ID = str(uuid.uuid1())
+
 ENDPOINT_ID = str(uuid.uuid1())
+ENDPOINT_ID_2 = str(uuid.uuid1())
 
 FUNCTION_ID = str(uuid.uuid1())
 FUNCTION_NAME = "howdy_world"
