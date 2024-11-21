@@ -106,7 +106,7 @@ class ComputeClientV2(client.BaseClient):
 
             .. tab-item:: API Info
 
-                .. extdoclink:: Delete Endpoint
+                .. extdoclink:: Lock Endpoint
                     :service: compute
                     :ref: Endpoints/operation/lock_endpoint_v2_endpoints__endpoint_uuid__lock_post
         """  # noqa: E501
@@ -235,6 +235,69 @@ class ComputeClientV3(client.BaseClient):
     service_name = "compute"
     scopes = ComputeScopes
     default_scope_requirements = [Scope(ComputeScopes.all)]
+
+    def register_endpoint(self, data: dict[str, t.Any]) -> GlobusHTTPResponse:
+        """Register a new endpoint.
+
+        :param data: An endpoint registration document.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Register Endpoint
+                    :service: compute
+                    :ref: Endpoints/operation/register_endpoint_v3_endpoints_post
+        """
+        return self.post("/v3/endpoints", data=data)
+
+    def update_endpoint(
+        self, endpoint_id: UUIDLike, data: dict[str, t.Any]
+    ) -> GlobusHTTPResponse:
+        """Update an endpoint.
+
+        :param endpoint_id: The ID of the endpoint.
+        :param data: An endpoint update document.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Update Endpoint
+                    :service: compute
+                    :ref: Endpoints/operation/update_endpoint_v3_endpoints__endpoint_uuid__put
+        """  # noqa: E501
+        return self.put(f"/v3/endpoints/{endpoint_id}", data=data)
+
+    def lock_endpoint(self, endpoint_id: UUIDLike) -> GlobusHTTPResponse:
+        """Temporarily block registration requests for the endpoint.
+
+        :param endpoint_id: The ID of the Globus Compute endpoint.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Lock Endpoint
+                    :service: compute
+                    :ref: Endpoints/operation/lock_endpoint_v3_endpoints__endpoint_uuid__lock_post
+        """  # noqa: E501
+        return self.post(f"/v3/endpoints/{endpoint_id}/lock")
+
+    def get_endpoint_allowlist(self, endpoint_id: UUIDLike) -> GlobusHTTPResponse:
+        """Get a list of IDs for functions allowed to run on an endpoint.
+
+        :param endpoint_id: The ID of the Globus Compute endpoint.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Get Endpoint Allowlist
+                    :service: compute
+                    :ref: Endpoints/operation/get_endpoint_allowlist_v3_endpoints__endpoint_uuid__allowed_functions_get
+        """  # noqa: E501
+        return self.get(f"/v3/endpoints/{endpoint_id}/allowed_functions")
 
     def submit(
         self, endpoint_id: UUIDLike, data: dict[str, t.Any]
