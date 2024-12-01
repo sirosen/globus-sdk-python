@@ -24,6 +24,36 @@ class ComputeClientV2(client.BaseClient):
     scopes = ComputeScopes
     default_scope_requirements = [Scope(ComputeScopes.all)]
 
+    def get_version(self, service: str | None = None) -> GlobusHTTPResponse:
+        """Get the current version of the API and other services.
+
+        :param service: Service for which to get version information.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Get Version
+                    :service: compute
+                    :ref: Root/operation/get_version_v2_version_get
+        """
+        query_params = {"service": service} if service else None
+        return self.get("/v2/version", query_params=query_params)
+
+    def get_result_amqp_url(self) -> GlobusHTTPResponse:
+        """Generate new credentials (in the form of a connection URL) for
+        connecting to the AMQP service.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Get Result AMQP URL
+                    :service: compute
+                    :ref: Root/operation/get_user_specific_result_amqp_url_v2_get_amqp_result_connection_url_get
+        """  # noqa: E501
+        return self.get("/v2/get_amqp_result_connection_url")
+
     def register_endpoint(self, data: dict[str, t.Any]) -> GlobusHTTPResponse:
         """Register a new endpoint.
 
