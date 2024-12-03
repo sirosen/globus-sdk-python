@@ -392,7 +392,16 @@ class TransferClient(client.BaseClient):
         filter_owner_id: str | None = None,
         filter_host_endpoint: UUIDLike | None = None,
         filter_non_functional: bool | None = None,
-        filter_entity_type: str | None = None,
+        filter_entity_type: (
+            Literal[
+                "GCP_mapped_collection",
+                "GCP_guest_collection",
+                "GCSv5_endpoint",
+                "GCSv5_mapped_collection",
+                "GCSv5_guest_collection",
+            ]
+            | None
+        ) = None,
         limit: int | None = None,
         offset: int | None = None,
         query_params: dict[str, t.Any] | None = None,
@@ -414,8 +423,8 @@ class TransferClient(client.BaseClient):
         :param filter_non_functional: Limit search to endpoints which have the
             'non_functional' flag set to True or False. Mutually exclusive with
             ``filter_entity_type``.
-        :param filter_entity_type: Limit search to endpoints or collections by their
-            entity type. Mutually exclusive with ``filter_non_functional``.
+        :param filter_entity_type: Limit search to endpoints or collections of a
+            specified entity type. Mutually exclusive with ``filter_non_functional``.
         :param limit: limit the number of results
         :param offset: offset used in paging
         :param query_params: Any additional parameters will be passed through
