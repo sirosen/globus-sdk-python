@@ -12,6 +12,23 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.49.0:
+
+v3.49.0 (2024-12-04)
+--------------------
+
+Added
+~~~~~
+
+- Add ``filter_entity_type`` keyword argument on ``TransferClient.endpoint_search()``. (:pr:`1109`)
+
+- Added the ``ComputeClientV3.register_endpoint()``, ``ComputeClientV3.update_endpoint()``
+  ``ComputeClientV3.lock_endpoint()``, and ``ComputeClientV3.get_endpoint_allowlist()``
+  methods. (:pr:`1113`)
+
+- Added the ``ComputeClientV2.get_version()`` and ``ComputeClientV2.get_result_amqp_url()``
+  methods. (:pr:`1114`)
+
 .. _changelog-3.48.0:
 
 v3.48.0 (2024-11-21)
