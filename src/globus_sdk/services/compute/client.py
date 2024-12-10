@@ -221,7 +221,7 @@ class ComputeClientV2(client.BaseClient):
                     :ref: Root/operation/get_batch_status_v2_batch_status_post
         """
         task_ids = list(utils.safe_strseq_iter(task_ids))
-        return self.post("/v2/tasks/batch", data={"task_ids": task_ids})
+        return self.post("/v2/batch_status", data={"task_ids": task_ids})
 
     def get_task_group(self, task_group_id: UUIDLike) -> GlobusHTTPResponse:
         """Get a list of task IDs associated with a task group.

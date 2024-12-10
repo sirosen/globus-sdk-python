@@ -13,7 +13,7 @@ RESPONSES = ResponseSet(
     metadata={"task_id": TASK_ID},
     default=RegisteredResponse(
         service="compute",
-        path="/v2/tasks/batch",
+        path="/v2/batch_status",
         method="POST",
         json=TASK_BATCH_DOC,
         # Ensure task_ids is a list
