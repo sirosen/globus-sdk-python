@@ -78,7 +78,7 @@ class StorageGatewayDocument(utils.PayloadWrapper):
             root=root,
         )
         self._set_optstrlists(
-            allow_domains=allowed_domains,
+            allowed_domains=allowed_domains,
             users_allow=users_allow,
             users_deny=users_deny,
         )
