@@ -256,9 +256,9 @@ it can be added to a request has changed as follows:
 Responses are always GlobusHTTPResponse
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In version 2, `GlobusHTTPResponse` inherited from a base class,
-`GlobusResponse`. In version 3, the distinction has been eliminated and
-responses are only `GlobusHTTPResponse`.
+In version 2, ``GlobusHTTPResponse`` inherited from a base class,
+``GlobusResponse``. In version 3, the distinction has been eliminated and
+responses are only ``GlobusHTTPResponse``.
 
 This may appear in contexts where you type annotate or use ``isinstance`` checks
 to check the type of an object.

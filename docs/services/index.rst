@@ -13,14 +13,14 @@ Once instantiated, a Client gives you high-level interface to make API calls,
 without needing to know Globus API endpoints or their various parameters.
 
 For example, you could use the :class:`TransferClient` to list your task history
-very simply::
+very simply:
+
+.. code-block:: python
 
     from globus_sdk import TransferClient, AccessTokenAuthorizer
 
     # you must have a valid transfer token for this to work
-    tc = TransferClient(
-        authorizer=AccessTokenAuthorizer("TRANSFER_TOKEN_STRING")
-    )
+    tc = TransferClient(authorizer=AccessTokenAuthorizer("TRANSFER_TOKEN_STRING"))
 
     print("My Last 25 Tasks:")
     # `filter` to get Delete Tasks (default is just Transfer Tasks)
