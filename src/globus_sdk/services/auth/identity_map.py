@@ -136,7 +136,7 @@ class IdentityMap:
         *,
         id_batch_size: int | None = None,
         cache: None | t.MutableMapping[str, dict[str, t.Any]] = None,
-    ):
+    ) -> None:
         self.auth_client = auth_client
         self.id_batch_size = id_batch_size or self._default_id_batch_size
 

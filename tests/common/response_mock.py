@@ -28,7 +28,7 @@ class PickleableMockResponse(mock.NonCallableMock):
 
     def __init__(
         self, status_code, json_body=None, text=None, headers=None, *args, **kwargs
-    ):
+    ) -> None:
         kwargs["spec"] = requests.Response
         super().__init__(*args, **kwargs)
         self.__class__ = PickleableMockResponse

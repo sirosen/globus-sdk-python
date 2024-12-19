@@ -41,7 +41,7 @@ class GlobusAPIError(GlobusError):
     MESSAGE_FIELDS = ["message", "detail", "title"]
     RECOGNIZED_AUTHZ_SCHEMES = ["bearer", "basic", "globus-goauthtoken"]
 
-    def __init__(self, r: requests.Response, *args: t.Any, **kwargs: t.Any):
+    def __init__(self, r: requests.Response, *args: t.Any, **kwargs: t.Any) -> None:
         self._cached_raw_json: t.Any = _CACHE_SENTINEL
 
         self.http_status = r.status_code

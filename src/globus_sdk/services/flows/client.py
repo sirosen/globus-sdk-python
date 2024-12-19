@@ -852,7 +852,7 @@ class SpecificFlowClient(client.BaseClient):
         authorizer: GlobusAuthorizer | None = None,
         app_name: str | None = None,
         transport_params: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         self._flow_id = flow_id
         self.scopes = SpecificFlowScopeBuilder(flow_id)
         super().__init__(

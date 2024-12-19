@@ -195,7 +195,7 @@ def test_user_app_without_refresh_tokens_sets_expected_validators():
 
 
 class MockLoginFlowManager(LoginFlowManager):
-    def __init__(self, login_client: AuthLoginClient | None = None):
+    def __init__(self, login_client: AuthLoginClient | None = None) -> None:
         login_client = login_client or mock.Mock(spec=NativeAppAuthClient)
         super().__init__(login_client)
 
@@ -429,7 +429,7 @@ class RaisingLoginFlowManagerCounter(LoginFlowManager):
     each login attempt.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(mock.Mock(spec=NativeAppAuthClient))
         self.counter = 0
 
@@ -594,7 +594,7 @@ def test_app_login_flows_can_be_forced(login_kwargs, expected_login, monkeypatch
 
 
 class CountingCommandLineLoginFlowManager(CommandLineLoginFlowManager):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.counter = 0
 

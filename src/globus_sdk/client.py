@@ -74,7 +74,7 @@ class BaseClient:
         authorizer: GlobusAuthorizer | None = None,
         app_name: str | None = None,
         transport_params: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         # Determine the client's environment.
         if app is not None:
             # If we're using a GlobusApp, the client's environment must either match the

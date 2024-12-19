@@ -113,7 +113,7 @@ class SearchQuery(SearchQueryBase):
         offset: int | None = None,
         advanced: bool | None = None,
         additional_fields: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         super().__init__()
         exc.warn_deprecated("'SearchQuery' is deprecated. Use 'SearchQueryV1' instead.")
         if q is not None:
@@ -255,7 +255,7 @@ class SearchQueryV1(utils.PayloadWrapper):
         boosts: list[dict[str, t.Any]] | utils.MissingType = utils.MISSING,
         sort: list[dict[str, t.Any]] | utils.MissingType = utils.MISSING,
         additional_fields: dict[str, t.Any] | utils.MissingType = utils.MISSING,
-    ):
+    ) -> None:
         super().__init__()
         self["@version"] = "query#1.0.0"
 
@@ -301,7 +301,7 @@ class SearchScrollQuery(SearchQueryBase):
         advanced: bool | None = None,
         marker: str | None = None,
         additional_fields: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         super().__init__()
         if q is not None:
             self["q"] = q

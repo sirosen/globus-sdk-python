@@ -23,7 +23,7 @@ class NextTokenPaginator(Paginator[PageT]):
         items_key: str | None = None,
         client_args: tuple[t.Any, ...],
         client_kwargs: dict[str, t.Any],
-    ):
+    ) -> None:
         super().__init__(
             method,
             items_key=items_key,

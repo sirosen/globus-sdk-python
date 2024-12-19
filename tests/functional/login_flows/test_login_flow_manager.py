@@ -124,7 +124,7 @@ def test_command_line_login_flow_manager_eof_error(monkeypatch, capsys):
 
 
 class MockRedirectServer:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.socket = Mock()
         self.socket.getsockname.return_value = ("", 0)
 

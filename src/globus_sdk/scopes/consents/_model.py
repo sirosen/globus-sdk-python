@@ -139,7 +139,7 @@ class ConsentForest:
                                  [Scope: <collection2>:data_access]
     """
 
-    def __init__(self, consents: t.Iterable[t.Mapping[str, t.Any] | Consent]):
+    def __init__(self, consents: t.Iterable[t.Mapping[str, t.Any] | Consent]) -> None:
         """
         :param consents: An iterable of consent data objects. Typically, this will be
             a ConsentForestResponse retrieved via `auth_client.get_consents(identity)`.
@@ -225,7 +225,7 @@ class ConsentTree:
        consent dependencies.
     """
 
-    def __init__(self, root_id: int, forest: ConsentForest):
+    def __init__(self, root_id: int, forest: ConsentForest) -> None:
         self.root = forest.get_node(root_id)
         self.nodes = [self.root]
         self._node_by_id = {root_id: self.root}

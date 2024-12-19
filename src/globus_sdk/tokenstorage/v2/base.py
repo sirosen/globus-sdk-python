@@ -135,7 +135,9 @@ class FileTokenStorage(TokenStorage, metaclass=abc.ABCMeta):
     # File suffix associated with files of this type (e.g., "csv")
     file_format: str = "_UNSET_"  # must be overridden by subclasses
 
-    def __init__(self, filepath: pathlib.Path | str, *, namespace: str = "DEFAULT"):
+    def __init__(
+        self, filepath: pathlib.Path | str, *, namespace: str = "DEFAULT"
+    ) -> None:
         """
         :param filepath: the name of the file to write to and read from
         :param namespace: A user-supplied namespace for partitioning token data

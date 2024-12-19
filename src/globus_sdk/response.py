@@ -45,7 +45,7 @@ class GlobusHTTPResponse:
         self,
         response: Response | GlobusHTTPResponse,
         client: globus_sdk.BaseClient | None = None,
-    ):
+    ) -> None:
         # init on a GlobusHTTPResponse: we are wrapping this data
         # the _response is None
         if isinstance(response, GlobusHTTPResponse):

@@ -65,7 +65,7 @@ class ClientCredentialsAuthorizer(
         on_refresh: (
             None | t.Callable[[globus_sdk.OAuthClientCredentialsResponse], t.Any]
         ) = None,
-    ):
+    ) -> None:
         # values for _get_token_data
         self.confidential_client = confidential_client
         self.scopes = scopes_to_str(scopes)

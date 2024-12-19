@@ -53,7 +53,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         requested_scopes: ScopeCollectionType | None = None,
         state: str = "_default",
         refresh_tokens: bool = False,
-    ):
+    ) -> None:
         # convert a scope object or iterable to string immediately on load
         # and default to the default requested scopes
         self.requested_scopes: str = stringify_requested_scopes(requested_scopes)

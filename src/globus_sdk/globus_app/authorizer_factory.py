@@ -224,7 +224,7 @@ class ClientCredentialsAuthorizerFactory(
         token_storage: ValidatingTokenStorage,
         confidential_client: globus_sdk.ConfidentialAppAuthClient,
         scope_requirements: dict[str, list[globus_sdk.Scope]],
-    ):
+    ) -> None:
         """
         :param token_storage: The ``ValidatingTokenStorage`` used
         for defining and validating the set of authorization requirements that

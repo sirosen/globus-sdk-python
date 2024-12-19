@@ -12,7 +12,7 @@ N = 25
 
 
 class PagingSimulator:
-    def __init__(self, n):
+    def __init__(self, n) -> None:
         self.n = n  # the number of simulated items
 
     def simulate_get(self, *args, **params):
