@@ -643,14 +643,14 @@ Added
   ``scope`` parameter as a string or iterable of strings. (:pr:`965`)
 
 - Moved scope parsing out of experimental. The ``Scope`` construct is now importable from
-  the top level `globus_sdk` module. (:pr:`966`)
+  the top level ``globus_sdk`` module. (:pr:`966`)
 
 - Support updating subscriptions assigned to flows in the Flows service. (:pr:`974`)
 
 Development
 ~~~~~~~~~~~
 
-- Fix concurrency problems in the test suite caused by isort's `.isorted` temporary files. (:pr:`973`)
+- Fix concurrency problems in the test suite caused by isort's ``.isorted`` temporary files. (:pr:`973`)
 
 .. _changelog-3.39.0:
 
@@ -726,8 +726,8 @@ v3.35.0 (2024-01-29)
 Added
 ~~~~~
 
-- Added a `session_required_mfa` parameter to the `AuthorizationParameterInfo` error
-  info object and `oauth2_get_authorize_url` method (:pr:`939`)
+- Added a ``session_required_mfa`` parameter to the ``AuthorizationParameterInfo`` error
+  info object and ``oauth2_get_authorize_url`` method (:pr:`939`)
 
 Changed
 ~~~~~~~
@@ -745,7 +745,7 @@ Deprecated
 Fixed
 ~~~~~
 
-- Included documentation in `AuthorizationParameterInfo` for `session_required_policies`
+- Included documentation in ``AuthorizationParameterInfo`` for ``session_required_policies``
   (:pr:`939`)
 
 .. _changelog-3.34.0:
@@ -1415,7 +1415,7 @@ Fixed
   with a usage error instead of being translated into the default set of
   ``requested_scopes``
 
-* Fix the type annotation for `max_sleep` on client transports to allow `float`
+* Fix the type annotation for ``max_sleep`` on client transports to allow ``float``
   values (:pr:`697`)
 
 .. _changelog-3.17.0:
@@ -2063,10 +2063,10 @@ Added
 
 * Add ``iter_items`` as a method on ``TransferData`` and ``DeleteData`` (:pr:`488`)
 
-* Add the `resource_server` property to client classes and objects. For example,
-  `TransferClient.resource_server` and `GroupsClient().resource_server` are now usable
-  to get the resource server string for the relevant services. `resource_server` is
-  documented as part of `globus_sdk.BaseClient` and may be `None`. (:pr:`489`)
+* Add the ``resource_server`` property to client classes and objects. For example,
+  ``TransferClient.resource_server`` and ``GroupsClient().resource_server`` are now usable
+  to get the resource server string for the relevant services. ``resource_server`` is
+  documented as part of ``globus_sdk.BaseClient`` and may be ``None``. (:pr:`489`)
 
 * The implementation of several properties of ``GlobusHTTPResponse`` has
   changed (:pr:`497`)
@@ -2106,10 +2106,10 @@ Added
 Changed
 ~~~~~~~
 
-* Adjust package metadata for `cryptography` dependency, specifying
-  `cryptography>=3.3.1` and no upper bound. This is meant to help mitigate
-  issues in which an older `cryptography` version is installed gets used in
-  spite of it being incompatible with `pyjwt[crypto]>=2.0` (:pr:`486`)
+* Adjust package metadata for ``cryptography`` dependency, specifying
+  ``cryptography>=3.3.1`` and no upper bound. This is meant to help mitigate
+  issues in which an older ``cryptography`` version is installed gets used in
+  spite of it being incompatible with ``pyjwt[crypto]>=2.0`` (:pr:`486`)
 
 .. _changelog-3.0.3:
 

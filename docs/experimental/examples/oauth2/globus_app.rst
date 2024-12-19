@@ -95,7 +95,7 @@ client's resource server and configuring the app as the service client's auth pr
 
         ..  Note::
 
-            ``ClientApp.__init__(...)`` requires the `client_secret` keyword argument.
+            ``ClientApp.__init__(...)`` requires the ``client_secret`` keyword argument.
             Native clients, which lack secrets, are not allowed.
 
         ..  code-block:: python

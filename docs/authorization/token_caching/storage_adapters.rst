@@ -95,7 +95,7 @@ The :class:`SimpleJSONFileAdapter` is good for the "simplest possible"
 persistent storage, using a JSON file to store token data.
 
 :class:`MemoryAdapter` is even simpler still, and is great for writing and
-testing code which uses the `StorageAdapter` interface backed by an in-memory
+testing code which uses the ``StorageAdapter`` interface backed by an in-memory
 structure.
 
 The :class:`SQLiteAdapter` is more complex, for applications like the

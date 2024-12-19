@@ -96,9 +96,9 @@ you can customize and how, see :ref:`globus_app_config`.
     :member-order: bysource
 
 ..
-    In the above class, "scope_requirements" is excluded because it's an `@property`.
+    In the above class, "scope_requirements" is excluded because it's a ``@property``.
     Sphinx wants to document it as a method but that's not how it's invoked. Instead
-    documentation is included in the class docstring as an `ivar`.
+    documentation is included in the class docstring as an ``ivar``.
 
 Implementations
 ^^^^^^^^^^^^^^^

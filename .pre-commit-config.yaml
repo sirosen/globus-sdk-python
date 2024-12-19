@@ -41,6 +41,10 @@ repos:
   hooks:
     - id: isort
       name: "Sort python imports"
+- repo: https://github.com/sirosen/rstbebe
+  rev: 0.2.0
+  hooks:
+    - id: bad-backticks
 - repo: https://github.com/sirosen/slyp
   rev: 0.7.1
   hooks:
