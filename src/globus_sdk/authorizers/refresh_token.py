@@ -58,7 +58,7 @@ class RefreshTokenAuthorizer(
         on_refresh: (
             None | t.Callable[[globus_sdk.OAuthRefreshTokenResponse], t.Any]
         ) = None,
-    ):
+    ) -> None:
         log.info(
             "Setting up RefreshTokenAuthorizer with auth_client="
             f"[instance:{id(auth_client)}]"

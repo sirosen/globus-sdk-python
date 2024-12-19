@@ -65,7 +65,7 @@ class AuthorizationParameterInfo(ErrorInfo):
     >>>     print("got authz params:", authz_params)
     """
 
-    def __init__(self, error_data: dict[str, t.Any]):
+    def __init__(self, error_data: dict[str, t.Any]) -> None:
         # data is there if this key is present and it is a dict
         self._has_data = isinstance(error_data.get("authorization_parameters"), dict)
         data = t.cast(

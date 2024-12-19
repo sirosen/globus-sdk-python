@@ -162,7 +162,7 @@ class _ParsedPYIData:
             cls._CACHE[(module_name, pyi_filename)] = cls(module_name, pyi_filename)
         return cls._CACHE[(module_name, pyi_filename)]
 
-    def __init__(self, module_name: str, pyi_filename: str):
+    def __init__(self, module_name: str, pyi_filename: str) -> None:
         self.module_name = module_name
         self.pyi_filename = pyi_filename
         self._ast = _parse_pyi_ast(module_name, pyi_filename)

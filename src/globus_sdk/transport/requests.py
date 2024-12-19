@@ -110,7 +110,7 @@ class RequestsTransport:
         retry_checks: list[RetryCheck] | None = None,
         max_sleep: float | int = 10,
         max_retries: int | None = None,
-    ):
+    ) -> None:
         self.session = requests.Session()
         self.verify_ssl = config.get_ssl_verify(verify_ssl)
         self.http_timeout = config.get_http_timeout(http_timeout)

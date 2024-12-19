@@ -115,7 +115,7 @@ class EndpointDocument(utils.PayloadWrapper):
         gridftp_control_channel_port: int | None | MissingType = MISSING,
         # additional fields
         additional_fields: dict[str, t.Any] | MissingType = MISSING,
-    ):
+    ) -> None:
         super().__init__()
         self["DATA_TYPE"] = data_type
         self["contact_email"] = contact_email

@@ -294,7 +294,7 @@ class GroupPolicies(utils.PayloadWrapper):
         authentication_assurance_timeout: (
             int | None | utils.MissingType
         ) = utils.MISSING,
-    ):
+    ) -> None:
         super().__init__()
         self["is_high_assurance"] = is_high_assurance
         self["group_visibility"] = group_visibility

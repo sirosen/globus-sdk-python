@@ -56,7 +56,7 @@ class GlobusAuthorizationParameters(Serializable):
         required_scopes: list[str] | None = None,
         prompt: str | None = None,
         extra: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         self.session_message = validators.opt_str("session_message", session_message)
         self.session_required_identities = validators.opt_str_list(
             "session_required_identities", session_required_identities
@@ -103,7 +103,7 @@ class GARE(Serializable):
         authorization_parameters: dict[str, t.Any] | GlobusAuthorizationParameters,
         *,
         extra: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         self.code = validators.str_("code", code)
         self.authorization_parameters = validators.instance_or_dict(
             "authorization_parameters",

@@ -150,7 +150,7 @@ class ResponseList:
         self,
         *data: RegisteredResponse,
         metadata: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         self.responses = list(data)
         self._metadata = metadata
         self.parent: ResponseSet | None = None

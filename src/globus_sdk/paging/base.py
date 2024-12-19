@@ -59,7 +59,7 @@ class Paginator(t.Iterable[PageT], metaclass=abc.ABCMeta):
         # the Base paginator must accept arbitrary additional kwargs to indicate that
         # its child classes could define and use additional kwargs
         **kwargs: t.Any,
-    ):
+    ) -> None:
         self.method = method
         self.items_key = items_key
         self.client_args = client_args

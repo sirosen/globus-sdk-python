@@ -35,7 +35,7 @@ class SimpleJSONFileAdapter(FileAdapter):
     # the supported versions (data not in these versions causes an error)
     supported_versions = ("1.0",)
 
-    def __init__(self, filename: pathlib.Path | str):
+    def __init__(self, filename: pathlib.Path | str) -> None:
         self.filename = str(filename)
 
     def _invalid(self, msg: str) -> t.NoReturn:

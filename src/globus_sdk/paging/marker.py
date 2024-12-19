@@ -23,7 +23,7 @@ class MarkerPaginator(Paginator[PageT]):
         marker_key: str = "marker",
         client_args: tuple[t.Any, ...],
         client_kwargs: dict[str, t.Any],
-    ):
+    ) -> None:
         super().__init__(
             method,
             items_key=items_key,

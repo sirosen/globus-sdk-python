@@ -13,7 +13,7 @@ class MockRenewer(RenewingAuthorizer):
     _extract_token_data can return known values for testing
     """
 
-    def __init__(self, token_data, **kwargs):
+    def __init__(self, token_data, **kwargs) -> None:
         self.token_data = token_data
         self.token_response = mock.Mock()
         super().__init__(**kwargs)

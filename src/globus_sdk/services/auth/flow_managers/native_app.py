@@ -107,7 +107,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         verifier: str | None = None,
         refresh_tokens: bool = False,
         prefill_named_grant: str | None = None,
-    ):
+    ) -> None:
         self.auth_client = auth_client
 
         # set client_id, then check for validity

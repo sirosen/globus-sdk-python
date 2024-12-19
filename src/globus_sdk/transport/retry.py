@@ -36,7 +36,7 @@ class RetryContext:
         authorizer: GlobusAuthorizer | None = None,
         response: requests.Response | None = None,
         exception: Exception | None = None,
-    ):
+    ) -> None:
         # retry attempt number
         self.attempt = attempt
         # if there is an authorizer for the request, it will be available in the context
@@ -116,7 +116,7 @@ class RetryCheckRunner:
 
     # check configs: a list of pairs, (check, flags)
     # a check without flags is assumed to have flags=NONE
-    def __init__(self, checks: list[RetryCheck]):
+    def __init__(self, checks: list[RetryCheck]) -> None:
         self._checks: list[RetryCheck] = []
         self._check_data: dict[RetryCheck, dict[str, t.Any]] = {}
         for check in checks:

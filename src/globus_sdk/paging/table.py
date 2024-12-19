@@ -36,7 +36,7 @@ class PaginatorTable:
     Creation of ``PaginatorTable`` objects is considered a private API.
     """
 
-    def __init__(self, client: t.Any):
+    def __init__(self, client: t.Any) -> None:
         self._client = client
         # _bindings is a lazily loaded table of names -> callables which
         # return paginators

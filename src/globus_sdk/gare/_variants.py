@@ -40,7 +40,7 @@ class LegacyConsentRequiredTransferError(Serializable):
         code: Literal["ConsentRequired"],
         required_scopes: list[str],
         extra: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         self.code = _validate_consent_required_literal("code", code)
         self.required_scopes = validators.str_list("required_scopes", required_scopes)
         self.extra = extra or {}
@@ -71,7 +71,7 @@ class LegacyConsentRequiredAPError(Serializable):
         code: Literal["ConsentRequired"],
         required_scope: str,
         extra: dict[str, t.Any] | None,
-    ):
+    ) -> None:
         self.code = _validate_consent_required_literal("code", code)
         self.required_scope = validators.str_("required_scope", required_scope)
         self.extra = extra or {}
@@ -112,7 +112,7 @@ class LegacyAuthorizationParameters(Serializable):
         session_required_mfa: bool | None = None,
         prompt: Literal["login"] | None = None,
         extra: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         self.session_message = validators.opt_str("session_message", session_message)
         self.session_required_identities = validators.opt_str_list(
             "session_required_identities", session_required_identities
@@ -167,7 +167,7 @@ class LegacyAuthorizationParametersError(Serializable):
         authorization_parameters: dict[str, t.Any] | LegacyAuthorizationParameters,
         code: str | None = None,
         extra: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         # Apply default, if necessary
         self.code = validators.str_("code", code or self.DEFAULT_CODE)
         self.authorization_parameters = validators.instance_or_dict(

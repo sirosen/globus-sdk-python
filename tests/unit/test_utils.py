@@ -95,7 +95,7 @@ def test_classproperty_prefers_instance():
     class Foo:
         x = {"x": 1}
 
-        def __init__(self):
+        def __init__(self) -> None:
             self.x = {"x": 2}
 
         @utils.classproperty

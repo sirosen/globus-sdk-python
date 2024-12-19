@@ -46,7 +46,7 @@ class SQLiteAdapter(FileAdapter):
         *,
         namespace: str = "DEFAULT",
         connect_params: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         self.filename = self.dbname = str(dbname)
         self.namespace = namespace
         self._connection = self._init_and_connect(connect_params)

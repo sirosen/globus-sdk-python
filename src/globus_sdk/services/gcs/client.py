@@ -53,7 +53,7 @@ class GCSClient(client.BaseClient):
         authorizer: GlobusAuthorizer | None = None,
         app_name: str | None = None,
         transport_params: dict[str, t.Any] | None = None,
-    ):
+    ) -> None:
         # check if the provided address was a DNS name or an HTTPS URL
         if not gcs_address.startswith("https://"):
             # if it's a DNS name format it accordingly

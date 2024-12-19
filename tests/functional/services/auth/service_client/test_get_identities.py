@@ -9,7 +9,7 @@ from globus_sdk._testing import get_last_request, load_response
 class StringWrapper:
     """Simple test object to be a non-string obj wrapping a string"""
 
-    def __init__(self, s):
+    def __init__(self, s) -> None:
         self.s = s
 
     def __str__(self):

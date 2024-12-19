@@ -23,7 +23,7 @@ class ComputeFunctionMetadata(utils.PayloadWrapper):
         *,
         python_version: str | MissingType = MISSING,
         sdk_version: str | MissingType = MISSING,
-    ):
+    ) -> None:
         warn_deprecated("ComputeFunctionMetadata is deprecated.")
         super().__init__()
         self["python_version"] = python_version
@@ -55,7 +55,7 @@ class ComputeFunctionDocument(utils.PayloadWrapper):
         metadata: ComputeFunctionMetadata | MissingType = MISSING,
         group: UUIDLike | MissingType = MISSING,
         public: bool = False,
-    ):
+    ) -> None:
         warn_deprecated("ComputeFunctionDocument is deprecated.")
         super().__init__()
         self["function_name"] = function_name

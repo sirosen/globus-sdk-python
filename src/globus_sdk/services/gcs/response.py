@@ -57,7 +57,7 @@ class UnpackingGCSResponse(GlobusHTTPResponse):
         self,
         response: GlobusHTTPResponse,
         match: str | t.Callable[[dict[str, t.Any]], bool],
-    ):
+    ) -> None:
         super().__init__(response)
 
         if callable(match):

@@ -9,7 +9,7 @@ if t.TYPE_CHECKING:
 class ConsentParseError(Exception):
     """An error raised if consent parsing/loading fails."""
 
-    def __init__(self, message: str, raw_consent: dict[str, t.Any]):
+    def __init__(self, message: str, raw_consent: dict[str, t.Any]) -> None:
         super().__init__(message)
         self.raw_consent = raw_consent
 
@@ -17,6 +17,6 @@ class ConsentParseError(Exception):
 class ConsentTreeConstructionError(Exception):
     """An error raised if consent tree construction fails."""
 
-    def __init__(self, message: str, consents: list[Consent]):
+    def __init__(self, message: str, consents: list[Consent]) -> None:
         super().__init__(message)
         self.consents = consents

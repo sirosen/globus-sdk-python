@@ -16,7 +16,7 @@ class AccessTokenAuthorizer(StaticGlobusAuthorizer):
     :param access_token: An access token for Globus Auth
     """
 
-    def __init__(self, access_token: str):
+    def __init__(self, access_token: str) -> None:
         log.info(
             "Setting up an AccessTokenAuthorizer. It will use an "
             "auth type of Bearer and cannot handle 401s."
