@@ -89,15 +89,14 @@ class RegisteredResponse:
             "CONNECT",
             "TRACE",
         ] = "GET",
-        # these parameters derive from `response.Response`
+        # these parameters are passed through to `response.Response` (or omitted)
         body: str | None = None,
         content_type: str | None = None,
         headers: dict[str, str] | None = None,
         json: None | list[t.Any] | dict[str, t.Any] = None,
         status: int = 200,
         stream: bool | None = None,
-        # match derives from `responses.BaseResponse`; it has a default of `()` there
-        match: t.Sequence[t.Callable[..., tuple[bool, str]]] = (),
+        match: t.Sequence[t.Callable[..., tuple[bool, str]]] | None = None,
         # metadata is globus-sdk specific
         metadata: dict[str, t.Any] | None = None,
         # the following are known parameters to `responses.Response` which
@@ -162,7 +161,6 @@ class RegisteredResponse:
             "status": self.status,
             "stream": self.stream,
             "match_querystring": None,
-            "match": self.match,
         }
         if self.json is not None:
             kwargs["json"] = self.json
@@ -170,6 +168,8 @@ class RegisteredResponse:
             kwargs["body"] = self.body
         if self.content_type is not None:
             kwargs["content_type"] = self.content_type
+        if self.match is not None:
+            kwargs["match"] = self.match
 
         if requests_mock is None:
             use_requests_mock: responses.RequestsMock | types.ModuleType = responses
