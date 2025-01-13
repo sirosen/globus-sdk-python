@@ -91,7 +91,7 @@ class RegisteredResponse:
         metadata: dict[str, t.Any] | None = None,
         # the following are known parameters to `responses.Response` which
         # `RegisteredResponse` does not support:
-        #   - url: provided via (path, service)
+        #   - url: calculated from (path, service)
         #   - auto_calculate_content_length: a bool setting, usually not needed and can
         #                                    be achieved in user code via `headers`
         #   - passthrough: bool setting allowing calls to be emitted to the services
