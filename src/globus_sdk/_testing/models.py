@@ -76,8 +76,19 @@ class RegisteredResponse:
             ]
             | None
         ) = None,
-        # method derives from `responses.BaseResponse`
-        method: Literal["GET", "PUT", "POST", "PATCH", "HEAD", "DELETE"] = "GET",
+        # method will be passed through to `responses.Response`, so we
+        # support all of the values which it supports
+        method: Literal[
+            "GET",
+            "PUT",
+            "POST",
+            "PATCH",
+            "HEAD",
+            "DELETE",
+            "OPTIONS",
+            "CONNECT",
+            "TRACE",
+        ] = "GET",
         # these parameters derive from `response.Response`
         body: str | None = None,
         content_type: str | None = None,
