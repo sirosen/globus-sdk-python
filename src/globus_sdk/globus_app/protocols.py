@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-import sys
 import typing as t
 
 from globus_sdk import AuthLoginClient
 from globus_sdk._types import UUIDLike
 from globus_sdk.login_flows import LoginFlowManager
 from globus_sdk.tokenstorage import TokenStorage
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol, runtime_checkable
-else:
-    from typing import Protocol, runtime_checkable
 
 if t.TYPE_CHECKING:
     from globus_sdk.tokenstorage import TokenValidationError
@@ -20,8 +14,8 @@ if t.TYPE_CHECKING:
     from .config import GlobusAppConfig
 
 
-@runtime_checkable
-class TokenStorageProvider(Protocol):
+@t.runtime_checkable
+class TokenStorageProvider(t.Protocol):
     """
     A protocol for a factory which can create ``TokenStorages``.
 
@@ -47,8 +41,8 @@ class TokenStorageProvider(Protocol):
         """
 
 
-@runtime_checkable
-class LoginFlowManagerProvider(Protocol):
+@t.runtime_checkable
+class LoginFlowManagerProvider(t.Protocol):
     """
     A protocol for a factory which can create ``LoginFlowManagers``.
 
@@ -68,7 +62,7 @@ class LoginFlowManagerProvider(Protocol):
         """
 
 
-class TokenValidationErrorHandler(Protocol):
+class TokenValidationErrorHandler(t.Protocol):
     """
     A handler invoked when a :class:`TokenValidationError` is raised during a
     service client call.

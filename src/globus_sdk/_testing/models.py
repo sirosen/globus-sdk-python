@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-import sys
 import types
 import typing as t
 
 import responses
 
 from ..utils import slash_join
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal
 
 
 class RegisteredResponse:
@@ -63,7 +57,7 @@ class RegisteredResponse:
         # in `responses`, these are just `url`
         path: str,
         service: (
-            Literal[
+            t.Literal[
                 "auth",
                 "nexus",
                 "transfer",
@@ -78,7 +72,7 @@ class RegisteredResponse:
         ) = None,
         # method will be passed through to `responses.Response`, so we
         # support all of the values which it supports
-        method: Literal[
+        method: t.Literal[
             "GET",
             "PUT",
             "POST",
@@ -152,7 +146,7 @@ class RegisteredResponse:
 
     def _add_or_replace(
         self,
-        method: Literal["add", "replace"],
+        method: t.Literal["add", "replace"],
         *,
         requests_mock: responses.RequestsMock | None = None,
     ) -> RegisteredResponse:

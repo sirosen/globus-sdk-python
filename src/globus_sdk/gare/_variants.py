@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sys
 import typing as t
 
 from globus_sdk import exc
@@ -9,15 +8,10 @@ from globus_sdk._serializable import Serializable
 
 from ._auth_requirements_error import GARE, GlobusAuthorizationParameters
 
-if sys.version_info >= (3, 8):
-    from typing import Literal, Protocol
-else:
-    from typing_extensions import Literal, Protocol
-
 V = t.TypeVar("V", bound="LegacyAuthRequirementsErrorVariant")
 
 
-class LegacyAuthRequirementsErrorVariant(Protocol):
+class LegacyAuthRequirementsErrorVariant(t.Protocol):
     """
     Protocol for errors which can be converted to a Globus Auth Requirements Error.
     """
@@ -37,7 +31,7 @@ class LegacyConsentRequiredTransferError(Serializable):
     def __init__(
         self,
         *,
-        code: Literal["ConsentRequired"],
+        code: t.Literal["ConsentRequired"],
         required_scopes: list[str],
         extra: dict[str, t.Any] | None = None,
     ) -> None:
@@ -68,7 +62,7 @@ class LegacyConsentRequiredAPError(Serializable):
     def __init__(
         self,
         *,
-        code: Literal["ConsentRequired"],
+        code: t.Literal["ConsentRequired"],
         required_scope: str,
         extra: dict[str, t.Any] | None,
     ) -> None:
@@ -110,7 +104,7 @@ class LegacyAuthorizationParameters(Serializable):
         session_required_policies: str | list[str] | None = None,
         session_required_single_domain: str | list[str] | None = None,
         session_required_mfa: bool | None = None,
-        prompt: Literal["login"] | None = None,
+        prompt: t.Literal["login"] | None = None,
         extra: dict[str, t.Any] | None = None,
     ) -> None:
         self.session_message = validators.opt_str("session_message", session_message)
@@ -193,7 +187,7 @@ class LegacyAuthorizationParametersError(Serializable):
 
 def _validate_consent_required_literal(
     name: str, value: t.Any
-) -> Literal["ConsentRequired"]:
+) -> t.Literal["ConsentRequired"]:
     if value == "ConsentRequired":
         return "ConsentRequired"
     raise exc.ValidationError(f"'{name}' must be the string 'ConsentRequired'")

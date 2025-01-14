@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
 import typing as t
 
 import jwt
@@ -13,11 +12,6 @@ from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.exc.warnings import warn_deprecated
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import AuthScopes, TransferScopes, scopes_to_str
-
-if sys.version_info >= (3, 8):
-    from typing import Literal, Protocol, runtime_checkable
-else:
-    from typing_extensions import Literal, Protocol, runtime_checkable
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +41,7 @@ def stringify_requested_scopes(requested_scopes: ScopeCollectionType | None) -> 
     return requested_scopes_string
 
 
-class _JWKGetCallbackProto(Protocol):
+class _JWKGetCallbackProto(t.Protocol):
     def __call__(
         self,
         path: str,
@@ -91,8 +85,8 @@ def pem_decode_jwk_data(
     return jwk_as_pem
 
 
-@runtime_checkable
-class SupportsJWKMethods(Protocol):
+@t.runtime_checkable
+class SupportsJWKMethods(t.Protocol):
     client_id: str | None
 
     def get_openid_configuration(self) -> GlobusHTTPResponse: ...
@@ -102,7 +96,7 @@ class SupportsJWKMethods(Protocol):
         self,
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
-        as_pem: Literal[True],
+        as_pem: t.Literal[True],
     ) -> RSAPublicKey: ...
 
     @t.overload
@@ -110,7 +104,7 @@ class SupportsJWKMethods(Protocol):
         self,
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
-        as_pem: Literal[False],
+        as_pem: t.Literal[False],
     ) -> dict[str, t.Any]: ...
 
     def get_jwk(

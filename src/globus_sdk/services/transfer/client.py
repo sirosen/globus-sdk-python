@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import sys
 import time
 import typing as t
 import uuid
@@ -14,11 +13,6 @@ from .data import DeleteData, TransferData
 from .errors import TransferAPIError
 from .response import ActivationRequirementsResponse, IterableTransferResponse
 from .transport import TransferRequestsTransport
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
 
 log = logging.getLogger(__name__)
 
@@ -279,7 +273,7 @@ class TransferClient(client.BaseClient):
     def set_subscription_id(
         self,
         collection_id: UUIDLike,
-        subscription_id: UUIDLike | Literal["DEFAULT"] | None,
+        subscription_id: UUIDLike | t.Literal["DEFAULT"] | None,
     ) -> response.GlobusHTTPResponse:
         """
         Set the ``subscription_id`` on a mapped collection.
@@ -393,7 +387,7 @@ class TransferClient(client.BaseClient):
         filter_host_endpoint: UUIDLike | None = None,
         filter_non_functional: bool | None = None,
         filter_entity_type: (
-            Literal[
+            t.Literal[
                 "GCP_mapped_collection",
                 "GCP_guest_collection",
                 "GCSv5_endpoint",
@@ -2195,7 +2189,7 @@ class TransferClient(client.BaseClient):
         filter_task_id: None | UUIDLike | t.Iterable[UUIDLike] = None,
         filter_owner_id: UUIDLike | None = None,
         filter_endpoint: UUIDLike | None = None,
-        filter_endpoint_use: Literal["source", "destination"] | None = None,
+        filter_endpoint_use: t.Literal["source", "destination"] | None = None,
         filter_is_paused: bool | None = None,
         filter_completion_time: None | str | tuple[DateLike, DateLike] = None,
         filter_min_faults: int | None = None,
