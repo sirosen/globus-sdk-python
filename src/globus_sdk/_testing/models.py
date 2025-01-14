@@ -19,6 +19,25 @@ class RegisteredResponse:
     A mock response along with descriptive metadata to let a fixture "pass data
     forward" to the consuming test cases. (e.g. a ``GET Task`` fixture which
     shares the ``task_id`` it uses with consumers via ``.metadata["task_id"]``)
+
+    When initializing a ``RegisteredResponse``, you can use ``path`` and ``service``
+    to describe a path on a Globus service rather than a full URL. The ``metadata``
+    data container is also globus-sdk specific. Most other parameters are wrappers
+    over ``responses`` response characteristics.
+
+    :param path: Path on the target service or full URL if service is null
+    :param service: A known service name like ``"transfer"`` or ``"compute"``. This will
+        be used to deduce the base URL onto which ``path`` should be joined
+    :param method: A string HTTP Method
+    :param headers: HTTP headers for the response
+    :param json: A dict or list structure for a JSON response (mutex with ``body``)
+    :param body: A string response body (mutex with ``json``)
+    :param status: The HTTP status code for the response
+    :param content_type: A Content-Type header value for the response
+    :param match: A tuple or list of ``responses`` matchers
+    :param metadata: A dict of data to store on the response, which allows the usage
+        site which declares the response to pass information forward to the site which
+        activates and tests against the response.
     """
 
     _url_map = {
@@ -40,14 +59,54 @@ class RegisteredResponse:
     def __init__(
         self,
         *,
+        # path and service are glbous-sdk specific
+        # in `responses`, these are just `url`
         path: str,
-        service: str | None = None,
-        method: str = responses.GET,
-        headers: dict[str, str] | None = None,
-        metadata: dict[str, t.Any] | None = None,
-        json: None | list[t.Any] | dict[str, t.Any] = None,
+        service: (
+            Literal[
+                "auth",
+                "nexus",
+                "transfer",
+                "search",
+                "gcs",
+                "groups",
+                "timer",
+                "flows",
+                "compute",
+            ]
+            | None
+        ) = None,
+        # method will be passed through to `responses.Response`, so we
+        # support all of the values which it supports
+        method: Literal[
+            "GET",
+            "PUT",
+            "POST",
+            "PATCH",
+            "HEAD",
+            "DELETE",
+            "OPTIONS",
+            "CONNECT",
+            "TRACE",
+        ] = "GET",
+        # these parameters are passed through to `response.Response` (or omitted)
         body: str | None = None,
-        **kwargs: t.Any,
+        content_type: str | None = None,
+        headers: dict[str, str] | None = None,
+        json: None | list[t.Any] | dict[str, t.Any] = None,
+        status: int = 200,
+        stream: bool | None = None,
+        match: t.Sequence[t.Callable[..., tuple[bool, str]]] | None = None,
+        # metadata is globus-sdk specific
+        metadata: dict[str, t.Any] | None = None,
+        # the following are known parameters to `responses.Response` which
+        # `RegisteredResponse` does not support:
+        #   - url: calculated from (path, service)
+        #   - auto_calculate_content_length: a bool setting, usually not needed and can
+        #                                    be achieved in user code via `headers`
+        #   - passthrough: bool setting allowing calls to be emitted to the services
+        #                  (undesirable in any ordinary cases)
+        #   - match_querystring: legacy param which has been replaced with `match`
     ) -> None:
         self.service = service
 
@@ -69,12 +128,17 @@ class RegisteredResponse:
         # correctly -- method matching is case sensitive but we don't need to expose the
         # possibility of a non-uppercase method
         self.method = method.upper()
-        self.json = json
+
         self.body = body
+        self.content_type = content_type
         self.headers = headers
+        self.json = json
+        self.status = status
+        self.stream = stream
+
+        self.match = match
 
         self._metadata = metadata
-        self.kwargs = kwargs
 
         self.parent: ResponseSet | ResponseList | None = None
 
@@ -94,13 +158,18 @@ class RegisteredResponse:
     ) -> RegisteredResponse:
         kwargs: dict[str, t.Any] = {
             "headers": self.headers,
+            "status": self.status,
+            "stream": self.stream,
             "match_querystring": None,
-            **self.kwargs,
         }
         if self.json is not None:
             kwargs["json"] = self.json
         if self.body is not None:
             kwargs["body"] = self.body
+        if self.content_type is not None:
+            kwargs["content_type"] = self.content_type
+        if self.match is not None:
+            kwargs["match"] = self.match
 
         if requests_mock is None:
             use_requests_mock: responses.RequestsMock | types.ModuleType = responses
