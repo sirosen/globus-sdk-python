@@ -2,13 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
-import sys
 import typing as t
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
 
 from globus_sdk import exc, utils
 from globus_sdk._types import UUIDLike
@@ -17,7 +11,7 @@ if t.TYPE_CHECKING:
     import globus_sdk
 
 log = logging.getLogger(__name__)
-_StrSyncLevel = Literal["exists", "size", "mtime", "checksum"]
+_StrSyncLevel = t.Literal["exists", "size", "mtime", "checksum"]
 _sync_level_dict: dict[_StrSyncLevel, int] = {
     "exists": 0,
     "size": 1,
@@ -335,8 +329,10 @@ class TransferData(utils.PayloadWrapper):
         self,
         name: str,
         *,
-        method: Literal["include", "exclude"] = "exclude",
-        type: None | Literal["file", "dir"] = None,  # pylint: disable=redefined-builtin
+        method: t.Literal["include", "exclude"] = "exclude",
+        type: (  # pylint: disable=redefined-builtin
+            None | t.Literal["file", "dir"]
+        ) = None,
     ) -> None:
         """
         Add a filter rule to the transfer document.

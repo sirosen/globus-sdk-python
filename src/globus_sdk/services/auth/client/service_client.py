@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import functools
 import logging
-import sys
 import typing as t
 
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -29,11 +28,6 @@ from ..response import (
     GetProjectsResponse,
     GetScopesResponse,
 )
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
 
 log = logging.getLogger(__name__)
 
@@ -178,7 +172,7 @@ class AuthClient(client.BaseClient):
         self,
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
-        as_pem: Literal[True],
+        as_pem: t.Literal[True],
     ) -> RSAPublicKey: ...
 
     @t.overload
@@ -186,7 +180,7 @@ class AuthClient(client.BaseClient):
         self,
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
-        as_pem: Literal[False],
+        as_pem: t.Literal[False],
     ) -> dict[str, t.Any]: ...
 
     # FYI: this get_jwk method is duplicated in AuthLoginBaseClient

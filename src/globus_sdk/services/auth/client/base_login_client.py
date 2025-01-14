@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import sys
 import typing as t
 
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -20,11 +19,6 @@ from ..response import (
     OAuthRefreshTokenResponse,
     OAuthTokenResponse,
 )
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
 
 log = logging.getLogger(__name__)
 
@@ -103,7 +97,7 @@ class AuthLoginClient(client.BaseClient):
         self,
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
-        as_pem: Literal[True],
+        as_pem: t.Literal[True],
     ) -> RSAPublicKey: ...
 
     @t.overload
@@ -111,7 +105,7 @@ class AuthLoginClient(client.BaseClient):
         self,
         openid_configuration: None | GlobusHTTPResponse | dict[str, t.Any],
         *,
-        as_pem: Literal[False],
+        as_pem: t.Literal[False],
     ) -> dict[str, t.Any]: ...
 
     # FYI: this get_jwk method is duplicated in AuthClient
@@ -151,7 +145,7 @@ class AuthLoginClient(client.BaseClient):
         session_required_single_domain: str | t.Iterable[str] | None = None,
         session_required_policies: UUIDLike | t.Iterable[UUIDLike] | None = None,
         session_required_mfa: bool | None = None,
-        prompt: Literal["login"] | None = None,
+        prompt: t.Literal["login"] | None = None,
         query_params: dict[str, t.Any] | None = None,
     ) -> str:
         """

@@ -1,22 +1,15 @@
 from __future__ import annotations
 
-import sys
 import typing as t
 
 from globus_sdk.utils import MISSING
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol
-else:
-    from typing import Protocol
-
 
 VersionTuple = t.Tuple[int, int, int]
 
 DatatypeCallback = t.Callable[["DocumentWithInducedDatatype"], t.Optional[VersionTuple]]
 
 
-class DocumentWithInducedDatatype(Protocol):
+class DocumentWithInducedDatatype(t.Protocol):
     DATATYPE_BASE: str
     DATATYPE_VERSION_IMPLICATIONS: dict[str, VersionTuple]
     DATATYPE_VERSION_CALLBACKS: tuple[DatatypeCallback, ...]

@@ -1,18 +1,10 @@
 from __future__ import annotations
 
 import enum
-import sys
 import typing as t
 
 from globus_sdk import utils
 from globus_sdk._types import UUIDLike
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-    from typing_extensions import get_args as typing_get_args
-else:
-    from typing import Literal
-    from typing import get_args as typing_get_args
 
 T = t.TypeVar("T")
 
@@ -23,7 +15,7 @@ class GroupRole(enum.Enum):
     admin = "admin"
 
 
-_GROUP_ROLE_T = t.Union[GroupRole, Literal["member", "manager", "admin"]]
+_GROUP_ROLE_T = t.Union[GroupRole, t.Literal["member", "manager", "admin"]]
 
 
 class GroupMemberVisibility(enum.Enum):
@@ -32,7 +24,7 @@ class GroupMemberVisibility(enum.Enum):
 
 
 _GROUP_MEMBER_VISIBILITY_T = t.Union[
-    GroupMemberVisibility, Literal["members", "managers"]
+    GroupMemberVisibility, t.Literal["members", "managers"]
 ]
 
 
@@ -41,7 +33,7 @@ class GroupVisibility(enum.Enum):
     private = "private"
 
 
-_GROUP_VISIBILITY_T = t.Union[GroupVisibility, Literal["authenticated", "private"]]
+_GROUP_VISIBILITY_T = t.Union[GroupVisibility, t.Literal["authenticated", "private"]]
 
 
 class GroupRequiredSignupFields(enum.Enum):
@@ -61,7 +53,7 @@ class GroupRequiredSignupFields(enum.Enum):
 
 _GROUP_REQUIRED_SIGNUP_FIELDS_T = t.Union[
     GroupRequiredSignupFields,
-    Literal[
+    t.Literal[
         "institution",
         "current_project_name",
         "address",
@@ -85,7 +77,7 @@ def _typename(obj: t.Any) -> str:
 
 
 def _fmt_union(obj: t.Any) -> str:
-    return " | ".join(_typename(x) for x in typing_get_args(obj))
+    return " | ".join(_typename(x) for x in t.get_args(obj))
 
 
 def _docstring_fixer(cls: type[T]) -> type[T]:

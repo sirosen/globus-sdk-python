@@ -1,14 +1,8 @@
 from __future__ import annotations
 
 import datetime
-import sys
 import typing as t
 import uuid
-
-if sys.version_info < (3, 8):
-    from typing_extensions import Protocol
-else:
-    from typing import Protocol
 
 if t.TYPE_CHECKING:
     from globus_sdk.scopes import MutableScope, Scope
@@ -27,7 +21,7 @@ ScopeCollectionType = t.Union[
 ]
 
 
-class ResponseLike(Protocol):
+class ResponseLike(t.Protocol):
     @property
     def http_status(self) -> int: ...
 
