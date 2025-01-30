@@ -76,6 +76,8 @@ class AuthClient(client.BaseClient):
     A client for using the
     `Globus Auth API <https://docs.globus.org/api/auth/>`_
 
+    .. sdk-sphinx-copy-params:: BaseClient
+
     This class provides helper methods for most common resources in the
     Auth API, and the common low-level interface from
     :class:`BaseClient <globus_sdk.client.BaseClient>` of ``get``, ``put``,

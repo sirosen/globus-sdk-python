@@ -34,7 +34,9 @@ class GCSClient(client.BaseClient):
     Manager. All other arguments are the same as those for
     :class:`~globus_sdk.BaseClient`.
 
-    :param gcs_address: The FQDN (DNS name) or HTTPS URL for the GCS Manager API.
+    .. sdk-sphinx-copy-params:: BaseClient
+
+        :param gcs_address: The FQDN (DNS name) or HTTPS URL for the GCS Manager API.
 
     .. automethodlist:: globus_sdk.GCSClient
     """

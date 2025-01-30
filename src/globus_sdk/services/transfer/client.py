@@ -46,6 +46,8 @@ class TransferClient(client.BaseClient):
     Client for the
     `Globus Transfer API <https://docs.globus.org/api/transfer/>`_.
 
+    .. sdk-sphinx-copy-params:: BaseClient
+
     This class provides helper methods for most common resources in the
     REST API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
     from the base rest client that can be used to access any REST resource.

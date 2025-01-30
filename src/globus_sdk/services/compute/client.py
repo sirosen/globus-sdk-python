@@ -16,6 +16,8 @@ class ComputeClientV2(client.BaseClient):
     r"""
     Client for the Globus Compute API, version 2.
 
+    .. sdk-sphinx-copy-params:: BaseClient
+
     .. automethodlist:: globus_sdk.ComputeClientV2
     """
 
@@ -352,6 +354,8 @@ class ComputeClient(ComputeClientV2):
     r"""
     Canonical client for the Globus Compute API, with support exclusively for
     API version 2.
+
+    .. sdk-sphinx-copy-params:: BaseClient
 
     .. automethodlist:: globus_sdk.ComputeClient
     """

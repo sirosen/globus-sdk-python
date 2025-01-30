@@ -23,6 +23,8 @@ class TimersClient(client.BaseClient):
     r"""
     Client for the Globus Timer API.
 
+    .. sdk-sphinx-copy-params:: BaseClient
+
     .. automethodlist:: globus_sdk.TimersClient
     """
 

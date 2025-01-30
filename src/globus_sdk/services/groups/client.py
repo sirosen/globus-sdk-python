@@ -15,6 +15,8 @@ class GroupsClient(client.BaseClient):
     Client for the
     `Globus Groups API <https://docs.globus.org/api/groups/>`_.
 
+    .. sdk-sphinx-copy-params:: BaseClient
+
     This provides a relatively low level client to public groups API endpoints.
     You may also consider looking at the GroupsManager as a simpler interface
     to more common actions.

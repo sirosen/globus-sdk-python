@@ -24,6 +24,8 @@ class FlowsClient(client.BaseClient):
     r"""
     Client for the Globus Flows API.
 
+    .. sdk-sphinx-copy-params:: BaseClient
+
     .. automethodlist:: globus_sdk.FlowsClient
     """
 
@@ -833,7 +835,9 @@ class SpecificFlowClient(client.BaseClient):
     Unlike other client types, this must be provided with a specific flow id. All other
         arguments are the same as those for :class:`~globus_sdk.BaseClient`.
 
-    :param flow_id: The generated UUID associated with a flow
+    .. sdk-sphinx-copy-params:: BaseClient
+
+        :param flow_id: The generated UUID associated with a flow
 
     .. automethodlist:: globus_sdk.SpecificFlowClient
     """

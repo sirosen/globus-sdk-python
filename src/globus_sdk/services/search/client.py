@@ -18,6 +18,8 @@ class SearchClient(client.BaseClient):
     r"""
     Client for the Globus Search API
 
+    .. sdk-sphinx-copy-params:: BaseClient
+
     This class provides helper methods for most common resources in the
     API, and basic ``get``, ``put``, ``post``, and ``delete`` methods
     from the base client that can be used to access any API resource.
