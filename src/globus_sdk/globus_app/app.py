@@ -5,7 +5,14 @@ import contextlib
 import copy
 import typing as t
 
-from globus_sdk import AuthClient, AuthLoginClient, GlobusSDKUsageError, Scope
+from globus_sdk import (
+    AuthClient,
+    AuthLoginClient,
+    DefaultIDTokenDecoder,
+    GlobusSDKUsageError,
+    IDTokenDecoder,
+    Scope,
+)
 from globus_sdk._types import ScopeCollectionType, UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.gare import GlobusAuthorizationParameters
@@ -96,6 +103,9 @@ class GlobusApp(metaclass=abc.ABCMeta):
             consent_client=consent_client,
             scope_requirements=self._scope_requirements,
         )
+
+        # setup an ID Token Decoder based on config; build one if it was not provided
+        self._id_token_decoder = self._initialize_id_token_decoder()
 
         # initialize our authorizer factory
         self._initialize_authorizer_factory()
@@ -238,6 +248,29 @@ class GlobusApp(metaclass=abc.ABCMeta):
             f"Unsupported token_storage value: {token_storage}. Must be a "
             f"TokenStorage, TokenStorageProvider, or a supported string value."
         )
+
+    def _initialize_id_token_decoder(self) -> IDTokenDecoder:
+        """
+        Create an IDTokenDecoder or use the one provided via config, and set it on
+        the token storage adapters.
+
+        It is only set on inner storage if the decoder was not already set, so a
+        non-null value won't be overwritten.
+
+        This must run near the end of app initialization, when the `_token_storage`
+        (inner) and `token_storage` (validating storage, outer) storages have both
+        been initialized.
+        """
+        id_token_decoder = (
+            self.config.id_token_decoder
+            if self.config.id_token_decoder is not None
+            else DefaultIDTokenDecoder(self._login_client)
+        )
+        if self._token_storage.id_token_decoder is None:
+            self._token_storage.id_token_decoder = id_token_decoder
+        self.token_storage.id_token_decoder = id_token_decoder
+
+        return id_token_decoder
 
     @abc.abstractmethod
     def _initialize_authorizer_factory(self) -> None:

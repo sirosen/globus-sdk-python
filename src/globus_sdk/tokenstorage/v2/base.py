@@ -29,6 +29,19 @@ class TokenStorage(metaclass=abc.ABCMeta):
 
     def __init__(self, namespace: str = "DEFAULT") -> None:
         self.namespace = namespace
+        self._id_token_decoder: globus_sdk.IDTokenDecoder | None = None
+
+    @property
+    def id_token_decoder(self) -> globus_sdk.IDTokenDecoder | None:
+        """
+        An ID Token decoder to use when decoding ``id_token`` JWTs from Globus Auth.
+        By default, a new decoder is used each time decoding is performed.
+        """
+        return self._id_token_decoder
+
+    @id_token_decoder.setter
+    def id_token_decoder(self, value: globus_sdk.IDTokenDecoder) -> None:
+        self._id_token_decoder = value
 
     @abc.abstractmethod
     def store_token_data_by_resource_server(
@@ -111,8 +124,11 @@ class TokenStorage(metaclass=abc.ABCMeta):
         if isinstance(token_response, globus_sdk.OAuthDependentTokenResponse):
             return None
 
-        if token_response.get("id_token"):
-            decoded_id_token = token_response.decode_id_token()
+        if id_token := token_response.get("id_token"):
+            if self.id_token_decoder:
+                decoded_id_token = self.id_token_decoder.decode(id_token)
+            else:
+                decoded_id_token = token_response.decode_id_token()
             return decoded_id_token["sub"]  # type: ignore[no-any-return]
         else:
             return None

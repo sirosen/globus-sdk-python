@@ -133,7 +133,7 @@ class DefaultIDTokenDecoder(IDTokenDecoder):
         """
         Store a JWK for future use in ``decode()``.
 
-        :param openid_configuration: The JWK, as fetched via :meth:`AuthClient.get_jwk`
+        :param jwk: The JWK, as fetched via :meth:`AuthClient.get_jwk`
             with ``as_pem=True``.
         """
         self._jwk = jwk
