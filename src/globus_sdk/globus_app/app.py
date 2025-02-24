@@ -8,7 +8,6 @@ import typing as t
 from globus_sdk import (
     AuthClient,
     AuthLoginClient,
-    DefaultIDTokenDecoder,
     GlobusSDKUsageError,
     IDTokenDecoder,
     Scope,
@@ -105,7 +104,9 @@ class GlobusApp(metaclass=abc.ABCMeta):
         )
 
         # setup an ID Token Decoder based on config; build one if it was not provided
-        self._id_token_decoder = self._initialize_id_token_decoder()
+        self._id_token_decoder = self._initialize_id_token_decoder(
+            app_name=self.app_name, config=self.config, login_client=self._login_client
+        )
 
         # initialize our authorizer factory
         self._initialize_authorizer_factory()
@@ -249,7 +250,9 @@ class GlobusApp(metaclass=abc.ABCMeta):
             f"TokenStorage, TokenStorageProvider, or a supported string value."
         )
 
-    def _initialize_id_token_decoder(self) -> IDTokenDecoder:
+    def _initialize_id_token_decoder(
+        self, *, app_name: str, config: GlobusAppConfig, login_client: AuthLoginClient
+    ) -> IDTokenDecoder:
         """
         Create an IDTokenDecoder or use the one provided via config, and set it on
         the token storage adapters.
@@ -261,11 +264,14 @@ class GlobusApp(metaclass=abc.ABCMeta):
         (inner) and `token_storage` (validating storage, outer) storages have both
         been initialized.
         """
-        id_token_decoder = (
-            self.config.id_token_decoder
-            if self.config.id_token_decoder is not None
-            else DefaultIDTokenDecoder(self._login_client)
-        )
+        if isinstance(self.config.id_token_decoder, IDTokenDecoder):
+            id_token_decoder: IDTokenDecoder = self.config.id_token_decoder
+        else:
+            id_token_decoder = self.config.id_token_decoder.for_globus_app(
+                app_name=app_name,
+                config=config,
+                login_client=login_client,
+            )
         if self._token_storage.id_token_decoder is None:
             self._token_storage.id_token_decoder = id_token_decoder
         self.token_storage.id_token_decoder = id_token_decoder

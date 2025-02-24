@@ -11,6 +11,9 @@ from globus_sdk.response import GlobusHTTPResponse
 
 from ._common import SupportsJWKMethods
 
+if t.TYPE_CHECKING:
+    from globus_sdk import AuthLoginClient, GlobusAppConfig
+
 
 class IDTokenDecoder(abc.ABC):
     """
@@ -114,6 +117,24 @@ class DefaultIDTokenDecoder(IDTokenDecoder):
         self._auth_client = auth_client
         self._openid_configuration: dict[str, t.Any] | None = None
         self._jwk: RSAPublicKey | None = None
+
+    @classmethod
+    def for_globus_app(
+        cls,
+        *,
+        app_name: str,  # pylint: disable=unused-argument
+        config: GlobusAppConfig,  # pylint: disable=unused-argument
+        login_client: AuthLoginClient,
+    ) -> t.Self:
+        """
+        Create a ``DefaultIDTokenDecoder`` for use in a GlobusApp.
+
+        :param app_name: The name supplied to the GlobusApp.
+        :param config: The configuration supplied to the GlobusApp.
+        :param login_client: A login client to use for instantiating an
+            ``IDTokenDecoder``.
+        """
+        return cls(login_client)
 
     def store_openid_configuration(
         self, openid_configuration: dict[str, t.Any] | GlobusHTTPResponse
