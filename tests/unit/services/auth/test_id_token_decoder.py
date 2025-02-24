@@ -1,4 +1,3 @@
-import uuid
 from unittest import mock
 
 import pytest
@@ -68,20 +67,6 @@ def test_decoding_can_pass_explicit_audience():
     with mock.patch("jwt.decode") as mock_jwt_decode:
         decoder.decode("", audience="myaud")
         assert mock_jwt_decode.call_args.kwargs["audience"] == "myaud"
-
-
-def test_default_encoder_derives_audience_from_client():
-    client = mock.Mock()
-    client.client_id = uuid.uuid1()
-
-    decoder = globus_sdk.DefaultIDTokenDecoder(client)
-    assert decoder.default_audience == client.client_id
-
-    # delattr on a mock removes an attribute and ensures that a `hasattr` check on
-    # it will return False (the default is for any attribute to return True)
-    delattr(client, "client_id")
-
-    assert decoder.default_audience is None
 
 
 def test_setting_oidc_config_on_default_decoder_unpacks_data():

@@ -143,8 +143,6 @@ class DefaultIDTokenDecoder(IDTokenDecoder):
         """
         The audience for JWT verification defaults to the client's client ID.
         """
-        if not hasattr(self._auth_client, "client_id"):
-            return None
         return self._auth_client.client_id
 
     def get_openid_configuration(self) -> dict[str, t.Any]:
