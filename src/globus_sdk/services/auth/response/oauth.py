@@ -192,7 +192,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
             parameter, and all other values are passed as ``options``.
         """
         id_token = self["id_token"]
-        logger.info('Decoding ID Token "%s"', id_token)
+        logger.debug('Decoding ID Token "%s"', id_token)
         if not isinstance(self.client, SupportsJWKMethods):
             raise exc.GlobusSDKUsageError(
                 "decode_id_token() requires a client which supports JWK methods. "
