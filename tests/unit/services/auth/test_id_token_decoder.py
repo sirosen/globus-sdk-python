@@ -1,3 +1,4 @@
+import uuid
 from unittest import mock
 
 import pytest
@@ -38,35 +39,28 @@ class MockDecoder(globus_sdk.IDTokenDecoder):
         return mock.Mock()
 
 
-@pytest.mark.parametrize(
-    "default_audience_callable, expect_value",
-    (
-        pytest.param(None, None, id="no-override"),
-        pytest.param(lambda *_, **__: None, None, id="explicit-none"),
-        pytest.param(lambda *_, **__: "myaud", "myaud", id="myaud"),
-    ),
-)
-def test_decoding_passes_default_audience(default_audience_callable, expect_value):
-    class MyDecoder(MockDecoder):
-        pass
+def test_decoding_defaults_to_client_id_as_audience():
+    fake_client = mock.Mock()
+    fake_client.client_id = str(uuid.uuid1())
 
-    if default_audience_callable is not None:
-        MyDecoder.default_audience = property(default_audience_callable)
-
-    decoder = MyDecoder()
-    assert decoder.default_audience == expect_value
+    decoder = MockDecoder(fake_client)
 
     with mock.patch("jwt.decode") as mock_jwt_decode:
         decoder.decode("")
-        assert mock_jwt_decode.call_args.kwargs["audience"] == expect_value
+        assert mock_jwt_decode.call_args.kwargs["audience"] == fake_client.client_id
 
 
-def test_decoding_can_pass_explicit_audience():
-    decoder = MockDecoder()
+@pytest.mark.parametrize("audience_value", (None, "myaud"))
+def test_decoding_passes_audience(audience_value):
+    class MyDecoder(MockDecoder):
+        def get_jwt_audience(self):
+            return audience_value
+
+    decoder = MyDecoder(mock.Mock())
 
     with mock.patch("jwt.decode") as mock_jwt_decode:
-        decoder.decode("", audience="myaud")
-        assert mock_jwt_decode.call_args.kwargs["audience"] == "myaud"
+        decoder.decode("")
+        assert mock_jwt_decode.call_args.kwargs["audience"] == audience_value
 
 
 def test_setting_oidc_config_on_default_decoder_unpacks_data():
@@ -75,28 +69,16 @@ def test_setting_oidc_config_on_default_decoder_unpacks_data():
     raw_response.json.return_value = oidc_config
     response = globus_sdk.GlobusHTTPResponse(raw_response, client=mock.Mock())
 
-    decoder = globus_sdk.DefaultIDTokenDecoder(mock.Mock())
+    decoder = globus_sdk.IDTokenDecoder(mock.Mock())
     decoder.store_openid_configuration(response)
 
     assert decoder.get_openid_configuration() == oidc_config
 
 
-def test_default_jwt_leeway_can_be_overridden_on_call():
-    default_leeway = globus_sdk.IDTokenDecoder.DEFAULT_JWT_LEEWAY
-    decoder = MockDecoder()
-
-    with mock.patch("jwt.decode") as mock_jwt_decode:
-        decoder.decode("", leeway=int(default_leeway * 2))
-        assert mock_jwt_decode.call_args.kwargs["leeway"] == int(default_leeway * 2)
-
-
-def test_default_jwt_leeway_can_be_overridden_via_subclass():
-    default_leeway = globus_sdk.IDTokenDecoder.DEFAULT_JWT_LEEWAY
-
-    class MyDecoder(MockDecoder):
-        DEFAULT_JWT_LEEWAY = int(default_leeway * 2)
-
-    decoder = MyDecoder()
+def test_default_jwt_leeway_can_be_overridden_on_instance():
+    decoder = MockDecoder(mock.Mock())
+    default_leeway = decoder.jwt_leeway
+    decoder.jwt_leeway = int(default_leeway * 2)
 
     with mock.patch("jwt.decode") as mock_jwt_decode:
         decoder.decode("")

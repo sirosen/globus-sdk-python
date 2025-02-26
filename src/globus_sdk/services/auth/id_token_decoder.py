@@ -15,108 +15,62 @@ if t.TYPE_CHECKING:
     from globus_sdk import AuthLoginClient, GlobusAppConfig
 
 
-class IDTokenDecoder(abc.ABC):
+class JWTDecoder(abc.ABC):
     """
-    This ABC defines a decoder for parsing OIDC id_token data from Globus Auth.
+    This abstract class defines a decoder for parsing JWTs.
+
+    A decoder is an object with a ``decode()`` method which accepts a token as its only
+    required (positional) parameter and produces a dict of decoded data.
     """
-
-    # default to 300 seconds
-    #
-    # valuable inputs to this number:
-    # - expected clock drift per day (6s for a bad clock)
-    # - Windows time sync interval (64s)
-    # - Windows' stated goal of meeting the Kerberos 5 clock skew requirement (5m)
-    # - ntp panic threshold (1000s of drift)
-    # - the knowledge that VM clocks typically run slower and may skew significantly
-    #
-    # NTP panic should be understood as a critical error; 1000s of drift is
-    # therefore too high for us to allow.
-    #
-    # 300s (5m) is therefore chosen to match the Windows desired maximum for
-    # clock drift, and the underlying Kerberos requirement.
-    DEFAULT_JWT_LEEWAY: t.ClassVar[float | datetime.timedelta] = 300.0
-
-    def decode(
-        self,
-        id_token: str,
-        *,
-        jwt_params: dict[str, t.Any] | None = None,
-        leeway: float | datetime.timedelta | None = None,
-        audience: str | None = None,
-    ) -> dict[str, t.Any]:
-        """
-        The ``decode()`` method takes an ``id_token`` as a string, and decodes it to
-        a dictionary.
-
-        This method should implicitly retrieve the OpenID configuration and JWK
-        for Globus Auth.
-
-        :param id_token: The token to decode
-        :param jwt_params: An optional dict of parameters to pass to the pyjwt library
-            as 'options'
-        :param leeway: The leeway to use when verifying JWT expiration times.
-        :param audience: The 'audience' to use for JWT verification. Defaults to the
-            client ID of the ``auth_client`` provided on init.
-
-        .. note::
-
-            If the client is not an ``AuthLoginClient``, ``audience`` will be required,
-            because the ``client_id`` cannot be determined.
-        """
-        if leeway is None:
-            leeway = self.DEFAULT_JWT_LEEWAY
-
-        jwt_audience = audience if audience is not None else self.default_audience
-        jwt_params = jwt_params or {}
-
-        openid_configuration = self.get_openid_configuration()
-        jwk = self.get_jwk()
-
-        signing_algos = openid_configuration["id_token_signing_alg_values_supported"]
-
-        return jwt.decode(
-            id_token,
-            key=jwk,
-            algorithms=signing_algos,
-            audience=jwt_audience,
-            options=jwt_params,
-            leeway=leeway,
-        )
-
-    @property
-    def default_audience(self) -> str | None:
-        """The default 'audience' for verification of the JWT 'aud' claim."""
-        return None
 
     @abc.abstractmethod
-    def get_openid_configuration(self) -> dict[str, t.Any]:
-        """Fetch the OpenID Configuration for Globus Auth."""
-
-    @abc.abstractmethod
-    def get_jwk(self) -> RSAPublicKey:
-        """Fetch the JWK for Globus Auth."""
+    def decode(self, token: str, /) -> dict[str, t.Any]: ...
 
 
-class DefaultIDTokenDecoder(IDTokenDecoder):
+class IDTokenDecoder(JWTDecoder):
     """
-    The default implementation of ID token decoding.
+    An implementation of JWT decoding specialized to OIDC ID tokens issued by Globus
+    Auth. Decoding uses a client object to fetch necessary data from Globus Auth.
 
-    The default decoder implementation accepts a client on init, and will reach
-    out to Globus Auth to fetch OIDC configuration data dynamically, as needed.
-    It also has methods to store these values, to avoid the HTTP callouts at time
-    of use.
+    By default, the OIDC configuration data and JWKs will be cached in an internal dict.
+    An alternative cache can be provided on init to use an alternative storage
+    mechanism.
 
-    The main method of a decoder is ``decode()``, which accepts an ``id_token`` string
-    and parses it into a dict.
+    The ``get_jwt_audience`` and ``get_jwt_leeway`` methods supply parameters to
+    decoding. Subclasses can override these methods to customize the decoder.
 
     :param auth_client: The client which should be used to callout to Globus Auth as
         needed. Any AuthClient or AuthLoginClient will work for this purpose.
+
+    :ivar float | datetime.timedelta jwt_leeway: The JWT leeway to use during decoding,
+        as a number of seconds or a timedelta. The default is 5 minutes.
+    :ivar dict jwt_options: The ``options`` passed to the underlying JWT decode
+        function. Defaults to an empty dict.
     """
 
     def __init__(self, auth_client: SupportsJWKMethods) -> None:
         self._auth_client = auth_client
         self._openid_configuration: dict[str, t.Any] | None = None
         self._jwk: RSAPublicKey | None = None
+
+        # default to 300 seconds
+        #
+        # valuable inputs to this number:
+        # - expected clock drift per day (6s for a bad clock)
+        # - Windows time sync interval (64s)
+        # - Windows' stated goal of meeting the Kerberos 5 clock skew requirement (5m)
+        # - ntp panic threshold (1000s of drift)
+        # - the knowledge that VM clocks typically run slower and may skew significantly
+        #
+        # NTP panic should be understood as a critical error; 1000s of drift is
+        # therefore too high for us to allow.
+        #
+        # 300s (5m) is therefore chosen to match the Windows desired maximum for
+        # clock drift, and the underlying Kerberos requirement.
+        self.jwt_leeway: float | datetime.timedelta = 300.0
+
+        # the options passed to pyjwt decoding
+        self.jwt_options: dict[str, t.Any] = {}
 
     @classmethod
     def for_globus_app(
@@ -127,7 +81,7 @@ class DefaultIDTokenDecoder(IDTokenDecoder):
         login_client: AuthLoginClient,
     ) -> t.Self:
         """
-        Create a ``DefaultIDTokenDecoder`` for use in a GlobusApp.
+        Create an ``IDTokenDecoder`` for use in a GlobusApp.
 
         :param app_name: The name supplied to the GlobusApp.
         :param config: The configuration supplied to the GlobusApp.
@@ -135,6 +89,37 @@ class DefaultIDTokenDecoder(IDTokenDecoder):
             ``IDTokenDecoder``.
         """
         return cls(login_client)
+
+    def decode(self, id_token: str, /) -> dict[str, t.Any]:
+        """
+        The ``decode()`` method takes an ``id_token`` as a string, and decodes it to
+        a dictionary.
+
+        This method should implicitly retrieve the OpenID configuration and JWK
+        for Globus Auth.
+
+        :param id_token: The token to decode
+        """
+        audience = self.get_jwt_audience()
+        openid_configuration = self.get_openid_configuration()
+        jwk = self.get_jwk()
+
+        signing_algos = openid_configuration["id_token_signing_alg_values_supported"]
+
+        return jwt.decode(
+            id_token,
+            key=jwk,
+            algorithms=signing_algos,
+            audience=audience,
+            options=self.jwt_options,
+            leeway=self.jwt_leeway,
+        )
+
+    def get_jwt_audience(self) -> str | None:
+        """
+        The audience for JWT verification defaults to the client's client ID.
+        """
+        return self._auth_client.client_id
 
     def store_openid_configuration(
         self, openid_configuration: dict[str, t.Any] | GlobusHTTPResponse
@@ -158,13 +143,6 @@ class DefaultIDTokenDecoder(IDTokenDecoder):
             with ``as_pem=True``.
         """
         self._jwk = jwk
-
-    @property
-    def default_audience(self) -> str | None:
-        """
-        The audience for JWT verification defaults to the client's client ID.
-        """
-        return self._auth_client.client_id
 
     def get_openid_configuration(self) -> dict[str, t.Any]:
         """

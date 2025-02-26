@@ -1,5 +1,4 @@
 import sys
-from unittest import mock
 
 import pytest
 import responses
@@ -99,9 +98,8 @@ def token_response():
     ).add()
 
 
-@mock.patch.object(globus_sdk.DefaultIDTokenDecoder, "DEFAULT_JWT_LEEWAY", sys.maxsize)
 def test_globus_app_with_default_decoder_only_gets_oidc_data_once(
-    oidc_and_jwk_responses, token_response
+    oidc_and_jwk_responses, token_response, monkeypatch
 ):
     # needed for logout later
     load_response(globus_sdk.NativeAppAuthClient.oauth2_revoke_token)
@@ -119,6 +117,14 @@ def test_globus_app_with_default_decoder_only_gets_oidc_data_once(
         calls = [c.request for c in responses.calls]
         calls = [c for c in calls if c.url == "https://auth.globus.org/jwk.json"]
         return len(calls)
+
+    real_decode = globus_sdk.IDTokenDecoder.decode
+
+    def patched_decode(self, *args, **kwargs):
+        self.jwt_leeway = sys.maxsize
+        return real_decode(self, *args, **kwargs)
+
+    monkeypatch.setattr(globus_sdk.IDTokenDecoder, "decode", patched_decode)
 
     memory_storage = globus_sdk.tokenstorage.MemoryTokenStorage()
     config = globus_sdk.GlobusAppConfig(token_storage=memory_storage)

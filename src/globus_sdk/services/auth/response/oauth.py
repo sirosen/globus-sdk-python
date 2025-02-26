@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import json
 import logging
 import textwrap
@@ -13,7 +12,7 @@ from globus_sdk import exc
 from globus_sdk.response import GlobusHTTPResponse
 
 from .._common import SupportsJWKMethods
-from ..id_token_decoder import DefaultIDTokenDecoder
+from ..id_token_decoder import IDTokenDecoder
 
 logger = logging.getLogger(__name__)
 
@@ -202,7 +201,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
         else:
             auth_client: SupportsJWKMethods = self.client
 
-        decoder = DefaultIDTokenDecoder(auth_client)
+        decoder = IDTokenDecoder(auth_client)
 
         if openid_configuration:
             decoder.store_openid_configuration(openid_configuration)
@@ -215,12 +214,13 @@ class OAuthTokenResponse(GlobusHTTPResponse):
             decoder.store_jwk(jwk)
 
         jwt_params = jwt_params or {}
-        jwt_leeway: float | datetime.timedelta | None = None
         if "leeway" in jwt_params:
             jwt_params = jwt_params.copy()
-            jwt_leeway = jwt_params.pop("leeway")
+            decoder.jwt_leeway = jwt_params.pop("leeway")
 
-        return decoder.decode(id_token, jwt_params=jwt_params, leeway=jwt_leeway)
+        decoder.jwt_options = jwt_params
+
+        return decoder.decode(id_token)
 
     def __str__(self) -> str:
         by_rs = json.dumps(self.by_resource_server, indent=2, separators=(",", ": "))

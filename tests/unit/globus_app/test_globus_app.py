@@ -513,7 +513,7 @@ def test_client_app_get_authorizer():
     assert authorizer.confidential_client.client_id == "mock_client_id"
 
 
-@mock.patch.object(globus_sdk.DefaultIDTokenDecoder, "decode", _mock_decode)
+@mock.patch.object(globus_sdk.IDTokenDecoder, "decode", _mock_decode)
 def test_user_app_login_logout(monkeypatch, capsys):
     monkeypatch.setattr("builtins.input", _mock_input)
     load_response(NativeAppAuthClient.oauth2_exchange_code_for_tokens, case="openid")
@@ -536,7 +536,7 @@ def test_user_app_login_logout(monkeypatch, capsys):
     assert user_app.login_required() is True
 
 
-@mock.patch.object(globus_sdk.DefaultIDTokenDecoder, "decode", _mock_decode)
+@mock.patch.object(globus_sdk.IDTokenDecoder, "decode", _mock_decode)
 def test_client_app_login_logout():
     load_response(
         ConfidentialAppAuthClient.oauth2_client_credentials_tokens, case="openid"
@@ -560,7 +560,7 @@ def test_client_app_login_logout():
     assert memory_storage.get_token_data("auth.globus.org") is None
 
 
-@mock.patch.object(globus_sdk.DefaultIDTokenDecoder, "decode", _mock_decode)
+@mock.patch.object(globus_sdk.IDTokenDecoder, "decode", _mock_decode)
 @pytest.mark.parametrize(
     "login_kwargs,expected_login",
     (

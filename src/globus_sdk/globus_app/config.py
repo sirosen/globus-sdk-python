@@ -20,7 +20,7 @@ from globus_sdk.tokenstorage import (
 from globus_sdk.tokenstorage.v2.validating_token_storage import IdentityMismatchError
 
 from .protocols import (
-    IDTokenDecoderProvider,
+    JWTDecoderProvider,
     LoginFlowManagerProvider,
     TokenStorageProvider,
     TokenValidationErrorHandler,
@@ -103,11 +103,9 @@ class GlobusAppConfig:
         Default: ``resolve_by_login_flow`` (runs a login flow, storing the resulting
         tokens).
 
-    :ivar ``IDTokenDecoder`` | ``IDTokenDecoderProvider`` id_token_decoder:
-        An ID Token decoder or a callable provider which produces a decoder. The
-        decoder is used when decoding ``id_token`` JWTs from Globus Auth.
-        By default, a decoder is built by the app at initialization time using the
-        default provider.
+    :ivar ``JWTDecoder`` | ``JWTDecoderProvider`` id_token_decoder:
+        A JWT decoder or a provider which produces a decoder. The decoder is used when
+        decoding ``id_token`` JWTs from Globus Auth. Defaults to ``IDTokenDecoder``.
 
     :ivar str environment: The Globus environment of services to interact with. This is
         mostly used for testing purposes. This may additionally be set with the
@@ -123,8 +121,8 @@ class GlobusAppConfig:
     token_validation_error_handler: TokenValidationErrorHandler | None = (
         resolve_by_login_flow
     )
-    id_token_decoder: globus_sdk.IDTokenDecoder | IDTokenDecoderProvider = (
-        globus_sdk.DefaultIDTokenDecoder
+    id_token_decoder: globus_sdk.JWTDecoder | JWTDecoderProvider = (
+        globus_sdk.IDTokenDecoder
     )
     environment: str = dataclasses.field(default_factory=get_environment_name)
 

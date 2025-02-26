@@ -9,7 +9,7 @@ from globus_sdk import (
     AuthClient,
     AuthLoginClient,
     GlobusSDKUsageError,
-    IDTokenDecoder,
+    JWTDecoder,
     Scope,
 )
 from globus_sdk._types import ScopeCollectionType, UUIDLike
@@ -252,7 +252,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
 
     def _initialize_id_token_decoder(
         self, *, app_name: str, config: GlobusAppConfig, login_client: AuthLoginClient
-    ) -> IDTokenDecoder:
+    ) -> JWTDecoder:
         """
         Create an IDTokenDecoder or use the one provided via config, and set it on
         the token storage adapters.
@@ -264,8 +264,8 @@ class GlobusApp(metaclass=abc.ABCMeta):
         (inner) and `token_storage` (validating storage, outer) storages have both
         been initialized.
         """
-        if isinstance(self.config.id_token_decoder, IDTokenDecoder):
-            id_token_decoder: IDTokenDecoder = self.config.id_token_decoder
+        if isinstance(self.config.id_token_decoder, JWTDecoder):
+            id_token_decoder: JWTDecoder = self.config.id_token_decoder
         else:
             id_token_decoder = self.config.id_token_decoder.for_globus_app(
                 app_name=app_name,

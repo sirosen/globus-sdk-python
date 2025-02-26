@@ -52,9 +52,9 @@ batching, and other functionality.
    :exclude-members: __dict__,__weakref__
    :show-inheritance:
 
-.. autoclass:: IDTokenDecoder
+.. autoclass:: JWTDecoder
 
-.. autoclass:: DefaultIDTokenDecoder
+.. autoclass:: IDTokenDecoder
    :show-inheritance:
 
 .. autoclass:: DependentScopeSpec
