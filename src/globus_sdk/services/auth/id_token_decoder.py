@@ -41,18 +41,16 @@ class IDTokenDecoder(JWTDecoder):
 
     :param auth_client: The client which should be used to callout to Globus Auth as
         needed. Any AuthClient or AuthLoginClient will work for this purpose.
-
-    :ivar float | datetime.timedelta jwt_leeway: The JWT leeway to use during decoding,
-        as a number of seconds or a timedelta. The default is 5 minutes.
-    :ivar dict jwt_options: The ``options`` passed to the underlying JWT decode
-        function. Defaults to an empty dict.
+    :param jwt_leeway: The JWT leeway to use during decoding, as a number of seconds
+        or a timedelta. The default is 5 minutes.
+    :param jwt_options: The ``options`` passed to the underlying JWT decode function.
+        Defaults to an empty dict.
     """
 
-    def __init__(self, auth_client: SupportsJWKMethods) -> None:
-        self._auth_client = auth_client
-        self._openid_configuration: dict[str, t.Any] | None = None
-        self._jwk: RSAPublicKey | None = None
-
+    def __init__(
+        self,
+        auth_client: SupportsJWKMethods,
+        *,
         # default to 300 seconds
         #
         # valuable inputs to this number:
@@ -67,10 +65,17 @@ class IDTokenDecoder(JWTDecoder):
         #
         # 300s (5m) is therefore chosen to match the Windows desired maximum for
         # clock drift, and the underlying Kerberos requirement.
-        self.jwt_leeway: float | datetime.timedelta = 300.0
+        jwt_leeway: float | datetime.timedelta = 300.0,
+        jwt_options: dict[str, t.Any] | None = None,
+    ) -> None:
+        self._auth_client = auth_client
+        self._openid_configuration: dict[str, t.Any] | None = None
+        self._jwk: RSAPublicKey | None = None
 
-        # the options passed to pyjwt decoding
-        self.jwt_options: dict[str, t.Any] = {}
+        self.jwt_leeway: float | datetime.timedelta = 300.0
+        self.jwt_options: dict[str, t.Any] = (
+            jwt_options if jwt_options is not None else {}
+        )
 
     @classmethod
     def for_globus_app(

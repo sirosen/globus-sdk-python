@@ -12,6 +12,12 @@ from globus_sdk._testing import RegisteredResponse, load_response
 CLIENT_ID_FROM_JWT = "7fb58e00-839d-44e3-8047-10a502612dca"
 
 
+class InfiniteLeewayDecoder(globus_sdk.IDTokenDecoder):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.jwt_leeway = sys.maxsize
+
+
 @pytest.fixture(autouse=True)
 def _mock_input(capsys, monkeypatch):
     def _fake_input(s):
@@ -118,13 +124,7 @@ def test_globus_app_with_default_decoder_only_gets_oidc_data_once(
         calls = [c for c in calls if c.url == "https://auth.globus.org/jwk.json"]
         return len(calls)
 
-    real_decode = globus_sdk.IDTokenDecoder.decode
-
-    def patched_decode(self, *args, **kwargs):
-        self.jwt_leeway = sys.maxsize
-        return real_decode(self, *args, **kwargs)
-
-    monkeypatch.setattr(globus_sdk.IDTokenDecoder, "decode", patched_decode)
+    monkeypatch.setattr(globus_sdk, "IDTokenDecoder", InfiniteLeewayDecoder)
 
     memory_storage = globus_sdk.tokenstorage.MemoryTokenStorage()
     config = globus_sdk.GlobusAppConfig(token_storage=memory_storage)
