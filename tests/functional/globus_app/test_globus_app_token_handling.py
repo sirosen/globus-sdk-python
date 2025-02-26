@@ -104,7 +104,7 @@ def token_response():
     ).add()
 
 
-def test_globus_app_with_default_decoder_only_gets_oidc_data_once(
+def test_globus_app_only_gets_oidc_data_once(
     oidc_and_jwk_responses, token_response, monkeypatch
 ):
     # needed for logout later
@@ -124,10 +124,11 @@ def test_globus_app_with_default_decoder_only_gets_oidc_data_once(
         calls = [c for c in calls if c.url == "https://auth.globus.org/jwk.json"]
         return len(calls)
 
-    monkeypatch.setattr(globus_sdk, "IDTokenDecoder", InfiniteLeewayDecoder)
-
     memory_storage = globus_sdk.tokenstorage.MemoryTokenStorage()
-    config = globus_sdk.GlobusAppConfig(token_storage=memory_storage)
+    config = globus_sdk.GlobusAppConfig(
+        token_storage=memory_storage,
+        id_token_decoder=InfiniteLeewayDecoder,
+    )
     user_app = globus_sdk.UserApp(
         "test-app", config=config, client_id=CLIENT_ID_FROM_JWT
     )
@@ -149,3 +150,65 @@ def test_globus_app_with_default_decoder_only_gets_oidc_data_once(
     user_app.login()
     assert _count_oidc_calls() == 1
     assert _count_jwk_calls() == 1
+
+
+def test_globus_app_can_set_custom_id_token_decoder_via_config_provider(
+    oidc_and_jwk_responses,
+    token_response,
+):
+    init_counter = 0
+
+    class CustomDecoder(InfiniteLeewayDecoder):
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            nonlocal init_counter
+            init_counter += 1
+
+    memory_storage = globus_sdk.tokenstorage.MemoryTokenStorage()
+    config = globus_sdk.GlobusAppConfig(
+        token_storage=memory_storage,
+        id_token_decoder=CustomDecoder,
+    )
+    user_app = globus_sdk.UserApp(
+        "test-app", config=config, client_id=CLIENT_ID_FROM_JWT
+    )
+
+    # confirm that our custom init got called during app init
+    assert init_counter == 1
+    # login, and confirm no failure (the default would fail on the stale id_token used)
+    user_app.login()
+
+
+def test_globus_app_can_set_custom_id_token_decoder_via_config_instance(
+    oidc_and_jwk_responses,
+    token_response,
+):
+    # needed for logout later
+    load_response(globus_sdk.NativeAppAuthClient.oauth2_revoke_token)
+
+    call_counter = 0
+
+    class CustomDecoder(InfiniteLeewayDecoder):
+        def decode(self, *args, **kwargs) -> None:
+            nonlocal call_counter
+            call_counter += 1
+            return super().decode(*args, **kwargs)
+
+    login_client = globus_sdk.NativeAppAuthClient(client_id=CLIENT_ID_FROM_JWT)
+    memory_storage = globus_sdk.tokenstorage.MemoryTokenStorage()
+    config = globus_sdk.GlobusAppConfig(
+        token_storage=memory_storage, id_token_decoder=CustomDecoder(login_client)
+    )
+    user_app = globus_sdk.UserApp("test-app", config=config, login_client=login_client)
+
+    assert call_counter == 0
+    # login, and confirm no failure (the default would fail on the stale id_token used)
+    user_app.login()
+
+    # confirm that our custom decode got called
+    assert call_counter == 1
+
+    # logout and log back in; did it get called again? good
+    user_app.logout()
+    user_app.login()
+    assert call_counter == 2
