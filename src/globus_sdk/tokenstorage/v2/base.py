@@ -26,14 +26,14 @@ class TokenStorage(metaclass=abc.ABCMeta):
 
     :param namespace: A unique string for partitioning token data (Default: "DEFAULT").
 
-    :ivar globus_sdk.JWTDecoder | None id_token_decoder: A JWT decoder to use
-        when decoding ``id_token`` JWTs from Globus Auth. By default, a new decoder is
-        used each time decoding is performed.
+    :ivar globus_sdk.IDTokenDecoder | None id_token_decoder: A decoder to use
+        when decoding ``id_token`` JWTs from Globus Auth. By default, a new decoder
+        is used each time decoding is performed.
     """
 
     def __init__(self, namespace: str = "DEFAULT") -> None:
         self.namespace = namespace
-        self.id_token_decoder: globus_sdk.JWTDecoder | None = None
+        self.id_token_decoder: globus_sdk.IDTokenDecoder | None = None
 
     @abc.abstractmethod
     def store_token_data_by_resource_server(

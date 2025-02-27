@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import abc
 import datetime
 import typing as t
 
@@ -15,22 +14,10 @@ if t.TYPE_CHECKING:
     from globus_sdk import AuthLoginClient, GlobusAppConfig
 
 
-class JWTDecoder(abc.ABC):
+class IDTokenDecoder:
     """
-    This abstract class defines a decoder for parsing JWTs.
-
-    A decoder is an object with a ``decode()`` method which accepts a token as its only
-    required (positional) parameter and produces a dict of decoded data.
-    """
-
-    @abc.abstractmethod
-    def decode(self, token: str, /) -> dict[str, t.Any]: ...
-
-
-class IDTokenDecoder(JWTDecoder):
-    """
-    An implementation of JWT decoding specialized to OIDC ID tokens issued by Globus
-    Auth. Decoding uses a client object to fetch necessary data from Globus Auth.
+    JWT decoder for OIDC ID tokens issued by Globus Auth.
+    Decoding uses a client object to fetch necessary data from Globus Auth.
 
     By default, the OIDC configuration data and JWKs will be cached in an internal dict.
     An alternative cache can be provided on init to use an alternative storage

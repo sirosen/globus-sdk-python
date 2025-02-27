@@ -52,8 +52,6 @@ batching, and other functionality.
    :exclude-members: __dict__,__weakref__
    :show-inheritance:
 
-.. autoclass:: JWTDecoder
-
 .. autoclass:: IDTokenDecoder
    :show-inheritance:
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t
 
 if t.TYPE_CHECKING:
-    from globus_sdk import AuthLoginClient, JWTDecoder
+    from globus_sdk import AuthLoginClient, IDTokenDecoder
     from globus_sdk._types import UUIDLike
     from globus_sdk.login_flows import LoginFlowManager
     from globus_sdk.tokenstorage import TokenStorage, TokenValidationError
@@ -61,9 +61,9 @@ class LoginFlowManagerProvider(t.Protocol):
 
 
 @t.runtime_checkable
-class JWTDecoderProvider(t.Protocol):
+class IDTokenDecoderProvider(t.Protocol):
     r"""
-    A protocol for a factory which can create ``JWTDecoder``\s.
+    A protocol for a factory which can create ``IDTokenDecoder``\s.
 
     The SDK-provided ``IDTokenDecoder`` class supports this protocol.
     """
@@ -75,9 +75,9 @@ class JWTDecoderProvider(t.Protocol):
         app_name: str,
         config: GlobusAppConfig,
         login_client: AuthLoginClient,
-    ) -> JWTDecoder:
+    ) -> IDTokenDecoder:
         """
-        Create a ``JWTDecoder`` for use in a GlobusApp.
+        Create an ``IDTokenDecoder`` for use in a GlobusApp.
 
         :param app_name: The name supplied to the GlobusApp.
         :param config: The configuration supplied to the GlobusApp.

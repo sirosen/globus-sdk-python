@@ -37,6 +37,6 @@ Providers
     :special-members: __call__
     :member-order: bysource
 
-.. autoclass:: JWTDecoderProvider()
+.. autoclass:: IDTokenDecoderProvider()
     :members: for_globus_app
     :member-order: bysource
