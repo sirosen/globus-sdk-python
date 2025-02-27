@@ -2,7 +2,7 @@ Added
 ~~~~~
 
 - Introduce ``globus_sdk.IDTokenDecoder``, which implements ``id_token``
-  decoding. (:pr:`NUMBER`)
+  decoding. (:pr:`1136`)
 
   - For integration with ``GlobusApp``, a new builder protocol is defined,
     ``IDTokenDecoderProvider``. This defines instantiation within the context
