@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import typing as t
 
-from globus_sdk import AuthLoginClient
-from globus_sdk._types import UUIDLike
-from globus_sdk.login_flows import LoginFlowManager
-from globus_sdk.tokenstorage import TokenStorage
-
 if t.TYPE_CHECKING:
-    from globus_sdk.tokenstorage import TokenValidationError
+    from globus_sdk import AuthLoginClient, IDTokenDecoder
+    from globus_sdk._types import UUIDLike
+    from globus_sdk.login_flows import LoginFlowManager
+    from globus_sdk.tokenstorage import TokenStorage, TokenValidationError
 
     from .app import GlobusApp
     from .config import GlobusAppConfig
@@ -16,8 +14,8 @@ if t.TYPE_CHECKING:
 
 @t.runtime_checkable
 class TokenStorageProvider(t.Protocol):
-    """
-    A protocol for a factory which can create ``TokenStorages``.
+    r"""
+    A protocol for a factory which can create ``TokenStorage``\s.
 
     SDK-provided :ref:`token_storages` support this protocol.
     """
@@ -43,8 +41,8 @@ class TokenStorageProvider(t.Protocol):
 
 @t.runtime_checkable
 class LoginFlowManagerProvider(t.Protocol):
-    """
-    A protocol for a factory which can create ``LoginFlowManagers``.
+    r"""
+    A protocol for a factory which can create ``LoginFlowManager``\s.
 
     SDK-provided :ref:`login_flow_managers` support this protocol.
     """
@@ -59,6 +57,32 @@ class LoginFlowManagerProvider(t.Protocol):
         :param app_name: The name supplied to the GlobusApp.
         :param config: The configuration supplied to the GlobusApp.
         :param login_client: A login client to use for instantiating a LoginFlowManager.
+        """
+
+
+@t.runtime_checkable
+class IDTokenDecoderProvider(t.Protocol):
+    r"""
+    A protocol for a factory which can create ``IDTokenDecoder``\s.
+
+    The SDK-provided ``IDTokenDecoder`` class supports this protocol.
+    """
+
+    @classmethod
+    def for_globus_app(
+        cls,
+        *,
+        app_name: str,
+        config: GlobusAppConfig,
+        login_client: AuthLoginClient,
+    ) -> IDTokenDecoder:
+        """
+        Create an ``IDTokenDecoder`` for use in a GlobusApp.
+
+        :param app_name: The name supplied to the GlobusApp.
+        :param config: The configuration supplied to the GlobusApp.
+        :param login_client: A login client to use for instantiating an
+            ``IDTokenDecoder``.
         """
 
 

@@ -2,6 +2,7 @@ from .app import GlobusApp
 from .client_app import ClientApp
 from .config import GlobusAppConfig
 from .protocols import (
+    IDTokenDecoderProvider,
     LoginFlowManagerProvider,
     TokenStorageProvider,
     TokenValidationErrorHandler,
@@ -14,6 +15,7 @@ __all__ = (
     "ClientApp",
     "GlobusAppConfig",
     # Protocols
+    "IDTokenDecoderProvider",
     "TokenValidationErrorHandler",
     "TokenStorageProvider",
     "LoginFlowManagerProvider",

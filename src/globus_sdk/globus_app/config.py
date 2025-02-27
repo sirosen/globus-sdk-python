@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import typing as t
 
+import globus_sdk
 from globus_sdk.config import get_environment_name
 from globus_sdk.login_flows import (
     CommandLineLoginFlowManager,
@@ -19,6 +20,7 @@ from globus_sdk.tokenstorage import (
 from globus_sdk.tokenstorage.v2.validating_token_storage import IdentityMismatchError
 
 from .protocols import (
+    IDTokenDecoderProvider,
     LoginFlowManagerProvider,
     TokenStorageProvider,
     TokenValidationErrorHandler,
@@ -101,6 +103,11 @@ class GlobusAppConfig:
         Default: ``resolve_by_login_flow`` (runs a login flow, storing the resulting
         tokens).
 
+    :ivar ``IDTokenDecoder`` | ``IDTokenDecoderProvider`` id_token_decoder:
+        An ID token decoder or a provider which produces a decoder. The decoder is used
+        when decoding ``id_token`` JWTs from Globus Auth.
+        Defaults to ``IDTokenDecoder``.
+
     :ivar str environment: The Globus environment of services to interact with. This is
         mostly used for testing purposes. This may additionally be set with the
         environment variable `GLOBUS_SDK_ENVIRONMENT`. Default: ``"production"``.
@@ -114,6 +121,9 @@ class GlobusAppConfig:
     request_refresh_tokens: bool = False
     token_validation_error_handler: TokenValidationErrorHandler | None = (
         resolve_by_login_flow
+    )
+    id_token_decoder: globus_sdk.IDTokenDecoder | IDTokenDecoderProvider = (
+        globus_sdk.IDTokenDecoder
     )
     environment: str = dataclasses.field(default_factory=get_environment_name)
 

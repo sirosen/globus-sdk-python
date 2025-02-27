@@ -36,3 +36,7 @@ Providers
     :members:
     :special-members: __call__
     :member-order: bysource
+
+.. autoclass:: IDTokenDecoderProvider()
+    :members: for_globus_app
+    :member-order: bysource

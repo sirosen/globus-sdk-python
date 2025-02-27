@@ -6,6 +6,7 @@ from unittest import mock
 
 import pytest
 
+import globus_sdk
 from globus_sdk import (
     AccessTokenAuthorizer,
     AuthLoginClient,
@@ -32,7 +33,6 @@ from globus_sdk.login_flows import (
     LoginFlowManager,
 )
 from globus_sdk.scopes import AuthScopes, Scope
-from globus_sdk.services.auth import OAuthTokenResponse
 from globus_sdk.tokenstorage import (
     HasRefreshTokensValidator,
     JSONTokenStorage,
@@ -435,7 +435,7 @@ class RaisingLoginFlowManagerCounter(LoginFlowManager):
 
     def run_login_flow(
         self, auth_parameters: GlobusAuthorizationParameters
-    ) -> OAuthTokenResponse:
+    ) -> globus_sdk.OAuthTokenResponse:
         self.counter += 1
         raise CustomExitException("mock login attempt")
 
@@ -513,7 +513,7 @@ def test_client_app_get_authorizer():
     assert authorizer.confidential_client.client_id == "mock_client_id"
 
 
-@mock.patch.object(OAuthTokenResponse, "decode_id_token", _mock_decode)
+@mock.patch.object(globus_sdk.IDTokenDecoder, "decode", _mock_decode)
 def test_user_app_login_logout(monkeypatch, capsys):
     monkeypatch.setattr("builtins.input", _mock_input)
     load_response(NativeAppAuthClient.oauth2_exchange_code_for_tokens, case="openid")
@@ -536,7 +536,7 @@ def test_user_app_login_logout(monkeypatch, capsys):
     assert user_app.login_required() is True
 
 
-@mock.patch.object(OAuthTokenResponse, "decode_id_token", _mock_decode)
+@mock.patch.object(globus_sdk.IDTokenDecoder, "decode", _mock_decode)
 def test_client_app_login_logout():
     load_response(
         ConfidentialAppAuthClient.oauth2_client_credentials_tokens, case="openid"
@@ -560,7 +560,7 @@ def test_client_app_login_logout():
     assert memory_storage.get_token_data("auth.globus.org") is None
 
 
-@mock.patch.object(OAuthTokenResponse, "decode_id_token", _mock_decode)
+@mock.patch.object(globus_sdk.IDTokenDecoder, "decode", _mock_decode)
 @pytest.mark.parametrize(
     "login_kwargs,expected_login",
     (
@@ -601,6 +601,6 @@ class CountingCommandLineLoginFlowManager(CommandLineLoginFlowManager):
     def run_login_flow(
         self,
         auth_parameters: GlobusAuthorizationParameters,
-    ) -> OAuthTokenResponse:
+    ) -> globus_sdk.OAuthTokenResponse:
         self.counter += 1
         return super().run_login_flow(auth_parameters)
