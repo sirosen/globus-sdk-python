@@ -72,7 +72,7 @@ class IDTokenDecoder(JWTDecoder):
         self._openid_configuration: dict[str, t.Any] | None = None
         self._jwk: RSAPublicKey | None = None
 
-        self.jwt_leeway: float | datetime.timedelta = 300.0
+        self.jwt_leeway: float | datetime.timedelta = jwt_leeway
         self.jwt_options: dict[str, t.Any] = (
             jwt_options if jwt_options is not None else {}
         )

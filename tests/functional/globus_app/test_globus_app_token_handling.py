@@ -212,3 +212,24 @@ def test_globus_app_can_set_custom_id_token_decoder_via_config_instance(
     user_app.logout()
     user_app.login()
     assert call_counter == 2
+
+
+def test_globus_app_custom_id_token_decoder_instance_can_overload_jwt_leeway(
+    oidc_and_jwk_responses,
+    token_response,
+):
+    # needed for logout later
+    load_response(globus_sdk.NativeAppAuthClient.oauth2_revoke_token)
+
+    login_client = globus_sdk.NativeAppAuthClient(client_id=CLIENT_ID_FROM_JWT)
+    memory_storage = globus_sdk.tokenstorage.MemoryTokenStorage()
+    config = globus_sdk.GlobusAppConfig(
+        token_storage=memory_storage,
+        id_token_decoder=globus_sdk.IDTokenDecoder(
+            login_client, jwt_leeway=sys.maxsize
+        ),
+    )
+    user_app = globus_sdk.UserApp("test-app", config=config, login_client=login_client)
+
+    # login, and confirm no failure (the default would fail on the stale id_token used)
+    user_app.login()
