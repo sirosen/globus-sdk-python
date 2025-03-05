@@ -331,6 +331,21 @@ class ComputeClientV3(client.BaseClient):
         """  # noqa: E501
         return self.get(f"/v3/endpoints/{endpoint_id}/allowed_functions")
 
+    def register_function(self, data: dict[str, t.Any]) -> GlobusHTTPResponse:
+        """Register a new function.
+
+        :param data: A function registration document.
+
+        .. tab-set::
+
+            .. tab-item:: API Info
+
+                .. extdoclink:: Register Function
+                    :service: compute
+                    :ref: Functions/operation/register_function_v3_functions_post
+        """
+        return self.post("/v3/functions", data=data)
+
     def submit(
         self, endpoint_id: UUIDLike, data: dict[str, t.Any]
     ) -> GlobusHTTPResponse:
