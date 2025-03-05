@@ -1,4 +1,4 @@
 Added
 ~~~~~
 
-- Add ``ComputeClientV3.register_function()`` method. (:pr:`NUMBER`)
+- Add ``ComputeClientV3.register_function()`` method. (:pr:`1142`)
