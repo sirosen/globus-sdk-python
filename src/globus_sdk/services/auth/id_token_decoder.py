@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import sys
 import typing as t
 
 import jwt
@@ -12,6 +13,11 @@ from ._common import SupportsJWKMethods
 
 if t.TYPE_CHECKING:
     from globus_sdk import AuthLoginClient, GlobusAppConfig
+
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
 
 
 class IDTokenDecoder:
@@ -71,7 +77,7 @@ class IDTokenDecoder:
         app_name: str,  # pylint: disable=unused-argument
         config: GlobusAppConfig,  # pylint: disable=unused-argument
         login_client: AuthLoginClient,
-    ) -> t.Self:
+    ) -> Self:
         """
         Create an ``IDTokenDecoder`` for use in a GlobusApp.
 
