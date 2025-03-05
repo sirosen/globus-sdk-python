@@ -63,10 +63,12 @@ jobs:
           - name: "Quality"
             runner: "ubuntu-latest"
             cpythons:
+              - "3.8"
               - "3.13"
             tox-environments:
               - "check-min-python-is-tested"
-              - "mypy"
+              - "mypy-py3.13"
+              - "mypy-py3.8"
               - "mypy-test"
               - "poetry-check"
               - "pylint"
