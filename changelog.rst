@@ -12,6 +12,57 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.51.0:
+
+v3.51.0 (2025-03-06)
+--------------------
+
+Added
+~~~~~
+
+- Most client classes now have their ``__doc__`` attribute modified at runtime
+  to provide better ``help()`` and sphinx documentation. (:pr:`1131`)
+
+- Introduce ``globus_sdk.IDTokenDecoder``, which implements ``id_token``
+  decoding. (:pr:`1136`)
+
+  - For integration with ``GlobusApp``, a new builder protocol is defined,
+    ``IDTokenDecoderProvider``. This defines instantiation within the context
+    of an app.
+
+  - When ``OAuthTokenResponse.decode_id_token`` is called, it now internally
+    instantiates an ``IDTokenDecoder`` and uses it to perform the decode.
+
+  - ``IDTokenDecoder`` objects cache OpenID configuration data and JWKs
+    after looking them up. If a decoder is used multiple times, it will reuse
+    the cached data.
+
+  - Token storage constructs can now contain an ``IDTokenDecoder`` in their
+    ``id_token_decoder`` attribute. The decoder is used preferentially when
+    trying to read the ``sub`` field from an ``id_token`` to store.
+
+  - ``GlobusAppConfig`` can now contain ``id_token_decoder``, an
+    ``IDTokenDecoder`` or ``IDTokenDecoderProvider``.
+    The default is ``IDTokenDecoder``.
+
+  - ``GlobusApp`` initialization will now use the config's
+    ``id_token_decoder`` and attach the ``IDTokenDecoder`` to the
+    token storage which is used.
+
+- ``ConnectorTable`` has a new classmethod, ``extend`` which allows users to
+  add new connectors to the mapping. ``ConnectorTable.extend()`` returns a new
+  connector table subclass and does not modify the original. (:pr:`1021`)
+
+- Add ``ComputeClientV3.register_function()`` method. (:pr:`1142`)
+
+Changed
+~~~~~~~
+
+- The SDK now defaults JWT leeway to 300 seconds when decoding ``id_token``\s;
+  the previous leeway was 0.5 seconds. Users should find that they are much
+  less prone to validation errors when working in VMs or other scenarios which
+  can cause significant clock drift. (:pr:`1135`)
+
 .. _changelog-3.50.0:
 
 v3.50.0 (2025-01-14)
