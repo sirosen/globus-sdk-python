@@ -1,3 +1,5 @@
+.. currentmodule:: globus_sdk
+
 .. _minimal_app_tutorial:
 
 Tutorial: A Minimal App
@@ -29,7 +31,15 @@ Define your App Object
 Accessing Globus APIs as a user requires that you login to your new app and get
 it tokens, credentials providing access the service.
 
-Start by defining an application object using ``globus_sdk.UserApp``.
+The SDK provides a construct which represents an application. A
+:class:`GlobusApp` is an object which can respond to requests for new or
+existing tokens and store those tokens (by default, in ``~/.globus/app/``).
+
+:class:`UserApp` is the type of :class:`GlobusApp` used for human user,
+login-driven scenarios -- this is always the right type of application object
+to use when you want to interact with services using your own account.
+
+Start by defining an application object using :class:`UserApp`:
 
 .. code-block:: python
 
@@ -45,7 +55,7 @@ Start by defining an application object using ``globus_sdk.UserApp``.
 
 .. note::
 
-    The default behavior for a ``UserApp`` is to do a CLI-based login flow.
+    The default behavior for a :class:`UserApp` is to do a CLI-based login flow.
     This behavior can be disabled or customized in numerous ways.
 
     For the full menu of options, look at the documentation about :ref:`Using a
