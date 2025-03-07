@@ -1,9 +1,14 @@
-.. _tutorial:
+.. _legacy_tutorial:
 
-Tutorial
-========
+Legacy Tutorial
+===============
 
-.. _getting_started:
+.. caution::
+
+    This is the original Globus SDK tutorial. For new users, you should not use
+    this doc. However, for users who are trying to understand older codebases
+    or are actively migrating code, this may be a useful document for
+    understanding usage of the SDK prior to the introduction of :class:`GlobusApp`.
 
 First Steps
 -----------
@@ -14,12 +19,11 @@ them with our service.
 
 These are the steps we will take:
 
-#. :ref:`Create a Client <tutorial_step1>`
-#. :ref:`Login and get tokens! <tutorial_step2>`
-#. :ref:`Use tokens to access the service <tutorial_step3>`
-#. :ref:`Explore the OAuthTokenResponse <tutorial_step4>`
-#. :ref:`Do a login flow with Refresh Tokens <tutorial_step5>`
-#. :ref:`Selected Examples <tutorial_step6>`
+#. :ref:`Create a Client <legacy_tutorial_step1>`
+#. :ref:`Login and get tokens! <legacy_tutorial_step2>`
+#. :ref:`Use tokens to access the service <legacy_tutorial_step3>`
+#. :ref:`Explore the OAuthTokenResponse <legacy_tutorial_step4>`
+#. :ref:`Do a login flow with Refresh Tokens <legacy_tutorial_step5>`
 
 That should be enough to get you up and started.
 
@@ -34,7 +38,7 @@ If you plan to create your own application, you should create a new client by
 following the instructions below. However, just for the purposes of this
 tutorial, we have created a tutorial client which you may use.
 
-.. _tutorial_step1:
+.. _legacy_tutorial_step1:
 
 Step 1: Create a Client
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,7 +84,7 @@ Globus interaction client.
 In the rest of the tutorial we will assume in all code samples that the Client UUID is
 available in the variable ``CLIENT_ID``.
 
-.. _tutorial_step2:
+.. _legacy_tutorial_step2:
 
 Step 2: Login and get tokens!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,7 +132,7 @@ are useful for further reading:
 These are covered by several of the available :ref:`Examples <examples>` as
 well.
 
-.. _tutorial_step3:
+.. _legacy_tutorial_step3:
 
 Step 3: Use tokens to access the service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -170,7 +174,7 @@ and used it. However, we didn't explain what that token is and how it works.
 In this section, not only will we talk through more detail on Access Tokens, but
 we'll also explore more advanced use cases and their near-cousins, Refresh Tokens.
 
-.. _tutorial_step4:
+.. _legacy_tutorial_step4:
 
 Step 4: Explore the OAuthTokenResponse
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,7 +261,7 @@ response, and for each one, the response contains the following info:
     value will be the ID of the service client. For Globus Connect Server v5, this
     is the ID of the Endpoint.
 
-.. _tutorial_step5:
+.. _legacy_tutorial_step5:
 
 Step 5: Do a login flow with Refresh Tokens
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -318,24 +322,3 @@ Let's assume you want to do this with the :class:`TransferClient <globus_sdk.Tra
 
 With the above code, ``tc`` is a ``TransferClient`` which can authenticate
 indefinitely, refreshing the Access Token whenever it expires.
-
-.. _tutorial_step6:
-
-Step 6: Selected Examples
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-- The :ref:`Minimal File Transfer Script <example_minimal_transfer>` provides a
-  simple example of a file transfer
-
-This example builds upon everything documented above. It will also include the
-use of new features not covered by this tutorial. In particular, it will use
-:ref:`the scopes module <scopes>` to provide scope strings as constants,
-:class:`TransferData <globus_sdk.TransferData>` as a helper to construct a
-transfer task document, and the ``requested_scopes`` argument to
-``oauth2_start_flow`` (instead of the default scopes).
-
-- The :ref:`Group Listing Script <example_group_listing>` provides a
-  simple example of use of the Globus Groups service
-
-Like the Minimal File Transfer Script, this example builds upon the tutorial,
-specifying scopes. It demonstrates some simple output processing as well.
