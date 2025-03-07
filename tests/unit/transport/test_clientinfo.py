@@ -7,7 +7,7 @@ from globus_sdk.transport import GlobusClientInfo
 def make_empty_clientinfo():
     # create a clientinfo with no contents, as a starting point for tests
     obj = GlobusClientInfo()
-    obj.infos = []
+    obj.clear()
     return obj
 
 
@@ -110,3 +110,27 @@ def test_clientinfo_parses_as_expected():
             "alpha": "b01",
         },
     }
+
+
+def test_client_info_can_write_back_via_callback():
+    myvalue = ""
+
+    def onupdate(info):
+        nonlocal myvalue
+        myvalue = info.format()
+
+    info = GlobusClientInfo(update_callback=onupdate)
+
+    # initializing with the callback does not make it fire
+    # the value is unchanged
+    assert myvalue == ""
+
+    segment = "version=1.0.1,product=my-cool-tool"
+    # now, add something and make sure it rendered back into the value
+    # (along with python-sdk info)
+    info.add(segment)
+
+    # our new segment is visible
+    assert segment in myvalue
+    # but other values (the default, python-sdk version!) are also there
+    assert myvalue != segment
