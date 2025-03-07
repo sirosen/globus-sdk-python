@@ -125,7 +125,12 @@ def test_client_info_can_write_back_via_callback():
     # the value is unchanged
     assert myvalue == ""
 
+    segment = "version=1.0.1,product=my-cool-tool"
     # now, add something and make sure it rendered back into the value
     # (along with python-sdk info)
-    info.add("version=1.0.1,product=my-cool-tool")
-    assert "version=1.0.1,product=my-cool-tool" in myvalue
+    info.add(segment)
+
+    # our new segment is visible
+    assert segment in myvalue
+    # but other values (the default, python-sdk version!) are also there
+    assert myvalue != segment
