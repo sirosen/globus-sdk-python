@@ -15,24 +15,8 @@ groups_client = globus_sdk.GroupsClient(app=my_app)
 my_app.login()
 
 # print in CSV format
-print("ID,Name,Type,Session Enforcement,Roles")
+# ('name' could actually have commas in it, so it is quoted)
+print("ID,Name,Roles")
 for group in groups_client.get_my_groups():
-    # parse the group to get data for output
-    if group.get("enforce_session"):
-        session_enforcement = "strict"
-    else:
-        session_enforcement = "not strict"
     roles = "|".join({m["role"] for m in group["my_memberships"]})
-
-    print(
-        ",".join(
-            [
-                group["id"],
-                # note that 'name' could actually have commas in it, so quote it
-                f'"{group["name"]}"',
-                group["group_type"],
-                session_enforcement,
-                roles,
-            ]
-        )
-    )
+    print(",".join([group["id"], f'"{group["name"]}"', roles]))
