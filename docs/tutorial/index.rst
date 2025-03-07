@@ -28,8 +28,9 @@ For the smallest self-contained example, here's the final example from the
     :caption: ``tutorial_recap.py`` [:download:`download <tutorial_recap.py>`]
     :language: python
 
-We recommend following the tutorial doc for an explanation of how this script
-works and how you can modify it!
+*This example is complete. It should run without errors "as is".*
+
+We recommend following the tutorial doc for an explanation!
 
 Legacy Tutorial
 ---------------

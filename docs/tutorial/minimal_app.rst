@@ -108,6 +108,8 @@ One of them is exactly the same as the tutorial steps above, in a single block.
 The other example includes an explicit login step, so you can control when that
 login flow happens!
 
+*These examples are complete. They should run without errors "as is".*
+
 ..  tab-set::
 
     ..  tab-item:: Tutorial Recap
