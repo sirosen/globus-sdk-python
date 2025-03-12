@@ -1,23 +1,29 @@
 .. _tutorial_register_app:
 
-Registering an OAuth2 App
-=========================
+Registering a Globus Auth App
+=============================
 
-This tutorial walks you through app registration with Globus Auth.
+An OAuth2 Client, also sometimes called an "app", represents an application or
+script.
 
-Background on OAuth2
---------------------
+When a user logs in to an application, they grant consent for the client to
+perform certain actions, and the client is issued appropriate credentials for
+those actions.
 
-Globus uses OAuth2 to handle authentication. In order to login, your
-application must be registered with Globus Auth. This is called a "client" in
-OAuth2, but Globus will also sometimes call this an "app".
+Having your own app registered with the service also lets you set certain app-level
+settings for user logins, and keeps your application isolated from everyone
+else's apps using the service.
 
-If you plan to create your own application, you should create a new client by
-following the instructions below. However, just for the purposes of this
-tutorial, we have created a tutorial client which you may use.
+.. note::
 
-In order to complete an OAuth2 flow to get tokens, you must have a client or
-"app" definition registered with Globus.
+    SDK Tutorials and Examples frequently make use of the "tutorial client ID".
+    This makes the examples work if you copy and run them, but using the
+    tutorial client for production use cases is not recommended or supported.
+
+Developers who wish to learn more about OAuth2 at Globus are encouraged to read
+the `Clients, Scopes, and Consents
+<https://docs.globus.org/guides/overviews/clients-scopes-and-consents/>`_
+documentation.
 
 App Types & Native App
 ----------------------

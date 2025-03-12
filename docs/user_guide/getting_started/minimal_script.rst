@@ -1,20 +1,11 @@
 .. currentmodule:: globus_sdk
 
-.. _minimal_app_tutorial:
+.. _minimal_script_tutorial:
 
-Tutorial: A Minimal App
-=======================
+Creating A Minimal Script
+=========================
 
 This is a basic tutorial in the use of the Globus SDK.
-
-#. :ref:`Create an OAuth2 Client <minimal_app_createclient>`
-#. :ref:`Define your App Object <minimal_app_defineapp>`
-#. :ref:`Access the APIs via Clients <minimal_app_useclients>`
-
-.. _minimal_app_createclient:
-
-Create an OAuth2 Client
------------------------
 
 You can jump right in by using the ``CLIENT_ID`` seen in the example code blocks below!
 That is the ID of the tutorial client, which lets you get started quickly and easily.
@@ -23,7 +14,9 @@ When you are ready to create your own application, follow :ref:`the tutorial on
 registering a Native App <tutorial_register_app>` and use its ``CLIENT_ID`` in
 the rest of the tutorial to get your own app setup.
 
-.. _minimal_app_defineapp:
+For readers who prefer to start with complete working examples, jump ahead to the
+:ref:`example scripts <minimal_script_complete_examples>` at the end before reviewing
+the doc.
 
 Define your App Object
 ----------------------
@@ -61,8 +54,6 @@ Start by defining an application object using :class:`UserApp`:
     For the full menu of options, look at the documentation about :ref:`Using a
     GlobusApp! <using_globus_app>`
 
-.. _minimal_app_useclients:
-
 Access the APIs via Clients
 ---------------------------
 
@@ -93,6 +84,8 @@ your groups:
 When ``groups_client.get_my_groups()`` runs in the example above, the SDK
 will prompt you to login.
 
+.. _minimal_script_complete_examples:
+
 Summary: Complete Examples
 --------------------------
 
@@ -108,8 +101,8 @@ login flow happens!
 
     ..  tab-item:: Tutorial Recap
 
-        .. literalinclude:: tutorial_recap.py
-            :caption: ``tutorial_recap.py`` [:download:`download <tutorial_recap.py>`]
+        .. literalinclude:: list_groups.py
+            :caption: ``list_groups.py`` [:download:`download <list_groups.py>`]
             :language: python
 
     ..  tab-item:: Explicit ``login()`` Step
@@ -117,6 +110,6 @@ login flow happens!
         This example is very similar to the tutorial, but uses a separate login
         step.
 
-        .. literalinclude:: tutorial_with_login_step.py
-            :caption: ``tutorial_with_login_step.py`` [:download:`download <tutorial_with_login_step.py>`]
+        .. literalinclude:: list_groups_with_login.py
+            :caption: ``list_groups_with_login.py`` [:download:`download <list_groups_with_login.py>`]
             :language: python
