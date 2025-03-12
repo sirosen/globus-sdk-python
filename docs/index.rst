@@ -26,7 +26,6 @@ Table of Contents
 
     user_guide/installation
     user_guide/getting_started/index
-    user_guide/legacy_tutorial
 
 .. toctree::
     :caption: Full Reference
