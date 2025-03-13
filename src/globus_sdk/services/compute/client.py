@@ -371,6 +371,4 @@ class ComputeClient(ComputeClientV2):
     API version 2.
 
     .. sdk-sphinx-copy-params:: BaseClient
-
-    .. automethodlist:: globus_sdk.ComputeClient
     """
