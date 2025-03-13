@@ -123,10 +123,12 @@ source.
         authorizer=globus_sdk.AccessTokenAuthorizer(groups_tokens["access_token"])
     )
 
+    # call out to the Groups service to get a listing
+    my_groups = groups_client.get_my_groups()
+
     # print in CSV format
-    # ('name' could actually have commas in it, so it is quoted)
     print("ID,Name,Roles")
-    for group in groups_client.get_my_groups():
+    for group in my_groups:
         roles = "|".join({m["role"] for m in group["my_memberships"]})
         print(",".join([group["id"], f'"{group["name"]}"', roles]))
 
@@ -250,10 +252,12 @@ client, just as before:
     # use that authorizer to authorize the activity of the groups client
     groups_client = globus_sdk.GroupsClient(authorizer=authorizer)
 
+    # call out to the Groups service to get a listing
+    my_groups = groups_client.get_my_groups()
+
     # print in CSV format
-    # ('name' could actually have commas in it, so it is quoted)
     print("ID,Name,Roles")
-    for group in groups_client.get_my_groups():
+    for group in my_groups:
         roles = "|".join({m["role"] for m in group["my_memberships"]})
         print(",".join([group["id"], f'"{group["name"]}"', roles]))
 
