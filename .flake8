@@ -5,3 +5,8 @@ extend-ignore = W503,W504,E203
 
 # in pyi stubs, spacing rules are different (black handles this)
 per-file-ignores = *.pyi:E302,E305
+
+[flake8:local-plugins]
+extension =
+    SDK = _globus_sdk_flake8:Plugin
+paths = ./src/globus_sdk/
