@@ -162,13 +162,13 @@ class BaseClient:
         :raises: GlobusSDKUsageError if base_url cannot be resolved.
         """
         if init_base_url is not None:
-            log.info(f"Creating client of type {cls}")
+            log.debug(f"Creating client of type {cls}")
             return init_base_url
         elif cls.base_url != "_base":
-            log.info(f"Creating client of type {cls}")
+            log.debug(f"Creating client of type {cls}")
             return cls.base_url
         elif cls.service_name != "_base":
-            log.info(f'Creating client of type {cls} for service "{cls.service_name}"')
+            log.debug(f'Creating client of type {cls} for service "{cls.service_name}"')
             return config.get_service_url(cls.service_name, environment)
 
         raise GlobusSDKUsageError(

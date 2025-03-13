@@ -70,7 +70,7 @@ class ClientCredentialsAuthorizer(
         self.confidential_client = confidential_client
         self.scopes = scopes_to_str(scopes)
 
-        log.info(
+        log.debug(
             "Setting up ClientCredentialsAuthorizer with confidential_client="
             f"[instance:{id(confidential_client)}] and scopes={self.scopes}"
         )

@@ -77,7 +77,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Index Create
                     :ref: search/reference/index_create/
         """
-        log.info(f"SearchClient.create_index({display_name!r}, ...)")
+        log.debug(f"SearchClient.create_index({display_name!r}, ...)")
         return self.post(
             "/v1/index", data={"display_name": display_name, "description": description}
         )
@@ -118,7 +118,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Index Delete
                     :ref: search/reference/index_delete/
         """
-        log.info(f"SearchClient.delete_index({index_id!r}, ...)")
+        log.debug(f"SearchClient.delete_index({index_id!r}, ...)")
         return self.delete(f"/v1/index/{index_id}")
 
     def reopen_index(self, index_id: UUIDLike) -> response.GlobusHTTPResponse:
@@ -147,7 +147,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Index Reopen
                     :ref: search/reference/index_reopen/
         """
-        log.info(f"SearchClient.reopen_index({index_id!r}, ...)")
+        log.debug(f"SearchClient.reopen_index({index_id!r}, ...)")
         return self.post(f"/v1/index/{index_id}/reopen")
 
     def get_index(
@@ -181,7 +181,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Index Show
                     :ref: search/reference/index_show/
         """  # noqa: E501
-        log.info(f"SearchClient.get_index({index_id})")
+        log.debug(f"SearchClient.get_index({index_id})")
         return self.get(f"/v1/index/{index_id}", query_params=query_params)
 
     #
@@ -255,7 +255,7 @@ class SearchClient(client.BaseClient):
             }
         )
 
-        log.info(f"SearchClient.search({index_id}, ...)")
+        log.debug(f"SearchClient.search({index_id}, ...)")
         return self.get(f"/v1/index/{index_id}/search", query_params=query_params)
 
     @paging.has_paginator(
@@ -324,7 +324,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: POST Search Query
                     :ref: search/reference/post_query/
         """
-        log.info(f"SearchClient.post_search({index_id}, ...)")
+        log.debug(f"SearchClient.post_search({index_id}, ...)")
         add_kwargs = {}
         if offset is not None:
             add_kwargs["offset"] = offset
@@ -376,7 +376,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Scroll Query
                     :ref: search/reference/scroll_query/
         """
-        log.info(f"SearchClient.scroll({index_id}, ...)")
+        log.debug(f"SearchClient.scroll({index_id}, ...)")
         add_kwargs = {}
         if marker is not None:
             add_kwargs["marker"] = marker
@@ -448,7 +448,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Ingest
                     :ref: search/reference/ingest/
         """
-        log.info(f"SearchClient.ingest({index_id}, ...)")
+        log.debug(f"SearchClient.ingest({index_id}, ...)")
         return self.post(f"/v1/index/{index_id}/ingest", data=data)
 
     #
@@ -495,7 +495,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Delete By Query
                     :ref: search/reference/delete_by_query/
         """
-        log.info(f"SearchClient.delete_by_query({index_id}, ...)")
+        log.debug(f"SearchClient.delete_by_query({index_id}, ...)")
         return self.post(f"/v1/index/{index_id}/delete_by_query", data=data)
 
     def batch_delete_by_subject(
@@ -541,7 +541,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Delete By Subject
                     :ref: search/reference/batch_delete_by_subject/
         """
-        log.info(f"SearchClient.batch_delete_by_subject({index_id}, ...)")
+        log.debug(f"SearchClient.batch_delete_by_subject({index_id}, ...)")
         # convert the provided subjects to a list and use the "safe iter" helper to
         # ensure that a single string is *not* treated as an iterable of strings,
         # which is usually not intentional
@@ -590,7 +590,7 @@ class SearchClient(client.BaseClient):
         if query_params is None:
             query_params = {}
         query_params["subject"] = subject
-        log.info(f"SearchClient.get_subject({index_id}, {subject}, ...)")
+        log.debug(f"SearchClient.get_subject({index_id}, {subject}, ...)")
         return self.get(f"/v1/index/{index_id}/subject", query_params=query_params)
 
     def delete_subject(
@@ -634,7 +634,7 @@ class SearchClient(client.BaseClient):
             query_params = {}
         query_params["subject"] = subject
 
-        log.info(f"SearchClient.delete_subject({index_id}, {subject}, ...)")
+        log.debug(f"SearchClient.delete_subject({index_id}, {subject}, ...)")
         return self.delete(f"/v1/index/{index_id}/subject", query_params=query_params)
 
     #
@@ -692,7 +692,7 @@ class SearchClient(client.BaseClient):
         if entry_id is not None:
             query_params["entry_id"] = entry_id
 
-        log.info(
+        log.debug(
             "SearchClient.get_entry({}, {}, {}, ...)".format(
                 index_id, subject, entry_id
             )
@@ -760,7 +760,7 @@ class SearchClient(client.BaseClient):
             "SearchClient.create_entry is deprecated. "
             "Users should prefer using `SearchClient.ingest`"
         )
-        log.info(f"SearchClient.create_entry({index_id}, ...)")
+        log.debug(f"SearchClient.create_entry({index_id}, ...)")
         return self.post(f"/v1/index/{index_id}/entry", data=data)
 
     def update_entry(
@@ -807,7 +807,7 @@ class SearchClient(client.BaseClient):
             "SearchClient.update_entry is deprecated. "
             "Users should prefer using `SearchClient.ingest`"
         )
-        log.info(f"SearchClient.update_entry({index_id}, ...)")
+        log.debug(f"SearchClient.update_entry({index_id}, ...)")
         return self.put(f"/v1/index/{index_id}/entry", data=data)
 
     def delete_entry(
@@ -860,7 +860,7 @@ class SearchClient(client.BaseClient):
         query_params["subject"] = subject
         if entry_id is not None:
             query_params["entry_id"] = entry_id
-        log.info(
+        log.debug(
             "SearchClient.delete_entry({}, {}, {}, ...)".format(
                 index_id, subject, entry_id
             )
@@ -901,7 +901,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Get Task
                     :ref: search/reference/get_task/
         """
-        log.info(f"SearchClient.get_task({task_id})")
+        log.debug(f"SearchClient.get_task({task_id})")
         return self.get(f"/v1/task/{task_id}", query_params=query_params)
 
     def get_task_list(
@@ -935,7 +935,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Task List
                     :ref: search/reference/task_list/
         """
-        log.info(f"SearchClient.get_task_list({index_id})")
+        log.debug(f"SearchClient.get_task_list({index_id})")
         return self.get(f"/v1/task_list/{index_id}", query_params=query_params)
 
     #
@@ -981,7 +981,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Create Role
                     :ref: search/reference/role_create/
         """  # noqa: E501
-        log.info("SearchClient.create_role(%s, ...)", index_id)
+        log.debug("SearchClient.create_role(%s, ...)", index_id)
         return self.post(
             f"/v1/index/{index_id}/role", data=data, query_params=query_params
         )
@@ -1008,7 +1008,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Get Role List
                     :ref: search/reference/role_list/
         """
-        log.info("SearchClient.get_role_list(%s)", index_id)
+        log.debug("SearchClient.get_role_list(%s)", index_id)
         return self.get(f"/v1/index/{index_id}/role_list", query_params=query_params)
 
     def delete_role(
@@ -1036,7 +1036,7 @@ class SearchClient(client.BaseClient):
                 .. extdoclink:: Role Delete
                     :ref: search/reference/role_delete/
         """
-        log.info("SearchClient.delete_role(%s, %s)", index_id, role_id)
+        log.debug("SearchClient.delete_role(%s, %s)", index_id, role_id)
         return self.delete(
             f"/v1/index/{index_id}/role/{role_id}", query_params=query_params
         )

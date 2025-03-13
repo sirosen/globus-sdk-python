@@ -17,7 +17,7 @@ class AccessTokenAuthorizer(StaticGlobusAuthorizer):
     """
 
     def __init__(self, access_token: str) -> None:
-        log.info(
+        log.debug(
             "Setting up an AccessTokenAuthorizer. It will use an "
             "auth type of Bearer and cannot handle 401s."
         )

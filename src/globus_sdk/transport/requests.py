@@ -291,7 +291,7 @@ class RequestsTransport:
             retries which may already have been attempted.
         """
         sleep_period = min(self.retry_backoff(ctx), self.max_sleep)
-        log.info("request retry_sleep(%s) [max=%s]", sleep_period, self.max_sleep)
+        log.debug("request retry_sleep(%s) [max=%s]", sleep_period, self.max_sleep)
         time.sleep(sleep_period)
 
     def request(
@@ -361,7 +361,7 @@ class RequestsTransport:
             else:
                 log.debug("request success, still check should-retry")
                 if not checker.should_retry(ctx):
-                    log.info("request done (success)")
+                    log.debug("request done (success)")
                     return resp
                 log.debug("request may retry, will check attempts")
 

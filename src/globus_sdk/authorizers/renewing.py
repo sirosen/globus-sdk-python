@@ -59,7 +59,7 @@ class RenewingAuthorizer(GlobusAuthorizer, t.Generic[ResponseT], metaclass=abc.A
         self._access_token = None
         self._access_token_hash = None
 
-        log.info(
+        log.debug(
             "Setting up a RenewingAuthorizer. It will use an "
             "auth type of Bearer and can handle 401s."
         )
@@ -77,13 +77,13 @@ class RenewingAuthorizer(GlobusAuthorizer, t.Generic[ResponseT], metaclass=abc.A
         self.on_refresh = on_refresh
 
         if self.access_token is not None:
-            log.info(
+            log.debug(
                 "RenewingAuthorizer will start by using access_token "
                 f'with hash "{self._access_token_hash}"'
             )
         # if data were unspecified, fetch a new access token
         else:
-            log.info(
+            log.debug(
                 "Creating RenewingAuthorizer without Access "
                 "Token. Fetching initial token now."
             )
@@ -128,7 +128,7 @@ class RenewingAuthorizer(GlobusAuthorizer, t.Generic[ResponseT], metaclass=abc.A
         self.expires_at = token_data["expires_at_seconds"]
         self.access_token = token_data["access_token"]
 
-        log.info(
+        log.debug(
             "RenewingAuthorizer.access_token updated to "
             f'token with hash "{self._access_token_hash}"'
         )

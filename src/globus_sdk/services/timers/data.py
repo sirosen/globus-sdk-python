@@ -306,7 +306,7 @@ class TimerJob(PayloadWrapper):
         transfer_action_url = slash_join(
             get_service_url("actions", environment=environment), "transfer/transfer/run"
         )
-        log.info(
+        log.debug(
             "Creating TimerJob from TransferData, action_url=%s", transfer_action_url
         )
         for key in ("submission_id", "skip_activation_check"):

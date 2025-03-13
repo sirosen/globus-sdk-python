@@ -19,7 +19,7 @@ from .base import GlobusOAuthFlowManager
 if t.TYPE_CHECKING:
     import globus_sdk
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def make_native_app_challenge(
@@ -49,7 +49,7 @@ def make_native_app_challenge(
         if bool(re.search(r"[^a-zA-Z0-9~_.-]", verifier)):
             raise GlobusSDKUsageError("verifier contained invalid characters")
     else:
-        logger.info(
+        log.debug(
             "Autogenerating verifier secret. On low-entropy systems "
             "this may be insecure"
         )
@@ -113,7 +113,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         # set client_id, then check for validity
         self.client_id = auth_client.client_id
         if not self.client_id:
-            logger.error(
+            log.error(
                 "Invalid auth_client ID to start Native App Flow: {}".format(
                     self.client_id
                 )
@@ -142,16 +142,18 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         self.state = state
         self.prefill_named_grant = prefill_named_grant
 
-        logger.debug("Starting Native App Flow with params:")
-        logger.debug(f"auth_client.client_id={auth_client.client_id}")
-        logger.debug(f"redirect_uri={self.redirect_uri}")
-        logger.debug(f"refresh_tokens={refresh_tokens}")
-        logger.debug(f"state={state}")
-        logger.debug(f"requested_scopes={self.requested_scopes}")
-        logger.debug(f"verifier=<REDACTED>,challenge={self.challenge}")
+        log.debug(
+            "Starting Native App Flow with params: "
+            f"auth_client.client_id={auth_client.client_id} , "
+            f"redirect_uri={self.redirect_uri} , "
+            f"refresh_tokens={refresh_tokens} , "
+            f"state={state} , "
+            f"requested_scopes={self.requested_scopes} , "
+            f"verifier=<REDACTED>,challenge={self.challenge}"
+        )
 
         if prefill_named_grant is not None:
-            logger.debug(f"prefill_named_grant={self.prefill_named_grant}")
+            log.debug(f"prefill_named_grant={self.prefill_named_grant}")
 
     def get_authorize_url(self, query_params: dict[str, t.Any] | None = None) -> str:
         """
@@ -169,8 +171,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
         authorize_base_url = utils.slash_join(
             self.auth_client.base_url, "/v2/oauth2/authorize"
         )
-        logger.debug(f"Building authorization URI. Base URL: {authorize_base_url}")
-        logger.debug(f"query_params={query_params}")
+        log.debug(f"Building authorization URI. Base URL: {authorize_base_url}")
+        log.debug(f"query_params={query_params}")
 
         params = {
             "client_id": self.client_id,
@@ -199,7 +201,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
 
         :param auth_code: The short-lived code to exchange for tokens
         """
-        logger.debug(
+        log.debug(
             "Performing Native App auth_code exchange. "
             "Sending verifier and client_id"
         )

@@ -133,12 +133,12 @@ class DeleteData(utils.PayloadWrapper):
         )
 
         for k, v in self.items():
-            log.info("DeleteData.%s = %s", k, v)
+            log.debug("DeleteData.%s = %s", k, v)
 
         if additional_fields is not None:
             self.update(additional_fields)
             for option, value in additional_fields.items():
-                log.info(
+                log.debug(
                     f"DeleteData.{option} = {value} (option passed "
                     "in via additional_fields)"
                 )

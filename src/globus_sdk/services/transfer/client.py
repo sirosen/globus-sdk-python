@@ -221,7 +221,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get Endpoint or Collection by ID
                     :ref: transfer/endpoints_and_collections/#get_endpoint_or_collection_by_id
         """  # noqa: E501
-        log.info(f"TransferClient.get_endpoint({endpoint_id})")
+        log.debug(f"TransferClient.get_endpoint({endpoint_id})")
         return self.get(f"endpoint/{endpoint_id}", query_params=query_params)
 
     def update_endpoint(
@@ -269,7 +269,7 @@ class TransferClient(client.BaseClient):
         elif data.get("oauth_server"):
             data["myproxy_server"] = None
 
-        log.info(f"TransferClient.update_endpoint({endpoint_id}, ...)")
+        log.debug(f"TransferClient.update_endpoint({endpoint_id}, ...)")
         return self.put(f"endpoint/{endpoint_id}", data=data, query_params=query_params)
 
     def set_subscription_id(
@@ -347,7 +347,7 @@ class TransferClient(client.BaseClient):
                 "not both"
             )
 
-        log.info("TransferClient.create_endpoint(...)")
+        log.debug("TransferClient.create_endpoint(...)")
         return self.post("endpoint", data=data)
 
     def delete_endpoint(self, endpoint_id: UUIDLike) -> response.GlobusHTTPResponse:
@@ -370,7 +370,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Delete Globus Connect Personal collection by id
                     :ref: transfer/gcp_management/#delete_collection_by_id
         """
-        log.info(f"TransferClient.delete_endpoint({endpoint_id})")
+        log.debug(f"TransferClient.delete_endpoint({endpoint_id})")
         return self.delete(f"endpoint/{endpoint_id}")
 
     @paging.has_paginator(
@@ -480,7 +480,7 @@ class TransferClient(client.BaseClient):
             query_params["limit"] = limit
         if offset is not None:
             query_params["offset"] = offset
-        log.info(f"TransferClient.endpoint_search({query_params})")
+        log.debug(f"TransferClient.endpoint_search({query_params})")
         return IterableTransferResponse(
             self.get("endpoint_search", query_params=query_params)
         )
@@ -509,7 +509,7 @@ class TransferClient(client.BaseClient):
             query_params = {}
         if if_expires_in is not None:
             query_params["if_expires_in"] = if_expires_in
-        log.info(f"TransferClient.endpoint_autoactivate({endpoint_id})")
+        log.debug(f"TransferClient.endpoint_autoactivate({endpoint_id})")
         return self.post(
             f"endpoint/{endpoint_id}/autoactivate", query_params=query_params
         )
@@ -530,7 +530,7 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         """
-        log.info(f"TransferClient.endpoint_deactivate({endpoint_id})")
+        log.debug(f"TransferClient.endpoint_deactivate({endpoint_id})")
         return self.post(
             f"endpoint/{endpoint_id}/deactivate", query_params=query_params
         )
@@ -556,7 +556,7 @@ class TransferClient(client.BaseClient):
         :param query_params: Any additional parameters will be passed through
             as query params.
         """
-        log.info(f"TransferClient.endpoint_activate({endpoint_id})")
+        log.debug(f"TransferClient.endpoint_activate({endpoint_id})")
         return self.post(
             f"endpoint/{endpoint_id}/activate",
             data=requirements_data,
@@ -607,7 +607,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get my effective collection pause rules
                     :ref: transfer/endpoints_and_collections/#get_collection_pause_rules
         """
-        log.info(f"TransferClient.my_effective_pause_rule_list({endpoint_id}, ...)")
+        log.debug(f"TransferClient.my_effective_pause_rule_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(
                 f"endpoint/{endpoint_id}/my_effective_pause_rule_list",
@@ -639,7 +639,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get my guest collection list
                     :ref: transfer/endpoints_and_collections/#get_my_guest_collection_list
         """  # noqa: E501
-        log.info(f"TransferClient.my_shared_endpoint_list({endpoint_id}, ...)")
+        log.debug(f"TransferClient.my_shared_endpoint_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(
                 f"endpoint/{endpoint_id}/my_shared_endpoint_list",
@@ -678,7 +678,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get guest collection list
                     :ref: transfer/endpoints_and_collections/get_guest_collection_list
         """
-        log.info(f"TransferClient.get_shared_endpoint_list({endpoint_id}, ...)")
+        log.debug(f"TransferClient.get_shared_endpoint_list({endpoint_id}, ...)")
         if query_params is None:
             query_params = {}
         if max_results is not None:
@@ -724,7 +724,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Create guest collection
                     :ref: transfer/gcp_management/#create_guest_collection
         """
-        log.info("TransferClient.create_shared_endpoint(...)")
+        log.debug("TransferClient.create_shared_endpoint(...)")
         return self.post("shared_endpoint", data=data)
 
     # Endpoint servers
@@ -749,7 +749,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get endpoint or collection server list
                     :ref: transfer/endpoints_and_collections/#get_endpoint_or_collection_server_list
         """  # noqa: E501
-        log.info(f"TransferClient.endpoint_server_list({endpoint_id}, ...)")
+        log.debug(f"TransferClient.endpoint_server_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(f"endpoint/{endpoint_id}/server_list", query_params=query_params)
         )
@@ -775,7 +775,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get server by id
                     :ref: transfer/endpoints_and_collections/#get_server_by_id
         """
-        log.info(
+        log.debug(
             "TransferClient.get_endpoint_server(%s, %s, ...)", endpoint_id, server_id
         )
         return self.get(
@@ -794,7 +794,7 @@ class TransferClient(client.BaseClient):
         :param endpoint_id: The endpoint under which the server is being registered
         :param server_data: Fields for the new server, as a server document
         """
-        log.info(f"TransferClient.add_endpoint_server({endpoint_id}, ...)")
+        log.debug(f"TransferClient.add_endpoint_server({endpoint_id}, ...)")
         return self.post(f"endpoint/{endpoint_id}/server", data=server_data)
 
     def update_endpoint_server(
@@ -813,7 +813,7 @@ class TransferClient(client.BaseClient):
         :param server_id: The ID of the server to update
         :param server_data: Fields on the server to update, as a partial server document
         """
-        log.info(
+        log.debug(
             "TransferClient.update_endpoint_server(%s, %s, ...)",
             endpoint_id,
             server_id,
@@ -832,7 +832,7 @@ class TransferClient(client.BaseClient):
         :param endpoint_id: The endpoint under which the server is registered
         :param server_id: The ID of the server to delete
         """
-        log.info(
+        log.debug(
             "TransferClient.delete_endpoint_server(%s, %s)", endpoint_id, server_id
         )
         return self.delete(f"endpoint/{endpoint_id}/server/{server_id}")
@@ -861,7 +861,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get list of roles
                     :ref: transfer/roles/#role_list
         """
-        log.info(f"TransferClient.endpoint_role_list({endpoint_id}, ...)")
+        log.debug(f"TransferClient.endpoint_role_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(f"endpoint/{endpoint_id}/role_list", query_params=query_params)
         )
@@ -882,7 +882,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Create Globus Connect Personal collection role
                     :ref: transfer/roles/#create_role
         """
-        log.info(f"TransferClient.add_endpoint_role({endpoint_id}, ...)")
+        log.debug(f"TransferClient.add_endpoint_role({endpoint_id}, ...)")
         return self.post(f"endpoint/{endpoint_id}/role", data=role_data)
 
     def get_endpoint_role(
@@ -906,7 +906,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get role by id
                     :ref: transfer/roles/#get_role_by_id
         """
-        log.info(f"TransferClient.get_endpoint_role({endpoint_id}, {role_id}, ...)")
+        log.debug(f"TransferClient.get_endpoint_role({endpoint_id}, {role_id}, ...)")
         return self.get(
             f"endpoint/{endpoint_id}/role/{role_id}", query_params=query_params
         )
@@ -927,7 +927,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Delete Globus Connect Personal collection role by id
                     :ref: transfer/roles/#delete_role_by_id
         """
-        log.info(f"TransferClient.delete_endpoint_role({endpoint_id}, {role_id})")
+        log.debug(f"TransferClient.delete_endpoint_role({endpoint_id}, {role_id})")
         return self.delete(f"endpoint/{endpoint_id}/role/{role_id}")
 
     #
@@ -953,7 +953,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get list of access rules
                     :ref: transfer/acl/#rest_access_get_list
         """
-        log.info(f"TransferClient.endpoint_acl_list({endpoint_id}, ...)")
+        log.debug(f"TransferClient.endpoint_acl_list({endpoint_id}, ...)")
         return IterableTransferResponse(
             self.get(f"endpoint/{endpoint_id}/access_list", query_params=query_params)
         )
@@ -979,7 +979,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get access rule by ID
                     :ref: transfer/acl/#get_access_rule_by_id
         """
-        log.info(
+        log.debug(
             "TransferClient.get_endpoint_acl_rule(%s, %s, ...)", endpoint_id, rule_id
         )
         return self.get(
@@ -1020,7 +1020,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Create access rule
                     :ref: transfer/acl/#rest_access_create
         """
-        log.info(f"TransferClient.add_endpoint_acl_rule({endpoint_id}, ...)")
+        log.debug(f"TransferClient.add_endpoint_acl_rule({endpoint_id}, ...)")
         return self.post(f"endpoint/{endpoint_id}/access", data=rule_data)
 
     def update_endpoint_acl_rule(
@@ -1043,7 +1043,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Update access rule
                     :ref: transfer/acl/#update_access_rule
         """
-        log.info(
+        log.debug(
             "TransferClient.update_endpoint_acl_rule(%s, %s, ...)",
             endpoint_id,
             rule_id,
@@ -1066,7 +1066,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Delete access rule
                     :ref: transfer/acl/#delete_access_rule
         """
-        log.info(
+        log.debug(
             "TransferClient.delete_endpoint_acl_rule(%s, %s)", endpoint_id, rule_id
         )
         return self.delete(f"endpoint/{endpoint_id}/access/{rule_id}")
@@ -1090,7 +1090,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get list of bookmarks
                     :ref: transfer/collection_bookmarks/#get_list_of_bookmarks
         """
-        log.info(f"TransferClient.bookmark_list({query_params})")
+        log.debug(f"TransferClient.bookmark_list({query_params})")
         return IterableTransferResponse(
             self.get("bookmark_list", query_params=query_params)
         )
@@ -1110,7 +1110,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Create bookmark
                     :ref: transfer/collection_bookmarks/#create_bookmark
         """
-        log.info(f"TransferClient.create_bookmark({bookmark_data})")
+        log.debug(f"TransferClient.create_bookmark({bookmark_data})")
         return self.post("bookmark", data=bookmark_data)
 
     def get_bookmark(
@@ -1132,7 +1132,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get bookmark by ID
                     :ref: transfer/collection_bookmarks/#get_bookmark_by_id
         """
-        log.info(f"TransferClient.get_bookmark({bookmark_id})")
+        log.debug(f"TransferClient.get_bookmark({bookmark_id})")
         return self.get(f"bookmark/{bookmark_id}", query_params=query_params)
 
     def update_bookmark(
@@ -1151,7 +1151,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Update bookmark
                     :ref: transfer/collection_bookmarks/#update_bookmark
         """
-        log.info(f"TransferClient.update_bookmark({bookmark_id})")
+        log.debug(f"TransferClient.update_bookmark({bookmark_id})")
         return self.put(f"bookmark/{bookmark_id}", data=bookmark_data)
 
     def delete_bookmark(self, bookmark_id: UUIDLike) -> response.GlobusHTTPResponse:
@@ -1167,7 +1167,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Delete bookmark by ID
                     :ref: transfer/collection_bookmarks/#delete_bookmark_by_id
         """
-        log.info(f"TransferClient.delete_bookmark({bookmark_id})")
+        log.debug(f"TransferClient.delete_bookmark({bookmark_id})")
         return self.delete(f"bookmark/{bookmark_id}")
 
     #
@@ -1281,7 +1281,7 @@ class TransferClient(client.BaseClient):
         if local_user is not None:
             query_params["local_user"] = local_user
 
-        log.info(f"TransferClient.operation_ls({endpoint_id}, {query_params})")
+        log.debug(f"TransferClient.operation_ls({endpoint_id}, {query_params})")
         return IterableTransferResponse(
             self.get(f"operation/endpoint/{endpoint_id}/ls", query_params=query_params)
         )
@@ -1318,7 +1318,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Make Directory
                     :ref: transfer/file_operations/#make_directory
         """
-        log.info(
+        log.debug(
             "TransferClient.operation_mkdir({}, {}, {})".format(
                 endpoint_id, path, query_params
             )
@@ -1366,7 +1366,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Rename
                     :ref: transfer/file_operations/#rename
         """  # noqa: E501
-        log.info(
+        log.debug(
             "TransferClient.operation_rename({}, {}, {}, {})".format(
                 endpoint_id, oldpath, newpath, query_params
             )
@@ -1427,7 +1427,7 @@ class TransferClient(client.BaseClient):
         if local_user is not None:
             query_params["local_user"] = local_user
 
-        log.info(f"TransferClient.operation_stat({endpoint_id}, {query_params})")
+        log.debug(f"TransferClient.operation_stat({endpoint_id}, {query_params})")
         return self.get(
             f"operation/endpoint/{endpoint_id}/stat", query_params=query_params
         )
@@ -1454,7 +1454,7 @@ class TransferClient(client.BaseClient):
             "operation_symlink is not currently supported by any collections. "
             "To reduce confusion, this method will be removed."
         )
-        log.info(
+        log.debug(
             "TransferClient.operation_symlink({}, {}, {}, {})".format(
                 endpoint_id, symlink_target, path, query_params
             )
@@ -1501,7 +1501,7 @@ class TransferClient(client.BaseClient):
 
                 .. expandtestfixture:: transfer.get_submission_id
         """
-        log.info(f"TransferClient.get_submission_id({query_params})")
+        log.debug(f"TransferClient.get_submission_id({query_params})")
         return self.get("submission_id", query_params=query_params)
 
     def submit_transfer(
@@ -1547,7 +1547,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Submit a transfer task
                     :ref: transfer/task_submit/#submit_transfer_task
         """  # noqa: E501
-        log.info("TransferClient.submit_transfer(...)")
+        log.debug("TransferClient.submit_transfer(...)")
         if "submission_id" not in data:
             log.debug("submit_transfer autofetching submission_id")
             data["submission_id"] = self.get_submission_id()["value"]
@@ -1590,7 +1590,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Submit a delete task
                     :ref: transfer/task_submit/#submit_delete_task
         """
-        log.info("TransferClient.submit_delete(...)")
+        log.debug("TransferClient.submit_delete(...)")
         if "submission_id" not in data:
             log.debug("submit_delete autofetching submission_id")
             data["submission_id"] = self.get_submission_id()["value"]
@@ -1689,7 +1689,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Task List
                     :ref: transfer/task/#get_task_list
         """  # noqa: E501
-        log.info("TransferClient.task_list(...)")
+        log.debug("TransferClient.task_list(...)")
         if query_params is None:
             query_params = {}
         if limit is not None:
@@ -1754,7 +1754,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get Event List
                     :ref: transfer/task/#get_event_list
         """  # noqa: E501
-        log.info(f"TransferClient.task_event_list({task_id}, ...)")
+        log.debug(f"TransferClient.task_event_list({task_id}, ...)")
         if query_params is None:
             query_params = {}
         if limit is not None:
@@ -1784,7 +1784,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get task by ID
                     :ref: transfer/task/#get_task_by_id
         """
-        log.info(f"TransferClient.get_task({task_id}, ...)")
+        log.debug(f"TransferClient.get_task({task_id}, ...)")
         return self.get(f"task/{task_id}", query_params=query_params)
 
     def update_task(
@@ -1811,7 +1811,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Update task by ID
                     :ref: transfer/task/#update_task_by_id
         """
-        log.info(f"TransferClient.update_task({task_id}, ...)")
+        log.debug(f"TransferClient.update_task({task_id}, ...)")
         return self.put(f"task/{task_id}", data=data, query_params=query_params)
 
     def cancel_task(self, task_id: UUIDLike) -> response.GlobusHTTPResponse:
@@ -1829,7 +1829,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Cancel task by ID
                     :ref: transfer/task/#cancel_task_by_id
         """
-        log.info(f"TransferClient.cancel_task({task_id})")
+        log.debug(f"TransferClient.cancel_task({task_id})")
         return self.post(f"task/{task_id}/cancel")
 
     def task_wait(
@@ -1880,7 +1880,7 @@ class TransferClient(client.BaseClient):
                         print(".", end="")
                     print(f"\n{task_id} completed!")
         """  # noqa: E501
-        log.info(
+        log.debug(
             "TransferClient.task_wait(%s, %s, %s)", task_id, timeout, polling_interval
         )
 
@@ -1956,7 +1956,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get task pause info
                     :ref: transfer/task/#get_task_pause_info
         """
-        log.info(f"TransferClient.task_pause_info({task_id}, ...)")
+        log.debug(f"TransferClient.task_pause_info({task_id}, ...)")
         return self.get(f"task/{task_id}/pause_info", query_params=query_params)
 
     @paging.has_paginator(
@@ -2007,7 +2007,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get Task Successful Transfers
                     :ref: transfer/task/#get_task_successful_transfers
         """  # noqa: E501
-        log.info(f"TransferClient.task_successful_transfers({task_id}, ...)")
+        log.debug(f"TransferClient.task_successful_transfers({task_id}, ...)")
         if query_params is None:
             query_params = {}
         if marker is not None:
@@ -2058,7 +2058,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get Task Skipped Errors
                     :ref: transfer/task/#get_task_skipped_errors
         """  # noqa: E501
-        log.info("TransferClient.task_skipped_errors(%s, ...)", task_id)
+        log.debug("TransferClient.task_skipped_errors(%s, ...)", task_id)
         if query_params is None:
             query_params = {}
         if marker is not None:
@@ -2088,7 +2088,9 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get monitored endpoints and collections
                     :ref: transfer/advanced_collection_management/#get_monitored_endpoints_and_collections
         """  # noqa: E501
-        log.info(f"TransferClient.endpoint_manager_monitored_endpoints({query_params})")
+        log.debug(
+            f"TransferClient.endpoint_manager_monitored_endpoints({query_params})"
+        )
         return IterableTransferResponse(
             self.get("endpoint_manager/monitored_endpoints", query_params=query_params)
         )
@@ -2114,7 +2116,9 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get hosted endpoint list
                     :ref: transfer/advanced_collection_management/#get_hosted_collection_list
         """  # noqa: E501
-        log.info(f"TransferClient.endpoint_manager_hosted_endpoint_list({endpoint_id})")
+        log.debug(
+            f"TransferClient.endpoint_manager_hosted_endpoint_list({endpoint_id})"
+        )
         return IterableTransferResponse(
             self.get(
                 f"endpoint_manager/endpoint/{endpoint_id}/hosted_endpoint_list",
@@ -2143,7 +2147,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get endpoint as admin
                     :ref: transfer/advanced_collection_management/#mc_get_endpoint_or_collection
         """  # noqa: E501
-        log.info(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id})")
+        log.debug(f"TransferClient.endpoint_manager_get_endpoint({endpoint_id})")
         return self.get(
             f"endpoint_manager/endpoint/{endpoint_id}", query_params=query_params
         )
@@ -2169,7 +2173,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get guest collection access list as admin
                     :ref: transfer/advanced_collection_management/#get_guest_collection_access_list_as_admin
         """  # noqa: E501
-        log.info(
+        log.debug(
             f"TransferClient.endpoint_manager_endpoint_acl_list({endpoint_id}, ...)"
         )
         return IterableTransferResponse(
@@ -2303,7 +2307,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Advanced Collection Management: Get tasks
                     :ref: transfer/advanced_collection_management/#get_tasks
         """  # noqa: E501
-        log.info("TransferClient.endpoint_manager_task_list(...)")
+        log.debug("TransferClient.endpoint_manager_task_list(...)")
         if filter_endpoint is None and filter_endpoint_use is not None:
             raise exc.GlobusSDKUsageError(
                 "`filter_endpoint_use` is only valid when `filter_endpoint` is "
@@ -2363,7 +2367,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Advanced Collection Management: Get task
                     :ref: transfer/advanced_collection_management/#get_task
         """
-        log.info(f"TransferClient.endpoint_manager_get_task({task_id}, ...)")
+        log.debug(f"TransferClient.endpoint_manager_get_task({task_id}, ...)")
         return self.get(f"endpoint_manager/task/{task_id}", query_params=query_params)
 
     @paging.has_paginator(
@@ -2408,7 +2412,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Advanced Collection Management: Get task events
                     :ref: transfer/advanced_collection_management/#get_task_events
         """
-        log.info(f"TransferClient.endpoint_manager_task_event_list({task_id}, ...)")
+        log.debug(f"TransferClient.endpoint_manager_task_event_list({task_id}, ...)")
         if query_params is None:
             query_params = {}
         if limit is not None:
@@ -2445,7 +2449,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get task pause info as admin
                     :ref: transfer/advanced_collection_management/#get_task_pause_info_as_admin
         """  # noqa: E501
-        log.info(f"TransferClient.endpoint_manager_task_pause_info({task_id}, ...)")
+        log.debug(f"TransferClient.endpoint_manager_task_pause_info({task_id}, ...)")
         return self.get(
             f"endpoint_manager/task/{task_id}/pause_info", query_params=query_params
         )
@@ -2481,7 +2485,7 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/advanced_collection_management/\
                             #get_task_successful_transfers_as_admin
         """
-        log.info(
+        log.debug(
             "TransferClient.endpoint_manager_task_successful_transfers(%s, ...)",
             task_id,
         )
@@ -2527,7 +2531,9 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/advanced_collection_management/\
                             #get_task_skipped_errors_as_admin
         """
-        log.info(f"TransferClient.endpoint_manager_task_skipped_errors({task_id}, ...)")
+        log.debug(
+            f"TransferClient.endpoint_manager_task_skipped_errors({task_id}, ...)"
+        )
         if query_params is None:
             query_params = {}
         if marker is not None:
@@ -2564,7 +2570,7 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/advanced_collection_management/#admin_cancel
         """
         str_task_ids = [str(i) for i in task_ids]
-        log.info(
+        log.debug(
             f"TransferClient.endpoint_manager_cancel_tasks({str_task_ids}, {message})"
         )
         data = {"message": message, "task_id_list": str_task_ids}
@@ -2594,7 +2600,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get cancel status by ID
                     :ref: transfer/advanced_collection_management/#get_cancel_status_by_id
         """  # noqa: E501
-        log.info(f"TransferClient.endpoint_manager_cancel_status({admin_cancel_id})")
+        log.debug(f"TransferClient.endpoint_manager_cancel_status({admin_cancel_id})")
         return self.get(
             f"endpoint_manager/admin_cancel/{admin_cancel_id}",
             query_params=query_params,
@@ -2625,7 +2631,7 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/advanced_collection_management/#pause_tasks_as_admin
         """
         str_task_ids = [str(i) for i in task_ids]
-        log.info(
+        log.debug(
             f"TransferClient.endpoint_manager_pause_tasks({str_task_ids}, {message})"
         )
         data = {"message": message, "task_id_list": str_task_ids}
@@ -2656,7 +2662,7 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/advanced_collection_management/#resume_tasks_as_admin
         """
         str_task_ids = [str(i) for i in task_ids]
-        log.info(f"TransferClient.endpoint_manager_resume_tasks({str_task_ids})")
+        log.debug(f"TransferClient.endpoint_manager_resume_tasks({str_task_ids})")
         data = {"task_id_list": str_task_ids}
         return self.post(
             "endpoint_manager/admin_resume", data=data, query_params=query_params
@@ -2690,7 +2696,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get pause rules
                     :ref: transfer/advanced_collection_management/#get_pause_rules
         """
-        log.info("TransferClient.endpoint_manager_pause_rule_list(...)")
+        log.debug("TransferClient.endpoint_manager_pause_rule_list(...)")
         if query_params is None:
             query_params = {}
         if filter_endpoint is not None:
@@ -2732,7 +2738,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Create pause rule
                     :ref: transfer/advanced_collection_management/#create_pause_rule
         """
-        log.info("TransferClient.endpoint_manager_create_pause_rule(...)")
+        log.debug("TransferClient.endpoint_manager_create_pause_rule(...)")
         return self.post("endpoint_manager/pause_rule", data=data)
 
     def endpoint_manager_get_pause_rule(
@@ -2757,7 +2763,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Get pause rule
                     :ref: transfer/advanced_collection_management/#get_pause_rule
         """
-        log.info(f"TransferClient.endpoint_manager_get_pause_rule({pause_rule_id})")
+        log.debug(f"TransferClient.endpoint_manager_get_pause_rule({pause_rule_id})")
         return self.get(
             f"endpoint_manager/pause_rule/{pause_rule_id}", query_params=query_params
         )
@@ -2796,7 +2802,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Update pause rule
                     :ref: transfer/advanced_collection_management/#update_pause_rule
         """
-        log.info(f"TransferClient.endpoint_manager_update_pause_rule({pause_rule_id})")
+        log.debug(f"TransferClient.endpoint_manager_update_pause_rule({pause_rule_id})")
         return self.put(f"endpoint_manager/pause_rule/{pause_rule_id}", data=data)
 
     def endpoint_manager_delete_pause_rule(
@@ -2822,7 +2828,7 @@ class TransferClient(client.BaseClient):
                 .. extdoclink:: Delete pause rule
                     :ref: transfer/advanced_collection_management/#delete_pause_rule
         """
-        log.info(f"TransferClient.endpoint_manager_delete_pause_rule({pause_rule_id})")
+        log.debug(f"TransferClient.endpoint_manager_delete_pause_rule({pause_rule_id})")
         return self.delete(
             f"endpoint_manager/pause_rule/{pause_rule_id}", query_params=query_params
         )
