@@ -1,7 +1,7 @@
 .. _tutorial_register_app:
 
-Registering a Globus Auth App
-=============================
+How to Register an App in Globus Auth
+=====================================
 
 An OAuth2 Client, also sometimes called an "app", represents an application or
 script.

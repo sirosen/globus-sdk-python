@@ -22,4 +22,4 @@ may also enhance your understanding of how ``GlobusApp`` works.
 
     Register an App in Globus Auth <register_app>
     Create a Minimal Script <minimal_script>
-    Create a Script Without GlobusApp <minimal_script_noapp>
+    Create a Minimal Script Without GlobusApp <minimal_script_noapp>

@@ -2,8 +2,8 @@
 
 .. _minimal_script_tutorial:
 
-Creating A Minimal Script
-=========================
+How to Create A Minimal Script
+==============================
 
 This is a basic tutorial in the use of the Globus SDK.
 

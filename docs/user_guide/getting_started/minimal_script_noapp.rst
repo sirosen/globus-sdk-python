@@ -2,8 +2,8 @@
 
 .. _minimal_script_noapp_tutorial:
 
-Creating A Script without GlobusApp
-===================================
+How to Create A Minimal Script without GlobusApp
+================================================
 
 :class:`GlobusApp` provides a number of useful abstractions in the SDK.
 It handles login flows and storage of tokens, coupled with later retrieval of
