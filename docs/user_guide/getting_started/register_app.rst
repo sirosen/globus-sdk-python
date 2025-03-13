@@ -16,9 +16,11 @@ else's apps using the service.
 
 .. note::
 
-    SDK Tutorials and Examples frequently make use of the "tutorial client ID".
-    This makes the examples work if you copy and run them, but using the
-    tutorial client for production use cases is not recommended or supported.
+    SDK Tutorials and Examples frequently make use of a "tutorial client".
+    
+    This is a publicly registered application which makes the examples succeed
+    with no edits, but using the tutorial client for production use cases is not
+    recommended or supported.
 
 Developers who wish to learn more about OAuth2 at Globus are encouraged to read
 the `Clients, Scopes, and Consents
