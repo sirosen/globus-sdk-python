@@ -10,9 +10,9 @@ This is a basic tutorial in the use of the Globus SDK.
 You can jump right in by using the ``CLIENT_ID`` seen in the example code blocks below!
 That is the ID of the tutorial client, which lets you get started quickly and easily.
 
-When you are ready to create your own application, follow :ref:`the tutorial on
-registering a Native App <tutorial_register_app>` and use its ``CLIENT_ID`` in
-the rest of the tutorial to get your own app setup.
+When you are ready to create your own application, follow
+:ref:`How to Register an App in Globus Auth <tutorial_register_app>` and use
+its ``CLIENT_ID`` in the rest of the tutorial to get your own app setup.
 
 For readers who prefer to start with complete working examples, jump ahead to the
 :ref:`example scripts <minimal_script_complete_examples>` at the end before reviewing
@@ -49,7 +49,7 @@ Start by defining an application object using :class:`UserApp`:
 .. note::
 
     The default behavior for a :class:`UserApp` is to do a CLI-based login flow.
-    This behavior can be disabled or customized in numerous ways.
+    This behavior, and more, can be disabled or customized in numerous ways.
 
     For the full menu of options, look at the documentation about :ref:`Using a
     GlobusApp! <using_globus_app>`
@@ -60,8 +60,9 @@ Access the APIs via Clients
 Once you have an app defined, you can use it with client objects to access
 various Globus APIs.
 
-When you attempt to interact with a service, the app will automatically prompt
-you to login.
+When you attempt to interact with a service using an app-bound service client,
+the app will automatically prompt you to login if valid credentials are
+unavailable.
 
 Start by defining the client object:
 

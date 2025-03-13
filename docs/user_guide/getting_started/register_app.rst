@@ -6,9 +6,10 @@ How to Register an App in Globus Auth
 An OAuth2 Client, also sometimes called an "app", represents an application or
 script.
 
-When a user logs in to an application, they grant consent for the client to
-perform certain actions, and the client is issued appropriate credentials for
-those actions.
+When a user logs into an application, they must grant consent for the client to
+perform any required actions.
+At the end of a login flow, Globus Auth issues the client appropriate
+credentials for those actions.
 
 Having your own app registered with the service also lets you set certain app-level
 settings for user logins, and keeps your application isolated from everyone
@@ -27,18 +28,19 @@ the `Clients, Scopes, and Consents
 <https://docs.globus.org/guides/overviews/clients-scopes-and-consents/>`_
 documentation.
 
-App Types & Native App
-----------------------
+Creating a Native App
+---------------------
 
 There are several different types of applications which you can register with
 Globus Auth.
 
-For simplicity, this tutorial will only cover how to create a
-"Native App" -- this is the suitable type of application for scripts and
-distributed applications which can't have a secret associated with them.
+For simplicity, this tutorial will only cover registration of the "Native App"
+type.
+This is the suitable type of application for scripts and distributed
+applications which aren't able to use secrets.
 
-Creating a Native App
----------------------
+Steps
+^^^^^
 
 1. Navigate to the `Developer Site <https://app.globus.org/settings/developers>`_
 
