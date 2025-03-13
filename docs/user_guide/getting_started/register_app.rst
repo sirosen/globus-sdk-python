@@ -17,7 +17,7 @@ else's apps using the service.
 .. note::
 
     SDK Tutorials and Examples frequently make use of a "tutorial client".
-    
+
     This is a publicly registered application which makes the examples succeed
     with no edits, but using the tutorial client for production use cases is not
     recommended or supported.
