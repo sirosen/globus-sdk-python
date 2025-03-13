@@ -21,11 +21,11 @@ Table of Contents
 -----------------
 
 .. toctree::
-    :caption: Getting Started
+    :caption: User Guide
     :maxdepth: 1
 
-    installation
-    tutorial
+    user_guide/installation
+    user_guide/getting_started/index
 
 .. toctree::
     :caption: Full Reference
