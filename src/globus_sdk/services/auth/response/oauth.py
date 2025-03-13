@@ -14,7 +14,7 @@ from globus_sdk.response import GlobusHTTPResponse
 from .._common import SupportsJWKMethods
 from ..id_token_decoder import IDTokenDecoder
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def _convert_token_info_dict(
@@ -191,7 +191,7 @@ class OAuthTokenResponse(GlobusHTTPResponse):
             parameter, and all other values are passed as ``options``.
         """
         id_token = self["id_token"]
-        logger.debug('Decoding ID Token "%s"', id_token)
+        log.debug('Decoding ID Token "%s"', id_token)
         if not isinstance(self.client, SupportsJWKMethods):
             raise exc.GlobusSDKUsageError(
                 "decode_id_token() requires a client which supports JWK methods. "

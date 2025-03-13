@@ -98,7 +98,7 @@ class NativeAppAuthClient(AuthLoginClient):
                 `The PKCE Security Protocol
                 <https://docs.globus.org/api/auth/developer-guide/#pkce>`_.
         """
-        log.info("Starting Native App Grant Flow")
+        log.debug("Starting Native App Grant Flow")
         self.current_oauth2_flow_manager = GlobusNativeAppFlowManager(
             self,
             requested_scopes=requested_scopes,
@@ -125,7 +125,7 @@ class NativeAppAuthClient(AuthLoginClient):
         :param refresh_token: The refresh token to use to get a new access token
         :param body_params: Extra parameters to include in the POST body
         """
-        log.info("Executing token refresh without client credentials")
+        log.debug("Executing token refresh without client credentials")
         form_data = {
             "refresh_token": refresh_token,
             "grant_type": "refresh_token",

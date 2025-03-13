@@ -18,11 +18,11 @@ class BasicAuthorizer(StaticGlobusAuthorizer):
     """
 
     def __init__(self, username: str, password: str) -> None:
-        log.info(
+        log.debug(
             "Setting up a BasicAuthorizer. It will use an "
             "auth type of Basic and cannot handle 401s."
         )
-        log.info(f"BasicAuthorizer.username = {username}")
+        log.debug(f"BasicAuthorizer.username = {username}")
         self.username = username
         self.password = password
 

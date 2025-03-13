@@ -196,7 +196,7 @@ class TransferData(utils.PayloadWrapper):
         if destination_endpoint is None:
             raise exc.GlobusSDKUsageError("destination_endpoint is required")
 
-        log.info("Creating a new TransferData object")
+        log.debug("Creating a new TransferData object")
         self["DATA_TYPE"] = "transfer"
         self["DATA"] = []
         self._set_optstrs(
@@ -229,12 +229,12 @@ class TransferData(utils.PayloadWrapper):
         self._set_value("sync_level", sync_level, callback=_parse_sync_level)
 
         for k, v in self.items():
-            log.info("TransferData.%s = %s", k, v)
+            log.debug("TransferData.%s = %s", k, v)
 
         if additional_fields is not None:
             self.update(additional_fields)
             for option, value in additional_fields.items():
-                log.info(
+                log.debug(
                     f"TransferData.{option} = {value} (option passed "
                     "in via additional_fields)"
                 )

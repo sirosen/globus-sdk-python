@@ -14,7 +14,7 @@ from .base import GlobusOAuthFlowManager
 if t.TYPE_CHECKING:
     import globus_sdk
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
@@ -65,12 +65,14 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         self.refresh_tokens = refresh_tokens
         self.state = state
 
-        logger.debug("Starting Authorization Code Flow with params:")
-        logger.debug(f"auth_client.client_id={auth_client.client_id}")
-        logger.debug(f"redirect_uri={redirect_uri}")
-        logger.debug(f"refresh_tokens={refresh_tokens}")
-        logger.debug(f"state={state}")
-        logger.debug(f"requested_scopes={self.requested_scopes}")
+        log.debug(
+            "Starting Authorization Code Flow with params: "
+            f"auth_client.client_id={auth_client.client_id} , "
+            f"redirect_uri={redirect_uri} , "
+            f"refresh_tokens={refresh_tokens} , "
+            f"state={state} , "
+            f"requested_scopes={self.requested_scopes}"
+        )
 
     def get_authorize_url(self, query_params: dict[str, t.Any] | None = None) -> str:
         """
@@ -88,8 +90,8 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         authorize_base_url = utils.slash_join(
             self.auth_client.base_url, "/v2/oauth2/authorize"
         )
-        logger.debug(f"Building authorization URI. Base URL: {authorize_base_url}")
-        logger.debug(f"query_params={query_params}")
+        log.debug(f"Building authorization URI. Base URL: {authorize_base_url}")
+        log.debug(f"query_params={query_params}")
 
         params = {
             "client_id": self.client_id,
@@ -114,7 +116,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
 
         :param auth_code: The short-lived code to exchange for tokens
         """
-        logger.debug(
+        log.debug(
             "Performing Authorization Code auth_code exchange. "
             "Sending client_id and client_secret"
         )

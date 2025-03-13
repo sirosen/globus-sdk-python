@@ -166,7 +166,7 @@ class AuthClient(client.BaseClient):
         Fetch the OpenID Connect configuration data from the well-known URI for Globus
         Auth.
         """
-        log.info("Fetching OIDC Config")
+        log.debug("Fetching OIDC Config")
         return self.get("/.well-known/openid-configuration")
 
     @t.overload
@@ -244,7 +244,7 @@ class AuthClient(client.BaseClient):
                 .. extdoclink:: Get Userinfo
                     :ref: auth/reference/#get_or_post_v2_oauth2_userinfo_resource
         """
-        log.info("Looking up OIDC-style Userinfo from Globus Auth")
+        log.debug("Looking up OIDC-style Userinfo from Globus Auth")
         return self.get("/v2/oauth2/userinfo")
 
     def oauth2_userinfo(self) -> GlobusHTTPResponse:
@@ -343,7 +343,7 @@ class AuthClient(client.BaseClient):
                     :ref: auth/reference/#v2_api_identities_resources
         """  # noqa: E501
 
-        log.info("Looking up Globus Auth Identities")
+        log.debug("Looking up Globus Auth Identities")
 
         if query_params is None:
             query_params = {}
@@ -436,7 +436,7 @@ class AuthClient(client.BaseClient):
                     :ref: auth/reference/#get_identity_providers
         """  # noqa: E501
 
-        log.info("Looking up Globus Auth Identity Providers")
+        log.debug("Looking up Globus Auth Identity Providers")
 
         if query_params is None:
             query_params = {}

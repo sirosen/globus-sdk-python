@@ -54,7 +54,7 @@ def _load_var(
     # meaning that if we define the default as 'foo' and someone explicitly sets 'foo',
     # no info log gets emitted
     if value != default:
-        log.info(f"on lookup, non-default setting: {varname}={value}")
+        log.debug(f"on lookup, non-default setting: {varname}={value}")
     else:
         log.debug(f"on lookup, default setting: {varname}={value}")
     return value

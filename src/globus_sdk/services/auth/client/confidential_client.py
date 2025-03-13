@@ -129,7 +129,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         ...     tokens.by_resource_server["transfer.api.globus.org"])
         >>> transfer_token = transfer_token_info["access_token"]
         """
-        log.info("Fetching token(s) using client credentials")
+        log.debug("Fetching token(s) using client credentials")
         requested_scopes_string = stringify_requested_scopes(requested_scopes)
         return self.oauth2_token(
             {"grant_type": "client_credentials", "scope": requested_scopes_string},
@@ -175,7 +175,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
                 `in the Globus Auth Specification
                 <https://docs.globus.org/api/auth/developer-guide/#obtaining-authorization>`_.
         """
-        log.info("Starting OAuth2 Authorization Code Grant Flow")
+        log.debug("Starting OAuth2 Authorization Code Grant Flow")
         self.current_oauth2_flow_manager = GlobusAuthorizationCodeFlowManager(
             self,
             redirect_uri,
@@ -251,8 +251,10 @@ class ConfidentialAppAuthClient(AuthLoginClient):
                 .. extdoclink:: Dependent Token Grant
                     :ref: auth/reference/##dependent_token_grant_post_v2oauth2token
         """  # noqa: E501
-        log.info("Getting dependent tokens from access token")
-        log.debug(f"additional_params={additional_params}")
+        log.debug(
+            "Getting dependent tokens from access token"
+            f"additional_params={additional_params}"
+        )
         form_data = {
             "grant_type": "urn:globus:auth:grant_type:dependent_token",
             "token": token,
@@ -311,7 +313,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
                 .. extdoclink:: Token Introspection
                     :ref: auth/reference/#token_introspection_post_v2_oauth2_token_introspect
         """  # noqa: E501
-        log.info("Checking token validity (introspect)")
+        log.debug("Checking token validity (introspect)")
         body = {"token": token}
         if include is not None:
             body["include"] = include

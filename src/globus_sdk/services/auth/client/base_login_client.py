@@ -65,7 +65,7 @@ class AuthLoginClient(client.BaseClient):
         # managers
         self.current_oauth2_flow_manager: GlobusOAuthFlowManager | None = None
 
-        log.info(
+        log.debug(
             "Finished initializing AuthLoginClient. "
             f"client_id='{client_id}', type(authorizer)={type(authorizer)}"
         )
@@ -89,7 +89,7 @@ class AuthLoginClient(client.BaseClient):
         Fetch the OpenID Connect configuration data from the well-known URI for Globus
         Auth.
         """
-        log.info("Fetching OIDC Config")
+        log.debug("Fetching OIDC Config")
         return self.get("/.well-known/openid-configuration")
 
     @t.overload
@@ -198,7 +198,7 @@ class AuthLoginClient(client.BaseClient):
         auth_url = self.current_oauth2_flow_manager.get_authorize_url(
             query_params=query_params
         )
-        log.info(f"Got authorization URL: {auth_url}")
+        log.debug(f"Got authorization URL: {auth_url}")
         return auth_url
 
     def oauth2_exchange_code_for_tokens(
@@ -212,7 +212,7 @@ class AuthLoginClient(client.BaseClient):
             is exchanging for tokens. Tokens are the credentials used to authenticate
             against Globus APIs.
         """
-        log.info(
+        log.debug(
             "Final Step of 3-legged OAuth2 Flows: "
             "Exchanging authorization code for token(s)"
         )
@@ -249,7 +249,7 @@ class AuthLoginClient(client.BaseClient):
         :param refresh_token: A Globus Refresh Token as a string
         :param body_params: A dict of extra params to encode in the refresh call.
         """
-        log.info("Executing token refresh; typically requires client credentials")
+        log.debug("Executing token refresh; typically requires client credentials")
         form_data = {"refresh_token": refresh_token, "grant_type": "refresh_token"}
         return self.oauth2_token(
             form_data, body_params=body_params, response_class=OAuthRefreshTokenResponse
@@ -278,7 +278,7 @@ class AuthLoginClient(client.BaseClient):
             "Tokens should be treated as valid until they are used and their "
             "validity can be assessed."
         )
-        log.info("Validating token")
+        log.debug("Validating token")
         body = {"token": token}
 
         # if this client has no way of authenticating itself but
@@ -321,7 +321,7 @@ class AuthLoginClient(client.BaseClient):
         >>> ac = ConfidentialAppAuthClient(CLIENT_ID, CLIENT_SECRET)
         >>> ac.oauth2_revoke_token('<token_string>')
         """
-        log.info("Revoking token")
+        log.debug("Revoking token")
         body = {"token": token}
 
         # if this client has no way of authenticating itself but
@@ -395,7 +395,7 @@ class AuthLoginClient(client.BaseClient):
         :rtype: ``response_class`` if set, defaults to
             :py:attr:`~globus_sdk.OAuthTokenResponse`
         """
-        log.info("Fetching new token from Globus Auth")
+        log.debug("Fetching new token from Globus Auth")
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
         data = dict(form_data)
