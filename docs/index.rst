@@ -26,6 +26,7 @@ Table of Contents
 
     user_guide/installation
     user_guide/getting_started/index
+    user_guide/usage_patterns/index
 
 .. toctree::
     :caption: Reference
