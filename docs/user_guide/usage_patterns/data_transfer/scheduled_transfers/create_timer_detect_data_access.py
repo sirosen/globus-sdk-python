@@ -75,7 +75,7 @@ if uses_data_access(DST_COLLECTION):
 # submit the creation request to the service, printing out the ID of your new timer
 # after it's created -- you can find it in https://app.globus.org/activity/timers
 timer = timers_client.create_timer(
-    timer=globus_sdk.TransferTimer(
+    globus_sdk.TransferTimer(
         name=(
             "create-timer-example "
             f"[created at {datetime.datetime.now().isoformat()}]"
