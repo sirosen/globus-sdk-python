@@ -17,3 +17,4 @@ Timers is covered.
 
     Initiating a Transfer <submit_transfer/index>
     Scheduling a Repeating Transfer <scheduled_transfers/index>
+    Creating a Guest Collection <create_guest_collection/index>
