@@ -15,6 +15,7 @@ Timers is covered.
     :caption: How to Manage Data Transfers using the SDK
     :maxdepth: 1
 
-    Initiating a Transfer <submit_transfer/index>
-    Scheduling a Repeating Transfer <scheduled_transfers/index>
-    Creating a Guest Collection <create_guest_collection/index>
+    submit_transfer/index
+    scheduled_transfers/index
+    create_guest_collection/index
+    transfer_relative_deadline/index
