@@ -76,6 +76,24 @@ class GlobusAuthorizationParameters(Serializable):
         self.prompt = validators.opt_str("prompt", prompt)
         self.extra = extra or {}
 
+    def __repr__(self) -> str:
+        extra_repr = ""
+        if self.extra:
+            extra_repr = ", extra=..."
+        attrs = [
+            f"{name}={getattr(self, name)!r}"
+            for name in (
+                "session_message",
+                "session_required_identities",
+                "session_required_policies",
+                "session_required_single_domain",
+                "session_required_mfa",
+                "required_scopes",
+                "prompt",
+            )
+        ]
+        return "GlobusAuthorizationParameters(" + ", ".join(attrs) + extra_repr + ")"
+
 
 class GARE(Serializable):
     """
@@ -111,3 +129,13 @@ class GARE(Serializable):
             GlobusAuthorizationParameters,
         )
         self.extra = extra or {}
+
+    def __repr__(self) -> str:
+        extra_repr = ""
+        if self.extra:
+            extra_repr = ", extra=..."
+        return (
+            f"GARE(code={self.code!r}, "
+            f"authorization_parameters={self.authorization_parameters!r}"
+            f"{extra_repr})"
+        )
