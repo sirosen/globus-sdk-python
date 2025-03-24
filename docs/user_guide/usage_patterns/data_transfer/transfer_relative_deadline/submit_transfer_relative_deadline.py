@@ -19,7 +19,7 @@ DST_PATH = "/~/example-transfer-script-destination.txt"
 
 
 def make_relative_deadline(offset: datetime.timedelta) -> str:
-    now = datetime.datetime.now(tz=datetime.UTC)
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
     deadline = now + offset
     return deadline.isoformat()
 
