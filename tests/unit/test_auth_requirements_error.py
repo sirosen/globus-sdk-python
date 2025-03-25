@@ -457,3 +457,57 @@ def test_authorization_parameters_from_empty_dict(target_class):
     """ """
     authorization_params = target_class.from_dict({})
     assert authorization_params.to_dict() == {}
+
+
+def test_gare_repr_shows_attrs():
+    error_doc = GARE(
+        code="NeedsReauth",
+        authorization_parameters={"session_required_policies": ["foo"]},
+    )
+
+    # the repr will include the parameters repr -- tested separately below
+    assert repr(error_doc) == (
+        "GARE("
+        "code='NeedsReauth', "
+        f"authorization_parameters={error_doc.authorization_parameters!r}"
+        ")"
+    )
+
+
+def test_gare_repr_indicates_presence_of_extra():
+    error_doc_no_extra = GARE(
+        code="NeedsReauth",
+        authorization_parameters={"session_required_policies": ["foo"]},
+    )
+
+    error_doc_with_extra = GARE(
+        code="NeedsReauth",
+        authorization_parameters={"session_required_policies": ["foo"]},
+        extra={"alpha": "beta"},
+    )
+
+    assert "extra=..." not in repr(error_doc_no_extra)
+    assert "extra=..." in repr(error_doc_with_extra)
+
+
+def test_authorization_parameters_repr_shows_all_attrs():
+    params = GlobusAuthorizationParameters()
+    assert repr(params) == (
+        "GlobusAuthorizationParameters("
+        "session_message=None, "
+        "session_required_identities=None, "
+        "session_required_policies=None, "
+        "session_required_single_domain=None, "
+        "session_required_mfa=None, "
+        "required_scopes=None, "
+        "prompt=None"
+        ")"
+    )
+
+
+def test_authorization_parameters_repr_indicates_presence_of_extra():
+    params_no_extra = GlobusAuthorizationParameters()
+    params_with_extra = GlobusAuthorizationParameters(extra={"gamma": "delta"})
+
+    assert "extra=..." not in repr(params_no_extra)
+    assert "extra=..." in repr(params_with_extra)
