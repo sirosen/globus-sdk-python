@@ -28,3 +28,4 @@ transfers.
     :maxdepth: 1
 
     data_transfer/index
+    sessions_and_consents/index
