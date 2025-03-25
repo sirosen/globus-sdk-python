@@ -459,13 +459,19 @@ def test_authorization_parameters_from_empty_dict(target_class):
     assert authorization_params.to_dict() == {}
 
 
-def test_gare_repr_shows_code():
+def test_gare_repr_shows_attrs():
     error_doc = GARE(
         code="NeedsReauth",
         authorization_parameters={"session_required_policies": ["foo"]},
     )
 
-    assert "code='NeedsReauth'" in repr(error_doc)
+    # the repr will include the parameters repr -- tested separately below
+    assert repr(error_doc) == (
+        "GARE("
+        "code='NeedsReauth', "
+        f"authorization_parameters={error_doc.authorization_parameters!r}"
+        ")"
+    )
 
 
 def test_gare_repr_indicates_presence_of_extra():
@@ -486,17 +492,17 @@ def test_gare_repr_indicates_presence_of_extra():
 
 def test_authorization_parameters_repr_shows_all_attrs():
     params = GlobusAuthorizationParameters()
-    params_repr = repr(params)
-    for name in (
-        "session_message",
-        "session_required_identities",
-        "session_required_policies",
-        "session_required_single_domain",
-        "session_required_mfa",
-        "required_scopes",
-        "prompt",
-    ):
-        assert f"{name}=None" in params_repr
+    assert repr(params) == (
+        "GlobusAuthorizationParameters("
+        "session_message=None, "
+        "session_required_identities=None, "
+        "session_required_policies=None, "
+        "session_required_single_domain=None, "
+        "session_required_mfa=None, "
+        "required_scopes=None, "
+        "prompt=None"
+        ")"
+    )
 
 
 def test_authorization_parameters_repr_indicates_presence_of_extra():
