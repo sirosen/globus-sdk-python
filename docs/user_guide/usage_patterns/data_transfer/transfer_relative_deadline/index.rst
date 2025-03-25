@@ -10,13 +10,23 @@ When transferring or deleting data via Globus Transfer, users are able to set a
 This allows you to declare a time by which the task must be completed -- if the
 deadline is reached and the task is still in progress, it will be cancelled.
 
-The ``deadline`` field in a Transfer task takes a date and time in ISO 8601
-format. Because of the use of a standard format, it is easy to use the Python
+The ``deadline`` field in a Transfer task takes a date and time as a string,
+with support for common ISO 8601 format.
+Because of the use of standard formats, it is easy to use the Python
 ``datetime`` module to compute a relative deadline at some point in the future.
 You can use this to easily submit tasks with deadlines limited to the next minute,
 hour, or day.
 You can use this, for example, to enforce that a Transfer Task which takes too
 long results in errors (even if it is making slow progress).
+
+.. note::
+
+    Not all ISO 8601 syntaxes are supported.
+    We recommend sticking to the restrictive subset defined by RFC 3339, in
+    which date-time data is typically formatted as "YYYY-MM-DD'T'HH:mm:SSZ".
+
+    :py:meth:`datetime.isoformat() <datetime.datetime.isoformat()>` follows
+    this format and is therefore a great choice for Python programmers!
 
 For readers who prefer to start with complete working examples, jump ahead to the
 :ref:`example script <userguide_transfer_relative_deadline_example>`.
