@@ -12,6 +12,31 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.53.0:
+
+v3.53.0 (2025-03-25)
+--------------------
+
+Added
+~~~~~
+
+- Index listing in Globus Search is now available via
+  ``SearchClient.index_list``. (:pr:`1155`)
+
+Changed
+~~~~~~~
+
+- The ``repr`` for ``globus_sdk.gare.GARE`` has been enhanced to be more
+  informative. (:pr:`1156`)
+
+Documentation
+~~~~~~~~~~~~~
+
+- New sections on ``Data Transfer`` and ``Session & Consents`` have been added
+  to the User Guide in the docs.
+  Initial docs cover transfer submission, timer creation, deadlines, and
+  reauthentication after session timeouts. (:pr:`1150`, :pr:`1154`, :pr:`1157`)
+
 .. _changelog-3.52.0:
 
 v3.52.0 (2025-03-19)
