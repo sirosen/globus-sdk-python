@@ -245,17 +245,12 @@ class BaseClient:
 
         # now, assign the app, app_name, and scopes
         self._app = app
-        self.app_scopes = app_scopes
+        self.app_scopes = app_scopes or self.default_scope_requirements
         if self.app_name is None:
             self.app_name = app.app_name
 
-        if self.app_scopes:
-            scope_requirements = self.app_scopes
-        else:
-            scope_requirements = self.default_scope_requirements
-
         # finally, register the scope requirements on the app side
-        self._app.add_scope_requirements({self.resource_server: scope_requirements})
+        self._app.add_scope_requirements({self.resource_server: self.app_scopes})
 
     def add_app_scope(self, scope_collection: ScopeCollectionType) -> BaseClient:
         """
