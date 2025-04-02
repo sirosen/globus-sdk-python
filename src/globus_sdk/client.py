@@ -90,22 +90,18 @@ class BaseClient:
             raise exc.GlobusSDKUsageError(
                 f"A {type(self).__name__} cannot use both an 'app' and an 'authorizer'."
             )
-        if app and environment and environment != app.config.environment:
-            raise exc.GlobusSDKUsageError(
-                f"[Environment Mismatch] {type(self).__name__}'s environment "
-                f"({environment}) does not match the GlobusApp's configured "
-                f"environment ({app.config.environment})."
-            )
 
         # Determine the client's environment
-        # Either derived from the app used, or else from the provided kwarg
+        # Either the provided kwarg or derived from the app used
         #
         # If neither is specified, fallback to the GLOBUS_SDK_ENVIRONMENT environment
         # variable.
-        if app:
+        if environment:
+            self.environment = environment
+        elif app:
             self.environment = app.config.environment
         else:
-            self.environment = config.get_environment_name(environment)
+            self.environment = config.get_environment_name()
 
         # resolve the base_url for the client (see docstring for resolution precedence)
         self.base_url = self._resolve_base_url(base_url, self.environment)
@@ -229,14 +225,17 @@ class BaseClient:
                 "Unable to use an 'app' with a client with no "
                 "'resource_server' defined."
             )
-        # the client's environment must match the app's -- we can't tell which of these
-        # were set explicitly programmatically and which were implicit (e.g., from the
-        # env var), so erroring is the safest option
+        # the client's environment must match the app's
         #
-        # although we can track the value used in init (e.g., add
-        # `self._init_environment = environment` to init), it's harder to keep track of
-        # usages like
-        # `client = FooClient(); client.environment = "test"; client.base_url = ...`
+        # there are only two ways to get to a mismatch:
+        #
+        # 1. pass an explicit environment which doesn't match the app, e.g.,
+        #   `MyClient(environment="a", app=app)` where `app.config.environment="b"`
+        #
+        # 2. initialize a client without an app and later attach an app which doesn't
+        #    match, e.g., `MyClient(environment="a").attach_globus_app(app)`
+        #
+        # in these cases, the user has explicitly given us conflicting instructions
         if self.environment != app.config.environment:
             raise exc.GlobusSDKUsageError(
                 f"[Environment Mismatch] {type(self).__name__}'s environment "
