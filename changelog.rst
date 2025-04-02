@@ -12,6 +12,17 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.54.0:
+
+v3.54.0 (2025-04-02)
+--------------------
+
+Changed
+~~~~~~~
+
+- Added the optional ``required_mfa`` field to ``AuthClient.create_policy()`` and
+  ``AuthClient.update_policy()`` request bodies. (:pr:`1159`)
+
 .. _changelog-3.53.0:
 
 v3.53.0 (2025-03-25)
