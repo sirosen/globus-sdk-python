@@ -47,17 +47,13 @@ the service:
 
     collection_doc = transfer_client.get_endpoint(COLLECTION_ID)
 
-.. caution::
+.. note::
 
     Careful readers may note that we use the :meth:`TransferClient.get_endpoint`
     method to lookup a collection.
 
-    The Transfer service contains both Endpoints and Collections, and for
-    historical reasons both document types are available from the Get Endpoint
-    API.
-    This is the correct API to use not only when looking for information about
-    a Collection, but also for detecting whether an ID belongs to a Collection
-    or Endpoint, in cases where it is ambiguous.
+    The Transfer service contains both Endpoints and Collections,
+    and both document types are available from the Get Endpoint API.
 
 
 Reading Collection Type
@@ -70,21 +66,21 @@ First, whether or not the collection is a GCSv5 Mapped Collection:
 
 .. code-block:: python
 
-    entity_type: str = collection_doc["entity_type"]
-    is_v5_mapped_collection: bool = entity_type == "GCSv5_mapped_collection"
+    entity_type = collection_doc["entity_type"]
+    is_v5_mapped_collection = entity_type == "GCSv5_mapped_collection"
 
 Second, whether or not the collection is a High Assurance Collection:
 
 .. code-block:: python
 
-    high_assurance: bool = collection_doc["high_assurance"]
+    is_high_assurance = collection_doc["high_assurance"]
 
 Once we have this information, we can deduce whether or not ``data_access`` is
 needed with the following boolean assignment:
 
 .. code-block:: python
 
-    collection_uses_data_access: bool = is_v5_mapped_collection and not high_assurance
+    collection_uses_data_access = is_v5_mapped_collection and not is_high_assurance
 
 Converting Logic to a Helper Function
 -------------------------------------
