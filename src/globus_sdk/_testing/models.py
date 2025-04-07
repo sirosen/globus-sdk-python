@@ -304,7 +304,7 @@ class ResponseSet:
         # constructor which expects native dicts and converts them to RegisteredResponse
         # objects, then puts them into the ResponseSet
         def handle_value(
-            v: dict[str, t.Any] | list[dict[str, t.Any]]
+            v: dict[str, t.Any] | list[dict[str, t.Any]],
         ) -> RegisteredResponse | ResponseList:
             if isinstance(v, dict):
                 return RegisteredResponse(**v)

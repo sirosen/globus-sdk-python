@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 def to_gare(
-    error: exc.GlobusAPIError | exc.ErrorSubdocument | dict[str, t.Any]
+    error: exc.GlobusAPIError | exc.ErrorSubdocument | dict[str, t.Any],
 ) -> GARE | None:
     """
     Converts a GlobusAPIError, ErrorSubdocument, or dict into a
@@ -72,7 +72,7 @@ def to_gare(
 
 
 def to_gares(
-    errors: list[exc.GlobusAPIError | exc.ErrorSubdocument | dict[str, t.Any]]
+    errors: list[exc.GlobusAPIError | exc.ErrorSubdocument | dict[str, t.Any]],
 ) -> list[GARE]:
     """
     Converts a list of GlobusAPIErrors, ErrorSubdocuments, or dicts into a list of
@@ -105,7 +105,7 @@ def to_gares(
 
 
 def is_gare(
-    error: exc.GlobusAPIError | exc.ErrorSubdocument | dict[str, t.Any]
+    error: exc.GlobusAPIError | exc.ErrorSubdocument | dict[str, t.Any],
 ) -> bool:
     """
     Return True if the provided error matches a known
@@ -117,7 +117,7 @@ def is_gare(
 
 
 def has_gares(
-    errors: list[exc.GlobusAPIError | exc.ErrorSubdocument | dict[str, t.Any]]
+    errors: list[exc.GlobusAPIError | exc.ErrorSubdocument | dict[str, t.Any]],
 ) -> bool:
     """
     Return True if any of the provided errors match a known
