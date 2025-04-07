@@ -28,7 +28,7 @@ class AuthorizerFactory(
     authorization requirements used to initialize the ``ValidatingTokenStorage``.
 
     An ``AuthorizerFactory`` keeps a cache of authorizer objects that are
-    re-used until its ``store_token_response`` method is called.
+    reused until its ``store_token_response`` method is called.
     """
 
     def __init__(self, token_storage: ValidatingTokenStorage) -> None:
