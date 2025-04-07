@@ -128,7 +128,7 @@ class ValidatingTokenStorage(TokenStorage):
 
 
 def _identity_id_from_token_data(
-    token_data_by_resource_server: t.Mapping[str, TokenStorageData]
+    token_data_by_resource_server: t.Mapping[str, TokenStorageData],
 ) -> str | None:
     """
     Read token data by resource server and return the ``identity_id`` value

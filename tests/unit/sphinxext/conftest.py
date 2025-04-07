@@ -196,7 +196,6 @@ def register_temporary_directive():
     registered_names = []
 
     def func(name, directive):
-        nonlocal registered_names
         registered_names.append(name)
         register_directive(name, directive)
 

@@ -20,7 +20,7 @@ _sync_level_dict: dict[t.Literal["exists", "size", "mtime", "checksum"], int] = 
 
 
 def _parse_sync_level(
-    sync_level: t.Literal["exists", "size", "mtime", "checksum"] | int
+    sync_level: t.Literal["exists", "size", "mtime", "checksum"] | int,
 ) -> int:
     """
     Map sync_level strings to known int values
