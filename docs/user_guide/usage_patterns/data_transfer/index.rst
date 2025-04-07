@@ -17,5 +17,6 @@ Timers is covered.
 
     submit_transfer/index
     scheduled_transfers/index
+    detecting_data_access/index
     create_guest_collection/index
     transfer_relative_deadline/index
