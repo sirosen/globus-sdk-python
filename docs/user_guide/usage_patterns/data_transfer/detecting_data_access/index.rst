@@ -49,7 +49,7 @@ the service:
 
 .. caution::
 
-    Careful readers may note that we the :meth:`TransferClient.get_endpoint`
+    Careful readers may note that we use the :meth:`TransferClient.get_endpoint`
     method to lookup a collection.
 
     The Transfer service contains both Endpoints and Collections, and for
@@ -103,8 +103,8 @@ Here's a definition of such a helper which is broadly applicable:
         """
         Use the provided `transfer_client` to lookup a collection by ID.
 
-        Based on the record, return `True` if it uses a `data_access` scope and `False`
-        otherwise.
+        Return `True` if the collection uses a `data_access` scope
+        and `False` otherwise.
         """
         doc = transfer_client.get_endpoint(collection_id)
         if doc["entity_type"] != "GCSv5_mapped_collection":
