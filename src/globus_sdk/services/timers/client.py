@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 class TimersClient(client.BaseClient):
     r"""
-    Client for the Globus Timer API.
+    Client for the Globus Timers API.
 
     .. sdk-sphinx-copy-params:: BaseClient
 

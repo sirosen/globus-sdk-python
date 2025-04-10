@@ -1,4 +1,4 @@
-Globus Timer
+Globus Timers
 =============
 
 .. currentmodule:: globus_sdk
