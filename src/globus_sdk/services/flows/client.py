@@ -10,6 +10,7 @@ from globus_sdk.globus_app import GlobusApp
 from globus_sdk.scopes import FlowsScopes, Scope, ScopeBuilder, SpecificFlowScopeBuilder
 from globus_sdk.utils import MISSING, MissingType
 
+from .data import RunActivityNotificationPolicy
 from .errors import FlowsAPIError
 from .response import (
     IterableFlowsResponse,
@@ -934,6 +935,9 @@ class SpecificFlowClient(client.BaseClient):
         *,
         label: str | None = None,
         tags: list[str] | None = None,
+        activity_notification_policy: (
+            dict[str, t.Any] | RunActivityNotificationPolicy | None
+        ) = None,
         run_monitors: list[str] | None = None,
         run_managers: list[str] | None = None,
         additional_fields: dict[str, t.Any] | None = None,
@@ -945,6 +949,9 @@ class SpecificFlowClient(client.BaseClient):
         :param tags: A collection of searchable tags associated with the run. Tags are
             normalized by stripping leading and trailing whitespace, and replacing all
             whitespace with a single space.
+        :param activity_notification_policy: A policy document which declares when the
+            run will send notification emails. By default, notifications are only sent
+            when a run status changes to ``"INACTIVE"``.
         :param run_monitors: A list of authenticated entities (identified by URN)
             authorized to view this run in addition to the run owner
         :param run_managers: A list of authenticated entities (identified by URN)
@@ -966,6 +973,7 @@ class SpecificFlowClient(client.BaseClient):
                 "body": body,
                 "tags": tags,
                 "label": label,
+                "activity_notification_policy": activity_notification_policy,
                 "run_monitors": run_monitors,
                 "run_managers": run_managers,
             }.items()
