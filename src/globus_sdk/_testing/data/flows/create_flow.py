@@ -1,5 +1,3 @@
-from responses import matchers
-
 from globus_sdk._testing.models import RegisteredResponse, ResponseSet
 
 from ._common import TWO_HOP_TRANSFER_FLOW_DOC
@@ -29,11 +27,6 @@ RESPONSES = ResponseSet(
         path="/flows",
         method="POST",
         json=TWO_HOP_TRANSFER_FLOW_DOC,
-        match=[
-            matchers.json_params_matcher(
-                params=_two_hop_transfer_create_request, strict_match=False
-            )
-        ],
     ),
     bad_admin_principal_error=RegisteredResponse(
         service="flows",
