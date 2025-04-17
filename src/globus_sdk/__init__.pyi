@@ -55,6 +55,7 @@ from .services.flows import (
     FlowsAPIError,
     FlowsClient,
     IterableFlowsResponse,
+    RunActivityNotificationPolicy,
     SpecificFlowClient,
 )
 from .services.gcs import (
@@ -184,6 +185,7 @@ __all__ = (
     "FlowsAPIError",
     "FlowsClient",
     "IterableFlowsResponse",
+    "RunActivityNotificationPolicy",
     "SpecificFlowClient",
     "ActiveScaleStoragePolicies",
     "AzureBlobStoragePolicies",

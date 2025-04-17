@@ -57,6 +57,18 @@ When an error occurs, a :class:`FlowsClient` will raise a ``FlowsAPIError``.
    :members:
    :show-inheritance:
 
+Helper Objects
+--------------
+
+``RunActivityNotificationPolicy`` objects encode the data for
+``activity_notification_policy`` when ``run_flow`` is called. Using the helper
+object allows you to have typing-time validation of your data when calling this
+API.
+
+.. autoclass:: RunActivityNotificationPolicy
+   :members:
+   :show-inheritance:
+
 Responses
 ---------
 

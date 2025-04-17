@@ -20,6 +20,15 @@ RESPONSES = ResponseSet(
         json=TWO_HOP_TRANSFER_RUN,
         match=[matchers.json_params_matcher(params=_request_params)],
     ),
+    # 'lenient' is the same as the 'default' above, but without requiring
+    # payload matching, which makes it more usable for a wide variety of tests
+    # TODO: revisit which of the fixtures should have which param matchers
+    lenient=RegisteredResponse(
+        service="flows",
+        method="POST",
+        path=f"/flows/{TWO_HOP_TRANSFER_FLOW_ID}/run",
+        json=TWO_HOP_TRANSFER_RUN,
+    ),
     missing_scope_error=RegisteredResponse(
         service="flows",
         method="POST",
