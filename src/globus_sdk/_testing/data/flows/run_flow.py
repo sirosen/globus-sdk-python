@@ -1,5 +1,3 @@
-from responses import matchers
-
 from globus_sdk._testing.models import RegisteredResponse, ResponseSet
 
 from ._common import TWO_HOP_TRANSFER_FLOW_ID, TWO_HOP_TRANSFER_RUN
@@ -14,16 +12,6 @@ _request_params = {
 RESPONSES = ResponseSet(
     metadata={"flow_id": TWO_HOP_TRANSFER_FLOW_ID, "request_params": _request_params},
     default=RegisteredResponse(
-        service="flows",
-        method="POST",
-        path=f"/flows/{TWO_HOP_TRANSFER_FLOW_ID}/run",
-        json=TWO_HOP_TRANSFER_RUN,
-        match=[matchers.json_params_matcher(params=_request_params)],
-    ),
-    # 'lenient' is the same as the 'default' above, but without requiring
-    # payload matching, which makes it more usable for a wide variety of tests
-    # TODO: revisit which of the fixtures should have which param matchers
-    lenient=RegisteredResponse(
         service="flows",
         method="POST",
         path=f"/flows/{TWO_HOP_TRANSFER_FLOW_ID}/run",

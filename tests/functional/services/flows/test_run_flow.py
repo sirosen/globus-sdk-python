@@ -39,7 +39,7 @@ def test_run_flow_missing_scope(specific_flow_client_class: type[SpecificFlowCli
 def test_run_flow_without_activity_notification_policy(
     specific_flow_client_class,
 ):
-    metadata = load_response(SpecificFlowClient.run_flow, case="lenient").metadata
+    metadata = load_response(SpecificFlowClient.run_flow).metadata
     flow_client = specific_flow_client_class(flow_id=metadata["flow_id"])
     resp = flow_client.run_flow({})
     assert resp.http_status == 200
@@ -52,7 +52,7 @@ def test_run_flow_without_activity_notification_policy(
 def test_run_flow_with_empty_activity_notification_policy(
     specific_flow_client_class,
 ):
-    metadata = load_response(SpecificFlowClient.run_flow, case="lenient").metadata
+    metadata = load_response(SpecificFlowClient.run_flow).metadata
     flow_client = specific_flow_client_class(flow_id=metadata["flow_id"])
 
     policy = globus_sdk.RunActivityNotificationPolicy()
@@ -67,7 +67,7 @@ def test_run_flow_with_empty_activity_notification_policy(
 def test_run_flow_with_activity_notification_policy(
     specific_flow_client_class,
 ):
-    metadata = load_response(SpecificFlowClient.run_flow, case="lenient").metadata
+    metadata = load_response(SpecificFlowClient.run_flow).metadata
     flow_client = specific_flow_client_class(flow_id=metadata["flow_id"])
 
     policy = globus_sdk.RunActivityNotificationPolicy(status=["FAILED", "INACTIVE"])
