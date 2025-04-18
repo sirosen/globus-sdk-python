@@ -12,6 +12,34 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.55.0:
+
+v3.55.0 (2025-04-18)
+--------------------
+
+Added
+~~~~~
+
+- ``FlowsClient.create_flow`` and ``FlowsClient.update_flow`` now support ``run_managers``
+  and ``run_monitors``. (:pr:`1164`)
+
+- ``SpecificFlowClient.run_flow()`` now supports ``activity_notification_policy``
+  as an argument, allowing users to select when their run will notify them. A
+  new helper, ``RunActivityNotificationPolicy``, makes construction of valid
+  policies easier. (:pr:`1167`)
+
+Changed
+~~~~~~~
+
+- The initialization of a client with a ``GlobusApp`` has been improved and is
+  now available under the public ``attach_globus_app`` method on client
+  classes. Attaching an app is only valid for clients which were initialized
+  without an app or authorizer. (:pr:`1137`)
+
+- When a ``GlobusApp`` is used with a client, that client's ``app_scopes``
+  attribute will now always be populated with the scopes that it passed back to
+  the app. (:pr:`1137`)
+
 .. _changelog-3.54.0:
 
 v3.54.0 (2025-04-02)
