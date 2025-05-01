@@ -1,4 +1,5 @@
 import pathlib
+from unittest import mock
 
 import pytest
 
@@ -108,3 +109,12 @@ def test_double_clear_of_client_info_is_allowed():
     transport.globus_client_info.clear()
     transport.globus_client_info.clear()
     assert "X-Globus-Client-Info" not in transport.headers
+
+
+def test_transport_close_closes_session():
+    # there's no easy way to check if a real requests.Session object is closed,
+    # so just check that `close()` was called
+    transport = RequestsTransport()
+    with mock.patch.object(transport, "session") as mocked_session:
+        transport.close()
+        mocked_session.close.assert_called_once_with()
