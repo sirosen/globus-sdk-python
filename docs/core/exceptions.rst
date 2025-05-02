@@ -21,9 +21,8 @@ You can therefore capture *all* errors thrown by the SDK by looking for
         raise
 
 In most cases, it's best to look for specific subclasses of ``GlobusError``.
-For example, to write code which is distinguishes between network failures and
-unexpected API conditions, you'll want to look for ``NetworkError`` and
-``GlobusAPIError``
+For example, to write code that distinguishes between network failures and
+unexpected API conditions, use ``NetworkError`` and ``GlobusAPIError``
 
 .. code-block:: python
 
@@ -47,7 +46,7 @@ unexpected API conditions, you'll want to look for ``NetworkError`` and
             f"Error Code: {e.code}\n"
             f"Error Message: {e.message}"
         )
-        raise e
+        raise
     except NetworkError:
         logging.error("Network Failure. Possibly a firewall or connectivity issue")
         raise
