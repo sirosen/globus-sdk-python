@@ -2,6 +2,7 @@ import urllib.parse
 
 import pytest
 
+from globus_sdk import GlobusSDKUsageError, RemovedInV4Warning
 from globus_sdk._testing import get_last_request, load_response
 
 
@@ -19,7 +20,15 @@ def test_list_flows_simple(flows_client, filter_fulltext, filter_role, orderby):
     if orderby:
         add_kwargs["orderby"] = orderby
 
-    res = flows_client.list_flows(**add_kwargs)
+    if filter_role:
+        with pytest.warns(
+            RemovedInV4Warning,
+            match=r"The `filter_role` parameter is deprecated.*",
+        ):
+            res = flows_client.list_flows(**add_kwargs)
+    else:
+        res = flows_client.list_flows(**add_kwargs)
+
     assert res.http_status == 200
     # dict-like indexing
     assert meta["first_flow_id"] == res["flows"][0]["id"]
@@ -109,3 +118,68 @@ def test_list_flows_orderby_multi(flows_client, orderby_style, orderby_value):
         assert set(parsed_qs["orderby"]) == expected_orderby_value
     else:
         assert parsed_qs["orderby"] == expected_orderby_value
+
+
+@pytest.mark.parametrize(
+    "filter_role, filter_roles",
+    [
+        # empty string values
+        ("", ""),
+        ("", []),
+        ("", [""]),
+        # single string values
+        ("bar", "baz"),
+        # list values
+        ("bar", ["baz"]),
+        ("bar", ["baz", "qux"]),
+        # comma-separated string
+        ("bar", "baz,qux"),
+        # empty list
+        ("bar", []),
+        # list containing empty string
+        ("bar", [""]),
+        # list containing multiple empty strings
+        ("bar", ["", ""]),
+        # list containing mixed values
+        ("bar", ["baz", "", "qux"]),
+    ],
+)
+def test_list_flows_mutually_exclusive_roles(flows_client, filter_role, filter_roles):
+    with pytest.raises(GlobusSDKUsageError), pytest.warns(RemovedInV4Warning):
+        flows_client.list_flows(filter_role=filter_role, filter_roles=filter_roles)
+
+
+@pytest.mark.parametrize(
+    "filter_roles, expected_filter_roles",
+    [
+        # empty list, list with empty string, and None do not send the param
+        ([], None),
+        ([""], None),
+        (None, None),
+        # single role as string
+        ("foo", ["foo"]),
+        # single role as list
+        (["foo"], ["foo"]),
+        # multiple roles as comma-separated string
+        ("foo,bar", ["foo,bar"]),
+        # multiple roles as list
+        (["foo", "bar"], ["foo,bar"]),
+    ],
+)
+def test_list_flows_with_filter_roles_parameter(
+    flows_client, filter_roles, expected_filter_roles
+):
+    load_response(flows_client.list_flows).metadata
+
+    res = flows_client.list_flows(filter_roles=filter_roles)
+    assert res.http_status == 200
+
+    req = get_last_request()
+    assert req.body is None
+    parsed_qs = urllib.parse.parse_qs(urllib.parse.urlparse(req.url).query)
+
+    # Only check filter_roles in parsed_qs if we expect a non-empty value
+    if expected_filter_roles:
+        assert parsed_qs["filter_roles"] == expected_filter_roles
+    else:
+        assert "filter_roles" not in parsed_qs
