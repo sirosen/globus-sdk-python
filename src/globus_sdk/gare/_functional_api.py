@@ -82,13 +82,11 @@ def to_gares(errors: list[AnyErrorDocumentType]) -> list[GARE]:
 
     :param errors: The errors to convert.
     """
-    from globus_sdk.exc import GlobusAPIError
-
     maybe_gares: list[GARE | None] = []
     for error in errors:
         # when handling an API error, avoid `to_gare(error)` because that will
         # only unpack a single result
-        if isinstance(error, GlobusAPIError):
+        if isinstance(error, exc.GlobusAPIError):
             # Use the ErrorSubdocuments when handling API error types
             maybe_gares.extend(to_gare(e) for e in error.errors)
             # Also use the root document, but only if there is an `"errors"`
