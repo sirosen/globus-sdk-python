@@ -152,18 +152,22 @@ def test_list_flows_mutually_exclusive_roles(flows_client, filter_role, filter_r
 @pytest.mark.parametrize(
     "filter_roles, expected_filter_roles",
     [
-        # empty list, list with empty string, and None do not send the param
+        # empty list/tuple, list/tuple with empty string, and None do not send the param
+        ((), None),
         ([], None),
         ([""], None),
+        (("",), None),
         (None, None),
         # single role as string
         ("foo", ["foo"]),
-        # single role as list
+        # single role as list/tuple
         (["foo"], ["foo"]),
+        (("foo",), ["foo"]),
         # multiple roles as comma-separated string
         ("foo,bar", ["foo,bar"]),
-        # multiple roles as list
+        # multiple roles as list/tuple
         (["foo", "bar"], ["foo,bar"]),
+        (("foo", "bar"), ["foo,bar"]),
     ],
 )
 def test_list_flows_with_filter_roles_parameter(

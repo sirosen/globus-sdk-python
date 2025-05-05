@@ -238,7 +238,7 @@ class FlowsClient(client.BaseClient):
         self,
         *,
         filter_role: str | None = None,
-        filter_roles: str | list[str] | None = None,
+        filter_roles: str | t.Iterable[str] | None = None,
         filter_fulltext: str | None = None,
         orderby: str | t.Iterable[str] | None = None,
         marker: str | None = None,
@@ -619,7 +619,7 @@ class FlowsClient(client.BaseClient):
         self,
         *,
         filter_flow_id: t.Iterable[UUIDLike] | UUIDLike | None = None,
-        filter_roles: str | list[str] | None = None,
+        filter_roles: str | t.Iterable[str] | None = None,
         marker: str | None = None,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableRunsResponse:
