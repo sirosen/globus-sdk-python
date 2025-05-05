@@ -12,6 +12,43 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.56.0:
+
+v3.56.0 (2025-05-05)
+--------------------
+
+Added
+~~~~~
+
+- Transport objects now provide a ``close()`` method for closing resources which
+  belong to them, primarily the underlying session. (:pr:`1171`)
+
+- Add ``activity_notification_policy`` to GuestCollectionDocument,
+  associating it with GCS collection document version 1.14.0. (:pr:`1172`)
+
+- ``FlowsClient.list_flows`` and ``FlowsClient.list_runs`` now support the
+  ``filter_roles`` parameter to filter results by one or more roles. (:pr:`1174`)
+
+- ``AuthLoginClient`` now supports a ``session_message`` when constructing an
+  OAuth2 authorization URL. (:pr:`1179`)
+
+- ``LoginFlowManager`` will now use a ``session_message`` present in the
+  supplied ``GlobusAuthorizationParameters`` as part of the login flow. (:pr:`1179`)
+
+Changed
+~~~~~~~
+
+- When parsing GAREs using ``to_gare`` and ``to_gares``, the root document is
+  now considered a possible location for a GARE when subdocument errors are
+  present on a ``GlobusAPIError`` object. Previously, the root document would
+  only be considered in the absence of subdocument errors. (:pr:`1173`)
+
+Deprecated
+~~~~~~~~~~
+
+- ``filter_role`` parameter for ``FlowsClient.list_flows`` is deprecated. Use
+  ``filter_roles`` instead. (:pr:`1174`)
+
 .. _changelog-3.55.0:
 
 v3.55.0 (2025-04-18)
