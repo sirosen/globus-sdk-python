@@ -143,7 +143,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
     def oauth2_start_flow(
         self,
         redirect_uri: str,
-        requested_scopes: ScopeCollectionType | None = None,
+        requested_scopes: ScopeCollectionType,
         *,
         state: str = "_default",
         refresh_tokens: bool = False,

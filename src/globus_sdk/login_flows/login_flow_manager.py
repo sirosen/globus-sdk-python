@@ -70,6 +70,12 @@ class LoginFlowManager(metaclass=abc.ABCMeta):
         """
         login_client = self.login_client
         requested_scopes = auth_parameters.required_scopes
+        if not requested_scopes:
+            raise globus_sdk.GlobusSDKUsageError(
+                f"{type(self).__name__} cannot start a login flow without scopes "
+                "in the authorization parameters."
+            )
+
         # Native and Confidential App clients have different signatures for this method,
         # so they must be type checked & called independently.
         if isinstance(login_client, globus_sdk.NativeAppAuthClient):

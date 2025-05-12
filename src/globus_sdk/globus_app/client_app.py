@@ -117,6 +117,10 @@ class ClientApp(GlobusApp):
             only the required_scopes parameter is used.
         """
         auth_params = self._auth_params_with_required_scopes(auth_params)
+        if not auth_params.required_scopes:
+            raise GlobusSDKUsageError(
+                "A ClientApp cannot get tokens without configured required scopes."
+            )
         token_response = self._login_client.oauth2_client_credentials_tokens(
             requested_scopes=auth_params.required_scopes
         )
