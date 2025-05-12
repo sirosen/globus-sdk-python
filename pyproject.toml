@@ -156,6 +156,7 @@ entry_title_template = 'v{{ version }} ({{ date.strftime("%Y-%m-%d") }})'
 rst_header_chars = "-~"
 categories = [
     "Python Support",
+    "Breaking Changes",
     "Added",
     "Removed",
     "Changed",
