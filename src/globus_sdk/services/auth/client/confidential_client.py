@@ -107,8 +107,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         )
 
     def oauth2_client_credentials_tokens(
-        self,
-        requested_scopes: ScopeCollectionType | None = None,
+        self, requested_scopes: ScopeCollectionType
     ) -> OAuthClientCredentialsResponse:
         r"""
         Perform an OAuth2 Client Credentials Grant to get access tokens which
@@ -117,20 +116,25 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         This method does not use a ``GlobusOAuthFlowManager`` because it is not
         at all necessary to do so.
 
-        :param requested_scopes: The scopes on the token(s) being requested. Defaults to
-            ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
+        :param requested_scopes: The scopes on the token(s) being requested.
 
         For example, with a Client ID of "CID1001" and a Client Secret of
         "RAND2002", you could use this grant type like so:
 
-        >>> client = ConfidentialAppAuthClient("CID1001", "RAND2002")
-        >>> tokens = client.oauth2_client_credentials_tokens()
-        >>> transfer_token_info = (
-        ...     tokens.by_resource_server["transfer.api.globus.org"])
-        >>> transfer_token = transfer_token_info["access_token"]
-        """
-        log.debug("Fetching token(s) using client credentials")
+        .. code-block:: pycon
+
+            >>> client = ConfidentialAppAuthClient("CID1001", "RAND2002")
+            >>> tokens = client.oauth2_client_credentials_tokens(
+            ...     "urn:globus:auth:scope:transfer.api.globus.org:all"
+            ... )
+            >>> transfer_token_info = tokens.by_resource_server["transfer.api.globus.org"]
+            >>> transfer_token = transfer_token_info["access_token"]
+        """  # noqa: E501
         requested_scopes_string = stringify_requested_scopes(requested_scopes)
+        log.debug(
+            "Fetching token(s) using client credentials, "
+            f"scope={requested_scopes_string}"
+        )
         return self.oauth2_token(
             {"grant_type": "client_credentials", "scope": requested_scopes_string},
             response_class=OAuthClientCredentialsResponse,

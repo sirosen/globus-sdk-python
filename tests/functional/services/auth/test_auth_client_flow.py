@@ -180,12 +180,10 @@ def test_oauth2_get_authorize_url_supports_session_params(
 
 
 def test_oauth2_get_authorize_url_native_defaults(native_client):
-    # default parameters for starting auth flow
-    # should warn because scopes were not specified
-    with pytest.warns(globus_sdk.RemovedInV4Warning):
-        flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(
-            native_client
-        )
+    flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(
+        native_client,
+        TransferScopes.all,
+    )
     native_client.current_oauth2_flow_manager = flow_manager
 
     # get url and validate results
@@ -197,7 +195,7 @@ def test_oauth2_get_authorize_url_native_defaults(native_client):
     assert parsed_params == {
         "client_id": [native_client.client_id],
         "redirect_uri": [native_client.base_url + "v2/web/auth-code"],
-        "scope": [f"openid profile email {TransferScopes.all}"],
+        "scope": [TransferScopes.all],
         "state": ["_default"],
         "response_type": ["code"],
         "code_challenge": [flow_manager.challenge],
@@ -238,12 +236,9 @@ def test_oauth2_get_authorize_url_native_custom_params(native_client):
 
 
 def test_oauth2_get_authorize_url_confidential_defaults(confidential_client):
-    # default parameters for starting auth flow
-    # warns because no requested_scopes was passed
-    with pytest.warns(globus_sdk.RemovedInV4Warning):
-        flow_manager = globus_sdk.services.auth.GlobusAuthorizationCodeFlowManager(
-            confidential_client, "uri"
-        )
+    flow_manager = globus_sdk.services.auth.GlobusAuthorizationCodeFlowManager(
+        confidential_client, "uri", TransferScopes.all
+    )
     confidential_client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
@@ -255,7 +250,7 @@ def test_oauth2_get_authorize_url_confidential_defaults(confidential_client):
     assert parsed_params == {
         "client_id": [confidential_client.client_id],
         "redirect_uri": ["uri"],
-        "scope": [f"openid profile email {TransferScopes.all}"],
+        "scope": [TransferScopes.all],
         "state": ["_default"],
         "response_type": ["code"],
         "access_type": ["online"],

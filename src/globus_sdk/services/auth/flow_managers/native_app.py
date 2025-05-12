@@ -80,8 +80,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
     :param auth_client: The client object on which this flow is based.
         It is used to extract default values for the flow, and also to make calls to the
         Auth service.
-    :param requested_scopes: The scopes on the token(s) being requested. Defaults to
-        ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
+    :param requested_scopes: The scopes on the token(s) being requested.
     :param redirect_uri: The page that users should be directed to after authenticating
         at the authorize URL. Defaults to 'https://auth.globus.org/v2/web/auth-code',
         which displays the resulting ``auth_code`` for users to copy-paste back into
@@ -101,7 +100,7 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
     def __init__(
         self,
         auth_client: globus_sdk.NativeAppAuthClient,
-        requested_scopes: ScopeCollectionType | None = None,
+        requested_scopes: ScopeCollectionType,
         redirect_uri: str | None = None,
         state: str = "_default",
         verifier: str | None = None,
@@ -123,7 +122,6 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
             )
 
         # convert scopes iterable to string immediately on load
-        # and default to the default requested scopes
         self.requested_scopes = stringify_requested_scopes(requested_scopes)
 
         # default to `/v2/web/auth-code` on whatever environment we're looking
