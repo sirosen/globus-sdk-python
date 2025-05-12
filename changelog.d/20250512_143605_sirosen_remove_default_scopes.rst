@@ -1,5 +1,5 @@
-Removed
-~~~~~~~
+Breaking Changes
+~~~~~~~~~~~~~~~~
 
 - The SDK no longer sets default scopes for direct use of client
   credentials and auth client login flow methods. Users should either use
