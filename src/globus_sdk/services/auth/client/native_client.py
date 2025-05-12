@@ -50,7 +50,7 @@ class NativeAppAuthClient(AuthLoginClient):
 
     def oauth2_start_flow(
         self,
-        requested_scopes: ScopeCollectionType | None = None,
+        requested_scopes: ScopeCollectionType,
         *,
         redirect_uri: str | None = None,
         state: str = "_default",

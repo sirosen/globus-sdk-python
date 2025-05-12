@@ -36,8 +36,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         and also to make calls to the Auth service.
     :param redirect_uri: The page that users should be directed to after authenticating
         at the authorize URL.
-    :param requested_scopes: The scopes on the token(s) being requested. Defaults to
-        ``openid profile email urn:globus:auth:scope:transfer.api.globus.org:all``
+    :param requested_scopes: The scopes on the token(s) being requested.
     :param state: This string allows an application to pass information back to itself
         in the course of the OAuth flow. Because the user will navigate away from the
         application to complete the flow, this parameter lets the app pass an arbitrary
@@ -50,7 +49,7 @@ class GlobusAuthorizationCodeFlowManager(GlobusOAuthFlowManager):
         self,
         auth_client: globus_sdk.ConfidentialAppAuthClient,
         redirect_uri: str,
-        requested_scopes: ScopeCollectionType | None = None,
+        requested_scopes: ScopeCollectionType,
         state: str = "_default",
         refresh_tokens: bool = False,
     ) -> None:

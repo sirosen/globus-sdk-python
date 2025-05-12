@@ -42,6 +42,42 @@ Then, code can dispatch with
     else:
         pass  # do another
 
+From 3.x to 4.0
+---------------
+
+``requested_scopes`` is Required
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Several methods have historically taken an optional parameter,
+``requested_scopes``.
+
+- ``ConfidentialAppAuthClient.oauth2_client_credentials_tokens``
+- ``ConfidentialAppAuthClient.oauth2_start_flow``
+- ``NativeAppAuthClient.oauth2_start_flow``
+
+In previous versions of the SDK, these methods provided a default value for
+``requested_scopes`` of
+``"openid profile email urn:globus:auth:scopes:transfer.api.globus.org:all"``.
+This default has now been removed and users should always specify the scopes
+they need when using these methods.
+
+Users of ``GlobusApp`` constructs (``UserApp`` and ``ClientApp``) do not need
+to update their usage.
+
+The default could only be used by applications which only use Globus Transfer
+and Globus Auth.
+Change:
+
+.. code-block:: python
+
+    # globus-sdk v3
+    auth_client.oauth2_start_flow()
+    authorize_url = auth_client.oauth2_get_authorize_url()
+
+    # globus-sdk v4
+    auth_client.oauth2_start_flow(requested_scopes=globus_sdk.TransferClient.scopes.all)
+    authorize_url = auth_client.oauth2_get_authorize_url()
+
 From 1.x or 2.x to 3.0
 -----------------------
 
