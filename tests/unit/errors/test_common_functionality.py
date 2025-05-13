@@ -86,13 +86,13 @@ def test_imperative_message_setting_warns():
 @pytest.mark.parametrize(
     "body, response_headers, http_status, expect_code, expect_message",
     (
-        ("text_data", {}, 401, "Error", "Unauthorized"),  # text
+        ("text_data", {}, 401, None, "Unauthorized"),  # text
         # JSON with unrecognized contents
         (
             {"foo": "bar"},
             {"Content-Type": "application/json"},
             403,
-            "Error",
+            None,
             "Forbidden",
         ),
         # JSON with well-known contents
@@ -108,7 +108,7 @@ def test_imperative_message_setting_warns():
             "[]",
             {"Content-Type": "application/json"},
             403,
-            "Error",
+            None,
             "Forbidden",
         ),
         # invalid JSON
@@ -116,7 +116,7 @@ def test_imperative_message_setting_warns():
             "{",
             {"Content-Type": "application/json"},
             400,
-            "Error",
+            None,
             "Bad Request",
         ),
     ),
@@ -544,7 +544,8 @@ def test_error_repr_has_expected_info(
     if error_code is not None:
         assert error_code in stringified
     else:
-        assert "'Error'" in stringified
+        # several things could be 'None', but at least one of them is 'code'
+        assert "None" in stringified
     if error_message is None:
         assert "otherdata" in stringified
     else:
@@ -584,16 +585,10 @@ def test_loads_jsonapi_error_subdocuments(content_type):
     )
 
     # code is not taken from any of the subdocuments (inherently too ambiguous)
-    # behavior will depend on which parsing path was taken
-    if content_type.endswith("vnd.api+json"):
-        # code becomes None because we saw "true" JSON:API and can opt-in to
-        # better behavior
-        assert err.code is None
-    else:
-        # code remains 'Error' for backwards compatibility in the non-JSON:API case
-        assert err.code == "Error"
+    # this holds regardless of which parsing path was taken
+    assert err.code is None
 
-    # but messages can be extracted, and they prefer detail to title
+    # messages can be extracted, and they prefer detail to title
     assert err.messages == [
         "password was only 3 chars long, must be at least 8",
         "password must have non-alphanumeric characters",
@@ -649,22 +644,19 @@ def test_loads_jsonapi_error_messages_from_various_fields(content_type):
         body=body, http_status=422, response_headers={"Content-Type": content_type}
     )
 
+    # no code was found
+    assert err.code is None
+
     # messages are extracted, and they use whichever field is appropriate for
     # each sub-error
     # note that 'message' will *not* be extracted if the Content-Type indicated JSON:API
     # because JSON:API does not define such a field
     if content_type.endswith("vnd.api+json"):
-        # code becomes None because we saw "true" JSON:API and can opt-in to
-        # better behavior
-        assert err.code is None
         assert err.messages == [
             "Must contain capital letter",
             "password must have non-alphanumeric characters",
         ]
     else:
-        # code remains 'Error' for backwards compatibility in the non-JSON:API case
-        assert err.code == "Error"
-
         assert err.messages == [
             "invalid password value",
             "Must contain capital letter",
