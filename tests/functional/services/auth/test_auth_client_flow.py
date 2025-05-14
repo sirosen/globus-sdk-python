@@ -299,7 +299,7 @@ def test_oauth2_exchange_code_for_tokens_native(native_client):
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
         native_client.oauth2_exchange_code_for_tokens("invalid_code")
     assert excinfo.value.http_status == 401
-    assert excinfo.value.code == "Error"
+    assert excinfo.value.code is None
 
 
 def test_oauth2_exchange_code_for_tokens_confidential(confidential_client):
@@ -319,4 +319,4 @@ def test_oauth2_exchange_code_for_tokens_confidential(confidential_client):
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
         confidential_client.oauth2_exchange_code_for_tokens("invalid_code")
     assert excinfo.value.http_status == 401
-    assert excinfo.value.code == "Error"
+    assert excinfo.value.code is None

@@ -29,7 +29,7 @@ class GlobusAPIError(GlobusError):
     Wraps errors returned by a REST API.
 
     :ivar int http_status: HTTP status code
-    :ivar str code: Error code from the API or "Error" for unclassified errors
+    :ivar str code: Error code from the API or ``None`` for unclassified errors
     :ivar str request_id: The 'request_id' included in the error data, if any.
     :ivar list[str] messages: A list of error messages, extracted from the response
         data. If the data cannot be parsed or does not contain any clear message fields,
@@ -46,7 +46,7 @@ class GlobusAPIError(GlobusError):
 
         self.http_status = r.status_code
         # defaults, may be rewritten during parsing
-        self.code: str | None = "Error"
+        self.code: str | None = None
         self.request_id: str | None = None
         self.messages: list[str] = []
         self.errors: list[ErrorSubdocument] = []

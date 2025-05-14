@@ -39,5 +39,5 @@ def test_timer_error_load_nested():
 
 def test_timer_error_load_unrecognized_format():
     err = construct_error(error_class=TimersAPIError, body={}, http_status=400)
-    assert err.code == "Error"
+    assert err.code is None
     assert err.message is None
