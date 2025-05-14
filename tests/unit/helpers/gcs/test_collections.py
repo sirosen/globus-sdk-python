@@ -1,4 +1,5 @@
 import inspect
+import typing as t
 import uuid
 
 import pytest
@@ -12,6 +13,7 @@ from globus_sdk import (
     POSIXStagingCollectionPolicies,
 )
 from globus_sdk.transport import JSONRequestEncoder
+from globus_sdk.utils import MISSING, MissingType, UUIDLike, filter_missing
 
 STUB_SG_ID = uuid.uuid1()  # storage gateway
 STUB_MC_ID = uuid.uuid1()  # mapped collection
@@ -212,18 +214,140 @@ def test_settings_which_are_only_supported_in_guest_collections(fieldname):
 @pytest.mark.parametrize(
     "fieldname",
     (
-        "allow_guest_collections",
+        "disable_verify",
+        "enable_https",
+        "force_encryption",
+        "force_verify",
+        "public",
         "delete_protected",
+        "allow_guest_collections",
         "disable_anonymous_writes",
     ),
 )
 @pytest.mark.parametrize("value", (True, False, None))
 def test_mapped_collection_opt_bool(fieldname, value):
-    doc = MappedCollectionDocument(
-        storage_gateway_id=STUB_SG_ID, collection_base_path="/", **{fieldname: value}
+    data = {}
+    if value is not None:
+        data[fieldname] = value
+
+    doc = filter_missing(
+        MappedCollectionDocument(
+            storage_gateway_id=STUB_SG_ID,
+            collection_base_path="/",
+            **data,
+        )
     )
     if value is not None:
         assert fieldname in doc
         assert doc[fieldname] == value
     else:
         assert fieldname not in doc
+
+
+common_collection_fields = [
+    ("collection_base_path", (str, MissingType)),
+    ("contact_email", (str, None, MissingType)),
+    ("contact_info", (str, None, MissingType)),
+    ("default_directory", (str, MissingType)),
+    ("department", (str, None, MissingType)),
+    ("description", (str, None, MissingType)),
+    ("display_name", (str, MissingType)),
+    ("identity_id", (UUIDLike, MissingType)),
+    ("info_link", (str, None, MissingType)),
+    ("organization", (str, MissingType)),
+    ("user_message", (str, None, MissingType)),
+    ("user_message_link", (str, None, MissingType)),
+    ("keywords", (t.Iterable[str], MissingType)),
+    ("disable_verify", (bool, MissingType)),
+    ("enable_https", (bool, MissingType)),
+    ("force_encryption", (bool, MissingType)),
+    ("force_verify", (bool, MissingType)),
+    ("public", (bool, MissingType)),
+]
+
+
+mapped_collection_fields = [
+    *common_collection_fields,
+    ("domain_name", (str, MissingType)),
+    ("guest_auth_policy_id", (UUIDLike, None, MissingType)),
+    ("disable_anonymous_writes", (bool, MissingType)),
+    ("policies", (t.Dict[str, t.Any], MissingType)),
+]
+
+
+guest_collection_fields = [
+    *common_collection_fields,
+    ("mapped_collection_id", (UUIDLike, MissingType)),
+    ("user_credential_id", (UUIDLike, MissingType)),
+    ("activity_notification_policy", (t.Dict[str, t.List[str]], MissingType)),
+]
+
+
+def expand_collection_fields(fields):
+    """
+    Expand each collection field into (field, valid_value)
+    """
+    return [
+        (param, value)
+        for param, types in fields
+        for _type in types
+        for value in _gen_value(_type)
+    ]
+
+
+def _gen_value(_type):
+    """
+    Return a list of valid values for type _type.
+    """
+    if _type is MissingType:
+        return [MISSING]
+    if _type is None:
+        return [None]
+    if _type is str:
+        return ["STRING"]
+    if _type is bool:
+        return [True, False]
+    if _type is UUIDLike:
+        return [str(uuid.uuid1()), uuid.uuid1()]
+    if _type is t.Iterable[str]:
+        return [[], ["a", "b", "c"]]
+    if _type is t.Dict[str, t.Any]:
+        return [{"A": 1}]
+    if _type is t.Dict[str, t.List[str]]:
+        return [{"a": ["b", "c"]}]
+
+    raise AssertionError(f"Unexpected Type: {_type}")
+
+
+@pytest.mark.parametrize(
+    "fieldname,value",
+    expand_collection_fields(mapped_collection_fields),
+)
+def test_mapped_collection_fields(fieldname, value):
+    """
+    Verify that each field in the mapped collection document can be set to a valid
+    value.
+    """
+    data = {}
+    if value != MISSING:
+        data[fieldname] = value
+
+    doc = MappedCollectionDocument(**data)
+    assert doc[fieldname] == value
+
+
+@pytest.mark.parametrize(
+    "fieldname,value",
+    expand_collection_fields(guest_collection_fields),
+)
+def test_guest_collection_fields(fieldname, value):
+    """
+    Verify that each field in the guest collection document can be set to a valid
+    value.
+    """
+    data = {}
+    if value != MISSING:
+        data[fieldname] = value
+
+    doc = GuestCollectionDocument(**data)
+    assert doc[fieldname] == value
