@@ -12,6 +12,45 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.0a1:
+
+v4.0.0a1 (2025-05-20)
+---------------------
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- The SDK no longer sets default scopes for direct use
+  of client credentials and auth client login flow methods.
+  Users should either use ``GlobusApp`` objects,
+  which can specify scopes based on the clients in use,
+  or else pass a list of scopes explicitly to
+  ``oauth2_client_credentials_tokens`` or ``oauth2_start_flow``. (:pr:`1186`)
+
+- The default ``GlobusAPIError.code`` value is now ``None``
+  when ``code`` is not supplied in the error body.
+  Previously, the default was ``"Error"``. (:pr:`1190`)
+
+- The default ``TimersAPIError.code`` value is now ``None``
+  when an error which appears to be validation-related has no ``code``.
+  Previously, the default was ``"ValidationError"``. (:pr:`1191`)
+
+- SDK client classes no longer define nor prepend a ``base_path`` attribute to paths.
+  Make sure to use the full path now when using client methods. (:pr:`1185`)
+
+- Updated MappedCollectionDoc and GuestCollectionDoc with MissingType. (:pr:`1189`)
+
+.. _changelog-3.56.1:
+
+v3.56.1 (2025-05-20)
+--------------------
+
+Fixed
+~~~~~
+
+- Fix the type annotation on ``filter_roles`` for ``FlowsClient``
+  to allow non-list iterables. (:pr:`1184`)
+
 .. _changelog-3.56.0:
 
 v3.56.0 (2025-05-05)
