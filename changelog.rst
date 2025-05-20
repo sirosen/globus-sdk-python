@@ -21,7 +21,7 @@ Fixed
 ~~~~~
 
 - Fix the type annotation on ``filter_roles`` for ``FlowsClient``
-  to allow non-list iterables. (:pr:`1184`)
+  to allow non-list iterables. (:pr:`1183`)
 
 .. _changelog-3.56.0:
 
