@@ -25,10 +25,10 @@ the globus-sdk at the same time, consider adding this snippet:
 
 .. code-block:: python
 
-    import globus_sdk
+    import importlib.metadata
 
-    GLOBUS_SDK_VERSION = tuple(globus_sdk.__version__.split("."))
-    GLOBUS_SDK_MAJOR_VERSION = int(GLOBUS_SDK_VERSION[0])
+    GLOBUS_SDK_VERSION = importlib.metadata.distribution("globus_sdk").version
+    GLOBUS_SDK_MAJOR_VERSION = int(GLOBUS_SDK_VERSION.split(".")[0])
 
 This will parse the Globus SDK version information into a tuple and grab the
 first element (the major version number) as an integer.

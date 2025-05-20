@@ -9,14 +9,13 @@ import typing as t
 
 import requests
 
-from globus_sdk import config, exc, utils
+from globus_sdk import __version__, config, exc, utils
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.transport.encoders import (
     FormRequestEncoder,
     JSONRequestEncoder,
     RequestEncoder,
 )
-from globus_sdk.version import __version__
 
 from ._clientinfo import GlobusClientInfo
 from .retry import (

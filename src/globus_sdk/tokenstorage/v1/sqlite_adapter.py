@@ -6,7 +6,7 @@ import sqlite3
 import typing as t
 
 import globus_sdk
-from globus_sdk.version import __version__
+from globus_sdk import __version__
 
 from .base import FileAdapter
 
