@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "globus-sdk"
+version = "4.0.0a1"
 authors = [
     { name = "Globus Team", email = "support@globus.org" },
 ]
@@ -36,7 +37,6 @@ dependencies = [
     # python versions older than 3.9 don't have importlib.resources
     'importlib_resources>=5.12.0; python_version<"3.9"',
 ]
-dynamic = ["version"]
 
 [project.readme]
 file = "README.rst"
@@ -100,9 +100,6 @@ globus_sdk = [
 ]
 "globus_sdk.login_flows.local_server_login_flow_manager.html_files" = ["*.html"]
 
-[tool.setuptools.dynamic.version]
-attr = "globus_sdk.__version__"
-
 # non-packaging tool configs follow
 
 [tool.pytest.ini_options]
@@ -149,7 +146,7 @@ exclude_lines =[
 ]
 
 [tool.scriv]
-version = "literal: src/globus_sdk/version.py: __version__"
+version = "literal: pyproject.toml: project.version"
 format = "rst"
 output_file = "changelog.rst"
 entry_title_template = 'v{{ version }} ({{ date.strftime("%Y-%m-%d") }})'

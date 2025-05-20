@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=$(grep '^__version__' src/globus_sdk/version.py | cut -d '"' -f2)
+VERSION=$(grep '^version' pyproject.toml | head -n 1 | cut -d '"' -f2)
 
 case "$READTHEDOCS_VERSION_TYPE" in
     external)

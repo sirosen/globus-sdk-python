@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import typing as t
 
-from globus_sdk.version import __version__
+from globus_sdk import __version__
 
 from .base import FileTokenStorage
 from .token_data import TokenStorageData

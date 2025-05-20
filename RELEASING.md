@@ -18,7 +18,7 @@
 - Decide on the new version number and create a branch;
    `git checkout -b release-$SDK_VERSION`
 
-- Update the version in `src/globus_sdk/version.py`
+- Update the version in `pyproject.toml`
 
 - Update metadata and changelog, then verify changes in `changelog.rst`
 
@@ -28,7 +28,7 @@ $EDITOR changelog.rst
 ```
 
 - Add changed files;
-    `git add changelog.d/ changelog.rst src/globus_sdk/version.py`
+    `git add changelog.d/ changelog.rst pyproject.toml`
 
 - Commit; `git commit -m 'Bump version and changelog for release'`
 

@@ -127,7 +127,8 @@ from .services.transfer import (
     TransferData,
 )
 from .utils import MISSING, MissingType
-from .version import __version__
+
+__version__ = "x.y.z"
 
 def _force_eager_imports() -> None: ...
 
