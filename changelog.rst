@@ -12,6 +12,17 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.56.1:
+
+v3.56.1 (2025-05-20)
+--------------------
+
+Fixed
+~~~~~
+
+- Fix the type annotation on ``filter_roles`` for ``FlowsClient``
+  to allow non-list iterables. (:pr:`1184`)
+
 .. _changelog-3.56.0:
 
 v3.56.0 (2025-05-05)
