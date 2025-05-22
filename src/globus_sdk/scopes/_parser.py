@@ -12,36 +12,50 @@ SPECIAL_TOKENS = set("[]*")
 def _tokenize(scope_string: str) -> list[str]:
     tokens: list[str] = []
     start = 0
-    for idx, c in enumerate(scope_string):
-        try:
-            peek: str | None = scope_string[idx + 1]
-        except IndexError:
-            peek = None
+    for idx, c, peek in _peek_enumerate(scope_string):
+        if c not in SPECIAL_CHARACTERS:
+            continue
+        _reject_bad_adjacent_pairs(c, peek)
 
-        if c in SPECIAL_CHARACTERS:
-            if start != idx:
-                tokens.append(scope_string[start:idx])
+        if start != idx:
+            tokens.append(scope_string[start:idx])
 
-            start = idx + 1
-            if c == "*":
-                if peek == " ":
-                    raise ScopeParseError("'*' must not be followed by a space")
-                tokens.append(c)
-            elif c == "[":
-                tokens.append(c)
-            elif c == "]":
-                if peek is not None and peek not in (" ", "]"):
-                    raise ScopeParseError("']' may only be followed by a space or ']'")
-                tokens.append(c)
-            elif c == " ":
-                if peek == "[":
-                    raise ScopeParseError("'[' cannot have a preceding space")
-            else:
-                raise NotImplementedError
+        start = idx + 1
+        if c in ("*", "[", "]"):
+            tokens.append(c)
+        elif c == " ":
+            pass
+        else:
+            raise NotImplementedError
     remainder = scope_string[start:].strip()
     if remainder:
         tokens.append(remainder)
     return tokens
+
+
+def _peek_enumerate(data: str) -> t.Iterator[tuple[int, str, str | None]]:
+    """An iterator producing (index, character, next_char)"""
+    for idx, c in enumerate(data):
+        try:
+            peek: str | None = data[idx + 1]
+        except IndexError:
+            peek = None
+
+        yield (idx, c, peek)
+
+
+def _reject_bad_adjacent_pairs(current_char: str, next_char: str | None) -> None:
+    """Given a pair of adjacent characters during tokenization, raise
+    appropriate errors if they are not valid."""
+    if next_char is None:
+        return
+
+    if (current_char, next_char) == ("*", " "):
+        raise ScopeParseError("'*' must not be followed by a space")
+    elif current_char == "]" and next_char not in (" ", "]"):
+        raise ScopeParseError("']' may only be followed by a space or ']'")
+    elif (current_char, next_char) == (" ", "["):
+        raise ScopeParseError("'[' cannot have a preceding space")
 
 
 def _parse_tokens(tokens: list[str]) -> list[ScopeTreeNode]:
