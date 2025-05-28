@@ -21,7 +21,7 @@ def _tokenize(scope_string: str) -> list[str]:
             tokens.append(scope_string[start:idx])
         start = idx + 1
 
-        if current_char in ("*", "[", "]"):
+        if current_char in SPECIAL_TOKENS:
             tokens.append(current_char)
         elif current_char == " ":
             pass
