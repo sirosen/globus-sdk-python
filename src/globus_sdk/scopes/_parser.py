@@ -15,7 +15,7 @@ def _tokenize(scope_string: str) -> list[str]:
     for idx, current_char, next_char in _peek_enumerate(scope_string):
         if current_char not in SPECIAL_CHARACTERS:
             continue
-        _reject_bad_adjacent_pairs(current_char, next_char)
+        _reject_bad_adjacent_characters(current_char, next_char)
 
         if start != idx:
             tokens.append(scope_string[start:idx])
@@ -33,7 +33,7 @@ def _tokenize(scope_string: str) -> list[str]:
     return tokens
 
 
-def _reject_bad_adjacent_pairs(current_char: str, next_char: str | None) -> None:
+def _reject_bad_adjacent_characters(current_char: str, next_char: str | None) -> None:
     """Given a pair of adjacent characters during tokenization, raise
     appropriate errors if they are not valid."""
     if next_char is None:
@@ -59,22 +59,11 @@ def _parse_tokens(tokens: list[str]) -> list[ScopeTreeNode]:
     current_scope: ScopeTreeNode | None = None
 
     for _, token, next_token in _peek_enumerate(tokens):
+        _reject_bad_adjacent_tokens(token, next_token)
+
         if token == "*":
             current_optional = True
-            if next_token is None:
-                raise ScopeParseError("ended in optional marker")
-            if next_token in SPECIAL_TOKENS:
-                raise ScopeParseError(
-                    "a scope string must always follow an optional marker"
-                )
-
         elif token == "[":
-            if next_token is None:
-                raise ScopeParseError("ended in left bracket")
-            if next_token == "]":
-                raise ScopeParseError("found empty brackets")
-            if next_token == "[":
-                raise ScopeParseError("found double left-bracket")
             if not current_scope:
                 raise ScopeParseError("found '[' without a preceding scope string")
 
@@ -94,6 +83,26 @@ def _parse_tokens(tokens: list[str]) -> list[ScopeTreeNode]:
         raise ScopeParseError("unclosed brackets, missing ']'")
 
     return ret
+
+
+def _reject_bad_adjacent_tokens(current_token: str, next_token: str | None) -> None:
+    """
+    Given a pair of tokens from parsing, raise appropriate errors if they are
+    not a valid sequence.
+    """
+    if current_token == "*":
+        if next_token is None:
+            raise ScopeParseError("ended in optional marker")
+        elif next_token in SPECIAL_TOKENS:
+            raise ScopeParseError(
+                "a scope string must always follow an optional marker"
+            )
+    elif (current_token, next_token) == ("[", None):
+        raise ScopeParseError("ended in left bracket")
+    elif (current_token, next_token) == ("[", "]"):
+        raise ScopeParseError("found empty brackets")
+    elif (current_token, next_token) == ("[", "["):
+        raise ScopeParseError("found double left-bracket")
 
 
 class ScopeTreeNode:
