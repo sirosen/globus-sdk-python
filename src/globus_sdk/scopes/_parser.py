@@ -12,18 +12,18 @@ SPECIAL_TOKENS = set("[]*")
 def _tokenize(scope_string: str) -> list[str]:
     tokens: list[str] = []
     start = 0
-    for idx, c, peek in _peek_enumerate(scope_string):
-        if c not in SPECIAL_CHARACTERS:
+    for idx, current_char, next_char in _peek_enumerate(scope_string):
+        if current_char not in SPECIAL_CHARACTERS:
             continue
-        _reject_bad_adjacent_pairs(c, peek)
+        _reject_bad_adjacent_pairs(current_char, next_char)
 
         if start != idx:
             tokens.append(scope_string[start:idx])
-
         start = idx + 1
-        if c in ("*", "[", "]"):
-            tokens.append(c)
-        elif c == " ":
+
+        if current_char in ("*", "[", "]"):
+            tokens.append(current_char)
+        elif current_char == " ":
             pass
         else:
             raise NotImplementedError
@@ -31,17 +31,6 @@ def _tokenize(scope_string: str) -> list[str]:
     if remainder:
         tokens.append(remainder)
     return tokens
-
-
-def _peek_enumerate(data: str) -> t.Iterator[tuple[int, str, str | None]]:
-    """An iterator producing (index, character, next_char)"""
-    for idx, c in enumerate(data):
-        try:
-            peek: str | None = data[idx + 1]
-        except IndexError:
-            peek = None
-
-        yield (idx, c, peek)
 
 
 def _reject_bad_adjacent_pairs(current_char: str, next_char: str | None) -> None:
@@ -69,28 +58,22 @@ def _parse_tokens(tokens: list[str]) -> list[ScopeTreeNode]:
     # track the current (or, by similar terminology, "last") complete scope seen
     current_scope: ScopeTreeNode | None = None
 
-    for idx in range(len(tokens)):
-        token = tokens[idx]
-        try:
-            peek: str | None = tokens[idx + 1]
-        except IndexError:
-            peek = None
-
+    for _, token, next_token in _peek_enumerate(tokens):
         if token == "*":
             current_optional = True
-            if peek is None:
+            if next_token is None:
                 raise ScopeParseError("ended in optional marker")
-            if peek in SPECIAL_TOKENS:
+            if next_token in SPECIAL_TOKENS:
                 raise ScopeParseError(
                     "a scope string must always follow an optional marker"
                 )
 
         elif token == "[":
-            if peek is None:
+            if next_token is None:
                 raise ScopeParseError("ended in left bracket")
-            if peek == "]":
+            if next_token == "]":
                 raise ScopeParseError("found empty brackets")
-            if peek == "[":
+            if next_token == "[":
                 raise ScopeParseError("found double left-bracket")
             if not current_scope:
                 raise ScopeParseError("found '[' without a preceding scope string")
@@ -245,6 +228,24 @@ def _convert_trees(trees: list[ScopeTreeNode]) -> ScopeGraph:
             graph.add_edge(scope_string, dep.scope_string, dep.optional)
 
     return graph
+
+
+def _peek_enumerate(data: str | list[str]) -> t.Iterator[tuple[int, str, str | None]]:
+    """
+    An iterator producing (index, character, next_char)
+    or else producing (index, str, next_str)
+
+    (Depending on whether or not the input is a string or list of strings)
+    """
+    if not data:
+        return
+
+    prev: str = data[0]
+    for idx, c in enumerate(data[1:]):
+        yield (idx, prev, c)
+        prev = c
+
+    yield (len(data) - 1, prev, None)
 
 
 def parse_scope_graph(scopes: str) -> ScopeGraph:
