@@ -48,9 +48,10 @@ From 3.x to 4.0
 ``MutableScope`` is Removed, use ``Scope`` Instead
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``MutableScope`` type was removed in version 4 in favor of the ``Scope``
-type.
-When manipulating scopes as objects, use the ``Scope`` object anywhere that
+The ``MutableScope`` type was removed in version 4 in favor of the
+:class:`Scope <globus_sdk.scopes.Scope>` type.
+When manipulating scopes as objects, use
+:class:`Scope <globus_sdk.scopes.Scope>` anywhere that
 ``MutableScope`` was used, for example:
 
 .. code-block:: python
@@ -67,8 +68,8 @@ When manipulating scopes as objects, use the ``Scope`` object anywhere that
 
 .. note::
 
-    The ``Scope`` type was added in Globus SDK v3, so this transition can be
-    made prior to upgrading to version 4.
+    The :class:`Scope <globus_sdk.scopes.Scope>` type was added in Globus SDK
+    v3, so this transition can be made prior to upgrading to version 4.
 
 ``requested_scopes`` is Required
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
