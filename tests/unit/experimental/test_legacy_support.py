@@ -23,11 +23,12 @@ from globus_sdk.gare import (
 
 
 def test_scope_importable_from_experimental():
-    from globus_sdk.experimental.scope_parser import (  # noqa: F401
-        Scope,
-        ScopeCycleError,
-        ScopeParseError,
-    )
+    with pytest.warns(RemovedInV4Warning):
+        from globus_sdk.experimental.scope_parser import (  # noqa: F401
+            Scope,
+            ScopeCycleError,
+            ScopeParseError,
+        )
 
 
 @pytest.mark.parametrize(
