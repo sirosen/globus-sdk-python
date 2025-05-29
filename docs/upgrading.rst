@@ -56,12 +56,10 @@ Compatibility aliases were left in place.
 Under version 4, the compatibility aliases have been removed.
 The removed alias and new module names are shown in the table below.
 
-===================================================  ===================
-Removed Alias                                        New Name
-===================================================  ===================
-``globus_sdk.experimental.auth_requirements_error``  ``globus_sdk.gare``
-===================================================  ===================
+..  csv-table::
+    :header: "Removed alias", "New name"
 
+    "``globus_sdk.experimental.auth_requirements_error``", "``globus_sdk.gare``"
 
 ``MutableScope`` is Removed, use ``Scope`` Instead
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
