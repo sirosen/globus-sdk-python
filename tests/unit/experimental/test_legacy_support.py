@@ -12,14 +12,6 @@ Eventually these constructs do get deprecated at which point the tests in this m
 import pytest
 
 from globus_sdk import RemovedInV4Warning
-from globus_sdk.gare import (
-    GARE,
-    GlobusAuthorizationParameters,
-    has_gares,
-    is_gare,
-    to_gare,
-    to_gares,
-)
 
 
 def test_scope_importable_from_experimental():
@@ -28,27 +20,6 @@ def test_scope_importable_from_experimental():
         ScopeCycleError,
         ScopeParseError,
     )
-
-
-@pytest.mark.parametrize(
-    "alias, value",
-    (
-        ("GlobusAuthorizationParameters", GlobusAuthorizationParameters),
-        ("GlobusAuthRequirementsError", GARE),
-        ("to_auth_requirements_error", to_gare),
-        ("to_auth_requirements_errors", to_gares),
-        ("has_auth_requirements_errors", has_gares),
-        ("is_auth_requirements_error", is_gare),
-    ),
-)
-def test_deprecated_experimental_alias(alias, value):
-    with pytest.warns(RemovedInV4Warning):
-        from globus_sdk.experimental import (
-            auth_requirements_error as experimental_module,
-        )
-
-        aliased_value = getattr(experimental_module, alias)
-    assert aliased_value is value
 
 
 def test_login_flow_manager_importable_from_experimental():

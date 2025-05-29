@@ -45,6 +45,24 @@ Then, code can dispatch with
 From 3.x to 4.0
 ---------------
 
+Deprecated Experimental Aliases Removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+During the version 3 lifecycle, several modules were added under
+``globus_sdk.experimental`` and later promoted to new names in the main
+``globus_sdk`` namespace.
+Compatibility aliases were left in place.
+
+Under version 4, the compatibility aliases have been removed.
+The removed alias and new module names are shown in the table below.
+
+===================================================  ===================
+Removed Alias                                        New Name
+===================================================  ===================
+``globus_sdk.experimental.auth_requirements_error``  ``globus_sdk.gare``
+===================================================  ===================
+
+
 ``MutableScope`` is Removed, use ``Scope`` Instead
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
