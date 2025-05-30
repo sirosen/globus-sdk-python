@@ -65,24 +65,6 @@ def test_raw_text_property_warns():
         assert err.raw_text == body_text
 
 
-def test_imperative_message_setting_warns():
-    err = construct_error(
-        body={"code": "FooCode", "message": "FooMessage"}, http_status=400
-    )
-    assert err.message == "FooMessage"
-
-    with pytest.warns(
-        RemovedInV4Warning,
-        match=(
-            r"Setting a message on GlobusAPIError objects is deprecated\. "
-            r"This overwrites any parsed messages\. Append to 'messages' instead\."
-        ),
-    ):
-        err.message = "BarMessage"
-
-    assert err.message == "BarMessage"
-
-
 @pytest.mark.parametrize(
     "body, response_headers, http_status, expect_code, expect_message",
     (
