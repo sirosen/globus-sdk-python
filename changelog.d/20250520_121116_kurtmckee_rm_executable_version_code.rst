@@ -1,7 +1,7 @@
 Breaking Changes
 ~~~~~~~~~~~~~~~~
 
-- The SDK version is no longer available in ``globus_sdk.version.__version__``. (:pr:`NUMBER`)
+- The SDK version is no longer available in ``globus_sdk.version.__version__``. (:pr:`1203`)
 
   Packages that want to query the SDK version must use ``importlib.metadata``:
 
