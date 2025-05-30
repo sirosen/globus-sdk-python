@@ -68,14 +68,6 @@ class GlobusAPIError(GlobusError):
             return "; ".join(self.messages)
         return None
 
-    @message.setter
-    def message(self, value: str) -> None:
-        warn_deprecated(
-            "Setting a message on GlobusAPIError objects is deprecated. "
-            "This overwrites any parsed messages. Append to 'messages' instead."
-        )
-        self.messages = [value]
-
     @property
     def http_reason(self) -> str:
         """
