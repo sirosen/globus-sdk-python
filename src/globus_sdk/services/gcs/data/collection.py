@@ -488,7 +488,6 @@ class GuestCollectionDocument(CollectionDocument):
             # additional fields
             additional_fields=additional_fields,
         )
-        self._set_value("activity_notification_policy", activity_notification_policy)
 
         self["mapped_collection_id"] = mapped_collection_id
         self["user_credential_id"] = user_credential_id
