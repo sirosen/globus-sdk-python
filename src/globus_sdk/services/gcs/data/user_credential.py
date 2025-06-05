@@ -4,6 +4,7 @@ import typing as t
 
 from globus_sdk import utils
 from globus_sdk._types import UUIDLike
+from globus_sdk.utils import MISSING, MissingType
 
 
 class UserCredentialDocument(utils.PayloadWrapper):
@@ -27,12 +28,12 @@ class UserCredentialDocument(utils.PayloadWrapper):
     def __init__(
         self,
         DATA_TYPE: str = "user_credential#1.0.0",
-        identity_id: UUIDLike | None = None,
-        connector_id: UUIDLike | None = None,
-        username: str | None = None,
-        display_name: str | None = None,
-        storage_gateway_id: UUIDLike | None = None,
-        policies: dict[str, t.Any] | None = None,
+        identity_id: UUIDLike | MissingType = MISSING,
+        connector_id: UUIDLike | MissingType = MISSING,
+        username: str | MissingType = MISSING,
+        display_name: str | MissingType = MISSING,
+        storage_gateway_id: UUIDLike | MissingType = MISSING,
+        policies: dict[str, t.Any] | MissingType = MISSING,
         additional_fields: dict[str, t.Any] | None = None,
     ) -> None:
         super().__init__()
@@ -45,6 +46,4 @@ class UserCredentialDocument(utils.PayloadWrapper):
             storage_gateway_id=storage_gateway_id,
         )
         self._set_value("policies", policies)
-
-        if additional_fields is not None:
-            self.update(additional_fields)
+        self.update(additional_fields or {})
