@@ -1,9 +1,4 @@
-from __future__ import annotations
-
-import sys
 import timeit
-
-from globus_sdk.scopes._parser import parse_scope_graph
 
 
 def timeit_test() -> None:
@@ -20,7 +15,7 @@ def timeit_test() -> None:
     ):
         if style == "deep":
             setup = f"""\
-from globus_sdk.experimental.scope_parser import Scope
+from globus_sdk.scopes import Scope
 big_scope = ""
 for i in range({size}):
     big_scope += f"foo{{i}}["
@@ -30,7 +25,7 @@ for _ in range({size}):
 """
         elif style == "wide":
             setup = f"""\
-from globus_sdk.experimental.scope_parser import Scope
+from globus_sdk.scopes import Scope
 big_scope = ""
 for i in range({size}):
     big_scope += f"foo{{i}} "
@@ -67,27 +62,9 @@ def _stats(timing_data: list[float]) -> tuple[float, float, float, float]:
     return best, worst, average, variance
 
 
-def parse_test(scope_string: str) -> None:
-    parsed_graph = parse_scope_graph(scope_string)
-    print(
-        "top level scopes:",
-        ", ".join([name for name, _optional in parsed_graph.top_level_scopes]),
-    )
-    print(parsed_graph)
-
-
 def main() -> None:
-    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
-        print("This script supports two usage patterns:")
-        print("    python -m globus_sdk.experimental.scope_parser SCOPE_STRING")
-        print("    python -m globus_sdk.experimental.scope_parser --timeit")
-        sys.exit(0)
-
-    print()
-    if sys.argv[1] == "--timeit":
-        timeit_test()
-    else:
-        parse_test(sys.argv[1])
+    timeit_test()
 
 
-main()
+if __name__ == "__main__":
+    main()

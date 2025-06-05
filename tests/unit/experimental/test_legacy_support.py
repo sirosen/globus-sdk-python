@@ -14,15 +14,6 @@ import pytest
 from globus_sdk import RemovedInV4Warning
 
 
-def test_scope_importable_from_experimental():
-    with pytest.warns(RemovedInV4Warning):
-        from globus_sdk.experimental.scope_parser import (  # noqa: F401
-            Scope,
-            ScopeCycleError,
-            ScopeParseError,
-        )
-
-
 def test_login_flow_manager_importable_from_experimental():
     with pytest.warns(RemovedInV4Warning):
         from globus_sdk.experimental.login_flow_manager import (  # noqa: F401
