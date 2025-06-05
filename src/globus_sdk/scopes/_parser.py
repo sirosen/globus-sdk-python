@@ -12,36 +12,39 @@ SPECIAL_TOKENS = set("[]*")
 def _tokenize(scope_string: str) -> list[str]:
     tokens: list[str] = []
     start = 0
-    for idx, c in enumerate(scope_string):
-        try:
-            peek: str | None = scope_string[idx + 1]
-        except IndexError:
-            peek = None
+    for idx, current_char, next_char in _peek_enumerate(scope_string):
+        if current_char not in SPECIAL_CHARACTERS:
+            continue
+        _reject_bad_adjacent_characters(current_char, next_char)
 
-        if c in SPECIAL_CHARACTERS:
-            if start != idx:
-                tokens.append(scope_string[start:idx])
+        if start != idx:
+            tokens.append(scope_string[start:idx])
+        start = idx + 1
 
-            start = idx + 1
-            if c == "*":
-                if peek == " ":
-                    raise ScopeParseError("'*' must not be followed by a space")
-                tokens.append(c)
-            elif c == "[":
-                tokens.append(c)
-            elif c == "]":
-                if peek is not None and peek not in (" ", "]"):
-                    raise ScopeParseError("']' may only be followed by a space or ']'")
-                tokens.append(c)
-            elif c == " ":
-                if peek == "[":
-                    raise ScopeParseError("'[' cannot have a preceding space")
-            else:
-                raise NotImplementedError
+        if current_char in SPECIAL_TOKENS:
+            tokens.append(current_char)
+        elif current_char == " ":
+            pass
+        else:
+            raise NotImplementedError
     remainder = scope_string[start:].strip()
     if remainder:
         tokens.append(remainder)
     return tokens
+
+
+def _reject_bad_adjacent_characters(current_char: str, next_char: str | None) -> None:
+    """Given a pair of adjacent characters during tokenization, raise
+    appropriate errors if they are not valid."""
+    if next_char is None:
+        return
+
+    if (current_char, next_char) == ("*", " "):
+        raise ScopeParseError("'*' must not be followed by a space")
+    elif current_char == "]" and next_char not in (" ", "]"):
+        raise ScopeParseError("']' may only be followed by a space or ']'")
+    elif (current_char, next_char) == (" ", "["):
+        raise ScopeParseError("'[' cannot have a preceding space")
 
 
 def _parse_tokens(tokens: list[str]) -> list[ScopeTreeNode]:
@@ -55,29 +58,12 @@ def _parse_tokens(tokens: list[str]) -> list[ScopeTreeNode]:
     # track the current (or, by similar terminology, "last") complete scope seen
     current_scope: ScopeTreeNode | None = None
 
-    for idx in range(len(tokens)):
-        token = tokens[idx]
-        try:
-            peek: str | None = tokens[idx + 1]
-        except IndexError:
-            peek = None
+    for _, token, next_token in _peek_enumerate(tokens):
+        _reject_bad_adjacent_tokens(token, next_token)
 
         if token == "*":
             current_optional = True
-            if peek is None:
-                raise ScopeParseError("ended in optional marker")
-            if peek in SPECIAL_TOKENS:
-                raise ScopeParseError(
-                    "a scope string must always follow an optional marker"
-                )
-
         elif token == "[":
-            if peek is None:
-                raise ScopeParseError("ended in left bracket")
-            if peek == "]":
-                raise ScopeParseError("found empty brackets")
-            if peek == "[":
-                raise ScopeParseError("found double left-bracket")
             if not current_scope:
                 raise ScopeParseError("found '[' without a preceding scope string")
 
@@ -97,6 +83,26 @@ def _parse_tokens(tokens: list[str]) -> list[ScopeTreeNode]:
         raise ScopeParseError("unclosed brackets, missing ']'")
 
     return ret
+
+
+def _reject_bad_adjacent_tokens(current_token: str, next_token: str | None) -> None:
+    """
+    Given a pair of tokens from parsing, raise appropriate errors if they are
+    not a valid sequence.
+    """
+    if current_token == "*":
+        if next_token is None:
+            raise ScopeParseError("ended in optional marker")
+        elif next_token in SPECIAL_TOKENS:
+            raise ScopeParseError(
+                "a scope string must always follow an optional marker"
+            )
+    elif (current_token, next_token) == ("[", None):
+        raise ScopeParseError("ended in left bracket")
+    elif (current_token, next_token) == ("[", "]"):
+        raise ScopeParseError("found empty brackets")
+    elif (current_token, next_token) == ("[", "["):
+        raise ScopeParseError("found double left-bracket")
 
 
 class ScopeTreeNode:
@@ -231,6 +237,24 @@ def _convert_trees(trees: list[ScopeTreeNode]) -> ScopeGraph:
             graph.add_edge(scope_string, dep.scope_string, dep.optional)
 
     return graph
+
+
+def _peek_enumerate(data: str | list[str]) -> t.Iterator[tuple[int, str, str | None]]:
+    """
+    An iterator producing (index, character, next_char)
+    or else producing (index, str, next_str)
+
+    (Depending on whether or not the input is a string or list of strings)
+    """
+    if not data:
+        return
+
+    prev: str = data[0]
+    for idx, c in enumerate(data[1:]):
+        yield (idx, prev, c)
+        prev = c
+
+    yield (len(data) - 1, prev, None)
 
 
 def parse_scope_graph(scopes: str) -> ScopeGraph:

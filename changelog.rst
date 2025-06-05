@@ -40,6 +40,29 @@ Breaking Changes
 
 - Updated MappedCollectionDoc and GuestCollectionDoc with MissingType. (:pr:`1189`)
 
+.. _changelog-3.57.0:
+
+v3.57.0 (2025-06-04)
+--------------------
+
+Added
+~~~~~
+
+- Globus Connect Server collection document classes now support attributes up
+  to document version 1.15.0. (:pr:`1197`)
+
+Deprecated
+~~~~~~~~~~
+
+- Importing scope parsing tools from ``globus_sdk.experimental`` now emits a
+  deprecation warning. These names were previously deprecated in documentation
+  only. (:pr:`1201`)
+
+Documentation
+~~~~~~~~~~~~~
+
+- Remove the badges at the top of the README. (:pr:`1194`)
+
 .. _changelog-3.56.1:
 
 v3.56.1 (2025-05-20)
@@ -49,7 +72,7 @@ Fixed
 ~~~~~
 
 - Fix the type annotation on ``filter_roles`` for ``FlowsClient``
-  to allow non-list iterables. (:pr:`1184`)
+  to allow non-list iterables. (:pr:`1183`)
 
 .. _changelog-3.56.0:
 
