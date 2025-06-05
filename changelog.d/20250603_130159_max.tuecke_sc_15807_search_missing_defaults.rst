@@ -1,4 +1,0 @@
-Breaking Changes
-~~~~~~~~~~~~~~~~
-
-- All defaults of ``None`` converted to ``globus_sdk.MISSING`` for all payload types in the Search client. (:pr:`1207`)

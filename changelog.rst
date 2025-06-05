@@ -12,6 +12,45 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.0a2:
+
+v4.0.0a2 (2025-06-05)
+---------------------
+
+Breaking Changes
+~~~~~~~~~~~~~~~~
+
+- The SDK version is no longer available in ``globus_sdk.version.__version__``. (:pr:`1195`)
+
+  Packages that want to query the SDK version must use ``importlib.metadata``:
+
+  ..  code-block:: python
+
+        import importlib.metadata
+
+        GLOBUS_SDK_VERSION = importlib.metadata.distribution("globus_sdk").version
+
+- The legacy ``MutableScope`` type has been removed. (:pr:`1198`)
+
+    - The ``make_mutable`` method on ``ScopeBuilder`` objects has also been
+      removed as a consequence of this change.
+
+- Defaults of ``None`` were converted to ``globus_sdk.MISSING`` for multiple client
+  methods and payload types, covering Compute, Flows, Groups, GCS, and Search.
+  (:pr:`1205`, :pr:`1207`, :pr:`1212`, :pr:`1214`)
+
+Removed
+~~~~~~~
+
+- ``globus_sdk.experimental.auth_requirements_error`` has been removed. Use
+  ``globus_sdk.gare`` instead. (:pr:`1202`)
+
+- ``GlobusAPIError`` no longer provides a setter for ``message``. The
+  ``message`` property is now read-only. (:pr:`1204`)
+
+- Deprecated aliases for ``TimersClient``, ``TimersScopes``, and
+  ``TimersAPIError`` have been removed. (:pr:`1206`)
+
 .. _changelog-4.0.0a1:
 
 v4.0.0a1 (2025-05-20)
