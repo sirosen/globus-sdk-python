@@ -1,4 +1,0 @@
-Breaking Changes
-~~~~~~~~~~~~~~~~
-
-- All defaults of ``None`` converted to ``globus_sdk.MISSING`` for all payload types in the GCS client. (:pr:`1214`)
