@@ -1581,7 +1581,7 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/task_submit/#submit_transfer_task
         """  # noqa: E501
         log.debug("TransferClient.submit_transfer(...)")
-        if isinstance(data.get("submission_id", MISSING), MissingType):
+        if "submission_id" not in data:
             log.debug("submit_transfer autofetching submission_id")
             data["submission_id"] = self.get_submission_id()["value"]
         return self.post("/v0.10/transfer", data=data)
@@ -1624,7 +1624,7 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/task_submit/#submit_delete_task
         """
         log.debug("TransferClient.submit_delete(...)")
-        if isinstance(data.get("submission_id", MISSING), MissingType):
+        if "submission_id" not in data:
             log.debug("submit_delete autofetching submission_id")
             data["submission_id"] = self.get_submission_id()["value"]
         return self.post("/v0.10/delete", data=data)
