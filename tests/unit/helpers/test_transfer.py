@@ -303,8 +303,12 @@ def test_notification_options(n_succeeded, n_failed, n_inactive):
         "notify_on_inactive": _default(n_inactive),
     }
     for k, v in expect.items():
-        assert tdata[k] is v
-        assert ddata[k] is v
+        if k in notify_kwargs:
+            assert tdata[k] is v
+            assert ddata[k] is v
+        else:
+            assert k not in tdata
+            assert k not in ddata
 
 
 @pytest.mark.parametrize(
@@ -368,7 +372,7 @@ def test_add_filter_rule():
     tdata = TransferData(source_endpoint=GO_EP1_ID, destination_endpoint=GO_EP2_ID)
     assert "filter_rules" not in tdata
 
-    tdata.add_filter_rule("*.tgz", type="file")
+    tdata.add_filter_rule("*.tgz", type="file", method="exclude")
     assert "filter_rules" in tdata
     assert isinstance(tdata["filter_rules"], list)
     assert len(tdata["filter_rules"]) == 1
@@ -380,7 +384,7 @@ def test_add_filter_rule():
     tdata.add_filter_rule("tmp")
     assert len(tdata["filter_rules"]) == 2
     assert tdata["filter_rules"][1]["DATA_TYPE"] == "filter_rule"
-    assert tdata["filter_rules"][1]["method"] == "exclude"
+    assert tdata["filter_rules"][1]["method"] == MISSING
     assert tdata["filter_rules"][1]["name"] == "tmp"
     assert tdata["filter_rules"][1]["type"] == MISSING
 
