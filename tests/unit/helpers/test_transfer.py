@@ -372,7 +372,7 @@ def test_add_filter_rule():
     tdata = TransferData(source_endpoint=GO_EP1_ID, destination_endpoint=GO_EP2_ID)
     assert "filter_rules" not in tdata
 
-    tdata.add_filter_rule("*.tgz", type="file", method="exclude")
+    tdata.add_filter_rule("*.tgz", type="file")
     assert "filter_rules" in tdata
     assert isinstance(tdata["filter_rules"], list)
     assert len(tdata["filter_rules"]) == 1
@@ -384,7 +384,7 @@ def test_add_filter_rule():
     tdata.add_filter_rule("tmp")
     assert len(tdata["filter_rules"]) == 2
     assert tdata["filter_rules"][1]["DATA_TYPE"] == "filter_rule"
-    assert tdata["filter_rules"][1]["method"] == MISSING
+    assert tdata["filter_rules"][1]["method"] == "exclude"
     assert tdata["filter_rules"][1]["name"] == "tmp"
     assert tdata["filter_rules"][1]["type"] == MISSING
 

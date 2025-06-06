@@ -328,7 +328,7 @@ class TransferData(utils.PayloadWrapper):
         self,
         name: str,
         *,
-        method: t.Literal["include", "exclude"] | MissingType = MISSING,
+        method: t.Literal["include", "exclude"] = "exclude",
         type: (  # pylint: disable=redefined-builtin
             t.Literal["file", "dir"] | MissingType
         ) = MISSING,
