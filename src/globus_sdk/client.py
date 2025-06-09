@@ -5,6 +5,7 @@ import typing as t
 import urllib.parse
 
 from globus_sdk import GlobusSDKUsageError, config, exc, utils
+from globus_sdk._classproperty import classproperty
 from globus_sdk._types import ScopeCollectionType
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.paging import PaginatorTable
@@ -293,7 +294,7 @@ class BaseClient:
     def app_name(self, value: str) -> None:
         self._app_name = self.transport.user_agent = value
 
-    @utils.classproperty
+    @classproperty
     def resource_server(  # pylint: disable=missing-param-doc
         self_or_cls: BaseClient | type[BaseClient],
     ) -> str | None:

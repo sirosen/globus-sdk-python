@@ -4,6 +4,7 @@ import typing as t
 import uuid
 
 from globus_sdk import client, exc, paging, response, scopes, utils
+from globus_sdk._classproperty import classproperty
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.globus_app import GlobusApp
@@ -144,7 +145,7 @@ class GCSClient(client.BaseClient):
             )
         ]
 
-    @utils.classproperty
+    @classproperty
     def resource_server(  # pylint: disable=missing-param-doc
         self_or_cls: client.BaseClient | type[client.BaseClient],
     ) -> str | None:

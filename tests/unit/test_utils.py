@@ -80,32 +80,6 @@ def test_payload_wrapper_methods():
     assert data.data == {"foo": 1, "bar": 2, "x": "hello", "y": "world"}
 
 
-def test_classproperty_simple():
-    class Foo:
-        x = {"x": 1}
-
-        @utils.classproperty
-        def y(self_or_cls):
-            return self_or_cls.x["x"]
-
-    assert Foo.y == 1
-
-
-def test_classproperty_prefers_instance():
-    class Foo:
-        x = {"x": 1}
-
-        def __init__(self) -> None:
-            self.x = {"x": 2}
-
-        @utils.classproperty
-        def y(self_or_cls):
-            return self_or_cls.x["x"]
-
-    assert Foo.y == 1
-    assert Foo().y == 2
-
-
 @pytest.mark.parametrize(
     "value, expected_result",
     (
