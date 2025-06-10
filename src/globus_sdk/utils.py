@@ -6,7 +6,6 @@ import hashlib
 import platform
 import typing as t
 import uuid
-from base64 import b64encode
 
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
@@ -20,10 +19,6 @@ else:
 
 def sha256_string(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
-
-
-def b64str(s: str) -> str:
-    return b64encode(s.encode("utf-8")).decode("utf-8")
 
 
 def get_nice_hostname() -> str | None:

@@ -5,20 +5,6 @@ import pytest
 from globus_sdk import utils
 
 
-def test_b64str_non_ascii():
-    test_string = "ⓤⓢⓔⓡⓝⓐⓜⓔ"
-    expected_b64 = "4pOk4pOi4pOU4pOh4pOd4pOQ4pOc4pOU"
-
-    assert utils.b64str(test_string) == expected_b64
-
-
-def test_b64str_ascii():
-    test_string = "username"
-    expected_b64 = "dXNlcm5hbWU="
-
-    assert utils.b64str(test_string) == expected_b64
-
-
 def test_sha256string():
     test_string = "foo"
     expected_sha = "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
