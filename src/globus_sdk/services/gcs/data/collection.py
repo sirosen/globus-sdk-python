@@ -3,9 +3,9 @@ from __future__ import annotations
 import abc
 import typing as t
 
-from globus_sdk import utils
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import AbstractPayload
+from globus_sdk._remarshal import safe_strseq_listify
 from globus_sdk._types import UUIDLike
 
 from ._common import (
@@ -198,11 +198,7 @@ class CollectionDocument(AbstractPayload):
         )
         self["user_message"] = user_message
         self["user_message_link"] = user_message_link
-        self["keywords"] = (
-            keywords
-            if isinstance(keywords, MissingType)
-            else list(utils.safe_strseq_iter(keywords))
-        )
+        self["keywords"] = safe_strseq_listify(keywords)
         self["disable_verify"] = disable_verify
         self["enable_https"] = enable_https
         self["force_encryption"] = force_encryption
@@ -361,16 +357,8 @@ class MappedCollectionDocument(CollectionDocument):
         self["guest_auth_policy_id"] = guest_auth_policy_id
         self["storage_gateway_id"] = storage_gateway_id
 
-        self["sharing_users_allow"] = (
-            sharing_users_allow
-            if isinstance(sharing_users_allow, (MissingType, type(None)))
-            else list(utils.safe_strseq_iter(sharing_users_allow))
-        )
-        self["sharing_users_deny"] = (
-            sharing_users_deny
-            if isinstance(sharing_users_deny, (MissingType, type(None)))
-            else list(utils.safe_strseq_iter(sharing_users_deny))
-        )
+        self["sharing_users_allow"] = safe_strseq_listify(sharing_users_allow)
+        self["sharing_users_deny"] = safe_strseq_listify(sharing_users_deny)
 
         self["delete_protected"] = delete_protected
         self["allow_guest_collections"] = allow_guest_collections
@@ -531,16 +519,8 @@ class POSIXCollectionPolicies(CollectionPolicies):
         super().__init__()
         self["DATA_TYPE"] = DATA_TYPE
 
-        self["sharing_groups_allow"] = (
-            sharing_groups_allow
-            if isinstance(sharing_groups_allow, (MissingType, type(None)))
-            else list(utils.safe_strseq_iter(sharing_groups_allow))
-        )
-        self["sharing_groups_deny"] = (
-            sharing_groups_deny
-            if isinstance(sharing_groups_deny, (MissingType, type(None)))
-            else list(utils.safe_strseq_iter(sharing_groups_deny))
-        )
+        self["sharing_groups_allow"] = safe_strseq_listify(sharing_groups_allow)
+        self["sharing_groups_deny"] = safe_strseq_listify(sharing_groups_deny)
 
         if not isinstance(additional_fields, MissingType):
             self.update(additional_fields)
@@ -570,16 +550,8 @@ class POSIXStagingCollectionPolicies(CollectionPolicies):
     ) -> None:
         super().__init__()
         self["DATA_TYPE"] = DATA_TYPE
-        self["sharing_groups_allow"] = (
-            sharing_groups_allow
-            if isinstance(sharing_groups_allow, (MissingType, type(None)))
-            else list(utils.safe_strseq_iter(sharing_groups_allow))
-        )
-        self["sharing_groups_deny"] = (
-            sharing_groups_deny
-            if isinstance(sharing_groups_deny, (MissingType, type(None)))
-            else list(utils.safe_strseq_iter(sharing_groups_deny))
-        )
+        self["sharing_groups_allow"] = safe_strseq_listify(sharing_groups_allow)
+        self["sharing_groups_deny"] = safe_strseq_listify(sharing_groups_deny)
 
         if not isinstance(additional_fields, MissingType):
             self.update(additional_fields)

@@ -3,9 +3,9 @@ from __future__ import annotations
 import enum
 import typing as t
 
-from globus_sdk import utils
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import Payload
+from globus_sdk._remarshal import safe_strseq_iter
 from globus_sdk._types import UUIDLike
 
 T = t.TypeVar("T")
@@ -117,7 +117,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("accept", []).extend(
             {"identity_id": identity_id}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -135,7 +135,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("add", []).extend(
             {"identity_id": identity_id, "role": role}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -149,7 +149,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("approve", []).extend(
             {"identity_id": identity_id}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -163,7 +163,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("decline", []).extend(
             {"identity_id": identity_id}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -181,7 +181,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("invite", []).extend(
             {"identity_id": identity_id, "role": role}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -194,7 +194,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("join", []).extend(
             {"identity_id": identity_id}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -207,7 +207,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("leave", []).extend(
             {"identity_id": identity_id}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -221,7 +221,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("reject", []).extend(
             {"identity_id": identity_id}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -236,7 +236,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("remove", []).extend(
             {"identity_id": identity_id}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 
@@ -250,7 +250,7 @@ class BatchMembershipActions(Payload):
         """
         self.setdefault("request_join", []).extend(
             {"identity_id": identity_id}
-            for identity_id in utils.safe_strseq_iter(identity_ids)
+            for identity_id in safe_strseq_iter(identity_ids)
         )
         return self
 

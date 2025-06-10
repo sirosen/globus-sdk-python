@@ -3,8 +3,9 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from globus_sdk import exc, utils
+from globus_sdk import exc
 from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._remarshal import commajoin, safe_strseq_iter, safe_strseq_listify
 from globus_sdk._types import ScopeCollectionType, UUIDLike
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
@@ -96,12 +97,12 @@ class ConfidentialAppAuthClient(AuthLoginClient):
             query_params = {}
 
         if usernames is not None:
-            query_params["usernames"] = utils.commajoin(usernames)
+            query_params["usernames"] = commajoin(usernames)
             query_params["provision"] = (
                 "false" if str(provision).lower() == "false" else "true"
             )
         if ids is not None:
-            query_params["ids"] = utils.commajoin(ids)
+            query_params["ids"] = commajoin(ids)
 
         return GetIdentitiesResponse(
             self.get("/v2/api/identities", query_params=query_params)
@@ -270,7 +271,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         if refresh_tokens:
             form_data["access_type"] = "offline"
         if not isinstance(scope, MissingType):
-            form_data["scope"] = " ".join(utils.safe_strseq_iter(scope))
+            form_data["scope"] = " ".join(safe_strseq_iter(scope))
         if additional_params:
             form_data.update(additional_params)
 
@@ -456,7 +457,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
             "client_type": client_type,
         }
         if not isinstance(redirect_uris, MissingType):
-            body["redirect_uris"] = list(utils.safe_strseq_iter(redirect_uris))
+            body["redirect_uris"] = safe_strseq_listify(redirect_uris)
 
         # terms_and_conditions and privacy_policy must both be set or unset
         if bool(terms_and_conditions) ^ bool(privacy_policy):

@@ -6,8 +6,9 @@ import typing as t
 
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
-from globus_sdk import client, exc, utils
+from globus_sdk import client, exc
 from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._remarshal import commajoin, safe_strseq_listify
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.response import GlobusHTTPResponse, IterableResponse
@@ -352,12 +353,12 @@ class AuthClient(client.BaseClient):
 
         # if either of these params has a truthy value, stringify it
         if usernames:
-            query_params["usernames"] = utils.commajoin(usernames)
+            query_params["usernames"] = commajoin(usernames)
             query_params["provision"] = (
                 "false" if str(provision).lower() == "false" else "true"
             )
         if ids:
-            query_params["ids"] = utils.commajoin(ids)
+            query_params["ids"] = commajoin(ids)
 
         log.debug(f"query_params={query_params}")
 
@@ -453,9 +454,9 @@ class AuthClient(client.BaseClient):
         # letting us consume args whose `__str__` methods produce "the right
         # thing"
         elif domains is not None:
-            query_params["domains"] = utils.commajoin(domains)
+            query_params["domains"] = commajoin(domains)
         elif ids is not None:
-            query_params["ids"] = utils.commajoin(ids)
+            query_params["ids"] = commajoin(ids)
         else:
             log.warning(
                 "neither 'domains' nor 'ids' provided to get_identity_providers(). "
@@ -623,9 +624,9 @@ class AuthClient(client.BaseClient):
             "contact_email": contact_email,
         }
         if admin_ids is not None:
-            body["admin_ids"] = list(utils.safe_strseq_iter(admin_ids))
+            body["admin_ids"] = safe_strseq_listify(admin_ids)
         if admin_group_ids is not None:
-            body["admin_group_ids"] = list(utils.safe_strseq_iter(admin_group_ids))
+            body["admin_group_ids"] = safe_strseq_listify(admin_group_ids)
         return self.post("/v2/api/projects", data={"project": body})
 
     def update_project(
@@ -679,9 +680,9 @@ class AuthClient(client.BaseClient):
         if contact_email is not None:
             body["contact_email"] = contact_email
         if admin_ids is not None:
-            body["admin_ids"] = list(utils.safe_strseq_iter(admin_ids))
+            body["admin_ids"] = safe_strseq_listify(admin_ids)
         if admin_group_ids is not None:
-            body["admin_group_ids"] = list(utils.safe_strseq_iter(admin_group_ids))
+            body["admin_group_ids"] = safe_strseq_listify(admin_group_ids)
         return self.put(f"/v2/api/projects/{project_id}", data={"project": body})
 
     def delete_project(self, project_id: UUIDLike) -> GlobusHTTPResponse:
@@ -1647,9 +1648,9 @@ class AuthClient(client.BaseClient):
             query_params = {}
 
         if not isinstance(scope_strings, MissingType):
-            query_params["scope_strings"] = utils.commajoin(scope_strings)
+            query_params["scope_strings"] = commajoin(scope_strings)
         if not isinstance(ids, MissingType):
-            query_params["ids"] = utils.commajoin(ids)
+            query_params["ids"] = commajoin(ids)
 
         return GetScopesResponse(self.get("/v2/api/scopes", query_params=query_params))
 

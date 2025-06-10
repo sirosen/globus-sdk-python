@@ -4,7 +4,7 @@ import abc
 import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk.utils import safe_strseq_iter
+from globus_sdk._remarshal import safe_strseq_iter
 
 if t.TYPE_CHECKING:
     # pylint: disable=unsubscriptable-object

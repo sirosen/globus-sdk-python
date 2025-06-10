@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import typing as t
 
-from globus_sdk import utils
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import Payload
+from globus_sdk._remarshal import safe_strseq_listify
 from globus_sdk.services.gcs.data._common import DatatypeCallback, ensure_datatype
 
 
@@ -127,11 +127,7 @@ class EndpointDocument(Payload):
         self["info_link"] = info_link
         self["network_use"] = network_use
         self["organization"] = organization
-        self["keywords"] = (
-            keywords
-            if isinstance(keywords, MissingType)
-            else list(utils.safe_strseq_iter(keywords))
-        )
+        self["keywords"] = safe_strseq_listify(keywords)
         self["allow_udt"] = allow_udt
         self["public"] = public
         self["max_concurrency"] = max_concurrency

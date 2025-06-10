@@ -6,6 +6,7 @@ import uuid
 from globus_sdk import client, exc, paging, response, scopes, utils
 from globus_sdk._classproperty import classproperty
 from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._remarshal import commajoin
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.globus_app import GlobusApp
@@ -258,7 +259,7 @@ class GCSClient(client.BaseClient):
                     :ref: openapi_Endpoint/#patchEndpoint
                     :service: gcs
         """
-        query_params = {"include": utils.commajoin(include), **(query_params or {})}
+        query_params = {"include": commajoin(include), **(query_params or {})}
         return UnpackingGCSResponse(
             self.patch(
                 "/endpoint",
@@ -313,11 +314,11 @@ class GCSClient(client.BaseClient):
                     :service: gcs
         """
         query_params = {
-            "include": utils.commajoin(include),
+            "include": commajoin(include),
             "page_size": page_size,
             "marker": marker,
             "mapped_collection_id": mapped_collection_id,
-            "filter": utils.commajoin(filter),
+            "filter": commajoin(filter),
             **(query_params or {}),
         }
         return IterableGCSResponse(self.get("collections", query_params=query_params))
@@ -480,7 +481,7 @@ class GCSClient(client.BaseClient):
                     :service: gcs
         """
         query_params = {
-            "include": utils.commajoin(include),
+            "include": commajoin(include),
             "page_size": page_size,
             "marker": marker,
             **(query_params or {}),
@@ -544,7 +545,7 @@ class GCSClient(client.BaseClient):
                     :ref: openapi_Storage_Gateways/#getStorageGateway
                     :service: gcs
         """
-        query_params = {"include": utils.commajoin(include), **(query_params or {})}
+        query_params = {"include": commajoin(include), **(query_params or {})}
         return UnpackingGCSResponse(
             self.get(
                 f"/storage_gateways/{storage_gateway_id}",
