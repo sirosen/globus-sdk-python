@@ -5,6 +5,7 @@ import typing as t
 
 from globus_sdk import utils
 from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._payload import Payload
 from globus_sdk._types import UUIDLike
 
 T = t.TypeVar("T")
@@ -98,7 +99,7 @@ def _docstring_fixer(cls: type[T]) -> type[T]:
     return cls
 
 
-class BatchMembershipActions(utils.PayloadWrapper):
+class BatchMembershipActions(Payload):
     """
     An object used to represent a batch action on memberships of a group.
     `Perform actions on group members
@@ -255,7 +256,7 @@ class BatchMembershipActions(utils.PayloadWrapper):
 
 
 @_docstring_fixer
-class GroupPolicies(utils.PayloadWrapper):
+class GroupPolicies(Payload):
     """
     An object used to represent the policy settings of a group.
     This may be used to set or modify group settings.

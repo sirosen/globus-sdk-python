@@ -7,14 +7,8 @@ import platform
 import typing as t
 import uuid
 
-from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._missing import MissingType
 from globus_sdk._types import UUIDLike
-
-if t.TYPE_CHECKING:
-    # pylint: disable=unsubscriptable-object
-    PayloadWrapperBase = collections.UserDict[str, t.Any]
-else:
-    PayloadWrapperBase = collections.UserDict
 
 
 def sha256_string(s: str) -> str:
@@ -89,87 +83,3 @@ def commajoin(val: UUIDLike | t.Iterable[UUIDLike] | MissingType) -> str | Missi
     if isinstance(val, collections.abc.Iterable):
         return ",".join(safe_strseq_iter(val))
     return str(val)
-
-
-class PayloadWrapper(PayloadWrapperBase):
-    """
-    A class for defining helper objects which wrap some kind of "payload" dict.
-    Typical for helper objects which formulate a request payload, e.g. as JSON.
-
-    Payload types inheriting from this class can be passed directly to the client
-    ``post()``, ``put()``, and ``patch()`` methods instead of a dict. These methods will
-    recognize a ``PayloadWrapper`` and convert it to a dict for serialization with the
-    requested encoder (e.g. as a JSON request body).
-    """
-
-    # use UserDict rather than subclassing dict so that our API is always consistent
-    # e.g. `dict.pop` does not invoke `dict.__delitem__`. Overriding `__delitem__` on a
-    # dict subclass can lead to inconsistent behavior between usages like these:
-    #   x = d["k"]; del d["k"]
-    #   x = d.pop("k")
-    #
-    # UserDict inherits from MutableMapping and only defines the dunder methods, so
-    # changing its behavior safely/consistently is simpler
-
-    #
-    # internal helpers for setting non-null values
-    #
-
-    def _set_value(
-        self,
-        key: str,
-        val: t.Any,
-        callback: t.Callable[[t.Any], t.Any] | None = None,
-    ) -> None:
-        """
-        Internal helper for setting an omittable value on the payload.
-
-        If the value is non-None, it will be set and the callback (if provided) will be
-        invoked on it.
-        Otherwise, it will be ignored and the callback will not be invoked.
-
-        :param key: The key to set.
-        :param val: The value to set.
-        :param callback: An optional callback to apply to the value immediately
-            before it is set.
-        """
-        if val is not None and val is not MISSING:
-            self[key] = callback(val) if callback else val
-
-    def _set_optstrs(self, **kwargs: t.Any) -> None:
-        """
-        Convenience function for setting a collection of omittable string values.
-
-        Values are converted to strings prior to assignment.
-        """
-        for k, v in kwargs.items():
-            self._set_value(k, v, callback=str)
-
-    def _set_optstrlists(
-        self, **kwargs: t.Iterable[t.Any] | None | MissingType
-    ) -> None:
-        """
-        Convenience function for setting a collection of omittable string list values.
-
-        Values are converted to lists of strings prior to assignment.
-        """
-        for k, v in kwargs.items():
-            self._set_value(k, v, callback=lambda x: list(safe_strseq_iter(x)))
-
-    def _set_optbools(self, **kwargs: bool | None | MissingType) -> None:
-        """
-        Convenience function for setting a collection of omittable bool values.
-
-        Values are converted to bools prior to assignment.
-        """
-        for k, v in kwargs.items():
-            self._set_value(k, v, callback=bool)
-
-    def _set_optints(self, **kwargs: t.Any) -> None:
-        """
-        Convenience function for setting a collection of omittable int values.
-
-        Values are converted to ints prior to assignment.
-        """
-        for k, v in kwargs.items():
-            self._set_value(k, v, callback=int)

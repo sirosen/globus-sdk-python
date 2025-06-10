@@ -3,14 +3,14 @@ from __future__ import annotations
 import abc
 import typing as t
 
-from globus_sdk import utils
 from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._payload import Payload
 from globus_sdk._types import UUIDLike
 
 from ._common import DatatypeCallback, ensure_datatype
 
 
-class StorageGatewayDocument(utils.PayloadWrapper):
+class StorageGatewayDocument(Payload):
     """
     Convenience class for constructing a Storage Gateway document
     to use as the `data` parameter to ``create_storage_gateway`` or
@@ -91,7 +91,7 @@ class StorageGatewayDocument(utils.PayloadWrapper):
         ensure_datatype(self)
 
 
-class StorageGatewayPolicies(utils.PayloadWrapper, abc.ABC):
+class StorageGatewayPolicies(Payload, abc.ABC):
     """
     This is the abstract base type for Storage Policies documents to use as the
     ``policies`` parameter when creating a StorageGatewayDocument.

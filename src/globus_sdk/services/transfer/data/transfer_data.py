@@ -4,8 +4,9 @@ import datetime
 import logging
 import typing as t
 
-from globus_sdk import exc, utils
+from globus_sdk import exc
 from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._payload import Payload
 from globus_sdk._types import UUIDLike
 
 if t.TYPE_CHECKING:
@@ -36,7 +37,7 @@ def _parse_sync_level(
     return sync_level
 
 
-class TransferData(utils.PayloadWrapper):
+class TransferData(Payload):
     r"""
     Convenience class for constructing a transfer document, to use as the
     ``data`` parameter to

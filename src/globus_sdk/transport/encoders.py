@@ -6,7 +6,6 @@ import uuid
 
 import requests
 
-from globus_sdk import utils
 from globus_sdk._missing import MISSING, filter_missing
 
 
@@ -87,12 +86,12 @@ class RequestEncoder:
         """
         Prepare the data (body) for a request.
 
-        If the body is a dict or PayloadWrapper, it will be recursively processed to
+        If the body is a dict, list, or tuple, it will be recursively processed to
         filter out MISSING and format primitives.
 
         Otherwise, it is returned as-is.
         """
-        if isinstance(data, (dict, utils.PayloadWrapper)):
+        if isinstance(data, dict):
             return filter_missing({k: self._prepare_data(v) for k, v in data.items()})
         elif isinstance(data, (list, tuple)):
             return [self._prepare_data(x) for x in data if x is not MISSING]
@@ -139,7 +138,7 @@ class FormRequestEncoder(RequestEncoder):
         data: t.Any,
         headers: dict[str, str],
     ) -> requests.Request:
-        if not isinstance(data, (dict, utils.PayloadWrapper)):
+        if not isinstance(data, dict):
             raise TypeError("FormRequestEncoder cannot encode non-dict data")
         return requests.Request(
             method,

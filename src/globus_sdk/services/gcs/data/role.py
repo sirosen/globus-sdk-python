@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import typing as t
 
-from globus_sdk import utils
 from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._payload import Payload
 from globus_sdk._types import UUIDLike
 
 
-class GCSRoleDocument(utils.PayloadWrapper):
+class GCSRoleDocument(Payload):
     """
     Convenience class for constructing a Role document
     to use as the `data` parameter to `create_role`

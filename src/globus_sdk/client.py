@@ -18,7 +18,7 @@ if t.TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-_DataParamType = t.Union[None, str, bytes, t.Dict[str, t.Any], utils.PayloadWrapper]
+_DataParamType: t.TypeAlias = t.Union[None, str, bytes, t.Dict[str, t.Any]]
 
 
 class BaseClient:

@@ -344,13 +344,13 @@ class AuthLoginClient(client.BaseClient):
     @t.overload
     def oauth2_token(
         self,
-        form_data: dict[str, t.Any] | utils.PayloadWrapper,
+        form_data: dict[str, t.Any],
     ) -> OAuthTokenResponse: ...
 
     @t.overload
     def oauth2_token(
         self,
-        form_data: dict[str, t.Any] | utils.PayloadWrapper,
+        form_data: dict[str, t.Any],
         *,
         body_params: dict[str, t.Any] | None,
     ) -> OAuthTokenResponse: ...
@@ -358,7 +358,7 @@ class AuthLoginClient(client.BaseClient):
     @t.overload
     def oauth2_token(
         self,
-        form_data: dict[str, t.Any] | utils.PayloadWrapper,
+        form_data: dict[str, t.Any],
         *,
         response_class: type[RT],
     ) -> RT: ...
@@ -366,7 +366,7 @@ class AuthLoginClient(client.BaseClient):
     @t.overload
     def oauth2_token(
         self,
-        form_data: dict[str, t.Any] | utils.PayloadWrapper,
+        form_data: dict[str, t.Any],
         *,
         body_params: dict[str, t.Any] | None,
         response_class: type[RT],
@@ -374,7 +374,7 @@ class AuthLoginClient(client.BaseClient):
 
     def oauth2_token(
         self,
-        form_data: dict[str, t.Any] | utils.PayloadWrapper,
+        form_data: dict[str, t.Any],
         *,
         body_params: dict[str, t.Any] | None = None,
         response_class: type[OAuthTokenResponse] | type[RT] = OAuthTokenResponse,

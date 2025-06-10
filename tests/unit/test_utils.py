@@ -45,27 +45,6 @@ def test_slash_join(a, b):
     assert utils.slash_join(a, b) == "a/b"
 
 
-def test_payload_wrapper_methods():
-    # just make sure that PayloadWrapper acts like a dict...
-    data = utils.PayloadWrapper()
-    assert "foo" not in data
-    with pytest.raises(KeyError):
-        data["foo"]
-    data["foo"] = 1
-    assert "foo" in data
-    assert data["foo"] == 1
-    del data["foo"]
-    assert "foo" not in data
-    assert len(data) == 0
-    assert list(data) == []
-    data["foo"] = 1
-    data["bar"] = 2
-    assert len(data) == 2
-    assert data.data == {"foo": 1, "bar": 2}
-    data.update({"x": "hello", "y": "world"})
-    assert data.data == {"foo": 1, "bar": 2, "x": "hello", "y": "world"}
-
-
 @pytest.mark.parametrize(
     "value, expected_result",
     (

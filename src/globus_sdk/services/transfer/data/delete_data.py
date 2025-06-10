@@ -4,8 +4,9 @@ import datetime
 import logging
 import typing as t
 
-from globus_sdk import exc, utils
+from globus_sdk import exc
 from globus_sdk._missing import MISSING, MissingType
+from globus_sdk._payload import Payload
 from globus_sdk._types import UUIDLike
 
 if t.TYPE_CHECKING:
@@ -14,7 +15,7 @@ if t.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-class DeleteData(utils.PayloadWrapper):
+class DeleteData(Payload):
     r"""
     Convenience class for constructing a delete document, to use as the
     `data` parameter to

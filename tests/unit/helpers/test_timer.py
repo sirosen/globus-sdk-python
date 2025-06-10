@@ -76,7 +76,7 @@ def test_transfer_timer_removes_disallowed_fields():
 )
 def test_once_timer_schedule_formats_datetime(input_time, expected):
     schedule = OnceTimerSchedule(datetime=input_time)
-    assert schedule.data == {"type": "once", "datetime": expected}
+    assert dict(schedule) == {"type": "once", "datetime": expected}
 
 
 def test_recurring_timer_schedule_interval_only():

@@ -21,8 +21,8 @@ STUB_MC_ID = uuid.uuid1()  # mapped collection
 STUB_UC_ID = uuid.uuid1()  # user credential
 
 
-MappedCollectionSignature = inspect.signature(MappedCollectionDocument)
-GuestCollectionSignature = inspect.signature(GuestCollectionDocument)
+MappedCollectionSignature = inspect.signature(MappedCollectionDocument.__init__)
+GuestCollectionSignature = inspect.signature(GuestCollectionDocument.__init__)
 
 
 def test_collection_base_abstract():
