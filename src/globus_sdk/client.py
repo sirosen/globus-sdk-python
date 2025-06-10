@@ -4,9 +4,10 @@ import logging
 import typing as t
 import urllib.parse
 
-from globus_sdk import GlobusSDKUsageError, config, exc, utils
+from globus_sdk import GlobusSDKUsageError, config, exc
 from globus_sdk._classproperty import classproperty
 from globus_sdk._types import ScopeCollectionType
+from globus_sdk._utils import slash_join
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.paging import PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
@@ -477,7 +478,7 @@ class BaseClient:
         if path.startswith("https://") or path.startswith("http://"):
             url = path
         else:
-            url = utils.slash_join(self.base_url, urllib.parse.quote(path))
+            url = slash_join(self.base_url, urllib.parse.quote(path))
 
         # either use given authorizer or get one from app
         if automatic_authorization:

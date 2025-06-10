@@ -3,11 +3,12 @@ from __future__ import annotations
 import typing as t
 import uuid
 
-from globus_sdk import client, exc, paging, response, scopes, utils
+from globus_sdk import client, exc, paging, response, scopes
 from globus_sdk._classproperty import classproperty
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._remarshal import commajoin
 from globus_sdk._types import UUIDLike
+from globus_sdk._utils import slash_join
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.globus_app import GlobusApp
 from globus_sdk.scopes import Scope
@@ -66,7 +67,7 @@ class GCSClient(client.BaseClient):
         # if it was an HTTPS URL, check that it ends with /api/
         elif not gcs_address.endswith(("/api/", "/api")):
             # if it doesn't, add it
-            gcs_address = utils.slash_join(gcs_address, "/api/")
+            gcs_address = slash_join(gcs_address, "/api/")
 
         self._endpoint_client_id: str | None = None
 

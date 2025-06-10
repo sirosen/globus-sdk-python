@@ -23,7 +23,7 @@ As a result, where ``MISSING`` is used as the default for a value, ``None`` can
 be used to explicitly pass the value ``null``.
 
 .. class:: globus_sdk.MissingType
-    :canonical: globus_sdk.utils.MissingType
+    :canonical: globus_sdk._missing.MissingType
 
     This is the type of ``MISSING``.
 

@@ -1,13 +1,13 @@
 import pytest
 
-from globus_sdk import utils
+from globus_sdk._utils import get_nice_hostname, sha256_string, slash_join
 
 
 def test_sha256string():
     test_string = "foo"
     expected_sha = "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
 
-    assert utils.sha256_string(test_string) == expected_sha
+    assert sha256_string(test_string) == expected_sha
 
 
 @pytest.mark.parametrize(
@@ -26,7 +26,7 @@ def test_sha256string():
 )
 def test_get_nice_hostname(platform_value, result, monkeypatch):
     monkeypatch.setattr("platform.node", lambda: platform_value)
-    assert utils.get_nice_hostname() == result
+    assert get_nice_hostname() == result
 
 
 @pytest.mark.parametrize(
@@ -40,4 +40,4 @@ def test_slash_join(a, b):
     to b's with and without leading "/"
     Confirms all have the same correct slash_join output
     """
-    assert utils.slash_join(a, b) == "a/b"
+    assert slash_join(a, b) == "a/b"
