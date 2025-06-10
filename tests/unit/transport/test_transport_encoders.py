@@ -2,8 +2,9 @@ import uuid
 
 import pytest
 
+from globus_sdk import MISSING
 from globus_sdk.transport import FormRequestEncoder, JSONRequestEncoder, RequestEncoder
-from globus_sdk.utils import MISSING, PayloadWrapper
+from globus_sdk.utils import PayloadWrapper
 
 
 @pytest.mark.parametrize("data", ("foo", b"bar"))

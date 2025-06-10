@@ -6,9 +6,9 @@ import typing as t
 import uuid
 
 from globus_sdk import _guards, client, exc, paging, response, utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import DateLike, IntLike, UUIDLike
 from globus_sdk.scopes import GCSCollectionScopeBuilder, Scope, TransferScopes
-from globus_sdk.utils import MISSING, MissingType
 
 from .data import DeleteData, TransferData
 from .errors import TransferAPIError

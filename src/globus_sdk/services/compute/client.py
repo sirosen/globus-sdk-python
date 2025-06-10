@@ -4,9 +4,9 @@ import logging
 import typing as t
 
 from globus_sdk import GlobusHTTPResponse, client, utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import ComputeScopes, Scope
-from globus_sdk.utils import MISSING, MissingType
 
 from .errors import ComputeAPIError
 

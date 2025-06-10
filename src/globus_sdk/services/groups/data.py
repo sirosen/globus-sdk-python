@@ -4,6 +4,7 @@ import enum
 import typing as t
 
 from globus_sdk import utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 
 T = t.TypeVar("T")
@@ -283,9 +284,7 @@ class GroupPolicies(utils.PayloadWrapper):
         group_members_visibility: _GROUP_MEMBER_VISIBILITY_T,
         join_requests: bool,
         signup_fields: t.Iterable[_GROUP_REQUIRED_SIGNUP_FIELDS_T],
-        authentication_assurance_timeout: (
-            int | None | utils.MissingType
-        ) = utils.MISSING,
+        authentication_assurance_timeout: int | None | MissingType = MISSING,
     ) -> None:
         super().__init__()
         self["is_high_assurance"] = is_high_assurance

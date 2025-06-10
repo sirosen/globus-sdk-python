@@ -7,6 +7,7 @@ import typing as t
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 from globus_sdk import client, exc, utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.response import GlobusHTTPResponse, IterableResponse
@@ -815,15 +816,11 @@ class AuthClient(client.BaseClient):
         project_id: UUIDLike,
         display_name: str,
         description: str,
-        high_assurance: bool | utils.MissingType = utils.MISSING,
-        authentication_assurance_timeout: int | utils.MissingType = utils.MISSING,
-        required_mfa: bool | utils.MissingType = utils.MISSING,
-        domain_constraints_include: (
-            t.Iterable[str] | None | utils.MissingType
-        ) = utils.MISSING,
-        domain_constraints_exclude: (
-            t.Iterable[str] | None | utils.MissingType
-        ) = utils.MISSING,
+        high_assurance: bool | MissingType = MISSING,
+        authentication_assurance_timeout: int | MissingType = MISSING,
+        required_mfa: bool | MissingType = MISSING,
+        domain_constraints_include: t.Iterable[str] | None | MissingType = MISSING,
+        domain_constraints_exclude: t.Iterable[str] | None | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Create a new Auth policy. Requires the ``manage_projects`` scope.
@@ -897,17 +894,13 @@ class AuthClient(client.BaseClient):
         self,
         policy_id: UUIDLike,
         *,
-        project_id: UUIDLike | utils.MissingType = utils.MISSING,
-        authentication_assurance_timeout: int | utils.MissingType = utils.MISSING,
-        required_mfa: bool | utils.MissingType = utils.MISSING,
-        display_name: str | utils.MissingType = utils.MISSING,
-        description: str | utils.MissingType = utils.MISSING,
-        domain_constraints_include: (
-            t.Iterable[str] | None | utils.MissingType
-        ) = utils.MISSING,
-        domain_constraints_exclude: (
-            t.Iterable[str] | None | utils.MissingType
-        ) = utils.MISSING,
+        project_id: UUIDLike | MissingType = MISSING,
+        authentication_assurance_timeout: int | MissingType = MISSING,
+        required_mfa: bool | MissingType = MISSING,
+        display_name: str | MissingType = MISSING,
+        description: str | MissingType = MISSING,
+        domain_constraints_include: t.Iterable[str] | None | MissingType = MISSING,
+        domain_constraints_exclude: t.Iterable[str] | None | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Update a policy. Requires the ``manage_projects`` scope.
@@ -990,8 +983,8 @@ class AuthClient(client.BaseClient):
     def get_client(
         self,
         *,
-        client_id: UUIDLike | utils.MissingType = utils.MISSING,
-        fqdn: str | utils.MissingType = utils.MISSING,
+        client_id: UUIDLike | MissingType = MISSING,
+        fqdn: str | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Look up a client by ``client_id`` or (exclusive) by ``fqdn``.
@@ -1053,18 +1046,18 @@ class AuthClient(client.BaseClient):
                 .. extdoclink:: Get Clients
                     :ref: auth/reference/#get_clients
         """  # noqa: E501
-        if client_id is not utils.MISSING and fqdn is not utils.MISSING:
+        if client_id is not MISSING and fqdn is not MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.get_client does not take both "
                 "'client_id' and 'fqdn'. These are mutually exclusive."
             )
 
-        if client_id is utils.MISSING and fqdn is utils.MISSING:
+        if client_id is MISSING and fqdn is MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.get_client requires either 'client_id' or 'fqdn'."
             )
 
-        if client_id is not utils.MISSING:
+        if client_id is not MISSING:
             return self.get(f"/v2/api/clients/{client_id}")
         return self.get("/v2/api/clients", query_params={"fqdn": fqdn})
 
@@ -1141,9 +1134,9 @@ class AuthClient(client.BaseClient):
         name: str,
         project: UUIDLike,
         *,
-        public_client: bool | utils.MissingType = utils.MISSING,
+        public_client: bool | MissingType = MISSING,
         client_type: (
-            utils.MissingType
+            MissingType
             | t.Literal[
                 "client_identity",
                 "confidential_client",
@@ -1152,14 +1145,14 @@ class AuthClient(client.BaseClient):
                 "hybrid_confidential_client_resource_server",
                 "resource_server",
             ]
-        ) = utils.MISSING,
-        visibility: utils.MissingType | t.Literal["public", "private"] = utils.MISSING,
-        redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
-        terms_and_conditions: str | utils.MissingType = utils.MISSING,
-        privacy_policy: str | utils.MissingType = utils.MISSING,
-        required_idp: UUIDLike | utils.MissingType = utils.MISSING,
-        preselect_idp: UUIDLike | utils.MissingType = utils.MISSING,
-        additional_fields: dict[str, t.Any] | utils.MissingType = utils.MISSING,
+        ) = MISSING,
+        visibility: MissingType | t.Literal["public", "private"] = MISSING,
+        redirect_uris: t.Iterable[str] | MissingType = MISSING,
+        terms_and_conditions: str | MissingType = MISSING,
+        privacy_policy: str | MissingType = MISSING,
+        required_idp: UUIDLike | MissingType = MISSING,
+        preselect_idp: UUIDLike | MissingType = MISSING,
+        additional_fields: dict[str, t.Any] | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Create a new client. Requires the ``manage_projects`` scope.
@@ -1247,12 +1240,12 @@ class AuthClient(client.BaseClient):
                     :ref: auth/reference/#create_client
         """
         # Must specify exactly one of public_client or client_type
-        if public_client is not utils.MISSING and client_type is not utils.MISSING:
+        if public_client is not MISSING and client_type is not MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.create_client does not take both "
                 "'public_client' and 'client_type'. These are mutually exclusive."
             )
-        if public_client is utils.MISSING and client_type is utils.MISSING:
+        if public_client is MISSING and client_type is MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.create_client requires either 'public_client' or "
                 "'client_type'."
@@ -1273,14 +1266,14 @@ class AuthClient(client.BaseClient):
             raise exc.GlobusSDKUsageError(
                 "terms_and_conditions and privacy_policy must both be set or unset"
             )
-        links: dict[str, str | utils.MissingType] = {
+        links: dict[str, str | MissingType] = {
             "terms_and_conditions": terms_and_conditions,
             "privacy_policy": privacy_policy,
         }
         if terms_and_conditions or privacy_policy:
             body["links"] = links
 
-        if not isinstance(additional_fields, utils.MissingType):
+        if not isinstance(additional_fields, MissingType):
             body.update(additional_fields)
 
         return self.post("/v2/api/clients", data={"client": body})
@@ -1289,14 +1282,14 @@ class AuthClient(client.BaseClient):
         self,
         client_id: UUIDLike,
         *,
-        name: str | utils.MissingType = utils.MISSING,
-        visibility: utils.MissingType | t.Literal["public", "private"] = utils.MISSING,
-        redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
-        terms_and_conditions: str | None | utils.MissingType = utils.MISSING,
-        privacy_policy: str | None | utils.MissingType = utils.MISSING,
-        required_idp: UUIDLike | None | utils.MissingType = utils.MISSING,
-        preselect_idp: UUIDLike | None | utils.MissingType = utils.MISSING,
-        additional_fields: dict[str, t.Any] | utils.MissingType = utils.MISSING,
+        name: str | MissingType = MISSING,
+        visibility: MissingType | t.Literal["public", "private"] = MISSING,
+        redirect_uris: t.Iterable[str] | MissingType = MISSING,
+        terms_and_conditions: str | None | MissingType = MISSING,
+        privacy_policy: str | None | MissingType = MISSING,
+        required_idp: UUIDLike | None | MissingType = MISSING,
+        preselect_idp: UUIDLike | None | MissingType = MISSING,
+        additional_fields: dict[str, t.Any] | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Update a client. Requires the ``manage_projects`` scope.
@@ -1361,17 +1354,14 @@ class AuthClient(client.BaseClient):
             raise exc.GlobusSDKUsageError(
                 "terms_and_conditions and privacy_policy must both be set or unset"
             )
-        links: dict[str, str | None | utils.MissingType] = {
+        links: dict[str, str | None | MissingType] = {
             "terms_and_conditions": terms_and_conditions,
             "privacy_policy": privacy_policy,
         }
-        if (
-            terms_and_conditions is not utils.MISSING
-            or privacy_policy is not utils.MISSING
-        ):
+        if terms_and_conditions is not MISSING or privacy_policy is not MISSING:
             body["links"] = links
 
-        if not isinstance(additional_fields, utils.MissingType):
+        if not isinstance(additional_fields, MissingType):
             body.update(additional_fields)
 
         return self.put(f"/v2/api/clients/{client_id}", data={"client": body})
@@ -1575,9 +1565,9 @@ class AuthClient(client.BaseClient):
     def get_scopes(
         self,
         *,
-        scope_strings: t.Iterable[str] | str | utils.MissingType = utils.MISSING,
-        ids: t.Iterable[UUIDLike] | UUIDLike | utils.MissingType = utils.MISSING,
-        query_params: dict[str, t.Any] | utils.MissingType = utils.MISSING,
+        scope_strings: t.Iterable[str] | str | MissingType = MISSING,
+        ids: t.Iterable[UUIDLike] | UUIDLike | MissingType = MISSING,
+        query_params: dict[str, t.Any] | MissingType = MISSING,
     ) -> IterableResponse:
         """
         Look up scopes in projects on which the authenticated user is an admin.
@@ -1647,18 +1637,18 @@ class AuthClient(client.BaseClient):
                 .. extdoclink:: Get Scopes
                     :ref: auth/reference/#get_scopes
         """  # noqa: E501
-        if scope_strings is not utils.MISSING and ids is not utils.MISSING:
+        if scope_strings is not MISSING and ids is not MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.get_scopes does not take both "
                 "'scopes_strings' and 'ids'. These are mutually exclusive."
             )
 
-        if isinstance(query_params, utils.MissingType):
+        if isinstance(query_params, MissingType):
             query_params = {}
 
-        if not isinstance(scope_strings, utils.MissingType):
+        if not isinstance(scope_strings, MissingType):
             query_params["scope_strings"] = utils.commajoin(scope_strings)
-        if not isinstance(ids, utils.MissingType):
+        if not isinstance(ids, MissingType):
             query_params["ids"] = utils.commajoin(ids)
 
         return GetScopesResponse(self.get("/v2/api/scopes", query_params=query_params))
@@ -1670,12 +1660,10 @@ class AuthClient(client.BaseClient):
         description: str,
         scope_suffix: str,
         *,
-        required_domains: t.Iterable[str] | utils.MissingType = utils.MISSING,
-        dependent_scopes: (
-            t.Iterable[DependentScopeSpec] | utils.MissingType
-        ) = utils.MISSING,
-        advertised: bool | utils.MissingType = utils.MISSING,
-        allows_refresh_token: bool | utils.MissingType = utils.MISSING,
+        required_domains: t.Iterable[str] | MissingType = MISSING,
+        dependent_scopes: t.Iterable[DependentScopeSpec] | MissingType = MISSING,
+        advertised: bool | MissingType = MISSING,
+        allows_refresh_token: bool | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Create a new scope. Requires the ``manage_projects`` scope.
@@ -1738,15 +1726,13 @@ class AuthClient(client.BaseClient):
         self,
         scope_id: UUIDLike,
         *,
-        name: str | utils.MissingType = utils.MISSING,
-        description: str | utils.MissingType = utils.MISSING,
-        scope_suffix: str | utils.MissingType = utils.MISSING,
-        required_domains: t.Iterable[str] | utils.MissingType = utils.MISSING,
-        dependent_scopes: (
-            t.Iterable[DependentScopeSpec] | utils.MissingType
-        ) = utils.MISSING,
-        advertised: bool | utils.MissingType = utils.MISSING,
-        allows_refresh_token: bool | utils.MissingType = utils.MISSING,
+        name: str | MissingType = MISSING,
+        description: str | MissingType = MISSING,
+        scope_suffix: str | MissingType = MISSING,
+        required_domains: t.Iterable[str] | MissingType = MISSING,
+        dependent_scopes: t.Iterable[DependentScopeSpec] | MissingType = MISSING,
+        advertised: bool | MissingType = MISSING,
+        allows_refresh_token: bool | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Update a scope. Requires the ``manage_projects`` scope.

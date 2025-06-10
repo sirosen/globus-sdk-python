@@ -7,6 +7,7 @@ import uuid
 import requests
 
 from globus_sdk import utils
+from globus_sdk._missing import MISSING, filter_missing
 
 
 class RequestEncoder:
@@ -66,9 +67,7 @@ class RequestEncoder:
         """
         if params is None:
             return None
-        return utils.filter_missing(
-            {k: self._format_primitive(v) for k, v in params.items()}
-        )
+        return filter_missing({k: self._format_primitive(v) for k, v in params.items()})
 
     def _prepare_headers(
         self, headers: dict[str, t.Any] | None
@@ -80,7 +79,7 @@ class RequestEncoder:
         """
         if headers is None:
             return None
-        return utils.filter_missing(
+        return filter_missing(
             {k: self._format_primitive(v) for k, v in headers.items()}
         )
 
@@ -94,11 +93,9 @@ class RequestEncoder:
         Otherwise, it is returned as-is.
         """
         if isinstance(data, (dict, utils.PayloadWrapper)):
-            return utils.filter_missing(
-                {k: self._prepare_data(v) for k, v in data.items()}
-            )
+            return filter_missing({k: self._prepare_data(v) for k, v in data.items()})
         elif isinstance(data, (list, tuple)):
-            return [self._prepare_data(x) for x in data if x is not utils.MISSING]
+            return [self._prepare_data(x) for x in data if x is not MISSING]
         else:
             return self._format_primitive(data)
 

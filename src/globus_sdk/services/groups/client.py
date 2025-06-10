@@ -3,9 +3,9 @@ from __future__ import annotations
 import typing as t
 
 from globus_sdk import client, response, utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import GroupsScopes, Scope
-from globus_sdk.utils import MISSING, MissingType
 
 from .data import BatchMembershipActions, GroupPolicies
 from .errors import GroupsAPIError

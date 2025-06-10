@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from globus_sdk import utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 from globus_sdk.exc import warn_deprecated
-from globus_sdk.utils import MISSING, MissingType
 
 
 class ComputeFunctionMetadata(utils.PayloadWrapper):

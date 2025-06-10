@@ -5,8 +5,8 @@ import logging
 import typing as t
 
 from globus_sdk import exc, utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
-from globus_sdk.utils import MISSING, MissingType
 
 if t.TYPE_CHECKING:
     import globus_sdk

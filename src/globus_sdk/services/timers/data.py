@@ -6,10 +6,11 @@ import datetime as dt
 import logging
 import typing as t
 
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.config import get_service_url
 from globus_sdk.exc import warn_deprecated
 from globus_sdk.services.transfer import TransferData
-from globus_sdk.utils import MISSING, MissingType, PayloadWrapper, slash_join
+from globus_sdk.utils import PayloadWrapper, slash_join
 
 log = logging.getLogger(__name__)
 

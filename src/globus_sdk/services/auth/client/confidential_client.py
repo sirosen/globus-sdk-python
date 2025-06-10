@@ -4,6 +4,7 @@ import logging
 import typing as t
 
 from globus_sdk import exc, utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import ScopeCollectionType, UUIDLike
 from globus_sdk.authorizers import BasicAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
@@ -194,7 +195,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         token: str,
         *,
         refresh_tokens: bool = False,
-        scope: str | t.Iterable[str] | utils.MissingType = utils.MISSING,
+        scope: str | t.Iterable[str] | MissingType = MISSING,
         additional_params: dict[str, t.Any] | None = None,
     ) -> OAuthDependentTokenResponse:
         """
@@ -268,7 +269,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         # back to the user than the OAuth2 spec wording
         if refresh_tokens:
             form_data["access_type"] = "offline"
-        if not isinstance(scope, utils.MissingType):
+        if not isinstance(scope, MissingType):
             form_data["scope"] = " ".join(utils.safe_strseq_iter(scope))
         if additional_params:
             form_data.update(additional_params)
@@ -332,7 +333,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
         self,
         name: str,
         *,
-        public_client: bool | utils.MissingType = utils.MISSING,
+        public_client: bool | MissingType = MISSING,
         client_type: (
             t.Literal[
                 "client_identity",
@@ -342,15 +343,15 @@ class ConfidentialAppAuthClient(AuthLoginClient):
                 "hybrid_confidential_client_resource_server",
                 "resource_server",
             ]
-            | utils.MissingType
-        ) = utils.MISSING,
-        visibility: t.Literal["public", "private"] | utils.MissingType = utils.MISSING,
-        redirect_uris: t.Iterable[str] | utils.MissingType = utils.MISSING,
-        terms_and_conditions: str | utils.MissingType = utils.MISSING,
-        privacy_policy: str | utils.MissingType = utils.MISSING,
-        required_idp: UUIDLike | utils.MissingType = utils.MISSING,
-        preselect_idp: UUIDLike | utils.MissingType = utils.MISSING,
-        additional_fields: dict[str, t.Any] | utils.MissingType = utils.MISSING,
+            | MissingType
+        ) = MISSING,
+        visibility: t.Literal["public", "private"] | MissingType = MISSING,
+        redirect_uris: t.Iterable[str] | MissingType = MISSING,
+        terms_and_conditions: str | MissingType = MISSING,
+        privacy_policy: str | MissingType = MISSING,
+        required_idp: UUIDLike | MissingType = MISSING,
+        preselect_idp: UUIDLike | MissingType = MISSING,
+        additional_fields: dict[str, t.Any] | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Create a new client. Requires the ``manage_projects`` scope.
@@ -435,12 +436,12 @@ class ConfidentialAppAuthClient(AuthLoginClient):
                     :ref: auth/reference/#create_client
         """
         # Must specify exactly one of public_client or client_type
-        if public_client is not utils.MISSING and client_type is not utils.MISSING:
+        if public_client is not MISSING and client_type is not MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.create_client does not take both "
                 "'public_client' and 'client_type'. These are mutually exclusive."
             )
-        if public_client is utils.MISSING and client_type is utils.MISSING:
+        if public_client is MISSING and client_type is MISSING:
             raise exc.GlobusSDKUsageError(
                 "AuthClient.create_client requires either 'public_client' or "
                 "'client_type'."
@@ -454,7 +455,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
             "public_client": public_client,
             "client_type": client_type,
         }
-        if not isinstance(redirect_uris, utils.MissingType):
+        if not isinstance(redirect_uris, MissingType):
             body["redirect_uris"] = list(utils.safe_strseq_iter(redirect_uris))
 
         # terms_and_conditions and privacy_policy must both be set or unset
@@ -462,14 +463,14 @@ class ConfidentialAppAuthClient(AuthLoginClient):
             raise exc.GlobusSDKUsageError(
                 "terms_and_conditions and privacy_policy must both be set or unset"
             )
-        links: dict[str, str | utils.MissingType] = {
+        links: dict[str, str | MissingType] = {
             "terms_and_conditions": terms_and_conditions,
             "privacy_policy": privacy_policy,
         }
         if terms_and_conditions or privacy_policy:
             body["links"] = links
 
-        if not isinstance(additional_fields, utils.MissingType):
+        if not isinstance(additional_fields, MissingType):
             body.update(additional_fields)
 
         return self.post("/v2/api/clients", data={"client": body})

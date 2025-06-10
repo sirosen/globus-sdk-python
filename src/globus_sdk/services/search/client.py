@@ -4,10 +4,10 @@ import logging
 import typing as t
 
 from globus_sdk import client, paging, response, utils
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 from globus_sdk.exc.warnings import warn_deprecated
 from globus_sdk.scopes import Scope, SearchScopes
-from globus_sdk.utils import MISSING, MissingType
 
 from .data import SearchQuery, SearchScrollQuery
 from .errors import SearchAPIError

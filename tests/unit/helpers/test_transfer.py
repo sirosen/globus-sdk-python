@@ -1,9 +1,14 @@
 import pytest
 
-from globus_sdk import DeleteData, GlobusSDKUsageError, TransferClient, TransferData
+from globus_sdk import (
+    MISSING,
+    DeleteData,
+    GlobusSDKUsageError,
+    TransferClient,
+    TransferData,
+)
 from globus_sdk._testing import load_response
 from globus_sdk.services.transfer.client import _format_filter
-from globus_sdk.utils import MISSING
 from tests.common import GO_EP1_ID, GO_EP2_ID
 
 

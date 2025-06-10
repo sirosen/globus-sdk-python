@@ -14,6 +14,7 @@ from globus_sdk import (
     paging,
     utils,
 )
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.globus_app import GlobusApp
@@ -25,7 +26,6 @@ from globus_sdk.scopes import (
     SpecificFlowScopeBuilder,
     TransferScopes,
 )
-from globus_sdk.utils import MISSING, MissingType
 
 from .data import RunActivityNotificationPolicy
 from .errors import FlowsAPIError

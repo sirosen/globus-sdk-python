@@ -5,11 +5,11 @@ import uuid
 
 from globus_sdk import client, exc, paging, response, scopes, utils
 from globus_sdk._classproperty import classproperty
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.globus_app import GlobusApp
 from globus_sdk.scopes import Scope
-from globus_sdk.utils import MISSING, MissingType
 
 from .connector_table import ConnectorTable
 from .data import (
