@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import abc
+import sys
 import typing as t
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 # TODO: Remove this dispatch after we drop Python 3.8 support.
 #       In 3.9+ `dict.__class_getitem__` is available.
 if t.TYPE_CHECKING:
     # pylint: disable=unsubscriptable-object
-    _PayloadBaseDict = dict[str, t.Any]
+    _PayloadBaseDict = t.Dict[str, t.Any]
 else:
     _PayloadBaseDict = dict
 
@@ -37,7 +43,7 @@ class AbstractPayload(Payload, abc.ABC):
 
     # explicitly define `__new__` in order to check for abstract methods which
     # were not redefined
-    def __new__(cls, *args: t.Any, **kwargs: t.Any) -> t.Self:
+    def __new__(cls, *args: t.Any, **kwargs: t.Any) -> Self:
         obj = super().__new__(cls, *args, **kwargs)
         abstractmethods: frozenset[str] = (
             obj.__abstractmethods__  # type: ignore[attr-defined]

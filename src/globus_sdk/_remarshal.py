@@ -45,11 +45,11 @@ def safe_strseq_iter(
             yield str(x)
 
 
-def safe_stringify(
-    value: object | MissingType | None,
-) -> str | MissingType | None:
+def safe_stringify(value: object | MissingType | None) -> str | MissingType | None:
     """
     Given any object or a MISSING|None, return `str(object) | MISSING | None`.
+
+    :param value: The stringifiable object
     """
     if value is None:
         return None
@@ -76,6 +76,8 @@ def safe_strseq_listify(
     Unlike safe_strseq_iter, this may be the "last mile" remarshalling step before
     data is actually passed to the network layer. Therefore, it makes sense for this
     helper to handle (MISSING | None).
+
+    :param value: The stringifiable object or iterable of objects
     """
     if value is None:
         return None
@@ -95,6 +97,8 @@ def listify(value: t.Iterable[T]) -> list[T]: ...
 def listify(value: t.Iterable[T] | MissingType | None) -> list[T] | MissingType | None:
     """
     Convert any iterable to a list, with handling for None and Missing.
+
+    :param value: The iterable of objects
     """
     if value is None:
         return None
@@ -126,6 +130,9 @@ def safe_list_map(
 ) -> list[R] | MissingType | None:
     """
     Like map() but handles None|MISSING and listifies the result otherwise.
+
+    :param value: The iterable of objects over which to map
+    :param mapped_function: The function to map
     """
     if value is None:
         return None

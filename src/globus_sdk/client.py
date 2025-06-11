@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import typing as t
 import urllib.parse
 
@@ -14,12 +15,17 @@ from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import Scope, ScopeBuilder
 from globus_sdk.transport import RequestsTransport
 
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
+
 if t.TYPE_CHECKING:
     from globus_sdk.globus_app import GlobusApp
 
 log = logging.getLogger(__name__)
 
-_DataParamType: t.TypeAlias = t.Union[None, str, bytes, t.Dict[str, t.Any]]
+_DataParamType: TypeAlias = t.Union[None, str, bytes, t.Dict[str, t.Any]]
 
 
 class BaseClient:
