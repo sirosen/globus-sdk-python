@@ -61,7 +61,7 @@ def test_transfer_init_no_client():
         assert tdata["DATA_TYPE"] == "transfer"
         assert tdata["source_endpoint"] == GO_EP1_ID
         assert tdata["destination_endpoint"] == GO_EP2_ID
-        assert "submission_id" not in tdata
+        assert tdata["submission_id"] is MISSING
         assert "DATA" in tdata
         assert len(tdata["DATA"]) == 0
 
@@ -204,7 +204,7 @@ def test_delete_init_no_client(args, kwargs):
     ddata = DeleteData(*args, **kwargs)
     assert ddata["DATA_TYPE"] == "delete"
     assert ddata["endpoint"] == GO_EP1_ID
-    assert "submission_id" not in ddata
+    assert ddata["submission_id"] is MISSING
     assert "DATA" in ddata
     assert len(ddata["DATA"]) == 0
 
@@ -312,8 +312,8 @@ def test_notification_options(n_succeeded, n_failed, n_inactive):
             assert tdata[k] is v
             assert ddata[k] is v
         else:
-            assert k not in tdata
-            assert k not in ddata
+            assert tdata[k] is MISSING
+            assert ddata[k] is MISSING
 
 
 @pytest.mark.parametrize(
@@ -362,7 +362,7 @@ def test_skip_activation_check_supported(datatype, value):
 
     if value is None:
         # not present if not provided as a param or provided as explicit None
-        assert "skip_activation_check" not in create()
+        assert create()["skip_activation_check"] is MISSING
     elif value:
         data = create(skip_activation_check=True)
         assert "skip_activation_check" in data

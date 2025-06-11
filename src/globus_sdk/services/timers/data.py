@@ -312,7 +312,7 @@ class TimerJob(Payload):
             "Creating TimerJob from TransferData, action_url=%s", transfer_action_url
         )
         for key in ("submission_id", "skip_activation_check"):
-            if key in transfer_data:
+            if transfer_data.get(key, MISSING) is not MISSING:
                 raise ValueError(
                     f"cannot create TimerJob from TransferData which has {key} set"
                 )

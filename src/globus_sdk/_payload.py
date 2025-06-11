@@ -3,8 +3,6 @@ from __future__ import annotations
 import abc
 import typing as t
 
-from globus_sdk._missing import MISSING, MissingType
-
 # TODO: Remove this dispatch after we drop Python 3.8 support.
 #       In 3.9+ `dict.__class_getitem__` is available.
 if t.TYPE_CHECKING:
@@ -24,49 +22,6 @@ class Payload(_PayloadBaseDict):
     recognize a ``PayloadBase`` and apply conversions for serialization with
     the requested encoder (e.g. as a JSON request body).
     """
-
-    #
-    # internal helpers for setting non-null values
-    #
-
-    def _set_value(
-        self,
-        key: str,
-        val: t.Any,
-        callback: t.Callable[[t.Any], t.Any] | None = None,
-    ) -> None:
-        """
-        Internal helper for setting an omittable value on the payload.
-
-        If the value is non-None, it will be set and the callback (if provided) will be
-        invoked on it.
-        Otherwise, it will be ignored and the callback will not be invoked.
-
-        :param key: The key to set.
-        :param val: The value to set.
-        :param callback: An optional callback to apply to the value immediately
-            before it is set.
-        """
-        if val is not None and val is not MISSING:
-            self[key] = callback(val) if callback else val
-
-    def _set_optstrs(self, **kwargs: t.Any) -> None:
-        """
-        Convenience function for setting a collection of omittable string values.
-
-        Values are converted to strings prior to assignment.
-        """
-        for k, v in kwargs.items():
-            self._set_value(k, v, callback=str)
-
-    def _set_optbools(self, **kwargs: bool | None | MissingType) -> None:
-        """
-        Convenience function for setting a collection of omittable bool values.
-
-        Values are converted to bools prior to assignment.
-        """
-        for k, v in kwargs.items():
-            self._set_value(k, v, callback=bool)
 
 
 class AbstractPayload(Payload, abc.ABC):

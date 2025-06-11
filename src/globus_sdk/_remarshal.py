@@ -45,6 +45,19 @@ def safe_strseq_iter(
             yield str(x)
 
 
+def safe_stringify(
+    value: object | MissingType | None,
+) -> str | MissingType | None:
+    """
+    Given any object or a MISSING|None, return `str(object) | MISSING | None`.
+    """
+    if value is None:
+        return None
+    if isinstance(value, MissingType):
+        return MISSING
+    return str(value)
+
+
 @t.overload
 def safe_strseq_listify(value: None) -> None: ...
 @t.overload

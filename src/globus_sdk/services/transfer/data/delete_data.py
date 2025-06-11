@@ -7,6 +7,7 @@ import typing as t
 from globus_sdk import exc
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import Payload
+from globus_sdk._remarshal import safe_stringify
 from globus_sdk._types import UUIDLike
 
 if t.TYPE_CHECKING:
@@ -112,27 +113,20 @@ class DeleteData(Payload):
 
         self["DATA_TYPE"] = "delete"
         self["DATA"] = []
-        self._set_optstrs(
-            endpoint=endpoint,
-            label=label,
-            submission_id=submission_id
-            or (
-                transfer_client.get_submission_id()["value"]
-                if transfer_client
-                else None
-            ),
-            deadline=deadline,
-            local_user=local_user,
+        self["endpoint"] = endpoint
+        self["label"] = label
+        self["submission_id"] = submission_id or (
+            transfer_client.get_submission_id()["value"] if transfer_client else MISSING
         )
-        self._set_optbools(
-            recursive=recursive,
-            ignore_missing=ignore_missing,
-            interpret_globs=interpret_globs,
-            skip_activation_check=skip_activation_check,
-            notify_on_succeeded=notify_on_succeeded,
-            notify_on_failed=notify_on_failed,
-            notify_on_inactive=notify_on_inactive,
-        )
+        self["deadline"] = safe_stringify(deadline)
+        self["local_user"] = local_user
+        self["recursive"] = recursive
+        self["ignore_missing"] = ignore_missing
+        self["interpret_globs"] = interpret_globs
+        self["skip_activation_check"] = skip_activation_check
+        self["notify_on_succeeded"] = notify_on_succeeded
+        self["notify_on_failed"] = notify_on_failed
+        self["notify_on_inactive"] = notify_on_inactive
 
         for k, v in self.items():
             log.debug("DeleteData.%s = %s", k, v)
