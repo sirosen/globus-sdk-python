@@ -15,6 +15,9 @@ import uuid
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._types import UUIDLike
 
+T = t.TypeVar("T")
+R = t.TypeVar("R")
+
 
 def safe_strseq_iter(
     value: t.Iterable[t.Any] | str | uuid.UUID,
@@ -66,6 +69,56 @@ def safe_strseq_listify(
     if isinstance(value, MissingType):
         return MISSING
     return list(safe_strseq_iter(value))
+
+
+@t.overload
+def listify(value: None) -> None: ...
+@t.overload
+def listify(value: MissingType) -> MissingType: ...
+@t.overload
+def listify(value: t.Iterable[T]) -> list[T]: ...
+
+
+def listify(value: t.Iterable[T] | MissingType | None) -> list[T] | MissingType | None:
+    """
+    Convert any iterable to a list, with handling for None and Missing.
+    """
+    if value is None:
+        return None
+    if isinstance(value, MissingType):
+        return MISSING
+    if isinstance(value, list):
+        return value
+    return list(value)
+
+
+@t.overload
+def safe_list_map(value: None, mapped_function: t.Callable[[T], R]) -> None: ...
+
+
+@t.overload
+def safe_list_map(
+    value: MissingType, mapped_function: t.Callable[[T], R]
+) -> MissingType: ...
+
+
+@t.overload
+def safe_list_map(
+    value: t.Iterable[T], mapped_function: t.Callable[[T], R]
+) -> list[R]: ...
+
+
+def safe_list_map(
+    value: t.Iterable[T] | MissingType | None, mapped_function: t.Callable[[T], R]
+) -> list[R] | MissingType | None:
+    """
+    Like map() but handles None|MISSING and listifies the result otherwise.
+    """
+    if value is None:
+        return None
+    if isinstance(value, MissingType):
+        return MISSING
+    return [mapped_function(element) for element in value]
 
 
 @t.overload

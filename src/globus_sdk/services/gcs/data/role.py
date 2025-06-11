@@ -31,10 +31,8 @@ class GCSRoleDocument(Payload):
         additional_fields: dict[str, t.Any] | None = None,
     ) -> None:
         super().__init__()
-        self._set_optstrs(
-            DATA_TYPE=DATA_TYPE,
-            collection=collection,
-            principal=principal,
-            role=role,
-        )
+        self["DATA_TYPE"] = DATA_TYPE
+        self["collection"] = collection
+        self["principal"] = principal
+        self["role"] = role
         self.update(additional_fields or {})

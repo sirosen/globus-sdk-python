@@ -4,8 +4,9 @@ import abc
 import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._remarshal import safe_strseq_iter
 
+# TODO: Remove this dispatch after we drop Python 3.8 support.
+#       In 3.9+ `dict.__class_getitem__` is available.
 if t.TYPE_CHECKING:
     # pylint: disable=unsubscriptable-object
     _PayloadBaseDict = dict[str, t.Any]
@@ -58,17 +59,6 @@ class Payload(_PayloadBaseDict):
         for k, v in kwargs.items():
             self._set_value(k, v, callback=str)
 
-    def _set_optstrlists(
-        self, **kwargs: t.Iterable[t.Any] | None | MissingType
-    ) -> None:
-        """
-        Convenience function for setting a collection of omittable string list values.
-
-        Values are converted to lists of strings prior to assignment.
-        """
-        for k, v in kwargs.items():
-            self._set_value(k, v, callback=lambda x: list(safe_strseq_iter(x)))
-
     def _set_optbools(self, **kwargs: bool | None | MissingType) -> None:
         """
         Convenience function for setting a collection of omittable bool values.
@@ -77,15 +67,6 @@ class Payload(_PayloadBaseDict):
         """
         for k, v in kwargs.items():
             self._set_value(k, v, callback=bool)
-
-    def _set_optints(self, **kwargs: t.Any) -> None:
-        """
-        Convenience function for setting a collection of omittable int values.
-
-        Values are converted to ints prior to assignment.
-        """
-        for k, v in kwargs.items():
-            self._set_value(k, v, callback=int)
 
 
 class AbstractPayload(Payload, abc.ABC):

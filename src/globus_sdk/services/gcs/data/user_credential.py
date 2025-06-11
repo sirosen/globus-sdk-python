@@ -37,13 +37,11 @@ class UserCredentialDocument(Payload):
         additional_fields: dict[str, t.Any] | None = None,
     ) -> None:
         super().__init__()
-        self._set_optstrs(
-            DATA_TYPE=DATA_TYPE,
-            identity_id=identity_id,
-            connector_id=connector_id,
-            username=username,
-            display_name=display_name,
-            storage_gateway_id=storage_gateway_id,
-        )
-        self._set_value("policies", policies)
+        self["DATA_TYPE"] = DATA_TYPE
+        self["identity_id"] = identity_id
+        self["connector_id"] = connector_id
+        self["username"] = username
+        self["display_name"] = display_name
+        self["storage_gateway_id"] = storage_gateway_id
+        self["policies"] = policies
         self.update(additional_fields or {})
