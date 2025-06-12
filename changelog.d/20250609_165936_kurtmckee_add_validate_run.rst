@@ -1,4 +1,4 @@
 Added
 ~~~~~
 
-- Add the ``SpecificFlow.validate_run()`` method. (:pr:`NUMBER`)
+- Add the ``SpecificFlow.validate_run()`` method. (:pr:`1221`)
