@@ -29,14 +29,10 @@ def _in_sphinx_build() -> bool:  # pragma: no cover
 
 class _classproperty(t.Generic[T, R]):
     """
-    This is a well-typed Generic Descriptor which can be used to wrap decorated
-    functions.
+    A hybrid class/instance property descriptor.
 
-    Note that this descriptor will pass an instance (self) if possible, and the
-    class (cls) only if there is no instance. This is unlike ``classmethod``.
-
-    For more guidance on how this works, see the python3 descriptor guide:
-      https://docs.python.org/3/howto/descriptor.html#properties
+    On a class, the decorated method will be invoked with `cls`.
+    On an instance, the decorated method will be invoked with `self`.
     """
 
     def __init__(self, func: t.Callable[[type[T] | T], R]) -> None:

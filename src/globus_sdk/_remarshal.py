@@ -23,7 +23,7 @@ def safe_strseq_iter(
     value: t.Iterable[t.Any] | str | uuid.UUID,
 ) -> t.Iterator[str]:
     """
-    Given an Iterable (typically of strings), produce an iterator over it of strings.
+    Iterate over one or more string/string-convertible values.
 
     :param value: The stringifiable object or objects to iterate over
 
@@ -47,7 +47,7 @@ def safe_strseq_iter(
 
 def safe_stringify(value: object | MissingType | None) -> str | MissingType | None:
     """
-    Given any object or a MISSING|None, return `str(object) | MISSING | None`.
+    Convert a value to a string, with handling for None and Missing.
 
     :param value: The stringifiable object
     """
