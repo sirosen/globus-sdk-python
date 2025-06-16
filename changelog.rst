@@ -12,6 +12,22 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.58.0:
+
+v3.58.0 (2025-06-16)
+--------------------
+
+Added
+~~~~~
+
+- Add the ``SpecificFlow.validate_run()`` method. (:pr:`1221`)
+
+Fixed
+~~~~~
+
+- Fix an error which caused the ``restrict_transfers_to_high_assurance`` field
+  to be malformed when set on a collection payload type. (:pr:`1211`)
+
 .. _changelog-3.57.0:
 
 v3.57.0 (2025-06-04)
