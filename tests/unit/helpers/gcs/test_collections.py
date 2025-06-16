@@ -351,3 +351,24 @@ def test_guest_collection_fields(fieldname, value):
 
     doc = GuestCollectionDocument(**data)
     assert doc[fieldname] == value
+
+
+# regression test for a typo which caused this to be set improperly to the wrong key
+@pytest.mark.parametrize("value", ("inbound", "outbound", "all"))
+@pytest.mark.parametrize("collection_type", ("mapped", "guest"))
+def test_can_set_restrict_transfers_to_high_assurance(value, collection_type):
+    if collection_type == "mapped":
+        c = MappedCollectionDocument(
+            storage_gateway_id=STUB_SG_ID,
+            collection_base_path="/",
+            restrict_transfers_to_high_assurance=value,
+        )
+    else:
+        c = GuestCollectionDocument(
+            mapped_collection_id=STUB_MC_ID,
+            user_credential_id=STUB_UC_ID,
+            collection_base_path="/",
+            restrict_transfers_to_high_assurance=value,
+        )
+
+    assert c["restrict_transfers_to_high_assurance"] == value
