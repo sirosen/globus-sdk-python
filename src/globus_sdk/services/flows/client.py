@@ -1065,6 +1065,9 @@ class SpecificFlowClient(client.BaseClient):
         tags: list[str] | MissingType = MISSING,
         run_monitors: list[str] | MissingType = MISSING,
         run_managers: list[str] | MissingType = MISSING,
+        activity_notification_policy: (
+            dict[str, t.Any] | RunActivityNotificationPolicy | MissingType
+        ) = MISSING,
         additional_fields: dict[str, t.Any] | None = None,
     ) -> GlobusHTTPResponse:
         """
@@ -1077,6 +1080,9 @@ class SpecificFlowClient(client.BaseClient):
             authorized to monitor this run (in addition to the run owner).
         :param run_managers: A list of Globus Auth principals (identified by URN)
             authorized to manage this run (in addition to the run owner).
+        :param activity_notification_policy:
+            A policy document which declares when the Flows service will send
+            notification emails regarding the run's activity.
         :param additional_fields: Additional key/value pairs sent to the run API.
             This parameter can be used to bypass SDK parameter validation.
 
@@ -1102,6 +1108,7 @@ class SpecificFlowClient(client.BaseClient):
             "label": label,
             "run_monitors": run_monitors,
             "run_managers": run_managers,
+            "activity_notification_policy": activity_notification_policy,
         }
         data.update(additional_fields or {})
 
