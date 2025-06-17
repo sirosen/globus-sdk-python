@@ -4,7 +4,7 @@ import typing as t
 
 from globus_sdk import exc
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 
 # workaround for absence of Self type
 # for the workaround and some background, see:
@@ -22,7 +22,7 @@ def _format_histogram_range(
 
 
 # an internal class for declaring multiple related types with shared methods
-class SearchQueryBase(Payload):
+class SearchQueryBase(GlobusPayload):
     """
     The base class for all Search query helpers.
 
@@ -227,7 +227,7 @@ class SearchQuery(SearchQueryBase):
         return self
 
 
-class SearchQueryV1(Payload):
+class SearchQueryV1(GlobusPayload):
     """
     A specialized dict which has helpers for creating and modifying a Search
     Query document. Replaces the usage of ``SearchQuery``.

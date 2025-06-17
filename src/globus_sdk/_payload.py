@@ -18,7 +18,7 @@ else:
     _PayloadBaseDict = dict
 
 
-class Payload(_PayloadBaseDict):
+class GlobusPayload(_PayloadBaseDict):
     """
     A class for defining helper objects which wrap some kind of "payload" dict.
     Typical for helper objects which formulate a request payload.
@@ -30,9 +30,9 @@ class Payload(_PayloadBaseDict):
     """
 
 
-class AbstractPayload(Payload, abc.ABC):
+class AbstractGlobusPayload(GlobusPayload, abc.ABC):
     """
-    An abstract class which is a Payload.
+    An abstract class which is a GlobusPayload.
 
     This is a shim which is needed because we have a metaclass conflict between
     dict:type and ABC:ABCMeta.

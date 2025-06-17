@@ -3,11 +3,11 @@ from __future__ import annotations
 import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 from globus_sdk._types import UUIDLike
 
 
-class UserCredentialDocument(Payload):
+class UserCredentialDocument(GlobusPayload):
     """
     Convenience class for constructing a UserCredential document
     to use as the `data` parameter to `create_user_credential` and

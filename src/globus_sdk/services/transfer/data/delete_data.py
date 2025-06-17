@@ -6,7 +6,7 @@ import typing as t
 
 from globus_sdk import exc
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 from globus_sdk._remarshal import safe_stringify
 from globus_sdk._types import UUIDLike
 
@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-class DeleteData(Payload):
+class DeleteData(GlobusPayload):
     r"""
     Convenience class for constructing a delete document, to use as the
     `data` parameter to

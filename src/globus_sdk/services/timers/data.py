@@ -7,7 +7,7 @@ import logging
 import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 from globus_sdk._utils import slash_join
 from globus_sdk.config import get_service_url
 from globus_sdk.exc import warn_deprecated
@@ -16,7 +16,7 @@ from globus_sdk.services.transfer import TransferData
 log = logging.getLogger(__name__)
 
 
-class TransferTimer(Payload):
+class TransferTimer(GlobusPayload):
     """
     A helper for defining a payload for Transfer Timer creation.
     Use this along with :meth:`create_timer <globus_sdk.TimersClient.create_timer>` to
@@ -125,7 +125,7 @@ class TransferTimer(Payload):
         return new_body
 
 
-class RecurringTimerSchedule(Payload):
+class RecurringTimerSchedule(GlobusPayload):
     """
     A helper used as part of a *timer* to define when the *timer* will run.
 
@@ -183,7 +183,7 @@ class RecurringTimerSchedule(Payload):
             }
 
 
-class OnceTimerSchedule(Payload):
+class OnceTimerSchedule(GlobusPayload):
     """
     A helper used as part of a *timer* to define when the *timer* will run.
 
@@ -203,7 +203,7 @@ class OnceTimerSchedule(Payload):
         self["datetime"] = _format_date(datetime)
 
 
-class TimerJob(Payload):
+class TimerJob(GlobusPayload):
     r"""
     .. warning::
 

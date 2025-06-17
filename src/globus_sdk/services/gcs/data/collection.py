@@ -4,7 +4,7 @@ import abc
 import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._payload import AbstractPayload
+from globus_sdk._payload import AbstractGlobusPayload
 from globus_sdk._remarshal import safe_strseq_listify
 from globus_sdk._types import UUIDLike
 
@@ -61,7 +61,7 @@ def _user_message_length_callback(
 
 # Declare a metaclass of ABCMeta even though inheriting from `Payload` renders it
 # inert. This will let type checkers understand that this class is abstract.
-class CollectionDocument(AbstractPayload):
+class CollectionDocument(AbstractGlobusPayload):
     """
     This is the base class for :class:`~.MappedCollectionDocument` and
     :class:`~.GuestCollectionDocument`.
@@ -487,7 +487,7 @@ class GuestCollectionDocument(CollectionDocument):
         ensure_datatype(self)
 
 
-class CollectionPolicies(AbstractPayload):
+class CollectionPolicies(AbstractGlobusPayload):
     """
     This is the abstract base type for Collection Policies documents to use as the
     ``policies`` parameter when creating a MappedCollectionDocument.

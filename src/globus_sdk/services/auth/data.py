@@ -1,8 +1,8 @@
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 from globus_sdk._types import UUIDLike
 
 
-class DependentScopeSpec(Payload):
+class DependentScopeSpec(GlobusPayload):
     """
     Utility class for creating dependent scope values as parameters to
     :meth:`AuthClient.create_scope <globus_sdk.AuthClient.create_scope>`

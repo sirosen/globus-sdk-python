@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 from globus_sdk._types import UUIDLike
 from globus_sdk.exc import warn_deprecated
 
 
-class ComputeFunctionMetadata(Payload):
+class ComputeFunctionMetadata(GlobusPayload):
     """
     .. warning::
 
@@ -30,7 +30,7 @@ class ComputeFunctionMetadata(Payload):
         self["sdk_version"] = sdk_version
 
 
-class ComputeFunctionDocument(Payload):
+class ComputeFunctionDocument(GlobusPayload):
     """
     .. warning::
 

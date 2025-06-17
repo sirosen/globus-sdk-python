@@ -3,7 +3,7 @@ import uuid
 import pytest
 
 from globus_sdk import MISSING
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 from globus_sdk.transport import FormRequestEncoder, JSONRequestEncoder, RequestEncoder
 
 
@@ -85,7 +85,7 @@ def test_all_request_encoders_remove_missing_in_params_and_headers(encoder_class
         # nested payload wrappers (get dictified / "unwrapped")
         (
             True,
-            {"bar": Payload(foo=1), "baz": [2, Payload(foo=1)]},
+            {"bar": GlobusPayload(foo=1), "baz": [2, GlobusPayload(foo=1)]},
             {"bar": {"foo": 1}, "baz": [2, {"foo": 1}]},
         ),
         # document with UUIDs and tuples buried inside nested structures
@@ -100,7 +100,7 @@ def test_json_encoder_payload_preparation(
     using_payload_type, payload_contents, expected_data
 ):
     encoder = JSONRequestEncoder()
-    x = Payload() if using_payload_type else {}
+    x = GlobusPayload() if using_payload_type else {}
     for k, v in payload_contents.items():
         x[k] = v
     request = encoder.encode(
@@ -148,7 +148,7 @@ def test_form_encoder_payload_preparation(
     using_payload_type, payload_contents, expected_data
 ):
     encoder = FormRequestEncoder()
-    x = Payload() if using_payload_type else {}
+    x = GlobusPayload() if using_payload_type else {}
     for k, v in payload_contents.items():
         x[k] = v
     request = encoder.encode(

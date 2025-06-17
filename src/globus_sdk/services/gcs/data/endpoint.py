@@ -3,12 +3,12 @@ from __future__ import annotations
 import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 from globus_sdk._remarshal import safe_strseq_listify
 from globus_sdk.services.gcs.data._common import DatatypeCallback, ensure_datatype
 
 
-class EndpointDocument(Payload):
+class EndpointDocument(GlobusPayload):
     r"""
 
     :param data_type: Explicitly set the ``DATA_TYPE`` value for this endpoint document.

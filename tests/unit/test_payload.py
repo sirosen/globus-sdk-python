@@ -2,12 +2,12 @@ import abc
 
 import pytest
 
-from globus_sdk._payload import AbstractPayload, Payload
+from globus_sdk._payload import AbstractGlobusPayload, GlobusPayload
 
 
 def test_payload_methods():
     # just make sure that PayloadWrapper acts like a dict...
-    data = Payload()
+    data = GlobusPayload()
     assert "foo" not in data
     with pytest.raises(KeyError):
         data["foo"]
@@ -28,12 +28,12 @@ def test_payload_methods():
 
 def test_abstract_payload_detects_abstract_methods():
     # A has no abstract methods so it will instantiate
-    class A(AbstractPayload):
+    class A(AbstractGlobusPayload):
         pass
 
     A()
 
-    # B has an abstract method and inherits from AbstractPayload so it should
+    # B has an abstract method and inherits from AbstractGlobusPayload so it should
     # fail to instantiate
     class B(A):
         @abc.abstractmethod

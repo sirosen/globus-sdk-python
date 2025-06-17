@@ -4,7 +4,7 @@ import enum
 import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._payload import Payload
+from globus_sdk._payload import GlobusPayload
 from globus_sdk._remarshal import safe_strseq_iter
 from globus_sdk._types import UUIDLike
 
@@ -99,7 +99,7 @@ def _docstring_fixer(cls: type[T]) -> type[T]:
     return cls
 
 
-class BatchMembershipActions(Payload):
+class BatchMembershipActions(GlobusPayload):
     """
     An object used to represent a batch action on memberships of a group.
     `Perform actions on group members
@@ -256,7 +256,7 @@ class BatchMembershipActions(Payload):
 
 
 @_docstring_fixer
-class GroupPolicies(Payload):
+class GroupPolicies(GlobusPayload):
     """
     An object used to represent the policy settings of a group.
     This may be used to set or modify group settings.
