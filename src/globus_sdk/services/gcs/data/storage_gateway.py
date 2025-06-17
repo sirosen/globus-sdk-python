@@ -5,7 +5,7 @@ import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import AbstractGlobusPayload, GlobusPayload
-from globus_sdk._remarshal import listify, safe_list_map, safe_strseq_listify
+from globus_sdk._remarshal import list_map, listify, strseq_listify
 from globus_sdk._types import UUIDLike
 
 from ._common import DatatypeCallback, ensure_datatype
@@ -77,9 +77,9 @@ class StorageGatewayDocument(GlobusPayload):
         self["display_name"] = display_name
         self["connector_id"] = connector_id
         self["root"] = root
-        self["allowed_domains"] = safe_strseq_listify(allowed_domains)
-        self["users_allow"] = safe_strseq_listify(users_allow)
-        self["users_deny"] = safe_strseq_listify(users_deny)
+        self["allowed_domains"] = strseq_listify(allowed_domains)
+        self["users_allow"] = strseq_listify(users_allow)
+        self["users_deny"] = strseq_listify(users_deny)
         self["high_assurance"] = high_assurance
         self["require_mfa"] = require_mfa
         self["authentication_timeout_mins"] = authentication_timeout_mins
@@ -122,8 +122,8 @@ class POSIXStoragePolicies(StorageGatewayPolicies):
     ) -> None:
         super().__init__()
         self["DATA_TYPE"] = DATA_TYPE
-        self["groups_allow"] = safe_strseq_listify(groups_allow)
-        self["groups_deny"] = safe_strseq_listify(groups_deny)
+        self["groups_allow"] = strseq_listify(groups_allow)
+        self["groups_deny"] = strseq_listify(groups_deny)
         self.update(additional_fields or {})
 
 
@@ -156,10 +156,10 @@ class POSIXStagingStoragePolicies(StorageGatewayPolicies):
         super().__init__()
         self["DATA_TYPE"] = DATA_TYPE
         self["stage_app"] = stage_app
-        self["groups_allow"] = safe_strseq_listify(groups_allow)
-        self["groups_deny"] = safe_strseq_listify(groups_deny)
+        self["groups_allow"] = strseq_listify(groups_allow)
+        self["groups_deny"] = strseq_listify(groups_deny)
         # make shallow copies of all the dicts passed
-        self["environment"] = safe_list_map(environment, copy.copy)
+        self["environment"] = list_map(environment, copy.copy)
         self.update(additional_fields or {})
 
 
@@ -251,7 +251,7 @@ class CephStoragePolicies(StorageGatewayPolicies):
         self["s3_endpoint"] = s3_endpoint
         self["ceph_admin_key_id"] = ceph_admin_key_id
         self["ceph_admin_secret_key"] = ceph_admin_secret_key
-        self["s3_buckets"] = safe_strseq_listify(s3_buckets)
+        self["s3_buckets"] = strseq_listify(s3_buckets)
         self.update(additional_fields or {})
 
 
@@ -325,8 +325,8 @@ class GoogleCloudStoragePolicies(StorageGatewayPolicies):
         self["DATA_TYPE"] = DATA_TYPE
         self["client_id"] = client_id
         self["secret"] = secret
-        self["buckets"] = safe_strseq_listify(buckets)
-        self["projects"] = safe_strseq_listify(projects)
+        self["buckets"] = strseq_listify(buckets)
+        self["projects"] = strseq_listify(projects)
         self["service_account_key"] = service_account_key
         self.update(additional_fields or {})
 
@@ -434,7 +434,7 @@ class S3StoragePolicies(StorageGatewayPolicies):
         self["DATA_TYPE"] = DATA_TYPE
         self["s3_endpoint"] = s3_endpoint
         self["s3_user_credential_required"] = s3_user_credential_required
-        self["s3_buckets"] = safe_strseq_listify(s3_buckets)
+        self["s3_buckets"] = strseq_listify(s3_buckets)
         self.update(additional_fields or {})
 
 

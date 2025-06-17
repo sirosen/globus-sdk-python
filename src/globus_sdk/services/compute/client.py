@@ -5,7 +5,7 @@ import typing as t
 
 from globus_sdk import GlobusHTTPResponse, client
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._remarshal import safe_strseq_listify
+from globus_sdk._remarshal import strseq_listify
 from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import ComputeScopes, Scope
 
@@ -225,7 +225,7 @@ class ComputeClientV2(client.BaseClient):
                     :ref: Root/operation/get_batch_status_v2_batch_status_post
         """
         return self.post(
-            "/v2/batch_status", data={"task_ids": safe_strseq_listify(task_ids)}
+            "/v2/batch_status", data={"task_ids": strseq_listify(task_ids)}
         )
 
     def get_task_group(self, task_group_id: UUIDLike) -> GlobusHTTPResponse:

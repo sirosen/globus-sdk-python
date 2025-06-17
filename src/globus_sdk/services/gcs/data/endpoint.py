@@ -4,7 +4,7 @@ import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import GlobusPayload
-from globus_sdk._remarshal import safe_strseq_listify
+from globus_sdk._remarshal import strseq_listify
 from globus_sdk.services.gcs.data._common import DatatypeCallback, ensure_datatype
 
 
@@ -127,7 +127,7 @@ class EndpointDocument(GlobusPayload):
         self["info_link"] = info_link
         self["network_use"] = network_use
         self["organization"] = organization
-        self["keywords"] = safe_strseq_listify(keywords)
+        self["keywords"] = strseq_listify(keywords)
         self["allow_udt"] = allow_udt
         self["public"] = public
         self["max_concurrency"] = max_concurrency

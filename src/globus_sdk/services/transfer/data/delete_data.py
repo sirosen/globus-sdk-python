@@ -7,7 +7,7 @@ import typing as t
 from globus_sdk import exc
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import GlobusPayload
-from globus_sdk._remarshal import safe_stringify
+from globus_sdk._remarshal import stringify
 from globus_sdk._types import UUIDLike
 
 if t.TYPE_CHECKING:
@@ -118,7 +118,7 @@ class DeleteData(GlobusPayload):
         self["submission_id"] = submission_id or (
             transfer_client.get_submission_id()["value"] if transfer_client else MISSING
         )
-        self["deadline"] = safe_stringify(deadline)
+        self["deadline"] = stringify(deadline)
         self["local_user"] = local_user
         self["recursive"] = recursive
         self["ignore_missing"] = ignore_missing

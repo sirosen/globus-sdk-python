@@ -5,7 +5,7 @@ import typing as t
 
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import GlobusPayload
-from globus_sdk._remarshal import safe_strseq_iter
+from globus_sdk._remarshal import strseq_iter
 from globus_sdk._types import UUIDLike
 
 T = t.TypeVar("T")
@@ -116,8 +116,7 @@ class BatchMembershipActions(GlobusPayload):
         :param identity_ids: The identities for whom to accept invites
         """
         self.setdefault("accept", []).extend(
-            {"identity_id": identity_id}
-            for identity_id in safe_strseq_iter(identity_ids)
+            {"identity_id": identity_id} for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -135,7 +134,7 @@ class BatchMembershipActions(GlobusPayload):
         """
         self.setdefault("add", []).extend(
             {"identity_id": identity_id, "role": role}
-            for identity_id in safe_strseq_iter(identity_ids)
+            for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -148,8 +147,7 @@ class BatchMembershipActions(GlobusPayload):
         :param identity_ids: The identities to approve as members of the group
         """
         self.setdefault("approve", []).extend(
-            {"identity_id": identity_id}
-            for identity_id in safe_strseq_iter(identity_ids)
+            {"identity_id": identity_id} for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -162,8 +160,7 @@ class BatchMembershipActions(GlobusPayload):
         :param identity_ids: The identities for whom invitations should be declined
         """
         self.setdefault("decline", []).extend(
-            {"identity_id": identity_id}
-            for identity_id in safe_strseq_iter(identity_ids)
+            {"identity_id": identity_id} for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -181,7 +178,7 @@ class BatchMembershipActions(GlobusPayload):
         """
         self.setdefault("invite", []).extend(
             {"identity_id": identity_id, "role": role}
-            for identity_id in safe_strseq_iter(identity_ids)
+            for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -193,8 +190,7 @@ class BatchMembershipActions(GlobusPayload):
         :param identity_ids: The identities to use to join the group
         """
         self.setdefault("join", []).extend(
-            {"identity_id": identity_id}
-            for identity_id in safe_strseq_iter(identity_ids)
+            {"identity_id": identity_id} for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -206,8 +202,7 @@ class BatchMembershipActions(GlobusPayload):
         :param identity_ids: The identities to remove from the group
         """
         self.setdefault("leave", []).extend(
-            {"identity_id": identity_id}
-            for identity_id in safe_strseq_iter(identity_ids)
+            {"identity_id": identity_id} for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -220,8 +215,7 @@ class BatchMembershipActions(GlobusPayload):
         :param identity_ids: The identities to reject from the group
         """
         self.setdefault("reject", []).extend(
-            {"identity_id": identity_id}
-            for identity_id in safe_strseq_iter(identity_ids)
+            {"identity_id": identity_id} for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -235,8 +229,7 @@ class BatchMembershipActions(GlobusPayload):
         :param identity_ids: The identities to remove from the group
         """
         self.setdefault("remove", []).extend(
-            {"identity_id": identity_id}
-            for identity_id in safe_strseq_iter(identity_ids)
+            {"identity_id": identity_id} for identity_id in strseq_iter(identity_ids)
         )
         return self
 
@@ -249,8 +242,7 @@ class BatchMembershipActions(GlobusPayload):
         :param identity_ids: The identities to use to request membership in the group
         """
         self.setdefault("request_join", []).extend(
-            {"identity_id": identity_id}
-            for identity_id in safe_strseq_iter(identity_ids)
+            {"identity_id": identity_id} for identity_id in strseq_iter(identity_ids)
         )
         return self
 
