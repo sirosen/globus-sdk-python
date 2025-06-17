@@ -20,7 +20,7 @@ R = t.TypeVar("R")
 
 
 def safe_strseq_iter(
-    value: t.Iterable[t.Any] | str | uuid.UUID,
+    value: t.Iterable[str | uuid.UUID] | str | uuid.UUID,
 ) -> t.Iterator[str]:
     """
     Iterate over one or more string/string-convertible values.
@@ -62,12 +62,16 @@ def safe_stringify(value: object | MissingType | None) -> str | MissingType | No
 def safe_strseq_listify(value: None) -> None: ...
 @t.overload
 def safe_strseq_listify(value: MissingType) -> MissingType: ...
+
+
 @t.overload
-def safe_strseq_listify(value: t.Iterable[t.Any] | str | uuid.UUID) -> list[str]: ...
+def safe_strseq_listify(
+    value: t.Iterable[str | uuid.UUID] | str | uuid.UUID,
+) -> list[str]: ...
 
 
 def safe_strseq_listify(
-    value: t.Iterable[t.Any] | str | uuid.UUID | MissingType | None,
+    value: t.Iterable[str | uuid.UUID] | str | uuid.UUID | MissingType | None,
 ) -> list[str] | MissingType | None:
     """
     A wrapper over safe_strseq_iter which produces list outputs.
