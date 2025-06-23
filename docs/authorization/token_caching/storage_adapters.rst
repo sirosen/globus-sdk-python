@@ -130,4 +130,3 @@ Reference
    :members:
    :member-order: bysource
    :show-inheritance:
-
