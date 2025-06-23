@@ -153,7 +153,7 @@ version = "literal: src/globus_sdk/version.py: __version__"
 format = "rst"
 output_file = "changelog.rst"
 entry_title_template = 'v{{ version }} ({{ date.strftime("%Y-%m-%d") }})'
-rst_header_chars = "-~"
+rst_header_chars = "=-"
 categories = [
     "Python Support",
     "Added",
