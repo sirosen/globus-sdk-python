@@ -42,4 +42,3 @@ Reference
 .. autoexception:: ConsentParseError
 
 .. autoexception:: ConsentTreeConstructionError
-

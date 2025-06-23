@@ -150,7 +150,7 @@ version = "literal: pyproject.toml: project.version"
 format = "rst"
 output_file = "changelog.rst"
 entry_title_template = 'v{{ version }} ({{ date.strftime("%Y-%m-%d") }})'
-rst_header_chars = "-~"
+rst_header_chars = "=-"
 categories = [
     "Python Support",
     "Breaking Changes",
