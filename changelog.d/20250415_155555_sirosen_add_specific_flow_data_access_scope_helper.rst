@@ -1,5 +1,5 @@
 Added
-~~~~~
+-----
 
 - ``SpecificFlowClient`` has a new method,
   ``add_app_transfer_data_access_scope`` which facilitates declaration of scope

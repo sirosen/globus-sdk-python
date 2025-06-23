@@ -15,10 +15,10 @@ to a major new version of the SDK.
 .. _changelog-4.0.0a2:
 
 v4.0.0a2 (2025-06-05)
----------------------
+=====================
 
 Breaking Changes
-~~~~~~~~~~~~~~~~
+----------------
 
 - The SDK version is no longer available in ``globus_sdk.version.__version__``. (:pr:`1195`)
 
@@ -40,7 +40,7 @@ Breaking Changes
   (:pr:`1205`, :pr:`1207`, :pr:`1212`, :pr:`1214`)
 
 Removed
-~~~~~~~
+-------
 
 - ``globus_sdk.experimental.auth_requirements_error`` has been removed. Use
   ``globus_sdk.gare`` instead. (:pr:`1202`)
@@ -54,10 +54,10 @@ Removed
 .. _changelog-4.0.0a1:
 
 v4.0.0a1 (2025-05-20)
----------------------
+=====================
 
 Breaking Changes
-~~~~~~~~~~~~~~~~
+----------------
 
 - The SDK no longer sets default scopes for direct use
   of client credentials and auth client login flow methods.
