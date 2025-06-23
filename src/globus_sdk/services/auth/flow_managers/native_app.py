@@ -185,8 +185,8 @@ class GlobusNativeAppFlowManager(GlobusOAuthFlowManager):
             "code_challenge_method": "S256",
             "access_type": (self.refresh_tokens and "offline") or "online",
             "prefill_named_grant": self.prefill_named_grant,
+            **(query_params or {}),
         }
-        params.update(query_params or {})
         params = filter_missing(params)
 
         encoded_params = urllib.parse.urlencode(params)

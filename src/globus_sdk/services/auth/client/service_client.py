@@ -365,8 +365,8 @@ class AuthClient(client.BaseClient):
             and query_params["ids"] is not MISSING
         ):
             log.warning(
-                "get_identities call with both usernames and "
-                "identities set! Expected to result in errors"
+                "get_identities called with both usernames and "
+                "identities set! Expecting an error."
             )
 
         log.debug(f"query_params={query_params}")
@@ -451,7 +451,7 @@ class AuthClient(client.BaseClient):
             )
         elif domains is MISSING and ids is MISSING:
             log.warning(
-                "neither 'domains' nor 'ids' provided to get_identity_providers(). "
+                "Neither 'domains' nor 'ids' provided to get_identity_providers(). "
                 "This can only succeed if 'query_params' were given."
             )
 

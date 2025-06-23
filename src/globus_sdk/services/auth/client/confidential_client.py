@@ -451,7 +451,7 @@ class ConfidentialAppAuthClient(AuthLoginClient):
                 "terms_and_conditions and privacy_policy must both be set or unset"
             )
         links: dict[str, str | MissingType] | MissingType = MISSING
-        if terms_and_conditions or privacy_policy:
+        if terms_and_conditions and privacy_policy:
             links = {
                 "terms_and_conditions": terms_and_conditions,
                 "privacy_policy": privacy_policy,
@@ -468,8 +468,5 @@ class ConfidentialAppAuthClient(AuthLoginClient):
             "links": links,
             **(additional_fields or {}),
         }
-
-        if additional_fields is not None:
-            body.update(additional_fields)
 
         return self.post("/v2/api/clients", data={"client": body})

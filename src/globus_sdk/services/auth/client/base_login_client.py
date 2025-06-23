@@ -395,7 +395,7 @@ class AuthLoginClient(client.BaseClient):
         log.debug("Fetching new token from Globus Auth")
         # use the fact that requests implicitly encodes the `data` parameter as
         # a form POST
-        data = {**dict(form_data), **(body_params or {})}
+        data = {**form_data, **(body_params or {})}
         return response_class(
             self.post(
                 "/v2/oauth2/token",
