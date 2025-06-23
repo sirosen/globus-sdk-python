@@ -23,9 +23,9 @@ class DeleteData(GlobusPayload):
 
     :param endpoint: The endpoint ID which is targeted by this deletion Task
     :param label: A string label for the Task
-    :param submission_id: A submission ID value fetched via :meth:`get_submission_id \
+    :param submission_id: A submission ID value fetched via :meth:`get_submission_id
         <globus_sdk.TransferClient.get_submission_id>`. By default, the SDK
-        will fetch and populate this field when :meth:`submit_delete \
+        will fetch and populate this field when :meth:`submit_delete
         <globus_sdk.TransferClient.submit_delete>` is called.
     :param recursive: Recursively delete subdirectories on the target endpoint
       [default: ``False``]
@@ -65,10 +65,10 @@ class DeleteData(GlobusPayload):
     **External Documentation**
 
     See the
-    `Task document definition \
+    `Task document definition
     <https://docs.globus.org/api/transfer/task_submit/#document_types>`_
     and
-    `Delete specific fields \
+    `Delete specific fields
     <https://docs.globus.org/api/transfer/task_submit/#delete_specific_fields>`_
     in the REST documentation for more details on Delete Task documents.
 
