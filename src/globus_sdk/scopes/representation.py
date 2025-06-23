@@ -18,7 +18,7 @@ class Scope:
     A scope object is a representation of a scope and its dynamic dependencies
     (other scopes).
 
-    A scope also has optionality, also called its "atomically revovocable" setting.
+    A scope may be optional (also referred to as "atomically revocable").
     An optional scope can be revoked without revoking consent for other scopes
     which were granted at the same time.
 

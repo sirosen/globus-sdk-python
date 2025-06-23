@@ -112,7 +112,7 @@ To control when a submission ID is fetched, use
         submission_id=submission_id,
     )
 
-Scopes are Immutable and Have New Methods
+Scopes Are Immutable and Have New Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :class:`Scope <globus_sdk.scopes.Scope>` object in v3 of the SDK could be
@@ -140,7 +140,7 @@ Update ``add_dependency`` usage like so:
     my_scope = Scope(ROOT_SCOPE_STRING)
     my_scope = my_scope.with_dependency(DEPENCENCY_STRING)
 
-ScopeParser is now separate from Scope
+ScopeParser Is Now Separate from Scope
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Scope parsing has been split from ``Scope`` to a new class, ``ScopeParser``.

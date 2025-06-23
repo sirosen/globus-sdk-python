@@ -43,8 +43,9 @@ class ScopeGraph:
             src, dest, optional = edge
             if not optional:
                 continue
-            alter_ego = (src, dest, not optional)
-            if alter_ego in self.edges:
+            # The current edge is optional; see if it's superseded by required edge
+            required_variant = (src, dest, False)
+            if required_variant in self.edges:
                 to_remove.add(edge)
         self.edges = self.edges - to_remove
         for edge in to_remove:
