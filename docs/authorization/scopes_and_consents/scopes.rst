@@ -145,10 +145,9 @@ constructed by means of ``Scope`` methods thusly:
     MAPPED_COLLECTION_ID = "...ID HERE..."
 
     # create the scope object, and get the data_access_scope as a string
-    transfer_scope = Scope(TransferScopes.all)
     data_access_scope = GCSCollectionScopeBuilder(MAPPED_COLLECTION_ID).data_access
     # add data_access as an optional dependency
-    transfer_scope = transfer_scope.with_dependency(data_access_scope, optional=True)
+    transfer_scope = TransferScopes.all.with_dependency(data_access_scope, optional=True)
 
 ``Scope``\s can be used in most of the same locations where scope
 strings can be used, but you can also call ``scope.serialize()`` to get a
@@ -203,27 +202,31 @@ manipulate scope objects.
 ScopeBuilders
 -------------
 
-ScopeBuilder Types
-~~~~~~~~~~~~~~~~~~
-
-.. autoclass:: ScopeBuilder
-    :members:
-    :show-inheritance:
-
-.. autoclass:: GCSEndpointScopeBuilder
-    :members:
-    :show-inheritance:
-
-.. autoclass:: GCSCollectionScopeBuilder
-    :members:
-    :show-inheritance:
-
-.. autoclass:: SpecificFlowScopeBuilder
-    :members:
-    :show-inheritance:
-
-ScopeBuilder Constants
+Scope Collection Types
 ~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: StaticScopeCollection
+    :members:
+    :show-inheritance:
+
+.. autoclass:: DynamicScopeCollection
+    :members:
+    :show-inheritance:
+
+.. autoclass:: GCSEndpointScopes
+    :members:
+    :show-inheritance:
+
+.. autoclass:: GCSCollectionScopes
+    :members:
+    :show-inheritance:
+
+.. autoclass:: SpecificFlowScopes
+    :members:
+    :show-inheritance:
+
+ScopeCollection Constants
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. py:data:: globus_sdk.scopes.data.AuthScopes
 

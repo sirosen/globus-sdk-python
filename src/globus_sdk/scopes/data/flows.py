@@ -1,56 +1,34 @@
 from __future__ import annotations
 
 import typing as t
+from functools import cached_property
 
 from globus_sdk._types import UUIDLike
 
-from ..builder import ScopeBuilder, ScopeBuilderScopes
-
-
-class _FlowsScopeBuilder(ScopeBuilder):
-    """
-    The Flows service breaks the scopes/resource server convention: its resource server
-    is a domain name but its scopes are built around the client ID.
-
-    Given that there isn't a simple way to support this more generally (and we
-    shouldn't encourage supporting this more generally), this class serves to
-    build out the scopes accurately specifically for Flows.
-    """
-
-    def __init__(
-        self,
-        domain_name: str,
-        client_id: str,
-        known_scopes: ScopeBuilderScopes = None,
-        known_url_scopes: ScopeBuilderScopes = None,
-    ) -> None:
-        self._client_id = client_id
-        super().__init__(
-            domain_name, known_scopes=known_scopes, known_url_scopes=known_url_scopes
-        )
-
-    def urn_scope_string(self, scope_name: str) -> str:
-        return f"urn:globus:auth:scope:{self._client_id}:{scope_name}"
-
-    def url_scope_string(self, scope_name: str) -> str:
-        return f"https://auth.globus.org/scopes/{self._client_id}/{scope_name}"
-
-
-FlowsScopes = _FlowsScopeBuilder(
-    "flows.globus.org",
-    "eec9b274-0c81-4334-bdc2-54e90e689b9a",
-    known_url_scopes=[
-        "all",
-        "manage_flows",
-        "view_flows",
-        "run",
-        "run_status",
-        "run_manage",
-    ],
+from ..collection import (
+    DynamicScopeCollection,
+    StaticScopeCollection,
+    _url_scope,
 )
+from ..representation import Scope
 
 
-class _SpecificFlowScopesClassStub(ScopeBuilder):
+class FlowsScopes(StaticScopeCollection):
+    # The Flows service breaks the scopes/resource server convention: its
+    # resource server is a domain name but its scopes are built around the
+    # client ID.
+    resource_server = "flows.globus.org"
+    client_id = "eec9b274-0c81-4334-bdc2-54e90e689b9a"
+
+    all = _url_scope(client_id, "all")
+    manage_flows = _url_scope(client_id, "manage_flows")
+    view_flows = _url_scope(client_id, "view_flows")
+    run = _url_scope(client_id, "run")
+    run_status = _url_scope(client_id, "run_status")
+    run_manage = _url_scope(client_id, "run_manage")
+
+
+class _SpecificFlowScopesClassStub(DynamicScopeCollection):
     """
     This stub object ensures that the type deductions for type checkers (e.g. mypy) on
     SpecificFlowClient.scopes are correct.
@@ -63,17 +41,14 @@ class _SpecificFlowScopesClassStub(ScopeBuilder):
     instance-var access.
     """
 
-    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
+    _scope_names = ("user",)
+
+    def __init__(self) -> None:
         super().__init__("<stub>")
 
-    def __getattr__(self, name: str) -> t.Any:
+    def __getattribute__(self, name: str) -> t.Any:
         if name == "user":
             _raise_attr_error("scopes")
-        elif name == "resource_server":
-            _raise_attr_error("resource_server")
-        return super().__getattr__(name)
-
-    def __getattribute__(self, name: str) -> t.Any:
         if name == "resource_server":
             _raise_attr_error("resource_server")
         return object.__getattribute__(self, name)
@@ -88,7 +63,7 @@ def _raise_attr_error(name: str) -> t.NoReturn:
     )
 
 
-class SpecificFlowScopeBuilder(ScopeBuilder):
+class SpecificFlowScopes(DynamicScopeCollection):
     """
     This defines the scopes for a single flow (as distinct from the Flows service).
 
@@ -99,16 +74,20 @@ class SpecificFlowScopeBuilder(ScopeBuilder):
 
     .. code-block:: python
 
-        sb = SpecificFlowScopeBuilder("my-flow-id-here")
-        flow_scope = sb.user
+        sc = SpecificFlowScopes("my-flow-id-here")
+        flow_scope = sc.user
     """
 
     _CLASS_STUB = _SpecificFlowScopesClassStub()
+    _scope_names = ("user",)
 
     def __init__(self, flow_id: UUIDLike) -> None:
         self._flow_id = flow_id
-        str_flow_id = str(flow_id)
-        super().__init__(
-            resource_server=str_flow_id,
-            known_url_scopes=[("user", f"flow_{str_flow_id.replace('-', '_')}_user")],
+        self._str_flow_id = str(flow_id)
+        super().__init__(resource_server=self._str_flow_id)
+
+    @cached_property
+    def user(self) -> Scope:
+        return _url_scope(
+            self.resource_server, f"flow_{self._str_flow_id.replace('-', '_')}_user"
         )

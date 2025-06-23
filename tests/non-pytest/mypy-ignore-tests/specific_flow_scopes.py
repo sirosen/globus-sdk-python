@@ -8,7 +8,7 @@ flow_id = "foo"
 specific_flow_client = globus_sdk.SpecificFlowClient(flow_id)
 
 scopes_object = specific_flow_client.scopes
-t.assert_type(scopes_object, globus_sdk.scopes.ScopeBuilder)
+t.assert_type(scopes_object, globus_sdk.scopes.DynamicScopeCollection)
 
 scope: str = scopes_object.user
 x: int = scopes_object.user  # type: ignore[assignment]

@@ -1,8 +1,7 @@
-from ..builder import ScopeBuilder
+from ..collection import StaticScopeCollection, _url_scope
 
-TimersScopes = ScopeBuilder(
-    "524230d7-ea86-4a52-8312-86065a9e0417",
-    known_url_scopes=[
-        "timer",
-    ],
-)
+
+class TimersScopes(StaticScopeCollection):
+    resource_server = "524230d7-ea86-4a52-8312-86065a9e0417"
+
+    timer = _url_scope(resource_server, "timer")
