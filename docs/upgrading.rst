@@ -48,7 +48,7 @@ From 3.x to 4.0
 ``TransferData`` and ``DeleteData`` Do Not Take a ``TransferClient``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The signatures for these two data constructors has changed to remove support
+The signatures for these two data constructors have changed to remove support
 for ``transfer_client`` as their first parameter.
 
 Generally, update usage which passed a client to omit it:
@@ -95,7 +95,7 @@ The client object was used to fetch a ``submission_id`` on initialization.
 Users typically will rely on ``TransferClient.submit_transfer()`` and
 ``TransferClient.submit_delete()`` filling in this value.
 To control when a submission ID is fetched, use
-``TransferClient.get_submsission_id()``, as in:
+``TransferClient.get_submission_id()``, as in:
 
 .. code-block:: python
 
