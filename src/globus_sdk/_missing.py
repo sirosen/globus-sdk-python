@@ -26,11 +26,10 @@ if t.TYPE_CHECKING:
     # they do not narrow in this case based on the runtime data
     import enum
 
-    class _MissingEnum(enum.Enum):
+    class MissingType(enum.Enum):
         MISSING = enum.auto()
 
-    MissingType = _MissingEnum
-    MISSING = _MissingEnum.MISSING
+    MISSING = MissingType.MISSING
 else:
 
     class MissingType:
