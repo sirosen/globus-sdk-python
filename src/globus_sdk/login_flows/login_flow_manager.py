@@ -52,6 +52,8 @@ class LoginFlowManager(metaclass=abc.ABCMeta):
         """
         self._oauth2_start_flow(auth_parameters, redirect_uri)
 
+        # prompt is assigned first because its usage is type-ignored below
+        # this makes it clear that the ignore applies to that usage
         prompt = none2missing(auth_parameters.prompt)
         return self.login_client.oauth2_get_authorize_url(
             session_required_identities=none2missing(
