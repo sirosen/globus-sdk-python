@@ -10,40 +10,61 @@ import typing as t
 
 T = t.TypeVar("T")
 
+if t.TYPE_CHECKING:
+    # pretend that `MISSING: MissingType` is an enum at type-checking time
+    # this allows type checkers to use identity comparisons to type narrow
+    #
+    # for example:
+    #
+    #       x: int | float | MissingType
+    #       if x is not MISSING:
+    #           reveal_type(x)
+    #
+    # should show `x: int | float`
+    #
+    # however, because type checkers don't know that `MISSING` is a sentinel
+    # they do not narrow in this case based on the runtime data
+    import enum
 
-class MissingType:
-    def __init__(self) -> None:
-        # disable instantiation, but gated to be able to run once
-        # when this module is imported
-        if "MISSING" in globals():
-            raise TypeError("MissingType should not be instantiated")
+    class _MissingEnum(enum.Enum):
+        MISSING = enum.auto()
 
-    def __bool__(self) -> bool:
-        return False
+    MissingType = _MissingEnum
+    MISSING = _MissingEnum.MISSING
+else:
 
-    def __copy__(self) -> MissingType:
-        return self
+    class MissingType:
+        def __init__(self) -> None:
+            # disable instantiation, but gated to be able to run once
+            # when this module is imported
+            if "MISSING" in globals():
+                raise TypeError("MissingType should not be instantiated")
 
-    def __deepcopy__(self, memo: dict[int, t.Any]) -> MissingType:
-        return self
+        def __bool__(self) -> bool:
+            return False
 
-    # unpickling a MissingType should always return the "MISSING" sentinel
-    def __reduce__(self) -> str:
-        return "MISSING"
+        def __copy__(self) -> MissingType:
+            return self
 
-    def __repr__(self) -> str:
-        return "<globus_sdk.MISSING>"
+        def __deepcopy__(self, memo: dict[int, t.Any]) -> MissingType:
+            return self
 
+        # unpickling a MissingType should always return the "MISSING" sentinel
+        def __reduce__(self) -> str:
+            return "MISSING"
 
-# a sentinel value for "missing" values which are distinguished from `None` (null)
-# this is the default used to indicate that a parameter was not passed, so that
-# method calls passing `None` can be distinguished from those which did not pass any
-# value
-# users should typically not use this value directly, but it is part of the public SDK
-# interfaces along with its type for annotation purposes
-#
-# *new in version 3.30.0*
-MISSING = MissingType()
+        def __repr__(self) -> str:
+            return "<globus_sdk.MISSING>"
+
+    # a sentinel value for "missing" values which are distinguished from `None` (null)
+    # this is the default used to indicate that a parameter was not passed, so that
+    # method calls passing `None` can be distinguished from those which did not pass any
+    # value
+    # users should typically not use this value directly, but it is part of the
+    # public SDK interfaces along with its type for annotation purposes
+    #
+    # *new in version 3.30.0*
+    MISSING = MissingType()
 
 
 @t.overload

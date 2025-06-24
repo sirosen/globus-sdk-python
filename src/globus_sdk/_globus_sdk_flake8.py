@@ -9,6 +9,8 @@ CODEMAP: dict[str, str] = {
     # lexical scopes!
     "SDK001": "SDK001 loggers should be named 'log'",
     "SDK002": "SDK002 never use 'log.info'",
+    # don't do `isinstance(x, MissingType)` -- use `x is MISSING` instead
+    "SDK003": "SDK003 use `is MISSING`, not `isinstance(..., MissingType)`",
 }
 
 
@@ -124,6 +126,18 @@ class SDKVisitor(ast.NodeVisitor):
     #     type_ignores=[])
     #
     def visit_Call(self, node: ast.Call) -> None:
+        # check for `isinstance()` calls
+        if isinstance(node.func, ast.Name) and node.func.id == "isinstance":
+            if len(node.args) != 2:
+                self.generic_visit(node)
+                return
+            rhs = node.args[1]
+            if not isinstance(rhs, ast.Name):
+                self.generic_visit(node)
+                return
+            if rhs.id == "MissingType":
+                self._record(node, "SDK003")
+
         # if it's not a call to 'x.info(...)', ignore
         if not (isinstance(node.func, ast.Attribute) and node.func.attr == "info"):
             self.generic_visit(node)
