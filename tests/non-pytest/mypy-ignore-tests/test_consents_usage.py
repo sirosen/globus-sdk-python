@@ -1,6 +1,7 @@
 import uuid
 
 from globus_sdk import AuthClient, Scope
+from globus_sdk.scopes import ScopeParser
 
 # setup: get a consent forest
 ac = AuthClient()
@@ -11,7 +12,8 @@ consent_forest = consents.to_forest()
 # create some variant types
 xfer_str: str = "urn:globus:auth:scope:transfer.api.globus.org:all"
 strlist: list[str] = [xfer_str]
-scopelist: list[Scope] = Scope.parse(xfer_str)
+scopelist: list[Scope] = ScopeParser.parse(xfer_str)
+scopeobj: Scope = Scope.parse(xfer_str)
 
 # all should be allowed
 b: bool
