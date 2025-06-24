@@ -61,8 +61,6 @@ else:
     # value
     # users should typically not use this value directly, but it is part of the
     # public SDK interfaces along with its type for annotation purposes
-    #
-    # *new in version 3.30.0*
     MISSING = MissingType()
 
 
