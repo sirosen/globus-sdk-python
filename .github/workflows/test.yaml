@@ -80,8 +80,12 @@ jobs:
               - "pylint"
               - "test-lazy-imports"
               - "twine-check"
-            cache-paths:
-              - ".mypy_cache/"
+            # TODO: revisit caching strategy for '.mypy_cache'
+            # we believe a bad cache can be restored when the package changes,
+            # tricking 'mypy-test' into seeing an old version of the SDK
+            #
+            # cache-paths:
+            #   - ".mypy_cache/"
 
     uses: "globus/workflows/.github/workflows/tox.yaml@f41714f6a8b102569807b348fce50960f9617df8" # v1.2
     with:
