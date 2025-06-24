@@ -50,18 +50,16 @@ def test_get_identities_success(usernames, service_client):
     }
 
 
-@pytest.mark.parametrize(
-    "inval, outval",
-    [
-        (True, "true"),
-        (False, "false"),
-        (1, "true"),
-        (0, "true"),
-        ("fALSe", "false"),
-        ("true", "true"),
-    ],
-)
-def test_get_identities_provision(inval, outval, service_client):
+def test_get_identities_provision_flag_defaults_to_false(service_client):
+    load_response(service_client.get_identities)
+    service_client.get_identities(usernames="globus@globus.org")
+    lastreq = get_last_request()
+    assert "provision" in lastreq.params
+    assert lastreq.params["provision"] == "false"
+
+
+@pytest.mark.parametrize("inval, outval", [(True, "true"), (False, "false")])
+def test_get_identities_provision_flag_formatting(inval, outval, service_client):
     load_response(service_client.get_identities)
     service_client.get_identities(usernames="globus@globus.org", provision=inval)
     lastreq = get_last_request()
