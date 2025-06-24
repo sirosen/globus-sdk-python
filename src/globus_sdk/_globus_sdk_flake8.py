@@ -126,28 +126,35 @@ class SDKVisitor(ast.NodeVisitor):
     #     type_ignores=[])
     #
     def visit_Call(self, node: ast.Call) -> None:
-        # check for `isinstance()` calls
-        if isinstance(node.func, ast.Name) and node.func.id == "isinstance":
-            if len(node.args) != 2:
-                self.generic_visit(node)
-                return
-            rhs = node.args[1]
-            if not isinstance(rhs, ast.Name):
-                self.generic_visit(node)
-                return
-            if rhs.id == "MissingType":
-                self._record(node, "SDK003")
+        # +---------------------------------------------+
+        # | check SDK003 | `isinstance(x, MissingType)` |
+        # +---------------------------------------------+
+        if (
+            # an `isinstance()` call with two arguments
+            # (really just means it's a valid call)
+            isinstance(node.func, ast.Name)
+            and node.func.id == "isinstance"
+            and len(args := node.args) == 2
+            # where the second argument is a name node,
+            # not a tuple or other expression
+            and isinstance(rhs := args[1], ast.Name)
+            # and the name used is 'MissingType'
+            and rhs.id == "MissingType"
+        ):
+            self._record(node, "SDK003")
 
-        # if it's not a call to 'x.info(...)', ignore
-        if not (isinstance(node.func, ast.Attribute) and node.func.attr == "info"):
+        # +--------------------------------+
+        # | check SDK002 | `log.info(...)` |
+        # +--------------------------------+
+        elif (
+            # the function call is of the form 'OBJ.info(...)'
+            isinstance(func_node := node.func, ast.Attribute)
+            and func_node.attr == "info"
+            # and, more specifically, the object is named 'log', so
+            # it's `log.info(...)
+            and isinstance(func_node.value, ast.Name)
+            and func_node.value.id == "log"
+        ):
+            self._record(node, "SDK002")
+        else:
             self.generic_visit(node)
-            return
-        func_node: ast.Attribute = node.func
-
-        # if the function was not a method of something named "log", ignore
-        if not (isinstance(func_node.value, ast.Name) and func_node.value.id == "log"):
-            self.generic_visit(node)
-            return
-
-        # nothing left, it failed SDK002!
-        self._record(node, "SDK002")
