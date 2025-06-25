@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing as t
-from functools import cached_property
 
 from globus_sdk._types import UUIDLike
 
@@ -13,7 +12,7 @@ from ..collection import (
 from ..representation import Scope
 
 
-class FlowsScopes(StaticScopeCollection):
+class _FlowsScopes(StaticScopeCollection):
     # The Flows service breaks the scopes/resource server convention: its
     # resource server is a domain name but its scopes are built around the
     # client ID.
@@ -28,7 +27,45 @@ class FlowsScopes(StaticScopeCollection):
     run_manage = _url_scope(client_id, "run_manage")
 
 
-class _SpecificFlowScopesClassStub(DynamicScopeCollection):
+FlowsScopes = _FlowsScopes()
+
+
+class SpecificFlowScopes(DynamicScopeCollection):
+    """
+    This defines the scopes for a single flow (as distinct from the Flows service).
+
+    It primarily provides the `user` scope which is typically needed to start a run of
+    a flow.
+
+    Example usage:
+
+    .. code-block:: python
+
+        sc = SpecificFlowScopes("my-flow-id-here")
+        flow_scope = sc.user
+    """
+
+    _scope_names = ("user",)
+
+    def __init__(self, flow_id: UUIDLike) -> None:
+        _flow_id = str(flow_id)
+        super().__init__(_flow_id)
+
+        self.user: Scope = _url_scope(
+            _flow_id, f"flow_{_flow_id.replace('-', '_')}_user"
+        )
+
+    @classmethod
+    def _build_class_stub(cls) -> SpecificFlowScopes:
+        """
+        This internal helper builds a "stub" object so that
+        ``SpecificFlowClient.scopes`` is typed as ``SpecificFlowScopes`` but
+        raises appropriate errors at runtime access via the class.
+        """
+        return _SpecificFlowScopesClassStub()
+
+
+class _SpecificFlowScopesClassStub(SpecificFlowScopes):
     """
     This stub object ensures that the type deductions for type checkers (e.g. mypy) on
     SpecificFlowClient.scopes are correct.
@@ -40,8 +77,6 @@ class _SpecificFlowScopesClassStub(DynamicScopeCollection):
     Our types are therefore less accurate for class-var access, but more accurate for
     instance-var access.
     """
-
-    _scope_names = ("user",)
 
     def __init__(self) -> None:
         super().__init__("<stub>")
@@ -61,33 +96,3 @@ def _raise_attr_error(name: str) -> t.NoReturn:
         f"Instead, instantiate a SpecificFlowClient and access the '{name}' attribute "
         "from that instance."
     )
-
-
-class SpecificFlowScopes(DynamicScopeCollection):
-    """
-    This defines the scopes for a single flow (as distinct from the Flows service).
-
-    It primarily provides the `user` scope which is typically needed to start a run of
-    a flow.
-
-    Example usage:
-
-    .. code-block:: python
-
-        sc = SpecificFlowScopes("my-flow-id-here")
-        flow_scope = sc.user
-    """
-
-    _CLASS_STUB = _SpecificFlowScopesClassStub()
-    _scope_names = ("user",)
-
-    def __init__(self, flow_id: UUIDLike) -> None:
-        self._flow_id = flow_id
-        self._str_flow_id = str(flow_id)
-        super().__init__(resource_server=self._str_flow_id)
-
-    @cached_property
-    def user(self) -> Scope:
-        return _url_scope(
-            self.resource_server, f"flow_{self._str_flow_id.replace('-', '_')}_user"
-        )

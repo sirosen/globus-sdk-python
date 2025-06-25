@@ -1,56 +1,50 @@
 from __future__ import annotations
 
+import abc
 import typing as t
 
 from .representation import Scope
 
 
-class StaticScopeCollectionMeta(type):
+class ScopeCollection(abc.ABC):
     """
-    The metaclass for StaticScopeCollection.
+    The common base for scope collections.
 
-    This defines the the stringification of these classes.
+    ScopeCollections act as namespaces with attribute access to get scopes.
+
+    They can also be iterated to get all of their defined scopes and provide
+    the appropriate resource_server string for use in OAuth2 flows.
     """
 
-    def __str__(self) -> str:
-        name: str = getattr(self, "__name__", "<unnamed-collection>")
-        resource_server: str = getattr(
-            self, "resource_server", "<unknown-resource-server>"
-        )
+    @property
+    @abc.abstractmethod
+    def resource_server(self) -> str: ...
 
-        scope_names: t.Iterable[str] = self._scope_names()  # type: ignore[attr-defined]
-
-        return f"{name}[{resource_server}]\n" + "\n".join(
-            f"  {name}:\n    {getattr(self, name)}" for name in scope_names
-        )
+    @abc.abstractmethod
+    def __iter__(self) -> t.Iterator[Scope]: ...
 
 
-class StaticScopeCollection(metaclass=StaticScopeCollectionMeta):
+class StaticScopeCollection(ScopeCollection):
     """
     A static scope collection is a data container which provides various scopes
     as class attributes.
 
-    ``resource_server`` is available as a class attribute.
-
-    ``str(<class>)`` is well-defined to produce a nice rendering of the scopes
-    contained in the class.
+    ``resource_server`` must be available as a class attribute.
     """
 
     resource_server: t.ClassVar[str]
 
-    @classmethod
-    def _scope_names(cls) -> t.Iterator[str]:
-        for key, value in vars(cls).items():
-            if isinstance(value, Scope):
-                yield key
+    def __iter__(self) -> t.Iterator[Scope]:
+        for view in (vars(self).values(), vars(self.__class__).values()):
+            for value in view:
+                if isinstance(value, Scope):
+                    yield value
 
 
-class DynamicScopeCollection:
+class DynamicScopeCollection(ScopeCollection):
     """
     The base type for dynamic scope collections, where the resource server is
     variable.
-
-    The class itself is not usable as a collection type, but its instances are.
 
     The default implementation takes the resource server as the only init-time
     parameter.
@@ -65,12 +59,17 @@ class DynamicScopeCollection:
     _scope_names: t.ClassVar[tuple[str, ...]]
 
     def __init__(self, resource_server: str) -> None:
-        self.resource_server = resource_server
+        self._resource_server = resource_server
 
-    def __str__(self) -> str:
-        return f"{self.__class__.__name__}[{self.resource_server}]\n" + "\n".join(
-            f"  {name}:\n    {getattr(self, name)}" for name in self._scope_names
-        )
+    def __iter__(self) -> t.Iterator[Scope]:
+        for name in self._scope_names:
+            value = getattr(self, name)
+            if isinstance(value, Scope):
+                yield value
+
+    @property
+    def resource_server(self) -> str:
+        return self._resource_server
 
 
 def _urn_scope(resource_server: str, scope_name: str) -> Scope:

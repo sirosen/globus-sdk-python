@@ -1,14 +1,12 @@
-import textwrap
 import uuid
 
-from globus_sdk.scopes import (
-    ComputeScopes,
+from globus_sdk.scopes import ComputeScopes, FlowsScopes, Scope
+from globus_sdk.scopes.collection import (
     DynamicScopeCollection,
-    FlowsScopes,
-    Scope,
     StaticScopeCollection,
+    _url_scope,
+    _urn_scope,
 )
-from globus_sdk.scopes.collection import _url_scope, _urn_scope
 
 
 def test_url_scope_string():
@@ -28,17 +26,19 @@ def test_urn_scope_string():
     assert str(s) == "urn:globus:auth:scope:example.globus.org:myscope"
 
 
-def test_static_scope_collection_str_contains_expected_values():
-    class MyScopes(StaticScopeCollection):
+def test_static_scope_collection_iter_contains_expected_values():
+    class _MyScopes(StaticScopeCollection):
         resource_server = str(uuid.UUID(int=0))
 
         foo = _urn_scope(resource_server, "foo")
         bar = _url_scope(resource_server, "bar")
 
-    stringified = str(MyScopes)
-    assert MyScopes.resource_server in stringified
-    assert str(MyScopes.foo) in stringified
-    assert str(MyScopes.bar) in stringified
+    MyScopes = _MyScopes()
+
+    listified = list(MyScopes)
+    as_set = set(listified)
+    assert len(listified) == len(as_set)
+    assert as_set == {MyScopes.foo, MyScopes.bar}
 
 
 def test_dynamic_scope_collection_contains_expected_values():
@@ -55,10 +55,11 @@ def test_dynamic_scope_collection_contains_expected_values():
 
     resource_server = str(uuid.UUID(int=10))
     scope_collection = MyScopes(resource_server)
-    stringified = str(scope_collection)
-    assert scope_collection.resource_server in stringified
-    assert str(scope_collection.foo) in stringified
-    assert str(scope_collection.bar) in stringified
+    assert scope_collection.resource_server == resource_server
+
+    listified = list(scope_collection)
+    assert scope_collection.foo in listified
+    assert scope_collection.bar in listified
 
 
 def test_flows_scopes_creation():
@@ -74,17 +75,4 @@ def test_compute_scopes_creation():
     assert (
         str(ComputeScopes.all)
         == "https://auth.globus.org/scopes/facd7ccc-c5f4-42aa-916b-a0e270e2c2a9/all"
-    )
-
-
-def test_stringify_static_scope_collection():
-    class MyScopes(StaticScopeCollection):
-        resource_server = "foo"
-        sc1 = _urn_scope(resource_server, "sc1")
-
-    assert str(MyScopes) == textwrap.dedent(
-        """\
-        MyScopes[foo]
-          sc1:
-            urn:globus:auth:scope:foo:sc1"""
     )

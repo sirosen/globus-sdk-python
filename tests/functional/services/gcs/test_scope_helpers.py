@@ -24,13 +24,9 @@ def test_data_access_scope_helper(client):
     assert not hasattr(sc, "manage_collections")
 
 
-def test_str_contains_scope_properties(client):
+def test_contains_scope_properties(client):
     ep_sc = client.get_gcs_endpoint_scopes(zero_id)
-
-    assert "manage_collections" in str(ep_sc)
-    assert str(ep_sc.manage_collections) in str(ep_sc)
+    assert ep_sc.manage_collections in list(ep_sc)
 
     collection_sc = client.get_gcs_collection_scopes(zero_id)
-
-    assert "data_access" in str(collection_sc)
-    assert str(collection_sc.data_access) in str(collection_sc)
+    assert collection_sc.data_access in list(collection_sc)

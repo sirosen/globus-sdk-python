@@ -205,6 +205,10 @@ ScopeBuilders
 Scope Collection Types
 ~~~~~~~~~~~~~~~~~~~~~~
 
+.. autoclass:: ScopeCollection
+    :members:
+    :show-inheritance:
+
 .. autoclass:: StaticScopeCollection
     :members:
     :show-inheritance:

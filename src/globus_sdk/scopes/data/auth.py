@@ -2,7 +2,7 @@ from ..collection import StaticScopeCollection, _urn_scope
 from ..representation import Scope
 
 
-class AuthScopes(StaticScopeCollection):
+class _AuthScopes(StaticScopeCollection):
     resource_server = "auth.globus.org"
 
     openid = Scope("openid")
@@ -16,3 +16,6 @@ class AuthScopes(StaticScopeCollection):
     view_consents = _urn_scope(resource_server, "view_consents")
     view_identities = _urn_scope(resource_server, "view_identities")
     view_identity_set = _urn_scope(resource_server, "view_identity_set")
+
+
+AuthScopes = _AuthScopes()

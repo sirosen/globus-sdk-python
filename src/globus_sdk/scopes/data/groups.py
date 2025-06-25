@@ -1,7 +1,7 @@
 from ..collection import StaticScopeCollection, _urn_scope
 
 
-class GroupsScopes(StaticScopeCollection):
+class _GroupsScopes(StaticScopeCollection):
     resource_server = "groups.api.globus.org"
 
     all = _urn_scope(resource_server, "all")
@@ -10,7 +10,11 @@ class GroupsScopes(StaticScopeCollection):
     )
 
 
-class NexusScopes(StaticScopeCollection):
+class _NexusScopes(StaticScopeCollection):
     resource_server = "nexus.api.globus.org"
 
     groups = _urn_scope(resource_server, "groups")
+
+
+GroupsScopes = _GroupsScopes()
+NexusScopes = _NexusScopes()

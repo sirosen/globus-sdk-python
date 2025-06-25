@@ -5,7 +5,7 @@ from pydoc import locate
 
 from docutils.parsers.rst import directives
 
-from globus_sdk.scopes import DynamicScopeCollection, StaticScopeCollection
+from globus_sdk.scopes import Scope, ScopeCollection
 
 from .add_content_directive import AddContentDirective
 
@@ -50,10 +50,8 @@ class ListKnownScopes(AddContentDirective):
 
 def extract_known_scopes(scope_collection_name: str) -> list[str]:
     sc = locate(scope_collection_name)
-    if isinstance(sc, DynamicScopeCollection):
-        return list(sc._scope_names)
-    elif isinstance(sc, type) and issubclass(sc, StaticScopeCollection):
-        return list(sc._scope_names())
+    if isinstance(sc, ScopeCollection):
+        return [name for name in dir(sc) if isinstance(getattr(sc, name), Scope)]
 
     raise RuntimeError(
         f"Expected {sc} to be a scope collection, but got {type(sc)} instead"

@@ -926,9 +926,7 @@ class SpecificFlowClient(client.BaseClient):
 
     error_class = FlowsAPIError
     service_name = "flows"
-    scopes: SpecificFlowScopes = (
-        SpecificFlowScopes._CLASS_STUB  # type: ignore[assignment]
-    )
+    scopes: SpecificFlowScopes = SpecificFlowScopes._build_class_stub()
 
     def __init__(
         self,
