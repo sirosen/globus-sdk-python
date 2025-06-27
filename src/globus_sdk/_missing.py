@@ -10,20 +10,29 @@ import typing as t
 
 T = t.TypeVar("T")
 
+# type checkers don't know that MISSING is a sentinel, so we will describe it
+# differently at typing time, allowing for type narrowing on `is MISSING` and
+# similar checks
 if t.TYPE_CHECKING:
     # pretend that `MISSING: MissingType` is an enum at type-checking time
-    # this allows type checkers to use identity comparisons to type narrow
     #
-    # for example:
+    # enums are treated as `Literal[...]` values and are narrowed under simple
+    # checks, as unions and literal types are
+    # therefore, under this definition, `MissingType ~= Literal[MissingType.MISSING]`
+    #
+    # Therefore, consider this example:
     #
     #       x: int | float | MissingType
     #       if x is not MISSING:
     #           reveal_type(x)
     #
-    # should show `x: int | float`
+    # This is effectively the same as if we wrote:
     #
-    # however, because type checkers don't know that `MISSING` is a sentinel
-    # they do not narrow in this case based on the runtime data
+    #       x: int | float | Literal["a"]
+    #       if x != "a":
+    #           reveal_type(x)
+    #
+    # Both should show `x: int | float`
     import enum
 
     class MissingType(enum.Enum):
