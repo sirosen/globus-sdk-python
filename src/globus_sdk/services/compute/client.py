@@ -3,10 +3,9 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from globus_sdk import GlobusHTTPResponse, client, utils
+from globus_sdk import MISSING, GlobusHTTPResponse, MissingType, client, utils
 from globus_sdk._types import UUIDLike
 from globus_sdk.scopes import ComputeScopes, Scope
-from globus_sdk import MISSING, MissingType
 
 from .errors import ComputeAPIError
 
