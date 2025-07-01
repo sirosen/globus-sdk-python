@@ -79,6 +79,26 @@ Breaking Changes
 
 - Updated MappedCollectionDoc and GuestCollectionDoc with MissingType. (:pr:`1189`)
 
+.. _changelog-3.59.0:
+
+v3.59.0 (2025-07-01)
+====================
+
+Added
+-----
+
+- Added the ``TransferClient.set_subscription_admin_verified()`` method. (:pr:`1227`)
+
+- Updated ``ComputeClientV2.get_endpoints`` with a new ``role`` kwarg. (:pr:`1238`)
+
+Development
+-----------
+
+-   Convert the CHANGELOG to Markdown-compatible headers.
+
+    This resolves rendering issues in Dependabot PRs in the CLI,
+    and simplifies compatibility between RST and Markdown.
+
 .. _changelog-3.58.0:
 
 v3.58.0 (2025-06-16)
