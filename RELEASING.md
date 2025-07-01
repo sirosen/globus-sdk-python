@@ -62,12 +62,18 @@ or create the release via the GitHub CLI
   combine both announcements into a single email notice.)
 
 - Ensure the 4.x-dev branch is updated with the latest changes from main
+  by creating a PR:
     ```
     git checkout 4.x-dev
     git pull
+    git checkout -b merge-main-to-4x-dev-$(date +%Y%m%d)
     git merge origin/main
-    git push origin 4.x-dev
+    # Resolve any conflicts if they occur
+    git push -u origin merge-main-to-4x-dev-$(date +%Y%m%d)
+    gh pr create --base 4.x-dev --title "Merge main into 4.x-dev" \
+      --body "Merging latest changes from main branch into 4.x-dev"
     ```
+    After the PR is reviewed and merged, the 4.x-dev branch will be updated.
 
 ## Publish Pre-release 4.x packages to PyPi
 
