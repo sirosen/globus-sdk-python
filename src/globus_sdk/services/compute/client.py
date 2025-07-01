@@ -103,8 +103,10 @@ class ComputeClientV2(client.BaseClient):
         """  # noqa: E501
         return self.get(f"/v2/endpoints/{endpoint_id}/status")
 
-    def get_endpoints(self) -> GlobusHTTPResponse:
+    def get_endpoints(self, role: str | MissingType = MISSING) -> GlobusHTTPResponse:
         """Get a list of registered endpoints associated with the authenticated user.
+
+        :param role: Role of the user in relation to endpoints. (e.g.: owner, any)
 
         .. tab-set::
 
@@ -114,7 +116,8 @@ class ComputeClientV2(client.BaseClient):
                     :service: compute
                     :ref: Endpoints/operation/get_endpoints_v2_endpoints_get
         """  # noqa: E501
-        return self.get("/v2/endpoints")
+        query_params = {"role": role} if role else None
+        return self.get("/v2/endpoints", query_params=query_params)
 
     def delete_endpoint(self, endpoint_id: UUIDLike) -> GlobusHTTPResponse:
         """Delete a registered endpoint.
