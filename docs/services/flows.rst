@@ -75,3 +75,11 @@ Responses
 .. autoclass:: IterableFlowsResponse
    :members:
    :show-inheritance:
+
+.. autoclass:: globus_sdk.services.flows.IterableRunsResponse
+   :members:
+   :show-inheritance:
+
+.. autoclass:: globus_sdk.services.flows.IterableRunLogsResponse
+   :members:
+   :show-inheritance:
