@@ -4,8 +4,8 @@ import logging
 import typing as t
 import urllib.parse
 
+from globus_sdk._internal.utils import slash_join
 from globus_sdk._missing import filter_missing
-from globus_sdk._utils import slash_join
 from globus_sdk.scopes import Scope
 
 from .._common import stringify_requested_scopes
