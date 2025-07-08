@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t
 
 from globus_sdk import AuthLoginClient, ConfidentialAppAuthClient, GlobusSDKUsageError
-from globus_sdk._types import UUIDLike
+from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk.gare import GlobusAuthorizationParameters
 from globus_sdk.scopes import Scope
 

@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 import typing as t
 
+from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk._types import UUIDLike
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import Scope
