@@ -35,8 +35,7 @@ class LegacyDependentConsentRequiredAuthError(Serializable):
         errors: list[dict[str, str]],
         extra: dict[str, t.Any] | None = None,
     ) -> None:
-        self.code = _validate_dependent_consent_required_literal("error", error)
-        self.error = error
+        self.error = _validate_dependent_consent_required_literal("error", error)
 
         try:
             first_error = errors[0]
@@ -56,15 +55,11 @@ class LegacyDependentConsentRequiredAuthError(Serializable):
         Return a GlobusAuthRequirementsError representing this error.
         """
 
-        message = self.errors[0].get("title") or ""
-        message = message.replace("unapproved_scopes", "required_scopes")
         return GARE(
             code="ConsentRequired",
             authorization_parameters=GlobusAuthorizationParameters(
                 required_scopes=self.unapproved_scopes,
-                session_message=message,
             ),
-            extra=self.extra,
         )
 
 
@@ -240,8 +235,8 @@ def _validate_consent_required_literal(
 
 def _validate_dependent_consent_required_literal(
     name: str, value: t.Any
-) -> t.Literal["ConsentRequired"]:
+) -> t.Literal["dependent_consent_required"]:
     if value == "dependent_consent_required":
-        return "ConsentRequired"
+        return "dependent_consent_required"
     msg = f"'{name}' must be the string 'dependent_consent_required'"
     raise exc.ValidationError(msg)

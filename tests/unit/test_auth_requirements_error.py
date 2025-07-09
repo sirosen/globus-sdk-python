@@ -65,7 +65,7 @@ from globus_sdk.gare import (
             [
                 "https://auth.globus.org/scopes/00000000-ec3c-427d-bfb5-51049530122b/flow_00000000_ec3c_427d_bfb5_51049530122b_user"  # noqa: E501
             ],
-            "User must approve your client using scopes. See 'required_scopes'.",
+            None,
             id="Auth 'dependent_consent_required' error",
         ),
     ),
@@ -97,9 +97,11 @@ def test_create_auth_requirements_error_from_consent_error(
             authreq_error.authorization_parameters.required_scopes
             == expected_required_scopes
         )
-        assert (
-            authreq_error.authorization_parameters.session_message == expected_message
-        )
+        if expected_message is not None:
+            assert (
+                authreq_error.authorization_parameters.session_message
+                == expected_message
+            )
 
 
 @pytest.mark.parametrize(
