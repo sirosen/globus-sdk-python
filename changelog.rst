@@ -12,6 +12,25 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.60.0:
+
+v3.60.0 (2025-07-09)
+====================
+
+Added
+-----
+
+- Recognize ``dependent_consent_required`` errors from the Auth API
+  as a Globus Auth Requirements Error (GARE)
+  and support converting them to GAREs. (:pr:`1246`)
+
+Fixed
+-----
+
+-   Accept authorization parameters containing dependent scopes
+    when ``app.login()`` is called with a GARE's authorization parameters.
+    (:pr:`1247`)
+
 .. _changelog-3.59.0:
 
 v3.59.0 (2025-07-01)
