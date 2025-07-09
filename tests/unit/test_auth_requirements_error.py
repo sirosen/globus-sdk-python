@@ -16,7 +16,7 @@ from globus_sdk.gare import (
 
 
 @pytest.mark.parametrize(
-    "error_dict, status",
+    "error_dict, status, expected_required_scopes, expected_message",
     (
         (
             {
@@ -29,6 +29,8 @@ from globus_sdk.gare import (
                 "resource": "/transfer",
             },
             403,
+            ["urn:globus:auth:scope:transfer.api.globus.org:all[*foo *bar]"],
+            "Missing required foo_bar consent",
         ),
         (
             {
@@ -39,10 +41,38 @@ from globus_sdk.gare import (
                 "description": "Missing required foo_bar consent",
             },
             401,
+            ["urn:globus:auth:scope:transfer.api.globus.org:all[*foo *bar]"],
+            "Missing required foo_bar consent",
+        ),
+        pytest.param(
+            {
+                "error": "dependent_consent_required",
+                "error_description": "User must approve your client using scopes. See 'unapproved_scopes'.",  # noqa: E501
+                "errors": [
+                    {
+                        "code": "DEPENDENT_CONSENT_REQUIRED",
+                        "id": str(uuid.uuid4()),
+                        "title": "User must approve your client using scopes. See 'unapproved_scopes'.",  # noqa: E501
+                        "unapproved_scopes": [
+                            "https://auth.globus.org/scopes/00000000-ec3c-427d-bfb5-51049530122b/flow_00000000_ec3c_427d_bfb5_51049530122b_user"  # noqa: E501
+                        ],
+                        "status": "403",
+                        "detail": "User hasn't approved the following scopes: https://auth.globus.org/scopes/00000000-ec3c-427d-bfb5-51049530122b/flow_00000000_ec3c_427d_bfb5_51049530122b_user",  # noqa: E501
+                    }
+                ],
+            },
+            403,
+            [
+                "https://auth.globus.org/scopes/00000000-ec3c-427d-bfb5-51049530122b/flow_00000000_ec3c_427d_bfb5_51049530122b_user"  # noqa: E501
+            ],
+            "User must approve your client using scopes. See 'required_scopes'.",
+            id="Auth 'dependent_consent_required' error",
         ),
     ),
 )
-def test_create_auth_requirements_error_from_consent_error(error_dict, status):
+def test_create_auth_requirements_error_from_consent_error(
+    error_dict, status, expected_required_scopes, expected_message
+):
     """
     Test that various ConsentRequired error shapes can be detected and converted
     to a GlobusAuthRequirementsError.
@@ -59,16 +89,16 @@ def test_create_auth_requirements_error_from_consent_error(error_dict, status):
         # Check that this only produces one error
         assert len(to_gares([error])) == 1
 
-        # Create a Globus Auth requirements error from a Transfer format error
+        # Create a Globus Auth requirements error from the original error
         authreq_error = to_gare(error)
         assert isinstance(authreq_error, GARE)
         assert authreq_error.code == "ConsentRequired"
-        assert authreq_error.authorization_parameters.required_scopes == [
-            "urn:globus:auth:scope:transfer.api.globus.org:all[*foo *bar]"
-        ]
         assert (
-            authreq_error.authorization_parameters.session_message
-            == "Missing required foo_bar consent"
+            authreq_error.authorization_parameters.required_scopes
+            == expected_required_scopes
+        )
+        assert (
+            authreq_error.authorization_parameters.session_message == expected_message
         )
 
 

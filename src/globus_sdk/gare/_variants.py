@@ -23,6 +23,51 @@ class LegacyAuthRequirementsErrorVariant(t.Protocol):
     def to_auth_requirements_error(self) -> GARE: ...
 
 
+class LegacyDependentConsentRequiredAuthError(Serializable):
+    """
+    The dependent_consent_required error format emitted by the Globus Auth service.
+    """
+
+    def __init__(
+        self,
+        *,
+        error: t.Literal["dependent_consent_required"],
+        errors: list[dict[str, str]],
+        extra: dict[str, t.Any] | None = None,
+    ) -> None:
+        self.code = _validate_dependent_consent_required_literal("error", error)
+        self.error = error
+
+        try:
+            first_error = errors[0]
+            if not isinstance(first_error, dict):
+                raise TypeError
+        except (AttributeError, KeyError, TypeError) as _error:
+            msg = "'errors' must be list of errors with at least one error object"
+            raise exc.ValidationError(msg) from _error
+        self.errors = errors
+        self.unapproved_scopes = validators.str_list(
+            "unapproved_scopes", first_error.get("unapproved_scopes", [])
+        )
+        self.extra = extra or {}
+
+    def to_auth_requirements_error(self) -> GARE:
+        """
+        Return a GlobusAuthRequirementsError representing this error.
+        """
+
+        message = self.errors[0].get("title") or ""
+        message = message.replace("unapproved_scopes", "required_scopes")
+        return GARE(
+            code="ConsentRequired",
+            authorization_parameters=GlobusAuthorizationParameters(
+                required_scopes=self.unapproved_scopes,
+                session_message=message,
+            ),
+            extra=self.extra,
+        )
+
+
 class LegacyConsentRequiredTransferError(Serializable):
     """
     The ConsentRequired error format emitted by the Globus Transfer service.
@@ -191,3 +236,12 @@ def _validate_consent_required_literal(
     if value == "ConsentRequired":
         return "ConsentRequired"
     raise exc.ValidationError(f"'{name}' must be the string 'ConsentRequired'")
+
+
+def _validate_dependent_consent_required_literal(
+    name: str, value: t.Any
+) -> t.Literal["ConsentRequired"]:
+    if value == "dependent_consent_required":
+        return "ConsentRequired"
+    msg = f"'{name}' must be the string 'dependent_consent_required'"
+    raise exc.ValidationError(msg)
