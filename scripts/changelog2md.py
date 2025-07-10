@@ -23,8 +23,8 @@ CHANGELOG_ANCHOR_PATTERN = re.compile(
 )
 CHANGELOG_HEADER_PATTERN = re.compile(r"^v(\d+\.\d+\.\d+).*$", re.MULTILINE)
 
-H2_RST_PATTERN = re.compile(r"-+")
-H3_RST_PATTERN = re.compile(r"~+")
+H2_RST_PATTERN = re.compile(r"=+")
+H3_RST_PATTERN = re.compile(r"-+")
 
 SPHINX_ISSUES_PR_PATTERN = re.compile(r":pr:`(\d+)`")
 SPHINX_ISSUES_ISSUE_PATTERN = re.compile(r":issue:`(\d+)`")
