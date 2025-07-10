@@ -1,5 +1,5 @@
-Globus Flows _testing Method List
-=================================
+Globus Flows testing Method List
+================================
 
 .. enumeratetestingfixtures:: globus_sdk.FlowsClient
 
