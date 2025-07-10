@@ -12,6 +12,101 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.0a3:
+
+v4.0.0a3 (2025-07-10)
+=====================
+
+Breaking Changes
+----------------
+
+- All defaults of ``None`` converted to ``globus_sdk.MISSING`` for all payload types in the Transfer client. (:pr:`1216`)
+
+- The ``transfer_client`` parameter to ``TransferData`` and ``DeleteData`` has been removed.
+  See the upgrading doc for transition details. (:pr:`1236`)
+
+- In Globus Auth client classes, defaults of ``None`` are converted to
+  ``MISSING`` for optional fields. (:pr:`1236`)
+
+Added
+-----
+
+- ``SpecificFlowClient`` has a new method,
+  ``add_app_transfer_data_access_scope`` which facilitates declaration of scope
+  requirements when starting flows which interact with collections that need
+  ``data_access`` scopes. (:pr:`1166`)
+
+Removed
+-------
+
+- ``globus_sdk.experimental.scope_parser`` has been removed. Use
+  ``globus_sdk.scopes`` instead. (:pr:`1236`)
+
+Changed
+-------
+
+- ``Scope`` objects are now immutable. (:pr:`1208`)
+
+  - ``Scope.dependencies`` is now a tuple, not a list.
+
+  - The ``add_dependency`` method has been removed, since mutating a ``Scope``
+    is no longer possible.
+
+  - A new evolver method, ``Scope.with_dependency`` has been added. It extends
+    the ``dependencies`` tuple in a new ``Scope`` object.
+
+  - A batch version of ``Scope.with_dependency`` has been added,
+    ``Scope.with_dependencies``.
+
+  - An evolver for the ``optional`` field of a ``Scope`` is also now available,
+    named ``Scope.with_optional``.
+
+- Scope parsing has been separated from the main ``Scope`` class into a
+  dedicated ``ScopeParser`` which provides parsing methods. (:pr:`1208`)
+
+  - Use ``globus_sdk.scopes.ScopeParser`` for complex parsing use-cases. The
+    ``ScopeParser.parse`` classmethod parses strings into lists of scope
+    objects.
+
+  - ``Scope.merge_scopes`` has been moved to ``ScopeParser.merge_scopes``.
+
+  - ``Scope.parse`` is changed to call ``ScopeParser.parse`` and verify that
+    there is exactly one result, which it returns. This means that
+    ``Scope.parse`` now returns a single ``Scope``, not a ``list[Scope]``.
+
+  - ``Scope.serialize`` and ``Scope.deserialize`` have been removed as methods.
+    Use ``str(scope_object)`` as a replacement for ``serialize()`` and
+    ``Scope.parse`` as a replacement for ``deserialize()``.
+
+- Payload types now inherit from ``dict`` rather than ``UserDict``. The
+  ``PayloadWrapper`` utility class has been replaced with ``Payload``.
+  (:pr:`1222`)
+- Payload types are more consistent about encoding missing values using ``MISSING``.
+  (:pr:`1222`)
+
+- The SDK's ``ScopeBuilder`` types have been replaced with
+  ``StaticScopeCollection`` and ``DynamicScopeCollection`` types. (:pr:`NUMBER`)
+
+  - Scopes provided as constants by the SDK are now ``Scope`` objects, not
+    strings. They can be converted to strings trivially with ``str(scope)``.
+
+  - The various scope builder types have been renamed. ``SpecificFlowScopes``,
+    ``GCSEndpointScopes``, and ``GCSCollectionScopes`` replace
+    ``SpecificFlowScopeBuilder``, ``GCSEndpointScopeBuilder``, and
+    ``GCSCollectionScopeBuilder``.
+
+- The ``ScopeBuilder`` types have been simplified and improved as the new
+  ``ScopeCollection`` types. (:pr:`NUMBER`)
+
+  - ``ScopeBuilder`` is replaced with ``StaticScopeCollection`` and
+    ``DynamicScopeCollection``. The ``scopes`` attribute of client classes is
+    now a scope collection.
+
+  - The attributes of ``ScopeCollection``\s are ``Scope`` objects, not strings.
+
+  - ``ScopeCollection``\s define ``__iter__``, yielding the provided scopes,
+    but not ``__str__``.
+
 .. _changelog-4.0.0a2:
 
 v4.0.0a2 (2025-06-05)
