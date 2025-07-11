@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import typing as t
-
-from globus_sdk._internal.type_definitions import UUIDLike
+import uuid
 
 from ..collection import (
     DynamicScopeCollection,
@@ -47,7 +46,7 @@ class SpecificFlowScopes(DynamicScopeCollection):
 
     _scope_names = ("user",)
 
-    def __init__(self, flow_id: UUIDLike) -> None:
+    def __init__(self, flow_id: uuid.UUID | str) -> None:
         _flow_id = str(flow_id)
         super().__init__(_flow_id)
 

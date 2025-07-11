@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import typing as t
+import uuid
 
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import GlobusPayload
 
@@ -25,7 +25,7 @@ class GCSRoleDocument(GlobusPayload):
     def __init__(
         self,
         DATA_TYPE: str = "role#1.0.0",
-        collection: UUIDLike | MissingType = MISSING,
+        collection: uuid.UUID | str | MissingType = MISSING,
         principal: str | MissingType = MISSING,
         role: str | MissingType = MISSING,
         additional_fields: dict[str, t.Any] | None = None,

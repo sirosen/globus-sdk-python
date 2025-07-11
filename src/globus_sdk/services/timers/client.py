@@ -6,7 +6,6 @@ import uuid
 
 from globus_sdk import client, exc, response
 from globus_sdk._internal import guards
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk.scopes import (
     GCSCollectionScopes,
     Scope,
@@ -35,7 +34,7 @@ class TimersClient(client.BaseClient):
     default_scope_requirements = [TimersScopes.timer]
 
     def add_app_transfer_data_access_scope(
-        self, collection_ids: UUIDLike | t.Iterable[UUIDLike]
+        self, collection_ids: uuid.UUID | str | t.Iterable[uuid.UUID | str]
     ) -> TimersClient:
         """
         Add a dependent ``data_access`` scope for one or more given ``collection_ids``
@@ -117,7 +116,7 @@ class TimersClient(client.BaseClient):
 
     def get_job(
         self,
-        job_id: UUIDLike,
+        job_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -208,7 +207,7 @@ class TimersClient(client.BaseClient):
         return self.post("/jobs/", data=data)
 
     def update_job(
-        self, job_id: UUIDLike, data: dict[str, t.Any]
+        self, job_id: uuid.UUID | str, data: dict[str, t.Any]
     ) -> response.GlobusHTTPResponse:
         """
         ``PATCH /jobs/<job_id>``
@@ -226,7 +225,7 @@ class TimersClient(client.BaseClient):
 
     def delete_job(
         self,
-        job_id: UUIDLike,
+        job_id: uuid.UUID | str,
     ) -> response.GlobusHTTPResponse:
         """
         ``DELETE /jobs/<job_id>``
@@ -243,7 +242,7 @@ class TimersClient(client.BaseClient):
 
     def pause_job(
         self,
-        job_id: UUIDLike,
+        job_id: uuid.UUID | str,
     ) -> response.GlobusHTTPResponse:
         """
         Make a timer job inactive, preventing it from running until it is resumed.
@@ -260,7 +259,7 @@ class TimersClient(client.BaseClient):
 
     def resume_job(
         self,
-        job_id: UUIDLike,
+        job_id: uuid.UUID | str,
         *,
         update_credentials: bool | None = None,
     ) -> response.GlobusHTTPResponse:

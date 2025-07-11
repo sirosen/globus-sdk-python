@@ -6,7 +6,6 @@ import uuid
 from globus_sdk import client, exc, paging, response
 from globus_sdk._internal.classprop import classproperty
 from globus_sdk._internal.remarshal import commajoin
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._internal.utils import slash_join
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.authorizers import GlobusAuthorizer
@@ -110,7 +109,7 @@ class GCSClient(client.BaseClient):
         return GCSCollectionScopes(str(collection_id))
 
     @staticmethod
-    def connector_id_to_name(connector_id: UUIDLike) -> str | None:
+    def connector_id_to_name(connector_id: uuid.UUID | str) -> str | None:
         """
         .. warning::
 
@@ -279,7 +278,7 @@ class GCSClient(client.BaseClient):
     def get_collection_list(
         self,
         *,
-        mapped_collection_id: UUIDLike | MissingType = MISSING,
+        mapped_collection_id: uuid.UUID | str | MissingType = MISSING,
         filter: (  # pylint: disable=redefined-builtin
             str | t.Iterable[str] | MissingType
         ) = MISSING,
@@ -324,7 +323,7 @@ class GCSClient(client.BaseClient):
 
     def get_collection(
         self,
-        collection_id: UUIDLike,
+        collection_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> UnpackingGCSResponse:
@@ -382,7 +381,7 @@ class GCSClient(client.BaseClient):
 
     def update_collection(
         self,
-        collection_id: UUIDLike,
+        collection_id: uuid.UUID | str,
         collection_data: dict[str, t.Any] | CollectionDocument,
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -415,7 +414,7 @@ class GCSClient(client.BaseClient):
 
     def delete_collection(
         self,
-        collection_id: UUIDLike,
+        collection_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -519,7 +518,7 @@ class GCSClient(client.BaseClient):
 
     def get_storage_gateway(
         self,
-        storage_gateway_id: UUIDLike,
+        storage_gateway_id: uuid.UUID | str,
         *,
         include: str | t.Iterable[str] | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -555,7 +554,7 @@ class GCSClient(client.BaseClient):
 
     def update_storage_gateway(
         self,
-        storage_gateway_id: UUIDLike,
+        storage_gateway_id: uuid.UUID | str,
         data: dict[str, t.Any] | StorageGatewayDocument,
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -620,7 +619,7 @@ class GCSClient(client.BaseClient):
     )
     def get_role_list(
         self,
-        collection_id: UUIDLike | MissingType = MISSING,
+        collection_id: uuid.UUID | str | MissingType = MISSING,
         include: str | MissingType = MISSING,
         page_size: int | MissingType = MISSING,
         marker: str | MissingType = MISSING,
@@ -690,7 +689,7 @@ class GCSClient(client.BaseClient):
 
     def get_role(
         self,
-        role_id: UUIDLike,
+        role_id: uuid.UUID | str,
         query_params: dict[str, t.Any] | None = None,
     ) -> UnpackingGCSResponse:
         """
@@ -714,7 +713,7 @@ class GCSClient(client.BaseClient):
 
     def delete_role(
         self,
-        role_id: UUIDLike,
+        role_id: uuid.UUID | str,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -742,7 +741,7 @@ class GCSClient(client.BaseClient):
     )
     def get_user_credential_list(
         self,
-        storage_gateway: UUIDLike | MissingType = MISSING,
+        storage_gateway: uuid.UUID | str | MissingType = MISSING,
         page_size: int | MissingType = MISSING,
         marker: str | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -805,7 +804,7 @@ class GCSClient(client.BaseClient):
 
     def get_user_credential(
         self,
-        user_credential_id: UUIDLike,
+        user_credential_id: uuid.UUID | str,
         query_params: dict[str, t.Any] | None = None,
     ) -> UnpackingGCSResponse:
         """
@@ -831,7 +830,7 @@ class GCSClient(client.BaseClient):
 
     def update_user_credential(
         self,
-        user_credential_id: UUIDLike,
+        user_credential_id: uuid.UUID | str,
         data: dict[str, t.Any] | UserCredentialDocument,
         query_params: dict[str, t.Any] | None = None,
     ) -> UnpackingGCSResponse:
@@ -860,7 +859,7 @@ class GCSClient(client.BaseClient):
 
     def delete_user_credential(
         self,
-        user_credential_id: UUIDLike,
+        user_credential_id: uuid.UUID | str,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
         """

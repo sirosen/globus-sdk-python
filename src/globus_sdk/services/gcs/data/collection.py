@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import abc
 import typing as t
+import uuid
 
 from globus_sdk._internal.remarshal import strseq_listify
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import AbstractGlobusPayload
 
@@ -157,7 +157,7 @@ class CollectionDocument(AbstractGlobusPayload):
         department: str | None | MissingType = MISSING,
         description: str | None | MissingType = MISSING,
         display_name: str | MissingType = MISSING,
-        identity_id: UUIDLike | MissingType = MISSING,
+        identity_id: uuid.UUID | str | MissingType = MISSING,
         info_link: str | None | MissingType = MISSING,
         organization: str | MissingType = MISSING,
         restrict_transfers_to_high_assurance: (
@@ -277,7 +277,7 @@ class MappedCollectionDocument(CollectionDocument):
         department: str | None | MissingType = MISSING,
         description: str | None | MissingType = MISSING,
         display_name: str | MissingType = MISSING,
-        identity_id: UUIDLike | MissingType = MISSING,
+        identity_id: uuid.UUID | str | MissingType = MISSING,
         info_link: str | None | MissingType = MISSING,
         organization: str | MissingType = MISSING,
         restrict_transfers_to_high_assurance: (
@@ -299,8 +299,8 @@ class MappedCollectionDocument(CollectionDocument):
         # > specific args start <
         # strs
         domain_name: str | MissingType = MISSING,
-        guest_auth_policy_id: UUIDLike | None | MissingType = MISSING,
-        storage_gateway_id: UUIDLike | MissingType = MISSING,
+        guest_auth_policy_id: uuid.UUID | str | None | MissingType = MISSING,
+        storage_gateway_id: uuid.UUID | str | MissingType = MISSING,
         # str lists
         sharing_users_allow: t.Iterable[str] | None | MissingType = MISSING,
         sharing_users_deny: t.Iterable[str] | None | MissingType = MISSING,
@@ -417,7 +417,7 @@ class GuestCollectionDocument(CollectionDocument):
         department: str | None | MissingType = MISSING,
         description: str | None | MissingType = MISSING,
         display_name: str | MissingType = MISSING,
-        identity_id: UUIDLike | MissingType = MISSING,
+        identity_id: uuid.UUID | str | MissingType = MISSING,
         info_link: str | None | MissingType = MISSING,
         organization: str | MissingType = MISSING,
         restrict_transfers_to_high_assurance: (
@@ -439,8 +439,8 @@ class GuestCollectionDocument(CollectionDocument):
         associated_flow_policy: dict[str, t.Any] | MissingType = MISSING,
         # > common args end <
         # > specific args start <
-        mapped_collection_id: UUIDLike | MissingType = MISSING,
-        user_credential_id: UUIDLike | MissingType = MISSING,
+        mapped_collection_id: uuid.UUID | str | MissingType = MISSING,
+        user_credential_id: uuid.UUID | str | MissingType = MISSING,
         skip_auto_delete: bool | MissingType = MISSING,
         activity_notification_policy: dict[str, list[str]] | MissingType = MISSING,
         # > specific args end <

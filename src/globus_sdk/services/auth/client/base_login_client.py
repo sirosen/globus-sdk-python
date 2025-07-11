@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 import typing as t
+import uuid
 
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 from globus_sdk import client, exc
 from globus_sdk._internal import guards
 from globus_sdk._internal.remarshal import commajoin
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.authorizers import GlobusAuthorizer, NullAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
@@ -48,7 +48,7 @@ class AuthLoginClient(client.BaseClient):
 
     def __init__(
         self,
-        client_id: UUIDLike | None = None,
+        client_id: uuid.UUID | str | None = None,
         environment: str | None = None,
         base_url: str | None = None,
         authorizer: GlobusAuthorizer | None = None,
@@ -147,11 +147,11 @@ class AuthLoginClient(client.BaseClient):
         self,
         *,
         session_required_identities: (
-            UUIDLike | t.Iterable[UUIDLike] | MissingType
+            uuid.UUID | str | t.Iterable[uuid.UUID | str] | MissingType
         ) = MISSING,
         session_required_single_domain: str | t.Iterable[str] | MissingType = MISSING,
         session_required_policies: (
-            UUIDLike | t.Iterable[UUIDLike] | MissingType
+            uuid.UUID | str | t.Iterable[uuid.UUID | str] | MissingType
         ) = MISSING,
         session_required_mfa: bool | MissingType = MISSING,
         session_message: str | MissingType = MISSING,

@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 import typing as t
+import uuid
 
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 from globus_sdk import client, exc
 from globus_sdk._internal.remarshal import commajoin, strseq_listify
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.response import GlobusHTTPResponse, IterableResponse
@@ -72,7 +72,7 @@ class AuthClient(client.BaseClient):
 
     def __init__(
         self,
-        client_id: UUIDLike | None = None,
+        client_id: uuid.UUID | str | None = None,
         environment: str | None = None,
         base_url: str | None = None,
         app: GlobusApp | None = None,
@@ -113,7 +113,7 @@ class AuthClient(client.BaseClient):
         return self._client_id
 
     @client_id.setter
-    def client_id(self, value: UUIDLike) -> None:
+    def client_id(self, value: uuid.UUID | str) -> None:
         exc.warn_deprecated(
             "The client_id attribute on `AuthClient` / "
             "`AuthClient` is deprecated. "
@@ -226,7 +226,7 @@ class AuthClient(client.BaseClient):
         self,
         *,
         usernames: t.Iterable[str] | str | MissingType = MISSING,
-        ids: t.Iterable[UUIDLike] | UUIDLike | MissingType = MISSING,
+        ids: t.Iterable[uuid.UUID | str] | uuid.UUID | str | MissingType = MISSING,
         provision: bool = False,
         query_params: dict[str, t.Any] | None = None,
     ) -> GetIdentitiesResponse:
@@ -340,7 +340,7 @@ class AuthClient(client.BaseClient):
         self,
         *,
         domains: t.Iterable[str] | str | MissingType = MISSING,
-        ids: t.Iterable[UUIDLike] | UUIDLike | MissingType = MISSING,
+        ids: t.Iterable[uuid.UUID | str] | uuid.UUID | str | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
     ) -> GetIdentityProvidersResponse:
         r"""
@@ -431,7 +431,7 @@ class AuthClient(client.BaseClient):
     # Developer APIs
     #
 
-    def get_project(self, project_id: UUIDLike) -> GlobusHTTPResponse:
+    def get_project(self, project_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Look up a project. Requires the ``manage_projects`` scope.
 
@@ -532,8 +532,12 @@ class AuthClient(client.BaseClient):
         display_name: str,
         contact_email: str,
         *,
-        admin_ids: UUIDLike | t.Iterable[UUIDLike] | MissingType = MISSING,
-        admin_group_ids: UUIDLike | t.Iterable[UUIDLike] | MissingType = MISSING,
+        admin_ids: (
+            uuid.UUID | str | t.Iterable[uuid.UUID | str] | MissingType
+        ) = MISSING,
+        admin_group_ids: (
+            uuid.UUID | str | t.Iterable[uuid.UUID | str] | MissingType
+        ) = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Create a new project. Requires the ``manage_projects`` scope.
@@ -588,12 +592,16 @@ class AuthClient(client.BaseClient):
 
     def update_project(
         self,
-        project_id: UUIDLike,
+        project_id: uuid.UUID | str,
         *,
         display_name: str | MissingType = MISSING,
         contact_email: str | MissingType = MISSING,
-        admin_ids: UUIDLike | t.Iterable[UUIDLike] | MissingType = MISSING,
-        admin_group_ids: UUIDLike | t.Iterable[UUIDLike] | MissingType = MISSING,
+        admin_ids: (
+            uuid.UUID | str | t.Iterable[uuid.UUID | str] | MissingType
+        ) = MISSING,
+        admin_group_ids: (
+            uuid.UUID | str | t.Iterable[uuid.UUID | str] | MissingType
+        ) = MISSING,
     ) -> GlobusHTTPResponse:
         """
         Update a project. Requires the ``manage_projects`` scope.
@@ -639,7 +647,7 @@ class AuthClient(client.BaseClient):
         }
         return self.put(f"/v2/api/projects/{project_id}", data={"project": body})
 
-    def delete_project(self, project_id: UUIDLike) -> GlobusHTTPResponse:
+    def delete_project(self, project_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Delete a project. Requires the ``manage_projects`` scope.
 
@@ -668,7 +676,7 @@ class AuthClient(client.BaseClient):
         """
         return self.delete(f"/v2/api/projects/{project_id}")
 
-    def get_policy(self, policy_id: UUIDLike) -> GlobusHTTPResponse:
+    def get_policy(self, policy_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Look up a policy. Requires the ``manage_projects`` scope.
 
@@ -767,7 +775,7 @@ class AuthClient(client.BaseClient):
     def create_policy(
         self,
         *,
-        project_id: UUIDLike,
+        project_id: uuid.UUID | str,
         display_name: str,
         description: str,
         high_assurance: bool | MissingType = MISSING,
@@ -846,9 +854,9 @@ class AuthClient(client.BaseClient):
 
     def update_policy(
         self,
-        policy_id: UUIDLike,
+        policy_id: uuid.UUID | str,
         *,
-        project_id: UUIDLike | MissingType = MISSING,
+        project_id: uuid.UUID | str | MissingType = MISSING,
         authentication_assurance_timeout: int | MissingType = MISSING,
         required_mfa: bool | MissingType = MISSING,
         display_name: str | MissingType = MISSING,
@@ -905,7 +913,7 @@ class AuthClient(client.BaseClient):
         }
         return self.put(f"/v2/api/policies/{policy_id}", data={"policy": body})
 
-    def delete_policy(self, policy_id: UUIDLike) -> GlobusHTTPResponse:
+    def delete_policy(self, policy_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Delete a policy. Requires the ``manage_projects`` scope.
 
@@ -937,7 +945,7 @@ class AuthClient(client.BaseClient):
     def get_client(
         self,
         *,
-        client_id: UUIDLike | MissingType = MISSING,
+        client_id: uuid.UUID | str | MissingType = MISSING,
         fqdn: str | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
@@ -1086,7 +1094,7 @@ class AuthClient(client.BaseClient):
     def create_client(
         self,
         name: str,
-        project: UUIDLike,
+        project: uuid.UUID | str,
         *,
         public_client: bool | MissingType = MISSING,
         client_type: (
@@ -1104,8 +1112,8 @@ class AuthClient(client.BaseClient):
         redirect_uris: t.Iterable[str] | MissingType = MISSING,
         terms_and_conditions: str | MissingType = MISSING,
         privacy_policy: str | MissingType = MISSING,
-        required_idp: UUIDLike | MissingType = MISSING,
-        preselect_idp: UUIDLike | MissingType = MISSING,
+        required_idp: uuid.UUID | str | MissingType = MISSING,
+        preselect_idp: uuid.UUID | str | MissingType = MISSING,
         additional_fields: dict[str, t.Any] | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
@@ -1234,15 +1242,15 @@ class AuthClient(client.BaseClient):
 
     def update_client(
         self,
-        client_id: UUIDLike,
+        client_id: uuid.UUID | str,
         *,
         name: str | MissingType = MISSING,
         visibility: MissingType | t.Literal["public", "private"] = MISSING,
         redirect_uris: t.Iterable[str] | MissingType = MISSING,
         terms_and_conditions: str | None | MissingType = MISSING,
         privacy_policy: str | None | MissingType = MISSING,
-        required_idp: UUIDLike | None | MissingType = MISSING,
-        preselect_idp: UUIDLike | None | MissingType = MISSING,
+        required_idp: uuid.UUID | str | None | MissingType = MISSING,
+        preselect_idp: uuid.UUID | str | None | MissingType = MISSING,
         additional_fields: dict[str, t.Any] | MissingType = MISSING,
     ) -> GlobusHTTPResponse:
         """
@@ -1315,7 +1323,7 @@ class AuthClient(client.BaseClient):
 
         return self.put(f"/v2/api/clients/{client_id}", data={"client": body})
 
-    def delete_client(self, client_id: UUIDLike) -> GlobusHTTPResponse:
+    def delete_client(self, client_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Delete a client. Requires the ``manage_projects`` scope.
 
@@ -1344,7 +1352,7 @@ class AuthClient(client.BaseClient):
         """
         return self.delete(f"/v2/api/clients/{client_id}")
 
-    def get_client_credentials(self, client_id: UUIDLike) -> IterableResponse:
+    def get_client_credentials(self, client_id: uuid.UUID | str) -> IterableResponse:
         """
         Look up client credentials by ``client_id``.  Requires the
         ``manage_projects`` scope.
@@ -1387,7 +1395,7 @@ class AuthClient(client.BaseClient):
 
     def create_client_credential(
         self,
-        client_id: UUIDLike,
+        client_id: uuid.UUID | str,
         name: str,
     ) -> GlobusHTTPResponse:
         """
@@ -1436,8 +1444,8 @@ class AuthClient(client.BaseClient):
 
     def delete_client_credential(
         self,
-        client_id: UUIDLike,
-        credential_id: UUIDLike,
+        client_id: uuid.UUID | str,
+        credential_id: uuid.UUID | str,
     ) -> GlobusHTTPResponse:
         """
         Delete a credential. Requires the ``manage_projects`` scope.
@@ -1469,7 +1477,7 @@ class AuthClient(client.BaseClient):
         """
         return self.delete(f"/v2/api/clients/{client_id}/credentials/{credential_id}")
 
-    def get_scope(self, scope_id: UUIDLike) -> GlobusHTTPResponse:
+    def get_scope(self, scope_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Look up a scope by ``scope_id``.  Requires the ``manage_projects`` scope.
 
@@ -1515,7 +1523,7 @@ class AuthClient(client.BaseClient):
         self,
         *,
         scope_strings: t.Iterable[str] | str | MissingType = MISSING,
-        ids: t.Iterable[UUIDLike] | UUIDLike | MissingType = MISSING,
+        ids: t.Iterable[uuid.UUID | str] | uuid.UUID | str | MissingType = MISSING,
         query_params: dict[str, t.Any] | MissingType = MISSING,
     ) -> IterableResponse:
         """
@@ -1604,7 +1612,7 @@ class AuthClient(client.BaseClient):
 
     def create_scope(
         self,
-        client_id: UUIDLike,
+        client_id: uuid.UUID | str,
         name: str,
         description: str,
         scope_suffix: str,
@@ -1673,7 +1681,7 @@ class AuthClient(client.BaseClient):
 
     def update_scope(
         self,
-        scope_id: UUIDLike,
+        scope_id: uuid.UUID | str,
         *,
         name: str | MissingType = MISSING,
         description: str | MissingType = MISSING,
@@ -1734,7 +1742,7 @@ class AuthClient(client.BaseClient):
 
         return self.put(f"/v2/api/scopes/{scope_id}", data={"scope": body})
 
-    def delete_scope(self, scope_id: UUIDLike) -> GlobusHTTPResponse:
+    def delete_scope(self, scope_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Delete a scope. Requires the ``manage_projects`` scope.
 
@@ -1765,7 +1773,7 @@ class AuthClient(client.BaseClient):
 
     def get_consents(
         self,
-        identity_id: UUIDLike,
+        identity_id: uuid.UUID | str,
         *,
         # pylint: disable=redefined-builtin
         all: bool = False,
