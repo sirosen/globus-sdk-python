@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
 from globus_sdk import Scope
-from globus_sdk._types import UUIDLike
 from globus_sdk.scopes.consents import Consent, ConsentForest
 
 ScopeRepr = namedtuple("Scope", ["id", "name"])
@@ -21,11 +20,11 @@ class ConsentTest(Consent):
     Required fields: client, scope, scope_name
     """
 
-    client: UUIDLike
-    scope: UUIDLike
+    client: uuid.UUID | str
+    scope: uuid.UUID | str
     scope_name: str
     id: int = field(default_factory=lambda: uuid.uuid1().int)
-    effective_identity: UUIDLike = str(uuid.uuid4())
+    effective_identity: uuid.UUID | str = str(uuid.uuid4())
     dependency_path: list[int] = field(default_factory=list)
     created: datetime = field(
         default_factory=lambda: datetime.now() - timedelta(days=1)
