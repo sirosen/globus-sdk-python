@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import functools
 import logging
 import typing as t
 
@@ -34,44 +33,6 @@ from ..response import (
 log = logging.getLogger(__name__)
 
 F = t.TypeVar("F", bound=t.Callable[..., GlobusHTTPResponse])
-
-
-def _create_policy_compat(f: F) -> F:
-    @functools.wraps(f)
-    def wrapper(self: t.Any, *args: t.Any, **kwargs: t.Any) -> t.Any:
-        if args:
-            if len(args) > 5:
-                raise TypeError(
-                    "create_policy() takes 5 positional arguments "
-                    f"but {len(args)} were given"
-                )
-
-            exc.warn_deprecated(
-                "'AuthClient.create_policy' received positional arguments. "
-                "Use only keyword arguments instead."
-            )
-
-            for argname, argvalue in zip(
-                (
-                    "project_id",
-                    "high_assurance",
-                    "authentication_assurance_timeout",
-                    "required_mfa",
-                    "display_name",
-                    "description",
-                ),
-                args,
-            ):
-                if argname in kwargs:
-                    raise TypeError(
-                        f"create_policy() got multiple values for argument '{argname}'"
-                    )
-                else:
-                    kwargs[argname] = argvalue
-
-        return f(self, **kwargs)
-
-    return t.cast(F, wrapper)
 
 
 class AuthClient(client.BaseClient):
@@ -803,8 +764,7 @@ class AuthClient(client.BaseClient):
         """
         return GetPoliciesResponse(self.get("/v2/api/policies"))
 
-    @_create_policy_compat
-    def create_policy(  # pylint: disable=missing-param-doc
+    def create_policy(
         self,
         *,
         project_id: UUIDLike,
@@ -820,15 +780,15 @@ class AuthClient(client.BaseClient):
         Create a new Auth policy. Requires the ``manage_projects`` scope.
 
         :param project_id: ID of the project for the new policy
+        :param display_name: A user-friendly name for the policy
+        :param description: A user-friendly description to explain the purpose of the
+            policy
         :param high_assurance: Whether or not this policy is applied to sessions.
         :param authentication_assurance_timeout: Number of seconds within which someone
             must have authenticated to satisfy the policy
         :param required_mfa: If True, then multi-factor authentication is required.
             This can only be set to True for high-assurance policies. The default
             is False.
-        :param display_name: A user-friendly name for the policy
-        :param description: A user-friendly description to explain the purpose of the
-            policy
         :param domain_constraints_include: A list of domains that can satisfy the policy
         :param domain_constraints_exclude: A list of domains that cannot satisfy the
             policy
