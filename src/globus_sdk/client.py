@@ -6,8 +6,8 @@ import typing as t
 import urllib.parse
 
 from globus_sdk import GlobusSDKUsageError, config, exc
-from globus_sdk._classproperty import classproperty
-from globus_sdk._utils import slash_join
+from globus_sdk._internal.classprop import classproperty
+from globus_sdk._internal.utils import slash_join
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.paging import PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse

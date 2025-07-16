@@ -8,8 +8,8 @@ import re
 import typing as t
 import urllib.parse
 
+from globus_sdk._internal.utils import slash_join
 from globus_sdk._missing import MISSING, MissingType, filter_missing
-from globus_sdk._utils import slash_join
 from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.scopes import Scope
 
