@@ -190,13 +190,13 @@ class TimersClient(client.BaseClient):
 
         **Examples**
 
-        >>> from datetime import datetime, timedelta
+        >>> from datetime import datetime, timedelta, timezone
         >>> transfer_client = TransferClient(...)
         >>> transfer_data = TransferData(transfer_client, ...)
         >>> timer_client = globus_sdk.TimersClient(...)
         >>> job = TimerJob.from_transfer_data(
         ...     transfer_data,
-        ...     datetime.utcnow(),
+        ...     datetime.now(tz=timezone.utc).replace(tzinfo=None),
         ...     timedelta(days=14),
         ...     name="my-timer-job"
         ... )
