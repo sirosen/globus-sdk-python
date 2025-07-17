@@ -179,6 +179,24 @@ Update ``add_dependency`` usage like so:
     my_scope = Scope(ROOT_SCOPE_STRING)
     my_scope = my_scope.with_dependency(DEPENCENCY_STRING)
 
+For optional dependencies, the ``optional`` parameter must now be specified when
+creating the dependency scope, not when adding it:
+
+.. code-block:: python
+
+    # globus-sdk v3
+    from globus_sdk.scopes import Scope
+
+    my_scope = Scope(ROOT_SCOPE_STRING)
+    my_scope.add_dependency(DEPENDENCY_STRING, optional=True)
+
+    # globus-sdk v4
+    from globus_sdk.scopes import Scope
+
+    my_scope = Scope(ROOT_SCOPE_STRING)
+    dependency = Scope(DEPENDENCY_STRING, optional=True)
+    my_scope = my_scope.with_dependency(dependency)
+
 ScopeParser Is Now Separate from Scope
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -198,7 +216,7 @@ For example, update like so:
     my_scopes: list[Scope] = Scope.parse(scope_string)
 
     # globus-sdk v4
-    from globus_sdk.scopes import Scope, Scopeparser
+    from globus_sdk.scopes import Scope, ScopeParser
 
     my_scopes: list[Scope] = ScopeParser.parse(scope_string)
 
