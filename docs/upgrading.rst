@@ -256,6 +256,7 @@ The removed alias and new module names are shown in the table below.
     :header: "Removed alias", "New name"
 
     "``globus_sdk.experimental.auth_requirements_error``", "``globus_sdk.gare``"
+    "``globus_sdk.experimental.globus_app``", "``globus_sdk.globus_app``"
     "``globus_sdk.experimental.scope_parser``", "``globus_sdk.scopes``"
     "``globus_sdk.experimental.consents``", "``globus_sdk.scopes.consents``"
     "``globus_sdk.experimental.tokenstorage``", "``globus_sdk.token_storage``"

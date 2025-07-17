@@ -21,21 +21,3 @@ def test_login_flow_manager_importable_from_experimental():
             LocalServerLoginFlowManager,
             LoginFlowManager,
         )
-
-
-def test_globus_app_importable_from_experimental():
-    # This construct should be imported from `globus_sdk.globus_app`.
-    with pytest.warns(RemovedInV4Warning, match=r"globus_sdk\.globus_app\."):
-        from globus_sdk.experimental.globus_app import (  # noqa: F401
-            TokenValidationErrorHandler,
-        )
-
-    # Each of these constructs should be imported from `globus_sdk`.
-    # This regex ensures we didn't include `globus_sdk.globus_app.` in any warning
-    with pytest.warns(RemovedInV4Warning, match=r"^(?!globus_sdk\.globus_app\.).*$"):
-        from globus_sdk.experimental.globus_app import (  # noqa: F401
-            ClientApp,
-            GlobusApp,
-            GlobusAppConfig,
-            UserApp,
-        )
