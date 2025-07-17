@@ -14,7 +14,6 @@ from globus_sdk import (
 )
 from globus_sdk._internal import guards
 from globus_sdk._internal.remarshal import commajoin
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.globus_app import GlobusApp
@@ -69,7 +68,7 @@ class FlowsClient(client.BaseClient):
         run_managers: list[str] | MissingType = MISSING,
         run_monitors: list[str] | MissingType = MISSING,
         keywords: list[str] | MissingType = MISSING,
-        subscription_id: UUIDLike | None | MissingType = MISSING,
+        subscription_id: uuid.UUID | str | None | MissingType = MISSING,
         additional_fields: dict[str, t.Any] | None = None,
     ) -> GlobusHTTPResponse:
         """
@@ -218,7 +217,7 @@ class FlowsClient(client.BaseClient):
 
     def get_flow(
         self,
-        flow_id: UUIDLike,
+        flow_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> GlobusHTTPResponse:
@@ -372,7 +371,7 @@ class FlowsClient(client.BaseClient):
 
     def update_flow(
         self,
-        flow_id: UUIDLike,
+        flow_id: uuid.UUID | str,
         *,
         title: str | MissingType = MISSING,
         definition: dict[str, t.Any] | MissingType = MISSING,
@@ -386,7 +385,7 @@ class FlowsClient(client.BaseClient):
         run_managers: list[str] | MissingType = MISSING,
         run_monitors: list[str] | MissingType = MISSING,
         keywords: list[str] | MissingType = MISSING,
-        subscription_id: UUIDLike | t.Literal["DEFAULT"] | MissingType = MISSING,
+        subscription_id: uuid.UUID | str | t.Literal["DEFAULT"] | MissingType = MISSING,
         additional_fields: dict[str, t.Any] | None = None,
     ) -> GlobusHTTPResponse:
         """
@@ -528,7 +527,7 @@ class FlowsClient(client.BaseClient):
 
     def delete_flow(
         self,
-        flow_id: UUIDLike,
+        flow_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> GlobusHTTPResponse:
@@ -607,7 +606,9 @@ class FlowsClient(client.BaseClient):
     def list_runs(
         self,
         *,
-        filter_flow_id: t.Iterable[UUIDLike] | UUIDLike | MissingType = MISSING,
+        filter_flow_id: (
+            t.Iterable[uuid.UUID | str] | uuid.UUID | str | MissingType
+        ) = MISSING,
         filter_roles: str | t.Iterable[str] | MissingType = MISSING,
         marker: str | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -661,7 +662,7 @@ class FlowsClient(client.BaseClient):
     @paging.has_paginator(paging.MarkerPaginator, items_key="entries")
     def get_run_logs(
         self,
-        run_id: UUIDLike,
+        run_id: uuid.UUID | str,
         *,
         limit: int | MissingType = MISSING,
         reverse_order: bool | MissingType = MISSING,
@@ -710,7 +711,7 @@ class FlowsClient(client.BaseClient):
 
     def get_run(
         self,
-        run_id: UUIDLike,
+        run_id: uuid.UUID | str,
         *,
         include_flow_description: bool | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -754,7 +755,7 @@ class FlowsClient(client.BaseClient):
 
     def get_run_definition(
         self,
-        run_id: UUIDLike,
+        run_id: uuid.UUID | str,
     ) -> GlobusHTTPResponse:
         """
         Get the flow definition and input schema at the time the run was started.
@@ -785,7 +786,7 @@ class FlowsClient(client.BaseClient):
 
         return self.get(f"/runs/{run_id}/definition")
 
-    def cancel_run(self, run_id: UUIDLike) -> GlobusHTTPResponse:
+    def cancel_run(self, run_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Cancel a run.
 
@@ -818,7 +819,7 @@ class FlowsClient(client.BaseClient):
 
     def update_run(
         self,
-        run_id: UUIDLike,
+        run_id: uuid.UUID | str,
         *,
         label: str | MissingType = MISSING,
         tags: list[str] | MissingType = MISSING,
@@ -876,7 +877,7 @@ class FlowsClient(client.BaseClient):
         }
         return self.put(f"/runs/{run_id}", data=data)
 
-    def delete_run(self, run_id: UUIDLike) -> GlobusHTTPResponse:
+    def delete_run(self, run_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         Delete a run.
 
@@ -928,7 +929,7 @@ class SpecificFlowClient(client.BaseClient):
 
     def __init__(
         self,
-        flow_id: UUIDLike,
+        flow_id: uuid.UUID | str,
         *,
         environment: str | None = None,
         app: GlobusApp | None = None,
@@ -953,7 +954,7 @@ class SpecificFlowClient(client.BaseClient):
         return [self.scopes.user]
 
     def add_app_transfer_data_access_scope(
-        self, collection_ids: UUIDLike | t.Iterable[UUIDLike]
+        self, collection_ids: uuid.UUID | str | t.Iterable[uuid.UUID | str]
     ) -> Self:
         """
         Add a dependent ``data_access`` scope for one or more given ``collection_ids``
@@ -1061,7 +1062,7 @@ class SpecificFlowClient(client.BaseClient):
         }
         return self.post(f"/flows/{self._flow_id}/run", data=data)
 
-    def resume_run(self, run_id: UUIDLike) -> GlobusHTTPResponse:
+    def resume_run(self, run_id: uuid.UUID | str) -> GlobusHTTPResponse:
         """
         :param run_id: The ID of the run to resume
 

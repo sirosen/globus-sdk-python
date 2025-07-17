@@ -12,7 +12,6 @@ from globus_sdk import (
     POSIXCollectionPolicies,
     POSIXStagingCollectionPolicies,
 )
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType, filter_missing
 from globus_sdk.transport import JSONRequestEncoder
 
@@ -253,7 +252,7 @@ common_collection_fields = [
     ("department", (str, None, MissingType)),
     ("description", (str, None, MissingType)),
     ("display_name", (str, MissingType)),
-    ("identity_id", (UUIDLike, MissingType)),
+    ("identity_id", (t.Union[uuid.UUID, str], MissingType)),
     ("info_link", (str, None, MissingType)),
     ("organization", (str, MissingType)),
     ("user_message", (str, None, MissingType)),
@@ -270,7 +269,7 @@ common_collection_fields = [
 mapped_collection_fields = [
     *common_collection_fields,
     ("domain_name", (str, MissingType)),
-    ("guest_auth_policy_id", (UUIDLike, None, MissingType)),
+    ("guest_auth_policy_id", (t.Union[uuid.UUID, str], None, MissingType)),
     ("disable_anonymous_writes", (bool, MissingType)),
     ("policies", (t.Dict[str, t.Any], MissingType)),
 ]
@@ -278,8 +277,8 @@ mapped_collection_fields = [
 
 guest_collection_fields = [
     *common_collection_fields,
-    ("mapped_collection_id", (UUIDLike, MissingType)),
-    ("user_credential_id", (UUIDLike, MissingType)),
+    ("mapped_collection_id", (t.Union[uuid.UUID, str], MissingType)),
+    ("user_credential_id", (t.Union[uuid.UUID, str], MissingType)),
     ("activity_notification_policy", (t.Dict[str, t.List[str]], MissingType)),
 ]
 
@@ -308,7 +307,7 @@ def _gen_value(_type):
         return ["STRING"]
     if _type is bool:
         return [True, False]
-    if _type is UUIDLike:
+    if _type is t.Union[uuid.UUID, str]:
         return [str(uuid.uuid1()), uuid.uuid1()]
     if _type is t.Iterable[str]:
         return [[], ["a", "b", "c"]]

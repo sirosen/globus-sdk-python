@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import copy
 import typing as t
+import uuid
 
 from globus_sdk._internal.remarshal import list_map, listify, strseq_listify
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import AbstractGlobusPayload, GlobusPayload
 
@@ -60,7 +60,7 @@ class StorageGatewayDocument(GlobusPayload):
         self,
         DATA_TYPE: str | MissingType = MISSING,
         display_name: str | MissingType = MISSING,
-        connector_id: UUIDLike | MissingType = MISSING,
+        connector_id: uuid.UUID | str | MissingType = MISSING,
         root: str | MissingType = MISSING,
         identity_mappings: t.Iterable[dict[str, t.Any]] | MissingType = MISSING,
         policies: StorageGatewayPolicies | dict[str, t.Any] | MissingType = MISSING,

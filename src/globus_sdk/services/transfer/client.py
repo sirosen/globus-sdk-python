@@ -8,7 +8,7 @@ import uuid
 from globus_sdk import client, exc, paging, response
 from globus_sdk._internal import guards
 from globus_sdk._internal.remarshal import commajoin
-from globus_sdk._internal.type_definitions import DateLike, IntLike, UUIDLike
+from globus_sdk._internal.type_definitions import DateLike, IntLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.scopes import GCSCollectionScopes, Scope, TransferScopes
 
@@ -135,7 +135,7 @@ class TransferClient(client.BaseClient):
     default_scope_requirements = [TransferScopes.all]
 
     def add_app_data_access_scope(
-        self, collection_ids: UUIDLike | t.Iterable[UUIDLike]
+        self, collection_ids: uuid.UUID | str | t.Iterable[uuid.UUID | str]
     ) -> TransferClient:
         """
         Add a dependent ``data_access`` scope for one or more given ``collection_ids``
@@ -219,7 +219,7 @@ class TransferClient(client.BaseClient):
 
     def get_endpoint(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -250,7 +250,7 @@ class TransferClient(client.BaseClient):
 
     def update_endpoint(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         data: dict[str, t.Any],
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -300,8 +300,8 @@ class TransferClient(client.BaseClient):
 
     def set_subscription_id(
         self,
-        collection_id: UUIDLike,
-        subscription_id: UUIDLike | t.Literal["DEFAULT"] | None,
+        collection_id: uuid.UUID | str,
+        subscription_id: uuid.UUID | str | t.Literal["DEFAULT"] | None,
     ) -> response.GlobusHTTPResponse:
         """
         Set the ``subscription_id`` on a mapped collection.
@@ -359,7 +359,7 @@ class TransferClient(client.BaseClient):
 
     def set_subscription_admin_verified(
         self,
-        collection_id: UUIDLike,
+        collection_id: uuid.UUID | str,
         subscription_admin_verified: bool,
     ) -> response.GlobusHTTPResponse:
         """
@@ -430,7 +430,9 @@ class TransferClient(client.BaseClient):
         log.debug("TransferClient.create_endpoint(...)")
         return self.post("/v0.10/endpoint", data=data)
 
-    def delete_endpoint(self, endpoint_id: UUIDLike) -> response.GlobusHTTPResponse:
+    def delete_endpoint(
+        self, endpoint_id: uuid.UUID | str
+    ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: ID of endpoint to delete
 
@@ -466,7 +468,7 @@ class TransferClient(client.BaseClient):
         *,
         filter_scope: str | MissingType = MISSING,
         filter_owner_id: str | MissingType = MISSING,
-        filter_host_endpoint: UUIDLike | MissingType = MISSING,
+        filter_host_endpoint: uuid.UUID | str | MissingType = MISSING,
         filter_non_functional: bool | MissingType = MISSING,
         filter_entity_type: (
             t.Literal[
@@ -568,7 +570,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_autoactivate(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         if_expires_in: int | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -597,7 +599,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_deactivate(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -618,7 +620,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_activate(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         requirements_data: dict[str, t.Any] | None,
         query_params: dict[str, t.Any] | None = None,
@@ -646,7 +648,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_get_activation_requirements(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> ActivationRequirementsResponse:
@@ -670,7 +672,7 @@ class TransferClient(client.BaseClient):
 
     def my_effective_pause_rule_list(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
@@ -700,7 +702,7 @@ class TransferClient(client.BaseClient):
 
     def my_shared_endpoint_list(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
@@ -731,7 +733,7 @@ class TransferClient(client.BaseClient):
     @paging.has_paginator(paging.NextTokenPaginator, items_key="shared_endpoints")
     def get_shared_endpoint_list(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         max_results: int | MissingType = MISSING,
         next_token: str | MissingType = MISSING,
@@ -813,7 +815,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_server_list(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
@@ -840,7 +842,7 @@ class TransferClient(client.BaseClient):
 
     def get_endpoint_server(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         server_id: IntLike,
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -868,7 +870,7 @@ class TransferClient(client.BaseClient):
         )
 
     def add_endpoint_server(
-        self, endpoint_id: UUIDLike, server_data: dict[str, t.Any]
+        self, endpoint_id: uuid.UUID | str, server_data: dict[str, t.Any]
     ) -> response.GlobusHTTPResponse:
         """
         .. warning::
@@ -884,7 +886,7 @@ class TransferClient(client.BaseClient):
 
     def update_endpoint_server(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         server_id: IntLike,
         server_data: dict[str, t.Any],
     ) -> response.GlobusHTTPResponse:
@@ -908,7 +910,7 @@ class TransferClient(client.BaseClient):
         )
 
     def delete_endpoint_server(
-        self, endpoint_id: UUIDLike, server_id: IntLike
+        self, endpoint_id: uuid.UUID | str, server_id: IntLike
     ) -> response.GlobusHTTPResponse:
         """
         .. warning::
@@ -930,7 +932,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_role_list(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
@@ -956,7 +958,7 @@ class TransferClient(client.BaseClient):
         )
 
     def add_endpoint_role(
-        self, endpoint_id: UUIDLike, role_data: dict[str, t.Any]
+        self, endpoint_id: uuid.UUID | str, role_data: dict[str, t.Any]
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the role is being added
@@ -976,7 +978,7 @@ class TransferClient(client.BaseClient):
 
     def get_endpoint_role(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         role_id: str,
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -1001,7 +1003,7 @@ class TransferClient(client.BaseClient):
         )
 
     def delete_endpoint_role(
-        self, endpoint_id: UUIDLike, role_id: str
+        self, endpoint_id: uuid.UUID | str, role_id: str
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the role applies
@@ -1025,7 +1027,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_acl_list(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
@@ -1051,7 +1053,7 @@ class TransferClient(client.BaseClient):
 
     def get_endpoint_acl_rule(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         rule_id: str,
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -1078,7 +1080,7 @@ class TransferClient(client.BaseClient):
         )
 
     def add_endpoint_acl_rule(
-        self, endpoint_id: UUIDLike, rule_data: dict[str, t.Any]
+        self, endpoint_id: uuid.UUID | str, rule_data: dict[str, t.Any]
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: ID of endpoint to which to add the acl
@@ -1116,7 +1118,7 @@ class TransferClient(client.BaseClient):
 
     def update_endpoint_acl_rule(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         rule_id: str,
         rule_data: dict[str, t.Any],
     ) -> response.GlobusHTTPResponse:
@@ -1144,7 +1146,7 @@ class TransferClient(client.BaseClient):
         )
 
     def delete_endpoint_acl_rule(
-        self, endpoint_id: UUIDLike, rule_id: str
+        self, endpoint_id: uuid.UUID | str, rule_id: str
     ) -> response.GlobusHTTPResponse:
         """
         :param endpoint_id: The endpoint on which the access rule applies
@@ -1208,7 +1210,7 @@ class TransferClient(client.BaseClient):
 
     def get_bookmark(
         self,
-        bookmark_id: UUIDLike,
+        bookmark_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -1229,7 +1231,7 @@ class TransferClient(client.BaseClient):
         return self.get(f"/v0.10/bookmark/{bookmark_id}", query_params=query_params)
 
     def update_bookmark(
-        self, bookmark_id: UUIDLike, bookmark_data: dict[str, t.Any]
+        self, bookmark_id: uuid.UUID | str, bookmark_data: dict[str, t.Any]
     ) -> response.GlobusHTTPResponse:
         """
         :param bookmark_id: The ID of the bookmark to modify
@@ -1247,7 +1249,9 @@ class TransferClient(client.BaseClient):
         log.debug(f"TransferClient.update_bookmark({bookmark_id})")
         return self.put(f"/v0.10/bookmark/{bookmark_id}", data=bookmark_data)
 
-    def delete_bookmark(self, bookmark_id: UUIDLike) -> response.GlobusHTTPResponse:
+    def delete_bookmark(
+        self, bookmark_id: uuid.UUID | str
+    ) -> response.GlobusHTTPResponse:
         """
         :param bookmark_id: The ID of the bookmark to delete
 
@@ -1269,7 +1273,7 @@ class TransferClient(client.BaseClient):
 
     def operation_ls(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         path: str | MissingType = MISSING,
         *,
         show_hidden: bool | MissingType = MISSING,
@@ -1379,7 +1383,7 @@ class TransferClient(client.BaseClient):
 
     def operation_mkdir(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         path: str,
         *,
         local_user: str | MissingType = MISSING,
@@ -1427,7 +1431,7 @@ class TransferClient(client.BaseClient):
 
     def operation_rename(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         oldpath: str,
         newpath: str,
         *,
@@ -1478,7 +1482,7 @@ class TransferClient(client.BaseClient):
 
     def operation_stat(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         path: str | MissingType = MISSING,
         *,
         local_user: str | MissingType = MISSING,
@@ -1524,7 +1528,7 @@ class TransferClient(client.BaseClient):
 
     def operation_symlink(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         symlink_target: str,
         path: str,
         *,
@@ -1801,7 +1805,7 @@ class TransferClient(client.BaseClient):
     )
     def task_event_list(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         limit: int | MissingType = MISSING,
         offset: int | MissingType = MISSING,
@@ -1851,7 +1855,7 @@ class TransferClient(client.BaseClient):
 
     def get_task(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -1873,7 +1877,7 @@ class TransferClient(client.BaseClient):
 
     def update_task(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         data: dict[str, t.Any],
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -1898,7 +1902,7 @@ class TransferClient(client.BaseClient):
         log.debug(f"TransferClient.update_task({task_id}, ...)")
         return self.put(f"/v0.10/task/{task_id}", data=data, query_params=query_params)
 
-    def cancel_task(self, task_id: UUIDLike) -> response.GlobusHTTPResponse:
+    def cancel_task(self, task_id: uuid.UUID | str) -> response.GlobusHTTPResponse:
         """
         Cancel a task which is still running.
 
@@ -1917,7 +1921,7 @@ class TransferClient(client.BaseClient):
         return self.post(f"/v0.10/task/{task_id}/cancel")
 
     def task_wait(
-        self, task_id: UUIDLike, *, timeout: int = 10, polling_interval: int = 10
+        self, task_id: uuid.UUID | str, *, timeout: int = 10, polling_interval: int = 10
     ) -> bool:
         r"""
         Wait until a Task is complete or fails, with a time limit. If the task
@@ -2021,7 +2025,7 @@ class TransferClient(client.BaseClient):
 
     def task_pause_info(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -2048,7 +2052,7 @@ class TransferClient(client.BaseClient):
     )
     def task_successful_transfers(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         marker: str | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -2107,7 +2111,7 @@ class TransferClient(client.BaseClient):
     )
     def task_skipped_errors(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         marker: str | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -2185,7 +2189,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_hosted_endpoint_list(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
@@ -2216,7 +2220,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_get_endpoint(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -2242,7 +2246,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_acl_list(
         self,
-        endpoint_id: UUIDLike,
+        endpoint_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
@@ -2280,9 +2284,11 @@ class TransferClient(client.BaseClient):
         self,
         *,
         filter_status: str | t.Iterable[str] | MissingType = MISSING,
-        filter_task_id: UUIDLike | t.Iterable[UUIDLike] | MissingType = MISSING,
-        filter_owner_id: UUIDLike | MissingType = MISSING,
-        filter_endpoint: UUIDLike | MissingType = MISSING,
+        filter_task_id: (
+            uuid.UUID | str | t.Iterable[uuid.UUID | str] | MissingType
+        ) = MISSING,
+        filter_owner_id: uuid.UUID | str | MissingType = MISSING,
+        filter_endpoint: uuid.UUID | str | MissingType = MISSING,
         filter_endpoint_use: t.Literal["source", "destination"] | MissingType = MISSING,
         filter_is_paused: bool | MissingType = MISSING,
         filter_completion_time: str | tuple[DateLike, DateLike] | MissingType = MISSING,
@@ -2420,7 +2426,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_get_task(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -2454,7 +2460,7 @@ class TransferClient(client.BaseClient):
     )
     def endpoint_manager_task_event_list(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         limit: int | MissingType = MISSING,
         offset: int | MissingType = MISSING,
@@ -2507,7 +2513,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_task_pause_info(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -2538,7 +2544,7 @@ class TransferClient(client.BaseClient):
     )
     def endpoint_manager_task_successful_transfers(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         marker: str | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -2584,7 +2590,7 @@ class TransferClient(client.BaseClient):
     )
     def endpoint_manager_task_skipped_errors(
         self,
-        task_id: UUIDLike,
+        task_id: uuid.UUID | str,
         *,
         marker: str | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
@@ -2626,7 +2632,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_cancel_tasks(
         self,
-        task_ids: t.Iterable[UUIDLike],
+        task_ids: t.Iterable[uuid.UUID | str],
         message: str,
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -2659,7 +2665,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_cancel_status(
         self,
-        admin_cancel_id: UUIDLike,
+        admin_cancel_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -2687,7 +2693,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_pause_tasks(
         self,
-        task_ids: t.Iterable[UUIDLike],
+        task_ids: t.Iterable[uuid.UUID | str],
         message: str,
         *,
         query_params: dict[str, t.Any] | None = None,
@@ -2720,7 +2726,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_resume_tasks(
         self,
-        task_ids: t.Iterable[UUIDLike],
+        task_ids: t.Iterable[uuid.UUID | str],
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -2754,7 +2760,7 @@ class TransferClient(client.BaseClient):
     def endpoint_manager_pause_rule_list(
         self,
         *,
-        filter_endpoint: UUIDLike | MissingType = MISSING,
+        filter_endpoint: uuid.UUID | str | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
     ) -> IterableTransferResponse:
         """
@@ -2824,7 +2830,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_get_pause_rule(
         self,
-        pause_rule_id: UUIDLike,
+        pause_rule_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
@@ -2852,7 +2858,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_update_pause_rule(
         self,
-        pause_rule_id: UUIDLike,
+        pause_rule_id: uuid.UUID | str,
         data: dict[str, t.Any] | None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -2891,7 +2897,7 @@ class TransferClient(client.BaseClient):
 
     def endpoint_manager_delete_pause_rule(
         self,
-        pause_rule_id: UUIDLike,
+        pause_rule_id: uuid.UUID | str,
         *,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:

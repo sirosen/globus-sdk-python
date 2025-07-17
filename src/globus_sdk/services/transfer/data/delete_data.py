@@ -3,9 +3,9 @@ from __future__ import annotations
 import datetime
 import logging
 import typing as t
+import uuid
 
 from globus_sdk._internal.remarshal import stringify
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import GlobusPayload
 
@@ -77,10 +77,10 @@ class DeleteData(GlobusPayload):
 
     def __init__(
         self,
-        endpoint: UUIDLike,
+        endpoint: uuid.UUID | str,
         *,
         label: str | MissingType = MISSING,
-        submission_id: UUIDLike | MissingType = MISSING,
+        submission_id: uuid.UUID | str | MissingType = MISSING,
         recursive: bool | MissingType = MISSING,
         ignore_missing: bool | MissingType = MISSING,
         interpret_globs: bool | MissingType = MISSING,

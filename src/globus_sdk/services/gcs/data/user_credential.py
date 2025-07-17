@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import typing as t
+import uuid
 
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import GlobusPayload
 
@@ -28,11 +28,11 @@ class UserCredentialDocument(GlobusPayload):
     def __init__(
         self,
         DATA_TYPE: str = "user_credential#1.0.0",
-        identity_id: UUIDLike | MissingType = MISSING,
-        connector_id: UUIDLike | MissingType = MISSING,
+        identity_id: uuid.UUID | str | MissingType = MISSING,
+        connector_id: uuid.UUID | str | MissingType = MISSING,
         username: str | MissingType = MISSING,
         display_name: str | MissingType = MISSING,
-        storage_gateway_id: UUIDLike | MissingType = MISSING,
+        storage_gateway_id: uuid.UUID | str | MissingType = MISSING,
         policies: dict[str, t.Any] | MissingType = MISSING,
         additional_fields: dict[str, t.Any] | None = None,
     ) -> None:

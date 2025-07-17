@@ -4,6 +4,7 @@ import abc
 import contextlib
 import copy
 import typing as t
+import uuid
 
 from globus_sdk import (
     AuthClient,
@@ -11,7 +12,6 @@ from globus_sdk import (
     GlobusSDKUsageError,
     IDTokenDecoder,
 )
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.gare import GlobusAuthorizationParameters
 from globus_sdk.scopes import AuthScopes, Scope, ScopeParser, scopes_to_scope_list
@@ -64,7 +64,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         app_name: str = "Unnamed Globus App",
         *,
         login_client: AuthLoginClient | None = None,
-        client_id: UUIDLike | None = None,
+        client_id: uuid.UUID | str | None = None,
         client_secret: str | None = None,
         scope_requirements: (
             t.Mapping[str, str | Scope | t.Iterable[str | Scope]] | None
@@ -139,9 +139,9 @@ class GlobusApp(metaclass=abc.ABCMeta):
         app_name: str,
         config: GlobusAppConfig,
         login_client: AuthLoginClient | None,
-        client_id: UUIDLike | None,
+        client_id: uuid.UUID | str | None,
         client_secret: str | None,
-    ) -> tuple[UUIDLike, AuthLoginClient]:
+    ) -> tuple[uuid.UUID | str, AuthLoginClient]:
         """
         Extracts a client_id and login_client from GlobusApp initialization parameters,
         validating that the parameters were provided correctly.
@@ -192,7 +192,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         self,
         app_name: str,
         config: GlobusAppConfig,
-        client_id: UUIDLike,
+        client_id: uuid.UUID | str,
         client_secret: str | None,
     ) -> AuthLoginClient:
         """
@@ -220,7 +220,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         return validating_token_storage
 
     def _resolve_token_storage(
-        self, app_name: str, client_id: UUIDLike, config: GlobusAppConfig
+        self, app_name: str, client_id: uuid.UUID | str, config: GlobusAppConfig
     ) -> TokenStorage:
         """
         Resolve the raw token storage to be used by the app.

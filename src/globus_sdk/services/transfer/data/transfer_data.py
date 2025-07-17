@@ -3,8 +3,8 @@ from __future__ import annotations
 import datetime
 import logging
 import typing as t
+import uuid
 
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk._payload import GlobusPayload
 
@@ -154,11 +154,11 @@ class TransferData(GlobusPayload):
 
     def __init__(
         self,
-        source_endpoint: UUIDLike,
-        destination_endpoint: UUIDLike,
+        source_endpoint: uuid.UUID | str,
+        destination_endpoint: uuid.UUID | str,
         *,
         label: str | MissingType = MISSING,
-        submission_id: UUIDLike | MissingType = MISSING,
+        submission_id: uuid.UUID | str | MissingType = MISSING,
         sync_level: (
             int | t.Literal["exists", "size", "mtime", "checksum"] | MissingType
         ) = MISSING,

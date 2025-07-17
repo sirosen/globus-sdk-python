@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import logging
 import typing as t
+import uuid
 
-from globus_sdk._internal.type_definitions import UUIDLike
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.response import GlobusHTTPResponse
@@ -35,7 +35,7 @@ class NativeAppAuthClient(AuthLoginClient):
 
     def __init__(
         self,
-        client_id: UUIDLike,
+        client_id: uuid.UUID | str,
         environment: str | None = None,
         base_url: str | None = None,
         app_name: str | None = None,
@@ -139,7 +139,7 @@ class NativeAppAuthClient(AuthLoginClient):
 
     def create_native_app_instance(
         self,
-        template_id: UUIDLike,
+        template_id: uuid.UUID | str,
         name: str,
     ) -> GlobusHTTPResponse:
         """
