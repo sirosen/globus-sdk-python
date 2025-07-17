@@ -12,7 +12,7 @@ from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.paging import PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
 from globus_sdk.scopes import Scope, ScopeCollection
-from globus_sdk.transport import RequestsTransport
+from globus_sdk.transport import RequestCallerInfo, RequestsTransport
 
 if sys.version_info >= (3, 10):
     from typing import TypeAlias
@@ -496,16 +496,19 @@ class BaseClient:
         else:
             authorizer = None
 
+        # create caller info with the authorizer
+        caller_info = RequestCallerInfo(authorizer=authorizer)
+
         # make the request
         log.debug("request will hit URL: %s", url)
         r = self.transport.request(
-            method=method,
-            url=url,
+            method,
+            url,
+            caller_info=caller_info,
             data=data,
             query_params=query_params,
             headers=rheaders,
             encoding=encoding,
-            authorizer=authorizer,
             allow_redirects=allow_redirects,
             stream=stream,
         )
