@@ -1,6 +1,6 @@
 import pytest
 
-from globus_sdk.token_storage import SQLiteAdapter
+from globus_sdk.token_storage.legacy import SQLiteAdapter
 
 
 def test_sqlite_reading_bad_config():
