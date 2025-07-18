@@ -213,15 +213,6 @@ class AuthClient(client.BaseClient):
         log.debug("Looking up OIDC-style Userinfo from Globus Auth")
         return self.get("/v2/oauth2/userinfo")
 
-    def oauth2_userinfo(self) -> GlobusHTTPResponse:
-        """
-        A deprecated alias for ``userinfo``.
-        """
-        exc.warn_deprecated(
-            "The method `oauth2_userinfo` is deprecated. Use `userinfo` instead."
-        )
-        return self.userinfo()
-
     def get_identities(
         self,
         *,
@@ -561,7 +552,7 @@ class AuthClient(client.BaseClient):
                 .. code-block:: pycon
 
                     >>> ac = globus_sdk.AuthClient(...)
-                    >>> userinfo = ac.oauth2_userinfo()
+                    >>> userinfo = ac.userinfo()
                     >>> identity_id = userinfo["sub"]
                     >>> email = userinfo["email"]
                     >>> r = ac.create_project(
@@ -624,7 +615,7 @@ class AuthClient(client.BaseClient):
 
                     >>> ac = globus_sdk.AuthClient(...)
                     >>> project_id = ...
-                    >>> userinfo = ac.oauth2_userinfo()
+                    >>> userinfo = ac.userinfo()
                     >>> email = userinfo["email"]
                     >>> r = ac.update_project(project_id, contact_email=email)
 
