@@ -260,6 +260,7 @@ The removed alias and new module names are shown in the table below.
     "``globus_sdk.experimental.scope_parser``", "``globus_sdk.scopes``"
     "``globus_sdk.experimental.consents``", "``globus_sdk.scopes.consents``"
     "``globus_sdk.experimental.tokenstorage``", "``globus_sdk.token_storage``"
+    "``globus_sdk.experimental.login_flow_manager``", "``globus_sdk.login_flows``"
 
 ``MutableScope`` is Removed, use ``Scope`` Instead
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
