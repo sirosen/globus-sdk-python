@@ -7,7 +7,6 @@ import uuid
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 from globus_sdk import client, exc
-from globus_sdk._internal import guards
 from globus_sdk._internal.remarshal import commajoin
 from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.authorizers import GlobusAuthorizer, NullAuthorizer
@@ -256,41 +255,6 @@ class AuthLoginClient(client.BaseClient):
         return self.oauth2_token(
             form_data, body_params=body_params, response_class=OAuthRefreshTokenResponse
         )
-
-    def oauth2_validate_token(
-        self,
-        token: str,
-        *,
-        body_params: dict[str, t.Any] | None = None,
-    ) -> GlobusHTTPResponse:
-        """
-        Deprecated. Because the validity of a token may be dependent on policies
-        enforced both by Globus Auth and the resource server, this method is not
-        considered a reliable way to check token validity.
-        Users are encouraged to treat tokens as valid until proven otherwise instead.
-
-        :param token: The token which should be validated. Can be a refresh token or an
-            access token
-        :param body_params: Additional parameters to include in the validation
-            body. Primarily for internal use
-        """
-        exc.warn_deprecated(
-            f"{self.__class__.__name__}.oauth2_validate_token() is deprecated. "
-            "This validation method gives non-definitive results. "
-            "Tokens should be treated as valid until they are used and their "
-            "validity can be assessed."
-        )
-        log.debug("Validating token")
-        body = {"token": token}
-
-        # if this client has no way of authenticating itself but
-        # it does have a client_id, we'll send that in the request
-        no_authentication = guards.is_optional(self.authorizer, NullAuthorizer)
-        if no_authentication and self.client_id:
-            log.debug("Validating token with unauthenticated client")
-            body.update({"client_id": self.client_id})
-        body.update(body_params or {})
-        return self.post("/v2/oauth2/token/validate", data=body, encoding="form")
 
     def oauth2_revoke_token(
         self,
