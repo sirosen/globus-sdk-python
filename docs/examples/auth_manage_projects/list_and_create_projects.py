@@ -38,7 +38,7 @@ def get_auth_client():
 
 def create_project(args):
     auth_client = get_auth_client()
-    userinfo = auth_client.oauth2_userinfo()
+    userinfo = auth_client.userinfo()
     print(
         auth_client.create_project(
             args.name,
