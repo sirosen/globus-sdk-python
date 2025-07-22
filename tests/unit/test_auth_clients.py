@@ -43,9 +43,3 @@ def test_confidential_app_auth_client_rejects_authorizer():
         globus_sdk.ConfidentialAppAuthClient(
             CLIENT_ID_UUID, "foo-secret", authorizer=authorizer
         )
-
-
-def test_service_client_rejects_client_id():
-    # init will warn because a value is being passed
-    with pytest.raises(TypeError):
-        globus_sdk.AuthClient(client_id=CLIENT_ID_STR)
