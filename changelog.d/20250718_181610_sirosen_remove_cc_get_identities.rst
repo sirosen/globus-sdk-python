@@ -2,7 +2,7 @@ Breaking Changes
 ----------------
 
 - Removed support for ``ConfidentialAppAuthClient.get_identities``.
-  This usage was deprecated in ``globus-sdk`` version 3. (:pr:`NUMBER`)
+  This usage was deprecated in ``globus-sdk`` version 3. (:pr:`1273`)
 
   - Users calling the Get Identities API on behalf of a client identity should
     instead get tokens for the client and use those tokens to call
