@@ -6,13 +6,7 @@ import uuid
 
 import pytest
 
-from globus_sdk import ConnectorTable, GCSClient, GlobusConnectServerConnector, exc
-
-
-def test_deprecated_connector_lookup_method_warns():
-    client = GCSClient("foo.bar.example.org")
-    with pytest.warns(exc.RemovedInV4Warning):
-        assert client.connector_id_to_name("foo") is None
+from globus_sdk import ConnectorTable, GlobusConnectServerConnector
 
 
 @pytest.mark.parametrize("connector_data", ConnectorTable._connectors)
