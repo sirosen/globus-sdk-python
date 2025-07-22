@@ -77,29 +77,6 @@ def test_update_endpoint_invalid_activation_servers(client):
     assert "either MyProxy or OAuth, not both" in str(excinfo.value)
 
 
-def test_create_endpoint(client):
-    load_response(client.create_endpoint)
-
-    create_data = {"display_name": "Name", "description": "desc"}
-    create_doc = client.create_endpoint(create_data)
-
-    # make sure response is a successful update
-    assert create_doc["DATA_TYPE"] == "endpoint_create_result"
-    assert create_doc["code"] == "Created"
-    assert create_doc["message"] == "Endpoint created successfully"
-
-    req = get_last_request()
-    assert json.loads(req.body) == create_data
-
-
-def test_create_endpoint_invalid_activation_servers(client):
-    create_data = {"oauth_server": "foo", "myproxy_server": "bar"}
-    with pytest.raises(globus_sdk.GlobusSDKUsageError) as excinfo:
-        client.create_endpoint(create_data)
-
-    assert "either MyProxy or OAuth, not both" in str(excinfo.value)
-
-
 def test_autoactivation(client):
     """
     Do `autoactivate` on go#ep1, validate results, and check that `if_expires_in` can be

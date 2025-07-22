@@ -411,25 +411,6 @@ class TransferClient(client.BaseClient):
             data={"subscription_admin_verified": subscription_admin_verified},
         )
 
-    def create_endpoint(self, data: dict[str, t.Any]) -> response.GlobusHTTPResponse:
-        """
-        .. warning::
-
-            This method is deprecated with the end of Globus Connect Server v4
-            support and may no longer function with the Transfer API.
-
-        :param data: An endpoint document with fields for the new endpoint
-        """
-        if data.get("myproxy_server") and data.get("oauth_server"):
-            raise exc.GlobusSDKUsageError(
-                "an endpoint cannot be created using multiple identity "
-                "providers for activation; specify either MyProxy or OAuth, "
-                "not both"
-            )
-
-        log.debug("TransferClient.create_endpoint(...)")
-        return self.post("/v0.10/endpoint", data=data)
-
     def delete_endpoint(
         self, endpoint_id: uuid.UUID | str
     ) -> response.GlobusHTTPResponse:
