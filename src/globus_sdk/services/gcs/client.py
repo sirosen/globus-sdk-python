@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t
 import uuid
 
-from globus_sdk import client, exc, paging, response
+from globus_sdk import client, paging, response
 from globus_sdk._internal.classprop import classproperty
 from globus_sdk._internal.remarshal import commajoin
 from globus_sdk._internal.utils import slash_join
@@ -12,7 +12,6 @@ from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.globus_app import GlobusApp
 from globus_sdk.scopes import GCSCollectionScopes, GCSEndpointScopes, Scope
 
-from .connector_table import ConnectorTable
 from .data import (
     CollectionDocument,
     EndpointDocument,
@@ -107,34 +106,6 @@ class GCSClient(client.BaseClient):
         more information.
         """
         return GCSCollectionScopes(str(collection_id))
-
-    @staticmethod
-    def connector_id_to_name(connector_id: uuid.UUID | str) -> str | None:
-        """
-        .. warning::
-
-            This method is deprecated -- use
-            ``ConnectorTable.lookup`` instead.
-
-        Helper that converts a given connector ID into a human-readable
-        connector name string.
-
-        :param connector_id: The ID of the connector
-        """
-        exc.warn_deprecated(
-            "`connector_id_to_name` has been replaced with "
-            "`ConnectorTable.lookup`. Use that instead, "
-            "and retrieve the `name` attribute from the result."
-        )
-        connector_obj = ConnectorTable.lookup(connector_id)
-        if connector_obj is None:
-            return None
-        name = connector_obj.name
-        # compatibility shim due to name change in the data (which was updated to
-        # match internal sources referring to this only as "BlackPearl")
-        if name == "BlackPearl":
-            name = "Spectralogic BlackPearl"
-        return name
 
     @property
     def default_scope_requirements(self) -> list[Scope]:
