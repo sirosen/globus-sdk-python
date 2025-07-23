@@ -2,7 +2,7 @@ Removed
 -------
 
 - Removed support for Endpoint Activation, a feature which was specific to
-  Globus Connect Server v4. (:pr:`NUMBER`)
+  Globus Connect Server v4. (:pr:`1279`)
 
   - Removed the activation methods: ``TransferClient.endpoint_autoactivate``,
     ``TransferClient.endpoint_activate``,
