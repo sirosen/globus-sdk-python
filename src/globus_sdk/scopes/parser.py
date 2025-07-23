@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing as t
+
 from ._graph_parser import ScopeGraph
 from .representation import Scope
 
@@ -72,3 +74,29 @@ class ScopeParser:
         return cls.parse(
             " ".join([str(s) for s in scopes_a] + [str(s) for s in scopes_b])
         )
+
+    @classmethod
+    def serialize(cls, scopes: str | Scope | t.Iterable[str | Scope]) -> str:
+        """
+        Normalize scopes to a space-separated scope string.
+
+        The results of this method are suitable for sending to Globus Auth.
+        Scopes are not parsed, merged, or normalized by this method.
+
+        :param scopes: A scope string, scope object, or an iterable of scope strings
+            and scope objects.
+        :returns: A space-separated scope string.
+
+        Example usage:
+
+        .. code-block:: pycon
+
+            >>> ScopeParser.serialize([Scope("foo"), "bar", Scope("qux")])
+            'foo bar qux'
+        """
+        scope_iter: t.Iterable[str | Scope]
+        if isinstance(scopes, (str, Scope)):
+            scope_iter = (scopes,)
+        else:
+            scope_iter = scopes
+        return " ".join(str(scope) for scope in scope_iter)
