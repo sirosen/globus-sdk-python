@@ -368,12 +368,3 @@ class ComputeClientV3(client.BaseClient):
                     :ref: Endpoints/operation/submit_batch_v3_endpoints__endpoint_uuid__submit_post
         """  # noqa: E501
         return self.post(f"/v3/endpoints/{endpoint_id}/submit", data=data)
-
-
-class ComputeClient(ComputeClientV2):
-    r"""
-    Canonical client for the Globus Compute API, with support exclusively for
-    API version 2.
-
-    .. sdk-sphinx-copy-params:: BaseClient
-    """

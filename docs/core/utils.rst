@@ -32,8 +32,7 @@ request, it will be removed before the request is sent to the service.
 As a result, where ``MISSING`` is used as the default for a value, ``None`` can
 be used to explicitly pass the value ``null``.
 
-.. class:: globus_sdk.MissingType
-    :canonical: globus_sdk.utils.MissingType
+.. py:class:: globus_sdk.MissingType
 
     This is the type of ``MISSING``.
 

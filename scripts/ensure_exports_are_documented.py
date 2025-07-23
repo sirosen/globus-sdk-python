@@ -57,11 +57,11 @@ def iter_all_documented_names() -> t.Iterable[str]:
     )
     # names under these directives
     #
-    #   .. class:: <name>
+    #   .. py:class:: <name>
     #   .. py:data:: <name>
     pydoc_pattern = re.compile(
         r"""
-        ^\.\.\s+(?:py:data|class)::\s+ # directive
+        ^\.\.\s+py:(?:data|class)::\s+ # directive
         (?:\w+\.)*(\w+)(?:\(.*\))?$    # symbol name (captured)
         """,
         flags=re.MULTILINE | re.X,
