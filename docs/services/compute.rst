@@ -10,16 +10,10 @@ Under the hood, the Globus Compute SDK uses the following clients to interact wi
 the Globus Compute API. Advanced users may choose to work directly with these clients
 for custom implementations.
 
-The canonical :class:`ComputeClient` is a subclass of :class:`ComputeClientV2`,
-which supports version 2 of the Globus Compute API. When feasible, new projects
-should use :class:`ComputeClientV3`, which supports version 3 and includes the
-latest API features and improvements.
-
-..  autoclass:: ComputeClient
-    :members:
-    :member-order: bysource
-    :show-inheritance:
-    :exclude-members: error_class, scopes
+There are two client classes, supporting versions 2 and 3 of the Globus Compute
+API.
+Where feasible, new projects should use :class:`ComputeClientV3`, which
+includes the latest API features and improvements.
 
 ..  autoclass:: ComputeClientV2
     :members:
@@ -30,7 +24,7 @@ latest API features and improvements.
     ..  attribute:: scopes
 
         ..  listknownscopes:: globus_sdk.scopes.ComputeScopes
-            :base_name: ComputeClient.scopes
+            :base_name: ComputeClientV2.scopes
 
 ..  autoclass:: ComputeClientV3
     :members:
@@ -41,13 +35,23 @@ latest API features and improvements.
     ..  attribute:: scopes
 
         ..  listknownscopes:: globus_sdk.scopes.ComputeScopes
-            :base_name: ComputeClient.scopes
+            :base_name: ComputeClientV3.scopes
 
+
+..  py:class:: ComputeClient
+
+    A deprecated alias for :class:`ComputeClientV2`.
+
+    ..  warning::
+
+        Users should prefer the explicitly versioned class whenever possible.
+        This class will be removed in ``globus-sdk`` version 4.
 
 Client Errors
 -------------
 
-When an error occurs, a :class:`ComputeClient` will raise a ``ComputeAPIError``.
+When an API error occurs, :class:`ComputeClientV2` and :class:`ComputeClientV3`
+will raise ``ComputeAPIError``.
 
 .. autoclass:: ComputeAPIError
    :members:
