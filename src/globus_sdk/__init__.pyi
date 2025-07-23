@@ -51,7 +51,6 @@ from .services.compute import (
     ComputeFunctionDocument,
     ComputeFunctionMetadata,
 )
-from .services.compute.deprecated_client import ComputeClient
 from .services.flows import (
     FlowsAPIError,
     FlowsClient,
@@ -176,7 +175,6 @@ __all__ = (
     "OAuthTokenResponse",
     "IDTokenDecoder",
     "ComputeAPIError",
-    "ComputeClient",
     "ComputeClientV2",
     "ComputeClientV3",
     "ComputeFunctionDocument",
