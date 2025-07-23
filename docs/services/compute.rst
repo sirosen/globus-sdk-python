@@ -13,7 +13,7 @@ for custom implementations.
 There are two client classes, supporting versions 2 and 3 of the Globus Compute
 API.
 Where feasible, new projects should use :class:`ComputeClientV3`, which
-includes the latest API features and improvements.
+supports the latest API features and improvements.
 
 ..  autoclass:: ComputeClientV2
     :members:
@@ -44,8 +44,8 @@ includes the latest API features and improvements.
 
     ..  warning::
 
-        Users should prefer the explicitly versioned class whenever possible.
         This class will be removed in ``globus-sdk`` version 4.
+        Users should migrate to one of the explicitly-versioned classes.
 
 Client Errors
 -------------

@@ -19,8 +19,8 @@ else:
     def __getattr__(name: str) -> t.Any:
         if name == "ComputeClient":
             warn_deprecated(
-                "'globus_sdk.ComputeClient' is deprecated but is supported as "
-                "an alias for now. Prefer 'globus_sdk.ComputeClientV2'."
+                "'globus_sdk.ComputeClient' is deprecated and will be removed "
+                "in the future. Prefer 'globus_sdk.ComputeClientV2'."
             )
 
             class ComputeClient(ComputeClientV2):
