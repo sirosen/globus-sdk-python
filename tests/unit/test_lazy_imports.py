@@ -8,7 +8,6 @@ def test_explicit_dir_func_works():
     assert "__all__" in dir(globus_sdk)
 
 
-@pytest.mark.filterwarnings("ignore::globus_sdk.RemovedInV4Warning")
 def test_force_eager_imports_can_run():
     # this check will not do much, other than ensuring that this does not crash
     globus_sdk._force_eager_imports()
