@@ -12,6 +12,21 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.61.0:
+
+v3.61.0 (2025-07-23)
+====================
+
+Deprecated
+----------
+
+- ``TransferClient`` methods which are specific to Globus Connect Server v4 are
+  now deprecated and emit deprecation warnings when used. (:pr:`1274`)
+
+- The ``ComputeClient`` alias for ``ComputeClientV2`` is now deprecated. Users
+  of Globus Compute are encouraged to use ``ComputeClientV2`` or
+  ``ComputeClientV3`` instead. (:pr:`1278`)
+
 .. _changelog-3.60.0:
 
 v3.60.0 (2025-07-09)
