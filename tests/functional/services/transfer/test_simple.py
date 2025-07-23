@@ -5,6 +5,7 @@ import uuid
 import pytest
 
 import globus_sdk
+import globus_sdk.exc
 from globus_sdk.testing import get_last_request, load_response
 from tests.common import GO_EP1_ID, register_api_route_fixture_file
 
@@ -91,7 +92,8 @@ def test_autoactivation(client):
     )
 
     # load and check the activation doc
-    res = client.endpoint_autoactivate(GO_EP1_ID)
+    with pytest.warns(globus_sdk.exc.RemovedInV4Warning):
+        res = client.endpoint_autoactivate(GO_EP1_ID)
     assert res["code"] == "AutoActivated.CachedCredential"
 
     # check the formatted url for the request
@@ -108,7 +110,8 @@ def test_autoactivation(client):
         method="POST",
         replace=True,
     )
-    res = client.endpoint_autoactivate(GO_EP1_ID, if_expires_in=300)
+    with pytest.warns(globus_sdk.exc.RemovedInV4Warning):
+        res = client.endpoint_autoactivate(GO_EP1_ID, if_expires_in=300)
     assert res["code"] == "AlreadyActivated"
 
     req = get_last_request()

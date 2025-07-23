@@ -187,14 +187,14 @@ class TimersClient(client.BaseClient):
 
         **Examples**
 
-        >>> from datetime import datetime, timedelta
+        >>> from datetime import datetime, timedelta, timezone
         >>> callback_url = ...
         >>> data = ...
-        >>> timers_client = globus_sdk.TimersClient(...)
+        >>> timer_client = globus_sdk.TimersClient(...)
         >>> job = TimerJob(
         ...     callback_url,
         ...     data,
-        ...     datetime.utcnow(),
+        ...     datetime.now(tz=timezone.utc).replace(tzinfo=None),
         ...     timedelta(days=14),
         ...     name="my-timer-job"
         ... )
