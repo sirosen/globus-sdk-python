@@ -12,6 +12,102 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.0a4:
+
+v4.0.0a4 (2025-07-25)
+=====================
+
+Breaking Changes
+----------------
+
+- The ``function_data`` argument to ``ComputeClientV2.register_function`` has
+  been renamed to ``data`` to be consistent with other usages.
+
+- ``AuthClient`` no longer accepts ``client_id`` as a parameter and does not
+  provide it as an attribute. This was deprecated in globus-sdk version 3. (:pr:`1271`)
+
+Added
+-----
+
+- Add ``RequestCallerInfo`` data object to ``RequestsTransport.request`` for passing caller context information. (:pr:`1261`)
+
+Removed
+-------
+
+- The ``TimerJob.from_transfer_data`` classmethod, which was deprecated in
+  globus-sdk version 3, has been removed. Users should use the ``TransferTimer``
+  class to construct timers which submit transfer tasks. (:pr:`1269`)
+
+- The ``oauth2_validate_token`` method has been removed from
+  ``NativeAppAuthClient`` and ``ConfidentialAppAuthClient``.
+  This method was deprecated in globus-sdk v3. (:pr:`1270`)
+
+- Removed ``AuthClient.oauth2_userinfo``. This method was deprecated in
+  ``globus-sdk`` version 3. (:pr:`1272`)
+
+- Removed support for ``ConfidentialAppAuthClient.get_identities``.
+  This usage was deprecated in ``globus-sdk`` version 3. (:pr:`1273`)
+
+  - Users calling the Get Identities API on behalf of a client identity should
+    instead get tokens for the client and use those tokens to call
+    ``AuthClient.get_identities``. For example, by instantiating an
+    ``AuthClient`` using a ``ClientCredentialsAuthorizer``.
+
+  - This also means that it is no longer valid to use a
+    ``ConfidentialAppAuthClient`` to initialize an ``IdentityMap``.
+
+- ``TransferClient.create_endpoint`` has been removed. This method primarily
+  supported creation of GCSv4 servers and was deprecated in ``globus-sdk`` v3.
+  (:pr:`1276`)
+
+- ``GCSClient.connector_id_to_name()`` has been removed. It was deprecated in
+  ``globus-sdk`` version 3. Users should use ``globus_sdk.ConnectorTable``
+  instead. (:pr:`1277`)
+
+- Removed support for Endpoint Activation, a feature which was specific to
+  Globus Connect Server v4. (:pr:`1279`)
+
+  - Removed the activation methods: ``TransferClient.endpoint_autoactivate``,
+    ``TransferClient.endpoint_activate``,
+    ``TransferClient.endpoint_deactivate``, and
+    ``TransferClient.endpoint_get_activation_requirements``
+
+  - Removed the specialized ``ActivationRequirementsResponse`` parsed response
+    type
+
+  - ``TransferClient.update_endpoint`` would previously check the
+    ``myproxy_server`` and ``oauth_server`` parameters, which were solely used
+    for the purpose of configuring activation. It no longer does so.
+
+- Removed the ``ComputeClient`` alias. This name was deprecated in
+  ``globus-sdk`` version 3. Users should use ``ComputeClientV2`` or
+  ``ComputeClientV3`` instead. (:pr:`1282`)
+
+- Removed ``GlobusAPIError.raw_text``. This attribute was deprecated in
+  ``globus-sdk`` version 3. Users should use the ``text`` attribute instead.
+  (:pr:`1283`)
+
+- Removed ``TransferClient`` methods for modifying "endpoint servers", a
+  feature specific to Globus Connect Server v4. Specifically,
+  ``add_endpoint_server``, ``update_endpoint_server``, and
+  ``delete_endpoint_server``.
+  These methods were deprecated in ``globus-sdk`` version 3. (:pr:`1284`)
+
+- Removed the ``ComputeFunctionDocument`` and ``ComputeFunctionMetadata``
+  classes. These helpers were deprecated in ``globus-sdk`` version 3.
+
+- Removed ``TransferClient.operation_symlink``. This method was deprecated in
+  ``globus-sdk`` version 3. (:pr:`1286`)
+
+Changed
+-------
+
+- Renamed the ``globus_sdk._testing`` subpackage to ``globus_sdk.testing``. (:pr:`1251`)
+
+- Renamed the ``globus_sdk.tokenstorage`` subpackage to ``globus_sdk.token_storage`` and removed the ``globus_sdk.experimental.tokenstorage`` (:pr:`1252`)
+
+- Remove support for normalizing nested iterables of scopes, e.g. ``[["scope1"], "scope2"]`` (:pr:`1259`)
+
 .. _changelog-4.0.0a3:
 
 v4.0.0a3 (2025-07-10)
