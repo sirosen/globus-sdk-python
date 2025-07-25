@@ -8,22 +8,9 @@ import jwt
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.response import GlobusHTTPResponse
-from globus_sdk.scopes import Scope, ScopeParser
 
 log = logging.getLogger(__name__)
-
-
-def stringify_requested_scopes(
-    requested_scopes: str | Scope | t.Iterable[str | Scope],
-) -> str:
-    requested_scopes_string: str = ScopeParser.serialize(requested_scopes)
-    if requested_scopes_string == "":
-        raise GlobusSDKUsageError(
-            "requested_scopes cannot be the empty string or empty collection"
-        )
-    return requested_scopes_string
 
 
 class _JWKGetCallbackProto(t.Protocol):

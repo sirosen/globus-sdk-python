@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing as t
 
+from globus_sdk import exc
+
 from ._graph_parser import ScopeGraph
 from .representation import Scope
 
@@ -76,7 +78,9 @@ class ScopeParser:
         )
 
     @classmethod
-    def serialize(cls, scopes: str | Scope | t.Iterable[str | Scope]) -> str:
+    def serialize(
+        cls, scopes: str | Scope | t.Iterable[str | Scope], *, reject_empty: bool = True
+    ) -> str:
         """
         Normalize scopes to a space-separated scope string.
 
@@ -85,6 +89,8 @@ class ScopeParser:
 
         :param scopes: A scope string, scope object, or an iterable of scope strings
             and scope objects.
+        :param reject_empty: When true (the default), raise an error if the
+            scopes serialize to the empty string.
         :returns: A space-separated scope string.
 
         Example usage:
@@ -99,4 +105,10 @@ class ScopeParser:
             scope_iter = (scopes,)
         else:
             scope_iter = scopes
-        return " ".join(str(scope) for scope in scope_iter)
+
+        result = " ".join(str(scope) for scope in scope_iter)
+        if reject_empty and result == "":
+            raise exc.GlobusSDKUsageError(
+                "'scopes' cannot be the empty string or empty collection."
+            )
+        return result

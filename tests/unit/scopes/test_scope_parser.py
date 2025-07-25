@@ -2,6 +2,7 @@ import time
 
 import pytest
 
+from globus_sdk import exc
 from globus_sdk.scopes import Scope, ScopeCycleError, ScopeParseError, ScopeParser
 
 
@@ -248,3 +249,17 @@ def test_serialize_of_simple_collection_of_strings(scope_collection):
 )
 def test_serialize_handles_mixed_data(scope_collection, expect_str):
     assert ScopeParser.serialize(scope_collection) == expect_str
+
+
+@pytest.mark.parametrize("input_obj", ("", [], set(), ()))
+def test_serialize_rejects_empty_by_default(input_obj):
+    with pytest.raises(
+        exc.GlobusSDKUsageError,
+        match="'scopes' cannot be the empty string or empty collection",
+    ):
+        ScopeParser.serialize(input_obj)
+
+
+@pytest.mark.parametrize("input_obj", ("", [], set(), ()))
+def test_serialize_allows_empty_string_with_flag(input_obj):
+    assert ScopeParser.serialize(input_obj, reject_empty=False) == ""
