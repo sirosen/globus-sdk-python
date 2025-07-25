@@ -1,4 +1,0 @@
-Changed
--------
-
-- Remove support for normalizing nested iterables of scopes, e.g. ``[["scope1"], "scope2"]`` (:pr:`1259`)
