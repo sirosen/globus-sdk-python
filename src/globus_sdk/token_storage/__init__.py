@@ -1,14 +1,13 @@
-from .v2 import (
-    FileTokenStorage,
+from .base import FileTokenStorage, TokenStorage
+from .json import JSONTokenStorage
+from .memory import MemoryTokenStorage
+from .sqlite import SQLiteTokenStorage
+from .token_data import TokenStorageData
+from .validating_token_storage import (
     HasRefreshTokensValidator,
-    JSONTokenStorage,
-    MemoryTokenStorage,
     NotExpiredValidator,
     ScopeRequirementsValidator,
-    SQLiteTokenStorage,
     TokenDataValidator,
-    TokenStorage,
-    TokenStorageData,
     TokenValidationContext,
     TokenValidationError,
     UnchangingIdentityIDValidator,
@@ -16,14 +15,13 @@ from .v2 import (
 )
 
 __all__ = (
-    # "TokenStorage" Constructs
     "TokenStorage",
     "TokenStorageData",
     "FileTokenStorage",
     "JSONTokenStorage",
     "SQLiteTokenStorage",
     "MemoryTokenStorage",
-    # "ValidatingTokenStorage" Constructs
+    # TokenValidationStorage constructs
     "ValidatingTokenStorage",
     "TokenValidationContext",
     "TokenDataValidator",

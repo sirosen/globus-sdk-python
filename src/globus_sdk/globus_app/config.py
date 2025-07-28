@@ -17,7 +17,7 @@ from globus_sdk.token_storage import (
     TokenStorage,
     TokenValidationError,
 )
-from globus_sdk.token_storage.v2.validating_token_storage import IdentityMismatchError
+from globus_sdk.token_storage.validating_token_storage import IdentityMismatchError
 
 from .protocols import (
     IDTokenDecoderProvider,
