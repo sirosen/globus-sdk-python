@@ -791,53 +791,6 @@ class SearchClient(client.BaseClient):
         log.debug(f"SearchClient.create_entry({index_id}, ...)")
         return self.post(f"/v1/index/{index_id}/entry", data=data)
 
-    def update_entry(
-        self, index_id: uuid.UUID | str, data: dict[str, t.Any]
-    ) -> response.GlobusHTTPResponse:
-        """
-        This API method is in effect an alias of ingest and is deprecated.
-        Users are recommended to use :meth:`~.ingest` instead.
-
-        Create or update one Entry document in Search.
-
-        This does not do a partial update, but replaces the existing document.
-
-        :param index_id: the index containing this Entry
-        :param data: the entry document to write
-
-        .. tab-set::
-
-            .. tab-item:: Example Usage
-
-                Update an entry with a subject of ``https://example.com/foo/bar`` and
-                a null entry_id:
-
-                .. code-block:: python
-
-                    sc = globus_sdk.SearchClient(...)
-                    sc.update_entry(
-                        index_id,
-                        {
-                            "subject": "https://example.com/foo/bar",
-                            "visible_to": ["public"],
-                            "content": {"foo/bar": "some val"},
-                        },
-                    )
-
-            .. tab-item:: API Info
-
-                ``PUT /v1/index/<index_id>/entry``
-
-                .. extdoclink:: Update Entry
-                    :ref: search/reference/create_or_update_entry/
-        """
-        warn_deprecated(
-            "SearchClient.update_entry is deprecated. "
-            "Users should prefer using `SearchClient.ingest`"
-        )
-        log.debug(f"SearchClient.update_entry({index_id}, ...)")
-        return self.put(f"/v1/index/{index_id}/entry", data=data)
-
     def delete_entry(
         self,
         index_id: uuid.UUID | str,
