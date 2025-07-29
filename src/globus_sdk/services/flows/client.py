@@ -5,13 +5,7 @@ import sys
 import typing as t
 import uuid
 
-from globus_sdk import (
-    GlobusHTTPResponse,
-    GlobusSDKUsageError,
-    client,
-    exc,
-    paging,
-)
+from globus_sdk import GlobusHTTPResponse, client, paging
 from globus_sdk._internal import guards
 from globus_sdk._internal.remarshal import commajoin
 from globus_sdk._missing import MISSING, MissingType
@@ -241,7 +235,6 @@ class FlowsClient(client.BaseClient):
     def list_flows(
         self,
         *,
-        filter_role: str | MissingType = MISSING,
         filter_roles: str | t.Iterable[str] | MissingType = MISSING,
         filter_fulltext: str | MissingType = MISSING,
         orderby: str | t.Iterable[str] | MissingType = MISSING,
@@ -251,12 +244,8 @@ class FlowsClient(client.BaseClient):
         """
         List deployed flows
 
-        :param filter_role: (deprecated) A role name specifying the minimum permissions
-            required for a flow to be included in the response. Mutually exclusive with
-            **filter_roles**.
         :param filter_roles: A list of role names specifying the roles the user must
-            have for a flow to be included in the response. Mutually exclusive with
-            **filter_role**.
+            have for a flow to be included in the response.
         :param filter_fulltext: A string to use in a full-text search to filter results
         :param orderby: A criterion for ordering flows in the listing
         :param marker: A marker for pagination
@@ -276,15 +265,6 @@ class FlowsClient(client.BaseClient):
         - ``flow_owner``
         - ``run_monitor``
         - ``run_manager``
-
-        .. note::
-
-            The deprecated ``filter_role`` parameter has similar behavior.
-
-            ``filter_role`` accepts exactly one role name, and filters to flows
-            where the caller has the specified role or a strictly weaker role.
-            For example, ``filter_role="flow_administrator"`` will include flows
-            where the caller has the ``flow_starter`` role.
 
         **OrderBy Values**
 
@@ -318,7 +298,7 @@ class FlowsClient(client.BaseClient):
 
                     flows = FlowsClient(...)
                     my_frobulate_flows = flows.list_flows(
-                        filter_role="flow_owner",
+                        filter_roles="flow_owner",
                         filter_fulltext="frobulate",
                         orderby=("title ASC", "updated_at DESC"),
                     )
@@ -348,15 +328,7 @@ class FlowsClient(client.BaseClient):
                     :service: flows
                     :ref: Flows/paths/~1flows/get
         """
-        if filter_role is not MISSING:
-            exc.warn_deprecated(
-                "The `filter_role` parameter is deprecated. Use `filter_roles` instead."
-            )
-        if filter_role is not MISSING and filter_roles is not MISSING:
-            msg = "Mutually exclusive parameters: filter_role and filter_roles."
-            raise GlobusSDKUsageError(msg)
         query_params = {
-            "filter_role": filter_role,
             "filter_roles": commajoin(filter_roles),
             "filter_fulltext": filter_fulltext,
             # if `orderby` is an iterable (e.g., generator expression), it gets
