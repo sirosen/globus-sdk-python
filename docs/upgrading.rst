@@ -383,6 +383,17 @@ For example:
     ``globus-sdk`` version 3, so this transition can be made prior to upgrading
     to version 4.
 
+``SearchClient.create_entry`` and ``SearchClient.update_entry`` Removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These methods were deprecated in version 3 in favor of ``SearchClient.ingest``,
+which provides greater functionality and a more uniform interface.
+
+For any document being passed by these methods, upgrade to using an ingest
+document with ``"ingest_type": "GMetaEntry"``.
+Consult the :extdoclink:`Search Ingest Guide </search/ingest/>`
+for details on the document formats.
+
 ``MutableScope`` is Removed, use ``Scope`` Instead
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
