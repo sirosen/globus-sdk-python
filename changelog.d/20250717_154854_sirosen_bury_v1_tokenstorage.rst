@@ -5,4 +5,4 @@ Changed
   ``globus_sdk.token_storage.legacy`` subpackage.
 
   Users are encouraged to migrate to the newer tooling available directly from
-  ``globus_sdk.token_storage``. (:pr:`NUMBER`)
+  ``globus_sdk.token_storage``. (:pr:`1290`)
