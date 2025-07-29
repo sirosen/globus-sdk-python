@@ -18,6 +18,7 @@ from globus_sdk.scopes import (
     SpecificFlowScopes,
     TransferScopes,
 )
+from globus_sdk.transport import RequestsTransport, RetryConfig
 
 from .data import RunActivityNotificationPolicy
 from .errors import FlowsAPIError
@@ -908,7 +909,8 @@ class SpecificFlowClient(client.BaseClient):
         app_scopes: list[Scope] | None = None,
         authorizer: GlobusAuthorizer | None = None,
         app_name: str | None = None,
-        transport_params: dict[str, t.Any] | None = None,
+        transport: RequestsTransport | None = None,
+        retry_config: RetryConfig | None = None,
     ) -> None:
         self._flow_id = flow_id
         self.scopes = SpecificFlowScopes(flow_id)
@@ -918,7 +920,8 @@ class SpecificFlowClient(client.BaseClient):
             environment=environment,
             authorizer=authorizer,
             app_name=app_name,
-            transport_params=transport_params,
+            transport=transport,
+            retry_config=retry_config,
         )
 
     @property
