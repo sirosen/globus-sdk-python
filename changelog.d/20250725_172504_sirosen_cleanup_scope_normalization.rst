@@ -1,7 +1,7 @@
 Breaking Changes
 ----------------
 
-- Interfaces for normalizing scope data have changed. (:pr:`NUMBER`)
+- Interfaces for normalizing scope data have changed. (:pr:`1289`)
 
   - The ``scopes_to_str`` function has been replaced with
     ``ScopeParser.serialize``.
