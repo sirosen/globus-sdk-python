@@ -331,6 +331,58 @@ The removed alias and new module names are shown in the table below.
     "``globus_sdk.experimental.tokenstorage``", "``globus_sdk.token_storage``"
     "``globus_sdk.experimental.login_flow_manager``", "``globus_sdk.login_flows``"
 
+``SearchQuery`` is Removed, use ``SearchQueryV1`` Instead
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``SearchQuery`` helper was removed in version 4 in favor of the
+:class:`SearchQueryV1 <globus_sdk.SearchQueryV1>` type.
+
+Simply replace one type with the other for most simple usages:
+
+.. code-block:: python
+
+    # globus-sdk v3
+    from globus_sdk import SearchQuery
+
+    query = SearchQuery(q="foo")
+
+    # globus-sdk v4
+    from globus_sdk import SearchQuery
+
+    query = SearchQueryV1(q="foo")
+
+Note that ``SearchQuery`` supported the query string, ``q``, as a positional
+argument, but ``SearchQueryV1`` requires that it is passed as a named
+parameter.
+
+``SearchQuery`` also supported helper methods which are not provided by
+``SearchQueryV1``.
+These must be replaced by setting the relevant parameters directly or on
+initialization.
+For example:
+
+.. code-block:: python
+
+    # globus-sdk v3
+    from globus_sdk import SearchQuery
+
+    query = SearchQuery(q="foo")
+    query.set_offset(100)  # removed in v4
+
+    # globus-sdk v4
+    from globus_sdk import SearchQuery
+
+    query = SearchQueryV1(q="foo", offset=100)  # on init
+    # or
+    query = SearchQueryV1(q="foo")
+    query["offset"] = 100  # by setting a field
+
+.. note::
+
+    :class:`SearchQueryV1 <globus_sdk.SearchQueryV1>` was added in
+    ``globus-sdk`` version 3, so this transition can be made prior to upgrading
+    to version 4.
+
 ``MutableScope`` is Removed, use ``Scope`` Instead
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
