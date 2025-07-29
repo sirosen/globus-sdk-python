@@ -22,7 +22,7 @@ from globus_sdk.token_storage import (
     UnchangingIdentityIDValidator,
     ValidatingTokenStorage,
 )
-from globus_sdk.token_storage.v2.validating_token_storage import (
+from globus_sdk.token_storage.validating_token_storage import (
     IdentityMismatchError,
     MissingIdentityError,
     MissingTokenError,

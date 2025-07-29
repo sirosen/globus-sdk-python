@@ -1,21 +1,13 @@
-from .v1 import (
-    FileAdapter,
-    MemoryAdapter,
-    SimpleJSONFileAdapter,
-    SQLiteAdapter,
-    StorageAdapter,
-)
-from .v2 import (
-    FileTokenStorage,
+from .base import FileTokenStorage, TokenStorage
+from .json import JSONTokenStorage
+from .memory import MemoryTokenStorage
+from .sqlite import SQLiteTokenStorage
+from .token_data import TokenStorageData
+from .validating_token_storage import (
     HasRefreshTokensValidator,
-    JSONTokenStorage,
-    MemoryTokenStorage,
     NotExpiredValidator,
     ScopeRequirementsValidator,
-    SQLiteTokenStorage,
     TokenDataValidator,
-    TokenStorage,
-    TokenStorageData,
     TokenValidationContext,
     TokenValidationError,
     UnchangingIdentityIDValidator,
@@ -23,20 +15,13 @@ from .v2 import (
 )
 
 __all__ = (
-    # [v1] "StorageAdapter" Constructs
-    "StorageAdapter",
-    "FileAdapter",
-    "SimpleJSONFileAdapter",
-    "SQLiteAdapter",
-    "MemoryAdapter",
-    # [v2] "TokenStorage" Constructs
     "TokenStorage",
     "TokenStorageData",
     "FileTokenStorage",
     "JSONTokenStorage",
     "SQLiteTokenStorage",
     "MemoryTokenStorage",
-    # [v2] "ValidatingTokenStorage" Constructs
+    # TokenValidationStorage constructs
     "ValidatingTokenStorage",
     "TokenValidationContext",
     "TokenDataValidator",

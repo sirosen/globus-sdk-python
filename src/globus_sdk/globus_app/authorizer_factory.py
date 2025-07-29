@@ -13,7 +13,7 @@ from globus_sdk.authorizers import (
 )
 from globus_sdk.services.auth import OAuthTokenResponse
 from globus_sdk.token_storage import ValidatingTokenStorage
-from globus_sdk.token_storage.v2.validating_token_storage import MissingTokenError
+from globus_sdk.token_storage.validating_token_storage import MissingTokenError
 
 GA = t.TypeVar("GA", bound=GlobusAuthorizer)
 
