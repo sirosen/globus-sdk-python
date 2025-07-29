@@ -104,7 +104,7 @@ class RetryCheckCollection:
       (except via the backoff which may be set)
     - what kinds of request parameters (e.g., timeouts) are used
 
-    It *only* contains ``RetryCheck`` methods which can look at a response or
+    It *only* contains ``RetryCheck`` functions which can look at a response or
     error and decide whether or not to retry.
     """
 

@@ -516,7 +516,7 @@ This could then be configured on a custom client class:
     client = MyClientClass()
 
 Under SDK v4, in order to customize the same information, users can simply
-client and then modify the attributes of the ``retry_config`` object:
+create a client and then modify the attributes of the ``retry_config`` object:
 
 .. code-block:: python
 
