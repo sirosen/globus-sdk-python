@@ -7,7 +7,6 @@ import uuid
 from globus_sdk import client, paging, response
 from globus_sdk._internal.remarshal import strseq_listify
 from globus_sdk._missing import MISSING, MissingType
-from globus_sdk.exc.warnings import warn_deprecated
 from globus_sdk.scopes import SearchScopes
 
 from .data import SearchQueryV1, SearchScrollQuery
@@ -726,70 +725,6 @@ class SearchClient(client.BaseClient):
             **(query_params or {}),
         }
         return self.get(f"/v1/index/{index_id}/entry", query_params=query_params)
-
-    def create_entry(
-        self, index_id: uuid.UUID | str, data: dict[str, t.Any]
-    ) -> response.GlobusHTTPResponse:
-        """
-        This API method is in effect an alias of ingest and is deprecated.
-        Users are recommended to use :meth:`~.ingest` instead.
-
-        Create or update one Entry document in Search.
-
-        The API does not enforce that the document does not exist, and will overwrite
-        any existing data.
-
-        :param index_id: the index containing this Entry
-        :param data: the entry document to write
-
-        .. tab-set::
-
-            .. tab-item:: Example Usage
-
-                Create an entry with a subject of ``https://example.com/foo/bar`` and
-                a null entry_id:
-
-                .. code-block:: python
-
-                    sc = globus_sdk.SearchClient(...)
-                    sc.create_entry(
-                        index_id,
-                        {
-                            "subject": "https://example.com/foo/bar",
-                            "visible_to": ["public"],
-                            "content": {"foo/bar": "some val"},
-                        },
-                    )
-
-                Create an entry with a subject of ``https://example.com/foo/bar`` and
-                an entry_id of ``foo/bar``:
-
-                .. code-block:: python
-
-                    sc = globus_sdk.SearchClient(...)
-                    sc.create_entry(
-                        index_id,
-                        {
-                            "subject": "https://example.com/foo/bar",
-                            "visible_to": ["public"],
-                            "id": "foo/bar",
-                            "content": {"foo/bar": "some val"},
-                        },
-                    )
-
-            .. tab-item:: API Info
-
-                ``POST /v1/index/<index_id>/entry``
-
-                .. extdoclink:: Create Entry
-                    :ref: search/reference/create_or_update_entry/
-        """
-        warn_deprecated(
-            "SearchClient.create_entry is deprecated. "
-            "Users should prefer using `SearchClient.ingest`"
-        )
-        log.debug(f"SearchClient.create_entry({index_id}, ...)")
-        return self.post(f"/v1/index/{index_id}/entry", data=data)
 
     def delete_entry(
         self,
