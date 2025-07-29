@@ -5,7 +5,7 @@ Breaking Changes
   configuration which controls request retries. A new ``RetryConfig`` object is
   introduced and provided as ``client.retry_config`` on all client types. The
   interface for controlling these configurations has been updated.
-  (:pr:`NUMBER`)
+  (:pr:`1275`)
 
   - The ``transport_class`` attribute has been removed from client classes.
 
