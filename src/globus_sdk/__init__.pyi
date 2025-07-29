@@ -103,7 +103,6 @@ from .services.groups import (
 from .services.search import (
     SearchAPIError,
     SearchClient,
-    SearchQuery,
     SearchQueryV1,
     SearchScrollQuery,
 )
@@ -222,7 +221,6 @@ __all__ = (
     "GroupVisibility",
     "SearchAPIError",
     "SearchClient",
-    "SearchQuery",
     "SearchQueryV1",
     "SearchScrollQuery",
     "OnceTimerSchedule",

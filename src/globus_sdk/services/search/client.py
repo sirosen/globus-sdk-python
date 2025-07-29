@@ -10,7 +10,7 @@ from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.exc.warnings import warn_deprecated
 from globus_sdk.scopes import SearchScopes
 
-from .data import SearchQuery, SearchScrollQuery
+from .data import SearchQueryV1, SearchScrollQuery
 from .errors import SearchAPIError
 from .response import IndexListResponse
 
@@ -297,7 +297,7 @@ class SearchClient(client.BaseClient):
     def post_search(
         self,
         index_id: uuid.UUID | str,
-        data: dict[str, t.Any] | SearchQuery,
+        data: dict[str, t.Any] | SearchQueryV1,
         *,
         offset: int | MissingType = MISSING,
         limit: int | MissingType = MISSING,
