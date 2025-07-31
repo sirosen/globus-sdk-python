@@ -12,6 +12,74 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.0b1:
+
+v4.0.0b1 (2025-07-31)
+=====================
+
+Breaking Changes
+----------------
+
+- The ``RequestsTransport`` object has been refactored to separate it from
+  configuration which controls request retries. A new ``RetryConfig`` object is
+  introduced and provided as ``client.retry_config`` on all client types. The
+  interface for controlling these configurations has been updated.
+  (:pr:`1275`)
+
+  - The ``transport_class`` attribute has been removed from client classes.
+
+  - Clients now accept ``transport``, an instance of ``RequestsTransport``, and
+    ``retry_config``, an instance of ``RetryConfig``, instead of
+    ``transport_params``.
+
+  - Users seeking to customize the retry backoff, sleep maximum, and max
+    retries should now use ``retry_config``, as these are no longer controlled
+    through ``transport``.
+
+  - The capabilities of the ``RequestsTransport.tune()`` context manager have
+    been divided into ``RequestsTransport.tune()`` and ``RetryConfig.tune()``.
+
+  - The retry configuration is exposed to retry checks as an attribute of the
+    ``RequestCallerInfo``, which is provided on the ``RetryContext``. As a
+    result, checks can examine the configuration.
+
+- Interfaces for normalizing scope data have changed. (:pr:`1289`)
+
+  - The ``scopes_to_str`` function has been replaced with
+    ``ScopeParser.serialize``.
+
+  - ``ScopeParser.serialize`` will raise an error if the serialized data is
+    empty. A flag, ``reject_empty=False``, can be passed to disable this check.
+
+  - The ``scopes_to_scope_list`` function has been removed.
+
+Removed
+-------
+
+- Removed the ``filter_role`` parameter to ``FlowsClient.list_flows``.
+  This parameter was deprecated in ``globus-sdk`` version 3. (:pr:`1291`)
+
+- Removed ``SearchClient.update_entry``.
+  This method was deprecated in ``globus-sdk`` version 3. (:pr:`1292`)
+
+- Removed ``SearchClient.create_entry``.
+  This method was deprecated in ``globus-sdk`` version 3. (:pr:`1293`)
+
+- Removed the ``SearchQuery`` type. Users should use ``SearchQueryV1`` instead.
+  ``SearchQuery`` was deprecated in ``globus-sdk`` version 3. (:pr:`1294`)
+
+Changed
+-------
+
+- The legacy token storage adapters are now only available from the
+  ``globus_sdk.token_storage.legacy`` subpackage.
+
+  Users are encouraged to migrate to the newer tooling available directly from
+  ``globus_sdk.token_storage``. (:pr:`1290`)
+
+- Update ``warn_deprecated`` to emit ``RemovedInV5Warning`` and remove
+  ``RemovedInV4Warning`` class (:pr:`1295`)
+
 .. _changelog-4.0.0a4:
 
 v4.0.0a4 (2025-07-25)
