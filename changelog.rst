@@ -12,6 +12,17 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.62.0:
+
+v3.62.0 (2025-07-31)
+====================
+
+Added
+-----
+
+- Added support for setting a group's ``subscription_id``
+  via ``GroupsClient.set_subscription_admin_verified_id``. (:pr:`1287`)
+
 .. _changelog-3.61.0:
 
 v3.61.0 (2025-07-23)
