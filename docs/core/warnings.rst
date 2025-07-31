@@ -4,7 +4,7 @@ Warnings
 The following warnings can be emitted by the Globus SDK to indicate a
 problem, or a future change, which is not necessarily an error.
 
-.. autoclass:: globus_sdk.RemovedInV4Warning
+.. autoclass:: globus_sdk.RemovedInV5Warning
     :members:
     :show-inheritance:
 
