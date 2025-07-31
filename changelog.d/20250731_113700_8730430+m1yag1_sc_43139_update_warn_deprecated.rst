@@ -1,0 +1,5 @@
+Changed
+-------
+
+- Update ``warn_deprecated`` to emit ``RemovedInV5Warning`` and remove
+  ``RemovedInV4Warning`` class (:pr:`NUMBER`)

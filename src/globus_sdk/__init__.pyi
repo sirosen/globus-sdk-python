@@ -16,7 +16,7 @@ from .exc import (
     GlobusSDKUsageError,
     GlobusTimeoutError,
     NetworkError,
-    RemovedInV4Warning,
+    RemovedInV5Warning,
     ValidationError,
 )
 from .globus_app import ClientApp, GlobusApp, GlobusAppConfig, UserApp
@@ -141,7 +141,7 @@ __all__ = (
     "GlobusSDKUsageError",
     "GlobusTimeoutError",
     "NetworkError",
-    "RemovedInV4Warning",
+    "RemovedInV5Warning",
     "ValidationError",
     "ClientApp",
     "GlobusApp",
