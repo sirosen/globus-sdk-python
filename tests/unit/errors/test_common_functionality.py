@@ -1,4 +1,6 @@
 import itertools
+import sys
+import uuid
 
 import pytest
 import requests
@@ -50,6 +52,17 @@ def test_binary_content_property():
     body_text = "some data"
     err = construct_error(body=body_text, http_status=400)
     assert err.binary_content == body_text.encode("utf-8")
+
+
+# `add_note()` and `__notes__` are new in Python 3.11
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="Exception.add_note() is new in Python 3.11"
+)
+def test_notes_are_populated_with_text():
+    text_body = f"some error: {uuid.uuid4()}"
+    err = construct_error(body=text_body, http_status=400)
+    assert err.text == text_body
+    assert any(text_body in note for note in err.__notes__)
 
 
 @pytest.mark.parametrize(
