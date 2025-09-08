@@ -393,7 +393,7 @@ class GroupsClient(client.BaseClient):
             f"/v2/groups/{group_id}", data=actions, query_params=query_params
         )
 
-    def set_subscription_admin_verified_id(
+    def set_subscription_admin_verified(
         self,
         group_id: uuid.UUID | str,
         subscription_id: uuid.UUID | str | None,
