@@ -57,7 +57,7 @@ class GlobusAPIError(GlobusError):
         self._parse_response()
 
         if sys.version_info >= (3, 11):
-            self.add_note(
+            self.add_note(  # pylint: disable=no-member
                 (
                     "This exception was caused by an API error. "
                     "The response body is as follows:\n\n"

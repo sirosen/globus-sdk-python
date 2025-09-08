@@ -3,10 +3,10 @@ import json
 from globus_sdk.testing import get_last_request, load_response
 
 
-def test_set_subscription_admin_verified_id(groups_client):
-    meta = load_response(groups_client.set_subscription_admin_verified_id).metadata
+def test_set_subscription_admin_verified(groups_client):
+    meta = load_response(groups_client.set_subscription_admin_verified).metadata
 
-    res = groups_client.set_subscription_admin_verified_id(
+    res = groups_client.set_subscription_admin_verified(
         group_id=meta["group_id"],
         subscription_id=meta["subscription_id"],
     )
