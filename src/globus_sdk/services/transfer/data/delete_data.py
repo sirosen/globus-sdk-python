@@ -49,8 +49,8 @@ class DeleteData(utils.PayloadWrapper):
         timestamp is in UTC to avoid confusion and ambiguity. Examples of ISO-8601
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
-    :param skip_activation_check: When true, allow submission even if the endpoint
-        isn't currently activated
+    :param skip_activation_check: This argument is deprecated, as 'activation' is no
+        longer supported by Globus Collections.
     :param notify_on_succeeded: Send a notification email when the delete task
         completes with a status of SUCCEEDED.
         [default: ``True``]
@@ -107,6 +107,12 @@ class DeleteData(utils.PayloadWrapper):
         # the first arg
         if endpoint is None:
             raise exc.GlobusSDKUsageError("endpoint is required")
+
+        if skip_activation_check is not None:
+            exc.warn_deprecated(
+                "`skip_activation_check` is no longer supported by Globus Collections, "
+                "and has no effect when set."
+            )
 
         self["DATA_TYPE"] = "delete"
         self["DATA"] = []

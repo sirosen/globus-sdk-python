@@ -1,6 +1,12 @@
 import pytest
 
-from globus_sdk import DeleteData, GlobusSDKUsageError, TransferClient, TransferData
+from globus_sdk import (
+    DeleteData,
+    GlobusSDKUsageError,
+    TransferClient,
+    TransferData,
+    exc,
+)
 from globus_sdk._testing import load_response
 from globus_sdk.services.transfer.client import _format_filter
 from tests.common import GO_EP1_ID, GO_EP2_ID
@@ -337,11 +343,19 @@ def test_skip_activation_check_supported(datatype, value):
         # not present if not provided as a param or provided as explicit None
         assert "skip_activation_check" not in create()
     elif value:
-        data = create(skip_activation_check=True)
+        with pytest.warns(
+            exc.RemovedInV4Warning,
+            match="`skip_activation_check` is no longer supported",
+        ):
+            data = create(skip_activation_check=True)
         assert "skip_activation_check" in data
         assert data["skip_activation_check"] is True
     else:
-        data = create(skip_activation_check=False)
+        with pytest.warns(
+            exc.RemovedInV4Warning,
+            match="`skip_activation_check` is no longer supported",
+        ):
+            data = create(skip_activation_check=False)
         assert "skip_activation_check" in data
         assert data["skip_activation_check"] is False
 
