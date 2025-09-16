@@ -77,12 +77,8 @@ class TransferData(utils.PayloadWrapper):
         timestamp is in UTC to avoid confusion and ambiguity. Examples of ISO-8601
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
-    :param recursive_symlinks: Specify the behavior of recursive directory transfers
-        when encountering symlinks. One of ``"ignore"``, ``"keep"``, or ``"copy"``.
-        ``"ignore"`` skips symlinks, ``"keep"`` creates symlinks at the destination
-        matching the source (without modifying the link path at all), and
-        ``"copy"`` follows symlinks on the source, failing if the link is invalid.
-        [default: ``"ignore"``]
+    :param recursive_symlinks: This keyword argument is deprecated as not collections
+        support it.
     :param skip_activation_check: When true, allow submission even if the endpoints
         aren't currently activated
     :param skip_source_errors: When true, source permission denied and file
@@ -92,7 +88,7 @@ class TransferData(utils.PayloadWrapper):
     :param fail_on_quota_errors: When true, quota exceeded errors will cause the
         task to fail.
         [default: ``False``]
-    :param delete_destination_extra: Delete files, directories, and symlinks on the
+    :param delete_destination_extra: Delete files and directories on the
         destination endpoint which don’t exist on the source endpoint or are a
         different type. Only applies for recursive directory transfers.
         [default: ``False``]
@@ -196,6 +192,12 @@ class TransferData(utils.PayloadWrapper):
         if destination_endpoint is None:
             raise exc.GlobusSDKUsageError("destination_endpoint is required")
 
+        if recursive_symlinks:
+            exc.warn_deprecated(
+                "`recursive_symlinks` is not currently supported by any collections. "
+                "To reduce confusion, this keyword argument will be removed."
+            )
+
         log.debug("Creating a new TransferData object")
         self["DATA_TYPE"] = "transfer"
         self["DATA"] = []
@@ -250,9 +252,7 @@ class TransferData(utils.PayloadWrapper):
         additional_fields: dict[str, t.Any] | None = None,
     ) -> None:
         """
-        Add a file or directory to be transferred. If the item is a symlink
-        to a file or directory, the file or directory at the target of
-        the symlink will be transferred.
+        Add a file or directory to be transferred.
 
         Appends a transfer_item document to the DATA key of the transfer
         document.
@@ -304,6 +304,10 @@ class TransferData(utils.PayloadWrapper):
 
     def add_symlink_item(self, source_path: str, destination_path: str) -> None:
         """
+        .. warning::
+
+            This method is not currently supported by any collections.
+
         Add a symlink to be transferred as a symlink rather than as the
         target of the symlink.
 
@@ -313,6 +317,10 @@ class TransferData(utils.PayloadWrapper):
         :param source_path: Path to the source symlink
         :param destination_path: Path to which the source symlink will be transferred
         """
+        exc.warn_deprecated(
+            "add_symlink_item is not currently supported by any collections. "
+            "To reduce confusion, this method will be removed."
+        )
         item_data = {
             "DATA_TYPE": "transfer_symlink_item",
             "source_path": source_path,
