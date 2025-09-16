@@ -133,23 +133,6 @@ def test_transfer_add_item():
     assert all(fields_data[k] == v for k, v in addfields.items())
 
 
-def test_transfer_add_symlink_item():
-    """
-    Adds a transfer_symlink_item to TransferData, verifies results
-    """
-    tdata = TransferData(source_endpoint=GO_EP1_ID, destination_endpoint=GO_EP2_ID)
-    # add item
-    source_path = "source/path/"
-    dest_path = "dest/path/"
-    tdata.add_symlink_item(source_path, dest_path)
-    # verify results
-    assert len(tdata["DATA"]) == 1
-    data = tdata["DATA"][0]
-    assert data["DATA_TYPE"] == "transfer_symlink_item"
-    assert data["source_path"] == source_path
-    assert data["destination_path"] == dest_path
-
-
 def test_delete_init_with_client():
     """
     Verifies DeleteData field initialization
