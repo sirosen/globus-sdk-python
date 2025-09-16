@@ -79,8 +79,8 @@ class TransferData(utils.PayloadWrapper):
         ``2017-10-12``
     :param recursive_symlinks: This keyword argument is deprecated as not collections
         support it.
-    :param skip_activation_check: When true, allow submission even if the endpoints
-        aren't currently activated
+    :param skip_activation_check: This argument is deprecated, as 'activation' is no
+        longer supported by Globus Collections.
     :param skip_source_errors: When true, source permission denied and file
         not found errors from the source endpoint will cause the offending
         path to be skipped.
@@ -196,6 +196,12 @@ class TransferData(utils.PayloadWrapper):
             exc.warn_deprecated(
                 "`recursive_symlinks` is not currently supported by any collections. "
                 "To reduce confusion, this keyword argument will be removed."
+            )
+
+        if skip_activation_check is not None:
+            exc.warn_deprecated(
+                "`skip_activation_check` is no longer supported by Globus Collections, "
+                "and has no effect when set."
             )
 
         log.debug("Creating a new TransferData object")

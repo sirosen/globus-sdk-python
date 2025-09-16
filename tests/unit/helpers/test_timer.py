@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 
 import pytest
@@ -30,7 +31,16 @@ def test_timer_from_transfer_data_ok():
     "badkey, value", (("submission_id", "foo"), ("skip_activation_check", True))
 )
 def test_timer_from_transfer_data_rejects_forbidden_keys(badkey, value):
-    tdata = TransferData(None, GO_EP1_ID, GO_EP2_ID, **{badkey: value})
+    if badkey == "skip_activation_check":
+        ctx = pytest.warns(
+            exc.RemovedInV4Warning,
+            match="`skip_activation_check` is no longer supported",
+        )
+    else:
+        ctx = contextlib.nullcontext()
+
+    with ctx:
+        tdata = TransferData(None, GO_EP1_ID, GO_EP2_ID, **{badkey: value})
     with pytest.raises(ValueError):
         with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
             TimerJob.from_transfer_data(tdata, "2022-01-01T00:00:00Z", 600)
