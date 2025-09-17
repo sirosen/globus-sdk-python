@@ -40,8 +40,6 @@ class DeleteData(GlobusPayload):
         timestamp is in UTC to avoid confusion and ambiguity. Examples of ISO-8601
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
-    :param skip_activation_check: When true, allow submission even if the endpoint
-        isn't currently activated
     :param notify_on_succeeded: Send a notification email when the delete task
         completes with a status of SUCCEEDED.
         [default: ``True``]
@@ -85,7 +83,6 @@ class DeleteData(GlobusPayload):
         ignore_missing: bool | MissingType = MISSING,
         interpret_globs: bool | MissingType = MISSING,
         deadline: str | datetime.datetime | MissingType = MISSING,
-        skip_activation_check: bool | MissingType = MISSING,
         notify_on_succeeded: bool | MissingType = MISSING,
         notify_on_failed: bool | MissingType = MISSING,
         notify_on_inactive: bool | MissingType = MISSING,
@@ -103,7 +100,6 @@ class DeleteData(GlobusPayload):
         self["recursive"] = recursive
         self["ignore_missing"] = ignore_missing
         self["interpret_globs"] = interpret_globs
-        self["skip_activation_check"] = skip_activation_check
         self["notify_on_succeeded"] = notify_on_succeeded
         self["notify_on_failed"] = notify_on_failed
         self["notify_on_inactive"] = notify_on_inactive
