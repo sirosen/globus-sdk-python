@@ -68,14 +68,6 @@ class TransferData(GlobusPayload):
         timestamp is in UTC to avoid confusion and ambiguity. Examples of ISO-8601
         timestamps include ``2017-10-12 09:30Z``, ``2017-10-12 12:33:54+00:00``, and
         ``2017-10-12``
-    :param recursive_symlinks: Specify the behavior of recursive directory transfers
-        when encountering symlinks. One of ``"ignore"``, ``"keep"``, or ``"copy"``.
-        ``"ignore"`` skips symlinks, ``"keep"`` creates symlinks at the destination
-        matching the source (without modifying the link path at all), and
-        ``"copy"`` follows symlinks on the source, failing if the link is invalid.
-        [default: ``"ignore"``]
-    :param skip_activation_check: When true, allow submission even if the endpoints
-        aren't currently activated
     :param skip_source_errors: When true, source permission denied and file
         not found errors from the source endpoint will cause the offending
         path to be skipped.
@@ -83,7 +75,7 @@ class TransferData(GlobusPayload):
     :param fail_on_quota_errors: When true, quota exceeded errors will cause the
         task to fail.
         [default: ``False``]
-    :param delete_destination_extra: Delete files, directories, and symlinks on the
+    :param delete_destination_extra: Delete files and directories on the
         destination endpoint which don’t exist on the source endpoint or are a
         different type. Only applies for recursive directory transfers.
         [default: ``False``]
@@ -166,10 +158,8 @@ class TransferData(GlobusPayload):
         preserve_timestamp: bool | MissingType = MISSING,
         encrypt_data: bool | MissingType = MISSING,
         deadline: datetime.datetime | str | MissingType = MISSING,
-        skip_activation_check: bool | MissingType = MISSING,
         skip_source_errors: bool | MissingType = MISSING,
         fail_on_quota_errors: bool | MissingType = MISSING,
-        recursive_symlinks: str | MissingType = MISSING,
         delete_destination_extra: bool | MissingType = MISSING,
         notify_on_succeeded: bool | MissingType = MISSING,
         notify_on_failed: bool | MissingType = MISSING,
@@ -186,14 +176,12 @@ class TransferData(GlobusPayload):
         self["destination_endpoint"] = destination_endpoint
         self["label"] = label
         self["submission_id"] = submission_id
-        self["recursive_symlinks"] = recursive_symlinks
         self["deadline"] = deadline
         self["source_local_user"] = source_local_user
         self["destination_local_user"] = destination_local_user
         self["verify_checksum"] = verify_checksum
         self["preserve_timestamp"] = preserve_timestamp
         self["encrypt_data"] = encrypt_data
-        self["skip_activation_check"] = skip_activation_check
         self["skip_source_errors"] = skip_source_errors
         self["fail_on_quota_errors"] = fail_on_quota_errors
         self["delete_destination_extra"] = delete_destination_extra
@@ -224,9 +212,7 @@ class TransferData(GlobusPayload):
         additional_fields: dict[str, t.Any] | None = None,
     ) -> None:
         """
-        Add a file or directory to be transferred. If the item is a symlink
-        to a file or directory, the file or directory at the target of
-        the symlink will be transferred.
+        Add a file or directory to be transferred.
 
         Appends a transfer_item document to the DATA key of the transfer
         document.
@@ -263,32 +249,6 @@ class TransferData(GlobusPayload):
         }
         log.debug(
             'TransferData[{}, {}].add_item: "{}"->"{}"'.format(
-                self["source_endpoint"],
-                self["destination_endpoint"],
-                source_path,
-                destination_path,
-            )
-        )
-        self["DATA"].append(item_data)
-
-    def add_symlink_item(self, source_path: str, destination_path: str) -> None:
-        """
-        Add a symlink to be transferred as a symlink rather than as the
-        target of the symlink.
-
-        Appends a transfer_symlink_item document to the DATA key of the
-        transfer document.
-
-        :param source_path: Path to the source symlink
-        :param destination_path: Path to which the source symlink will be transferred
-        """
-        item_data = {
-            "DATA_TYPE": "transfer_symlink_item",
-            "source_path": source_path,
-            "destination_path": destination_path,
-        }
-        log.debug(
-            'TransferData[{}, {}].add_symlink_item: "{}"->"{}"'.format(
                 self["source_endpoint"],
                 self["destination_endpoint"],
                 source_path,

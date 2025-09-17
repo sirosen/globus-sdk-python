@@ -97,23 +97,6 @@ def test_transfer_add_item():
     assert all(fields_data[k] == v for k, v in addfields.items())
 
 
-def test_transfer_add_symlink_item():
-    """
-    Adds a transfer_symlink_item to TransferData, verifies results
-    """
-    tdata = TransferData(GO_EP1_ID, GO_EP2_ID)
-    # add item
-    source_path = "source/path/"
-    dest_path = "dest/path/"
-    tdata.add_symlink_item(source_path, dest_path)
-    # verify results
-    assert len(tdata["DATA"]) == 1
-    data = tdata["DATA"][0]
-    assert data["DATA_TYPE"] == "transfer_symlink_item"
-    assert data["source_path"] == source_path
-    assert data["destination_path"] == dest_path
-
-
 @pytest.mark.parametrize(
     "args, kwargs",
     (
@@ -274,28 +257,6 @@ def test_transfer_sync_levels_result(sync_level, result):
     else:
         tdata = TransferData(GO_EP1_ID, GO_EP2_ID, sync_level=sync_level)
         assert tdata["sync_level"] == result
-
-
-@pytest.mark.parametrize("datatype", ("transfer", "delete"))
-@pytest.mark.parametrize("value", (None, True, False))
-def test_skip_activation_check_supported(datatype, value):
-    def create(**kwargs):
-        if datatype == "transfer":
-            return TransferData(GO_EP1_ID, GO_EP2_ID, **kwargs)
-        else:
-            return DeleteData(GO_EP1_ID, **kwargs)
-
-    if value is None:
-        # not present if not provided as a param or provided as explicit None
-        assert create()["skip_activation_check"] is MISSING
-    elif value:
-        data = create(skip_activation_check=True)
-        assert "skip_activation_check" in data
-        assert data["skip_activation_check"] is True
-    else:
-        data = create(skip_activation_check=False)
-        assert "skip_activation_check" in data
-        assert data["skip_activation_check"] is False
 
 
 def test_add_filter_rule():

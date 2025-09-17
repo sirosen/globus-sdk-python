@@ -41,7 +41,6 @@ def test_transfer_submit_success(client):
     assert tdata["sync_level"] == 0
 
     tdata.add_item("/path/to/foo", "/path/to/bar")
-    tdata.add_symlink_item("linkfoo", "linkbar")
 
     res = client.submit_transfer(tdata)
 
