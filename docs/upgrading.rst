@@ -563,6 +563,59 @@ A ``retry_config`` can also be passed to clients on initialization:
     client = globus_sdk.GroupsClient(retry_config=RetryConfig(max_retries=2))
     my_groups = client.get_my_groups()
 
+Clients No Longer Define ``base_path``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In version 3 and earlier, client classes defined an attribute ``base_path``
+which was joined as a prefix to request paths for the HTTP methods: ``get()``,
+``put()``, ``post()``, ``patch()``, ``delete()``, ``head()``, and ``request()``.
+The ``base_path`` attribute has been removed and direct use of HTTP APIs now
+requires the full path when bare HTTP methods are used.
+
+``base_path`` values were also used in the testing tools defined by
+``globus_sdk.testing`` and have similarly been removed.
+
+The ``base_path`` was automatically deduplicated when provided to SDK version 3,
+meaning that code which includes this prefix will work on both SDK version 3 and
+version 4.
+
+For example, ``TransferClient`` defined a ``base_path`` of ``"v0.10"``.
+As a result, the request URI for a ``get()`` HTTP call would be mapped as follows:
+
+.. code-block:: python
+
+    import globus_sdk
+
+    tc = globus_sdk.TransferClient()
+
+    # GET https://transfer.api.globus.org/v0.10/foo/bar
+    tc.get("/foo/bar")
+
+In version 4, without the ``base_path``, the mapping is as follows:
+
+.. code-block:: python
+
+    # GET https://transfer.api.globus.org/foo/bar
+    tc.get("/foo/bar")
+
+Due to the deduplication of a leading ``base_path`` in version 3, the following
+snippet has the same effect in both versions:
+
+.. code-block:: python
+
+    # GET https://transfer.api.globus.org/v0.10/foo/bar
+    tc.get("/v0.10/foo/bar")
+
+Clients with a ``base_path`` and the values they defined in version 3 are listed
+below.
+
+==================  ===========
+Client Class        base_path
+==================  ===========
+``TransferClient``  ``"v0.10"``
+``GroupsClient``    ``"v2"``
+==================  ===========
+
 
 From 1.x or 2.x to 3.0
 -----------------------
