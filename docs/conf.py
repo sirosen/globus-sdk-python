@@ -38,6 +38,7 @@ author = "Globus Team"
 version = globus_sdk.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
+major_version = version.partition(".")[0]
 
 issues_github_path = "globus/globus-sdk-python"
 
@@ -56,7 +57,7 @@ exclude_patterns = ["_build"]
 # HTML Theme Options
 html_show_sourcelink = True
 html_theme = "furo"
-html_title = "globus-sdk v4"
+html_title = f"globus-sdk v{major_version}"
 html_theme_options = {
     "light_css_variables": {
         "color-brand-primary": "#27518F",
