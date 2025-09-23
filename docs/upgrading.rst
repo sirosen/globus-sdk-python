@@ -609,11 +609,12 @@ snippet has the same effect in both versions:
 Clients with a ``base_path`` and the values they defined in version 3 are listed
 below.
 
-..  csv-table::
-    :header: "Client Class", "base_path"
-
-    "``TransferClient``", "``"v0.10"``"
-    "``GroupsClient``", "``"v2"``"
+==================  ===========
+Client Class        base_path
+==================  ===========
+``TransferClient``  ``"v0.10"``
+``GroupsClient``    ``"v2"``
+==================  ===========
 
 
 From 1.x or 2.x to 3.0
