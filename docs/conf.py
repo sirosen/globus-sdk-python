@@ -56,7 +56,7 @@ exclude_patterns = ["_build"]
 # HTML Theme Options
 html_show_sourcelink = True
 html_theme = "furo"
-html_title = "globus-sdk v3"
+html_title = "globus-sdk v4"
 html_theme_options = {
     "light_css_variables": {
         "color-brand-primary": "#27518F",
