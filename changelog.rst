@@ -12,6 +12,35 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.0b2:
+
+v4.0.0b2 (2025-09-24)
+=====================
+
+Added
+-----
+
+- On Python 3.11+, the SDK will populate the ``__notes__`` of API errors with a
+  message containing the full body of the error response.
+  ``__notes__`` is part of the default presentation of a traceback. (:pr:`1299`)
+
+Removed
+-------
+
+- The following methods and parameters, which were deprecated in globus-sdk v3,
+  have been removed (:pr:`1309`):
+
+  - The ``skip_activation_check`` parameter for ``TransferData`` and ``DeleteData``.
+  - The ``recursive_symlinks`` parameter for ``TransferData``.
+  - The ``add_symlink_item`` method of ``TransferData``.
+
+Changed
+-------
+
+- Passing non-``Scope`` types to ``Scope.with_dependency`` and
+  ``Scope.with_dependencies`` now raises a ``TypeError``. Previously, this was
+  allowed at runtime but created an invalid ``Scope`` object. (:pr:`1300`)
+
 .. _changelog-4.0.0b1:
 
 v4.0.0b1 (2025-07-31)
