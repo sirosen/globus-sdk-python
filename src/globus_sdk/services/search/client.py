@@ -79,6 +79,52 @@ class SearchClient(client.BaseClient):
             "/v1/index", data={"display_name": display_name, "description": description}
         )
 
+    def update_index(
+        self,
+        index_id: uuid.UUID | str,
+        *,
+        display_name: str | MissingType = MISSING,
+        description: str | MissingType = MISSING,
+    ) -> response.GlobusHTTPResponse:
+        """
+        Update index metadata.
+
+        :param index_id: the ID of the index
+        :param display_name: the name of the index
+        :param description: a description of the index
+
+        .. tab-set::
+
+            .. tab-item:: Example Usage
+
+                .. code-block:: python
+
+                    sc = globus_sdk.SearchClient(...)
+                    MY_INDEX_ID = ...
+                    r = sc.update_index(
+                        MY_INDEX_ID,
+                        display_name="My Awesome Index",
+                        description="Very awesome searchable data",
+                    )
+                    print(f"index ID: {r['id']}")
+
+            .. tab-item:: Example Response Data
+
+                .. expandtestfixture:: search.create_index
+
+            .. tab-item:: API Info
+
+                ``PATCH /v1/index/<index_id>``
+
+                .. extdoclink:: Index Update
+                    :ref: search/reference/index_update/
+        """
+        log.debug(f"SearchClient.update_index({index_id!r}, ...)")
+        return self.patch(
+            f"/v1/index/{index_id}",
+            data={"display_name": display_name, "description": description},
+        )
+
     def delete_index(self, index_id: uuid.UUID | str) -> response.GlobusHTTPResponse:
         """
         Mark an index for deletion.
