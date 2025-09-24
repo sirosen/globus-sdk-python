@@ -12,6 +12,31 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-3.64.0:
+
+v3.64.0 (2025-09-24)
+====================
+
+Added
+-----
+
+- Added ``SearchClient.update_index`` as a method for modifying index names and
+  descriptions. (:pr:`1310`)
+
+Deprecated
+----------
+
+- The following Transfer features have been deprecated: (:pr:`1308`, :pr:`1309`)
+
+  - The ``add_symlink_item`` method of ``TransferData``.
+    This is not supported by any collections.
+
+  - The  ``recursive_symlinks`` parameter to ``TransferData``.
+    This is not supported by any collections.
+
+  - The ``skip_activation_check`` parameter to ``TransferData`` and ``DeleteData``.
+    This no longer has any effect when set.
+
 .. _changelog-3.63.0:
 
 v3.63.0 (2025-09-04)
