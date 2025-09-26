@@ -14,7 +14,7 @@ import globus_sdk
 from .token_data import TokenStorageData
 
 if t.TYPE_CHECKING:
-    from globus_sdk.globus_app import GlobusAppConfig
+    from globus_sdk.globus_app import GlobusApp, GlobusAppConfig
 
 
 class TokenStorage(metaclass=abc.ABCMeta):
@@ -32,6 +32,7 @@ class TokenStorage(metaclass=abc.ABCMeta):
     """
 
     def __init__(self, namespace: str = "DEFAULT") -> None:
+        self.resource_owner: GlobusApp | None = None
         self.namespace = namespace
         self.id_token_decoder: globus_sdk.IDTokenDecoder | None = None
 
@@ -124,6 +125,13 @@ class TokenStorage(metaclass=abc.ABCMeta):
             return decoded_id_token["sub"]  # type: ignore[no-any-return]
         else:
             return None
+
+    def close(self) -> None:  # noqa: B027
+        """
+        Close any resources associated with this token storage.
+
+        By default, this does nothing, but subclasses may override it.
+        """
 
 
 class FileTokenStorage(TokenStorage, metaclass=abc.ABCMeta):

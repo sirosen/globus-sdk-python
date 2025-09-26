@@ -3,6 +3,7 @@ from __future__ import annotations
 import abc
 import contextlib
 import copy
+import logging
 import typing as t
 import uuid
 
@@ -25,6 +26,11 @@ from globus_sdk.token_storage import (
 from .authorizer_factory import AuthorizerFactory
 from .config import DEFAULT_CONFIG, KNOWN_TOKEN_STORAGES, GlobusAppConfig
 from .protocols import TokenStorageProvider
+
+if t.TYPE_CHECKING:
+    from globus_sdk import BaseClient
+
+log = logging.getLogger(__name__)
 
 
 class GlobusApp(metaclass=abc.ABCMeta):
@@ -73,6 +79,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
     ) -> None:
         self.app_name = app_name
         self.config = config
+        self.owned_clients: set[BaseClient] = set()
         self._token_validation_error_handling_enabled = True
 
         self.client_id, self._login_client = self._resolve_client_info(
@@ -240,21 +247,25 @@ class GlobusApp(metaclass=abc.ABCMeta):
             return token_storage
 
         elif isinstance(token_storage, TokenStorageProvider):
-            return token_storage.for_globus_app(
+            token_storage = token_storage.for_globus_app(
                 app_name=app_name,
                 config=config,
                 client_id=client_id,
                 namespace=namespace,
             )
+            token_storage.resource_owner = self
+            return token_storage
 
         elif token_storage in KNOWN_TOKEN_STORAGES:
             provider = KNOWN_TOKEN_STORAGES[token_storage]
-            return provider.for_globus_app(
+            token_storage = provider.for_globus_app(
                 app_name=app_name,
                 config=config,
                 client_id=client_id,
                 namespace=namespace,
             )
+            token_storage.resource_owner = self
+            return token_storage
 
         raise GlobusSDKUsageError(
             f"Unsupported token_storage value: {token_storage}. Must be a "
@@ -356,6 +367,21 @@ class GlobusApp(metaclass=abc.ABCMeta):
 
         # Invalidate any cached authorizers
         self._authorizer_factory.clear_cache()
+
+    def close(self) -> None:
+        """
+        Close all resources currently held by the app.
+        This does not trigger a logout.
+        """
+        for client in self.owned_clients:
+            if client.resource_owner is self:
+                log.debug(
+                    f"closing app associated client of type {type(client).__name__}"
+                )
+                client.close()
+        if self.token_storage.resource_owner is self:
+            log.debug("closing app associated token storage")
+            self.token_storage.close()
 
     @abc.abstractmethod
     def _run_login_flow(
