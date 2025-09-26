@@ -105,13 +105,24 @@ class BaseClient:
         else:
             self.environment = config.get_environment_name()
 
+        # initially, there is no owner for a client
+        # if an app is attached, it will be made into the owner
+        self._resource_owner: GlobusApp | None = None
+
         # resolve the base_url for the client (see docstring for resolution precedence)
         self.base_url = self._resolve_base_url(base_url, self.environment)
 
         self.retry_config: RetryConfig = retry_config or RetryConfig()
         self._register_standard_retry_checks(self.retry_config)
 
-        self.transport = transport if transport is not None else RequestsTransport()
+        # the resource_owner for a Transport is implicitly this client if and only if
+        # the client creates the Transport
+        if transport is not None:
+            self.transport = transport
+        else:
+            self.transport = RequestsTransport()
+            self.transport.resource_owner = self
+
         log.debug(f"initialized transport of type {type(self.transport)}")
 
         # setup paginated methods
@@ -260,6 +271,9 @@ class BaseClient:
         if self.app_name is None:
             self.app_name = app.app_name
 
+        # notate that the app owns the client
+        self.resource_owner = app
+
         # finally, register the scope requirements on the app side
         self._app.add_scope_requirements({self.resource_server: self.app_scopes})
 
@@ -308,6 +322,23 @@ class BaseClient:
         return self
 
     @property
+    def resource_owner(self) -> GlobusApp | None:
+        """
+        The GlobusApp which owns this client.
+        Defaults to whatever app was attached to the client, or None.
+        """
+        return self._resource_owner
+
+    @resource_owner.setter
+    def resource_owner(self, value: GlobusApp | None) -> None:
+        if self._resource_owner is not None and self._resource_owner is not value:
+            self._resource_owner.owned_clients.remove(self)
+
+        self._resource_owner = value
+        if value is not None:
+            value.owned_clients.add(self)
+
+    @property
     def app_name(self) -> str | None:
         return self._app_name
 
@@ -330,6 +361,17 @@ class BaseClient:
         if self_or_cls.scopes is None:
             return None
         return self_or_cls.scopes.resource_server
+
+    def close(self) -> None:
+        """
+        Close all resources which are owned by this client.
+
+        This closes any transport object attached to the client which lists the client
+        as its owner.
+        """
+        if self.transport.resource_owner is self:
+            log.debug(f"closing transport for {type(self).__name__}")
+            self.transport.close()
 
     def get(  # pylint: disable=missing-param-doc
         self,
