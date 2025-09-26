@@ -105,13 +105,25 @@ class BaseClient:
         else:
             self.environment = config.get_environment_name()
 
+        # by default, there is no owner for a client
+        # if an app is attached, it will be made into the owner in attach_globus_app()
+        # therefore, if an app is passed in, it will be "late bound" to this
+        self._resource_owner: GlobusApp | None = None
+
         # resolve the base_url for the client (see docstring for resolution precedence)
         self.base_url = self._resolve_base_url(base_url, self.environment)
 
         self.retry_config: RetryConfig = retry_config or RetryConfig()
         self._register_standard_retry_checks(self.retry_config)
 
-        self.transport = transport if transport is not None else RequestsTransport()
+        # the resource_owner for a Transport is implicitly this client if and only if
+        # the client creates the Transport
+        if transport is not None:
+            self.transport = transport
+        else:
+            self.transport = RequestsTransport()
+            self.transport._resource_owner = self
+
         log.debug(f"initialized transport of type {type(self.transport)}")
 
         # setup paginated methods
@@ -260,6 +272,10 @@ class BaseClient:
         if self.app_name is None:
             self.app_name = app.app_name
 
+        # notate that the app owns the client
+        self._resource_owner = app
+        app._owned_clients.add(self)
+
         # finally, register the scope requirements on the app side
         self._app.add_scope_requirements({self.resource_server: self.app_scopes})
 
@@ -330,6 +346,20 @@ class BaseClient:
         if self_or_cls.scopes is None:
             return None
         return self_or_cls.scopes.resource_server
+
+    def _close(self) -> None:
+        """
+        Close all resources which are owned by this client.
+
+        This method is private to the SDK and is intended to be called by GlobusApp when
+        an app is closed.
+
+        This closes any transport object attached to the client which lists the client
+        as its owner.
+        """
+        if self.transport._resource_owner is self:
+            log.debug(f"closing transport for {type(self).__name__}")
+            self.transport.close()
 
     def get(  # pylint: disable=missing-param-doc
         self,

@@ -22,6 +22,9 @@ from .retry import RetryContext
 from .retry_check_runner import RetryCheckRunner
 from .retry_config import RetryConfig
 
+if t.TYPE_CHECKING:
+    from globus_sdk import BaseClient
+
 log = logging.getLogger(__name__)
 
 
@@ -66,6 +69,7 @@ class RequestsTransport:
         verify_ssl: bool | str | pathlib.Path | None = None,
         http_timeout: float | None = None,
     ) -> None:
+        self._resource_owner: BaseClient | None = None
         self.session = requests.Session()
         self.verify_ssl = config.get_ssl_verify(verify_ssl)
         self.http_timeout = config.get_http_timeout(http_timeout)
