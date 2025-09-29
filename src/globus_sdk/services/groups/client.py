@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import typing as t
 import uuid
 
@@ -10,6 +11,21 @@ from globus_sdk.scopes import GroupsScopes, Scope
 
 from .data import BatchMembershipActions, GroupPolicies
 from .errors import GroupsAPIError
+
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
+
+_VALID_STATUSES_T: TypeAlias = t.Literal[
+    "active",
+    "declined",
+    "invited",
+    "left",
+    "pending",
+    "rejected",
+    "removed",
+]
 
 
 class GroupsClient(client.BaseClient):
@@ -35,11 +51,21 @@ class GroupsClient(client.BaseClient):
         return [GroupsScopes.view_my_groups_and_memberships]
 
     def get_my_groups(
-        self, *, query_params: dict[str, t.Any] | None = None
+        self,
+        *,
+        statuses: (
+            _VALID_STATUSES_T | t.Iterable[_VALID_STATUSES_T] | MissingType
+        ) = MISSING,
+        query_params: dict[str, t.Any] | None = None,
     ) -> response.ArrayResponse:
         """
         Return a list of groups your identity belongs to.
 
+        :param statuses:
+            If provided, only groups containing memberships with the given status
+            are returned.
+            Valid values are ``active``, ``invited``, ``pending``, ``rejected``,
+            ``removed``, ``left``, and ``declined``.
         :param query_params: Additional passthrough query parameters
 
         .. tab-set::
@@ -52,6 +78,7 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: get_my_groups_and_memberships_v2_groups_my_groups_get
         """
+        query_params = {"statuses": commajoin(statuses), **(query_params or {})}
         return response.ArrayResponse(
             self.get("/v2/groups/my_groups", query_params=query_params)
         )
