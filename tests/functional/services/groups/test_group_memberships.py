@@ -75,6 +75,7 @@ def test_batch_action_payload(groups_client, role):
             [uuid.uuid1(), uuid.uuid1()],
             role=role,
         )
+        .change_roles("admin", [uuid.uuid1(), uuid.uuid1()])
         .invite_members([uuid.uuid1(), uuid.uuid1()])
         .join([uuid.uuid1(), uuid.uuid1()])
     )
@@ -85,6 +86,11 @@ def test_batch_action_payload(groups_client, role):
 
     assert "accept" in batch_action
     assert len(batch_action["accept"]) == 1
+
+    assert "change_role" in batch_action
+    assert len(batch_action["change_role"]) == 2
+    for change_role in batch_action["change_role"]:
+        assert change_role["role"] == "admin"
 
     assert "invite" in batch_action
     assert len(batch_action["invite"]) == 2
