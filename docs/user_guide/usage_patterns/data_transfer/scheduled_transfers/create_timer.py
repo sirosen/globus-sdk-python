@@ -38,22 +38,26 @@ schedule = globus_sdk.RecurringTimerSchedule(
 with UserApp("manage-timers-example", client_id=NATIVE_CLIENT_ID) as app:
     # create a TimersClient to interact with the service, and register any data_access
     # scopes for the collections
-    timers_client = globus_sdk.TimersClient(app=app)
-    # Omit this step if the collections are either
-    #   (1) A guest collection or (2) high assurance.
-    timers_client.add_app_transfer_data_access_scope((SRC_COLLECTION, DST_COLLECTION))
-
-    # submit the creation request to the service, printing out the ID of your new timer
-    # after it's created -- you can find it in https://app.globus.org/activity/timers
-    timer = timers_client.create_timer(
-        globus_sdk.TransferTimer(
-            name=(
-                "create-timer-example "
-                f"[created at {datetime.datetime.now().isoformat()}]"
-            ),
-            body=transfer_request,
-            schedule=schedule,
+    with globus_sdk.TimersClient(app=app) as timers_client:
+        # Omit this step if the collections are either
+        #   (1) A guest collection or (2) high assurance.
+        timers_client.add_app_transfer_data_access_scope(
+            (SRC_COLLECTION, DST_COLLECTION)
         )
-    )
+
+        # submit the creation request to the service, printing out the
+        # ID of your new timer after it's created -- you can find it in
+        # https://app.globus.org/activity/timers
+        timer = timers_client.create_timer(
+            globus_sdk.TransferTimer(
+                name=(
+                    "create-timer-example "
+                    f"[created at {datetime.datetime.now().isoformat()}]"
+                ),
+                body=transfer_request,
+                schedule=schedule,
+            )
+        )
+
     print("Finished submitting timer.")
     print(f"timer_id: {timer['timer']['job_id']}")

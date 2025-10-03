@@ -17,22 +17,25 @@ DST_PATH = "/~/example-transfer-script-destination.txt"
 
 def main():
     with UserApp("my-simple-transfer", client_id=NATIVE_CLIENT_ID) as app:
-        transfer_client = globus_sdk.TransferClient(app=app)
+        with globus_sdk.TransferClient(app=app) as client:
+            submit_transfer(client)
 
-        transfer_request = globus_sdk.TransferData(SRC_COLLECTION, DST_COLLECTION)
-        transfer_request.add_item(SRC_PATH, DST_PATH)
 
-        try:
-            task = transfer_client.submit_transfer(transfer_request)
-        except globus_sdk.TransferAPIError as err:
-            if not err.info.consent_required:
-                raise
+def submit_transfer(transfer_client: globus_sdk.TransferClient):
+    transfer_request = globus_sdk.TransferData(SRC_COLLECTION, DST_COLLECTION)
+    transfer_request.add_item(SRC_PATH, DST_PATH)
 
-            print("Additional consent required.")
-            transfer_client.add_app_scope(err.info.consent_required.required_scopes)
+    try:
+        task = transfer_client.submit_transfer(transfer_request)
+    except globus_sdk.TransferAPIError as err:
+        if not err.info.consent_required:
+            raise
 
-            task = transfer_client.submit_transfer(transfer_request)
-        print(f"Submitted transfer. Task ID: {task['task_id']}.")
+        print("Additional consent required.")
+        transfer_client.add_app_scope(err.info.consent_required.required_scopes)
+
+        task = transfer_client.submit_transfer(transfer_request)
+    print(f"Submitted transfer. Task ID: {task['task_id']}.")
 
 
 if __name__ == "__main__":
