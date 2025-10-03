@@ -107,6 +107,7 @@ from .services.search import (
     SearchScrollQuery,
 )
 from .services.timers import (
+    FlowTimer,
     OnceTimerSchedule,
     RecurringTimerSchedule,
     TimerJob,
@@ -228,6 +229,7 @@ __all__ = (
     "TimerJob",
     "TimersAPIError",
     "TimersClient",
+    "FlowTimer",
     "TransferTimer",
     "DeleteData",
     "IterableTransferResponse",
