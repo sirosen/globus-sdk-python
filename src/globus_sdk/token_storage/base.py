@@ -14,7 +14,7 @@ import globus_sdk
 from .token_data import TokenStorageData
 
 if t.TYPE_CHECKING:
-    from globus_sdk.globus_app import GlobusApp, GlobusAppConfig
+    from globus_sdk.globus_app import GlobusAppConfig
 
 
 class TokenStorage(metaclass=abc.ABCMeta):
@@ -32,7 +32,6 @@ class TokenStorage(metaclass=abc.ABCMeta):
     """
 
     def __init__(self, namespace: str = "DEFAULT") -> None:
-        self._resource_owner: GlobusApp | None = None
         self.namespace = namespace
         self.id_token_decoder: globus_sdk.IDTokenDecoder | None = None
 
