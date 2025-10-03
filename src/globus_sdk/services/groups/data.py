@@ -151,6 +151,22 @@ class BatchMembershipActions(GlobusPayload):
         )
         return self
 
+    def change_roles(
+        self,
+        role: _GROUP_ROLE_T,
+        identity_ids: t.Iterable[uuid.UUID | str],
+    ) -> BatchMembershipActions:
+        """
+        Assign a new role to a list of identities.
+
+        :param role: The new role to assign.
+        :param identity_ids: The identities to assign to the new role.
+        """
+        self.setdefault("change_role", []).extend(
+            {"role": role, "identity_id": identity_id} for identity_id in identity_ids
+        )
+        return self
+
     def decline_invites(
         self, identity_ids: t.Iterable[uuid.UUID | str]
     ) -> BatchMembershipActions:

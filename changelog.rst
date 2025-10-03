@@ -367,6 +367,24 @@ Breaking Changes
 
 - Updated MappedCollectionDoc and GuestCollectionDoc with MissingType. (:pr:`1189`)
 
+.. _changelog-3.65.0:
+
+v3.65.0 (2025-10-02)
+====================
+
+Added
+-----
+
+- Add a ``FlowTimer`` payload class to aid in creating timers that run flows.
+- Add the ``statuses`` parameter to ``GroupsClient.get_my_groups()``. (:pr:`1317`)
+- Add ``.change_role()`` to the Globus Groups ``BatchMembershipActions`` helper class. (:pr:`1318`)
+- Add ``.change_roles()`` to the Globus Groups ``GroupsManager`` class. (:pr:`1318`)
+
+Development
+-----------
+
+- Fix a Poetry deprecation warning in the test suite. (:pr:`1320`)
+
 .. _changelog-3.64.0:
 
 v3.64.0 (2025-09-24)
