@@ -82,6 +82,57 @@ The following table provides a comparison of these two options:
     a user be the primary data access actor. In these cases, a ``ClientApp``
     will be rejected and a ``UserApp`` must be used instead.
 
+
+Closing Resources via GlobusApps
+--------------------------------
+
+When used as context managers, ``GlobusApp``\s automatically call their
+``close()`` method on exit.
+
+Closing an app closes the resources owned by it.
+This covers any token storage created by the app on init, and any clients which
+are registered with the app.
+
+When token storages and transports are created explicitly, they are exempt from
+the close behavior.
+For example,
+
+.. code-block:: python
+
+    from globus_sdk import GlobusAppConfig, UserApp
+    from globus_sdk.token_storage import SQLiteTokenStorage
+
+    # this manually created storage will not be automatically closed
+    sql_storage = SQLiteTokenStorage("tokens.sqlite")
+
+    # create an app configured to use this storage
+    config = GlobusAppConfig(token_storage=sql_storage)
+    app = UserApp("sample-app", client_id="FILL_IN_HERE", config=config)
+
+    # close the app
+    app.close()
+
+    # at this stage, the storage will still not be closed
+    # it can be explicitly closed
+    sql_storage.close()
+
+For most use-cases, users are recommended to use the context manager form, which
+ensures that ``close()`` will be called, and to allow ``GlobusApp`` to maintain ownership
+of token storage.
+For example,
+
+.. code-block:: python
+
+    from globus_sdk import GlobusAppConfig, UserApp
+
+    # create an app configured to create its own sqlite storage
+    config = GlobusAppConfig(token_storage="sqlite")
+    with UserApp("sample-app", client_id="FILL_IN_HERE", config=config) as app:
+        ...  # any clients, usage, etc.
+
+    # after the context manager, any storage is implicitly closed
+
+
 Reference
 ---------
 
