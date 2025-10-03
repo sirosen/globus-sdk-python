@@ -1,4 +1,5 @@
 import uuid
+from unittest import mock
 
 import pytest
 
@@ -222,3 +223,15 @@ def test_gcs_client_default_scopes(app):
     assert [str(s) for s in app.scope_requirements[endpoint_client_id]] == [
         f"urn:globus:auth:scope:{endpoint_client_id}:manage_collections"
     ]
+
+
+def test_closing_app_closes_client():
+    config = GlobusAppConfig(token_storage=MemoryTokenStorage(), environment="sandbox")
+    app = UserApp("test-app", client_id="client_id", config=config)
+
+    client = globus_sdk.AuthClient(app=app)
+
+    with mock.patch.object(client, "_close") as client_close:
+        app.close()
+
+        client_close.assert_called_once()
