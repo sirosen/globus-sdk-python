@@ -95,8 +95,11 @@ Summary: Complete Examples
 For ease of use, here are a pair of examples.
 
 One of them is exactly the same as the tutorial steps above, in a single block.
+
 The other example includes an explicit login step, so you can control when that
 login flow happens!
+It also converts the app to be used as a context manager, which will make it
+automatically close network connections and the token storage on exit.
 
 *These examples are complete. They should run without errors "as is".*
 
