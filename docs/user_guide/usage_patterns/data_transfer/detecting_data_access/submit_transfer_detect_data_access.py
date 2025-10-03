@@ -35,17 +35,16 @@ DST_PATH = "/~/example-transfer-script-destination.txt"
 with globus_sdk.UserApp(
     "detect-data-access-example", client_id=NATIVE_CLIENT_ID
 ) as app:
-    transfer_client = globus_sdk.TransferClient(app=app)
+    with globus_sdk.TransferClient(app=app) as transfer_client:
+        # check if either source or dest needs data_access, and if so add the relevant
+        # requirement
+        if uses_data_access(transfer_client, SRC_COLLECTION):
+            transfer_client.add_app_data_access_scope(SRC_COLLECTION)
+        if uses_data_access(transfer_client, DST_COLLECTION):
+            transfer_client.add_app_data_access_scope(DST_COLLECTION)
 
-    # check if either source or dest needs data_access, and if so add the relevant
-    # requirement
-    if uses_data_access(transfer_client, SRC_COLLECTION):
-        transfer_client.add_app_data_access_scope(SRC_COLLECTION)
-    if uses_data_access(transfer_client, DST_COLLECTION):
-        transfer_client.add_app_data_access_scope(DST_COLLECTION)
+        transfer_request = globus_sdk.TransferData(SRC_COLLECTION, DST_COLLECTION)
+        transfer_request.add_item(SRC_PATH, DST_PATH)
 
-    transfer_request = globus_sdk.TransferData(SRC_COLLECTION, DST_COLLECTION)
-    transfer_request.add_item(SRC_PATH, DST_PATH)
-
-    task = transfer_client.submit_transfer(transfer_request)
-    print(f"Submitted transfer. Task ID: {task['task_id']}.")
+        task = transfer_client.submit_transfer(transfer_request)
+        print(f"Submitted transfer. Task ID: {task['task_id']}.")
