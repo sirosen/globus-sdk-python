@@ -3,7 +3,8 @@ import uuid
 
 import pytest
 
-from globus_sdk._testing import get_last_request, load_response
+from globus_sdk import MISSING
+from globus_sdk.testing import get_last_request, load_response
 
 
 def test_list_runs_simple(flows_client):
@@ -79,7 +80,7 @@ def test_list_runs_filter_flow_id(flows_client, pass_as_uuids):
         ((), None),
         ([""], None),
         (("",), None),
-        (None, None),
+        (MISSING, None),
         # single role as string
         ("foo", ["foo"]),
         # single role as list/tuple

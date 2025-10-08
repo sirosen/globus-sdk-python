@@ -28,18 +28,20 @@ PYTHON_BINARY = os.environ.get("GLOBUS_TEST_PY", sys.executable)
         "paging",
         "response",
         "scopes",
-        "tokenstorage",
+        "token_storage",
         # the top-level of the 'exc' subpackage (but not necessarily its contents)
         # should similarly be standalone, for exception handlers
         "exc",
         # internal components and utilities are a special case:
         # failing to ensure that these avoid 'requests' can make it more difficult
         # to ensure that the main parts (above) do not transitively pick it up
-        "_guards",
-        "_serializable",
-        "_types",
-        "utils",
-        "version",
+        "_internal.classprop",
+        "_internal.guards",
+        "_internal.remarshal",
+        "_internal.serializable",
+        "_internal.utils",
+        "_internal.type_definitions",
+        "_missing",
     ),
 )
 def test_module_does_not_require_requests(module_name):

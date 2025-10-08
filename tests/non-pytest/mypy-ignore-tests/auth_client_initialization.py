@@ -16,3 +16,10 @@ nc = globus_sdk.NativeAppAuthClient(  # type: ignore[call-arg]
 cc = globus_sdk.ConfidentialAppAuthClient(  # type: ignore[call-arg]
     "foo_client_id", "foo_client_secret", authorizer=authorizer
 )
+
+# the login clients allow a client_id kwarg, but AuthClient does not
+globus_sdk.NativeAppAuthClient(client_id="foo_client_id")
+globus_sdk.ConfidentialAppAuthClient(
+    client_id="foo_client_id", client_secret="foo_client_secret"
+)
+globus_sdk.AuthClient(client_id="foo_client_id")  # type: ignore[call-arg]

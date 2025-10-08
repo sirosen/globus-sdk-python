@@ -6,16 +6,16 @@ import pytest
 import responses
 
 import globus_sdk
-from globus_sdk._testing import get_last_request, load_response
+from globus_sdk._missing import filter_missing
+from globus_sdk.testing import get_last_request, load_response
 from tests.common import register_api_route_fixture_file
 
 
 @pytest.fixture
-def search_client(no_retry_transport):
-    class CustomSearchClient(globus_sdk.SearchClient):
-        transport_class = no_retry_transport
-
-    return CustomSearchClient()
+def search_client():
+    client = globus_sdk.SearchClient()
+    with client.retry_config.tune(max_retries=0):
+        yield client
 
 
 def test_search_query_simple(search_client):
@@ -31,37 +31,12 @@ def test_search_query_simple(search_client):
     req = get_last_request()
     assert req.body is None
     parsed_qs = urllib.parse.parse_qs(urllib.parse.urlparse(req.url).query)
-    assert parsed_qs == {
-        "q": ["foo"],
-        "advanced": ["False"],
-        "limit": ["10"],
-        "offset": ["0"],
-    }
+    assert parsed_qs == {"q": ["foo"]}
 
 
 @pytest.mark.parametrize("query_doc", [{"q": "foo"}, {"q": "foo", "limit": 10}])
 def test_search_post_query_simple(search_client, query_doc):
     meta = load_response(search_client.post_search).metadata
-
-    res = search_client.post_search(meta["index_id"], query_doc)
-    assert res.http_status == 200
-
-    data = res.data
-    assert isinstance(data, dict)
-    assert data["gmeta"][0]["entries"][0]["content"]["foo"] == "bar"
-
-    req = get_last_request()
-    assert req.body is not None
-    req_body = json.loads(req.body)
-    assert req_body == dict(query_doc)
-
-
-def test_search_post_query_with_legacy_helper(search_client):
-    meta = load_response(search_client.post_search).metadata
-    with pytest.warns(
-        globus_sdk.RemovedInV4Warning, match="'SearchQuery' is deprecated"
-    ):
-        query_doc = globus_sdk.SearchQuery("foo")
 
     res = search_client.post_search(meta["index_id"], query_doc)
     assert res.http_status == 200
@@ -93,36 +68,16 @@ def test_search_post_query_simple_with_v1_helper(search_client):
     assert req_body == {"@version": "query#1.0.0", "q": "foo"}
 
 
-def test_search_post_query_arg_overrides(search_client):
+@pytest.mark.parametrize("doc_type", ("dict", "helper"))
+def test_search_post_query_arg_overrides(search_client, doc_type):
     meta = load_response(search_client.post_search).metadata
 
-    query_doc = {"q": "foo", "limit": 10, "offset": 0}
-    res = search_client.post_search(meta["index_id"], query_doc, limit=100, offset=150)
-    assert res.http_status == 200
-
-    data = res.data
-    assert isinstance(data, dict)
-    assert data["gmeta"][0]["entries"][0]["content"]["foo"] == "bar"
-
-    req = get_last_request()
-    assert req.body is not None
-    req_body = json.loads(req.body)
-    assert req_body != dict(query_doc)
-    assert req_body["q"] == query_doc["q"]
-    assert req_body["limit"] == 100
-    assert req_body["offset"] == 150
-    # important! these should be unchanged (no side-effects)
-    assert query_doc["limit"] == 10
-    assert query_doc["offset"] == 0
-
-
-def test_search_post_query_arg_overrides_with_legacy_helper(search_client):
-    meta = load_response(search_client.post_search).metadata
-    with pytest.warns(
-        globus_sdk.RemovedInV4Warning, match="'SearchQuery' is deprecated"
-    ):
-        query_doc = globus_sdk.SearchQuery("foo", limit=10, offset=0)
-
+    if doc_type == "dict":
+        query_doc = {"q": "foo", "limit": 10, "offset": 0}
+    elif doc_type == "helper":
+        query_doc = globus_sdk.SearchQueryV1(q="foo", limit=10, offset=0)
+    else:
+        raise NotImplementedError(doc_type)
     res = search_client.post_search(meta["index_id"], query_doc, limit=100, offset=150)
     assert res.http_status == 200
 
@@ -181,4 +136,4 @@ def test_search_paginated_scroll_query(search_client, query_doc):
     assert data[1]["entries"][0]["content"]["foo"] == "baz"
 
     # confirm that pagination was not side-effecting
-    assert "marker" not in query_doc
+    assert "marker" not in filter_missing(query_doc)

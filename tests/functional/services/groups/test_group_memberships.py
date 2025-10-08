@@ -4,7 +4,7 @@ import uuid
 import pytest
 
 from globus_sdk import BatchMembershipActions, GroupRole
-from globus_sdk._testing import RegisteredResponse, get_last_request, load_response
+from globus_sdk.testing import RegisteredResponse, get_last_request, load_response
 from tests.common import register_api_route_fixture_file
 
 
@@ -63,7 +63,7 @@ def test_batch_action_payload(groups_client, role):
     group_id = str(uuid.uuid1())
     load_response(
         RegisteredResponse(
-            service="groups", method="POST", path=f"/groups/{group_id}", json={}
+            service="groups", method="POST", path=f"/v2/groups/{group_id}", json={}
         )
     )
     rolestr = role if isinstance(role, str) else role.value

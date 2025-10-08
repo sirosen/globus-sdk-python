@@ -2,7 +2,7 @@ import urllib.parse
 
 import pytest
 
-from globus_sdk._testing import RegisteredResponse, get_last_request, load_response
+from globus_sdk.testing import RegisteredResponse, get_last_request, load_response
 from tests.common import GO_EP1_ID
 
 
@@ -40,7 +40,7 @@ def _setup_ls_response():
     load_response(
         RegisteredResponse(
             service="transfer",
-            path=f"/operation/endpoint/{GO_EP1_ID}/ls",
+            path=f"/v0.10/operation/endpoint/{GO_EP1_ID}/ls",
             json=_mk_ls_data(),
         ),
     )

@@ -2,32 +2,25 @@ import urllib.parse
 
 import pytest
 
-from globus_sdk import GlobusSDKUsageError, RemovedInV4Warning
-from globus_sdk._testing import get_last_request, load_response
+from globus_sdk import MISSING
+from globus_sdk.testing import get_last_request, load_response
 
 
-@pytest.mark.parametrize("filter_fulltext", [None, "foo"])
-@pytest.mark.parametrize("filter_role", [None, "bar"])
-@pytest.mark.parametrize("orderby", [None, "created_at ASC"])
-def test_list_flows_simple(flows_client, filter_fulltext, filter_role, orderby):
+@pytest.mark.parametrize("filter_fulltext", [MISSING, "foo"])
+@pytest.mark.parametrize("filter_roles", [MISSING, "bar"])
+@pytest.mark.parametrize("orderby", [MISSING, "created_at ASC"])
+def test_list_flows_simple(flows_client, filter_fulltext, filter_roles, orderby):
     meta = load_response(flows_client.list_flows).metadata
 
     add_kwargs = {}
     if filter_fulltext:
         add_kwargs["filter_fulltext"] = filter_fulltext
-    if filter_role:
-        add_kwargs["filter_role"] = filter_role
+    if filter_roles:
+        add_kwargs["filter_roles"] = filter_roles
     if orderby:
         add_kwargs["orderby"] = orderby
 
-    if filter_role:
-        with pytest.warns(
-            RemovedInV4Warning,
-            match=r"The `filter_role` parameter is deprecated.*",
-        ):
-            res = flows_client.list_flows(**add_kwargs)
-    else:
-        res = flows_client.list_flows(**add_kwargs)
+    res = flows_client.list_flows(**add_kwargs)
 
     assert res.http_status == 200
     # dict-like indexing
@@ -42,10 +35,10 @@ def test_list_flows_simple(flows_client, filter_fulltext, filter_role, orderby):
         k: [v]
         for k, v in (
             ("filter_fulltext", filter_fulltext),
-            ("filter_role", filter_role),
+            ("filter_roles", filter_roles),
             ("orderby", orderby),
         )
-        if v is not None
+        if v is not MISSING
     }
     assert parsed_qs == expect_query_params
 
@@ -121,35 +114,6 @@ def test_list_flows_orderby_multi(flows_client, orderby_style, orderby_value):
 
 
 @pytest.mark.parametrize(
-    "filter_role, filter_roles",
-    [
-        # empty string values
-        ("", ""),
-        ("", []),
-        ("", [""]),
-        # single string values
-        ("bar", "baz"),
-        # list values
-        ("bar", ["baz"]),
-        ("bar", ["baz", "qux"]),
-        # comma-separated string
-        ("bar", "baz,qux"),
-        # empty list
-        ("bar", []),
-        # list containing empty string
-        ("bar", [""]),
-        # list containing multiple empty strings
-        ("bar", ["", ""]),
-        # list containing mixed values
-        ("bar", ["baz", "", "qux"]),
-    ],
-)
-def test_list_flows_mutually_exclusive_roles(flows_client, filter_role, filter_roles):
-    with pytest.raises(GlobusSDKUsageError), pytest.warns(RemovedInV4Warning):
-        flows_client.list_flows(filter_role=filter_role, filter_roles=filter_roles)
-
-
-@pytest.mark.parametrize(
     "filter_roles, expected_filter_roles",
     [
         # empty list/tuple, list/tuple with empty string, and None do not send the param
@@ -157,7 +121,7 @@ def test_list_flows_mutually_exclusive_roles(flows_client, filter_role, filter_r
         ([], None),
         ([""], None),
         (("",), None),
-        (None, None),
+        (MISSING, None),
         # single role as string
         ("foo", ["foo"]),
         # single role as list/tuple

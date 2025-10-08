@@ -4,8 +4,8 @@ import pytest
 
 import globus_sdk
 from globus_sdk import GlobusApp, GlobusAppConfig, UserApp
-from globus_sdk._testing import load_response
-from globus_sdk.tokenstorage import MemoryTokenStorage
+from globus_sdk.testing import load_response
+from globus_sdk.token_storage import MemoryTokenStorage
 
 
 @pytest.fixture
@@ -64,6 +64,17 @@ def test_timers_client_add_app_data_access_scope(app):
     assert expected in str_list
 
 
+def test_specific_flow_client_add_app_data_access_scope(app):
+    flow_id = str(uuid.UUID(int=1))
+    client = globus_sdk.SpecificFlowClient(flow_id, app=app)
+
+    collection_id = str(uuid.UUID(int=0))
+    client.add_app_transfer_data_access_scope(collection_id)
+    str_list = [str(s) for s in app.scope_requirements[client.resource_server]]
+    expected = f"{client.scopes.user}[*urn:globus:auth:scope:transfer.api.globus.org:all[*https://auth.globus.org/scopes/{collection_id}/data_access]]"  # noqa: E501
+    assert expected in str_list
+
+
 def test_transfer_client_add_app_data_access_scope_chaining(app):
     collection_id_1 = str(uuid.UUID(int=1))
     collection_id_2 = str(uuid.UUID(int=2))
@@ -92,7 +103,7 @@ def test_transfer_client_add_app_data_access_scope_in_iterable(app):
 
     transfer_dependencies = []
     for scope in app.scope_requirements["transfer.api.globus.org"]:
-        if scope.scope_string != globus_sdk.TransferClient.scopes.all:
+        if scope.scope_string != str(globus_sdk.TransferClient.scopes.all):
             continue
         for dep in scope.dependencies:
             transfer_dependencies.append((dep.scope_string, dep.optional))
@@ -113,10 +124,10 @@ def test_timers_client_add_app_data_access_scope_in_iterable(app):
 
     transfer_dependencies = []
     for scope in app.scope_requirements[globus_sdk.TimersClient.resource_server]:
-        if scope.scope_string != globus_sdk.TimersClient.scopes.timer:
+        if scope.scope_string != str(globus_sdk.TimersClient.scopes.timer):
             continue
         for dep in scope.dependencies:
-            if dep.scope_string != globus_sdk.TransferClient.scopes.all:
+            if dep.scope_string != str(globus_sdk.TransferClient.scopes.all):
                 continue
             for subdep in dep.dependencies:
                 transfer_dependencies.append((subdep.scope_string, subdep.optional))

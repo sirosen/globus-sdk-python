@@ -4,7 +4,7 @@ import argparse
 import os
 
 import globus_sdk
-from globus_sdk.tokenstorage import SimpleJSONFileAdapter
+from globus_sdk.token_storage import SimpleJSONFileAdapter
 
 MY_FILE_ADAPTER = SimpleJSONFileAdapter(
     os.path.expanduser("~/.sdk-manage-projects.json")
@@ -38,7 +38,7 @@ def get_auth_client():
 
 def create_project(args):
     auth_client = get_auth_client()
-    userinfo = auth_client.oauth2_userinfo()
+    userinfo = auth_client.userinfo()
     print(
         auth_client.create_project(
             args.name,

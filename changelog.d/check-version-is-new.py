@@ -6,24 +6,22 @@ import os
 import re
 import sys
 
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    # Older Python versions
+    import tomli as tomllib
+
 PATTERN_FORMAT = "^v{version}\\s+\\({date}\\)$"
 CHANGELOG_D = os.path.dirname(__file__)
 REPO_ROOT = os.path.dirname(CHANGELOG_D)
 
 
 def parse_version():
-    # single source of truth for package version
-    version_string = ""
-    version_pattern = re.compile(r'__version__ = "([^"]*)"')
-    with open(os.path.join(REPO_ROOT, "src", "globus_sdk", "version.py")) as f:
-        for line in f:
-            match = version_pattern.match(line)
-            if match:
-                version_string = match.group(1)
-                break
-    if not version_string:
-        raise RuntimeError("Failed to parse version information")
-    return version_string
+    with open(os.path.join(REPO_ROOT, "pyproject.toml"), "rb") as f:
+        pyproject = tomllib.load(f)
+
+    return pyproject["project"]["version"]
 
 
 def get_header_re(version):

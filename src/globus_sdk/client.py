@@ -1,23 +1,31 @@
 from __future__ import annotations
 
 import logging
+import sys
 import typing as t
 import urllib.parse
 
-from globus_sdk import GlobusSDKUsageError, config, exc, utils
-from globus_sdk._types import ScopeCollectionType
+from globus_sdk import GlobusSDKUsageError, config, exc
+from globus_sdk._internal.classprop import classproperty
+from globus_sdk._internal.utils import slash_join
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.paging import PaginatorTable
 from globus_sdk.response import GlobusHTTPResponse
-from globus_sdk.scopes import Scope, ScopeBuilder
-from globus_sdk.transport import RequestsTransport
+from globus_sdk.scopes import Scope, ScopeCollection
+from globus_sdk.transport import RequestCallerInfo, RequestsTransport, RetryConfig
+from globus_sdk.transport.default_retry_checks import DEFAULT_RETRY_CHECKS
+
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
 
 if t.TYPE_CHECKING:
     from globus_sdk.globus_app import GlobusApp
 
 log = logging.getLogger(__name__)
 
-_DataParamType = t.Union[None, str, bytes, t.Dict[str, t.Any], utils.PayloadWrapper]
+_DataParamType: TypeAlias = t.Union[None, str, bytes, t.Dict[str, t.Any]]
 
 
 class BaseClient:
@@ -41,9 +49,11 @@ class BaseClient:
         intelligently by default. Set it when inheriting from BaseClient or
         communicating through a proxy. This value takes precedence over the class
         attribute of the same name.
-    :param transport_params: Options to pass to the transport for this client
-
-    All other parameters are for internal use and should be ignored.
+    :param transport: A :class:`RequestsTransport` object for sending and
+        retrying requests. By default, one will be constructed by the client.
+    :param retry_config: A :class:`RetryConfig` object with parameters to
+        control request retry behavior. By default, one will be constructed by
+        the client.
     """
 
     # service name is used to lookup a service URL from config
@@ -54,21 +64,12 @@ class BaseClient:
     # `BaseClient._resolve_base_url` method for more details.
     base_url: str = "_base"
 
-    # path under the client base URL
-    # NOTE: using this attribute is now considered bad practice for client definitions,
-    # as it prevents calls to new routes at the root of an API's base_url
-    # Consider removing in a future release
-    base_path: str = "/"
-
     #: the class for errors raised by this client on HTTP 4xx and 5xx errors
     #: this can be set in subclasses, but must always be a subclass of GlobusError
     error_class: type[exc.GlobusAPIError] = exc.GlobusAPIError
 
-    #: the type of Transport which will be used, defaults to ``RequestsTransport``
-    transport_class: type[RequestsTransport] = RequestsTransport
-
-    #: the scopes for this client may be present as a ``ScopeBuilder``
-    scopes: ScopeBuilder | None = None
+    #: the scopes for this client may be present as a ``ScopeCollection``
+    scopes: ScopeCollection | None = None
 
     def __init__(
         self,
@@ -79,7 +80,8 @@ class BaseClient:
         app_scopes: list[Scope] | None = None,
         authorizer: GlobusAuthorizer | None = None,
         app_name: str | None = None,
-        transport_params: dict[str, t.Any] | None = None,
+        transport: RequestsTransport | None = None,
+        retry_config: RetryConfig | None = None,
     ) -> None:
         # check for input parameter conflicts
         if app_scopes and not app:
@@ -105,10 +107,11 @@ class BaseClient:
 
         # resolve the base_url for the client (see docstring for resolution precedence)
         self.base_url = self._resolve_base_url(base_url, self.environment)
-        # append the base_path to the base_url if necessary
-        self.base_url = utils.slash_join(self.base_url, self.base_path)
 
-        self.transport = self.transport_class(**(transport_params or {}))
+        self.retry_config: RetryConfig = retry_config or RetryConfig()
+        self._register_standard_retry_checks(self.retry_config)
+
+        self.transport = transport if transport is not None else RequestsTransport()
         log.debug(f"initialized transport of type {type(self.transport)}")
 
         # setup paginated methods
@@ -139,6 +142,14 @@ class BaseClient:
         return sane results while the Base Client is being initialized.
         """
         raise NotImplementedError
+
+    def _register_standard_retry_checks(self, retry_config: RetryConfig) -> None:
+        """
+        Setup the standard checks for this client.
+
+        This is called during init and may be overridden by subclasses.
+        """
+        retry_config.checks.register_many_checks(DEFAULT_RETRY_CHECKS)
 
     @classmethod
     def _resolve_base_url(cls, init_base_url: str | None, environment: str) -> str:
@@ -252,7 +263,9 @@ class BaseClient:
         # finally, register the scope requirements on the app side
         self._app.add_scope_requirements({self.resource_server: self.app_scopes})
 
-    def add_app_scope(self, scope_collection: ScopeCollectionType) -> BaseClient:
+    def add_app_scope(
+        self, scope_collection: str | Scope | t.Iterable[str | Scope]
+    ) -> BaseClient:
         """
         Add a given scope collection to this client's ``GlobusApp`` scope requirements
         for this client's ``resource_server``. This allows defining additional scope
@@ -263,8 +276,9 @@ class BaseClient:
         Raises ``GlobusSDKUsageError`` if this client was not initialized with a
             ``GlobusApp``.
 
-        :param scope_collection: A scope or scopes of ``ScopeCollectionType`` to be
-            added to the app's required scopes.
+        :param scope_collection: A scope or scopes of
+            ``str | Scope | t.Iterable[str | Scope]`` to be added to
+            the app's required scopes.
 
         .. tab-set::
 
@@ -301,7 +315,7 @@ class BaseClient:
     def app_name(self, value: str) -> None:
         self._app_name = self.transport.user_agent = value
 
-    @utils.classproperty
+    @classproperty
     def resource_server(  # pylint: disable=missing-param-doc
         self_or_cls: BaseClient | type[BaseClient],
     ) -> str | None:
@@ -484,12 +498,7 @@ class BaseClient:
         if path.startswith("https://") or path.startswith("http://"):
             url = path
         else:
-            # if passed a path which has a prefix matching the base_path, strip it
-            # this means that if a client has a base path of `/v1/`, a request for
-            # `/v1/foo` will hit `/v1/foo` rather than `/v1/v1/foo`
-            if path.startswith(self.base_path):
-                path = path[len(self.base_path) :]
-            url = utils.slash_join(self.base_url, urllib.parse.quote(path))
+            url = slash_join(self.base_url, urllib.parse.quote(path))
 
         # either use given authorizer or get one from app
         if automatic_authorization:
@@ -499,16 +508,21 @@ class BaseClient:
         else:
             authorizer = None
 
+        # capture info about this client as the caller to pass to the transport
+        caller_info = RequestCallerInfo(
+            retry_config=self.retry_config, authorizer=authorizer
+        )
+
         # make the request
         log.debug("request will hit URL: %s", url)
         r = self.transport.request(
-            method=method,
-            url=url,
+            method,
+            url,
+            caller_info=caller_info,
             data=data,
             query_params=query_params,
             headers=rheaders,
             encoding=encoding,
-            authorizer=authorizer,
             allow_redirects=allow_redirects,
             stream=stream,
         )

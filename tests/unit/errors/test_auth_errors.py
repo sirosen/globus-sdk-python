@@ -1,7 +1,7 @@
 import pytest
 
 from globus_sdk import AuthAPIError
-from globus_sdk._testing import construct_error
+from globus_sdk.testing import construct_error
 
 
 def test_auth_error_get_args_simple():
@@ -17,7 +17,7 @@ def test_auth_error_get_args_simple():
         req.url,
         None,
         404,
-        "Error",
+        None,
         "simple auth error message",
     ]
 
@@ -38,7 +38,7 @@ def test_nested_auth_error_message_and_code():
     )
 
     assert err.message == "nested auth error message; some secondary error"
-    assert err.code == "Error"
+    assert err.code is None
 
 
 @pytest.mark.parametrize(

@@ -4,7 +4,7 @@ import os
 import sys
 
 import globus_sdk
-from globus_sdk.tokenstorage import SimpleJSONFileAdapter
+from globus_sdk.token_storage import SimpleJSONFileAdapter
 
 MY_FILE_ADAPTER = SimpleJSONFileAdapter(os.path.expanduser("~/.sdk-manage-flow.json"))
 
@@ -94,7 +94,7 @@ def delete_flow(args):
 
 def list_flows():
     flows_client = get_flows_client()
-    for flow in flows_client.list_flows(filter_role="flow_owner"):
+    for flow in flows_client.list_flows(filter_roles="flow_owner"):
         print(f"title: {flow['title']}")
         print(f"id: {flow['id']}")
         print()

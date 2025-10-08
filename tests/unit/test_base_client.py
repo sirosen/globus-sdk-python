@@ -7,10 +7,11 @@ import pytest
 
 import globus_sdk
 from globus_sdk import GlobusApp, GlobusAppConfig, GlobusSDKUsageError, UserApp
-from globus_sdk._testing import RegisteredResponse, get_last_request
 from globus_sdk.authorizers import NullAuthorizer
 from globus_sdk.scopes import Scope, TransferScopes
-from globus_sdk.tokenstorage import TokenValidationError
+from globus_sdk.testing import RegisteredResponse, get_last_request
+from globus_sdk.token_storage import TokenValidationError
+from globus_sdk.transport import RequestsTransport
 
 
 @pytest.fixture
@@ -19,13 +20,15 @@ def auth_client():
 
 
 @pytest.fixture
-def base_client_class(no_retry_transport):
+def base_client_class():
     class CustomClient(globus_sdk.BaseClient):
-        base_path = "/v0.10/"
         service_name = "transfer"
-        transport_class = no_retry_transport
         scopes = TransferScopes
-        default_scope_requirements = [Scope(TransferScopes.all)]
+        default_scope_requirements = [TransferScopes.all]
+
+        def __init__(self, **kwargs) -> None:
+            super().__init__(**kwargs)
+            self.retry_config.max_retries = 0
 
     return CustomClient
 
@@ -47,16 +50,13 @@ def test_cannot_instantiate_plain_base_client():
 
 
 def test_can_instantiate_base_client_with_explicit_url():
-    # note how a trailing slash is added due to the default
-    # base_path of '/'
-    # this may change in a future major version, to preserve the base_url exactly
     client = globus_sdk.BaseClient(base_url="https://example.org")
-    assert client.base_url == "https://example.org/"
+    assert client.base_url == "https://example.org"
 
 
 def test_can_instantiate_with_base_url_class_attribute():
     class MyCoolClient(globus_sdk.BaseClient):
-        base_url = "https://example.org"
+        base_url = "https://example.org/"
 
     client = MyCoolClient()
     assert client.base_url == "https://example.org/"
@@ -77,8 +77,8 @@ def test_base_url_resolution_precedence():
         service_name = "service-name"
 
     # All 3 are set
-    assert BothAttributesClient(base_url="init-base").base_url == "init-base/"
-    assert BothAttributesClient().base_url == "class-base/"
+    assert BothAttributesClient(base_url="init-base").base_url == "init-base"
+    assert BothAttributesClient().base_url == "class-base"
     assert OnlyServiceClient().base_url == "https://service-name.api.globus.org/"
 
 
@@ -93,10 +93,10 @@ def test_set_http_timeout(base_client):
         client = FooClient()
         assert client.transport.http_timeout == 60.0
 
-        client = FooClient(transport_params={"http_timeout": None})
+        client = FooClient(transport=RequestsTransport(http_timeout=None))
         assert client.transport.http_timeout == 60.0
 
-        client = FooClient(transport_params={"http_timeout": -1})
+        client = FooClient(transport=RequestsTransport(http_timeout=-1))
         assert client.transport.http_timeout is None
 
         os.environ["GLOBUS_SDK_HTTP_TIMEOUT"] = "120"
@@ -142,7 +142,7 @@ def test_http_methods(method, allows_body, base_client):
     """
     methodname = method.upper()
     resolved_method = getattr(base_client, method)
-    path = "/madeuppath/objectname"
+    path = "/v0.10/madeuppath/objectname"
     RegisteredResponse(
         service="transfer", path=path, method=methodname, json={"x": "y"}
     ).add()
@@ -195,8 +195,10 @@ def test_http_methods(method, allows_body, base_client):
 
 def test_handle_url_unsafe_chars(base_client):
     # make sure this path (escaped) and the request path (unescaped) match
-    RegisteredResponse(service="transfer", path="/foo/foo%20bar", json={"x": "y"}).add()
-    res = base_client.get("foo/foo bar")
+    RegisteredResponse(
+        service="transfer", path="/v0.10/foo/foo%20bar", json={"x": "y"}
+    ).add()
+    res = base_client.get("/v0.10/foo/foo bar")
     assert "x" in res
     assert res["x"] == "y"
 
@@ -209,33 +211,6 @@ def test_access_resource_server_property_via_instance(base_client):
 def test_access_resource_server_property_via_class(base_client_class):
     # get works (and returns accurate info)
     assert base_client_class.resource_server == TransferScopes.resource_server
-
-
-@pytest.mark.parametrize("leading_slash", (True, False))
-@pytest.mark.parametrize("test_fixture_uses_base_path", (True, False))
-def test_base_path_matching_prefix(
-    base_client, leading_slash, test_fixture_uses_base_path
-):
-    # self-check/sanity check
-    base_path = base_client.base_path
-    assert base_path == "/v0.10/"
-
-    # construct the path and confirm it (sanity check)
-    req_path = f"{base_client.base_path}foo"
-    if not leading_slash:
-        req_path.lstrip("/")
-
-    # register a response under the target path
-    # this is parametrized so that we are also testing the matching of our
-    # test fixtures against the same path construction
-    test_fixture_path = f"{base_path}foo" if test_fixture_uses_base_path else "foo"
-    RegisteredResponse(
-        service="transfer", path=test_fixture_path, json={"x": "y"}
-    ).add()
-
-    # confirm that a "GET" works
-    res = base_client.get(req_path)
-    assert res["x"] == "y"
 
 
 def test_app_integration(base_client_class):
@@ -252,7 +227,7 @@ def test_app_integration(base_client_class):
 
     # confirm default_required_scopes were automatically added
     assert [str(s) for s in app.scope_requirements[c.resource_server]] == [
-        TransferScopes.all
+        str(TransferScopes.all)
     ]
 
     # confirm attempt at getting an authorizer from app
@@ -279,7 +254,7 @@ def test_add_app_scope(base_client_class):
     c.add_app_scope("foo")
     str_list = [str(s) for s in app.scope_requirements[c.resource_server]]
     assert len(str_list) == 2
-    assert TransferScopes.all in str_list
+    assert str(TransferScopes.all) in str_list
     assert "foo" in str_list
 
 
@@ -288,7 +263,7 @@ def test_add_app_scope_chaining(base_client_class):
     c = base_client_class(app=app).add_app_scope("foo").add_app_scope("bar")
     str_list = [str(s) for s in app.scope_requirements[c.resource_server]]
     assert len(str_list) == 3
-    assert TransferScopes.all in str_list
+    assert str(TransferScopes.all) in str_list
     assert "foo" in str_list
     assert "bar" in str_list
 
@@ -356,9 +331,8 @@ def test_cannot_attach_app_when_authorizer_was_provided(base_client_class):
 
 def test_cannot_attach_app_when_resource_server_is_not_resolvable():
     class CustomClient(globus_sdk.BaseClient):
-        base_path = "/v0.10/"
         service_name = "transfer"
-        default_scope_requirements = [Scope(TransferScopes.all)]
+        default_scope_requirements = [TransferScopes.all]
 
     c = CustomClient()
     app = UserApp("SDK Test", client_id="client_id")

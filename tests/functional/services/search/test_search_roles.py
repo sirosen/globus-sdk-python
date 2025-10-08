@@ -3,15 +3,14 @@ import json
 import pytest
 
 import globus_sdk
-from globus_sdk._testing import get_last_request, load_response
+from globus_sdk.testing import get_last_request, load_response
 
 
 @pytest.fixture
-def search_client(no_retry_transport):
-    class CustomSearchClient(globus_sdk.SearchClient):
-        transport_class = no_retry_transport
-
-    return CustomSearchClient()
+def search_client():
+    client = globus_sdk.SearchClient()
+    with client.retry_config.tune(max_retries=0):
+        yield client
 
 
 def test_search_role_create(search_client):

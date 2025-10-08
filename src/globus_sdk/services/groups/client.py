@@ -4,7 +4,9 @@ import sys
 import typing as t
 import uuid
 
-from globus_sdk import client, exc, response, utils
+from globus_sdk import client, response
+from globus_sdk._internal.remarshal import commajoin
+from globus_sdk._missing import MISSING, MissingType
 from globus_sdk.scopes import GroupsScopes, Scope
 
 from .data import BatchMembershipActions, GroupPolicies
@@ -40,21 +42,20 @@ class GroupsClient(client.BaseClient):
     .. automethodlist:: globus_sdk.GroupsClient
     """
 
-    # NOTE: setting base_path is no longer considered good practice
-    #       see the BaseClient source for details
-    base_path = "/v2/"
     error_class = GroupsAPIError
     service_name = "groups"
     scopes = GroupsScopes
 
     @property
     def default_scope_requirements(self) -> list[Scope]:
-        return [Scope(GroupsScopes.view_my_groups_and_memberships)]
+        return [GroupsScopes.view_my_groups_and_memberships]
 
     def get_my_groups(
         self,
         *,
-        statuses: _VALID_STATUSES_T | t.Iterable[_VALID_STATUSES_T] | None = None,
+        statuses: (
+            _VALID_STATUSES_T | t.Iterable[_VALID_STATUSES_T] | MissingType
+        ) = MISSING,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.ArrayResponse:
         """
@@ -77,19 +78,16 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: get_my_groups_and_memberships_v2_groups_my_groups_get
         """
-        if query_params is None:
-            query_params = {}
-        if statuses is not None:
-            query_params["statuses"] = ",".join(utils.safe_strseq_iter(statuses))
+        query_params = {"statuses": commajoin(statuses), **(query_params or {})}
         return response.ArrayResponse(
-            self.get("/groups/my_groups", query_params=query_params)
+            self.get("/v2/groups/my_groups", query_params=query_params)
         )
 
     def get_group(
         self,
         group_id: uuid.UUID | str,
         *,
-        include: None | str | t.Iterable[str] = None,
+        include: str | t.Iterable[str] | MissingType = MISSING,
         query_params: dict[str, t.Any] | None = None,
     ) -> response.GlobusHTTPResponse:
         """
@@ -111,11 +109,8 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: get_group_v2_groups__group_id__get
         """
-        if query_params is None:
-            query_params = {}
-        if include is not None:
-            query_params["include"] = ",".join(utils.safe_strseq_iter(include))
-        return self.get(f"/groups/{group_id}", query_params=query_params)
+        query_params = {"include": commajoin(include), **(query_params or {})}
+        return self.get(f"/v2/groups/{group_id}", query_params=query_params)
 
     def get_group_by_subscription_id(
         self, subscription_id: uuid.UUID | str
@@ -148,7 +143,7 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: get_group_by_subscription_id_v2_subscription_info__subscription_id__get
         """  # noqa: E501
-        return self.get(f"/subscription_info/{subscription_id}")
+        return self.get(f"/v2/subscription_info/{subscription_id}")
 
     def delete_group(
         self,
@@ -172,7 +167,7 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: delete_group_v2_groups__group_id__delete
         """
-        return self.delete(f"/groups/{group_id}", query_params=query_params)
+        return self.delete(f"/v2/groups/{group_id}", query_params=query_params)
 
     def create_group(
         self,
@@ -196,7 +191,7 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: create_group_v2_groups_post
         """
-        return self.post("/groups", data=data, query_params=query_params)
+        return self.post("/v2/groups", data=data, query_params=query_params)
 
     def update_group(
         self,
@@ -222,7 +217,7 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: update_group_v2_groups__group_id__put
         """
-        return self.put(f"/groups/{group_id}", data=data, query_params=query_params)
+        return self.put(f"/v2/groups/{group_id}", data=data, query_params=query_params)
 
     def get_group_policies(
         self,
@@ -246,7 +241,7 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: get_policies_v2_groups__group_id__policies_get
         """
-        return self.get(f"/groups/{group_id}/policies", query_params=query_params)
+        return self.get(f"/v2/groups/{group_id}/policies", query_params=query_params)
 
     def set_group_policies(
         self,
@@ -273,7 +268,7 @@ class GroupsClient(client.BaseClient):
                     :ref: update_policies_v2_groups__group_id__policies_put
         """
         return self.put(
-            f"/groups/{group_id}/policies", data=data, query_params=query_params
+            f"/v2/groups/{group_id}/policies", data=data, query_params=query_params
         )
 
     def get_identity_preferences(
@@ -295,7 +290,7 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: get_identity_set_preferences_v2_preferences_get
         """
-        return self.get("/preferences", query_params=query_params)
+        return self.get("/v2/preferences", query_params=query_params)
 
     def set_identity_preferences(
         self,
@@ -327,7 +322,7 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: put_identity_set_preferences_v2_preferences_put
         """
-        return self.put("/preferences", data=data, query_params=query_params)
+        return self.put("/v2/preferences", data=data, query_params=query_params)
 
     def get_membership_fields(
         self,
@@ -352,7 +347,7 @@ class GroupsClient(client.BaseClient):
                     :ref: get_membership_fields_v2_groups__group_id__membership_fields_get
         """  # noqa: E501
         return self.get(
-            f"/groups/{group_id}/membership_fields", query_params=query_params
+            f"/v2/groups/{group_id}/membership_fields", query_params=query_params
         )
 
     def set_membership_fields(
@@ -380,7 +375,7 @@ class GroupsClient(client.BaseClient):
                     :ref: put_membership_fields_v2_groups__group_id__membership_fields_put
         """  # noqa: E501
         return self.put(
-            f"/groups/{group_id}/membership_fields",
+            f"/v2/groups/{group_id}/membership_fields",
             data=data,
             query_params=query_params,
         )
@@ -421,29 +416,8 @@ class GroupsClient(client.BaseClient):
                     :service: groups
                     :ref: group_membership_post_actions_v2_groups__group_id__post
         """
-        return self.post(f"/groups/{group_id}", data=actions, query_params=query_params)
-
-    def set_subscription_admin_verified_id(
-        self,
-        group_id: uuid.UUID | str,
-        subscription_id: uuid.UUID | str | None,
-        *,
-        query_params: dict[str, t.Any] | None = None,
-    ) -> response.GlobusHTTPResponse:
-        """
-        Deprecated alias for :meth:`set_subscription_admin_verified`.
-
-        :param group_id: the ID of the group
-        :param subscription_id: the ID of the subscription to which the group belongs,
-            or ``None`` to disassociate the group from a subscription
-        :param query_params: additional passthrough query parameters
-        """
-        exc.warn_deprecated(
-            "`GroupsClient.set_subscription_admin_verified_id()` has been renamed to "
-            "`GroupsClient.set_subscription_admin_verified()`."
-        )
-        return self.set_subscription_admin_verified(
-            group_id, subscription_id, query_params=query_params
+        return self.post(
+            f"/v2/groups/{group_id}", data=actions, query_params=query_params
         )
 
     def set_subscription_admin_verified(
@@ -474,7 +448,7 @@ class GroupsClient(client.BaseClient):
                         subscription_admin_verified_put
         """
         return self.put(
-            f"/groups/{group_id}/subscription_admin_verified",
+            f"/v2/groups/{group_id}/subscription_admin_verified",
             data={"subscription_admin_verified_id": subscription_id},
             query_params=query_params,
         )

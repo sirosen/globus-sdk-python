@@ -12,6 +12,368 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.0:
+
+v4.0.0 (2025-10-08)
+===================
+
+*No changes from v4.0.0b2*
+
+.. _changelog-4.0.0b2:
+
+v4.0.0b2 (2025-09-24)
+=====================
+
+Added
+-----
+
+- On Python 3.11+, the SDK will populate the ``__notes__`` of API errors with a
+  message containing the full body of the error response.
+  ``__notes__`` is part of the default presentation of a traceback. (:pr:`1299`)
+
+Removed
+-------
+
+- The following methods and parameters, which were deprecated in globus-sdk v3,
+  have been removed (:pr:`1309`):
+
+  - The ``skip_activation_check`` parameter for ``TransferData`` and ``DeleteData``.
+  - The ``recursive_symlinks`` parameter for ``TransferData``.
+  - The ``add_symlink_item`` method of ``TransferData``.
+
+Changed
+-------
+
+- Passing non-``Scope`` types to ``Scope.with_dependency`` and
+  ``Scope.with_dependencies`` now raises a ``TypeError``. Previously, this was
+  allowed at runtime but created an invalid ``Scope`` object. (:pr:`1300`)
+
+.. _changelog-4.0.0b1:
+
+v4.0.0b1 (2025-07-31)
+=====================
+
+Breaking Changes
+----------------
+
+- The ``RequestsTransport`` object has been refactored to separate it from
+  configuration which controls request retries. A new ``RetryConfig`` object is
+  introduced and provided as ``client.retry_config`` on all client types. The
+  interface for controlling these configurations has been updated.
+  (:pr:`1275`)
+
+  - The ``transport_class`` attribute has been removed from client classes.
+
+  - Clients now accept ``transport``, an instance of ``RequestsTransport``, and
+    ``retry_config``, an instance of ``RetryConfig``, instead of
+    ``transport_params``.
+
+  - Users seeking to customize the retry backoff, sleep maximum, and max
+    retries should now use ``retry_config``, as these are no longer controlled
+    through ``transport``.
+
+  - The capabilities of the ``RequestsTransport.tune()`` context manager have
+    been divided into ``RequestsTransport.tune()`` and ``RetryConfig.tune()``.
+
+  - The retry configuration is exposed to retry checks as an attribute of the
+    ``RequestCallerInfo``, which is provided on the ``RetryContext``. As a
+    result, checks can examine the configuration.
+
+- Interfaces for normalizing scope data have changed. (:pr:`1289`)
+
+  - The ``scopes_to_str`` function has been replaced with
+    ``ScopeParser.serialize``.
+
+  - ``ScopeParser.serialize`` will raise an error if the serialized data is
+    empty. A flag, ``reject_empty=False``, can be passed to disable this check.
+
+  - The ``scopes_to_scope_list`` function has been removed.
+
+Removed
+-------
+
+- Removed the ``filter_role`` parameter to ``FlowsClient.list_flows``.
+  This parameter was deprecated in ``globus-sdk`` version 3. (:pr:`1291`)
+
+- Removed ``SearchClient.update_entry``.
+  This method was deprecated in ``globus-sdk`` version 3. (:pr:`1292`)
+
+- Removed ``SearchClient.create_entry``.
+  This method was deprecated in ``globus-sdk`` version 3. (:pr:`1293`)
+
+- Removed the ``SearchQuery`` type. Users should use ``SearchQueryV1`` instead.
+  ``SearchQuery`` was deprecated in ``globus-sdk`` version 3. (:pr:`1294`)
+
+Changed
+-------
+
+- The legacy token storage adapters are now only available from the
+  ``globus_sdk.token_storage.legacy`` subpackage.
+
+  Users are encouraged to migrate to the newer tooling available directly from
+  ``globus_sdk.token_storage``. (:pr:`1290`)
+
+- Update ``warn_deprecated`` to emit ``RemovedInV5Warning`` and remove
+  ``RemovedInV4Warning`` class (:pr:`1295`)
+
+.. _changelog-4.0.0a4:
+
+v4.0.0a4 (2025-07-25)
+=====================
+
+Breaking Changes
+----------------
+
+- The ``function_data`` argument to ``ComputeClientV2.register_function`` has
+  been renamed to ``data`` to be consistent with other usages.
+
+- ``AuthClient`` no longer accepts ``client_id`` as a parameter and does not
+  provide it as an attribute. This was deprecated in globus-sdk version 3. (:pr:`1271`)
+
+Added
+-----
+
+- Add ``RequestCallerInfo`` data object to ``RequestsTransport.request`` for passing caller context information. (:pr:`1261`)
+
+Removed
+-------
+
+- The ``TimerJob.from_transfer_data`` classmethod, which was deprecated in
+  globus-sdk version 3, has been removed. Users should use the ``TransferTimer``
+  class to construct timers which submit transfer tasks. (:pr:`1269`)
+
+- The ``oauth2_validate_token`` method has been removed from
+  ``NativeAppAuthClient`` and ``ConfidentialAppAuthClient``.
+  This method was deprecated in globus-sdk v3. (:pr:`1270`)
+
+- Removed ``AuthClient.oauth2_userinfo``. This method was deprecated in
+  ``globus-sdk`` version 3. (:pr:`1272`)
+
+- Removed support for ``ConfidentialAppAuthClient.get_identities``.
+  This usage was deprecated in ``globus-sdk`` version 3. (:pr:`1273`)
+
+  - Users calling the Get Identities API on behalf of a client identity should
+    instead get tokens for the client and use those tokens to call
+    ``AuthClient.get_identities``. For example, by instantiating an
+    ``AuthClient`` using a ``ClientCredentialsAuthorizer``.
+
+  - This also means that it is no longer valid to use a
+    ``ConfidentialAppAuthClient`` to initialize an ``IdentityMap``.
+
+- ``TransferClient.create_endpoint`` has been removed. This method primarily
+  supported creation of GCSv4 servers and was deprecated in ``globus-sdk`` v3.
+  (:pr:`1276`)
+
+- ``GCSClient.connector_id_to_name()`` has been removed. It was deprecated in
+  ``globus-sdk`` version 3. Users should use ``globus_sdk.ConnectorTable``
+  instead. (:pr:`1277`)
+
+- Removed support for Endpoint Activation, a feature which was specific to
+  Globus Connect Server v4. (:pr:`1279`)
+
+  - Removed the activation methods: ``TransferClient.endpoint_autoactivate``,
+    ``TransferClient.endpoint_activate``,
+    ``TransferClient.endpoint_deactivate``, and
+    ``TransferClient.endpoint_get_activation_requirements``
+
+  - Removed the specialized ``ActivationRequirementsResponse`` parsed response
+    type
+
+  - ``TransferClient.update_endpoint`` would previously check the
+    ``myproxy_server`` and ``oauth_server`` parameters, which were solely used
+    for the purpose of configuring activation. It no longer does so.
+
+- Removed the ``ComputeClient`` alias. This name was deprecated in
+  ``globus-sdk`` version 3. Users should use ``ComputeClientV2`` or
+  ``ComputeClientV3`` instead. (:pr:`1282`)
+
+- Removed ``GlobusAPIError.raw_text``. This attribute was deprecated in
+  ``globus-sdk`` version 3. Users should use the ``text`` attribute instead.
+  (:pr:`1283`)
+
+- Removed ``TransferClient`` methods for modifying "endpoint servers", a
+  feature specific to Globus Connect Server v4. Specifically,
+  ``add_endpoint_server``, ``update_endpoint_server``, and
+  ``delete_endpoint_server``.
+  These methods were deprecated in ``globus-sdk`` version 3. (:pr:`1284`)
+
+- Removed the ``ComputeFunctionDocument`` and ``ComputeFunctionMetadata``
+  classes. These helpers were deprecated in ``globus-sdk`` version 3.
+
+- Removed ``TransferClient.operation_symlink``. This method was deprecated in
+  ``globus-sdk`` version 3. (:pr:`1286`)
+
+Changed
+-------
+
+- Renamed the ``globus_sdk._testing`` subpackage to ``globus_sdk.testing``. (:pr:`1251`)
+
+- Renamed the ``globus_sdk.tokenstorage`` subpackage to ``globus_sdk.token_storage`` and removed the ``globus_sdk.experimental.tokenstorage`` (:pr:`1252`)
+
+- Remove support for normalizing nested iterables of scopes, e.g. ``[["scope1"], "scope2"]`` (:pr:`1259`)
+
+.. _changelog-4.0.0a3:
+
+v4.0.0a3 (2025-07-10)
+=====================
+
+Breaking Changes
+----------------
+
+- All defaults of ``None`` converted to ``globus_sdk.MISSING`` for all payload types in the Transfer client. (:pr:`1216`)
+
+- The ``transfer_client`` parameter to ``TransferData`` and ``DeleteData`` has been removed.
+  See the upgrading doc for transition details. (:pr:`1236`)
+
+- In Globus Auth client classes, defaults of ``None`` are converted to
+  ``MISSING`` for optional fields. (:pr:`1236`)
+
+Added
+-----
+
+- ``SpecificFlowClient`` has a new method,
+  ``add_app_transfer_data_access_scope`` which facilitates declaration of scope
+  requirements when starting flows which interact with collections that need
+  ``data_access`` scopes. (:pr:`1166`)
+
+Removed
+-------
+
+- ``globus_sdk.experimental.scope_parser`` has been removed. Use
+  ``globus_sdk.scopes`` instead. (:pr:`1236`)
+
+Changed
+-------
+
+- ``Scope`` objects are now immutable. (:pr:`1208`)
+
+  - ``Scope.dependencies`` is now a tuple, not a list.
+
+  - The ``add_dependency`` method has been removed, since mutating a ``Scope``
+    is no longer possible.
+
+  - A new evolver method, ``Scope.with_dependency`` has been added. It extends
+    the ``dependencies`` tuple in a new ``Scope`` object.
+
+  - A batch version of ``Scope.with_dependency`` has been added,
+    ``Scope.with_dependencies``.
+
+  - An evolver for the ``optional`` field of a ``Scope`` is also now available,
+    named ``Scope.with_optional``.
+
+- Scope parsing has been separated from the main ``Scope`` class into a
+  dedicated ``ScopeParser`` which provides parsing methods. (:pr:`1208`)
+
+  - Use ``globus_sdk.scopes.ScopeParser`` for complex parsing use-cases. The
+    ``ScopeParser.parse`` classmethod parses strings into lists of scope
+    objects.
+
+  - ``Scope.merge_scopes`` has been moved to ``ScopeParser.merge_scopes``.
+
+  - ``Scope.parse`` is changed to call ``ScopeParser.parse`` and verify that
+    there is exactly one result, which it returns. This means that
+    ``Scope.parse`` now returns a single ``Scope``, not a ``list[Scope]``.
+
+  - ``Scope.serialize`` and ``Scope.deserialize`` have been removed as methods.
+    Use ``str(scope_object)`` as a replacement for ``serialize()`` and
+    ``Scope.parse`` as a replacement for ``deserialize()``.
+
+- Payload types now inherit from ``dict`` rather than ``UserDict``. The
+  ``PayloadWrapper`` utility class has been replaced with ``Payload``.
+  (:pr:`1222`)
+- Payload types are more consistent about encoding missing values using ``MISSING``.
+  (:pr:`1222`)
+
+- The SDK's ``ScopeBuilder`` types have been replaced with
+  ``StaticScopeCollection`` and ``DynamicScopeCollection`` types. (:pr:`1237`)
+
+  - Scopes provided as constants by the SDK are now ``Scope`` objects, not
+    strings. They can be converted to strings trivially with ``str(scope)``.
+
+  - The various scope builder types have been renamed. ``SpecificFlowScopes``,
+    ``GCSEndpointScopes``, and ``GCSCollectionScopes`` replace
+    ``SpecificFlowScopeBuilder``, ``GCSEndpointScopeBuilder``, and
+    ``GCSCollectionScopeBuilder``.
+
+- The ``ScopeBuilder`` types have been simplified and improved as the new
+  ``ScopeCollection`` types. (:pr:`1237`)
+
+  - ``ScopeBuilder`` is replaced with ``StaticScopeCollection`` and
+    ``DynamicScopeCollection``. The ``scopes`` attribute of client classes is
+    now a scope collection.
+
+  - The attributes of ``ScopeCollection``\s are ``Scope`` objects, not strings.
+
+  - ``ScopeCollection``\s define ``__iter__``, yielding the provided scopes,
+    but not ``__str__``.
+
+.. _changelog-4.0.0a2:
+
+v4.0.0a2 (2025-06-05)
+=====================
+
+Breaking Changes
+----------------
+
+- The SDK version is no longer available in ``globus_sdk.version.__version__``. (:pr:`1195`)
+
+  Packages that want to query the SDK version must use ``importlib.metadata``:
+
+  ..  code-block:: python
+
+        import importlib.metadata
+
+        GLOBUS_SDK_VERSION = importlib.metadata.distribution("globus_sdk").version
+
+- The legacy ``MutableScope`` type has been removed. (:pr:`1198`)
+
+    - The ``make_mutable`` method on ``ScopeBuilder`` objects has also been
+      removed as a consequence of this change.
+
+- Defaults of ``None`` were converted to ``globus_sdk.MISSING`` for multiple client
+  methods and payload types, covering Compute, Flows, Groups, GCS, and Search.
+  (:pr:`1205`, :pr:`1207`, :pr:`1212`, :pr:`1214`)
+
+Removed
+-------
+
+- ``globus_sdk.experimental.auth_requirements_error`` has been removed. Use
+  ``globus_sdk.gare`` instead. (:pr:`1202`)
+
+- ``GlobusAPIError`` no longer provides a setter for ``message``. The
+  ``message`` property is now read-only. (:pr:`1204`)
+
+- Deprecated aliases for ``TimersClient``, ``TimersScopes``, and
+  ``TimersAPIError`` have been removed. (:pr:`1206`)
+
+.. _changelog-4.0.0a1:
+
+v4.0.0a1 (2025-05-20)
+=====================
+
+Breaking Changes
+----------------
+
+- The SDK no longer sets default scopes for direct use
+  of client credentials and auth client login flow methods.
+  Users should either use ``GlobusApp`` objects,
+  which can specify scopes based on the clients in use,
+  or else pass a list of scopes explicitly to
+  ``oauth2_client_credentials_tokens`` or ``oauth2_start_flow``. (:pr:`1186`)
+
+- The default ``GlobusAPIError.code`` value is now ``None``
+  when ``code`` is not supplied in the error body.
+  Previously, the default was ``"Error"``. (:pr:`1190`)
+
+- The default ``TimersAPIError.code`` value is now ``None``
+  when an error which appears to be validation-related has no ``code``.
+  Previously, the default was ``"ValidationError"``. (:pr:`1191`)
+
+- SDK client classes no longer define nor prepend a ``base_path`` attribute to paths.
+  Make sure to use the full path now when using client methods. (:pr:`1185`)
+
+- Updated MappedCollectionDoc and GuestCollectionDoc with MissingType. (:pr:`1189`)
+
 .. _changelog-3.65.0:
 
 v3.65.0 (2025-10-02)
@@ -59,10 +421,6 @@ Deprecated
 
 v3.63.0 (2025-09-04)
 ====================
-
-Changed
--------
-
 - Renamed the ``GroupsClient`` method ``set_subscription_admin_verified_id`` to
   ``set_subscription_admin_verified``. (:pr:`1302`)
 
@@ -73,9 +431,6 @@ Changed
 
 v3.62.0 (2025-07-31)
 ====================
-
-Added
------
 
 - Added support for setting a group's ``subscription_id``
   via ``GroupsClient.set_subscription_admin_verified_id``. (:pr:`1287`)

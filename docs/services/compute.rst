@@ -37,16 +37,6 @@ supports the latest API features and improvements.
         ..  listknownscopes:: globus_sdk.scopes.ComputeScopes
             :base_name: ComputeClientV3.scopes
 
-
-..  py:class:: ComputeClient
-
-    A deprecated alias for :class:`ComputeClientV2`.
-
-    ..  warning::
-
-        This class will be removed in ``globus-sdk`` version 4.
-        Users should migrate to one of the explicitly-versioned classes.
-
 Client Errors
 -------------
 

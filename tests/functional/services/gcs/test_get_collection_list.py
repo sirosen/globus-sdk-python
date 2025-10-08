@@ -1,7 +1,7 @@
 import pytest
 
-from globus_sdk import GCSAPIError
-from globus_sdk._testing import get_last_request, load_response
+from globus_sdk import MISSING, GCSAPIError
+from globus_sdk.testing import get_last_request, load_response
 
 
 def test_get_collection_list(client):
@@ -22,7 +22,7 @@ def test_get_collection_list(client):
 @pytest.mark.parametrize(
     "include_param, expected",
     (
-        (None, None),
+        (MISSING, None),
         ("foo", "foo"),
         ("foo,bar", "foo,bar"),
         (("foo", "bar"), "foo,bar"),
@@ -32,7 +32,7 @@ def test_get_collection_list_include_param(client, include_param, expected):
     load_response(client.get_collection_list)
     client.get_collection_list(include=include_param)
     req = get_last_request()
-    if include_param is not None:
+    if include_param is not MISSING:
         assert "include" in req.params
         assert req.params["include"] == expected
     else:

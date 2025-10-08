@@ -3,9 +3,8 @@ import json
 
 import pytest
 
-from globus_sdk import TimerJob, TimersAPIError, TransferData, config, exc, utils
-from globus_sdk._testing import get_last_request, load_response
-from tests.common import GO_EP1_ID, GO_EP2_ID
+from globus_sdk import TimerJob, TimersAPIError
+from globus_sdk.testing import get_last_request, load_response
 
 
 def test_list_jobs(client):
@@ -38,19 +37,14 @@ def test_get_job_errors(client):
 )
 def test_create_job(client, start, interval):
     meta = load_response(client.create_job).metadata
-    transfer_data = TransferData(
-        source_endpoint=GO_EP1_ID, destination_endpoint=GO_EP2_ID
+    timer_job = TimerJob(
+        "https://example.bogus/bogus-callback", {"bogus": "bogus_body"}, start, interval
     )
-    with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
-        timer_job = TimerJob.from_transfer_data(transfer_data, start, interval)
+
     response = client.create_job(timer_job)
     assert response.http_status == 201
     assert response.data["job_id"] == meta["job_id"]
-    with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
-        timer_job = TimerJob.from_transfer_data(dict(transfer_data), start, interval)
-    response = client.create_job(timer_job)
-    assert response.http_status == 201
-    assert response.data["job_id"] == meta["job_id"]
+
     req_body = json.loads(get_last_request().body)
     if isinstance(start, datetime.datetime):
         assert req_body["start"] == start.isoformat()
@@ -60,27 +54,24 @@ def test_create_job(client, start, interval):
         assert req_body["interval"] == interval.total_seconds()
     else:
         assert req_body["interval"] == interval
-    assert req_body["callback_url"] == utils.slash_join(
-        config.get_service_url("actions"), "/transfer/transfer/run"
-    )
+    assert req_body["callback_url"] == "https://example.bogus/bogus-callback"
 
 
 def test_create_job_validation_error(client):
     meta = load_response(client.create_job, case="validation_error").metadata
-    transfer_data = TransferData(
-        source_endpoint=GO_EP1_ID, destination_endpoint=GO_EP2_ID
+    timer_job = TimerJob(
+        "https://example.bogus/bogus-callback",
+        {"bogus": "bogus_body"},
+        "2022-04-05T06:00:00",
+        1800,
     )
-    with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
-        timer_job = TimerJob.from_transfer_data(
-            transfer_data, "2022-04-05T06:00:00", 1800
-        )
 
     with pytest.raises(TimersAPIError) as excinfo:
         client.create_job(timer_job)
 
     err = excinfo.value
     assert err.http_status == 422
-    assert err.code == "Validation Error"
+    assert err.code is None
     assert err.messages == meta["expect_messages"]
 
 

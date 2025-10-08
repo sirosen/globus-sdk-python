@@ -4,29 +4,28 @@ import uuid
 import pytest
 
 import globus_sdk
-from globus_sdk._testing import load_response
+from globus_sdk._missing import MISSING
 from globus_sdk.scopes import TransferScopes
-from globus_sdk.services.auth.flow_managers.native_app import make_native_app_challenge
+from globus_sdk.services.auth.flow_managers.native_app import _make_native_app_challenge
+from globus_sdk.testing import load_response
 
 CLIENT_ID = "d0f1d9b0-bd81-4108-be74-ea981664453a"
 
 
 @pytest.fixture
-def native_client(no_retry_transport):
-    class CustomAuthClient(globus_sdk.NativeAppAuthClient):
-        transport_class = no_retry_transport
-
-    return CustomAuthClient(client_id=CLIENT_ID)
+def native_client():
+    client = globus_sdk.NativeAppAuthClient(client_id=CLIENT_ID)
+    with client.retry_config.tune(max_retries=0):
+        yield client
 
 
 @pytest.fixture
-def confidential_client(no_retry_transport):
-    class CustomAuthClient(globus_sdk.ConfidentialAppAuthClient):
-        transport_class = no_retry_transport
-
-    return CustomAuthClient(
+def confidential_client():
+    client = globus_sdk.ConfidentialAppAuthClient(
         client_id=CLIENT_ID, client_secret="SECRET_SECRET_HES_GOT_A_SECRET"
     )
+    with client.retry_config.tune(max_retries=0):
+        yield client
 
 
 # build a nearly-diagonal matrix over
@@ -62,7 +61,7 @@ mfa_options = (True, False)
 prompt_options = ("login",)
 # Seed an all-`None` option test, then use a loop to fill in the rest.
 # The number of parameters here must match the test parameters:
-_ALL_SESSION_PARAM_COMBINATIONS = [(None,) * 6]
+_ALL_SESSION_PARAM_COMBINATIONS = [(MISSING,) * 6]
 for idx, options in enumerate(
     (
         domain_options,
@@ -74,7 +73,7 @@ for idx, options in enumerate(
     )
 ):
     for option in options:
-        parameters = [None] * 6
+        parameters = [MISSING] * 6
         parameters[idx] = option
         _ALL_SESSION_PARAM_COMBINATIONS.append(tuple(parameters))
 
@@ -130,7 +129,7 @@ def test_oauth2_get_authorize_url_supports_session_params(
         "session_required_single_domain" if domain_option else None,
         "session_required_identities" if identity_option else None,
         "session_required_policies" if policy_option else None,
-        "session_required_mfa" if mfa_option is not None else None,
+        "session_required_mfa" if mfa_option is not MISSING else None,
         "prompt" if prompt_option else None,
     }
     expected_params_keys.discard(None)
@@ -147,7 +146,7 @@ def test_oauth2_get_authorize_url_supports_session_params(
     assert expected_params_keys <= parsed_params_keys
     assert (unexpected_query_params - parsed_params_keys) == unexpected_query_params
 
-    if domain_option is not None:
+    if domain_option is not MISSING:
         strized_option = (
             ",".join(str(x) for x in domain_option)
             if isinstance(domain_option, list)
@@ -155,7 +154,7 @@ def test_oauth2_get_authorize_url_supports_session_params(
         )
         assert parsed_params["session_required_single_domain"] == [strized_option]
 
-    if identity_option is not None:
+    if identity_option is not MISSING:
         strized_option = (
             ",".join(str(x) for x in identity_option)
             if isinstance(identity_option, list)
@@ -163,7 +162,7 @@ def test_oauth2_get_authorize_url_supports_session_params(
         )
         assert parsed_params["session_required_identities"] == [strized_option]
 
-    if policy_option is not None:
+    if policy_option is not MISSING:
         strized_option = (
             ",".join(str(x) for x in policy_option)
             if isinstance(policy_option, list)
@@ -171,21 +170,19 @@ def test_oauth2_get_authorize_url_supports_session_params(
         )
         assert parsed_params["session_required_policies"] == [strized_option]
 
-    if mfa_option is not None:
+    if mfa_option is not MISSING:
         strized_option = "True" if mfa_option else "False"
         assert parsed_params["session_required_mfa"] == [strized_option]
 
-    if prompt_option is not None:
+    if prompt_option is not MISSING:
         assert parsed_params["prompt"] == [prompt_option]
 
 
 def test_oauth2_get_authorize_url_native_defaults(native_client):
-    # default parameters for starting auth flow
-    # should warn because scopes were not specified
-    with pytest.warns(globus_sdk.RemovedInV4Warning):
-        flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(
-            native_client
-        )
+    flow_manager = globus_sdk.services.auth.GlobusNativeAppFlowManager(
+        native_client,
+        TransferScopes.all,
+    )
     native_client.current_oauth2_flow_manager = flow_manager
 
     # get url and validate results
@@ -197,7 +194,7 @@ def test_oauth2_get_authorize_url_native_defaults(native_client):
     assert parsed_params == {
         "client_id": [native_client.client_id],
         "redirect_uri": [native_client.base_url + "v2/web/auth-code"],
-        "scope": [f"openid profile email {TransferScopes.all}"],
+        "scope": [str(TransferScopes.all)],
         "state": ["_default"],
         "response_type": ["code"],
         "code_challenge": [flow_manager.challenge],
@@ -220,7 +217,7 @@ def test_oauth2_get_authorize_url_native_custom_params(native_client):
 
     # get url_and validate results
     url_res = native_client.oauth2_get_authorize_url()
-    verifier, remade_challenge = make_native_app_challenge("a" * 43)
+    verifier, remade_challenge = _make_native_app_challenge("a" * 43)
     parsed_url = urllib.parse.urlparse(url_res)
     assert f"https://{parsed_url.netloc}/" == native_client.base_url
     assert parsed_url.path == "/v2/oauth2/authorize"
@@ -238,12 +235,9 @@ def test_oauth2_get_authorize_url_native_custom_params(native_client):
 
 
 def test_oauth2_get_authorize_url_confidential_defaults(confidential_client):
-    # default parameters for starting auth flow
-    # warns because no requested_scopes was passed
-    with pytest.warns(globus_sdk.RemovedInV4Warning):
-        flow_manager = globus_sdk.services.auth.GlobusAuthorizationCodeFlowManager(
-            confidential_client, "uri"
-        )
+    flow_manager = globus_sdk.services.auth.GlobusAuthorizationCodeFlowManager(
+        confidential_client, "uri", TransferScopes.all
+    )
     confidential_client.current_oauth2_flow_manager = flow_manager
 
     # get url_and validate results
@@ -255,7 +249,7 @@ def test_oauth2_get_authorize_url_confidential_defaults(confidential_client):
     assert parsed_params == {
         "client_id": [confidential_client.client_id],
         "redirect_uri": ["uri"],
-        "scope": [f"openid profile email {TransferScopes.all}"],
+        "scope": [str(TransferScopes.all)],
         "state": ["_default"],
         "response_type": ["code"],
         "access_type": ["online"],
@@ -304,7 +298,7 @@ def test_oauth2_exchange_code_for_tokens_native(native_client):
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
         native_client.oauth2_exchange_code_for_tokens("invalid_code")
     assert excinfo.value.http_status == 401
-    assert excinfo.value.code == "Error"
+    assert excinfo.value.code is None
 
 
 def test_oauth2_exchange_code_for_tokens_confidential(confidential_client):
@@ -324,4 +318,4 @@ def test_oauth2_exchange_code_for_tokens_confidential(confidential_client):
     with pytest.raises(globus_sdk.AuthAPIError) as excinfo:
         confidential_client.oauth2_exchange_code_for_tokens("invalid_code")
     assert excinfo.value.http_status == 401
-    assert excinfo.value.code == "Error"
+    assert excinfo.value.code is None

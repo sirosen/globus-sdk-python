@@ -1,4 +1,3 @@
-import contextlib
 import datetime
 
 import pytest
@@ -6,48 +5,15 @@ import pytest
 from globus_sdk import (
     OnceTimerSchedule,
     RecurringTimerSchedule,
-    TimerJob,
     TransferData,
     TransferTimer,
-    exc,
-    utils,
 )
+from globus_sdk._missing import filter_missing
 from tests.common import GO_EP1_ID, GO_EP2_ID
 
 
-def test_timer_from_transfer_data_ok():
-    tdata = TransferData(None, GO_EP1_ID, GO_EP2_ID)
-    with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
-        job = TimerJob.from_transfer_data(tdata, "2022-01-01T00:00:00Z", 600)
-    assert "callback_body" in job
-    assert "body" in job["callback_body"]
-    assert "source_endpoint" in job["callback_body"]["body"]
-    assert "destination_endpoint" in job["callback_body"]["body"]
-    assert job["callback_body"]["body"]["source_endpoint"] == GO_EP1_ID
-    assert job["callback_body"]["body"]["destination_endpoint"] == GO_EP2_ID
-
-
-@pytest.mark.parametrize(
-    "badkey, value", (("submission_id", "foo"), ("skip_activation_check", True))
-)
-def test_timer_from_transfer_data_rejects_forbidden_keys(badkey, value):
-    if badkey == "skip_activation_check":
-        ctx = pytest.warns(
-            exc.RemovedInV4Warning,
-            match="`skip_activation_check` is no longer supported",
-        )
-    else:
-        ctx = contextlib.nullcontext()
-
-    with ctx:
-        tdata = TransferData(None, GO_EP1_ID, GO_EP2_ID, **{badkey: value})
-    with pytest.raises(ValueError):
-        with pytest.warns(exc.RemovedInV4Warning, match="Prefer TransferTimer"):
-            TimerJob.from_transfer_data(tdata, "2022-01-01T00:00:00Z", 600)
-
-
 def test_transfer_timer_ok():
-    tdata = TransferData(source_endpoint=GO_EP1_ID, destination_endpoint=GO_EP2_ID)
+    tdata = TransferData(GO_EP1_ID, GO_EP2_ID)
     timer = TransferTimer(body=tdata, name="foo timer", schedule={"type": "once"})
     assert timer["name"] == "foo timer"
     assert timer["schedule"]["type"] == "once"
@@ -86,12 +52,12 @@ def test_transfer_timer_removes_disallowed_fields():
 )
 def test_once_timer_schedule_formats_datetime(input_time, expected):
     schedule = OnceTimerSchedule(datetime=input_time)
-    assert schedule.data == {"type": "once", "datetime": expected}
+    assert dict(schedule) == {"type": "once", "datetime": expected}
 
 
 def test_recurring_timer_schedule_interval_only():
     schedule = RecurringTimerSchedule(interval_seconds=600)
-    assert utils.filter_missing(schedule) == {
+    assert filter_missing(schedule) == {
         "type": "recurring",
         "interval_seconds": 600,
     }
@@ -109,7 +75,7 @@ def test_recurring_timer_schedule_interval_only():
 )
 def test_recurring_timer_schedule_formats_start(input_time, expected):
     schedule = RecurringTimerSchedule(interval_seconds=600, start=input_time)
-    assert utils.filter_missing(schedule) == {
+    assert filter_missing(schedule) == {
         "type": "recurring",
         "interval_seconds": 600,
         "start": expected,
@@ -122,7 +88,7 @@ def test_recurring_timer_schedule_formats_datetime_for_end():
     schedule = RecurringTimerSchedule(
         interval_seconds=600, end={"condition": "time", "datetime": end_time}
     )
-    assert utils.filter_missing(schedule) == {
+    assert filter_missing(schedule) == {
         "type": "recurring",
         "interval_seconds": 600,
         "end": {"condition": "time", "datetime": "2023-10-27T05:38:49+00:00"},

@@ -19,7 +19,6 @@ from globus_sdk import (
     TransferClient,
     UserApp,
 )
-from globus_sdk._testing import load_response
 from globus_sdk.exc import GlobusSDKUsageError
 from globus_sdk.gare import GlobusAuthorizationParameters
 from globus_sdk.globus_app.authorizer_factory import (
@@ -33,7 +32,8 @@ from globus_sdk.login_flows import (
     LoginFlowManager,
 )
 from globus_sdk.scopes import AuthScopes, Scope
-from globus_sdk.tokenstorage import (
+from globus_sdk.testing import load_response
+from globus_sdk.token_storage import (
     HasRefreshTokensValidator,
     JSONTokenStorage,
     MemoryTokenStorage,
@@ -291,7 +291,7 @@ def test_add_scope_requirements_and_auth_params_with_required_scopes():
 
     # adding a requirement with a dependency
     user_app.add_scope_requirements(
-        {"foo": [Scope("foo:all").add_dependency(Scope("bar:all"))]}
+        {"foo": [Scope("foo:all").with_dependency(Scope("bar:all"))]}
     )
     params = user_app._auth_params_with_required_scopes()
     assert sorted(params.required_scopes) == [
@@ -303,7 +303,7 @@ def test_add_scope_requirements_and_auth_params_with_required_scopes():
 
     # re-adding a requirement with a new dependency, dependencies should be combined
     user_app.add_scope_requirements(
-        {"foo": [Scope("foo:all").add_dependency(Scope("baz:all"))]}
+        {"foo": [Scope("foo:all").with_dependency(Scope("baz:all"))]}
     )
     params = user_app._auth_params_with_required_scopes()
     # order of dependencies is not guaranteed
@@ -345,7 +345,7 @@ def test_constructor_scope_requirements_accepts_different_scope_types(scope_coll
 
 def test_scope_requirements_returns_copies_scopes():
     user_app = UserApp("test-app", client_id="mock_client_id")
-    foo_scope = Scope("foo:all").add_dependency(Scope("bar:all"))
+    foo_scope = Scope("foo:all").with_dependency(Scope("bar:all"))
     user_app.add_scope_requirements({"foo": [foo_scope]})
 
     real_requirements = user_app._scope_requirements

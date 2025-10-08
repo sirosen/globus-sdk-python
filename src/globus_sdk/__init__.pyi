@@ -1,3 +1,4 @@
+from ._missing import MISSING, MissingType
 from .authorizers import (
     AccessTokenAuthorizer,
     BasicAuthorizer,
@@ -15,7 +16,7 @@ from .exc import (
     GlobusSDKUsageError,
     GlobusTimeoutError,
     NetworkError,
-    RemovedInV4Warning,
+    RemovedInV5Warning,
     ValidationError,
 )
 from .globus_app import ClientApp, GlobusApp, GlobusAppConfig, UserApp
@@ -47,10 +48,7 @@ from .services.compute import (
     ComputeAPIError,
     ComputeClientV2,
     ComputeClientV3,
-    ComputeFunctionDocument,
-    ComputeFunctionMetadata,
 )
-from .services.compute.deprecated_client import ComputeClient
 from .services.flows import (
     FlowsAPIError,
     FlowsClient,
@@ -105,11 +103,9 @@ from .services.groups import (
 from .services.search import (
     SearchAPIError,
     SearchClient,
-    SearchQuery,
     SearchQueryV1,
     SearchScrollQuery,
 )
-from .services.timer import TimerAPIError, TimerClient
 from .services.timers import (
     FlowTimer,
     OnceTimerSchedule,
@@ -120,15 +116,14 @@ from .services.timers import (
     TransferTimer,
 )
 from .services.transfer import (
-    ActivationRequirementsResponse,
     DeleteData,
     IterableTransferResponse,
     TransferAPIError,
     TransferClient,
     TransferData,
 )
-from .utils import MISSING, MissingType
-from .version import __version__
+
+__version__ = "x.y.z"
 
 def _force_eager_imports() -> None: ...
 
@@ -147,7 +142,7 @@ __all__ = (
     "GlobusSDKUsageError",
     "GlobusTimeoutError",
     "NetworkError",
-    "RemovedInV4Warning",
+    "RemovedInV5Warning",
     "ValidationError",
     "ClientApp",
     "GlobusApp",
@@ -178,11 +173,8 @@ __all__ = (
     "OAuthTokenResponse",
     "IDTokenDecoder",
     "ComputeAPIError",
-    "ComputeClient",
     "ComputeClientV2",
     "ComputeClientV3",
-    "ComputeFunctionDocument",
-    "ComputeFunctionMetadata",
     "FlowsAPIError",
     "FlowsClient",
     "IterableFlowsResponse",
@@ -230,11 +222,8 @@ __all__ = (
     "GroupVisibility",
     "SearchAPIError",
     "SearchClient",
-    "SearchQuery",
     "SearchQueryV1",
     "SearchScrollQuery",
-    "TimerAPIError",
-    "TimerClient",
     "OnceTimerSchedule",
     "RecurringTimerSchedule",
     "TimerJob",
@@ -242,7 +231,6 @@ __all__ = (
     "TimersClient",
     "FlowTimer",
     "TransferTimer",
-    "ActivationRequirementsResponse",
     "DeleteData",
     "IterableTransferResponse",
     "TransferAPIError",

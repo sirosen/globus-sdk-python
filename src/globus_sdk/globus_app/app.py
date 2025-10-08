@@ -11,13 +11,11 @@ from globus_sdk import (
     AuthLoginClient,
     GlobusSDKUsageError,
     IDTokenDecoder,
-    Scope,
 )
-from globus_sdk._types import ScopeCollectionType
 from globus_sdk.authorizers import GlobusAuthorizer
 from globus_sdk.gare import GlobusAuthorizationParameters
-from globus_sdk.scopes import AuthScopes, scopes_to_scope_list
-from globus_sdk.tokenstorage import (
+from globus_sdk.scopes import AuthScopes, Scope, ScopeParser
+from globus_sdk.token_storage import (
     ScopeRequirementsValidator,
     TokenStorage,
     TokenValidationError,
@@ -68,7 +66,9 @@ class GlobusApp(metaclass=abc.ABCMeta):
         login_client: AuthLoginClient | None = None,
         client_id: uuid.UUID | str | None = None,
         client_secret: str | None = None,
-        scope_requirements: t.Mapping[str, ScopeCollectionType] | None = None,
+        scope_requirements: (
+            t.Mapping[str, str | Scope | t.Iterable[str | Scope]] | None
+        ) = None,
         config: GlobusAppConfig = DEFAULT_CONFIG,
     ) -> None:
         self.app_name = app_name
@@ -118,16 +118,19 @@ class GlobusApp(metaclass=abc.ABCMeta):
         #
         # additionally, this will ensure that openid scope requirement is always
         # registered (it's required for token identity validation).
-        consent_client.attach_globus_app(self, app_scopes=[Scope(AuthScopes.openid)])
+        consent_client.attach_globus_app(self, app_scopes=[AuthScopes.openid])
 
     def _resolve_scope_requirements(
-        self, scope_requirements: t.Mapping[str, ScopeCollectionType] | None
+        self,
+        scope_requirements: (
+            t.Mapping[str, str | Scope | t.Iterable[str | Scope]] | None
+        ),
     ) -> dict[str, list[Scope]]:
         if scope_requirements is None:
             return {}
 
         return {
-            resource_server: scopes_to_scope_list(scopes)
+            resource_server: list(self._iter_scopes(scopes))
             for resource_server, scopes in scope_requirements.items()
         }
 
@@ -382,12 +385,14 @@ class GlobusApp(metaclass=abc.ABCMeta):
             auth_params = GlobusAuthorizationParameters()
         parsed_required_scopes = []
         for s in auth_params.required_scopes or []:
-            parsed_required_scopes.extend(Scope.parse(s))
+            parsed_required_scopes.extend(ScopeParser.parse(s))
 
         # merge scopes for deduplication to minimize url request length
         # this is useful even if there weren't any auth_param scope requirements
         # as the app's scope_requirements can have duplicates
-        combined_scopes = Scope.merge_scopes(required_scopes, parsed_required_scopes)
+        combined_scopes = ScopeParser.merge_scopes(
+            required_scopes, parsed_required_scopes
+        )
         auth_params.required_scopes = [str(s) for s in combined_scopes]
 
         return auth_params
@@ -408,7 +413,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
             self._token_validation_error_handling_enabled = initial_val
 
     def add_scope_requirements(
-        self, scope_requirements: t.Mapping[str, ScopeCollectionType]
+        self, scope_requirements: t.Mapping[str, str | Scope | t.Iterable[str | Scope]]
     ) -> None:
         """
         Add given scope requirements to the app's scope requirements. Any duplicate
@@ -419,7 +424,7 @@ class GlobusApp(metaclass=abc.ABCMeta):
         """
         for resource_server, scopes in scope_requirements.items():
             curr = self._scope_requirements.setdefault(resource_server, [])
-            curr.extend(scopes_to_scope_list(scopes))
+            curr.extend(self._iter_scopes(scopes))
 
         self._authorizer_factory.clear_cache(*scope_requirements.keys())
 
@@ -457,3 +462,18 @@ class GlobusApp(metaclass=abc.ABCMeta):
         """
         # Scopes are mutable objects so we return a deepcopy
         return copy.deepcopy(self._scope_requirements)
+
+    def _iter_scopes(
+        self, scopes: str | Scope | t.Iterable[str | Scope]
+    ) -> t.Iterator[Scope]:
+        """Normalize scopes in various formats to an iterator of Scope objects."""
+        if isinstance(scopes, str):
+            yield from ScopeParser.parse(scopes)
+        elif isinstance(scopes, Scope):
+            yield scopes
+        else:
+            for item in scopes:
+                if isinstance(item, str):
+                    yield from ScopeParser.parse(item)
+                else:
+                    yield item

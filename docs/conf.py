@@ -28,7 +28,7 @@ extensions = [
     "sphinx_design",
     "sphinx_issues",
     # our custom one
-    "globus_sdk._sphinxext",
+    "globus_sdk._internal.extensions.sphinxext",
 ]
 
 project = "globus-sdk"
@@ -38,6 +38,7 @@ author = "Globus Team"
 version = globus_sdk.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
+major_version = version.partition(".")[0]
 
 issues_github_path = "globus/globus-sdk-python"
 
@@ -56,7 +57,7 @@ exclude_patterns = ["_build"]
 # HTML Theme Options
 html_show_sourcelink = True
 html_theme = "furo"
-html_title = "globus-sdk v3"
+html_title = f"globus-sdk v{major_version}"
 html_theme_options = {
     "light_css_variables": {
         "color-brand-primary": "#27518F",

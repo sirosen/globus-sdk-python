@@ -1,5 +1,5 @@
 from globus_sdk import TimersAPIError
-from globus_sdk._testing import construct_error
+from globus_sdk.testing import construct_error
 
 
 def test_timer_error_load_simple():
@@ -33,11 +33,11 @@ def test_timer_error_load_nested():
         http_status=422,
     )
 
-    assert err.code == "Validation Error"
+    assert err.code is None
     assert err.message == "field required: body.start; field required: body.end"
 
 
 def test_timer_error_load_unrecognized_format():
     err = construct_error(error_class=TimersAPIError, body={}, http_status=400)
-    assert err.code == "Error"
+    assert err.code is None
     assert err.message is None

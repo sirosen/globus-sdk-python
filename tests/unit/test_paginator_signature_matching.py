@@ -4,21 +4,18 @@ attached paginator requirements.
 """
 
 import inspect
-import warnings
 
 import pytest
 
 import globus_sdk
 
 _CLIENTS_TO_CHECK = []
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", category=globus_sdk.RemovedInV4Warning)
-    for attrname in dir(globus_sdk):
-        obj = getattr(globus_sdk, attrname)
-        if obj is globus_sdk.BaseClient:
-            continue
-        if isinstance(obj, type) and issubclass(obj, globus_sdk.BaseClient):
-            _CLIENTS_TO_CHECK.append(obj)
+for attrname in dir(globus_sdk):
+    obj = getattr(globus_sdk, attrname)
+    if obj is globus_sdk.BaseClient:
+        continue
+    if isinstance(obj, type) and issubclass(obj, globus_sdk.BaseClient):
+        _CLIENTS_TO_CHECK.append(obj)
 
 _METHODS_TO_CHECK = []
 for cls in _CLIENTS_TO_CHECK:
