@@ -12,6 +12,13 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.0:
+
+v4.0.0 (2025-10-08)
+===================
+
+*No changes from v4.0.0b2*
+
 .. _changelog-4.0.0b2:
 
 v4.0.0b2 (2025-09-24)
