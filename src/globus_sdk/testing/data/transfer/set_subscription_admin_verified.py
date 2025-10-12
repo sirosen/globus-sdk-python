@@ -10,7 +10,7 @@ NO_IDENTITIES_IN_SESSION_ENDPOINT_ID = str(uuid.UUID(int=12))
 
 
 def _format_verify_route(epid: str) -> str:
-    return f"/endpoint/{epid}/subscription_admin_verified"
+    return f"/v0.10/endpoint/{epid}/subscription_admin_verified"
 
 
 RESPONSES = ResponseSet(
