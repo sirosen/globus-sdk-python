@@ -19,7 +19,7 @@ method on exit.
 Closing a client closes the transport object attached to it if the transport was
 created implicitly during init.
 This means a transport passed in from the outside will not be closed, but one
-which is never directly accessed by the user will be.
+which was created by the client will be.
 
 For most cases, users are recommended to use the context manager form, and to
 allow clients to both create and close the transport:
@@ -34,7 +34,7 @@ allow clients to both create and close the transport:
 
     # after the context manager, any transport is implicitly closed
 
-However, transports are created explicitly, they are not automatically closed,
+However, if transports are created explicitly, they are not automatically closed,
 and the user becomes responsible for closing them.
 For example, in the following usage, the user must close the transport:
 

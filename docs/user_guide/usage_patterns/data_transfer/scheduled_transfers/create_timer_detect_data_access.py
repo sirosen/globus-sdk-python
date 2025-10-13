@@ -31,25 +31,26 @@ def uses_data_access(client: globus_sdk.TransferClient, collection_id: str) -> b
     return True
 
 
+# we'll define the timer as one which runs every hour for 3 days
+# declare these data in the form of a "schedule" for the timer
+#
+# a wide variety of schedules are possible here; to setup a recurring timer:
+# - you MUST declare an interval for the timer (`interval_seconds`)
+# - you MAY declare an end condition (`end`)
+schedule = globus_sdk.RecurringTimerSchedule(
+    interval_seconds=3600,
+    end={
+        "condition": "time",
+        "datetime": datetime.datetime.now() + datetime.timedelta(days=3),
+    },
+)
+
+
 with UserApp("manage-timers-example", client_id=NATIVE_CLIENT_ID) as app:
     # as with an immediate data transfer, we take our input data and wrap them in
     # a TransferData object, representing the transfer task
     transfer_request = globus_sdk.TransferData(SRC_COLLECTION, DST_COLLECTION)
     transfer_request.add_item(SRC_PATH, DST_PATH)
-
-    # we'll define the timer as one which runs every hour for 3 days
-    # declare these data in the form of a "schedule" for the timer
-    #
-    # a wide variety of schedules are possible here; to setup a recurring timer:
-    # - you MUST declare an interval for the timer (`interval_seconds`)
-    # - you MAY declare an end condition (`end`)
-    schedule = globus_sdk.RecurringTimerSchedule(
-        interval_seconds=3600,
-        end={
-            "condition": "time",
-            "datetime": datetime.datetime.now() + datetime.timedelta(days=3),
-        },
-    )
 
     with (
         # we need a TransferClient, for the needs_data_access helper

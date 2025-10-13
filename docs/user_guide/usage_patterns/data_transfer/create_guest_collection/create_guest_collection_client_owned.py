@@ -19,20 +19,24 @@ def main():
         client_secret=CONFIDENTIAL_CLIENT_SECRET,
     ) as app:
         with globus_sdk.GCSClient(ENDPOINT_HOSTNAME, app=app) as gcs_client:
-            # Comment out this line if the mapped collection is high assurance
-            attach_data_access_scope(gcs_client, MAPPED_COLLECTION_ID)
+            create_guest_collection(gcs_client)
 
-            ensure_user_credential(gcs_client)
 
-            collection_request = globus_sdk.GuestCollectionDocument(
-                public=True,
-                collection_base_path="/",
-                display_name="example_guest_collection",
-                mapped_collection_id=MAPPED_COLLECTION_ID,
-            )
+def create_guest_collection(gcs_client: globus_sdk.GCSClient):
+    # Comment out this line if the mapped collection is high assurance
+    attach_data_access_scope(gcs_client, MAPPED_COLLECTION_ID)
 
-            collection = gcs_client.create_collection(collection_request)
-            print(f"Created guest collection. Collection ID: {collection['id']}")
+    ensure_user_credential(gcs_client)
+
+    collection_request = globus_sdk.GuestCollectionDocument(
+        public=True,
+        collection_base_path="/",
+        display_name="example_guest_collection",
+        mapped_collection_id=MAPPED_COLLECTION_ID,
+    )
+
+    collection = gcs_client.create_collection(collection_request)
+    print(f"Created guest collection. Collection ID: {collection['id']}")
 
 
 def attach_data_access_scope(gcs_client, collection_id):

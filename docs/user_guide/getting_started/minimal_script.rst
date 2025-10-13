@@ -103,7 +103,7 @@ resources associated with the client and app are properly closed.
 
 The final example includes an explicit login step, so you can control when that
 login flow happens!
-It also uses the context manager style.
+Like the previous example, it uses the context manager style to ensure proper cleanup.
 
 *These examples are complete. They should run without errors "as is".*
 

@@ -111,8 +111,8 @@ For example,
 
 
 However, when token storages are created explicitly, they are not automatically
-closed, and the user becomes responsible for closing them. For example, the
-following usage is valid:
+closed, and the user becomes responsible for closing them. For example,
+in the following usage, the user must close the token storage:
 
 .. code-block:: python
 
