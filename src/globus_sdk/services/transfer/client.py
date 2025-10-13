@@ -399,7 +399,7 @@ class TransferClient(client.BaseClient):
                     :ref: transfer/gcp_management/#set_subscription_admin_verified
         """  # noqa: E501
         return self.put(
-            f"/endpoint/{collection_id}/subscription_admin_verified",
+            f"/v0.10/endpoint/{collection_id}/subscription_admin_verified",
             data={"subscription_admin_verified": subscription_admin_verified},
         )
 
