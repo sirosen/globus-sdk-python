@@ -12,6 +12,16 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.0.1:
+
+v4.0.1 (2025-10-13)
+===================
+
+Fixed
+-----
+
+- Fix the route for ``TransferClient.set_subscription_admin_verified()`` (:pr:`1331`)
+
 .. _changelog-4.0.0:
 
 v4.0.0 (2025-10-08)
