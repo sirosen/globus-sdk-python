@@ -4,6 +4,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   update_pr_numbers_in_change_fragments:
     runs-on: ubuntu-latest
