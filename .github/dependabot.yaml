@@ -16,5 +16,7 @@ updates:
     directory: "/requirements/"
     schedule:
       interval: "semiannually"
+    cooldown:
+      default-days: 20
     ignore:
       - dependency-name: "*"
