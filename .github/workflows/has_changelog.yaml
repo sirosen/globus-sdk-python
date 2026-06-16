@@ -9,6 +9,9 @@ on:
       - reopened
       - synchronize
 
+permissions:
+  contents: read
+
 jobs:
   check_has_news_in_changelog_dir:
     if: |
