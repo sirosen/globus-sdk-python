@@ -12,6 +12,18 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.8.1:
+
+v4.8.1 (2026-06-16)
+===================
+
+Fixed
+-----
+
+- Fix a crash bug in the orjson compatibility module. (:pr:`1396`)
+
+  This manifested as a ``RuntimeError`` when code inspected the module.
+
 .. _changelog-4.8.0:
 
 v4.8.0 (2026-06-10)
