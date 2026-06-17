@@ -1,0 +1,12 @@
+name: zizmor
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  zizmor:
+    permissions:
+      security-events: write
+
+    uses: zizmorcore/workflow/.github/workflows/reusable-zizmor.yml@465600191822382e76d26abf77772f21262ecdb6  # main
