@@ -103,7 +103,7 @@ To elaborate on the above example:
     auth_code = input("Please enter the code you get after login here: ").strip()
     token_response = client.oauth2_exchange_code_for_tokens(auth_code)
 
-    # use the `resource_server` of a ScopeBuilder to grab the associated token
+    # use the `resource_server` of a scope collection to grab the associated token
     # data from the response
     tokendata = token_response.by_resource_server[TransferScopes.resource_server]
 
