@@ -39,14 +39,16 @@ constructed by means of ``Scope`` methods thusly:
 
 .. code-block:: python
 
-    from globus_sdk.scopes import GCSCollectionScopeBuilder, TransferScopes, Scope
+    from globus_sdk.scopes import GCSCollectionScopes, TransferScopes, Scope
 
     MAPPED_COLLECTION_ID = "...ID HERE..."
 
     # create the scope object, and get the data_access_scope as a string
-    data_access_scope = GCSCollectionScopeBuilder(MAPPED_COLLECTION_ID).data_access
+    data_access_scope = GCSCollectionScopes(MAPPED_COLLECTION_ID).data_access
     # add data_access as an optional dependency
-    transfer_scope = TransferScopes.all.with_dependency(data_access_scope, optional=True)
+    transfer_scope = TransferScopes.all.with_dependency(
+        data_access_scope.with_optional(True)
+    )
 
 ``Scope``\s can be used in most of the same locations where scope
 strings can be used, but you can also call ``str(scope)`` to get a
@@ -72,11 +74,11 @@ strings. All scope objects support this by means of their defined
     >>> print(str(bar))
     bar[baz]
     >>> alpha = Scope("alpha")
-    >>> alpha = alpha.with_dependency("beta", optional=True)
+    >>> alpha = alpha.with_dependency(Scope("beta").with_optional(True))
     >>> print(str(alpha))
     alpha[*beta]
     >>> print(repr(alpha))
-    Scope("alpha", dependencies=[Scope("beta", optional=True)])
+    Scope("alpha", dependencies=(Scope("beta", optional=True),))
 
 Reference
 ~~~~~~~~~
