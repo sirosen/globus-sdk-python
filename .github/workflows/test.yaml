@@ -50,6 +50,7 @@ jobs:
               - "py3.9-orjson"
               - "py3.14-orjson"
               - "py3.11-sphinxext"
+              - "doctest"
               - "coverage_report"
 
           - name: "macOS"
@@ -59,6 +60,7 @@ jobs:
             tox-post-environments:
               - "py3.11-sphinxext"
               - "py3.14-orjson"
+              - "doctest"
               - "coverage_report"
 
           - name: "Windows"
@@ -70,6 +72,7 @@ jobs:
               - "py3.9-mindeps"
               - "py3.14-orjson"
               - "py3.11-sphinxext"
+              - "doctest"
               - "coverage_report"
 
           - name: "Quality"

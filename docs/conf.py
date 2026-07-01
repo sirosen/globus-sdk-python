@@ -15,12 +15,16 @@ autodoc_typehints = "description"
 # merely because they are type annotated
 autodoc_typehints_description_target = "documented_params"
 
+# disable doctest on `>>>` blocks which are not annotated as `doctest` blocks
+doctest_test_doctest_blocks = ""
+
 
 # sphinx extensions (minimally, we want autodoc and viewcode to build the site)
 # plus, we have our own custom extension in the SDK to include
 extensions = [
     # sphinx-included extensions
     "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     # other packages
