@@ -89,13 +89,8 @@ class TransferTimer(GlobusPayload):
 
     .. testsetup::
 
-        from unittest import mock
-        from globus_sdk import OnceTimerSchedule
-
-        my_schedule = OnceTimerSchedule()
-
-        patch = mock.patch("globus_sdk.TransferData")
-        patch.start()
+        my_schedule = globus_sdk.OnceTimerSchedule()
+        sdk_doctest_patch("globus_sdk.TransferData")
 
     .. doctest::
 
@@ -106,10 +101,6 @@ class TransferTimer(GlobusPayload):
         ...     schedule=my_schedule,
         ...     body=transfer_data,
         ... )
-
-    .. testcleanup::
-
-        patch.stop()
 
     Submit the timer to the Timers service with
     :meth:`create_timer <globus_sdk.TimersClient.create_timer>`.
@@ -212,9 +203,7 @@ class FlowTimer(GlobusPayload):
 
     .. testsetup::
 
-        from globus_sdk import OnceTimerSchedule
-
-        my_schedule = OnceTimerSchedule()
+        my_schedule = globus_sdk.OnceTimerSchedule()
 
     .. doctest::
 

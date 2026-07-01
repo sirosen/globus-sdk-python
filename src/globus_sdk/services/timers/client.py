@@ -205,9 +205,14 @@ class TimersClient(client.BaseClient):
 
             .. tab-item:: Example Usage
 
-                .. code-block:: pycon
+                .. testsetup:: create-timer-example
 
-                    >>> transfer_data = TransferData(...)
+                    sdk_doctest_patch("globus_sdk.TransferData")
+                    sdk_doctest_patch("globus_sdk.TimersClient")
+
+                .. doctest:: create-timer-example
+
+                    >>> transfer_data = globus_sdk.TransferData(...)
                     >>> timers_client = globus_sdk.TimersClient(...)
                     >>> create_doc = globus_sdk.TransferTimer(
                     ...     name="my-timer",
