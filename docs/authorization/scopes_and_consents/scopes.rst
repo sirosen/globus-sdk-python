@@ -62,7 +62,7 @@ strings. All scope objects support this by means of their defined
 ``__str__`` method. For example, the following is an example of
 ``str()`` and ``repr()`` usage:
 
-.. code-block:: pycon
+.. doctest::
 
     >>> from globus_sdk.scopes import Scope
     >>> foo = Scope("foo")
@@ -78,7 +78,7 @@ strings. All scope objects support this by means of their defined
     >>> print(str(alpha))
     alpha[*beta]
     >>> print(repr(alpha))
-    Scope("alpha", dependencies=(Scope("beta", optional=True),))
+    Scope('alpha', dependencies=(Scope('beta', optional=True),))
 
 Reference
 ~~~~~~~~~

@@ -15,12 +15,32 @@ autodoc_typehints = "description"
 # merely because they are type annotated
 autodoc_typehints_description_target = "documented_params"
 
+# disable doctest on `>>>` blocks which are not annotated as `doctest` blocks
+doctest_test_doctest_blocks = ""
+
+doctest_global_setup = """\
+import globus_sdk
+from unittest import mock
+
+UNDO_STACK = []
+
+def sdk_doctest_patch(*args):
+    p = mock.patch(*args)
+    p.start()
+    UNDO_STACK.append(p.stop)
+"""
+doctest_global_cleanup = """\
+for undo_callable in UNDO_STACK:
+    undo_callable()
+"""
+
 
 # sphinx extensions (minimally, we want autodoc and viewcode to build the site)
 # plus, we have our own custom extension in the SDK to include
 extensions = [
     # sphinx-included extensions
     "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     # other packages

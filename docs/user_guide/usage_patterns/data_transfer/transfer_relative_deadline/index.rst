@@ -40,7 +40,7 @@ We'll express that idea in a function which takes a :class:`datetime.timedelta`
 as an ``offset``, an amount of time into the future.
 This gives us a generic phrasing of getting a future date:
 
-.. code-block:: python
+.. testcode:: relative-deadline
 
     import datetime
 
@@ -65,7 +65,7 @@ Creating a Task with the Deadline
 Along with all of our other parameters to create the Transfer Task, here's
 a sample task document with a deadline set for "an hour from now":
 
-.. code-block:: python
+.. testcode:: relative-deadline
 
     # Globus Tutorial Collection 1
     # https://app.globus.org/file-manager/collections/6c54cade-bde5-45c1-bdea-f4bd71dba2cc
