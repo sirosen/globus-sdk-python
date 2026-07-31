@@ -812,7 +812,7 @@ class FlowsClient(client.BaseClient):
         Update the metadata of a specific run.
 
         :param run_id: The ID of the run to update
-        :param label: A short human-readable title (1 - 64 chars)
+        :param label: A short human-readable title.
         :param tags: A collection of searchable tags associated with the run.
             Tags are normalized by stripping leading and trailing whitespace,
             and replacing all whitespace with a single space.
@@ -1106,7 +1106,7 @@ class SpecificFlowClient(client.BaseClient):
         """
         :param body: The input json object handed to the first flow state. The flows
             service will validate this object against the flow's supplied input schema.
-        :param label: A short human-readable title (1 - 64 chars)
+        :param label: A short human-readable title.
         :param tags: A collection of searchable tags associated with the run. Tags are
             normalized by stripping leading and trailing whitespace, and replacing all
             whitespace with a single space.
