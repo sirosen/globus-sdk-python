@@ -30,7 +30,7 @@ def test_extdoclink_renders_simple(sphinx_runner):
     (
         ("groups", "https://groups.api.globus.org/redoc#operation"),
         ("gcs", "https://docs.globus.org/globus-connect-server/v5/api"),
-        ("flows", "https://globusonline.github.io/globus-flows#tag"),
+        ("flows", "https://flows.globus.org/redoc#tag"),
         ("compute", "https://compute.api.globus.org/redoc#tag"),
     ),
 )
