@@ -36,6 +36,8 @@ with globus_sdk.UserApp("ls-session", client_id=NATIVE_CLIENT_ID) as app:
             print("An authorization requirement was not met. Logging in again...")
 
             gare = globus_sdk.gare.to_gare(err)
+            if not gare:
+                raise
             params = gare.authorization_parameters
             # set 'prompt=login', which guarantees a fresh login without
             # reliance on the browser session

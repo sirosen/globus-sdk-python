@@ -1,7 +1,6 @@
 import datetime
 
 import globus_sdk
-from globus_sdk.experimental.globus_app import UserApp
 
 # Tutorial Client ID - <replace this with your own client>
 NATIVE_CLIENT_ID = "61338d24-54d5-408f-a10d-66c06b59f6d2"
@@ -35,7 +34,7 @@ schedule = globus_sdk.RecurringTimerSchedule(
     },
 )
 
-with UserApp("manage-timers-example", client_id=NATIVE_CLIENT_ID) as app:
+with globus_sdk.UserApp("manage-timers-example", client_id=NATIVE_CLIENT_ID) as app:
     # create a TimersClient to interact with the service, and register any data_access
     # scopes for the collections
     with globus_sdk.TimersClient(app=app) as timers_client:
