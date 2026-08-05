@@ -12,7 +12,7 @@ STORAGE_GATEWAY_ID = "947460f6-3fcd-4acc-9683-d71e14e5ace1"
 MAPPED_COLLECTION_ID = "6c54cade-bde5-45c1-bdea-f4bd71dba2cc"
 
 
-def main():
+def main() -> None:
     with ClientApp(
         "my-simple-client-collection",
         client_id=CONFIDENTIAL_CLIENT_ID,
@@ -22,7 +22,7 @@ def main():
             create_guest_collection(gcs_client)
 
 
-def create_guest_collection(gcs_client: globus_sdk.GCSClient):
+def create_guest_collection(gcs_client: globus_sdk.GCSClient) -> None:
     # Comment out this line if the mapped collection is high assurance
     attach_data_access_scope(gcs_client, MAPPED_COLLECTION_ID)
 
@@ -39,20 +39,20 @@ def create_guest_collection(gcs_client: globus_sdk.GCSClient):
     print(f"Created guest collection. Collection ID: {collection['id']}")
 
 
-def attach_data_access_scope(gcs_client, collection_id):
+def attach_data_access_scope(
+    gcs_client: globus_sdk.GCSClient, collection_id: str
+) -> None:
     """Compose and attach a ``data_access`` scope for the supplied collection"""
     endpoint_scopes = gcs_client.get_gcs_endpoint_scopes(gcs_client.endpoint_client_id)
     collection_scopes = gcs_client.get_gcs_collection_scopes(collection_id)
 
-    data_access = globus_sdk.Scope(collection_scopes.data_access, optional=True)
-    manage_collections = globus_sdk.Scope(
-        endpoint_scopes.manage_collections, dependencies=(data_access,)
-    )
+    data_access = collection_scopes.data_access.with_optional(True)
+    manage_collections = endpoint_scopes.manage_collections.with_dependency(data_access)
 
     gcs_client.add_app_scope(manage_collections)
 
 
-def ensure_user_credential(gcs_client):
+def ensure_user_credential(gcs_client: globus_sdk.GCSClient) -> None:
     """
     Ensure that the client has a user credential on the client.
     This is the mapping between Globus Auth (OAuth2) and the local system's permissions.
