@@ -89,26 +89,38 @@ def _concat(values: list[list[str] | None]) -> list[str] | None:
 
 
 if __name__ == "__main__":
+    import typing as t
+
+    def to_gare(data: t.Any) -> globus_sdk.gare.GARE:
+        """
+        to_gare() returns None if coercion fails; this wrapper treats that as an error
+        instead, for nicer types
+        """
+        g = globus_sdk.gare.to_gare(data)
+        if g is None:
+            raise ValueError(f"data unexpectedly did not validate as a GARE: {data!r}")
+        return g
+
     # these are example errors
-    case1 = globus_sdk.gare.to_gare(
+    case1 = to_gare(
         {
             "code": "ConsentRequired",
             "authorization_parameters": {"required_scopes": ["foo"]},
         }
     )
-    case2 = globus_sdk.gare.to_gare(
+    case2 = to_gare(
         {
             "code": "ConsentRequired",
             "authorization_parameters": {"required_scopes": ["bar"]},
         }
     )
-    case3 = globus_sdk.gare.to_gare(
+    case3 = to_gare(
         {
             "code": "AuthorizationRequired",
             "authorization_parameters": {"required_scopes": ["baz"]},
         }
     )
-    case4 = globus_sdk.gare.to_gare(
+    case4 = to_gare(
         {
             "code": "AuthorizationRequired",
             "authorization_parameters": {
@@ -119,7 +131,7 @@ if __name__ == "__main__":
             },
         }
     )
-    case5 = globus_sdk.gare.to_gare(
+    case5 = to_gare(
         {
             "code": "AuthorizationRequired",
             "authorization_parameters": {
@@ -131,7 +143,7 @@ if __name__ == "__main__":
             },
         }
     )
-    case6 = globus_sdk.gare.to_gare(
+    case6 = to_gare(
         {
             "code": "AuthorizationRequired",
             "authorization_parameters": {
@@ -140,7 +152,7 @@ if __name__ == "__main__":
             },
         }
     )
-    case7 = globus_sdk.gare.to_gare(
+    case7 = to_gare(
         {
             "code": "AuthorizationRequired",
             "authorization_parameters": {

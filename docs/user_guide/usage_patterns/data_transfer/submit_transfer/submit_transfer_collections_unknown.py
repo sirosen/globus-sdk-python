@@ -15,7 +15,7 @@ DST_COLLECTION = "31ce9ba0-176d-45a5-add3-f37d233ba47d"
 DST_PATH = "/~/example-transfer-script-destination.txt"
 
 
-def main():
+def main() -> None:
     with UserApp(
         "my-simple-transfer",
         client_id=NATIVE_CLIENT_ID,
@@ -25,7 +25,7 @@ def main():
             submit_transfer(client)
 
 
-def submit_transfer(transfer_client: globus_sdk.TransferClient):
+def submit_transfer(transfer_client: globus_sdk.TransferClient) -> None:
     transfer_request = globus_sdk.TransferData(SRC_COLLECTION, DST_COLLECTION)
     transfer_request.add_item(SRC_PATH, DST_PATH)
 

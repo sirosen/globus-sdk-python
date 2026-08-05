@@ -15,13 +15,13 @@ DST_COLLECTION = "31ce9ba0-176d-45a5-add3-f37d233ba47d"
 DST_PATH = "/~/example-transfer-script-destination.txt"
 
 
-def main():
+def main() -> None:
     with UserApp("my-simple-transfer", client_id=NATIVE_CLIENT_ID) as app:
         with globus_sdk.TransferClient(app=app) as client:
             submit_transfer(client)
 
 
-def submit_transfer(transfer_client: globus_sdk.TransferClient):
+def submit_transfer(transfer_client: globus_sdk.TransferClient) -> None:
     # Comment out each of these lines if the referenced collection is either
     #   (1) A guest collection or (2) high assurance.
     transfer_client.add_app_data_access_scope(SRC_COLLECTION)
