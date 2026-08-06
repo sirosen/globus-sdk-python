@@ -561,6 +561,49 @@ def test_client_app_login_logout():
     assert memory_storage.get_token_data("auth.globus.org") is None
 
 
+@pytest.mark.parametrize("app_type", ("UserApp", "ClientApp"))
+@pytest.mark.parametrize("sweep", (True, False))
+def test_logout_sweep_flag_controls_clearing_unrecognized_tokens(app_type, sweep):
+    # setup a storage for Auth + Transfer
+    memory_storage = MemoryTokenStorage()
+    memory_storage.store_token_data_by_resource_server(_mock_token_data_by_rs())
+    memory_storage.store_token_data_by_resource_server(
+        _mock_token_data_by_rs(
+            resource_server="transfer.api.globus.org",
+            scope=str(globus_sdk.TransferClient.scopes.all),
+        )
+    )
+    # setup the app (either type)
+    config = GlobusAppConfig(token_storage=memory_storage)
+    if app_type == "UserApp":
+        app = UserApp("test-app", client_id="mock_client_id", config=config)
+        load_response(NativeAppAuthClient.oauth2_revoke_token)
+    elif app_type == "ClientApp":
+        app = ClientApp(
+            "test-app",
+            client_id="mock_client_id",
+            client_secret="mock_client_secret",
+            config=config,
+        )
+        load_response(ConfidentialAppAuthClient.oauth2_revoke_token)
+    else:
+        raise NotImplementedError(app_type)
+
+    # verify that the data is present
+    assert memory_storage.get_token_data("auth.globus.org") is not None
+    assert memory_storage.get_token_data("transfer.api.globus.org") is not None
+
+    app.logout(sweep=sweep)  # act!
+
+    # test results
+    assert memory_storage.get_token_data("auth.globus.org") is None
+    transfer_token_data = memory_storage.get_token_data("transfer.api.globus.org")
+    if sweep:
+        assert transfer_token_data is None
+    else:
+        assert transfer_token_data is not None
+
+
 @mock.patch.object(globus_sdk.IDTokenDecoder, "decode", _mock_decode)
 @pytest.mark.parametrize(
     "login_kwargs,expected_login",
