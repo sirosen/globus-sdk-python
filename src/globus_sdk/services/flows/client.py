@@ -52,6 +52,10 @@ class FlowsClient(client.BaseClient):
     scopes = FlowsScopes
     default_scope_requirements = [FlowsScopes.all]
 
+    # annotate but do not assign 'resource_server'
+    # because we know that the classproperty of this name will evaluate to a string
+    resource_server: str
+
     def create_flow(
         self,
         title: str,

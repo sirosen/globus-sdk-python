@@ -34,6 +34,10 @@ class TimersClient(client.BaseClient):
     scopes = TimersScopes
     default_scope_requirements = [TimersScopes.timer]
 
+    # annotate but do not assign 'resource_server'
+    # because we know that the classproperty of this name will evaluate to a string
+    resource_server: str
+
     def add_app_transfer_data_access_scope(
         self, collection_ids: uuid.UUID | str | t.Iterable[uuid.UUID | str]
     ) -> TimersClient:
