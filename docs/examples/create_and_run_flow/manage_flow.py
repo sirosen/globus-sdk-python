@@ -8,14 +8,8 @@ import globus_sdk
 CLIENT_ID = "61338d24-54d5-408f-a10d-66c06b59f6d2"
 
 
-def get_flows_client(app: globus_sdk.GlobusApp) -> globus_sdk.FlowsClient:
-    return globus_sdk.FlowsClient(
-        app=app, app_scopes=[globus_sdk.FlowsClient.scopes.manage_flows]
-    )
-
-
 def create_flow(app: globus_sdk.GlobusApp, args: argparse.Namespace) -> None:
-    with get_flows_client(app) as flows_client:
+    with globus_sdk.FlowsClient(app=app) as flows_client:
         print(
             flows_client.create_flow(
                 title=args.title,
@@ -39,12 +33,12 @@ def create_flow(app: globus_sdk.GlobusApp, args: argparse.Namespace) -> None:
 
 
 def delete_flow(app: globus_sdk.GlobusApp, args: argparse.Namespace) -> None:
-    with get_flows_client(app) as flows_client:
+    with globus_sdk.FlowsClient(app=app) as flows_client:
         print(flows_client.delete_flow(args.flow_id))
 
 
 def list_flows(app: globus_sdk.GlobusApp) -> None:
-    with get_flows_client(app) as flows_client:
+    with globus_sdk.FlowsClient(app=app) as flows_client:
         for flow in flows_client.list_flows(filter_roles="flow_owner"):
             print(f"title: {flow['title']}")
             print(f"id: {flow['id']}")
