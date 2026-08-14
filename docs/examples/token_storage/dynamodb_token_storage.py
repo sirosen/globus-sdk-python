@@ -21,7 +21,7 @@ parser.add_argument(
 boto_client = boto3.client("dynamodb")
 
 
-class DynamoDBStorageAdapter(TokenStorage):
+class DynamoDBTokenStorage(TokenStorage):
 
     def __init__(
         self, client: t.Any, tablename: str, namespace: str = "DEFAULT"
@@ -197,5 +197,5 @@ if __name__ == "__main__":
     if args.create:
         create_table()
     else:
-        storage = DynamoDBStorageAdapter(boto_client, tablename)
+        storage = DynamoDBTokenStorage(boto_client, tablename)
         group_list(storage)

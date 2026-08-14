@@ -1,16 +1,16 @@
 .. _example_token_storage:
 
-Token Storage Adapters
-======================
+Token Storage objects
+=====================
 
 DynamoDB Token Storage
 ----------------------
 
-The following example demonstrates a token storage adapter which uses AWS
-DynamoDB as the backend storage mechanism.
+The following example demonstrates a token storage which uses AWS DynamoDB as
+the backend storage mechanism.
 
-Unlike the builtin adapters for JSON and sqlite, enumerating tokens in storage
-is not a desirable operation.
+Unlike the builtin storage interfaces for JSON and sqlite, enumerating tokens in
+a DyanmoDB table-backed storage is not a desirable operation.
 DynamoDB functions as a key-value store, and can efficiently map keys,
 but features slow sequential scans for enumeration.
 
