@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-
 import argparse
 import datetime
 
 import globus_sdk
-from globus_sdk.experimental.globus_app import UserApp
 
 # Tutorial Client ID - <replace this with your own client>
 NATIVE_CLIENT_ID = "61338d24-54d5-408f-a10d-66c06b59f6d2"
-USER_APP = UserApp("manage-timers-example", client_id=NATIVE_CLIENT_ID)
 
 
 def uses_data_access(transfer_client, collection_id):
@@ -40,9 +36,19 @@ def main():
     )
     args = parser.parse_args()
 
-    timers_client = globus_sdk.TimersClient(app=USER_APP)
-    transfer_client = globus_sdk.TransferClient(app=USER_APP)
+    with globus_sdk.UserApp("manage-timers-example", client_id=NATIVE_CLIENT_ID) as app:
+        with (
+            globus_sdk.TimersClient(app=app) as timers_client,
+            globus_sdk.TransferClient(app=app) as transfer_client,
+        ):
+            create_timer(timers_client, transfer_client, args)
 
+
+def create_timer(
+    timers_client: globus_sdk.TimersClient,
+    transfer_client: globus_sdk.TransferClient,
+    args: argparse.Namespace,
+) -> None:
     # check if the source or destination use 'data_access' scopes
     # if so, register these requirements with the app
     if uses_data_access(transfer_client, args.SOURCE_COLLECTION):
