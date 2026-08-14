@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-
 import argparse
 import datetime
 
 import globus_sdk
-from globus_sdk.experimental.globus_app import UserApp
 
 # Tutorial Client ID - <replace this with your own client>
 NATIVE_CLIENT_ID = "61338d24-54d5-408f-a10d-66c06b59f6d2"
-USER_APP = UserApp("manage-timers-example", client_id=NATIVE_CLIENT_ID)
 
 
 def main():
@@ -31,8 +27,12 @@ def main():
     )
     args = parser.parse_args()
 
-    client = globus_sdk.TimersClient(app=USER_APP)
+    with globus_sdk.UserApp("manage-timers-example", client_id=NATIVE_CLIENT_ID) as app:
+        with globus_sdk.TimersClient(app=app) as client:
+            create_timer(client, args)
 
+
+def create_timer(client: globus_sdk.TimersClient, args: argparse.Namespace) -> None:
     body = globus_sdk.TransferData(
         source_endpoint=args.SOURCE_COLLECTION,
         destination_endpoint=args.DESTINATION_COLLECTION,
