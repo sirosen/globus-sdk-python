@@ -85,6 +85,7 @@ jobs:
               - "mypy-py3.14"
               - "mypy-py3.9"
               - "mypy-test"
+              - "mypy-docs"
               - "poetry-check"
               - "pylint"
               - "test-lazy-imports"
