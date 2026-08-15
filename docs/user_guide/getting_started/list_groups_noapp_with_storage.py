@@ -1,4 +1,5 @@
 import os
+import sys
 
 import globus_sdk
 from globus_sdk.token_storage import JSONTokenStorage
@@ -32,6 +33,10 @@ if not token_storage.file_exists():
 
 # load the tokens from the storage -- either freshly stored or loaded from disk
 token_data = token_storage.get_token_data(globus_sdk.GroupsClient.resource_server)
+if token_data is None or token_data.refresh_token is None:
+    print("error: token data was not present or was malformed")
+    print(f"       try removing the token file at {token_storage.filepath!r}")
+    sys.exit(1)
 
 # construct the RefreshTokenAuthorizer which writes back to storage on refresh
 authorizer = globus_sdk.RefreshTokenAuthorizer(
