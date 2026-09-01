@@ -2,6 +2,7 @@ import copy
 
 import pytest
 
+from globus_sdk.testing import get_response_set
 from globus_sdk.transport.representation_providers import RequestsRepresentationProvider
 
 
@@ -28,6 +29,30 @@ def test_deeply_nested_object_encoding(benchmark, depth, width):
             f"nested{i}": data if width == 1 else copy.deepcopy(data)
             for i in range(width)
         }
+
+    provider = RequestsRepresentationProvider()
+    method = "POST"
+    url = "https://example.api.globus.org/foo"
+    params = {}
+    headers = {}
+
+    benchmark(provider.encode, method, url, params, data, headers)
+
+
+# Use known response objects as "typical" JSON blobs.
+# These aren't a perfect representative sample, but they're more realistically similar
+# to request data than fully synthetic object graphs.
+@pytest.mark.parametrize(
+    "response_lookup_path",
+    (
+        "auth.get_consents",
+        "transfer.create_tunnel",
+        "flows.get_run_logs",
+    ),
+)
+def test_typical_object_encoding(benchmark, response_lookup_path):
+    response_set = get_response_set(response_lookup_path)
+    data = response_set.lookup("default").json
 
     provider = RequestsRepresentationProvider()
     method = "POST"
