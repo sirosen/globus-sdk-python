@@ -15,7 +15,6 @@ SPECIAL_TOKENS = set("[]*")
 class ScopeGraph:
     def __init__(self) -> None:
         self.top_level_scopes: set[tuple[str, bool]] = set()
-        self.nodes: set[str] = set()
         self.edges: set[tuple[str, str, bool]] = set()
         self.adjacency_matrix: dict[str, set[tuple[str, str, bool]]] = defaultdict(set)
 
@@ -99,7 +98,6 @@ class ScopeGraph:
         while node_queue:
             tree_node = node_queue.pop()
             scope_string = tree_node.scope_string
-            graph.nodes.add(scope_string)
             for dep in tree_node.dependencies:
                 node_queue.append(dep)
                 graph.add_edge(scope_string, dep.scope_string, dep.optional)
