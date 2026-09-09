@@ -69,13 +69,13 @@ def test_get_authorize_url_for_authorization_code():
         requested_scopes=TransferScopes.all,
     )
 
-    silly_string = "ANANAS_IS_PINEAPPLE_BUT_BANANE_IS_BANANA"
+    value = ["apples", "bananas"]
 
     authorize_url = flow_manager.get_authorize_url()
     assert authorize_url.startswith("https://auth.globus.org")
-    assert silly_string not in authorize_url
+    assert "session_required_identities=" not in authorize_url
 
-    silly_authorize_url = flow_manager.get_authorize_url(
-        query_params={"silly_string": silly_string}
+    fruity_authorize_url = flow_manager.get_authorize_url(
+        query_params={"session_required_identities": value}
     )
-    assert silly_string in silly_authorize_url
+    assert "session_required_identities=apples%2Cbananas" in fruity_authorize_url
