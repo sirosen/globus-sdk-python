@@ -270,12 +270,6 @@ class _CycleDetector:
         # The use of `iter()` copies the set of edges into a consumable iterator.
         self.visit_stack.append((node, iter(self.graph.adjacency_matrix[node])))
 
-    def __getitem__(self, key: str) -> _DetectorStates:
-        return self.node_states.get(key, _DetectorStates.UNVISITED)
-
-    def __setitem__(self, key: str, value: _DetectorStates) -> None:
-        self.node_states[key] = value
-
     def run(self) -> None:
         """
         Check the graph for cycles, and if one is detected immediately error.
@@ -290,11 +284,11 @@ class _CycleDetector:
         for start in self._start_nodes():
             # If we already proved this node out, because one root refers to another,
             # don't do any extra work.
-            if self[start] is _DetectorStates.PROVEN_NO_CYCLE:
+            if self.node_states.get(start) is _DetectorStates.PROVEN_NO_CYCLE:
                 continue
 
             # Now a traversal begins, starting from this root node.
-            self[start] = _DetectorStates.ON_CURRENT_PATH
+            self.node_states[start] = _DetectorStates.ON_CURRENT_PATH
 
             self._stack_push(start)
             while self.visit_stack:
@@ -305,13 +299,13 @@ class _CycleDetector:
 
                 # walk all of the out-edges
                 for _, dest, _ in edges:
-                    dest_state = self[dest]
+                    dest_state = self.node_states.get(dest, _DetectorStates.UNVISITED)
 
                     # if we found a destination on the current path, error!
                     if dest_state is _DetectorStates.ON_CURRENT_PATH:
                         raise ScopeCycleError(f"A cycle was found involving '{dest}'")
                     elif dest_state is _DetectorStates.UNVISITED:
-                        self[dest] = _DetectorStates.ON_CURRENT_PATH
+                        self.node_states[dest] = _DetectorStates.ON_CURRENT_PATH
                         self._stack_push(dest)
                         break
                     else:  # _DetectorStates.PROVEN_NO_CYCLE
@@ -322,5 +316,5 @@ class _CycleDetector:
                 # Mark off the current node, pop the stack, and let the next round of
                 # iteration resume exploration of the graph.
                 else:
-                    self[current_node] = _DetectorStates.PROVEN_NO_CYCLE
+                    self.node_states[current_node] = _DetectorStates.PROVEN_NO_CYCLE
                     self.visit_stack.pop()
