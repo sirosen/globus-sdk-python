@@ -6,6 +6,7 @@ from unittest import mock
 import pytest
 
 import globus_sdk
+from globus_sdk import MISSING
 from globus_sdk.scopes import TransferScopes
 from globus_sdk.services.auth.flow_managers.authorization_code import (
     GlobusAuthorizationCodeFlowManager,
@@ -69,13 +70,82 @@ def test_get_authorize_url_for_authorization_code():
         requested_scopes=TransferScopes.all,
     )
 
-    silly_string = "ANANAS_IS_PINEAPPLE_BUT_BANANE_IS_BANANA"
+    value = ["apples", "bananas"]
 
     authorize_url = flow_manager.get_authorize_url()
     assert authorize_url.startswith("https://auth.globus.org")
-    assert silly_string not in authorize_url
+    assert "session_required_identities=" not in authorize_url
 
-    silly_authorize_url = flow_manager.get_authorize_url(
-        query_params={"silly_string": silly_string}
+    fruity_authorize_url = flow_manager.get_authorize_url(
+        query_params={"session_required_identities": value}
     )
-    assert silly_string in silly_authorize_url
+    assert "session_required_identities=apples%2Cbananas" in fruity_authorize_url
+
+
+@pytest.mark.parametrize("parameter", ("base_query_params", "query_params"))
+@pytest.mark.parametrize(
+    "key",
+    (
+        "session_required_identities",
+        "session_required_single_domain",
+        "session_required_policies",
+    ),
+)
+def test_get_authorize_url_formatting(parameter, key):
+    """
+    Verify 'session_required_*' values are comma-joined.
+
+    Prioritization of *query_params* over *base_query_params* is also tested
+    by confirming that the "wrong-value" in *base_query_params* is overridden
+    when the *key* is set in *query_params*.
+    """
+
+    # Arrange
+    parameters = {
+        "base_url": "https://auth.globus.org/",
+        "base_query_params": {
+            "session_required_identities": "wrong-value",
+            "session_required_single_domain": "wrong-value",
+            "session_required_policies": "wrong-value",
+        },
+        "query_params": {},
+    }
+    parameters[parameter][key] = ["correct", "value"]
+
+    # Act
+    url = GlobusAuthorizationCodeFlowManager._get_authorize_url(**parameters)
+
+    # Assert
+    assert f"{key}=correct%2Cvalue" in url
+
+
+@pytest.mark.parametrize("parameter", ("base_query_params", "query_params"))
+@pytest.mark.parametrize(
+    "key",
+    (
+        "session_required_identities",
+        "session_required_single_domain",
+        "session_required_policies",
+    ),
+)
+@pytest.mark.parametrize("value", (MISSING, None, []))
+def test_get_authorize_url_exclusions(key, parameter, value):
+    """Verify false-y 'session_required_*' values not serialized."""
+
+    # Arrange
+    parameters = {
+        "base_url": "https://auth.globus.org/",
+        "base_query_params": {
+            "session_required_identities": "wrong-value",
+            "session_required_single_domain": "wrong-value",
+            "session_required_policies": "wrong-value",
+        },
+        "query_params": {},
+    }
+    parameters[parameter][key] = value
+
+    # Act
+    url = GlobusAuthorizationCodeFlowManager._get_authorize_url(**parameters)
+
+    # Assert
+    assert f"{key}=" not in url
