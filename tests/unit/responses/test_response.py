@@ -196,14 +196,14 @@ def test_len_array_bad_data(dict_response, json_response_factory):
             "Cannot take len() on ArrayResponse data when type is 'NoneType'"
         ),
     ):
-        len(null_array)
+        len(null_array)  # noqa: B018
 
     dict_array = ArrayResponse(dict_response.r)
     with pytest.raises(
         TypeError,
         match=re.escape("Cannot take len() on ArrayResponse data when type is 'dict'"),
     ):
-        len(dict_array)
+        len(dict_array)  # noqa: B018
 
 
 def test_iter_array_bad_data(dict_response, json_response_factory):
