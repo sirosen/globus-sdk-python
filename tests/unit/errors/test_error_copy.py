@@ -2,7 +2,7 @@
 Several errors define `__reduce__` to ensure that they are pickleable.
 
 These tests ensure that we can copy without errors and that the results compare equal
-under some definition of "equal" (which may be specific top the error type).
+under some definition of "equal" (which may be specific to the error type).
 """
 
 import copy
