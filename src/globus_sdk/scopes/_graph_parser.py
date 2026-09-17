@@ -237,8 +237,10 @@ def _peek_enumerate(data: str | list[str]) -> t.Iterator[tuple[int, str, str | N
     if not data:
         return
 
-    prev: str = data[0]
-    for idx, c in enumerate(data[1:]):
+    iterator = enumerate(data, start=-1)
+    prev: str
+    _, prev = next(iterator)
+    for idx, c in iterator:
         yield (idx, prev, c)
         prev = c
 
