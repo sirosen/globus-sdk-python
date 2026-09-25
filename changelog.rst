@@ -12,6 +12,31 @@ to a major new version of the SDK.
 
 .. scriv-insert-here
 
+.. _changelog-4.9.1:
+
+v4.9.1 (2026-09-23)
+===================
+
+Changed
+-------
+
+- Scope parser speed has been improved when parsing deep scope strings. (:pr:`1428`)
+
+Fixed
+-----
+
+- Fix a ``RecursionError`` that occurs with deeply-nested request bodies. (:pr:`1423`)
+
+- Format and filter ``session_required_*`` query parameters
+  when generating authorization URLs. (:pr:`1430`)
+
+Documentation
+-------------
+
+- All example files in the globus-sdk documentation are now required to pass
+  type checking. Documentation examples will feature type annotations where they
+  are instructive and clarifying. (:pr:`1422`)
+
 .. _changelog-4.9.0:
 
 v4.9.0 (2026-08-10)
