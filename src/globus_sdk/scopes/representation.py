@@ -13,7 +13,7 @@ else:
     _add_dataclass_kwargs: dict[str, bool] = {}
 
 
-_BAD_SCOPE_CHARS_PATTERN: re.Pattern[str] = re.compile(r"(?:[\[\]\* ])")
+_BAD_SCOPE_CHARS_PATTERN: re.Pattern[str] = re.compile(r"[\[\]* ]")
 
 
 @dataclasses.dataclass(frozen=True, repr=False, **_add_dataclass_kwargs)
